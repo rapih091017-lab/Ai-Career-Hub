@@ -1,72 +1,20 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { jwtVerify } from "jose";
 
-/* ───────── Protected Routes ───────── */
-const PROTECTED_ROUTES = ["/dashboard", "/builder", "/profile", "/portfolio", "/settings", "/cv"];
-const AUTH_ROUTES = ["/login"];
+/* ───────── Auth API prefix (jangan diotak-atik middleware) ───────── */
 const AUTH_API_PREFIX = "/api/auth";
 
 /**
- * Edge-compatible auth check.
- * Uses jose (Edge-safe) to verify NextAuth JWT directly,
- * instead of importing auth() which pulls bcryptjs + postgres (Node.js only).
+ * Middleware — hanya handle security headers.
+ * Auth protection dilakukan oleh AuthGuard component di client-side.
+ * (Middleware tidak bisa verify NextAuth JWT dengan reliable di Edge Runtime)
  */
-async function getSessionFromToken(request: NextRequest) {
-  // NextAuth v5 stores the JWT in a cookie.
-  // On HTTPS (Vercel production), it uses __Secure- prefix.
-  const cookieNames = [
-    "__Secure-authjs.session-token",
-    "authjs.session-token",
-    "__Host-authjs.session-token",
-  ];
-  let token: string | undefined;
-  for (const name of cookieNames) {
-    const val = request.cookies.get(name)?.value;
-    if (val) {
-      token = val;
-      break;
-    }
-  }
-  if (!token) return null;
-
-  try {
-    const AUTH_SECRET = process.env.AUTH_SECRET;
-    if (!AUTH_SECRET) return null;
-
-    const secret = new TextEncoder().encode(AUTH_SECRET);
-    const { payload } = await jwtVerify(token, secret);
-    return payload;
-  } catch {
-    return null;
-  }
-}
-
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // ── Skip auth checks for OAuth callback URLs ──
+  // ── Skip OAuth callback URLs ──
   if (pathname.startsWith(AUTH_API_PREFIX)) {
     return NextResponse.next();
-  }
-
-  // ── Check session via JWT (Edge-safe) ──
-  const session = await getSessionFromToken(request);
-  const isAuthenticated = !!session?.sub;
-
-  // ── Auth: protect routes ──
-  const isProtected = PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
-  const isAuthPage = AUTH_ROUTES.some((route) => pathname.startsWith(route));
-
-  if (isProtected && !isAuthenticated) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  // ── Auth: redirect logged-in users away from login ──
-  if (isAuthPage && isAuthenticated) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
   // ── Security Headers ──
