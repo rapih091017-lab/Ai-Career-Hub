@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -161,36 +162,46 @@ export default function AppHeader() {
         </div>
       </div>
 
-      {/* Mobile Nav */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden bg-white border-t border-outline-variant/10 px-margin-mobile py-4 space-y-3">
-          {NAV_ITEMS.map((item) => {
-            const isActive = pathname === item.href;
-            return (
+      {/* Mobile Nav — with AnimatePresence */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+            className="md:hidden overflow-hidden bg-white border-t border-outline-variant/10"
+          >
+            <div className="px-margin-mobile py-4 space-y-3">
+              {NAV_ITEMS.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className={`block px-4 py-2 rounded-lg font-label-bold transition-colors ${
+                      isActive
+                        ? "bg-primary/10 text-primary"
+                        : "text-on-surface-variant hover:bg-surface-container"
+                    }`}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+              <hr className="border-outline-variant/30 my-2" />
               <Link
-                key={item.label}
-                href={item.href}
-                className={`block px-4 py-2 rounded-lg font-label-bold transition-colors ${
-                  isActive
-                    ? "bg-primary/10 text-primary"
-                    : "text-on-surface-variant hover:bg-surface-container"
-                }`}
+                href="/settings/profile"
+                className="block px-4 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors font-label-bold"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                {item.label}
+                {t("header.settings")}
               </Link>
-            );
-          })}
-          <hr className="border-outline-variant/30 my-2" />
-          <Link
-            href="/settings/profile"
-            className="block px-4 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors font-label-bold"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            {t("header.settings")}
-          </Link>
-        </div>
-      )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
     </>
   );
