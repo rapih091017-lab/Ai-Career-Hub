@@ -1,0 +1,30 @@
+# Railway Nixpacks Configuration
+# Installs Chromium system dependencies for Puppeteer PDF generation.
+
+[phases.setup]
+nixPkgs = [
+  "chromium",
+  "nss",
+  "nspr",
+  "atk",
+  "cups",
+  "libdrm",
+  "libxkbcommon",
+  "libxcomposite",
+  "libxdamage",
+  "libxfixes",
+  "libxrandr",
+  "alsa-lib",
+  "pango",
+  "cairo",
+  "at-spi2-core",
+  "libx11",
+  "libxcb",
+  "libxshmfence",
+  "mesa",
+  "libglvnd"
+]
+
+[variables]
+PUPPETEER_EXECUTABLE_PATH = "/usr/bin/chromium"
+PDF_SERVER_PORT = "3001"

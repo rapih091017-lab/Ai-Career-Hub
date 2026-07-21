@@ -1,26 +1,439 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+/* Fonts: Geist via geist/font/sans, Plus Jakarta Sans via next/font/google */
+/* Material Symbols CDN via <link> in layout.tsx (faster than CSS @import) */
+
+body {
+  font-family: "Geist", "Inter", sans-serif;
+  background-color: #fbf8fe;
+  color: #1b1b1f;
+}
+
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  vertical-align: middle;
+}
+
+/* Custom utility classes from design system */
+.hero-gradient {
+  background: radial-gradient(circle at top right, rgba(13, 115, 119, 0.05), transparent 40%),
+              radial-gradient(circle at bottom left, rgba(13, 115, 119, 0.05), transparent 40%);
+}
+
+.ai-border {
+  border: 1px solid rgba(13, 115, 119, 0.2);
+}
+
+.mask-faded-vertical {
+  mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+}
+
+.ambient-card-shadow {
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 10px -2px rgba(13, 115, 119, 0.05);
+}
+
+.soft-shadow {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.floating-shadow {
+  box-shadow: 0 12px 32px rgba(13, 115, 119, 0.08);
+}
+
+.shadow-soft {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.shadow-elevated {
+  box-shadow: 0 20px 48px -12px rgba(13, 115, 119, 0.12);
+}
+
+.shadow-card {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.blur-orb {
+  filter: blur(100px);
+  opacity: 0.15;
+  position: absolute;
+  border-radius: 9999px;
+  z-index: -1;
+}
+
+/* Accordion */
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out, padding 0.3s ease;
+}
+
+/* Focus styles */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand palette - Committed strategy (Teal) */
+  --color-focus-ring: #0d7377;
+  --color-primary-deep: #085955;
+  --color-accent: #e85d75;
+  --color-accent-soft: #fef0f3;
+  --color-muted: #6d7a79;
+  --color-surface-elevated: #ffffff;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Premium shadow tokens */
+.shadow-premium-sm {
+  box-shadow: 0 2px 8px rgba(13, 115, 119, 0.06), 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+.shadow-premium-md {
+  box-shadow: 0 4px 16px rgba(13, 115, 119, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+.shadow-premium-lg {
+  box-shadow: 0 12px 32px -8px rgba(13, 115, 119, 0.12), 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--color-focus-ring) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-focus-ring) 10%, transparent);
+}
+
+/* Focus-visible: keyboard focus ring */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #ccc3d4;
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #7b7483;
+}
+
+/* A4 Preview */
+.a4-preview {
+  width: 210mm;
+  min-height: 297mm;
+  padding: 20mm;
+  background: white;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+/* Page break indicator — shown when content exceeds one page */
+.a4-preview.has-multi-page::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 297mm;
+  border-top: 2px dashed #d0d0d0;
+  margin: 0 15mm;
+  pointer-events: none;
+}
+
+/* Page number indicator */
+.a4-preview-page-num {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: #999;
+  font-weight: 500;
+  padding: 2px 8px;
+  background: rgba(255,255,255,0.9);
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
+  transition: all 0.2s;
+}
+.a4-preview-page-num.active {
+  color: #0d7377;
+  border-color: #0d7377;
+  background: rgba(13,115,119,0.08);
+}
+
+/* Page navigation bar */
+.page-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  background: white;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.page-nav-btn:hover:not(:disabled) {
+  border-color: #0d7377;
+  color: #0d7377;
+  background: rgba(13,115,119,0.05);
+}
+.page-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* Page break in print */
+.cv-page-break {
+  page-break-before: always;
+  break-before: page;
+}
+
+/* Preview section hover — click to edit */
+.a4-preview .cv-section-hover:hover {
+  background-color: rgba(13, 115, 119, 0.04);
+  cursor: pointer;
+}
+.a4-preview .cv-section-hover {
+  transition: background-color 0.15s ease;
+}
+
+/* Hide scrollbar for scrollable tag clouds */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Glass card */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Theme card hover */
+.theme-card-hover {
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.theme-card-hover:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 24px 48px -12px rgba(13, 115, 119, 0.15);
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ── Print-style PDF export — CSS @page + window.print() ── */
+
+/* Dynamic @page margin di-set via JS (style injection), ini hanya style pelengkap */
+
+@media print {
+  /* Sembunyikan semua UI chrome saat print CV */
+  .printing-cv,
+  .printing-cv * {
+    visibility: hidden;
+  }
+
+  .printing-cv .a4-preview,
+  .printing-cv .a4-preview *,
+  .printing-cv .print-target,
+  .printing-cv .print-target * {
+    visibility: visible;
+  }
+
+  .printing-cv .a4-preview {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: 210mm;
+    min-height: 297mm;
+    height: auto;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    background: white !important;
+    transform: none !important;
+    scale: none !important;
+    overflow: visible !important;
+    max-height: none !important;
+  }
+
+  .printing-cv .a4-preview [data-page-indicator] {
+    display: none !important;
+  }
+
+  .printing-cv .a4-preview [style*="background-image: repeating-linear-gradient"] {
+    background-image: none !important;
+  }
+
+  /* ── Generic print target (checker reports, etc.) ── */
+  .printing-cv .print-target {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 640px;
+    background: white !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Reset card styling for print — convert colored backgrounds to clean white */
+  .printing-cv .print-target [class*="bg-green-"],
+  .printing-cv .print-target [class*="bg-red-"],
+  .printing-cv .print-target [class*="bg-blue-"],
+  .printing-cv .print-target [class*="bg-purple-"],
+  .printing-cv .print-target [class*="bg-orange-"],
+  .printing-cv .print-target [class*="bg-surface-"],
+  .printing-cv .print-target .shadow-premium-md {
+    box-shadow: none !important;
+    border-width: 1px !important;
+    border-style: solid !important;
+    border-color: #d0d0d0 !important;
+    background: #ffffff !important;
+    page-break-inside: avoid;
+  }
+
+  /* Preserve colored TEXT, just remove colored BACKGROUNDS for print */
+  .printing-cv .print-target .text-green-700,
+  .printing-cv .print-target .text-red-700,
+  .printing-cv .print-target .text-blue-700,
+  .printing-cv .print-target .text-purple-700,
+  .printing-cv .print-target .text-orange-700 {
+    color: #333333 !important;
+  }
+
+  /* Don't print CTA banner — it's a UI prompt, not part of the report */
+  .printing-cv .print-target [class*="bg-gradient-to-br from-primary"] {
+    display: none !important;
+  }
+
+  /* Prevent donut animation from breaking — ensure static rendering */
+  .printing-cv .print-target svg {
+    shape-rendering: geometricPrecision;
+  }
+
+  /* Pastikan page break alami bekerja */
+  .printing-cv .cv-page-break {
+    page-break-before: always;
+    break-before: page;
+  }
+
+  /* Hindari orphan section headers */
+  .printing-cv h2, 
+  .printing-cv h3,
+  .printing-cv h4 {
+    page-break-after: avoid;
+  }
+
+  .printing-cv li,
+  .printing-cv p {
+    page-break-inside: avoid;
+  }
+}
+
+/* Custom keyframes */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(2px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+@keyframes thinking-dots {
+  0%, 20% { opacity: 0; transform: translateY(4px); }
+  50% { opacity: 1; transform: translateY(0); }
+  80%, 100% { opacity: 0; transform: translateY(-2px); }
+}
+
+@keyframes loading-bar {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(0%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes shimmer-slow {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(13, 115, 119, 0.3); }
+  70% { box-shadow: 0 0 0 8px rgba(13, 115, 119, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(13, 115, 119, 0); }
+}
+
+/* Selection */
+::selection {
+  background-color: #c5f5f3;
+  color: #1a1c1c;
+}
+
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

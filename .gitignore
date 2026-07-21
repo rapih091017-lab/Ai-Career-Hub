@@ -23,6 +23,25 @@
 # misc
 .DS_Store
 *.pem
+nul
+
+# log files
+*.log
+nextdev.log
+pinchtab-server.log
+
+# personal files
+/public/*.pdf
+screenshot-*.jpg
+screenshot-*.png
+
+# project documentation (not needed for deployment)
+DESIGN.md
+PRODUCT.md
+skills-lock.json
+
+# temp scripts
+check_db.js
 
 # debug
 npm-debug.log*
@@ -35,6 +54,10 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# agent skill caches
+.agents/
+.impeccable/
 
 # typescript
 *.tsbuildinfo
