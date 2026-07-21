@@ -416,7 +416,7 @@ function PricingCard({ plan, delay, onSelectPlan, mode, tFn }: {
       onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}
       className={"relative flex flex-col rounded-2xl transition-all duration-300 " + (
         plan.featured
-          ? "scale-[1.02] lg:scale-105 z-10 border-2 border-primary shadow-[0_8px_32px_rgba(13,115,119,0.15)] dark:shadow-[0_8px_32px_rgba(124,58,237,0.3)]"
+          ? "lg:scale-105 z-10 border-2 border-primary shadow-[0_8px_32px_rgba(13,115,119,0.15)] dark:shadow-[0_8px_32px_rgba(124,58,237,0.3)]"
           : "border border-outline-variant/40 dark:border-gray-700 shadow-premium-sm hover:shadow-premium-md"
       ) + " " + (isHovered ? "translate-y-[-4px]" : "") + " bg-white dark:bg-[#1A1A2E] dark:text-white"}>
       {/* Badge */}

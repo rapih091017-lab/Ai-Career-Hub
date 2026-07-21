@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useMemo, useState } from "react";
-import { motion, useScroll, useTransform, useInView } from "motion/react";
+import { motion, AnimatePresence, useScroll, useTransform, useInView } from "motion/react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import AppFooter from "@/components/AppFooter";
@@ -65,9 +65,19 @@ export default function Home() {
   const secondColumn = testimonials.slice(3, 6);
   const thirdColumn = testimonials.slice(6, 9);
 
+  // Mobile hamburger menu
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   // Hydration-safe mount flag — prevents session-based SSR mismatch
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    const handleRoute = () => setMobileMenuOpen(false);
+    window.addEventListener("popstate", handleRoute);
+    return () => window.removeEventListener("popstate", handleRoute);
+  }, []);
 
   // Floating notification state
   const [showNotif, setShowNotif] = useState(false);
@@ -104,14 +114,24 @@ export default function Home() {
             <button onClick={toggleLang}
               className="w-9 h-9 rounded-lg border border-outline-variant/40 text-[11px] font-bold uppercase tracking-wider hover:bg-surface-container transition-colors"
               title="Switch language">{lang === "id" ? "EN" : "ID"}</button>
+
+            {/* Mobile Hamburger — md:hidden */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden w-10 h-10 rounded-xl border border-outline-variant/30 flex items-center justify-center hover:bg-surface-container transition-colors"
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            >
+              <span className="material-symbols-outlined text-xl">{mobileMenuOpen ? "close" : "menu"}</span>
+            </button>
+
             {!mounted ? (
               /* ── Skeleton same on server & client — prevents hydration mismatch ── */
-              <div className="flex items-center gap-3">
+              <div className="hidden md:flex items-center gap-3">
                 <div className="w-[88px] h-[38px] bg-surface-container-high rounded-lg animate-pulse" />
                 <div className="w-11 h-11 rounded-full bg-surface-container-high animate-pulse" />
               </div>
             ) : session ? (
-              <div className="flex items-center gap-3">
+              <div className="hidden md:flex items-center gap-3">
                 <MagneticButton>
                   <Link href="/dashboard" className="bg-primary text-on-primary px-5 py-2.5 rounded-lg font-label-bold hover:opacity-90 active:scale-95 transition-all shadow-sm cursor-pointer block">{t("nav.dashboard")}</Link>
                 </MagneticButton>
@@ -122,18 +142,50 @@ export default function Home() {
               </div>
             ) : (
               <>
-                <Link href="/login" className="text-on-surface-variant hover:text-primary font-label-bold transition-colors cursor-pointer">{t("nav.login")}</Link>
+                <Link href="/login" className="hidden md:inline text-on-surface-variant hover:text-primary font-label-bold transition-colors cursor-pointer">{t("nav.login")}</Link>
                 <MagneticButton>
-                  <Link href="/login" className="bg-on-background text-white px-6 py-2.5 rounded-lg font-label-bold hover:opacity-90 active:scale-95 transition-all shadow-sm cursor-pointer block">{t("nav.try-free")}</Link>
+                  <Link href="/login" className="hidden md:block bg-on-background text-white px-6 py-2.5 rounded-lg font-label-bold hover:opacity-90 active:scale-95 transition-all shadow-sm cursor-pointer">{t("nav.try-free")}</Link>
                 </MagneticButton>
               </>
             )}
           </div>
         </div>
+
+        {/* Mobile Menu Overlay */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
+              className="md:hidden overflow-hidden bg-white/95 backdrop-blur-lg border-t border-outline-variant/10"
+            >
+              <div className="px-margin-mobile py-4 flex flex-col gap-2">
+                <a onClick={() => setMobileMenuOpen(false)} className="w-full px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all text-left" href="#features">{t("nav.features")}</a>
+                <a onClick={() => setMobileMenuOpen(false)} className="w-full px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all text-left" href="#pricing">{t("nav.pricing")}</a>
+                <a onClick={() => setMobileMenuOpen(false)} className="w-full px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all text-left" href="#how-it-works">{t("nav.how-it-works")}</a>
+                <a onClick={() => setMobileMenuOpen(false)} className="w-full px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all text-left" href="/dashboard">{t("nav.dashboard")}</a>
+                <a onClick={() => setMobileMenuOpen(false)} className="w-full px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all text-left" href="/karir">{t("nav.karir")}</a>
+                <hr className="border-outline-variant/20 my-2" />
+                {!mounted ? null : session ? (
+                  <Link onClick={() => setMobileMenuOpen(false)} href="/profile" className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all">
+                    <span className="material-symbols-outlined text-lg">person</span>
+                    Profile
+                  </Link>
+                ) : (
+                  <Link onClick={() => setMobileMenuOpen(false)} href="/login" className="w-full px-4 py-3 bg-primary text-on-primary rounded-xl font-label-bold text-center block">
+                    {t("nav.try-free")}
+                  </Link>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* ── Hero ── */}
-      <header id="hero" ref={heroRef} className="relative min-h-[95vh] flex items-center overflow-hidden bg-gradient-to-b from-white via-primary/[0.02] to-white pt-32 pb-16 md:pb-24">
+      <header id="hero" ref={heroRef} className="relative min-h-[90vh] md:min-h-[95vh] flex items-center overflow-hidden bg-gradient-to-b from-white via-primary/[0.02] to-white pt-24 md:pt-32 pb-16 md:pb-24">
         {/* Animated grid pattern */}
         <motion.div className="absolute inset-0 pointer-events-none opacity-[0.04]"
           animate={{ backgroundPosition: ["0px 0px", "0px 60px"] }}

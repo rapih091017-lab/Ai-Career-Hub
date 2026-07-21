@@ -24,7 +24,7 @@ export default function AnimatedNotification({
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: 100, opacity: 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="fixed bottom-6 right-6 z-50 max-w-xs bg-white rounded-xl shadow-2xl border border-outline-variant/20 p-4 flex items-start gap-3 cursor-pointer"
+          className="fixed bottom-20 md:bottom-6 right-3 md:right-6 z-[60] max-w-[280px] md:max-w-xs bg-white rounded-xl shadow-2xl border border-outline-variant/20 p-3 md:p-4 flex items-start gap-3 cursor-pointer"
           onClick={onClose}
         >
           <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">

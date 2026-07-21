@@ -66,7 +66,7 @@ export default function AppFooter({ variant = "simple", bordered = false }: AppF
 
   return (
     <footer
-      className={`flex flex-col items-center gap-4 w-full max-w-[600px] mx-auto px-5 md:px-10 py-12 text-sm ${
+      className={`flex flex-col items-center gap-4 w-full max-w-[600px] mx-auto px-5 md:px-10 py-12 pb-24 md:pb-12 text-sm ${
         bordered ? "bg-background mt-12 border-t border-outline-variant/30" : ""
       }`}
     >
