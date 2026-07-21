@@ -25,6 +25,12 @@ let nextConfig: NextConfig = {
 
   // Optimasi build
   compress: true,
+
+  // Skip ESLint saat build — TypeScript sudah handle type checking
+  // Fix Vercel ESLint patch compatibility
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 // Bundle analyzer: ANALYZE=true npm run build
