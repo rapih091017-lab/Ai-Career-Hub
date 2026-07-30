@@ -44,12 +44,24 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        // Tampilkan pesan error spesifik dari server jika ada
-        const errorMessages: Record<string, string> = {
-          "Akun Anda belum diaktifkan oleh admin. Silakan tunggu konfirmasi.": "Akun Anda belum diaktifkan oleh admin. Silakan tunggu konfirmasi.",
-          "AccessDenied": "Akun Anda belum diaktifkan oleh admin.",
-        };
-        setSignInError(errorMessages[result.error] || "Email atau password salah. Silakan coba lagi.");
+        // Cek apakah user pending — biar error message-nya tepat
+        try {
+          const statusRes = await fetch(
+            `/api/auth/check-status?email=${encodeURIComponent(signInEmail)}`
+          );
+          const statusData = await statusRes.json();
+          if (statusData.status === "pending") {
+            setSignInError(
+              "Akun Anda belum diaktifkan oleh admin. Silakan tunggu konfirmasi."
+            );
+          } else {
+            setSignInError(
+              "Email atau password salah. Silakan coba lagi."
+            );
+          }
+        } catch {
+          setSignInError("Email atau password salah. Silakan coba lagi.");
+        }
       } else {
         router.push("/dashboard");
         router.refresh();

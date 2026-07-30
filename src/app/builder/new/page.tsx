@@ -14,6 +14,16 @@ function BuilderNewFormContent() {
   const searchParams = useSearchParams();
   const templateId = searchParams.get("template");
 
+  // ── Back to checker review ──
+  const [checkerSource] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        return sessionStorage.getItem("checker_source");
+      } catch {}
+    }
+    return null;
+  });
+
   const [jobTitle, setJobTitle] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -74,6 +84,24 @@ function BuilderNewFormContent() {
 
   return (
     <>
+      {/* ── Back to Checker Review ── */}
+      {checkerSource && (
+        <div className="flex justify-start">
+          <button
+            onClick={() => {
+              try { sessionStorage.removeItem("checker_source"); } catch {}
+              router.push(checkerSource);
+            }}
+            className="inline-flex items-center gap-1.5 text-xs text-on-surface-variant hover:text-primary transition-colors group"
+          >
+            <span className="material-symbols-outlined text-[14px] group-hover:-translate-x-0.5 transition-transform">
+              arrow_back
+            </span>
+            Kembali ke Hasil Review CV
+          </button>
+        </div>
+      )}
+
       {/* Headline */}
       <div className="text-center space-y-3 pt-12">
         <h1 className="text-[28px] font-bold text-on-surface">{t("cv.new.title")}</h1>

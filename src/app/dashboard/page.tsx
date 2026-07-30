@@ -38,6 +38,14 @@ interface CVItem {
   updatedAt: string;
 }
 
+interface CheckerHistoryItem {
+  id: string;
+  scores: { overall: number; keywordGap: number; contextRelevance: number; atsRules: number };
+  aiFeedback: { keywordGap: string; contextRelevance: string; atsRules: string; summary: string };
+  createdAt: string;
+  jobDescription: string;
+}
+
 interface ProfileCompleteness {
   score: number;
   sections: { label: string; filled: boolean; key: string }[];
@@ -66,6 +74,8 @@ export default function DashboardPage() {
   const [isCreating, setIsCreating] = useState(false);
   const [confirmAction, setConfirmAction] = useState<ConfirmAction | null>(null);
   const [profileData, setProfileData] = useState<ProfileCompleteness | null>(null);
+  const [checkerHistory, setCheckerHistory] = useState<CheckerHistoryItem[]>([]);
+  const [checkerHistoryLoading, setCheckerHistoryLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<"all" | "has-title" | "no-title">("all");
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "name-asc" | "name-desc">("newest");
@@ -127,6 +137,15 @@ export default function DashboardPage() {
         }
       })
       .catch(() => {});
+  }, []);
+
+  /* ── Fetch checker history ── */
+  useEffect(() => {
+    fetch("/api/checker/history")
+      .then((res) => res.json())
+      .then((data) => setCheckerHistory(Array.isArray(data) ? data : []))
+      .catch(() => setCheckerHistory([]))
+      .finally(() => setCheckerHistoryLoading(false));
   }, []);
 
   const handleCreateCV = async (templateId: string, jobTitle?: string) => {
@@ -319,6 +338,63 @@ export default function DashboardPage() {
                       </button>
                     </motion.div>
                   ))}
+                </div>
+              </section>
+            )}
+
+            {/* ── Checker History ── */}
+            {checkerHistoryLoading ? (
+              <section className="mb-8">
+                <h2 className="font-headline-md text-on-surface mb-3">Riwayat Analisis CV</h2>
+                <div className="space-y-2">
+                  {[1,2,3].map((i) => (
+                    <div key={i} className="bg-white rounded-xl p-4 shadow-premium-sm border border-outline-variant/30 flex items-center gap-4 animate-pulse">
+                      <div className="w-14 h-14 rounded-full bg-surface-container-high shrink-0" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-3 bg-surface-container-high rounded w-3/4" />
+                        <div className="h-2 bg-surface-container-high rounded w-1/4" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ) : checkerHistory.length > 0 && (
+              <section className="mb-8">
+                <h2 className="font-headline-md text-on-surface mb-3">Riwayat Analisis CV</h2>
+                <div className="space-y-2">
+                  {checkerHistory.map((item, i) => {
+                    const score = item.scores.overall;
+                    const bgRing = score > 70 ? "bg-green-50 border-green-300" : score >= 40 ? "bg-amber-50 border-amber-300" : "bg-red-50 border-red-300";
+                    const txtColor = score > 70 ? "text-green-700" : score >= 40 ? "text-amber-700" : "text-red-700";
+                    return (
+                      <motion.div
+                        key={item.id}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.25, delay: i * 0.03 }}
+                        className="bg-white rounded-xl p-4 shadow-premium-sm border border-outline-variant/30 hover:shadow-premium-md hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-4 cursor-pointer"
+                        onClick={() => router.push(`/checker/${item.id}`)}
+                      >
+                        {/* Score ring — pakai threshold yang sama dengan ScoreDonut */}
+                        <div className={`shrink-0 w-14 h-14 rounded-full flex items-center justify-center font-extrabold text-sm border-2 ${bgRing}`}>
+                          <span className={txtColor}>{score}%</span>
+                        </div>
+
+                        {/* Info */}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-semibold text-on-surface truncate">
+                            {item.aiFeedback.summary?.slice(0, 80) || "Analisis CV selesai"}
+                          </p>
+                          <p className="text-[10px] text-on-surface-variant mt-0.5">
+                            {timeAgo(new Date(item.createdAt))}
+                          </p>
+                        </div>
+
+                        {/* Arrow */}
+                        <span className="material-symbols-outlined text-on-surface-variant text-sm shrink-0">chevron_right</span>
+                      </motion.div>
+                    );
+                  })}
                 </div>
               </section>
             )}

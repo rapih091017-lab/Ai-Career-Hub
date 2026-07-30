@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import AppHeader from "@/components/AppHeader";
@@ -28,37 +28,80 @@ export default function CheckerPage() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
   const [dragActive, setDragActive] = useState(false);
+  const [showShareToast, setShowShareToast] = useState(false);
+  const shareTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const donutRef = useRef<HTMLDivElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
-  /* ---- Donut entrance animation ---- */
+  const extractedTextRef = useRef<string | null>(null); // simpan untuk retry
+  
+  /* ---- Donut entrance animation (dengan cleanup agar bisa repeat) ---- */
   useEffect(() => {
     if (pageState === "results" && donutRef.current) {
       const el = donutRef.current;
       el.style.opacity = "0";
       el.style.transform = "scale(0.8)";
-      requestAnimationFrame(() => {
+      const raf = requestAnimationFrame(() => {
         el.style.transition = "opacity 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)";
         el.style.opacity = "1";
         el.style.transform = "scale(1)";
       });
+      return () => {
+        cancelAnimationFrame(raf);
+        el.style.transition = "none";
+      };
     }
   }, [pageState]);
 
   /* ---- Reset ---- */
-  const reset = () => {
+  const reset = useCallback(() => {
+    // Bersihkan sessionStorage
+    try {
+      sessionStorage.removeItem("prefill_jobDesc");
+      sessionStorage.removeItem("checker_score");
+      sessionStorage.removeItem("checker_source");
+    } catch {}
     setPageState("input");
     setFile(null);
     setJdText("");
     setResult(null);
     setError("");
     setLoading(false);
-  };
+    setUploadError("");
+    extractedTextRef.current = null;
+  }, []);
 
-  /* ---- Analyze ---- */
+  /* ---- Analyze (dengan retry support) ---- */
+  const doAnalyze = useCallback(async (extractedText: string) => {
+    const res = await fetch("/api/checker/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        extractedText,
+        jobDescription: jdText.trim(),
+        originalFileName: file?.name ?? "cv.pdf",
+      }),
+    });
+
+    const resText = await res.text();
+    let data: any;
+    try {
+      data = JSON.parse(resText);
+    } catch {
+      throw new Error("[analyze] Server error: " + resText.slice(0, 200));
+    }
+
+    if (!res.ok) {
+      throw new Error(data.message || data.error || t("checker.error-failed"));
+    }
+    return data as AnalysisResult;
+  }, [jdText, file, t]);
+
   const handleAnalyze = async () => {
     setError("");
+    setUploadError("");
     if (!file) {
       setError(t("checker.error-upload"));
       return;
@@ -70,57 +113,41 @@ export default function CheckerPage() {
 
     setLoading(true);
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const extractRes = await fetch("/api/checker/extract", {
-        method: "POST",
-        body: formData,
-      });
+      // ── Step 1: Extract ──
+      const cachedText = extractedTextRef.current;
+      let extractedText: string;
+      if (!cachedText) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const extractRes = await fetch("/api/checker/extract", {
+          method: "POST",
+          body: formData,
+        });
 
-      const extractText = await extractRes.text();
-      let extractData: any;
-      try {
-        extractData = JSON.parse(extractText);
-      } catch {
-        setError("[extract] Server error: " + extractText.slice(0, 200));
-        setLoading(false);
-        return;
+        const extractText = await extractRes.text();
+        let extractData: any;
+        try {
+          extractData = JSON.parse(extractText);
+        } catch {
+          setError("[extract] Server error: " + extractText.slice(0, 200));
+          setLoading(false);
+          return;
+        }
+
+        if (!extractRes.ok) {
+          setError(extractData.message || t("checker.error-failed"));
+          setLoading(false);
+          return;
+        }
+        extractedText = extractData.extractedText as string;
+        extractedTextRef.current = extractedText; // cache untuk retry
+      } else {
+        extractedText = cachedText;
       }
 
-      if (!extractRes.ok) {
-        setError(extractData.message || t("checker.error-failed"));
-        setLoading(false);
-        return;
-      }
-
-      const extractedText = extractData.extractedText;
-
-      const res = await fetch("/api/checker/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          extractedText,
-          jobDescription: jdText.trim(),
-          originalFileName: file.name,
-        }),
-      });
-
-      const resText = await res.text();
-      let data: any;
-      try {
-        data = JSON.parse(resText);
-      } catch {
-        setError("[analyze] Server error: " + resText.slice(0, 200));
-        setLoading(false);
-        return;
-      }
-
-      if (!res.ok) {
-        setError(data.message || data.error || t("checker.error-failed"));
-        setLoading(false);
-        return;
-      }
-      setResult(data as AnalysisResult);
+      // ── Step 2: Analyze ──
+      const data = await doAnalyze(extractedText);
+      setResult(data);
       setPageState("results");
     } catch (err: any) {
       setError(err.message || "Terjadi kesalahan");
@@ -129,10 +156,62 @@ export default function CheckerPage() {
     }
   };
 
+  /* ---- Retry tanpa re-upload ---- */
+  const handleRetry = useCallback(async () => {
+    if (!extractedTextRef.current) {
+      handleAnalyze();
+      return;
+    }
+    setError("");
+    setLoading(true);
+    try {
+      const data = await doAnalyze(extractedTextRef.current);
+      setResult(data);
+      setPageState("results");
+    } catch (err: any) {
+      setError(err.message || "Terjadi kesalahan");
+    } finally {
+      setLoading(false);
+    }
+  }, [doAnalyze]);
+
   /* ================================================================ */
-  /*  RENDER: Input Screen                                             */
+  /*  RENDER: Input Screen (or skeleton while loading)                  */
   /* ================================================================ */
   if (pageState === "input") {
+    // ── Show skeleton while analyzing ──
+    if (loading) {
+      return (
+        <div className="min-h-screen flex flex-col bg-background text-on-background">
+          <AppHeader />
+          <main className="flex-1 w-full max-w-[640px] mx-auto px-5 md:px-6 pt-20 pb-12 space-y-10">
+            <div className="animate-pulse space-y-10">
+              <div className="flex flex-col items-center">
+                <div className="w-48 h-48 rounded-full bg-surface-container-high mb-4" />
+                <div className="h-8 w-64 bg-surface-container-high rounded-lg mb-2" />
+                <div className="h-4 w-48 bg-surface-container-high rounded-lg" />
+              </div>
+              {[1,2,3,4,5].map((i) => (
+                <div key={i} className="bg-surface rounded-xl border border-surface-container-high p-4 space-y-2">
+                  <div className="flex justify-between">
+                    <div className="h-5 w-32 bg-surface-container-high rounded" />
+                    <div className="h-5 w-10 bg-surface-container-high rounded" />
+                  </div>
+                  <div className="h-2 w-full bg-surface-container rounded-full" />
+                </div>
+              ))}
+            </div>
+            <p className="text-center text-sm text-on-surface-variant">
+              <span className="material-symbols-outlined text-lg align-middle mr-1 animate-spin select-none">sync</span>
+              Menganalisis CV dengan AI...
+            </p>
+          </main>
+          <AppFooter />
+        </div>
+      );
+    }
+
+    // ── Normal input form ──
     return (
       <div className="min-h-screen flex flex-col bg-background text-on-background">
         <AppHeader />
@@ -148,14 +227,16 @@ export default function CheckerPage() {
               </p>
             </div>
 
-            <div className="bg-white rounded-xl p-6 md:p-10 flex flex-col gap-8 border border-outline-variant/50 shadow-premium-md">
+            <div className="bg-surface rounded-xl p-6 md:p-10 flex flex-col gap-8 border border-outline-variant/50 shadow-premium-md">
               <UploadZone
                 file={file}
                 dragActive={dragActive}
-                onFileChange={setFile}
+                onFileChange={(f) => { setFile(f); extractedTextRef.current = null; setUploadError(""); }}
                 onDragStateChange={setDragActive}
                 label={t("checker.upload-label")}
                 hint={t("checker.upload-hint")}
+                loading={loading}
+                error={uploadError}
               />
 
               <div className="flex flex-col gap-2">
@@ -172,7 +253,20 @@ export default function CheckerPage() {
               </div>
 
               {error && (
-                <p className="text-red-600 text-sm font-semibold text-center">{error}</p>
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-3">
+                  <span className="material-symbols-outlined text-red-500 text-sm mt-0.5 select-none">error</span>
+                  <div className="flex-1">
+                    <p className="text-red-700 text-sm font-semibold">{error}</p>
+                    {extractedTextRef.current && (
+                      <button
+                        onClick={handleRetry}
+                        className="mt-1 text-xs text-red-600 underline hover:text-red-800"
+                      >
+                        Coba Lagi
+                      </button>
+                    )}
+                  </div>
+                </div>
               )}
 
               <div className="flex flex-col items-center gap-4">
@@ -245,12 +339,12 @@ export default function CheckerPage() {
   const fitMeta = fitLabelMeta(fitLabel, t);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f8fafc] text-on-background">
+    <div className="min-h-screen flex flex-col bg-surface-container-low/50 text-on-background">
       <AppHeader />
 
       <main className="flex-1 w-full max-w-[640px] mx-auto px-5 md:px-6 pt-20 pb-12 space-y-10">
-        {/* ── Top Bar: Back + Download ── */}
-        <div className="flex items-center justify-between">
+        {/* ── Top Bar: Back + Share + Download ── */}
+        <div className="flex items-center justify-between gap-2">
           <button
             className="flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary transition-colors active:scale-[0.97]"
             onClick={reset}
@@ -258,7 +352,33 @@ export default function CheckerPage() {
             <span className="material-symbols-outlined text-lg select-none">arrow_back</span>
             {t("checker.back-btn")}
           </button>
-          <PdfExportButton targetRef={resultsRef} />
+          <div className="flex items-center gap-2">
+            {/* Share button */}
+            <div className="relative">
+              <button
+                onClick={() => {
+                  try {
+                    const url = window.location.href;
+                    navigator.clipboard.writeText(url);
+                    setShowShareToast(true);
+                    if (shareTimerRef.current) clearTimeout(shareTimerRef.current);
+                    shareTimerRef.current = setTimeout(() => setShowShareToast(false), 2500);
+                  } catch {}
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-outline-variant text-on-surface-variant text-sm font-medium hover:bg-surface-container-low hover:text-primary transition-all active:scale-[0.97]"
+                title="Salin link hasil analisis"
+              >
+                <span className="material-symbols-outlined text-lg select-none">share</span>
+                <span className="hidden sm:inline">Bagikan</span>
+              </button>
+              {showShareToast && (
+                <div className="absolute top-full mt-2 right-0 bg-green-600 text-white text-xs rounded-lg px-3 py-2 shadow-premium-md whitespace-nowrap z-10">
+                  Link tersalin! ✓
+                </div>
+              )}
+            </div>
+            <PdfExportButton targetRef={resultsRef} />
+          </div>
         </div>
 
         <div ref={resultsRef} className="space-y-10">
@@ -320,7 +440,7 @@ export default function CheckerPage() {
         {/* ============================================================ */}
         {narrativeFeedback && (
           <motion.section
-            className="bg-white rounded-2xl border border-surface-container-high shadow-premium-md p-6 space-y-5"
+            className="bg-surface rounded-2xl border border-surface-container-high shadow-premium-md p-6 space-y-5"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.3 }}
@@ -395,7 +515,7 @@ export default function CheckerPage() {
         {/* ============================================================ */}
         {keywordAnalysis && (
           <motion.section
-            className="bg-white rounded-2xl border border-surface-container-high shadow-premium-md p-6 space-y-5"
+            className="bg-surface rounded-2xl border border-surface-container-high shadow-premium-md p-6 space-y-5"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.35 }}
@@ -475,7 +595,7 @@ export default function CheckerPage() {
         {/* ============================================================ */}
         {actionPlan && (
           <motion.section
-            className="bg-white rounded-2xl border border-surface-container-high shadow-premium-md p-6 space-y-5"
+            className="bg-surface rounded-2xl border border-surface-container-high shadow-premium-md p-6 space-y-5"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.4 }}
@@ -564,7 +684,7 @@ export default function CheckerPage() {
         {/* ============================================================ */}
         {missingSections && missingSections.length > 0 && (
           <motion.section
-            className="bg-white rounded-2xl border border-surface-container-high shadow-premium-md p-6"
+            className="bg-surface rounded-2xl border border-surface-container-high shadow-premium-md p-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.5 }}
@@ -582,26 +702,58 @@ export default function CheckerPage() {
         )}
 
         {/* ============================================================ */}
-        {/*  8. CTA BANNER                                                */}
+        {/*  8. CTA BANNER — score-based routing                          */}
         {/* ============================================================ */}
-        <div className="relative overflow-hidden rounded-2xl p-8 md:p-10 shadow-premium-lg bg-gradient-to-br from-primary via-primary-container to-primary-deep">
-          <div className="absolute -right-12 -top-12 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="text-center md:text-left">
-              <h2 className="text-[32px] leading-10 font-bold text-white mb-2">{t("checker.cta-title")}</h2>
-              <p className="text-base text-white/90 max-w-[320px]">{t("checker.cta-subtitle")}</p>
+        {(() => {
+          const score = scores?.overall ?? 0;
+          const isHighScore = score >= 90;
+          const targetRoute = isHighScore ? "/karir" : "/builder/new";
+          const ctaTitle = isHighScore
+            ? "Skor CV Kamu Istimewa! 🎉"
+            : t("checker.cta-title");
+          const ctaSubtitle = isHighScore
+            ? "CV kamu sudah sangat siap. Langsung cari lowongan yang cocok!"
+            : t("checker.cta-subtitle");
+          const ctaBtn = isHighScore ? "Cari Lowongan Sekarang" : t("checker.cta-btn");
+          const gradientBg = isHighScore
+            ? "bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500"
+            : "bg-gradient-to-br from-primary via-primary-container to-primary-deep";
+
+          return (
+            <div
+              className={`relative overflow-hidden rounded-2xl p-8 md:p-10 shadow-premium-lg ${gradientBg}`}
+            >
+              <div className="absolute -right-12 -top-12 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                <div className="text-center md:text-left">
+                  <h2 className="text-[32px] leading-10 font-bold text-white mb-2">
+                    {ctaTitle}
+                  </h2>
+                  <p className="text-base text-white/90 max-w-[320px]">{ctaSubtitle}</p>
+                </div>
+                <MagneticButton>
+                  <button
+                    onClick={() => {
+                      // Simpan jobDesc + score di sessionStorage untuk back button
+                      try {
+                        sessionStorage.setItem("prefill_jobDesc", jdText);
+                        sessionStorage.setItem("checker_score", String(score));
+                        sessionStorage.setItem("checker_source", window.location.href);
+                      } catch {}
+                      router.push(targetRoute);
+                    }}
+                    className="bg-white text-primary px-8 py-4 rounded-full text-sm font-semibold shadow-premium-md hover:bg-gray-100 active:scale-95 transition-[transform,background-color] flex items-center gap-2"
+                  >
+                    {ctaBtn}{" "}
+                    <span className="material-symbols-outlined text-sm select-none">
+                      {isHighScore ? "work" : "arrow_forward"}
+                    </span>
+                  </button>
+                </MagneticButton>
+              </div>
             </div>
-            <MagneticButton>
-              <button
-                onClick={() => { if (jdText.trim()) { try { sessionStorage.setItem("prefill_jobDesc", jdText); } catch (_) {} } router.push("/builder/new"); }}
-                className="bg-white text-primary px-8 py-4 rounded-full text-sm font-semibold shadow-premium-md hover:bg-gray-100 active:scale-95 transition-[transform,background-color] flex items-center gap-2"
-              >
-                {t("checker.cta-btn")}{" "}
-                <span className="material-symbols-outlined text-sm select-none">arrow_forward</span>
-              </button>
-            </MagneticButton>
-          </div>
-        </div>
+          );
+        })()}
 
         </div>{/* end resultsRef */}
       </main>

@@ -641,6 +641,7 @@ export default function AdminDashboardPage() {
                             <th className="pb-3 px-2">Email</th>
                             <th className="pb-3 px-2">Status</th>
                             <th className="pb-3 px-2">Bergabung</th>
+                            <th className="pb-3 px-2">Aksi</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -650,12 +651,44 @@ export default function AdminDashboardPage() {
                               <td className="py-3 px-2 text-sm text-on-surface-variant">{user.email}</td>
                               <td className="py-3 px-2">
                                 <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${
-                                  user.status === "active" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
+                                  user.status === "active"
+                                    ? "bg-green-100 text-green-700"
+                                    : user.status === "pending"
+                                    ? "bg-amber-100 text-amber-700 border border-amber-300"
+                                    : "bg-gray-100 text-gray-500"
                                 }`}>
-                                  {user.status}
+                                  {user.status === "pending" ? "⏳ Pending" : user.status}
                                 </span>
                               </td>
                               <td className="py-3 px-2 text-sm text-on-surface-variant">{formatDate(user.createdAt)}</td>
+                              <td className="py-3 px-2">
+                                {user.status === "pending" && (
+                                  <button
+                                    onClick={async () => {
+                                      try {
+                                        const res = await fetch("/api/admin/users/approve", {
+                                          method: "POST",
+                                          headers: { "Content-Type": "application/json" },
+                                          body: JSON.stringify({ userId: user.id }),
+                                        });
+                                        const data = await res.json();
+                                        if (res.ok) {
+                                          addToast({ type: "success", message: data.message || "User diaktifkan!" });
+                                          fetchStats();
+                                        } else {
+                                          addToast({ type: "error", message: data.message || "Gagal approve." });
+                                        }
+                                      } catch {
+                                        addToast({ type: "error", message: "Gagal menghubungi server." });
+                                      }
+                                    }}
+                                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-primary text-on-primary text-[11px] font-semibold hover:brightness-110 active:scale-95 transition-all"
+                                  >
+                                    <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>
+                                    Approve
+                                  </button>
+                                )}
+                              </td>
                             </tr>
                           ))}
                         </tbody>

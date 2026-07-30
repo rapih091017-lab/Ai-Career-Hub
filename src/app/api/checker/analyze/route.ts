@@ -210,6 +210,7 @@ ${jobDescription || "Tidak ada deskripsi pekerjaan."}`,
       jobDescription,
       scores,
       aiFeedback,
+      fullResult: aiStructuredData,
     })
     .returning();
 

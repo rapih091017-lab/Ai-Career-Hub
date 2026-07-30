@@ -3,12 +3,33 @@
 /*  ~30 positions × 8 questions (4 HR + 4 Technical/Role-specific)   */
 /* ─────────────────────────────────────────────────────────────────── */
 
+export type Difficulty = "easy" | "medium" | "hard";
+
 export interface InterviewQuestion {
   id: string;
   category: "hr" | "technical" | "role-specific";
+  difficulty?: Difficulty;
   question: string;
   answer: string;
   tips?: string[];
+}
+
+/* ─── Helper: get difficulty (compute from answer length jika tidak explicit) ─── */
+export function getDifficulty(q: InterviewQuestion): Difficulty {
+  if (q.difficulty) return q.difficulty;
+  const len = q.answer.length;
+  if (q.category === "hr") {
+    if (len > 350) return "medium";
+    return "easy";
+  }
+  if (q.category === "technical") {
+    if (len > 500) return "hard";
+    if (len > 250) return "medium";
+    return "easy";
+  }
+  if (len > 600) return "hard";
+  if (len > 300) return "medium";
+  return "easy";
 }
 
 export interface PositionQuestions {

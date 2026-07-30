@@ -115,6 +115,7 @@ export const checkerResults = pgTable("checker_results", {
   jobDescription: text("job_description").notNull(),
   scores: jsonb("scores").$type<{ overall: number; keywordGap: number; contextRelevance: number; atsRules: number }>().notNull(),
   aiFeedback: jsonb("ai_feedback").$type<{ keywordGap: string; contextRelevance: string; atsRules: string; summary: string }>().notNull(),
+  fullResult: jsonb("full_result").$type<Record<string, unknown> | null>().default(null),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
 });
 
