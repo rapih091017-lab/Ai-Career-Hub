@@ -70,7 +70,7 @@ export function UploadZone({ file, dragActive, onFileChange, onDragStateChange, 
       <input
         ref={fileInputRef}
         type="file"
-        accept=".pdf,.docx"
+        accept=".pdf,.docx,.png,.jpg,.jpeg,.webp"
         className="hidden"
         onChange={handleFileChange}
       />

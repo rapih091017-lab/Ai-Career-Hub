@@ -31,6 +31,11 @@ export default function CheckerPage() {
   const [uploadError, setUploadError] = useState("");
   const [dragActive, setDragActive] = useState(false);
   const [showShareToast, setShowShareToast] = useState(false);
+  const [pastedText, setPastedText] = useState("");
+  const [showPasteFallback, setShowPasteFallback] = useState(false);
+  const [showOcrButton, setShowOcrButton] = useState(false);
+  const [ocrLoading, setOcrLoading] = useState(false);
+  const [ocrProgress, setOcrProgress] = useState("");
   const shareTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const donutRef = useRef<HTMLDivElement>(null);
@@ -70,6 +75,11 @@ export default function CheckerPage() {
     setError("");
     setLoading(false);
     setUploadError("");
+    setPastedText("");
+    setShowPasteFallback(false);
+    setShowOcrButton(false);
+    setOcrLoading(false);
+    setOcrProgress("");
     extractedTextRef.current = null;
   }, []);
 
@@ -99,9 +109,144 @@ export default function CheckerPage() {
     return data as AnalysisResult;
   }, [jdText, file, t]);
 
+  /* ---- Analyze with pasted text (skip extract) ---- */
+  /* ---- Handle Browser-based OCR for scanned PDFs ---- */
+  const handleBrowserOcr = useCallback(async () => {
+    if (!file) return;
+    setOcrLoading(true);
+    setOcrProgress("Memuat PDF...");
+    setError("");
+
+    try {
+      // Dynamically import pdfjs-dist from CDN (browser build)
+      setOcrProgress("Memuat engine PDF...");
+      let pdfjs: any;
+      try {
+        const cdnUrl = `https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.296/build/pdf.min.mjs`;
+        pdfjs = await import(cdnUrl);
+      } catch {
+        // CDN fallback — coba unpkg
+        try {
+          const unpkgUrl = `https://unpkg.com/pdfjs-dist@5.4.296/build/pdf.min.mjs`;
+          pdfjs = await import(unpkgUrl);
+        } catch {
+          throw new Error(
+            "Gagal memuat engine PDF. Silakan tempel teks CV manual."
+          );
+        }
+      }
+
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
+      const totalPages = Math.min(pdf.numPages, 5); // Max 5 halaman untuk performa
+      setOcrProgress(`Merender ${totalPages} halaman...`);
+
+      // Process pages one at a time — upload immediately to free memory
+      let allText = "";
+      for (let i = 1; i <= totalPages; i++) {
+        setOcrProgress(`Halaman ${i}/${totalPages} — render...`);
+        const page = await pdf.getPage(i);
+        const viewport = page.getViewport({ scale: 1.5 }); // 1.5x balance speed/quality
+
+        const canvas = document.createElement("canvas");
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const ctx = canvas.getContext("2d")!;
+
+        await page.render({ canvasContext: ctx, viewport }).promise;
+
+        // Convert to Blob and upload immediately
+        const blob = await new Promise<Blob | null>((resolve) =>
+          canvas.toBlob((b) => resolve(b), "image/png")
+        );
+        if (!blob) continue;
+
+        // Free canvas memory
+        canvas.width = 0;
+        canvas.height = 0;
+
+        setOcrProgress(`Halaman ${i}/${totalPages} — OCR...`);
+        const pageFormData = new FormData();
+        pageFormData.append("images", blob, `page_${i}.png`);
+
+        const ocrRes = await fetch("/api/checker/ocr", {
+          method: "POST",
+          body: pageFormData,
+        });
+
+        const ocrText = await ocrRes.text();
+        let ocrData: any;
+        try {
+          ocrData = JSON.parse(ocrText);
+        } catch {
+          throw new Error("[ocr] Server error: " + ocrText.slice(0, 200));
+        }
+
+        if (!ocrRes.ok) {
+          throw new Error(ocrData.message || `OCR gagal di halaman ${i}`);
+        }
+
+        const pageText = (ocrData.extractedText || "").trim();
+        allText += pageText + "\n\n";
+      }
+
+      const extractedText = allText.trim();
+      if (extractedText.length < 20) {
+        throw new Error("Tidak dapat membaca teks dari PDF. Pastikan halaman tidak kosong.");
+      }
+
+      extractedTextRef.current = extractedText;
+      setOcrProgress("");
+      setOcrLoading(false);
+
+      // Now analyze with the OCR text
+      setLoading(true);
+      try {
+        const data = await doAnalyze(extractedText);
+        setResult(data);
+        setPageState("results");
+      } catch (err: any) {
+        setError(err.message || "Terjadi kesalahan saat analisis");
+      } finally {
+        setLoading(false);
+      }
+    } catch (err: any) {
+      setOcrLoading(false);
+      setOcrProgress("");
+      setError(err.message || "OCR gagal. Tempel teks CV manual sebagai alternatif.");
+      setShowPasteFallback(true);
+    }
+  }, [file, doAnalyze]);
+
+  const handlePasteAnalyze = useCallback(async () => {
+    if (!pastedText.trim()) {
+      setError("Teks CV tidak boleh kosong");
+      return;
+    }
+    if (!jdText.trim()) {
+      setError(t("checker.error-jd"));
+      return;
+    }
+
+    setError("");
+    setLoading(true);
+    const trimmedText = pastedText.trim();
+    extractedTextRef.current = trimmedText; // cache untuk retry
+    try {
+      const data = await doAnalyze(trimmedText);
+      setResult(data);
+      setPageState("results");
+    } catch (err: any) {
+      setError(err.message || "Terjadi kesalahan");
+    } finally {
+      setLoading(false);
+    }
+  }, [pastedText, jdText, doAnalyze, t]);
+
   const handleAnalyze = async () => {
     setError("");
     setUploadError("");
+    setShowPasteFallback(false);
     if (!file) {
       setError(t("checker.error-upload"));
       return;
@@ -135,6 +280,19 @@ export default function CheckerPage() {
         }
 
         if (!extractRes.ok) {
+          // Jika API mengirim suggestOcr, tampilkan tombol OCR
+          if (extractData.suggestOcr) {
+            setShowOcrButton(true);
+          }
+          // Jika API mengirim suggestPaste, tampilkan fallback paste
+          if (extractData.suggestPaste) {
+            setShowPasteFallback(true);
+          }
+          if (extractData.suggestOcr || extractData.suggestPaste) {
+            setError(extractData.message || t("checker.error-failed"));
+            setLoading(false);
+            return;
+          }
           setError(extractData.message || t("checker.error-failed"));
           setLoading(false);
           return;
@@ -257,7 +415,7 @@ export default function CheckerPage() {
                   <span className="material-symbols-outlined text-red-500 text-sm mt-0.5 select-none">error</span>
                   <div className="flex-1">
                     <p className="text-red-700 text-sm font-semibold">{error}</p>
-                    {extractedTextRef.current && (
+                    {extractedTextRef.current && !showPasteFallback && (
                       <button
                         onClick={handleRetry}
                         className="mt-1 text-xs text-red-600 underline hover:text-red-800"
@@ -265,6 +423,89 @@ export default function CheckerPage() {
                         Coba Lagi
                       </button>
                     )}
+                  </div>
+                </div>
+              )}
+
+              {/* ── OCR Button (when scanned PDF detected) ── */}
+              {showOcrButton && !ocrLoading && (
+                <div className="bg-violet-50 border border-violet-200 rounded-xl p-4 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <span className="material-symbols-outlined text-violet-600 text-sm mt-0.5 select-none">document_scanner</span>
+                    <div>
+                      <p className="text-sm font-semibold text-violet-800">Atau baca dengan OCR AI</p>
+                      <p className="text-xs text-violet-700 mt-0.5">
+                        Kami akan merender setiap halaman PDF dan membaca teksnya menggunakan AI.
+                        Cocok untuk PDF hasil scan/gambar.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleBrowserOcr}
+                    className="w-full inline-flex items-center justify-center gap-2 bg-violet-600 text-white font-bold px-5 py-2.5 rounded-lg hover:bg-violet-700 active:scale-[0.97] transition-all text-sm"
+                  >
+                    <span className="material-symbols-outlined text-sm select-none">scan</span>
+                    OCR dengan AI (Baca PDF)
+                  </button>
+                </div>
+              )}
+
+              {/* ── OCR Loading State ── */}
+              {ocrLoading && (
+                <div className="bg-violet-50 border border-violet-200 rounded-xl p-4 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <svg className="animate-spin h-5 w-5 text-violet-600" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    <span className="text-sm font-medium text-violet-800">{ocrProgress || "Memproses OCR..."}</span>
+                  </div>
+                  <div className="w-full bg-violet-200 rounded-full h-1.5">
+                    <div className="bg-violet-600 h-1.5 rounded-full animate-pulse w-2/3" />
+                  </div>
+                </div>
+              )}
+
+              {/* ── Paste text fallback (when PDF parsing fails) ── */}
+              {showPasteFallback && (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <span className="material-symbols-outlined text-amber-600 text-sm mt-0.5 select-none">content_paste</span>
+                    <div>
+                      <p className="text-sm font-semibold text-amber-800">Atau tempel teks CV Anda di sini</p>
+                      <p className="text-xs text-amber-700 mt-0.5">
+                        Salin seluruh teks dari CV Anda (bisa dari Word, Google Docs, atau PDF viewer) dan tempel di bawah.
+                      </p>
+                    </div>
+                  </div>
+                  <textarea
+                    className="w-full rounded-lg border border-amber-300 bg-white p-4 text-sm text-on-background focus:ring-2 focus:ring-primary focus:border-primary transition-[box-shadow,border-color] resize-none"
+                    rows={8}
+                    placeholder="Tempel teks CV Anda di sini...\n\nContoh:\nNama: Andi Pratama\nPengalaman: ...\nPendidikan: ..."
+                    value={pastedText}
+                    onChange={(e) => setPastedText(e.target.value)}
+                  />
+                  <div className="flex justify-end">
+                    <button
+                      onClick={handlePasteAnalyze}
+                      disabled={loading || !pastedText.trim()}
+                      className="inline-flex items-center gap-2 bg-primary text-white font-bold px-5 py-2.5 rounded-lg hover:opacity-90 active:scale-[0.97] transition-all disabled:opacity-50 text-sm"
+                    >
+                      {loading ? (
+                        <>
+                          <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                          </svg>
+                          Menganalisis...
+                        </>
+                      ) : (
+                        <>
+                          <span className="material-symbols-outlined text-sm select-none">auto_awesome</span>
+                          Analisis dengan Teks
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
               )}
