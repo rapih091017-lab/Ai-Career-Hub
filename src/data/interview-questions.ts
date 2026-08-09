@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────── */
-/*  Interview Question Database — Static Templates                    */
+/*  Interview Question Database - Static Templates                    */
 /*  ~30 positions × 8 questions (4 HR + 4 Technical/Role-specific)   */
 /* ─────────────────────────────────────────────────────────────────── */
 
@@ -67,7 +67,7 @@ const hrQuestions: InterviewQuestion[] = [
       "Saya adalah seorang profesional yang berpengalaman di bidang [bidang] dengan [X] tahun pengalaman. Saya memiliki keahlian dalam [skill utama] dan telah berhasil [prestasi terbesar]. Saat ini saya sedang mencari tantangan baru di [industri target] untuk terus berkembang.",
     tips: [
       "Gunakan formula: Masa lalu (pengalaman) → Sekarang (keahlian) → Masa depan (kontribusi)",
-      "Sesuaikan dengan posisi yang dilamar — jangan cerita panjang lebar",
+      "Sesuaikan dengan posisi yang dilamar - jangan cerita panjang lebar",
       "Durasi ideal: 60-90 detik",
     ],
   },
@@ -76,7 +76,7 @@ const hrQuestions: InterviewQuestion[] = [
     category: "hr",
     question: "Apa kelebihan dan kelemahan terbesar Anda?",
     answer:
-      "Kelebihan terbesar saya adalah [kelebihan relevan — contoh: kemampuan analisis data yang kuat], yang terbukti ketika saya [contoh konkret]. Untuk kelemahan, saya dulu kesulitan dengan [kelemahan], tapi saya mengatasinya dengan [cara mengatasi] sehingga sekarang [hasil positif].",
+      "Kelebihan terbesar saya adalah [kelebihan relevan - contoh: kemampuan analisis data yang kuat], yang terbukti ketika saya [contoh konkret]. Untuk kelemahan, saya dulu kesulitan dengan [kelemahan], tapi saya mengatasinya dengan [cara mengatasi] sehingga sekarang [hasil positif].",
     tips: [
       "Pilih kelemahan yang bukan keahlian inti posisi ini",
       "Sertakan langkah konkret perbaikan, jangan hanya mengakui kelemahan",
@@ -88,9 +88,9 @@ const hrQuestions: InterviewQuestion[] = [
     category: "hr",
     question: "Mengapa Anda ingin bekerja di perusahaan kami?",
     answer:
-      "Saya tertarik dengan [nama perusahaan] karena [alasan spesifik — contoh: reputasi inovasi di bidang AI]. Setelah membaca tentang [proyek/produk perusahaan], saya melihat korelasi dengan keahlian saya di [bidang]. Saya ingin berkontribusi pada [visi/misi perusahaan] dan tumbuh bersama tim yang dinamis.",
+      "Saya tertarik dengan [nama perusahaan] karena [alasan spesifik - contoh: reputasi inovasi di bidang AI]. Setelah membaca tentang [proyek/produk perusahaan], saya melihat korelasi dengan keahlian saya di [bidang]. Saya ingin berkontribusi pada [visi/misi perusahaan] dan tumbuh bersama tim yang dinamis.",
     tips: [
-      "Riset perusahaan sebelum wawancara — produk, budaya, berita terbaru",
+      "Riset perusahaan sebelum wawancara - produk, budaya, berita terbaru",
       "Jangan bilang 'karena butuh kerja' atau 'karena gajinya bagus'",
       "Hubungkan value perusahaan dengan value pribadi Anda",
     ],
@@ -100,10 +100,10 @@ const hrQuestions: InterviewQuestion[] = [
     category: "hr",
     question: "Di mana Anda melihat diri Anda dalam 5 tahun ke depan?",
     answer:
-      "Dalam 5 tahun, saya melihat diri saya sebagai seorang ahli di bidang [bidang] yang telah berkontribusi signifikan pada [nama perusahaan]. Saya berencana menguasai [skill lanjutan] dan mengambil peran [jenjang karir — contoh: senior/lead] yang memungkinkan saya membimbing anggota tim lain.",
+      "Dalam 5 tahun, saya melihat diri saya sebagai seorang ahli di bidang [bidang] yang telah berkontribusi signifikan pada [nama perusahaan]. Saya berencana menguasai [skill lanjutan] dan mengambil peran [jenjang karir - contoh: senior/lead] yang memungkinkan saya membimbing anggota tim lain.",
     tips: [
       "Tunjukkan ambisi yang realistis dan relevan dengan posisi",
-      "Hubungkan growth plan dengan perusahaan — jangan terkesan hanya batu loncatan",
+      "Hubungkan growth plan dengan perusahaan - jangan terkesan hanya batu loncatan",
       "Hindari jawaban terlalu spekulatif atau muluk",
     ],
   },
@@ -152,7 +152,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "technical",
         question: "Bagaimana Anda menangani error handling di aplikasi production?",
         answer:
-          "Layered approach: (1) Input validation di API layer menggunakan schema validation (Zod/Yup), (2) Centralized error handler dengan kode error yang konsisten, (3) Logging terstruktur (Winston/Sentry) untuk debugging, (4) Graceful degradation — user tetap bisa pakai fitur lain walau satu fitur error, (5) Monitoring dan alerting (Datadog/New Relic).",
+          "Layered approach: (1) Input validation di API layer menggunakan schema validation (Zod/Yup), (2) Centralized error handler dengan kode error yang konsisten, (3) Logging terstruktur (Winston/Sentry) untuk debugging, (4) Graceful degradation - user tetap bisa pakai fitur lain walau satu fitur error, (5) Monitoring dan alerting (Datadog/New Relic).",
         tips: ["Sebutkan pengalaman debugging production issue", "Tekankan pentingnya user experience saat error"],
       },
       {
@@ -168,8 +168,8 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "technical",
         question: "Jelaskan prinsip SOLID dalam pemrograman.",
         answer:
-          "S — Single Responsibility: setiap class satu alasan untuk berubah. O — Open/Closed: open for extension, closed for modification. L — Liskov Substitution: subclass bisa gantikan parent. I — Interface Segregation: banyak interface spesifik. D — Dependency Inversion: bergantung pada abstraksi, bukan implementasi.",
-        tips: ["Ini pertanyaan klasik di perusahaan yang pakai OOP — kuasai contoh konkretnya"],
+          "S - Single Responsibility: setiap class satu alasan untuk berubah. O - Open/Closed: open for extension, closed for modification. L - Liskov Substitution: subclass bisa gantikan parent. I - Interface Segregation: banyak interface spesifik. D - Dependency Inversion: bergantung pada abstraksi, bukan implementasi.",
+        tips: ["Ini pertanyaan klasik di perusahaan yang pakai OOP - kuasai contoh konkretnya"],
       },
       {
         id: "se-tech-7",
@@ -184,7 +184,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "technical",
         question: "Jelaskan perbedaan authentication dan authorization.",
         answer:
-          "Authentication: verifikasi identitas (siapa kamu?) — login dengan password, token JWT. Authorization: hak akses (apa yang boleh kamu lakukan?) — Role-Based Access Control (RBAC). Contoh: setelah login (auth), admin bisa hapus data tapi user biasa tidak bisa (authorization).",
+          "Authentication: verifikasi identitas (siapa kamu?) - login dengan password, token JWT. Authorization: hak akses (apa yang boleh kamu lakukan?) - Role-Based Access Control (RBAC). Contoh: setelah login (auth), admin bisa hapus data tapi user biasa tidak bisa (authorization).",
         tips: [],
       },
       {
@@ -218,7 +218,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         question: "Framework/librari frontend apa yang Anda kuasai? Bandingkan kelebihan dan kekurangannya.",
         answer:
           "Saya paling mahir dengan React/Next.js. React unggul di ekosistem yang mature dan community support besar. Saya juga familiar dengan Vue.js yang menurut saya lebih intuitif untuk proyek kecil. Untuk performa, saya pernah menggunakan Svelte yang menghasilkan bundle size sangat kecil. Pilihan tergantung kebutuhan proyek dan tim.",
-        tips: ["Jangan hanya hafal — tunjukkan pemahaman mendalam tentang satu framework"],
+        tips: ["Jangan hanya hafal - tunjukkan pemahaman mendalam tentang satu framework"],
       },
       {
         id: "fe-tech-2",
@@ -266,7 +266,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "technical",
         question: "Bagaimana Anda mendesain REST API yang baik?",
         answer:
-          "Prinsip-prinsip: (1) Naming konvensi — plural nouns (/users, bukan /getUser), (2) HTTP methods sesuai fungsinya, (3) Versioning via URL (/v1/), (4) Consistent error response format, (5) Pagination untuk list endpoint, (6) Rate limiting untuk security, (7) Dokumentasi otomatis (Swagger/OpenAPI).",
+          "Prinsip-prinsip: (1) Naming konvensi - plural nouns (/users, bukan /getUser), (2) HTTP methods sesuai fungsinya, (3) Versioning via URL (/v1/), (4) Consistent error response format, (5) Pagination untuk list endpoint, (6) Rate limiting untuk security, (7) Dokumentasi otomatis (Swagger/OpenAPI).",
         tips: [],
       },
       {
@@ -274,7 +274,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "technical",
         question: "Jelaskan pengalaman Anda dengan authentication dan authorization.",
         answer:
-          "Saya pernah implementasi berbagai metode: (1) JWT untuk stateless auth — token dengan expiry, refresh token rotation, (2) Session-based auth dengan Redis store, (3) OAuth2 untuk social login (Google, GitHub), (4) RBAC (Role-Based Access Control) untuk authorization level. Security best practices: HTTP-only cookies, CSRF protection, rate limiting pada login endpoint.",
+          "Saya pernah implementasi berbagai metode: (1) JWT untuk stateless auth - token dengan expiry, refresh token rotation, (2) Session-based auth dengan Redis store, (3) OAuth2 untuk social login (Google, GitHub), (4) RBAC (Role-Based Access Control) untuk authorization level. Security best practices: HTTP-only cookies, CSRF protection, rate limiting pada login endpoint.",
         tips: ["Sebutkan pengalaman dengan NextAuth.js atau sejenisnya"],
       },
       {
@@ -282,7 +282,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "technical",
         question: "Bagaimana Anda mengelola database migration di production?",
         answer:
-          "Saya menggunakan migration tools (Prisma Migrate, Drizzle Kit, Flyway) dengan versioning. Setiap perubahan schema adalah file migration terpisah yang di-review. Staging terlebih dahulu sebelum production. Untuk perubahan besar, saya buat backward-compatible migration — tambah kolom dulu sebelum hapus yang lama. Selalu backup database sebelum migrate.",
+          "Saya menggunakan migration tools (Prisma Migrate, Drizzle Kit, Flyway) dengan versioning. Setiap perubahan schema adalah file migration terpisah yang di-review. Staging terlebih dahulu sebelum production. Untuk perubahan besar, saya buat backward-compatible migration - tambah kolom dulu sebelum hapus yang lama. Selalu backup database sebelum migrate.",
         tips: [],
       },
     ],
@@ -315,7 +315,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "technical",
         question: "Bagaimana Anda menangani state management di aplikasi full-stack?",
         answer:
-          "Untuk data server, saya prefer React Server Components (RSC) atau React Query/TanStack Query — fetching data langsung dari server atau caching di client. Untuk UI state, cukup useState/useReducer. Global state seperti auth atau theme pakai Context atau Zustand. Hindari over-engineering — mulai simpel dulu.",
+          "Untuk data server, saya prefer React Server Components (RSC) atau React Query/TanStack Query - fetching data langsung dari server atau caching di client. Untuk UI state, cukup useState/useReducer. Global state seperti auth atau theme pakai Context atau Zustand. Hindari over-engineering - mulai simpel dulu.",
         tips: [],
       },
       {
@@ -323,7 +323,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "technical",
         question: "Ceritakan pengalaman Anda dengan deployment dan DevOps.",
         answer:
-          "Saya biasa menggunakan Docker untuk containerization, dengan docker-compose untuk local development. CI/CD via GitHub Actions — auto-test, build, dan deploy ke staging. Untuk production: setup Nginx reverse proxy, SSL via Let's Encrypt, dan monitoring dengan uptime robot atau Sentry untuk error tracking.",
+          "Saya biasa menggunakan Docker untuk containerization, dengan docker-compose untuk local development. CI/CD via GitHub Actions - auto-test, build, dan deploy ke staging. Untuk production: setup Nginx reverse proxy, SSL via Let's Encrypt, dan monitoring dengan uptime robot atau Sentry untuk error tracking.",
         tips: ["Sebutkan cloud platform: AWS, GCP, Vercel, atau Railway"],
       },
     ],
@@ -348,7 +348,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "technical",
         question: "Bagaimana Anda mengelola infrastruktur sebagai kode (IaC)?",
         answer:
-          "Saya menggunakan Terraform untuk provisioning cloud resources (AWS/GCP). Semua konfigurasi di-version control dan di-review seperti kode biasa. Untuk Kubernetes, saya pakai Helm charts. Pendekatan ini memastikan reproducibility — staging dan production identik, dan rollback semudah git revert.",
+          "Saya menggunakan Terraform untuk provisioning cloud resources (AWS/GCP). Semua konfigurasi di-version control dan di-review seperti kode biasa. Untuk Kubernetes, saya pakai Helm charts. Pendekatan ini memastikan reproducibility - staging dan production identik, dan rollback semudah git revert.",
         tips: [],
       },
       {
@@ -356,7 +356,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "technical",
         question: "Jelaskan pengalaman Anda dengan containerization dan orchestration.",
         answer:
-          "Saya sehari-hari menggunakan Docker untuk containerization — multi-stage builds untuk optimize image size. Untuk orchestration, saya manage Kubernetes cluster (EKS/GKE). Saya setup Horizontal Pod Autoscaler untuk scaling otomatis, dan Network Policies untuk security. Monitoring via Prometheus + Grafana.",
+          "Saya sehari-hari menggunakan Docker untuk containerization - multi-stage builds untuk optimize image size. Untuk orchestration, saya manage Kubernetes cluster (EKS/GKE). Saya setup Horizontal Pod Autoscaler untuk scaling otomatis, dan Network Policies untuk security. Monitoring via Prometheus + Grafana.",
         tips: [],
       },
       {
@@ -364,7 +364,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "technical",
         question: "Bagaimana Anda menangani incident response?",
         answer:
-          "Prosedur: (1) Detect — monitoring alert (PagerDuty), (2) Triage — assess severity dan impact, (3) Mitigate — rollback atau hotfix, (4) Resolve — fix permanen, (5) Post-mortem — root cause analysis dan action items. Saya percaya on-call rotation yang adil dan blameless culture untuk post-mortem.",
+          "Prosedur: (1) Detect - monitoring alert (PagerDuty), (2) Triage - assess severity dan impact, (3) Mitigate - rollback atau hotfix, (4) Resolve - fix permanen, (5) Post-mortem - root cause analysis dan action items. Saya percaya on-call rotation yang adil dan blameless culture untuk post-mortem.",
         tips: [],
       },
     ],
@@ -389,7 +389,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "technical",
         question: "Bagaimana Anda menangani data yang tidak seimbang (imbalanced dataset)?",
         answer:
-          "Beberapa pendekatan: (1) Resampling — oversampling kelas minoritas (SMOTE) atau undersampling kelas mayoritas, (2) Menggunakan algoritma yang robust terhadap imbalance (Random Forest, XGBoost), (3) Class weights dalam loss function, (4) Menggunakan metrik evaluasi yang tepat (F1-score, Precision-Recall AUC, bukan accuracy).",
+          "Beberapa pendekatan: (1) Resampling - oversampling kelas minoritas (SMOTE) atau undersampling kelas mayoritas, (2) Menggunakan algoritma yang robust terhadap imbalance (Random Forest, XGBoost), (3) Class weights dalam loss function, (4) Menggunakan metrik evaluasi yang tepat (F1-score, Precision-Recall AUC, bukan accuracy).",
         tips: [],
       },
       {
@@ -397,7 +397,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "technical",
         question: "Jelaskan proses feature engineering yang biasa Anda lakukan.",
         answer:
-          "Feature engineering adalah langkah paling penting. Proses saya: (1) Domain analysis — pahami bisnis konteks, (2) Missing value handling — imputation atau flagging, (3) Encoding — one-hot, label, atau target encoding untuk categorical, (4) Scaling — StandardScaler atau MinMaxScaler, (5) Feature interaction — polynomial features, (6) Dimensionality reduction — PCA atau feature selection.",
+          "Feature engineering adalah langkah paling penting. Proses saya: (1) Domain analysis - pahami bisnis konteks, (2) Missing value handling - imputation atau flagging, (3) Encoding - one-hot, label, atau target encoding untuk categorical, (4) Scaling - StandardScaler atau MinMaxScaler, (5) Feature interaction - polynomial features, (6) Dimensionality reduction - PCA atau feature selection.",
         tips: [],
       },
       {
@@ -430,7 +430,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "technical",
         question: "Bagaimana Anda mengoptimalkan performa aplikasi mobile?",
         answer:
-          "Key areas: (1) Image optimization — caching, lazy loading, compression, (2) List virtualization — FlatList/VirtualizedList di React Native, (3) Avoid unnecessary re-renders — memoization, (4) Bundle size optimization — code splitting, tree shaking, (5) Network — request batching, pagination, offline-first dengan local caching.",
+          "Key areas: (1) Image optimization - caching, lazy loading, compression, (2) List virtualization - FlatList/VirtualizedList di React Native, (3) Avoid unnecessary re-renders - memoization, (4) Bundle size optimization - code splitting, tree shaking, (5) Network - request batching, pagination, offline-first dengan local caching.",
         tips: ["Sebutkan metrik performa yang kamu monitor"],
       },
       {
@@ -471,7 +471,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "technical",
         question: "Bagaimana Anda memutuskan apa yang harus diotomatisasi vs manual test?",
         answer:
-          "Automation priority: (1) Regression tests — dijalankan setiap deploy, (2) Critical user flows — login, checkout, payment, (3) Data validation — form input, API response. Manual test: (1) Exploratory testing — UX feel, (2) Visual regression — layout di berbagai device, (3) Edge cases yang sulit di-automate. Goal: automate 80%, manual 20%.",
+          "Automation priority: (1) Regression tests - dijalankan setiap deploy, (2) Critical user flows - login, checkout, payment, (3) Data validation - form input, API response. Manual test: (1) Exploratory testing - UX feel, (2) Visual regression - layout di berbagai device, (3) Edge cases yang sulit di-automate. Goal: automate 80%, manual 20%.",
         tips: [],
       },
       {
@@ -479,7 +479,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "technical",
         question: "Apa yang Anda lakukan ketika menemukan bug di production?",
         answer:
-          "Prosedur: (1) Dokumentasi — screenshot, console log, langkah reproduksi, environment info, (2) Triage — severity (critical/major/minor) dan priority, (3) Laporkan ke issue tracker dengan label yang jelas, (4) Follow up dengan developer untuk fix, (5) Verifikasi fix di staging, (6) Regression test area terkait.",
+          "Prosedur: (1) Dokumentasi - screenshot, console log, langkah reproduksi, environment info, (2) Triage - severity (critical/major/minor) dan priority, (3) Laporkan ke issue tracker dengan label yang jelas, (4) Follow up dengan developer untuk fix, (5) Verifikasi fix di staging, (6) Regression test area terkait.",
         tips: ["Tekankan komunikasi yang baik dengan tim developer"],
       },
       {
@@ -512,7 +512,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "technical",
         question: "Bagaimana Anda melakukan penetration testing pada sebuah aplikasi web?",
         answer:
-          "Metodologi: (1) Reconnaissance — kumpulkan informasi (subdomain, teknologi, endpoint), (2) Scanning — automated scan dengan tools (Nmap, OWASP ZAP), (3) Exploitation — manual testing untuk injection, XSS, CSRF, IDOR, (4) Reporting — dokumentasi temuan dengan severity, PoC, dan rekomendasi fix. Saya mengikuti standar PTES atau OWASP Testing Guide.",
+          "Metodologi: (1) Reconnaissance - kumpulkan informasi (subdomain, teknologi, endpoint), (2) Scanning - automated scan dengan tools (Nmap, OWASP ZAP), (3) Exploitation - manual testing untuk injection, XSS, CSRF, IDOR, (4) Reporting - dokumentasi temuan dengan severity, PoC, dan rekomendasi fix. Saya mengikuti standar PTES atau OWASP Testing Guide.",
         tips: [],
       },
       {
@@ -520,7 +520,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "technical",
         question: "Jelaskan konsep defense in depth.",
         answer:
-          "Defense in depth adalah strategi keamanan berlapis. Jika satu layer ditembus, masih ada layer lain: (1) Physical security, (2) Network security — firewall, IDS/IPS, VPN, (3) Application security — input validation, WAF, (4) Data security — encryption at rest & in transit, (5) Identity & access — MFA, least privilege, (6) Monitoring — SIEM, log analysis.",
+          "Defense in depth adalah strategi keamanan berlapis. Jika satu layer ditembus, masih ada layer lain: (1) Physical security, (2) Network security - firewall, IDS/IPS, VPN, (3) Application security - input validation, WAF, (4) Data security - encryption at rest & in transit, (5) Identity & access - MFA, least privilege, (6) Monitoring - SIEM, log analysis.",
         tips: [],
       },
       {
@@ -528,7 +528,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "technical",
         question: "Apa yang Anda lakukan saat terjadi security incident?",
         answer:
-          "Saya mengikuti incident response framework NIST: (1) Preparation — playbook, tools, tim, (2) Detection & Analysis — identifikasi indicator of compromise, scope, severity, (3) Containment — isolate sistem terdampak, backup forensic data, (4) Eradication — hapus malware, patch vulnerability, (5) Recovery — restore dari backup bersih, monitoring ketat, (6) Post-incident — root cause analysis, lessons learned.",
+          "Saya mengikuti incident response framework NIST: (1) Preparation - playbook, tools, tim, (2) Detection & Analysis - identifikasi indicator of compromise, scope, severity, (3) Containment - isolate sistem terdampak, backup forensic data, (4) Eradication - hapus malware, patch vulnerability, (5) Recovery - restore dari backup bersih, monitoring ketat, (6) Post-incident - root cause analysis, lessons learned.",
         tips: [],
       },
     ],
@@ -547,7 +547,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Buatlah strategi marketing untuk peluncuran produk baru dengan budget terbatas.",
         answer:
-          "Dengan budget terbatas, fokus pada organic channels: (1) Content marketing — blog posts, SEO-optimized articles, video tutorials, (2) Social media — konten viral di TikTok/IG, community building di LinkedIn, (3) Email marketing — build newsletter dari awal, (4) Partnership — kolaborasi dengan influencers mikro di niche terkait, (5) PR — press release ke media lokal/industri.",
+          "Dengan budget terbatas, fokus pada organic channels: (1) Content marketing - blog posts, SEO-optimized articles, video tutorials, (2) Social media - konten viral di TikTok/IG, community building di LinkedIn, (3) Email marketing - build newsletter dari awal, (4) Partnership - kolaborasi dengan influencers mikro di niche terkait, (5) PR - press release ke media lokal/industri.",
         tips: [],
       },
       {
@@ -555,7 +555,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Bagaimana Anda mengukur ROI dari campaign marketing?",
         answer:
-          "Saya menggunakan framework: (1) Tentukan KPI spesifik per channel (CPC, CPM, CTR untuk paid; engagement rate, shares untuk organic), (2) Setup tracking — UTM parameters, Google Analytics goals, pixel, (3) Hitung CAC (Customer Acquisition Cost) dan LTV (Lifetime Value), (4) ROAS (Return on Ad Spend) untuk paid, (5) Attribution modeling — first-click, last-click, atau multi-touch.",
+          "Saya menggunakan framework: (1) Tentukan KPI spesifik per channel (CPC, CPM, CTR untuk paid; engagement rate, shares untuk organic), (2) Setup tracking - UTM parameters, Google Analytics goals, pixel, (3) Hitung CAC (Customer Acquisition Cost) dan LTV (Lifetime Value), (4) ROAS (Return on Ad Spend) untuk paid, (5) Attribution modeling - first-click, last-click, atau multi-touch.",
         tips: [],
       },
       {
@@ -564,14 +564,14 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         question: "Ceritakan campaign marketing paling sukses yang pernah Anda jalankan.",
         answer:
           "Contoh: Saya pernah menjalankan campaign [nama campaign] yang bertujuan meningkatkan brand awareness dan lead generation. Strategy: kombinasi Instagram Ads (stories + feed) dan content marketing (blog + LinkedIn articles). Hasil: 150% increase in website traffic, 40% lebih banyak leads, dan CAC turun 25% dalam 3 bulan.",
-        tips: ["Gunakan data konkret — jangan general", "Sebutkan tantangan yang dihadapi dan cara mengatasinya"],
+        tips: ["Gunakan data konkret - jangan general", "Sebutkan tantangan yang dihadapi dan cara mengatasinya"],
       },
       {
         id: "mm-role-4",
         category: "role-specific",
         question: "Bagaimana Anda mengikuti tren marketing terbaru dan mengadaptasinya?",
         answer:
-          "Saya follow beberapa sumber: (1) Newsletter industri — Marketing Brew, Neil Patel, (2) Podcast — Marketing School, (3) Komunitas — GrowthHacker community, (4) Tools — Google Trends, Exploding Topics. Untuk adaptasi: saya uji coba tren baru dengan A/B testing skala kecil dulu (10% budget), ukur hasil, baru scale up jika terbukti efektif.",
+          "Saya follow beberapa sumber: (1) Newsletter industri - Marketing Brew, Neil Patel, (2) Podcast - Marketing School, (3) Komunitas - GrowthHacker community, (4) Tools - Google Trends, Exploding Topics. Untuk adaptasi: saya uji coba tren baru dengan A/B testing skala kecil dulu (10% budget), ukur hasil, baru scale up jika terbukti efektif.",
         tips: [],
       },
     ],
@@ -588,7 +588,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Platform digital advertising apa yang Anda kuasai dan bagaimana optimasinya?",
         answer:
-          "Saya menguasai Google Ads (Search, Display, YouTube) dan Meta Ads (Facebook & Instagram). Optimasi: (1) Keyword research negatif untuk mengurangi wasted spend, (2) A/B testing — creative, headline, CTA, audience, (3) Quality Score optimization untuk Google Ads, (4) Audience layering — custom audiences, lookalikes, retargeting, (5) Budget allocation — alokasi ke campaign dengan ROAS tertinggi.",
+          "Saya menguasai Google Ads (Search, Display, YouTube) dan Meta Ads (Facebook & Instagram). Optimasi: (1) Keyword research negatif untuk mengurangi wasted spend, (2) A/B testing - creative, headline, CTA, audience, (3) Quality Score optimization untuk Google Ads, (4) Audience layering - custom audiences, lookalikes, retargeting, (5) Budget allocation - alokasi ke campaign dengan ROAS tertinggi.",
         tips: ["Sebutkan metrik: CTR, CPC, CPA, ROAS, Impression Share"],
       },
       {
@@ -596,7 +596,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Bagaimana Anda melakukan SEO untuk meningkatkan organic traffic?",
         answer:
-          "SEO approach: (1) Technical SEO — site speed, mobile-friendliness, structured data, XML sitemap, canonical tags, (2) On-page — keyword-optimized titles, meta descriptions, header tags, internal linking, (3) Content — blog posts answer search intent, pillar pages, content clusters, (4) Off-page — quality backlinks, guest posting, broken link building. Monitor dengan Google Search Console dan Ahrefs.",
+          "SEO approach: (1) Technical SEO - site speed, mobile-friendliness, structured data, XML sitemap, canonical tags, (2) On-page - keyword-optimized titles, meta descriptions, header tags, internal linking, (3) Content - blog posts answer search intent, pillar pages, content clusters, (4) Off-page - quality backlinks, guest posting, broken link building. Monitor dengan Google Search Console dan Ahrefs.",
         tips: [],
       },
       {
@@ -604,7 +604,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Jelaskan pengalaman Anda dengan email marketing dan automation.",
         answer:
-          "Saya menggunakan Mailchimp/Kit/SendGrid untuk: (1) Welcome sequence — 3-5 email onboarding, (2) Nurture sequence — edukasi konten relevan per segment, (3) Abandoned cart — 2-3 email reminder dengan insentif, (4) Re-engagement — email untuk subscriber tidak aktif. Metrics: open rate (target >25%), click rate (target >3%), unsubscribe rate (<0.5%). A/B testing subject line sangat penting.",
+          "Saya menggunakan Mailchimp/Kit/SendGrid untuk: (1) Welcome sequence - 3-5 email onboarding, (2) Nurture sequence - edukasi konten relevan per segment, (3) Abandoned cart - 2-3 email reminder dengan insentif, (4) Re-engagement - email untuk subscriber tidak aktif. Metrics: open rate (target >25%), click rate (target >3%), unsubscribe rate (<0.5%). A/B testing subject line sangat penting.",
         tips: [],
       },
       {
@@ -612,7 +612,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Bagaimana Anda menganalisis data campaign untuk membuat keputusan?",
         answer:
-          "Saya menggunakan data-driven approach: (1) Kumpulkan data dari Google Analytics, Meta Business Suite, dan CRM, (2) Buat dashboard di Google Data Studio/Looker, (3) Analisis tren — mana yang naik/turun dan kenapa, (4) A/B testing untuk hipotesis, (5) Weekly reporting dengan recommendations actionable. Keputusan berdasarkan data, bukan intuisi.",
+          "Saya menggunakan data-driven approach: (1) Kumpulkan data dari Google Analytics, Meta Business Suite, dan CRM, (2) Buat dashboard di Google Data Studio/Looker, (3) Analisis tren - mana yang naik/turun dan kenapa, (4) A/B testing untuk hipotesis, (5) Weekly reporting dengan recommendations actionable. Keputusan berdasarkan data, bukan intuisi.",
         tips: [],
       },
       {
@@ -677,7 +677,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Bagaimana Anda menulis copy yang mendorong konversi?",
         answer:
-          "Saya menggunakan formula AIDA: Attention — headline yang menarik perhatian dengan hook kuat, Interest — bangun ketertarikan dengan identifikasi masalah, Desire — manfaat konkret dan social proof, Action — CTA yang jelas dan urgent. Plus prinsip: (1) Fokus pada benefit, bukan fitur, (2) Bahasa yang sederhana dan langsung, (3) Gunakan angka dan data, (4) Sertakan urgency atau kelangkaan jika relevan.",
+          "Saya menggunakan formula AIDA: Attention - headline yang menarik perhatian dengan hook kuat, Interest - bangun ketertarikan dengan identifikasi masalah, Desire - manfaat konkret dan social proof, Action - CTA yang jelas dan urgent. Plus prinsip: (1) Fokus pada benefit, bukan fitur, (2) Bahasa yang sederhana dan langsung, (3) Gunakan angka dan data, (4) Sertakan urgency atau kelangkaan jika relevan.",
         tips: ["Sertakan contoh copy yang pernah berkonversi tinggi"],
       },
       {
@@ -685,7 +685,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Bagaimana Anda melakukan riset topik untuk artikel blog?",
         answer:
-          "Proses: (1) Keyword research — Google Keyword Planner, Ahrefs, SEMrush untuk mencari kata kunci dengan volume + relevansi tinggi, (2) Analyze search intent — apa yang user cari (informational, transactional, navigational), (3) Competitor analysis — lihat top article untuk kata kunci tersebut, apa yang kurang, (4) Content gap — topik yang belum banyak diliput, (5) Brainstorm angle unik — perspektif berbeda dari kompetitor.",
+          "Proses: (1) Keyword research - Google Keyword Planner, Ahrefs, SEMrush untuk mencari kata kunci dengan volume + relevansi tinggi, (2) Analyze search intent - apa yang user cari (informational, transactional, navigational), (3) Competitor analysis - lihat top article untuk kata kunci tersebut, apa yang kurang, (4) Content gap - topik yang belum banyak diliput, (5) Brainstorm angle unik - perspektif berbeda dari kompetitor.",
         tips: [],
       },
       {
@@ -693,15 +693,15 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Ceritakan proses editorial Anda dari ide hingga publish.",
         answer:
-          "Proses: (1) Ideation — riset topik, keyword, brief konten, (2) Outline — struktur artikel dengan H1, H2, H3, key points, (3) Drafting — tulis first draft tanpa edit berlebihan, (4) Self-edit — proofread, cek grammar, optimasi SEO, (5) Peer review — kolega review untuk feedback, (6) Final polish — formatting, images, internal links, meta description, (7) Publish & promote — share di social media, newsletter.",
-        tips: ["Tekankan konsistensi — editorial calendar adalah kunci"],
+          "Proses: (1) Ideation - riset topik, keyword, brief konten, (2) Outline - struktur artikel dengan H1, H2, H3, key points, (3) Drafting - tulis first draft tanpa edit berlebihan, (4) Self-edit - proofread, cek grammar, optimasi SEO, (5) Peer review - kolega review untuk feedback, (6) Final polish - formatting, images, internal links, meta description, (7) Publish & promote - share di social media, newsletter.",
+        tips: ["Tekankan konsistensi - editorial calendar adalah kunci"],
       },
       {
         id: "cw-role-4",
         category: "role-specific",
         question: "Bagaimana Anda menulis untuk platform yang berbeda (blog, social media, email)?",
         answer:
-          "Setiap platform punya gaya berbeda: (1) Blog — long-form, edukatif, 1500-2500 kata, fokus SEO, (2) LinkedIn — profesional, thought leadership, 300-500 kata, (3) Instagram/TikTok — pendek, visual, hook di 3 detik pertama, (4) Twitter/X — ringkas, tajam, 280 karakter maksimal, (5) Email — personal, conversational, value-first. Saya sesuaikan tone dan format dengan platform dan audiens.",
+          "Setiap platform punya gaya berbeda: (1) Blog - long-form, edukatif, 1500-2500 kata, fokus SEO, (2) LinkedIn - profesional, thought leadership, 300-500 kata, (3) Instagram/TikTok - pendek, visual, hook di 3 detik pertama, (4) Twitter/X - ringkas, tajam, 280 karakter maksimal, (5) Email - personal, conversational, value-first. Saya sesuaikan tone dan format dengan platform dan audiens.",
         tips: [],
       },
     ],
@@ -718,7 +718,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Jelaskan proses rekrutmen Anda dari awal hingga akhir.",
         answer:
-          "Proses: (1) Sourcing — job board (LinkedIn, Glints, Jobstreet), referral program, headhunting pasif, (2) Screening — CV screening, phone screening untuk verifikasi dasar, (3) Assessment — technical test, psikotes, atau case study, (4) Interview — HR interview + user interview, (5) Offering — negosiasi gaji dan benefit, (6) Onboarding — pertama hari, dokumen, budaya perusahaan. Saya ukur efektivitas dengan time-to-hire dan quality-of-hire.",
+          "Proses: (1) Sourcing - job board (LinkedIn, Glints, Jobstreet), referral program, headhunting pasif, (2) Screening - CV screening, phone screening untuk verifikasi dasar, (3) Assessment - technical test, psikotes, atau case study, (4) Interview - HR interview + user interview, (5) Offering - negosiasi gaji dan benefit, (6) Onboarding - pertama hari, dokumen, budaya perusahaan. Saya ukur efektivitas dengan time-to-hire dan quality-of-hire.",
         tips: [],
       },
       {
@@ -726,7 +726,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Bagaimana Anda menangani employee retention?",
         answer:
-          "Retention strategy: (1) Exit interview — pahami kenapa orang pergi, (2) Stay interview — tanya karyawan yang masih bertahan apa yang membuat mereka betah, (3) Career development — clear career path, training budget, mentorship, (4) Compensation — market benchmark gaji setiap tahun, (5) Culture — feedback culture, work-life balance, recognition program. Saya juga monitor engagement survey secara berkala.",
+          "Retention strategy: (1) Exit interview - pahami kenapa orang pergi, (2) Stay interview - tanya karyawan yang masih bertahan apa yang membuat mereka betah, (3) Career development - clear career path, training budget, mentorship, (4) Compensation - market benchmark gaji setiap tahun, (5) Culture - feedback culture, work-life balance, recognition program. Saya juga monitor engagement survey secara berkala.",
         tips: [],
       },
       {
@@ -734,7 +734,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Apa yang Anda lakukan ketika ada konflik antar karyawan?",
         answer:
-          "Langkah-langkah: (1) Dengarkan kedua sisi secara terpisah — pahami perspektif masing-masing, (2) Mediasi bersama — fasilitasi diskusi terbuka dan aman, (3) Cari common ground — apa yang disepakati kedua pihak, (4) Action plan — solusi konkret dengan timeline, (5) Follow up — pastikan solusi berjalan. Jika serius, libatkan atasan atau gunakan prosedur formal perusahaan.",
+          "Langkah-langkah: (1) Dengarkan kedua sisi secara terpisah - pahami perspektif masing-masing, (2) Mediasi bersama - fasilitasi diskusi terbuka dan aman, (3) Cari common ground - apa yang disepakati kedua pihak, (4) Action plan - solusi konkret dengan timeline, (5) Follow up - pastikan solusi berjalan. Jika serius, libatkan atasan atau gunakan prosedur formal perusahaan.",
         tips: [],
       },
       {
@@ -742,7 +742,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Bagaimana Anda memastikan proses rekrutmen tidak bias?",
         answer:
-          "Strategi: (1) Blind screening — hapus nama, foto, usia, gender dari CV sebelum review, (2) Structured interview — pertanyaan sama untuk semua kandidat, dinilai dengan scoring rubric, (3) Diverse panel — interview panel dengan latar belakang berbeda, (4) Objective criteria — tetapkan kriteria sukses sebelum lihat kandidat, (5) Training — bias awareness training untuk semua interviewer.",
+          "Strategi: (1) Blind screening - hapus nama, foto, usia, gender dari CV sebelum review, (2) Structured interview - pertanyaan sama untuk semua kandidat, dinilai dengan scoring rubric, (3) Diverse panel - interview panel dengan latar belakang berbeda, (4) Objective criteria - tetapkan kriteria sukses sebelum lihat kandidat, (5) Training - bias awareness training untuk semua interviewer.",
         tips: [],
       },
       {
@@ -767,7 +767,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         question: "Apa itu BPJS Ketenagakerjaan dan apa saja programnya?",
         answer:
           "BPJS Ketenagakerjaan melindungi pekerja dari risiko kerja. Program: JKK (Jaminan Kecelakaan Kerja), JKM (Jaminan Kematian), JHT (Jaminan Hari Tua), JP (Jaminan Pensiun), JKP (Jaminan Kehilangan Pekerjaan).",
-        tips: ["HR wajib paham BPJS — ini sering ditanyakan di interview"],
+        tips: ["HR wajib paham BPJS - ini sering ditanyakan di interview"],
       },
       {
         id: "hr-role-8",
@@ -807,7 +807,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Jelaskan proses sales Anda dari prospecting hingga closing.",
         answer:
-          "Pipeline: (1) Prospecting — LinkedIn Sales Navigator, cold email, referral, event networking, (2) Qualification — BANT framework (Budget, Authority, Need, Timeline), (3) Discovery — pahami pain points dan goals klien, (4) Presentation — demo produk yang tailored ke kebutuhan mereka, (5) Objection handling — atasi keraguan, (6) Closing — proposal, negosiasi, kontrak, (7) Follow-up — pastikan delivery dan upsell opportunity.",
+          "Pipeline: (1) Prospecting - LinkedIn Sales Navigator, cold email, referral, event networking, (2) Qualification - BANT framework (Budget, Authority, Need, Timeline), (3) Discovery - pahami pain points dan goals klien, (4) Presentation - demo produk yang tailored ke kebutuhan mereka, (5) Objection handling - atasi keraguan, (6) Closing - proposal, negosiasi, kontrak, (7) Follow-up - pastikan delivery dan upsell opportunity.",
         tips: ["Sebutkan quota dan achievement pribadi"],
       },
       {
@@ -815,7 +815,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Bagaimana Anda menangani rejection dari calon klien?",
         answer:
-          "Rejection adalah bagian dari sales. Saya: (1) Tidak personal — pahami alasan objektif, (2) Follow up dengan value — kadang timing yang kurang tepat, bukan produk yang buruk, (3) Minta feedback — 'Apa yang membuat Anda memutuskan tidak lanjut?', (4) Keep in touch — nurture dengan konten relevan hingga mereka siap, (5) Analisis pola rejection — apakah ada pattern yang bisa diperbaiki di approach.",
+          "Rejection adalah bagian dari sales. Saya: (1) Tidak personal - pahami alasan objektif, (2) Follow up dengan value - kadang timing yang kurang tepat, bukan produk yang buruk, (3) Minta feedback - 'Apa yang membuat Anda memutuskan tidak lanjut?', (4) Keep in touch - nurture dengan konten relevan hingga mereka siap, (5) Analisis pola rejection - apakah ada pattern yang bisa diperbaiki di approach.",
         tips: [],
       },
       {
@@ -823,7 +823,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Bagaimana Anda mencapai target sales yang agresif?",
         answer:
-          "Strategi: (1) Break down target — bulanan → mingguan → harian, (2) Prioritaskan pipeline — fokus pada deals dengan probability tinggi, (3) Time blocking — dedicated time untuk prospecting, follow-up, admin, (4) Leverage tools — CRM automation, email sequences, LinkedIn automation, (5) Continuous improvement — analisis win/loss ratio, refine pitch. Saya selalu exceed target [X]% di role sebelumnya.",
+          "Strategi: (1) Break down target - bulanan → mingguan → harian, (2) Prioritaskan pipeline - fokus pada deals dengan probability tinggi, (3) Time blocking - dedicated time untuk prospecting, follow-up, admin, (4) Leverage tools - CRM automation, email sequences, LinkedIn automation, (5) Continuous improvement - analisis win/loss ratio, refine pitch. Saya selalu exceed target [X]% di role sebelumnya.",
         tips: [],
       },
       {
@@ -831,7 +831,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Bagaimana Anda membangun hubungan jangka panjang dengan klien?",
         answer:
-          "Relationship building: (1) Trust — deliver promise, jangan over-promise, (2) Value-add — sharing industry insight, bukan cuma jualan, (3) Regular check-in — update produk, tanya kabar bisnis, (4) Customer success — pastikan klien sukses pakai produk, (5) Upsell/cross-sell yang relevant — jangan paksa, (6) Personal touch — ingat detail personal (ulang tahun, hobi).",
+          "Relationship building: (1) Trust - deliver promise, jangan over-promise, (2) Value-add - sharing industry insight, bukan cuma jualan, (3) Regular check-in - update produk, tanya kabar bisnis, (4) Customer success - pastikan klien sukses pakai produk, (5) Upsell/cross-sell yang relevant - jangan paksa, (6) Personal touch - ingat detail personal (ulang tahun, hobi).",
         tips: [],
       },
       {
@@ -839,8 +839,8 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Jual produk ini kepada saya! (Sell me this pen!)",
         answer:
-          "Sebelum menjual, tanya dulu kebutuhan: 'Kapan terakhir kali Anda menggunakan pulpen dan apa yang penting bagi Anda?' Setelah tahu kebutuhannya, baru tawarkan solusi. Kuncinya: tanya dulu kebutuhan, baru tawarkan solusi — jangan langsung pitching.",
-        tips: ["Ini tes klasik — tunjukkan bahwa Anda mendengar kebutuhan sebelum menjual"],
+          "Sebelum menjual, tanya dulu kebutuhan: 'Kapan terakhir kali Anda menggunakan pulpen dan apa yang penting bagi Anda?' Setelah tahu kebutuhannya, baru tawarkan solusi. Kuncinya: tanya dulu kebutuhan, baru tawarkan solusi - jangan langsung pitching.",
+        tips: ["Ini tes klasik - tunjukkan bahwa Anda mendengar kebutuhan sebelum menjual"],
       },
       {
         id: "se-role-6",
@@ -890,7 +890,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Jelaskan proses desain Anda dari riset hingga handoff ke developer.",
         answer:
-          "Proses: (1) Research — user interview, competitive analysis, analytics review, (2) Define — user personas, problem statement, user journey map, (3) Ideate — brainstorming, sketching, wireframe, (4) Design — high-fidelity mockup di Figma, design system, (5) Prototype — interactive prototype untuk user testing, (6) Validate — usability testing, iterasi berdasarkan feedback, (7) Handoff — design spec, asset export, developer handoff dengan Figma Dev Mode.",
+          "Proses: (1) Research - user interview, competitive analysis, analytics review, (2) Define - user personas, problem statement, user journey map, (3) Ideate - brainstorming, sketching, wireframe, (4) Design - high-fidelity mockup di Figma, design system, (5) Prototype - interactive prototype untuk user testing, (6) Validate - usability testing, iterasi berdasarkan feedback, (7) Handoff - design spec, asset export, developer handoff dengan Figma Dev Mode.",
         tips: ["Sebutkan tools: Figma, Miro, Maze, Dovetail"],
       },
       {
@@ -898,7 +898,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Bagaimana Anda membuat keputusan desain berdasarkan data?",
         answer:
-          "Saya menggunakan data triangulation: (1) Qualitative — user interview, usability testing (findings dari Maze/UserTesting), (2) Quantitative — analytics (hotjar heatmaps, Google Analytics funnels), A/B testing results, (3) Heuristic — Nielsen's 10 usability heuristics untuk evaluasi cepat, (4) Business metrics — conversion rate, task completion rate, time-on-task. Design decisions didukung minimal 2 sumber data.",
+          "Saya menggunakan data triangulation: (1) Qualitative - user interview, usability testing (findings dari Maze/UserTesting), (2) Quantitative - analytics (hotjar heatmaps, Google Analytics funnels), A/B testing results, (3) Heuristic - Nielsen's 10 usability heuristics untuk evaluasi cepat, (4) Business metrics - conversion rate, task completion rate, time-on-task. Design decisions didukung minimal 2 sumber data.",
         tips: [],
       },
       {
@@ -906,7 +906,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Apa yang Anda lakukan ketika stakeholder meminta fitur yang tidak user-centric?",
         answer:
-          "Pendekatan: (1) Dengarkan dulu — pahami goals bisnis di balik request tersebut, (2) Data-driven — tunjukkan data riset user yang bertentangan dengan request, (3) Alternatif — usulkan solusi yang memenuhi goals bisnis TETAP user-centric, (4) Compromise — prioritaskan: mana yang bisa di-launch dulu, mana yang butuh riset lebih lanjut, (5) Test — 'Bagaimana kalau kita A/B test dulu?'",
+          "Pendekatan: (1) Dengarkan dulu - pahami goals bisnis di balik request tersebut, (2) Data-driven - tunjukkan data riset user yang bertentangan dengan request, (3) Alternatif - usulkan solusi yang memenuhi goals bisnis TETAP user-centric, (4) Compromise - prioritaskan: mana yang bisa di-launch dulu, mana yang butuh riset lebih lanjut, (5) Test - 'Bagaimana kalau kita A/B test dulu?'",
         tips: [],
       },
       {
@@ -931,7 +931,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Jelaskan proses kreatif Anda dari brief hingga final design.",
         answer:
-          "Proses: (1) Brief analysis — pahami goals, target audience, brand guidelines, (2) Research — moodboard, referensi visual, tren industri, (3) Ideation — thumbnail sketching, eksplorasi konsep, (4) Design — digital execution di tools pilihan, (5) Refinement — detail polishing, color correction, typography, (6) Feedback — presentasi ke client/stakeholder, iterasi, (7) Finalize — prepare file untuk print/digital.",
+          "Proses: (1) Brief analysis - pahami goals, target audience, brand guidelines, (2) Research - moodboard, referensi visual, tren industri, (3) Ideation - thumbnail sketching, eksplorasi konsep, (4) Design - digital execution di tools pilihan, (5) Refinement - detail polishing, color correction, typography, (6) Feedback - presentasi ke client/stakeholder, iterasi, (7) Finalize - prepare file untuk print/digital.",
         tips: [],
       },
       {
@@ -939,7 +939,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Bagaimana Anda menangani feedback yang kontradiktif dari multiple stakeholder?",
         answer:
-          "Strategi: (1) Kumpulkan semua feedback dan kategorikan, (2) Identifikasi mana yang berasal dari user needs vs personal preference, (3) Prioritaskan berdasarkan project goals — feedback yang align dengan goals, (4) Usulkan solusi kompromi — design yang mengakomodasi beberapa feedback, (5) Decision maker — jika deadlock, minta keputusan dari satu orang yang bertanggung jawab.",
+          "Strategi: (1) Kumpulkan semua feedback dan kategorikan, (2) Identifikasi mana yang berasal dari user needs vs personal preference, (3) Prioritaskan berdasarkan project goals - feedback yang align dengan goals, (4) Usulkan solusi kompromi - design yang mengakomodasi beberapa feedback, (5) Decision maker - jika deadlock, minta keputusan dari satu orang yang bertanggung jawab.",
         tips: [],
       },
       {
@@ -947,7 +947,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Apa tools desain utama Anda dan bagaimana Anda menggunakannya secara efisien?",
         answer:
-          "Tools utama: (1) Figma — UI/UX, prototyping, kolaborasi tim, (2) Adobe Illustrator — vector graphics, logo, ilustrasi, (3) Adobe Photoshop — photo editing, digital painting, (4) Adobe After Effects — motion graphics, animasi. Efisiensi: plugins (automate repetitive tasks), keyboard shortcuts, custom templates, file organization yang rapi.",
+          "Tools utama: (1) Figma - UI/UX, prototyping, kolaborasi tim, (2) Adobe Illustrator - vector graphics, logo, ilustrasi, (3) Adobe Photoshop - photo editing, digital painting, (4) Adobe After Effects - motion graphics, animasi. Efisiensi: plugins (automate repetitive tasks), keyboard shortcuts, custom templates, file organization yang rapi.",
         tips: [],
       },
       {
@@ -974,7 +974,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Jelaskan metodologi manajemen proyek yang Anda kuasai.",
         answer:
-          "Saya menguasai beberapa metodologi: (1) Agile/Scrum — untuk software development, sprint planning, daily standup, retrospective, (2) Waterfall — untuk proyek dengan requirement fixed (konstruksi, manufacturing), (3) Hybrid — kombinasi perencanaan upfront + execution agile. Saya memilih metodologi berdasarkan tipe proyek, tim, dan client preference. Saya juga certified Scrum Master.",
+          "Saya menguasai beberapa metodologi: (1) Agile/Scrum - untuk software development, sprint planning, daily standup, retrospective, (2) Waterfall - untuk proyek dengan requirement fixed (konstruksi, manufacturing), (3) Hybrid - kombinasi perencanaan upfront + execution agile. Saya memilih metodologi berdasarkan tipe proyek, tim, dan client preference. Saya juga certified Scrum Master.",
         tips: [],
       },
       {
@@ -982,7 +982,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Bagaimana Anda menangani proyek yang meleset dari deadline?",
         answer:
-          "Langkah: (1) Assess — identifikasi penyebab keterlambatan (scope creep? resource? technical debt?), (2) Communicate — informasikan stakeholder segera, jangan sembunyi, (3) Mitigasi — apa yang bisa dilakukan? (tambah resource, kurangi scope, parallel task), (4) New timeline — realistic estimate, buffer untuk risiko, (5) Lessons learned — post-mortem untuk mencegah terulang.",
+          "Langkah: (1) Assess - identifikasi penyebab keterlambatan (scope creep? resource? technical debt?), (2) Communicate - informasikan stakeholder segera, jangan sembunyi, (3) Mitigasi - apa yang bisa dilakukan? (tambah resource, kurangi scope, parallel task), (4) New timeline - realistic estimate, buffer untuk risiko, (5) Lessons learned - post-mortem untuk mencegah terulang.",
         tips: [],
       },
       {
@@ -990,7 +990,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Bagaimana Anda memprioritaskan task dalam proyek yang kompleks?",
         answer:
-          "Framework prioritas: (1) Impact vs Effort matrix — lakukan high impact low effort dulu, (2) MoSCoW — Must have, Should have, Could have, Won't have, (3) Dependencies — mana yang blocking task lain? Kerjakan itu dulu, (4) Risk assessment — task dengan high risk perlu perhatian lebih awal. Tools: Jira, Trello, atau Asana untuk tracking.",
+          "Framework prioritas: (1) Impact vs Effort matrix - lakukan high impact low effort dulu, (2) MoSCoW - Must have, Should have, Could have, Won't have, (3) Dependencies - mana yang blocking task lain? Kerjakan itu dulu, (4) Risk assessment - task dengan high risk perlu perhatian lebih awal. Tools: Jira, Trello, atau Asana untuk tracking.",
         tips: [],
       },
       {
@@ -998,7 +998,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Ceritakan proyek paling menantang yang pernah Anda kelola.",
         answer:
-          "Contoh: [Nama proyek] dengan budget [budget] dan tim [size]. Tantangan: [deskripsi tantangan — misal: stakeholder tidak aligned, timeline ketat, resource terbatas]. yang saya lakukan: [aksi — misal: daily sync dengan stakeholder, reprioritasi scope, tambah freelance resource]. Hasil: deliver tepat waktu dengan kualitas sesuai standar, dan client puas. Pelajaran: [apa yang dipelajari].",
+          "Contoh: [Nama proyek] dengan budget [budget] dan tim [size]. Tantangan: [deskripsi tantangan - misal: stakeholder tidak aligned, timeline ketat, resource terbatas]. yang saya lakukan: [aksi - misal: daily sync dengan stakeholder, reprioritasi scope, tambah freelance resource]. Hasil: deliver tepat waktu dengan kualitas sesuai standar, dan client puas. Pelajaran: [apa yang dipelajari].",
         tips: ["Gunakan format STAR (Situation, Task, Action, Result)"],
       },
     ],
@@ -1015,7 +1015,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Jelaskan bagaimana Anda menentukan product roadmap.",
         answer:
-          "Proses: (1) Vision & strategy — di mana produk ingin berada dalam 1-2 tahun? (2) Data gathering — user feedback (survei, interview, support tickets), analytics (usage, retention), market research (kompetitor, tren), (3) Prioritization — framework seperti RICE (Reach, Impact, Confidence, Effort) atau Value vs Effort, (4) Stakeholder alignment — presentasi roadmap, manage ekspektasi, (5) Review & adapt — roadmap bukan dokumen mati, review setiap kuartal.",
+          "Proses: (1) Vision & strategy - di mana produk ingin berada dalam 1-2 tahun? (2) Data gathering - user feedback (survei, interview, support tickets), analytics (usage, retention), market research (kompetitor, tren), (3) Prioritization - framework seperti RICE (Reach, Impact, Confidence, Effort) atau Value vs Effort, (4) Stakeholder alignment - presentasi roadmap, manage ekspektasi, (5) Review & adapt - roadmap bukan dokumen mati, review setiap kuartal.",
         tips: [],
       },
       {
@@ -1023,7 +1023,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Bagaimana Anda memutuskan fitur apa yang akan dibangun selanjutnya?",
         answer:
-          "Saya menggunakan data-informed decision: (1) Impact — berapa banyak user yang akan terbantu? Berapa revenue potensial? (2) Urgency — apakah ini blocking issue? (3) Strategic alignment — apakah fitur ini mendukung visi produk? (4) Effort — berapa banyak resource yang dibutuhkan? (5) Confidence — seberapa yakin kita dengan estimasi? Tools: productboard atau Notion untuk manage ide dan prioritasi.",
+          "Saya menggunakan data-informed decision: (1) Impact - berapa banyak user yang akan terbantu? Berapa revenue potensial? (2) Urgency - apakah ini blocking issue? (3) Strategic alignment - apakah fitur ini mendukung visi produk? (4) Effort - berapa banyak resource yang dibutuhkan? (5) Confidence - seberapa yakin kita dengan estimasi? Tools: productboard atau Notion untuk manage ide dan prioritasi.",
         tips: [],
       },
       {
@@ -1031,7 +1031,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Bagaimana Anda mengukur kesuksesan sebuah fitur?",
         answer:
-          "North star metrics sesuai tipe fitur: (1) Feature adoption rate — berapa % user mencoba fitur dalam X hari? (2) Engagement — frequency of use, time spent, (3) Retention — apakah user yang pakai fitur ini lebih loyal? (4) Business impact — conversion rate, revenue, (5) User satisfaction — NPS, CSAT, feedback kualitatif. Definisi sukses ditentukan SEBELUM fitur dibangun.",
+          "North star metrics sesuai tipe fitur: (1) Feature adoption rate - berapa % user mencoba fitur dalam X hari? (2) Engagement - frequency of use, time spent, (3) Retention - apakah user yang pakai fitur ini lebih loyal? (4) Business impact - conversion rate, revenue, (5) User satisfaction - NPS, CSAT, feedback kualitatif. Definisi sukses ditentukan SEBELUM fitur dibangun.",
         tips: [],
       },
       {
@@ -1039,7 +1039,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Apa yang Anda lakukan ketika engineering mengatakan estimasi lebih lama dari ekspektasi?",
         answer:
-          "Langkah: (1) Pahami 'mengapa' — technical debt? Complexity? Resource kurang? (2) Break down — apa yang membuat lama? Bisa di-scope down? (3) Trade-off — apa yang bisa dikorbankan untuk mempercepat? (4) Alternative — solusi lain yang lebih sederhana? (5) Timeline adjustment — jika memang realistis, terima dan manage ekspektasi stakeholder. Jangan paksa estimasi yang tidak realistis.",
+          "Langkah: (1) Pahami 'mengapa' - technical debt? Complexity? Resource kurang? (2) Break down - apa yang membuat lama? Bisa di-scope down? (3) Trade-off - apa yang bisa dikorbankan untuk mempercepat? (4) Alternative - solusi lain yang lebih sederhana? (5) Timeline adjustment - jika memang realistis, terima dan manage ekspektasi stakeholder. Jangan paksa estimasi yang tidak realistis.",
         tips: [],
       },
     ],
@@ -1056,7 +1056,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Bagaimana Anda mengelola banyak tugas administratif secara bersamaan?",
         answer:
-          "Saya menggunakan sistem prioritas dan organisasi: (1) Daily to-do list — tulis semua task, prioritaskan urgency vs importance, (2) Time blocking — alokasikan waktu spesifik untuk task tertentu, (3) Tools — Google Calendar, Trello/Notion untuk tracking, (4) Batch processing — kumpulkan task serupa dan kerjakan sekaligus (misal: semua email dibalas di sesi yang sama), (5) Regular review — evaluasi produktivitas dan adjust approach.",
+          "Saya menggunakan sistem prioritas dan organisasi: (1) Daily to-do list - tulis semua task, prioritaskan urgency vs importance, (2) Time blocking - alokasikan waktu spesifik untuk task tertentu, (3) Tools - Google Calendar, Trello/Notion untuk tracking, (4) Batch processing - kumpulkan task serupa dan kerjakan sekaligus (misal: semua email dibalas di sesi yang sama), (5) Regular review - evaluasi produktivitas dan adjust approach.",
         tips: ["Berikan contoh konkret tools yang digunakan"],
       },
       {
@@ -1064,7 +1064,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Software perkantoran apa yang Anda kuasai?",
         answer:
-          "Saya mahir menggunakan: (1) Microsoft Office Suite — Word (mail merge, formatting), Excel (vlookup, pivot table, formula), PowerPoint, Outlook, (2) Google Workspace — Docs, Sheets, Gmail, Calendar, (3) Tools tambahan — Google Drive/Dropbox untuk file management, Trello/Asana untuk task management, Slack/Teams untuk komunikasi, Canva untuk design sederhana.",
+          "Saya mahir menggunakan: (1) Microsoft Office Suite - Word (mail merge, formatting), Excel (vlookup, pivot table, formula), PowerPoint, Outlook, (2) Google Workspace - Docs, Sheets, Gmail, Calendar, (3) Tools tambahan - Google Drive/Dropbox untuk file management, Trello/Asana untuk task management, Slack/Teams untuk komunikasi, Canva untuk design sederhana.",
         tips: [],
       },
       {
@@ -1072,7 +1072,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Bagaimana Anda memastikan akurasi data entry yang tinggi?",
         answer:
-          "Saya memiliki sistem double-check: (1) Pertama entry — fokus penuh, minim distraksi, (2) Verification — cross-check dengan sumber asli setelah entry, (3) Formula — gunakan Excel validation, conditional formatting untuk mendeteksi anomali, (4) Batch check — review sampel data secara random, (5) Regular audit — bandingkan data dengan periode sebelumnya untuk deteksi outlier.",
+          "Saya memiliki sistem double-check: (1) Pertama entry - fokus penuh, minim distraksi, (2) Verification - cross-check dengan sumber asli setelah entry, (3) Formula - gunakan Excel validation, conditional formatting untuk mendeteksi anomali, (4) Batch check - review sampel data secara random, (5) Regular audit - bandingkan data dengan periode sebelumnya untuk deteksi outlier.",
         tips: [],
       },
       {
@@ -1080,7 +1080,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Bagaimana Anda menangani informasi rahasia di tempat kerja?",
         answer:
-          "Saya sangat menjaga kerahasiaan: (1) Tidak membahas informasi sensitif di tempat umum, (2) Lock screen saat meninggalkan workstation, (3) Password management — tidak share password, gunakan manager password, (4) Secure file handling — enkripsi file sensitif, hapus setelah tidak diperlukan, (5) Sadar phishing — tidak sembarang klik link atau buka lampiran, (6) Memahami dan mematuhi kebijakan perusahaan tentang data privacy.",
+          "Saya sangat menjaga kerahasiaan: (1) Tidak membahas informasi sensitif di tempat umum, (2) Lock screen saat meninggalkan workstation, (3) Password management - tidak share password, gunakan manager password, (4) Secure file handling - enkripsi file sensitif, hapus setelah tidak diperlukan, (5) Sadar phishing - tidak sembarang klik link atau buka lampiran, (6) Memahami dan mematuhi kebijakan perusahaan tentang data privacy.",
         tips: [],
       },
       {
@@ -1131,7 +1131,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Bagaimana Anda mengelola kelas dengan siswa yang memiliki kemampuan berbeda?",
         answer:
-          "Saya menggunakan differentiated instruction: (1) Assessment awal — identifikasi level kemampuan masing-masing siswa, (2) Grouping — kelompokkan berdasarkan level untuk tugas tertentu, (3) Variasi materi — berikan tugas yang berbeda tingkat kesulitannya, (4) Scaffolding — siswa yang lebih lambat dapat tambahan bimbingan, yang lebih cepat dapat enrichment, (5) Flexible seating — atur posisi duduk sesuai kebutuhan pembelajaran.",
+          "Saya menggunakan differentiated instruction: (1) Assessment awal - identifikasi level kemampuan masing-masing siswa, (2) Grouping - kelompokkan berdasarkan level untuk tugas tertentu, (3) Variasi materi - berikan tugas yang berbeda tingkat kesulitannya, (4) Scaffolding - siswa yang lebih lambat dapat tambahan bimbingan, yang lebih cepat dapat enrichment, (5) Flexible seating - atur posisi duduk sesuai kebutuhan pembelajaran.",
         tips: [],
       },
       {
@@ -1139,7 +1139,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Ceritakan metode pengajaran favorit Anda dan mengapa efektif.",
         answer:
-          "Metode favorit saya adalah project-based learning (PBL). Siswa belajar melalui proyek nyata yang relevan dengan kehidupan sehari-hari. Efektif karena: (1) Meningkatkan engagement — siswa melihat relevansi materi, (2) Mengembangkan critical thinking — bukan hanya hafalan, (3) Kolaborasi — belajar bekerja dalam tim, (4) Authentic assessment — hasil proyek menunjukkan pemahaman nyata.",
+          "Metode favorit saya adalah project-based learning (PBL). Siswa belajar melalui proyek nyata yang relevan dengan kehidupan sehari-hari. Efektif karena: (1) Meningkatkan engagement - siswa melihat relevansi materi, (2) Mengembangkan critical thinking - bukan hanya hafalan, (3) Kolaborasi - belajar bekerja dalam tim, (4) Authentic assessment - hasil proyek menunjukkan pemahaman nyata.",
         tips: [],
       },
       {
@@ -1147,7 +1147,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Bagaimana Anda menangani siswa yang sulit diatur atau tidak termotivasi?",
         answer:
-          "Pendekatan: (1) Cari akar masalah — apakah masalah di rumah? Kesulitan belajar? Bosan? (2) Build rapport — hubungan personal, tunjukkan bahwa saya peduli, (3) Connect to interests — kaitkan materi dengan minat mereka, (4) Give choices — berikan opsi tugas agar mereka merasa punya kontrol, (5) Positive reinforcement — apresiasi progress kecil, bukan hanya hasil akhir, (6) Libatkan orang tua — komunikasi rutin untuk support dari rumah.",
+          "Pendekatan: (1) Cari akar masalah - apakah masalah di rumah? Kesulitan belajar? Bosan? (2) Build rapport - hubungan personal, tunjukkan bahwa saya peduli, (3) Connect to interests - kaitkan materi dengan minat mereka, (4) Give choices - berikan opsi tugas agar mereka merasa punya kontrol, (5) Positive reinforcement - apresiasi progress kecil, bukan hanya hasil akhir, (6) Libatkan orang tua - komunikasi rutin untuk support dari rumah.",
         tips: [],
       },
       {
@@ -1172,7 +1172,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Bagaimana Anda menangani situasi darurat medis?",
         answer:
-          "Prosedur: (1) Primary survey (ABCDE) — Airway, Breathing, Circulation, Disability, Exposure, (2) Panggil bantuan — code blue / dokter jaga, (3) Tindakan awal — CPR jika perlu, oksigen, akses IV, (4) Monitor — vital sign tiap 5 menit, (5) Dokumentasi — catat seluruh tindakan dan respons pasien, (6) Debriefing — evaluasi tim setelah situasi stabil. Saya tetap tenang mengikuti pelatihan BLS/ACLS.",
+          "Prosedur: (1) Primary survey (ABCDE) - Airway, Breathing, Circulation, Disability, Exposure, (2) Panggil bantuan - code blue / dokter jaga, (3) Tindakan awal - CPR jika perlu, oksigen, akses IV, (4) Monitor - vital sign tiap 5 menit, (5) Dokumentasi - catat seluruh tindakan dan respons pasien, (6) Debriefing - evaluasi tim setelah situasi stabil. Saya tetap tenang mengikuti pelatihan BLS/ACLS.",
         tips: ["Sebutkan sertifikasi: BLS, ACLS, PPGD"],
       },
       {
@@ -1180,7 +1180,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Bagaimana Anda menjaga empati saat menangani pasien yang sulit?",
         answer:
-          "Prinsip: (1) Dengarkan tanpa menghakimi — biarkan pasien mengekspresikan frustrasi, (2) Validasi perasaan — 'Saya mengerti Anda merasa frustrasi', (3) Tetap profesional — jangan bawa emosi pribadi, (4) Cari kebutuhan di balik keluhan — apa yang sebenarnya pasien butuhkan?, (5) Self-care — jaga mental health sendiri, jangan bawa pulang stress kerja, (6) Peer support — sharing dengan rekan sejawat.",
+          "Prinsip: (1) Dengarkan tanpa menghakimi - biarkan pasien mengekspresikan frustrasi, (2) Validasi perasaan - 'Saya mengerti Anda merasa frustrasi', (3) Tetap profesional - jangan bawa emosi pribadi, (4) Cari kebutuhan di balik keluhan - apa yang sebenarnya pasien butuhkan?, (5) Self-care - jaga mental health sendiri, jangan bawa pulang stress kerja, (6) Peer support - sharing dengan rekan sejawat.",
         tips: [],
       },
       {
@@ -1188,7 +1188,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Jelaskan pengalaman Anda dengan dokumentasi medis dan rekam medis elektronik.",
         answer:
-          "Saya terbiasa dengan dokumentasi medis yang akurat dan tepat waktu: (1) SOAP format — Subjective, Objective, Assessment, Plan, (2) Sistem RME/EHR — pengalaman dengan Simrs, ERME, atau SATUSEHAT, (3) Dokumentasi obat — nama, dosis, rute, waktu, reaksi, (4) Informed consent — pastikan pasien memahami prosedur, (5) Kerahasiaan — patuhi UU dan kode etik tentang privasi pasien.",
+          "Saya terbiasa dengan dokumentasi medis yang akurat dan tepat waktu: (1) SOAP format - Subjective, Objective, Assessment, Plan, (2) Sistem RME/EHR - pengalaman dengan Simrs, ERME, atau SATUSEHAT, (3) Dokumentasi obat - nama, dosis, rute, waktu, reaksi, (4) Informed consent - pastikan pasien memahami prosedur, (5) Kerahasiaan - patuhi UU dan kode etik tentang privasi pasien.",
         tips: [],
       },
       {
@@ -1196,7 +1196,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Bagaimana Anda menangani beban kerja yang tinggi dengan shift malam?",
         answer:
-          "Strategi: (1) Time management — prioritas berdasarkan urgensi pasien, (2) Teamwork — delegasi tugas sesuai kompetensi, (3) Physical preparation — tidur cukup sebelum shift malam, makan sehat, (4) Mental health — boundary antara kerja dan istirahat, (5) Komunikasi — handover yang jelas antar shift, (6) Safety first — jangan kompromi pada keselamatan pasien meskipun sibuk.",
+          "Strategi: (1) Time management - prioritas berdasarkan urgensi pasien, (2) Teamwork - delegasi tugas sesuai kompetensi, (3) Physical preparation - tidur cukup sebelum shift malam, makan sehat, (4) Mental health - boundary antara kerja dan istirahat, (5) Komunikasi - handover yang jelas antar shift, (6) Safety first - jangan kompromi pada keselamatan pasien meskipun sibuk.",
         tips: [],
       },
     ],
@@ -1216,7 +1216,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         question: "Apa yang Anda ketahui tentang siklus akuntansi?",
         answer:
           "Siklus akuntansi adalah rangkaian proses dari transaksi keuangan hingga menjadi laporan keuangan: Transaksi → Jurnal → Buku Besar (Ledger) → Neraca Saldo → Jurnal Penyesuaian → Laporan Keuangan → Jurnal Penutup → Neraca Saldo Setelah Penutup.",
-        tips: ["Hafalkan urutannya — ini pertanyaan wajib untuk fresh graduate akuntansi"],
+        tips: ["Hafalkan urutannya - ini pertanyaan wajib untuk fresh graduate akuntansi"],
       },
       {
         id: "acc-role-2",
@@ -1288,7 +1288,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         question: "Apa yang Anda lakukan jika menemukan kesalahan dalam laporan yang sudah disubmit?",
         answer:
           "Segera melapor ke atasan, jangan menyembunyikan. Kemudian buat jurnal koreksi yang sesuai, dokumentasikan penyebab dan solusinya, serta pastikan tidak terulang dengan memperbaiki proses verifikasi.",
-        tips: ["Kejujuran adalah kunci — jangan pernah mencoba menutupi kesalahan"],
+        tips: ["Kejujuran adalah kunci - jangan pernah mencoba menutupi kesalahan"],
       },
     ],
   },
@@ -1315,7 +1315,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         question: "Bagaimana cara Anda menghadapi pelanggan yang marah atau emosional?",
         answer:
           "1) Tetap tenang dan jangan terbawa emosi. 2) Biarkan pelanggan mengungkapkan keluhan tanpa interupsi. 3) Tunjukkan empati: 'Saya paham betapa frustrasinya situasi ini.' 4) Minta maaf atas ketidaknyamanan. 5) Fokus pada solusi, bukan perdebatan. 6) Konfirmasi masalah sudah terselesaikan.",
-        tips: ["Jangan pernah membalas kemarahan dengan kemarahan — tetap profesional"],
+        tips: ["Jangan pernah membalas kemarahan dengan kemarahan - tetap profesional"],
       },
       {
         id: "cs-role-3",
@@ -1397,7 +1397,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Jelaskan perbedaan FIFO, LIFO, dan FEFO.",
         answer:
-          "FIFO (First In First Out): barang yang masuk pertama dikeluarkan pertama — metode umum. LIFO (Last In First Out): barang yang masuk terakhir dikeluarkan pertama — jarang di Indonesia. FEFO (First Expired First Out): barang dengan kadaluarsa terdekat dikeluarkan pertama — wajib di industri makanan dan farmasi.",
+          "FIFO (First In First Out): barang yang masuk pertama dikeluarkan pertama - metode umum. LIFO (Last In First Out): barang yang masuk terakhir dikeluarkan pertama - jarang di Indonesia. FEFO (First Expired First Out): barang dengan kadaluarsa terdekat dikeluarkan pertama - wajib di industri makanan dan farmasi.",
         tips: [],
       },
       {
@@ -1414,7 +1414,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         question: "Apa itu EOQ (Economic Order Quantity)?",
         answer:
           "EOQ adalah jumlah pemesanan optimal yang meminimalkan total biaya inventori (biaya pesan + biaya simpan). Formula: EOQ = √(2DS/H) di mana D = demand tahunan, S = biaya per order, H = biaya simpan per unit per tahun.",
-        tips: ["Pahami konsepnya, tidak perlu hafal rumus persis — yang penting paham tujuannya"],
+        tips: ["Pahami konsepnya, tidak perlu hafal rumus persis - yang penting paham tujuannya"],
       },
       {
         id: "sc-role-6",
@@ -1488,7 +1488,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Apa itu outlier dan bagaimana cara mengidentifikasinya?",
         answer:
-          "Outlier adalah nilai yang jauh menyimpang dari distribusi normal. Identifikasi: Visualisasi (boxplot, scatter plot) atau Statistik (IQR method — nilai di luar Q1-1.5×IQR atau Q3+1.5×IQR, Z-score > 3). Penanganan: drop, transformasi log, atau cap/floor.",
+          "Outlier adalah nilai yang jauh menyimpang dari distribusi normal. Identifikasi: Visualisasi (boxplot, scatter plot) atau Statistik (IQR method - nilai di luar Q1-1.5×IQR atau Q3+1.5×IQR, Z-score > 3). Penanganan: drop, transformasi log, atau cap/floor.",
         tips: [],
       },
       {
@@ -1497,7 +1497,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         question: "Apa perbedaan antara korelasi dan kausalitas?",
         answer:
           "Korelasi: dua variabel bergerak bersama (positif/negatif), tapi tidak berarti sebab-akibat. Kausalitas: satu variabel secara langsung menyebabkan perubahan pada variabel lain. Contoh: penjualan es krim berkorelasi dengan tenggelam di kolam renang (sama-sama naik di musim panas), tapi bukan penyebab.",
-        tips: ["Ini pertanyaan klasik — tunjukkan pemahaman dengan contoh nyata"],
+        tips: ["Ini pertanyaan klasik - tunjukkan pemahaman dengan contoh nyata"],
       },
       {
         id: "da-role-7",
@@ -1572,7 +1572,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         question: "Apakah Anda bersedia bekerja shift malam dan lembur jika diperlukan?",
         answer:
           "Ya, saya bersedia bekerja shift malam dan lembur sesuai kebutuhan produksi. Saya memahami bahwa industri manufaktur membutuhkan operasi 24 jam dan saya siap menjalankan jadwal yang ditetapkan.",
-        tips: ["Jawab jujur — jika benar-benar tidak bisa shift malam, sampaikan sejak awal"],
+        tips: ["Jawab jujur - jika benar-benar tidak bisa shift malam, sampaikan sejak awal"],
       },
       {
         id: "op-role-6",
@@ -1580,7 +1580,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         question: "Apa itu 5S/5R dan mengapa penting?",
         answer:
           "5S (Seiri-Ringkas, Seiton-Rapi, Seiso-Resik, Seiketsu-Rawat, Shitsuke-Rajin) adalah metode pengelolaan tempat kerja yang sistematis. Penting untuk: meningkatkan efisiensi, mengurangi waste, mencegah kecelakaan, dan menciptakan lingkungan kerja yang nyaman dan produktif.",
-        tips: ["5S adalah konsep dasar di hampir semua pabrik — pahami baik-baik"],
+        tips: ["5S adalah konsep dasar di hampir semua pabrik - pahami baik-baik"],
       },
       {
         id: "op-role-7",
@@ -1615,7 +1615,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         question: "Jelaskan langkah Anda ketika ada user yang melaporkan komputer tidak bisa menyala.",
         answer:
           "1) Cek kabel power dan sumber listrik. 2) Cek indikator LED pada CPU dan monitor. 3) Coba restart. 4) Jika masih mati, cek hardware internal (power supply, koneksi kabel). 5) Dokumentasi dan laporkan temuan. Selalu mulai dari yang paling sederhana dulu.",
-        tips: ["Pendekatan sistematis — mulai dari yang paling mungkin dan termudah"],
+        tips: ["Pendekatan sistematis - mulai dari yang paling mungkin dan termudah"],
       },
       {
         id: "it-role-2",
@@ -1672,7 +1672,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         question: "Apa yang Anda ketahui tentang Industrial Engineering?",
         answer:
           "Industrial Engineering adalah ilmu yang berfokus pada optimalisasi sistem, proses, dan sumber daya. Mencakup perancangan, perbaikan, dan instalasi sistem terintegrasi yang terdiri dari manusia, material, peralatan, energi, dan informasi. Tujuannya meningkatkan efisiensi, produktivitas, dan kualitas.",
-        tips: ["Tekankan pendekatan sistem — IE bukan hanya tentang efisiensi, tapi optimalisasi menyeluruh"],
+        tips: ["Tekankan pendekatan sistem - IE bukan hanya tentang efisiensi, tapi optimalisasi menyeluruh"],
       },
       {
         id: "ie-role-2",
@@ -1695,7 +1695,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Apa itu layout pabrik dan jenis-jenisnya?",
         answer:
-          "Layout pabrik adalah pengaturan fisik fasilitas produksi. Jenis: (1) Product Layout — berdasarkan urutan proses produk, cocok produksi massal. (2) Process Layout — berdasarkan fungsi mesin, cocok job shop. (3) Fixed Position Layout — produk diam, pekerja bergerak. (4) Cellular Layout — grup mesin untuk produk keluarga tertentu.",
+          "Layout pabrik adalah pengaturan fisik fasilitas produksi. Jenis: (1) Product Layout - berdasarkan urutan proses produk, cocok produksi massal. (2) Process Layout - berdasarkan fungsi mesin, cocok job shop. (3) Fixed Position Layout - produk diam, pekerja bergerak. (4) Cellular Layout - grup mesin untuk produk keluarga tertentu.",
         tips: ["Berikan contoh industri yang cocok untuk masing-masing layout"],
       },
       {
@@ -1728,16 +1728,16 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Apa perbedaan Quality Assurance (QA) dan Quality Control (QC)?",
         answer:
-          "QA (Quality Assurance) bersifat proaktif — berfokus pada pencegahan cacat melalui perbaikan proses. QC (Quality Control) bersifat reaktif — berfokus pada deteksi cacat melalui inspeksi produk. QA: 'Kita lakukan proses yang benar.' QC: 'Apakah produk yang dihasilkan benar?' Keduanya saling melengkapi.",
-        tips: ["Pertanyaan klasik — pastikan Anda bisa menjelaskan bedanya dengan contoh konkret"],
+          "QA (Quality Assurance) bersifat proaktif - berfokus pada pencegahan cacat melalui perbaikan proses. QC (Quality Control) bersifat reaktif - berfokus pada deteksi cacat melalui inspeksi produk. QA: 'Kita lakukan proses yang benar.' QC: 'Apakah produk yang dihasilkan benar?' Keduanya saling melengkapi.",
+        tips: ["Pertanyaan klasik - pastikan Anda bisa menjelaskan bedanya dengan contoh konkret"],
       },
       {
         id: "qc-role-2",
         category: "role-specific",
         question: "Apa itu 7 Tools Quality Control?",
         answer:
-          "1) Check Sheet — pengumpulan data. 2) Histogram — distribusi data. 3) Pareto Chart — prioritas masalah. 4) Cause-and-Effect Diagram (Fishbone) — akar masalah. 5) Scatter Diagram — hubungan variabel. 6) Control Chart — stabilitas proses. 7) Flow Chart — alur proses.",
-        tips: ["Hafalkan 7 tools — ini pertanyaan wajib di industri manufaktur"],
+          "1) Check Sheet - pengumpulan data. 2) Histogram - distribusi data. 3) Pareto Chart - prioritas masalah. 4) Cause-and-Effect Diagram (Fishbone) - akar masalah. 5) Scatter Diagram - hubungan variabel. 6) Control Chart - stabilitas proses. 7) Flow Chart - alur proses.",
+        tips: ["Hafalkan 7 tools - ini pertanyaan wajib di industri manufaktur"],
       },
       {
         id: "qc-role-3",
@@ -1761,7 +1761,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         question: "Apa itu PDCA (Plan-Do-Check-Act)?",
         answer:
           "PDCA adalah siklus perbaikan berkelanjutan yang dikembangkan oleh Deming. Plan: identifikasi masalah dan rencanakan solusi. Do: implementasikan solusi dalam skala kecil. Check: evaluasi hasil implementasi. Act: jika berhasil, standarisasi; jika tidak, iterasi dengan rencana baru.",
-        tips: ["PDCA adalah fondasi continuous improvement — semua orang di manufaktur harus paham"],
+        tips: ["PDCA adalah fondasi continuous improvement - semua orang di manufaktur harus paham"],
       },
       {
         id: "qc-role-6",
@@ -1793,7 +1793,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Apa itu hierarki pengendalian risiko (Risk Control Hierarchy)?",
         answer:
-          "Hierarki dari yang paling efektif: (1) Eliminasi — hilangkan bahaya. (2) Substitusi — ganti dengan yang lebih aman. (3) Engineering Controls — isolasi, ventilasi, guarding. (4) Administrative Controls — SOP, training, rotasi kerja. (5) APD — masker, helm, safety shoes. Jangan hanya mengandalkan APD.",
+          "Hierarki dari yang paling efektif: (1) Eliminasi - hilangkan bahaya. (2) Substitusi - ganti dengan yang lebih aman. (3) Engineering Controls - isolasi, ventilasi, guarding. (4) Administrative Controls - SOP, training, rotasi kerja. (5) APD - masker, helm, safety shoes. Jangan hanya mengandalkan APD.",
         tips: ["Ingat urutannya: eliminasi adalah yang terbaik, APD adalah pilihan terakhir"],
       },
       {
@@ -1802,7 +1802,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         question: "Apa itu HIRADC?",
         answer:
           "HIRADC (Hazard Identification, Risk Assessment, and Determining Control) adalah proses sistematis untuk mengidentifikasi bahaya, menilai risiko, dan menentukan pengendalian yang diperlukan. Biasanya didokumentasikan dalam bentuk matriks risiko dengan likelihood × severity untuk menentukan risk rating.",
-        tips: ["Ini adalah dokumen inti K3 — wajib paham cara pengisiannya"],
+        tips: ["Ini adalah dokumen inti K3 - wajib paham cara pengisiannya"],
       },
       {
         id: "hse-role-4",
@@ -1825,7 +1825,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Apa saja KPI yang biasa digunakan di departemen HSE?",
         answer:
-          "1) Zero Accident — jumlah hari tanpa kecelakaan. 2) Lost Time Injury Frequency (LTIF). 3) Near Miss Reporting Rate. 4) Safety Training Completion. 5) Audit Score / SMK3 Compliance. 6) Hazard Reporting Rate. Yang terpenting: leading indicators (near miss, training) lebih penting dari lagging indicators (kecelakaan).",
+          "1) Zero Accident - jumlah hari tanpa kecelakaan. 2) Lost Time Injury Frequency (LTIF). 3) Near Miss Reporting Rate. 4) Safety Training Completion. 5) Audit Score / SMK3 Compliance. 6) Hazard Reporting Rate. Yang terpenting: leading indicators (near miss, training) lebih penting dari lagging indicators (kecelakaan).",
         tips: [],
       },
     ],
@@ -1850,7 +1850,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Jelaskan proses pengembangan produk baru dari ide hingga launching.",
         answer:
-          "1) Ideation — riset pasar, kebutuhan konsumen. 2) Screening — seleksi ide yang feasible. 3) Konsep & Desain — spesifikasi produk. 4) Prototype / Lab Trial — pembuatan sampel awal. 5) Pengujian — stability test, shelf life, sensory. 6) Scale-Up — trial produksi skala pilot. 7) Production Trial — uji coba produksi massal. 8) Launching.",
+          "1) Ideation - riset pasar, kebutuhan konsumen. 2) Screening - seleksi ide yang feasible. 3) Konsep & Desain - spesifikasi produk. 4) Prototype / Lab Trial - pembuatan sampel awal. 5) Pengujian - stability test, shelf life, sensory. 6) Scale-Up - trial produksi skala pilot. 7) Production Trial - uji coba produksi massal. 8) Launching.",
         tips: [],
       },
       {
@@ -1907,7 +1907,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Jelaskan tahapan proyek engineering dari awal hingga selesai.",
         answer:
-          "1) Feasibility Study — studi kelayakan. 2) Basic Engineering — desain konseptual. 3) Detail Engineering — gambar detail, spesifikasi teknis. 4) Procurement — pengadaan material dan jasa. 5) Construction / Fabrication — pelaksanaan di lapangan. 6) Commissioning — uji coba sistem. 7) Handover — serah terima ke operasional.",
+          "1) Feasibility Study - studi kelayakan. 2) Basic Engineering - desain konseptual. 3) Detail Engineering - gambar detail, spesifikasi teknis. 4) Procurement - pengadaan material dan jasa. 5) Construction / Fabrication - pelaksanaan di lapangan. 6) Commissioning - uji coba sistem. 7) Handover - serah terima ke operasional.",
         tips: ["FEP (Front End Planning) yang baik menentukan 80% kesuksesan proyek"],
       },
       {
@@ -1964,8 +1964,8 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Bagaimana cara Anda memotivasi tim operator untuk mencapai target?",
         answer:
-          "1) Komunikasikan target dengan jelas — berikan 'why' bukan cuma 'what'. 2) Berikan apresiasi atas pencapaian. 3) Libatkan operator dalam pemecahan masalah. 4) Pastikan kondisi kerja yang nyaman dan aman. 5) Berikan contoh langsung (lead by example). 6) Adakan kompetisi sehat antar shift/lini.",
-        tips: ["Operator yang termotivasi lebih produktif — tunjukkan bahwa Anda peduli"],
+          "1) Komunikasikan target dengan jelas - berikan 'why' bukan cuma 'what'. 2) Berikan apresiasi atas pencapaian. 3) Libatkan operator dalam pemecahan masalah. 4) Pastikan kondisi kerja yang nyaman dan aman. 5) Berikan contoh langsung (lead by example). 6) Adakan kompetisi sehat antar shift/lini.",
+        tips: ["Operator yang termotivasi lebih produktif - tunjukkan bahwa Anda peduli"],
       },
       {
         id: "fp-role-3",
@@ -1988,7 +1988,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Apa yang Anda ketahui tentang 5S/5R di tempat kerja?",
         answer:
-          "5S adalah metode pengelolaan tempat kerja: Seiri (Ringkas) — pisahkan yang perlu dan tidak. Seiton (Rapi) — atur barang pada tempatnya. Seiso (Resik) — bersihkan area kerja. Seiketsu (Rawat) — standarisasi praktik. Shitsuke (Rajin) — jadikan budaya. 5S adalah fondasi untuk mutu, keselamatan, dan produktivitas.",
+          "5S adalah metode pengelolaan tempat kerja: Seiri (Ringkas) - pisahkan yang perlu dan tidak. Seiton (Rapi) - atur barang pada tempatnya. Seiso (Resik) - bersihkan area kerja. Seiketsu (Rawat) - standarisasi praktik. Shitsuke (Rajin) - jadikan budaya. 5S adalah fondasi untuk mutu, keselamatan, dan produktivitas.",
         tips: ["5S harus menjadi kebiasaan, bukan cuma project sekali jalan"],
       },
       {

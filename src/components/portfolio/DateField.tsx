@@ -76,7 +76,7 @@ export default function DateField({
           className={inputClass + " flex items-center justify-between"}
           onClick={() => setShowPicker(!showPicker)}
         >
-          <span style={{ color: value ? "inherit" : "var(--p-text-muted, #999)" }}>
+          <span style={{ color: value ? "inherit" : "var(--p-text-secondary, #5c5a63)" }}>
             {value || placeholder}
           </span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-on-surface-variant">

@@ -90,7 +90,7 @@ function SortableSection({ id, children, isSelected, onSelect }: {
         {...attributes}
         {...listeners}
         className="absolute -left-8 top-1/2 -translate-y-1/2 z-20 opacity-0 group-hover/section:opacity-100 transition-opacity p-1 rounded cursor-grab active:cursor-grabbing"
-        style={{ color: "var(--p-text-muted, #666)" }}
+        style={{ color: "var(--p-text-secondary, #4a4452)" }}
         aria-label="Drag untuk urutkan"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -158,6 +158,9 @@ export const SECTION_META: Record<SectionId, { label: string; icon: string }> = 
   education: { label: "Pendidikan", icon: "school" },
   projects: { label: "Project", icon: "folder" },
   skills: { label: "Keahlian", icon: "stars" },
+  certifications: { label: "Sertifikat", icon: "workspace_premium" },
+  organizations: { label: "Organisasi", icon: "groups" },
+  hobbies: { label: "Hobi & Minat", icon: "favorite" },
   testimonials: { label: "Testimoni", icon: "format_quote" },
   contact: { label: "Kontak", icon: "contact_support" },
 };
@@ -296,7 +299,7 @@ export default function PortfolioCanvas({
             className="text-center py-8"
             style={{ color: theme.colors.textMuted, borderTop: `1px solid ${theme.colors.border}`, fontSize: "var(--p-font-size-sm, 13px)" }}
           >
-            &copy; 2026. Dibuat dengan MyCivi AI Career Hub
+            &copy; {new Date().getFullYear()}. Dibuat dengan AI Career Hub
           </footer>
         </div>
       </OrderContext.Provider>

@@ -21,8 +21,11 @@ async function getWorker(): Promise<Worker> {
   if (!workerPromise) {
     workerPromise = (async () => {
       const Tesseract = await import("tesseract.js");
+      // TANPA langPath custom — pakai CDN bawaan tesseract.js (jsdelivr).
+      // Di Vercel serverless /tmp/tessdata kosong & ephemeral → path lokal
+      // membuat load traineddata gagal (OCR error). CDN default otomatis
+      // mengunduh eng+ind.traineddata saat worker pertama kali dibuat.
       const worker = await Tesseract.createWorker("eng+ind", 1, {
-        langPath: "/tmp/tessdata",
         // Logger — hanya di development
         logger:
           process.env.NODE_ENV === "development"

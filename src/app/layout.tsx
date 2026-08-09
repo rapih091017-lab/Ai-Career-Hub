@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     template: "%s | AI Career Hub",
   },
   description:
-    "Satu platform untuk membuat CV ATS-friendly, mengecek skor resume, dan membangun portofolio profesional secara instan — semuanya dengan AI.",
+    "Satu platform untuk membuat CV ATS-friendly, mengecek skor resume, dan membangun portofolio profesional secara instan, semuanya dengan AI.",
   keywords: [
     "buat CV online", "CV ATS friendly", "pembuat CV AI", "cek skor CV",
     "portofolio website gratis", "AI career hub", "resume checker Indonesia",

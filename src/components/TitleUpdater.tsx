@@ -35,7 +35,7 @@ const pageDescriptions: Record<string, { id: string; en: string }> = {
   "/settings": { id: "Atur preferensi akun, langganan, dan keamanan akun.", en: "Manage account preferences, subscription, and security settings." },
   "/settings/profile": { id: "Ubah data diri dan preferensi profil akunmu.", en: "Edit your personal data and profile preferences." },
   "/settings/billing": { id: "Kelola tagihan, metode pembayaran, dan riwayat transaksi.", en: "Manage billing, payment methods, and transaction history." },
-  "/settings/security": { id: "Atur keamanan akun, ganti password, dan kelola sesi login.", en: "Manage account security, change password, and manage login sessions." },
+  "/settings/security": { id: "Kelola keamanan akun. Login dilakukan melalui Google.", en: "Manage account security. Sign-in is handled through Google." },
   "/settings/payment-history": { id: "Lihat riwayat pembayaran dan unduh invoice.", en: "View payment history and download invoices." },
 };
 

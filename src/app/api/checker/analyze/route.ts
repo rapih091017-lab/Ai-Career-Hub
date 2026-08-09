@@ -28,40 +28,36 @@ export const POST = apiHandler(async (request: NextRequest) => {
   }
 
   const body = await request.json();
-  const { extractedText, jobDescription, originalFileName } = body;
+  const { extractedText, jobDescription } = body;
 
-  // ── 1. CEK KUOTA ANONYMOUS ────────────────────────────────────────
-  // ip already defined by rate limiter above
-  const userAgent = request.headers.get("user-agent") ?? "unknown";
-  const cookieHash = userAgent;
-
-  const [anonCount] = await db
-    .select({ value: count() })
-    .from(usageLogs)
-    .where(
-      and(
-        eq(usageLogs.actionType, "checker_check"),
-        sql`${usageLogs.anonymousFingerprint}->>'ip' ILIKE ${ip}`,
-        sql`${usageLogs.anonymousFingerprint}->>'cookieHash' ILIKE ${cookieHash}`,
-      ),
-    );
-
-  if (anonCount.value >= 2) {
+  // ── 0.5 VALIDASI INPUT ───────────────────────────────────────────
+  // Cegah payload tak lengkap (undefined/non-string/kosong) dari crash
+  // toLowerCase, prompt AI berisi "undefined", atau insert DB gagal.
+  if (typeof extractedText !== "string" || !extractedText.trim()) {
     return NextResponse.json(
-      {
-        error: "QUOTA_EXCEEDED",
-        message:
-          "Batas gratis 2x pengecekan sudah habis. Silakan login untuk melanjutkan.",
-      },
-      { status: 403 },
+      { error: "BAD_REQUEST", message: "Teks CV wajib diisi." },
+      { status: 400 },
     );
   }
 
-  // ── 2. CEK KUOTA USER (jika login) ───────────────────────────────
+  // Job description opsional — normalisasi ke string kosong agar aman
+  // untuk cleanWords, prompt AI, dan insert DB (kolom NOT NULL).
+  const jd = typeof jobDescription === "string" ? jobDescription : "";
+
+  // ── 1. CEK SESSION DULU ──────────────────────────────────────────
+  // Session dicek sebelum kuota anonim — supaya user yang sudah login
+  // tidak ikut dihitung kuota anonim dari riwayat anonymous sebelumnya.
   const session = await auth();
 
+  // ── 2. CEK KUOTA USER (jika login) ───────────────────────────────
+  // Model analyzer: pembeli paket yang memberi fitur CV Analyzer → deepseek-reasoner (R1);
+  // free / paket tanpa analyzer → deepseek-chat (V3). Diputuskan di sini.
+  let useReasoner = false;
   if (session?.user?.id) {
     const access = await getUserAccess(session.user.id);
+    // purchasedFeatures = fitur yang benar-benar dibeli (bukan kuota gratis),
+    // jadi pembeli portfolio_web misalnya TETAP dapat V3 untuk jatah free analyzer-nya.
+    useReasoner = access.purchasedFeatures.cv_analyzer !== false;
     const cvAnalyzerLimit = access.limits.cv_analyzer;
 
     if (cvAnalyzerLimit === false) {
@@ -94,10 +90,48 @@ export const POST = apiHandler(async (request: NextRequest) => {
     }
   }
 
-  // ── 3. HITUNG SKOR RULE-BASED ────────────────────────────────────
-  const cleanWords = (text: string): Set<string> => {
+  // ── 3. CEK KUOTA ANONYMOUS (hanya jika TIDAK login) ──────────────
+  // ip already defined by rate limiter above
+  const userAgent = request.headers.get("user-agent") ?? "unknown";
+  const cookieHash = userAgent;
+  // x-anon-id: UUID per browser yang dikirim client (localStorage).
+  // Ini jadi fingerprint utama — supaya kuota 2x tidak dishare semua user
+  // yang kebetulan pakai IP/User-Agent sama (masalah di localhost & NAT).
+  const anonId = request.headers.get("x-anon-id")?.trim() || null;
+
+  if (!session?.user?.id) {
+    const [anonCount] = await db
+      .select({ value: count() })
+      .from(usageLogs)
+      .where(
+        and(
+          eq(usageLogs.actionType, "checker_check"),
+          // Prioritaskan anonId; fallback ke ip+cookieHash untuk record lama
+          anonId
+            ? sql`${usageLogs.anonymousFingerprint}->>'anonId' ILIKE ${anonId}`
+            : and(
+                sql`${usageLogs.anonymousFingerprint}->>'ip' ILIKE ${ip}`,
+                sql`${usageLogs.anonymousFingerprint}->>'cookieHash' ILIKE ${cookieHash}`,
+              ),
+        ),
+      );
+
+    if (anonCount.value >= 2) {
+      return NextResponse.json(
+        {
+          error: "QUOTA_EXCEEDED",
+          message:
+            "Batas gratis 2x pengecekan sudah habis. Silakan login untuk melanjutkan.",
+        },
+        { status: 403 },
+      );
+    }
+  }
+
+  // ── 4. HITUNG SKOR RULE-BASED ────────────────────────────────────
+  const cleanWords = (text: string | null | undefined): Set<string> => {
     return new Set(
-      text
+      (text ?? "")
         .toLowerCase()
         .replace(/[^\w\s]/g, "")
         .split(/\s+/)
@@ -105,7 +139,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
     );
   };
 
-  const jdWords = cleanWords(jobDescription);
+  const jdWords = cleanWords(jd);
   const cvWords = cleanWords(extractedText);
 
   let matches = 0;
@@ -114,9 +148,9 @@ export const POST = apiHandler(async (request: NextRequest) => {
   }
 
   const keywordMatchRate =
-    jdWords.size > 0 ? Math.round((matches / jdWords.size) * 100) : 0;    // ── 4. PANGGIL AI ────────────────────────────────────────────────
+    jdWords.size > 0 ? Math.round((matches / jdWords.size) * 100) : 0;    // ── 5. PANGGIL AI ────────────────────────────────────────────────
   // ── Extract role hint from CV for context injection ──
-  const cvLines = extractedText.split("\n").slice(0, 15);
+  const cvLines = (extractedText ?? "").split("\n").slice(0, 15);
   const roleHint: string | null = cvLines
     .map((l: string) => l.replace(/^[#*\s]+/, "").trim())
     .find((l: string) => l.toLowerCase().includes("engineer") || l.toLowerCase().includes("developer") || l.toLowerCase().includes("manager") || l.toLowerCase().includes("analyst") || l.toLowerCase().includes("designer") || l.toLowerCase().includes("specialist"))
@@ -129,10 +163,16 @@ export const POST = apiHandler(async (request: NextRequest) => {
       userPrompt: `${extractedText}
 
 === JOB DESCRIPTION ===
-${jobDescription || "Tidak ada deskripsi pekerjaan."}`,
+${jd || "Tidak ada deskripsi pekerjaan."}`,
       temperature: 0.3,
-      maxTokens: 8192,
-      model: MODELS.CHAT,
+      // Model: premium → deepseek-reasoner (R1) untuk analisis mendalam;
+      // free/anonymous → deepseek-chat (V3) agar biaya terkontrol.
+      // Catatan: R1 tidak mendukung response_format json_object — JSON dipaksa
+      // via prompt analysis-v3 dan ditangani adapter (isReasoner).
+      model: useReasoner ? MODELS.REASONER : MODELS.CHAT,
+      // R1: token reasoning ikut menghabiskan budget max_tokens → 16K agar
+      // JSON final tidak terpotong. V3 cukup 8K.
+      maxTokens: useReasoner ? 16384 : 8192,
       taskType: "analysis",
       userContext: buildUserContext({
         jobTitle: roleHint,
@@ -144,7 +184,7 @@ ${jobDescription || "Tidak ada deskripsi pekerjaan."}`,
     console.error("AI Analysis error:", error);
   }
 
-  // ── 5. NORMALIZE AI RESPONSE ──────────────────────────────────────
+  // ── 6. NORMALIZE AI RESPONSE ──────────────────────────────────────
   // ats_prediction bisa berupa string ATAU object {result, match_confidence, ...}
   // Pastikan selalu string untuk menghindari React render error
   const normalizeAtsPrediction = (pred: unknown): string | null => {
@@ -156,12 +196,15 @@ ${jobDescription || "Tidak ada deskripsi pekerjaan."}`,
     return String(pred);
   };
 
-  // ── 6. HITUNG SKOR AKHIR ─────────────────────────────────────────
+  // ── 7. HITUNG SKOR AKHIR ─────────────────────────────────────────
+  // Bobot fallback konsisten dengan metodologi prompt analysis-v3:
+  // Summary 20% · Experience 35% · Skills 25% · Education 10% · Format ATS 10%
   const overall = aiAnalysis?.overall_score ?? Math.round(
-    keywordMatchRate * 0.25 +
+    (aiAnalysis?.breakdown?.summary?.score ?? keywordMatchRate) * 0.2 +
       (aiAnalysis?.breakdown?.experience?.score ?? 50) * 0.35 +
       (aiAnalysis?.breakdown?.skills?.score ?? 50) * 0.25 +
-      (aiAnalysis?.breakdown?.format_ats?.score ?? 70) * 0.15
+      (aiAnalysis?.breakdown?.education?.score ?? 70) * 0.1 +
+      (aiAnalysis?.breakdown?.format_ats?.score ?? 70) * 0.1
   );
 
   // Backward-compat scores buat DB
@@ -195,10 +238,12 @@ ${jobDescription || "Tidak ada deskripsi pekerjaan."}`,
     atsPrediction: normalizedAtsPrediction,
   };
 
-  // ── 6. SIMPAN KE DATABASE ────────────────────────────────────────
+  // ── 8. SIMPAN KE DATABASE ────────────────────────────────────────
   const userId = session?.user?.id ?? null;
   const anonymousFingerprint = userId
     ? null
+    : anonId
+    ? { ip, cookieHash, anonId }
     : { ip, cookieHash };
 
   const [newResult] = await db
@@ -207,7 +252,7 @@ ${jobDescription || "Tidak ada deskripsi pekerjaan."}`,
       userId,
       anonymousFingerprint,
       cvTextExtracted: extractedText,
-      jobDescription,
+      jobDescription: jd,
       scores,
       aiFeedback,
       fullResult: aiStructuredData,
@@ -221,13 +266,17 @@ ${jobDescription || "Tidak ada deskripsi pekerjaan."}`,
     resourceId: newResult.id,
   });
 
-  // ── 7. RETURN ────────────────────────────────────────────────────
+  // ── 9. RETURN ────────────────────────────────────────────────────
   return NextResponse.json(
     {
       id: newResult.id,
       scores,
       aiFeedback,
       summary: aiFeedback.summary,
+      // Model yang dipakai — ditampilkan sebagai badge di UI hasil analisis.
+      // Hanya dikirim jika AI benar-benar berhasil (aiAnalysis non-null),
+      // supaya badge tidak muncul di response fallback tanpa analisis AI.
+      aiModel: aiAnalysis ? (useReasoner ? "R1" : "V3") : undefined,
       ...aiStructuredData,
     },
     { status: 200 },

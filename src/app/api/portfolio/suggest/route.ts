@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { masterProfiles, usageLogs } from "@/db/schema";
-import { eq, and, count } from "drizzle-orm";
+import { eq, and, count, gte } from "drizzle-orm";
 import { callAI, MODELS, buildUserContext } from "@/lib/ai/adapter";
 import { PORTFOLIO_PROMPT_V1 } from "@/lib/ai/prompts/portfolio-v1";
 import { getUserAccess } from "@/lib/access";
@@ -81,11 +81,27 @@ export async function POST(request: NextRequest) {
   }
 
   // ── Cek kuota ──
+  // Pakai limit dari sistem akses (getUserAccess) — konsisten dengan fitur lain.
+  // FREE_LIMITS.portfolio_web = false → user free tidak bisa; paket portfolio_web/pro/business/premium membuka kuotanya.
   const access = await getUserAccess(session.user.id);
-  const isPremium = access.isPremium;
-  const FREE_LIMIT = 2;
+  const portfolioLimit = access.limits.portfolio_web;
 
-  if (!isPremium) {
+  if (portfolioLimit === false) {
+    return NextResponse.json(
+      {
+        error: "FEATURE_NOT_AVAILABLE",
+        message: "Portfolio AI tidak tersedia di paket kamu. Upgrade untuk mengakses.",
+      },
+      { status: 403 }
+    );
+  }
+
+  if (portfolioLimit !== "unlimited") {
+    // Hitung pemakaian bulan berjalan — konsisten dengan checkQuota di fitur lain
+    const firstOfMonth = new Date();
+    firstOfMonth.setDate(1);
+    firstOfMonth.setHours(0, 0, 0, 0);
+
     const [usageCount] = await db
       .select({ count: count() })
       .from(usageLogs)
@@ -93,14 +109,15 @@ export async function POST(request: NextRequest) {
         and(
           eq(usageLogs.userId, session.user.id),
           eq(usageLogs.actionType, "portfolio_generate"),
+          gte(usageLogs.createdAt, firstOfMonth),
         )
       );
 
-    if (usageCount.count >= FREE_LIMIT) {
+    if (usageCount.count >= portfolioLimit) {
       return NextResponse.json(
         {
           error: "QUOTA_EXCEEDED",
-          message: `Batas gratis generate portfolio sudah terpakai (${FREE_LIMIT}/${FREE_LIMIT}). Upgrade ke Premium untuk unlimited.`,
+          message: `Batas generate portfolio sudah terpakai (${portfolioLimit}/${portfolioLimit}). Upgrade ke Premium untuk unlimited.`,
         },
         { status: 403 }
       );

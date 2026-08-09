@@ -26,7 +26,7 @@ export default function Error({
         <p className="text-sm text-[#4a4452]">{error.message || t("error.subtitle")}</p>
         <button
           onClick={reset}
-          className="px-6 py-3 rounded-full bg-[#6d3bd7] text-white font-semibold hover:opacity-90 transition-all active:scale-95"
+          className="px-6 py-3 rounded-full bg-[#0d7377] text-white font-semibold hover:opacity-90 transition-all active:scale-95"
         >
           {t("error.retry")}
         </button>

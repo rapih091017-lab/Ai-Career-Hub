@@ -91,6 +91,7 @@ const LANGGANAN_PLAN_DATA: Omit<PlanData, "nameKey" | "descKey" | "ctaKey" | "un
     features: [
       { key: "pricing.feat.1-cv", included: true },
       { key: "pricing.feat.preview-all", included: true },
+      { key: "pricing.feat.cover-free-3", included: true },
       { key: "pricing.feat.ai-gen", included: false },
       { key: "pricing.feat.cv-analyzer", included: false },
       { key: "pricing.feat.portfolio-web", included: false },
@@ -106,6 +107,7 @@ const LANGGANAN_PLAN_DATA: Omit<PlanData, "nameKey" | "descKey" | "ctaKey" | "un
       { key: "pricing.feat.save-3", included: true },
       { key: "pricing.feat.cv-analyzer", included: false },
       { key: "pricing.feat.portfolio-web", included: false },
+      { key: "pricing.feat.cover-letter", included: false },
     ],
   },
   {
@@ -117,6 +119,7 @@ const LANGGANAN_PLAN_DATA: Omit<PlanData, "nameKey" | "descKey" | "ctaKey" | "un
       { key: "pricing.feat.all-templates", included: true },
       { key: "pricing.feat.unlimited-analyzer", included: true },
       { key: "pricing.feat.ai-smart", included: true },
+      { key: "pricing.feat.cover-letter", included: true },
       { key: "pricing.feat.1-portfolio", included: true },
       { key: "pricing.feat.save-20", included: true },
       { key: "pricing.feat.priority", included: true },
@@ -139,14 +142,15 @@ const LANGGANAN_PLAN_DATA: Omit<PlanData, "nameKey" | "descKey" | "ctaKey" | "un
 const FAQ_KEYS = [0, 1, 2, 3, 4];
 
 const COMPARISON_ROW_KEYS = [
-  { labelKey: "pricing.compare.ai-gen", free: "—", starter: "5x/bln", pro: "Unlimited", business: "20x/bln" },
+  { labelKey: "pricing.compare.ai-gen", free: "-", starter: "5x/bln", pro: "Unlimited", business: "20x/bln" },
   { labelKey: "pricing.compare.templates", free: "Preview", starter: "5", pro: "10+", business: "10+" },
-  { labelKey: "pricing.compare.pdf-export", free: "—", starter: "✓", pro: "✓", business: "White-label" },
-  { labelKey: "pricing.compare.analyzer", free: "—", starter: "—", pro: "Unlimited", business: "Bulk" },
-  { labelKey: "pricing.compare.portfolio", free: "—", starter: "—", pro: "1 aktif", business: "3 aktif" },
-  { labelKey: "pricing.compare.saved-cvs", free: "—", starter: "3", pro: "20", business: "Unlimited" },
-  { labelKey: "pricing.compare.ai-revision", free: "—", starter: "—", pro: "✓", business: "✓" },
-  { labelKey: "pricing.compare.priority-support", free: "—", starter: "—", pro: "—", business: "✓" },
+  { labelKey: "pricing.compare.pdf-export", free: "-", starter: "✓", pro: "✓", business: "White-label" },
+  { labelKey: "pricing.compare.analyzer", free: "-", starter: "-", pro: "Unlimited", business: "Bulk" },
+  { labelKey: "pricing.compare.portfolio", free: "-", starter: "-", pro: "1 aktif", business: "3 aktif" },
+  { labelKey: "pricing.compare.saved-cvs", free: "-", starter: "3", pro: "20", business: "Unlimited" },
+  { labelKey: "pricing.compare.cover-letter", free: "3x/bln", starter: "-", pro: "Unlimited", business: "Unlimited" },
+  { labelKey: "pricing.compare.ai-revision", free: "-", starter: "-", pro: "✓", business: "✓" },
+  { labelKey: "pricing.compare.priority-support", free: "-", starter: "-", pro: "-", business: "✓" },
 ];
 
 /* ─── Component ─── */
@@ -201,9 +205,6 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
         {/* ─── HEADER ─── */}
         <motion.div className="text-center mb-12 md:mb-16"
           initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
-          <span className="inline-block text-xs font-bold tracking-[0.15em] uppercase text-primary/70 bg-primary/5 dark:bg-primary/20 px-4 py-1.5 rounded-full mb-6">
-            {t("nav.pricing")}
-          </span>
           <h2 className="font-display text-[36px] md:text-display text-on-background dark:text-white mb-4 leading-tight">
             {t("pricing.section-title")}
           </h2>
@@ -260,7 +261,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
               <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
                 <div className="text-center md:text-left">
                   <div className="flex items-center gap-2 mb-2">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-2xl shrink-0 animate-pulse"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-2xl shrink-0"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
                     <h4 className="font-label-bold text-lg text-on-surface">{t("pricing.bundle-title")}</h4>
                   </div>
                   <p className="text-sm text-on-surface-variant">{t("pricing.bundle-desc")}</p>
@@ -274,6 +275,38 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
                     <Link href="/settings/billing"
                       className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-on-primary rounded-xl font-label-bold hover:brightness-110 active:scale-[0.98] transition-all shadow-md whitespace-nowrap">
                       {t("pricing.bundle-cta")}
+                    </Link>
+                  </MagneticButton>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* ─── SURAT LAMARAN BANNER (satuan mode only) ─── */}
+        {mode === "satuan" && (
+          <motion.div className="mt-6"
+            initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.15 }}>
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary/10 via-white to-primary/10 dark:from-[#0E2B2C] dark:via-[#1A1A2E] dark:to-[#0E2B2C] border-2 border-primary/20 dark:border-primary/40 p-6 md:p-8">
+              <div className="absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none dark:bg-primary/20" />
+              <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
+                <div className="text-center md:text-left">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="material-symbols-outlined text-primary dark:text-primary text-2xl shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>mail</span>
+                    <h4 className="font-label-bold text-lg text-on-surface dark:text-white">{t("pricing.surat-banner.title")}</h4>
+                  </div>
+                  <p className="text-sm text-on-surface-variant dark:text-gray-400 max-w-lg">{t("pricing.surat-banner.desc")}</p>
+                </div>
+                <div className="md:ml-auto flex flex-col sm:flex-row items-center gap-3">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary rounded-full text-xs font-bold whitespace-nowrap">
+                    <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>redeem</span>
+                    {t("pricing.surat-banner.free-note")}
+                  </span>
+                  <MagneticButton>
+                    <Link href="/login"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-label-bold hover:brightness-110 active:scale-[0.98] transition-all shadow-md whitespace-nowrap">
+                      <span className="material-symbols-outlined text-lg">auto_awesome</span>
+                      {t("pricing.surat-banner.cta")}
                     </Link>
                   </MagneticButton>
                 </div>
@@ -416,7 +449,7 @@ function PricingCard({ plan, delay, onSelectPlan, mode, tFn }: {
       onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}
       className={"relative flex flex-col rounded-2xl transition-all duration-300 " + (
         plan.featured
-          ? "lg:scale-105 z-10 border-2 border-primary shadow-[0_8px_32px_rgba(13,115,119,0.15)] dark:shadow-[0_8px_32px_rgba(124,58,237,0.3)]"
+          ? "lg:scale-105 z-10 border-2 border-primary shadow-[0_8px_32px_rgba(13,115,119,0.15)] dark:shadow-[0_8px_32px_rgba(13,115,119,0.3)]"
           : "border border-outline-variant/40 dark:border-gray-700 shadow-premium-sm hover:shadow-premium-md"
       ) + " " + (isHovered ? "translate-y-[-4px]" : "") + " bg-white dark:bg-[#1A1A2E] dark:text-white"}>
       {/* Badge */}

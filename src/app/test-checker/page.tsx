@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import AuthGuard from "@/components/AuthGuard";
 
 declare const pdfjsLib: any;
 
@@ -72,7 +73,8 @@ export default function TestCheckerPage() {
   };
 
   return (
-    <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
+    <AuthGuard>
+      <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
       <h1 style={{ marginBottom: "1rem" }}>Test Checker - Extract Text (Client-side)</h1>
 
       <div style={{ marginBottom: "1rem" }}>
@@ -109,8 +111,8 @@ export default function TestCheckerPage() {
           whiteSpace: "pre-wrap",
           wordBreak: "break-word",
           minHeight: "100px",
-        }}
-      />
-    </div>
+        }}      />
+      </div>
+    </AuthGuard>
   );
 }

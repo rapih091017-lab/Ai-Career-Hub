@@ -6,7 +6,9 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["./src/__tests__/setup-globals.ts"],
-    include: ["**/*.test.{ts,tsx}"],
+    include: ["src/**/*.test.{ts,tsx}"],
+    // Tooling skill (gstack) & node_modules tidak boleh ikut ter-scan sebagai test
+    exclude: ["node_modules/**", ".agents/**", "skills/**", "scripts/**", "pdf-server/**"],
   },
   resolve: {
     alias: {

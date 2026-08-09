@@ -6,6 +6,9 @@ export type SectionId =
   | "education"
   | "projects"
   | "skills"
+  | "certifications"
+  | "organizations"
+  | "hobbies"
   | "testimonials"
   | "contact";
 
@@ -65,6 +68,9 @@ export type {
   ProjectItem,
   ExperienceItem,
   EducationItem,
+  CertificationItem,
+  OrganizationItem,
+  HobbyItem,
   TestimonialItem,
   ExtraLink,
   PortfolioFormData,

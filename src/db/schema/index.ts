@@ -119,6 +119,23 @@ export const checkerResults = pgTable("checker_results", {
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
 });
 
+export const coverLetters = pgTable("cover_letters", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  cvId: uuid("cv_id").references(() => cvDocuments.id, { onDelete: "set null" }),
+  jobTitle: text("job_title"),
+  companyName: text("company_name"),
+  recipientName: text("recipient_name"),
+  language: varchar("language", { length: 5 }).notNull().default("id"),
+  style: varchar("style", { length: 20 }).notNull().default("formal"),
+  subject: text("subject"),
+  letterNumber: text("letter_number"),
+  attachment: text("attachment"),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow(),
+});
+
 export const usageLogs = pgTable("usage_logs", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
@@ -170,6 +187,16 @@ export const packages = pgTable("packages", {
   active: boolean("active").notNull().default(true),
   sortOrder: integer("sort_order").default(0),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow(),
+});
+
+export const portfolioPages = pgTable("portfolio_pages", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().unique().references(() => users.id, { onDelete: "cascade" }),
+  slug: varchar("slug", { length: 60 }).notNull().unique(),
+  theme: varchar("theme", { length: 50 }).notNull().default("glass"),
+  data: jsonb("data").$type<Record<string, unknown>>().notNull(),
+  publishedAt: timestamp("published_at", { mode: "date" }).defaultNow(),
   updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow(),
 });
 

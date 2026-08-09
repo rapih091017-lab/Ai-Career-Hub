@@ -1,6 +1,5 @@
 import OpenAI from "openai";
 import { ZodSchema, ZodError } from "zod";
-import { SECURITY_GUARDRAIL } from "./prompts/shared";
 import { AI_SCHEMAS, AiTaskType } from "./prompts/schemas";
 
 const client = new OpenAI({
@@ -32,6 +31,13 @@ interface CallAIParams {
   userContext?: UserContext;
   /** Max retries on failure. Default: 2 */
   maxRetries?: number;
+  /**
+   * Format output yang diharapkan.
+   * - "json" (default): memaksa response_format json_object + validasi Zod.
+   * - "text": mengembalikan teks mentah apa adanya (TANPA json_object, TANPA JSON.parse).
+   *   Wajib dipakai untuk task yang outputnya teks murni (mis. AI Polish / Cover Letter).
+   */
+  responseFormat?: "json" | "text";
 }
 
 /* ─── Model routing ─────────────────────────────────────── */
@@ -76,12 +82,12 @@ Bahasa CV: ${ctx.cvLang === "en" ? "English" : "Indonesia"}
   return prompt.replace("{{USER_CONTEXT}}", contextStr);
 }
 
-/* ─── Inject input data into prompt ─────────────────────── */
 /* ─── Strip lone surrogate characters that break JSON serialization ── */
 function sanitizeText(text: string): string {
-  return text.replace(/[\uD800-\uDFFF]/g, '');
+  return text.replace(/[\uD800-\uDFFF]/g, "");
 }
 
+/* ─── Inject input data into prompt ─────────────────────── */
 function injectInputData(prompt: string, data: string): string {
   // Ekstrak CV dan JD dari data — pake indexOf biar toleran terhadap whitespace
   const JD_MARKER = "=== JOB DESCRIPTION ===";
@@ -96,39 +102,38 @@ function injectInputData(prompt: string, data: string): string {
     .replace("{{PROFILE_DATA}}", data);
 }
 
-/* ─── Parse & validate JSON + retry ─────────────────────── */
-async function parseWithRetry<T>(
+/* ─── Parse & validate JSON (single pass) ───────────────── */
+function parseAIResponse<T>(
   raw: string,
   schema?: ZodSchema<T>,
-  maxRetries: number = 0,
-): Promise<{ data: T | null; error: string | null }> {
-  let lastError: string | null = null;
-
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    try {
-      const parsed = JSON.parse(raw) as T;
-
-      if (schema) {
-        const validated = schema.parse(parsed);
-        return { data: validated, error: null };
-      }
-
-      return { data: parsed, error: null };
-    } catch (err) {
-      if (err instanceof ZodError) {
-        lastError = `Validation error: ${err.issues.map((e: any) => e.message).join("; ")}`;
-      } else if (err instanceof SyntaxError) {
-        lastError = `JSON parse error: ${err.message}`;
-        // Jika bukan attempt terakhir, kita coba lagi — tapi retry AI, bukan re-parse
-        return { data: null, error: lastError };
-      } else {
-        lastError = `Unknown error: ${String(err)}`;
-      }
-      return { data: null, error: lastError };
+): { ok: true; data: T } | { ok: false; error: string } {
+  try {
+    // Buang markdown code fence (```json ... ```) + teks pengantar yang kadang
+    // dibungkus model — terutama deepseek-reasoner yang tidak punya
+    // response_format json_object. Potong ke bagian JSON saja (dari { pertama).
+    let cleaned = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+    const start = cleaned.indexOf("{");
+    const end = cleaned.lastIndexOf("}");
+    if (start !== -1 && end > start) {
+      cleaned = cleaned.slice(start, end + 1);
     }
-  }
+    const parsed = JSON.parse(cleaned) as T;
 
-  return { data: null, error: lastError };
+    if (schema) {
+      const validated = schema.parse(parsed);
+      return { ok: true, data: validated };
+    }
+
+    return { ok: true, data: parsed };
+  } catch (err) {
+    if (err instanceof ZodError) {
+      return { ok: false, error: `Validation error: ${err.issues.map((e) => e.message).join("; ")}` };
+    }
+    if (err instanceof SyntaxError) {
+      return { ok: false, error: `JSON parse error: ${err.message}` };
+    }
+    return { ok: false, error: `Unknown error: ${String(err)}` };
+  }
 }
 
 /* ─── MAIN: callAI ─────────────────────────────────────── */
@@ -141,67 +146,87 @@ export async function callAI<T = unknown>({
   taskType,
   userContext,
   maxRetries = 2,
+  responseFormat = "json",
 }: CallAIParams): Promise<T> {
-  // 1. Inject security guardrail ke system prompt
-  const secureSystemPrompt = SECURITY_GUARDRAIL + "\n\n" + systemPrompt;
+  // CATATAN: SECURITY_GUARDRAIL TIDAK lagi ditambahkan di sini karena SEMUA
+  // system prompt yang dipakai aplikasi sudah menyisipkannya sendiri
+  // (lihat src/lib/ai/prompts/shared.ts + tiap file prompt).
+  // Jaga-jaga: beri peringatan keras di dev jika ada prompt baru yang lupa.
+  if (!systemPrompt.includes("GUARDRAIL KEAMANAN")) {
+    console.warn("[AI] systemPrompt tanpa SECURITY_GUARDRAIL — sisipkan dari src/lib/ai/prompts/shared.ts");
+  }
 
-  // 2. Inject user context ke prompt
-  const enrichedSystemPrompt = injectUserContext(secureSystemPrompt, userContext);
+  // Inject user context & input data ke system prompt
+  const systemPromptWithData = injectInputData(
+    injectUserContext(systemPrompt, userContext),
+    userPrompt,
+  );
 
-  // 3. Inject input data ke system prompt (placeholder {{CV_TEXT}}/{{JD_TEXT}} ada di system prompt)
-  const systemPromptWithData = injectInputData(enrichedSystemPrompt, userPrompt);
-  // 4. Sanitize user prompt — userPrompt berisi data aktual (CV/JD) yang mungkin mengandung
-  //    karakter lone surrogate yang bikin DeepSeek API 400 error
+  // Sanitize user prompt — userPrompt berisi data aktual (CV/JD) yang mungkin
+  // mengandung karakter lone surrogate yang bikin DeepSeek API 400 error
   const enrichedUserPrompt = sanitizeText(userPrompt);
 
-  // 4. Auto-select temperature & model by task type
+  const isTextMode = responseFormat === "text";
   const finalTemp = temperature ?? TEMPERATURE_MAP[taskType ?? ""] ?? 0.7;
   const finalModel = model ?? MODEL_MAP[taskType ?? ""] ?? MODELS.CHAT;
+  const isReasoner = finalModel === MODELS.REASONER;
+  const schema = taskType ? AI_SCHEMAS[taskType] : undefined;
 
-  // 5. Panggil AI (with retry)
+  // deepseek-reasoner TIDAK mendukung response_format json_object (400 error),
+  // dan menampilkan reasoning secara internal. Tambahkan instruksi agar model
+  // mengembalikan HANYA output akhir — reasoning berjalan internal.
+  const effectiveSystemPrompt = isReasoner
+    ? systemPromptWithData +
+      "\n\n--- CATATAN MODEL ---\nAnda adalah model reasoning (deepseek-reasoner). Lakukan seluruh analisis dan pemikiran secara INTERNAL — TANPA menampilkan langkah-langkah, TANPA blok <think>, TANPA penjelasan. Kembalikan HANYA output akhir yang valid sesuai skema yang diminta."
+    : systemPromptWithData;
+
+  // Petunjuk tambahan saat retry — meminta model mengembalikan JSON valid
+  const retryInstruction =
+    "\n\n⚠️ PERHATIAN: Respons AI sebelumnya TIDAK valid (bukan JSON valid / tidak sesuai skema)." +
+    " Mohon kembalikan HANYA JSON yang valid sesuai SKEMA OUTPUT WAJIB yang diminta, tanpa teks lain.";
+
+  const maxAttempts = maxRetries + 1; // 1 percobaan awal + N retry
   let lastError: string | null = null;
 
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
     try {
       const response = await client.chat.completions.create({
         model: finalModel,
         temperature: finalTemp,
         max_tokens: maxTokens,
         messages: [
-          { role: "system", content: systemPromptWithData },
-          { role: "user", content: enrichedUserPrompt },
+          { role: "system", content: effectiveSystemPrompt },
+          // Saat retry, perjelas ke model bahwa respons sebelumnya gagal diverifikasi
+          { role: "user", content: attempt === 0 ? enrichedUserPrompt : enrichedUserPrompt + retryInstruction },
         ],
-        response_format: { type: "json_object" },
+        // Text mode: TANPA response_format json_object (DeepSeek 400 jika dipaksa).
+        // deepseek-reasoner: json_object TIDAK didukung — JSON dipaksa via prompt.
+        response_format: isTextMode || isReasoner ? undefined : { type: "json_object" },
       });
 
-      const raw = response.choices[0]?.message?.content ?? "{}";
+      const raw = response.choices[0]?.message?.content ?? "";
 
-      // 6. Validasi dengan Zod schema jika taskType diberikan
-      const schema = taskType ? AI_SCHEMAS[taskType] : undefined;
-      const { data, error } = await parseWithRetry<T>(raw, schema as ZodSchema<T> | undefined, maxRetries);
-
-      if (data) return data;
-
-      lastError = error;
-
-      // Jika error parsing, retry — AI kadang return JSON tidak valid
-      if (attempt < maxRetries - 1) {
-        console.warn(`AI response parse error (attempt ${attempt + 1}/${maxRetries}): ${error}. Retrying...`);
-        continue;
+      if (isTextMode) {
+        // Text mode — return teks mentah (tanpa JSON.parse); retry jika kosong
+        const text = raw.trim();
+        if (text) return text as T;
+        lastError = "Empty text response";
+      } else {
+        // JSON mode — parse + validasi Zod
+        const parsed = parseAIResponse<T>(raw, schema as ZodSchema<T> | undefined);
+        if (parsed.ok) return parsed.data;
+        lastError = parsed.error;
       }
-
-      throw new Error(`AI response validation failed after ${maxRetries} attempts: ${error}`);
     } catch (err) {
       lastError = err instanceof Error ? err.message : String(err);
+    }
 
-      if (attempt < maxRetries - 1) {
-        console.warn(`AI call failed (attempt ${attempt + 1}/${maxRetries}): ${lastError}. Retrying...`);
-        continue;
-      }
+    if (attempt < maxAttempts - 1) {
+      console.warn(`AI call attempt ${attempt + 1}/${maxAttempts} gagal (${lastError}). Mencoba ulang...`);
     }
   }
 
-  throw new Error(`AI call failed after ${maxRetries} attempts: ${lastError}`);
+  throw new Error(`AI call failed after ${maxAttempts} attempts: ${lastError}`);
 }
 
 /* ─── Utility: build user context from partial data ─────── */
@@ -211,7 +236,9 @@ export function buildUserContext(opts: {
   cvLang?: "id" | "en";
   experienceLevel?: "entry" | "mid" | "senior" | "lead";
 }): UserContext | undefined {
-  if (!opts.jobTitle && !opts.industry) return undefined;
+  // cvLang ikut menentukan bahasa output prompt (mis. bullet revision),
+  // jadi tetap kirim meskipun jobTitle/industry kosong.
+  if (!opts.jobTitle && !opts.industry && !opts.cvLang) return undefined;
 
   return {
     targetRole: opts.jobTitle ?? undefined,

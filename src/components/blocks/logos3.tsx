@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
-import { motion, useInView, AnimatePresence } from "motion/react";
+import { useRef } from "react";
+import { motion, useInView } from "motion/react";
 import AutoScroll from "embla-carousel-auto-scroll";
 import {
   Carousel,
@@ -29,7 +29,7 @@ const trustBadges: TrustBadge[] = [
     descKey: "logos.badge-ats-desc",
     color: "bg-primary/10",
     iconColor: "text-primary",
-    glowColor: "#6d3bd7",
+    glowColor: "#0d7377",
   },
   {
     id: "ai-powered",
@@ -38,125 +38,54 @@ const trustBadges: TrustBadge[] = [
     descKey: "logos.badge-ai-desc",
     color: "bg-secondary/10",
     iconColor: "text-secondary",
-    glowColor: "#059669",
+    glowColor: "#4a7c7a",
   },
   {
     id: "instant",
     icon: "bolt",
     titleKey: "logos.badge-instant-title",
     descKey: "logos.badge-instant-desc",
-    color: "bg-[#8B5CF6]/10",
-    iconColor: "text-[#8B5CF6]",
-    glowColor: "#8B5CF6",
+    color: "bg-primary/10",
+    iconColor: "text-primary",
+    glowColor: "#0d7377",
   },
   {
     id: "export",
     icon: "file_download",
     titleKey: "logos.badge-export-title",
     descKey: "logos.badge-export-desc",
-    color: "bg-emerald-50",
-    iconColor: "text-emerald-600",
-    glowColor: "#059669",
+    color: "bg-primary/10",
+    iconColor: "text-primary",
+    glowColor: "#0d7377",
   },
   {
     id: "free",
     icon: "workspace_premium",
     titleKey: "logos.badge-free-title",
     descKey: "logos.badge-free-desc",
-    color: "bg-amber-50",
-    iconColor: "text-amber-600",
-    glowColor: "#D97706",
+    color: "bg-secondary/10",
+    iconColor: "text-secondary",
+    glowColor: "#4a7c7a",
   },
   {
     id: "multi-page",
     icon: "description",
     titleKey: "logos.badge-multi-title",
     descKey: "logos.badge-multi-desc",
-    color: "bg-sky-50",
-    iconColor: "text-sky-600",
-    glowColor: "#0284C7",
+    color: "bg-secondary/10",
+    iconColor: "text-secondary",
+    glowColor: "#4a7c7a",
   },
   {
     id: "portfolio",
     icon: "grid_view",
     titleKey: "logos.badge-portfolio-title",
     descKey: "logos.badge-portfolio-desc",
-    color: "bg-rose-50",
-    iconColor: "text-rose-600",
-    glowColor: "#E11D48",
+    color: "bg-primary/10",
+    iconColor: "text-primary",
+    glowColor: "#0d7377",
   },
 ];
-
-/* ─── Live Activity Feed ─── */
-interface Activity {
-  name: string;
-  actionKey: string;
-}
-
-const ACTIVITIES: Activity[] = [
-  { name: "Budi S.", actionKey: "logos.action-create" },
-  { name: "Sari A.", actionKey: "logos.action-analyze" },
-  { name: "Dewi K.", actionKey: "logos.action-update" },
-  { name: "Rudi H.", actionKey: "logos.action-portfolio" },
-  { name: "Maya S.", actionKey: "logos.action-revise" },
-  { name: "Ahmad F.", actionKey: "logos.action-analyze" },
-];
-
-const TIME_POOL = ["logos.time-2", "logos.time-3", "logos.time-5", "logos.time-8", "logos.time-11", "logos.time-14"];
-
-function LiveActivityFeed({ inView }: { inView: boolean }) {
-  const { t } = useTranslation();
-  const [index, setIndex] = useState(0);
-  const [timeOffset, setTimeOffset] = useState(0);
-
-  useEffect(() => {
-    if (!inView) return;
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % ACTIVITIES.length);
-      setTimeOffset((prev) => (prev + 1) % TIME_POOL.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [inView]);
-
-  const activity = ACTIVITIES[index];
-  const timeKey = TIME_POOL[timeOffset];
-
-  return (
-    <div className="flex items-center justify-center gap-2 sm:gap-3 text-xs">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={index + "-" + timeOffset}
-          initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
-          transition={{ duration: 0.35, ease: "easeOut" }}
-          className="flex items-center gap-2"
-        >
-          {/* Pulsing green dot */}
-          <span className="relative flex w-2 h-2">
-            <span className="absolute inline-flex w-full h-full rounded-full bg-green-500 opacity-75 animate-ping" />
-            <span className="relative inline-flex w-2 h-2 rounded-full bg-green-500" />
-          </span>
-
-          {/* Person icon */}
-          <span className="material-symbols-outlined text-[14px] text-on-surface-variant/60" style={{ fontVariationSettings: "'FILL' 1" }}>person</span>
-
-          {/* Name + action */}
-          <span className="text-on-surface-variant">
-            <span className="font-semibold text-on-surface">{activity.name}</span>
-            {" " + t(activity.actionKey)}
-          </span>
-
-          {/* Time */}
-          <span className="text-outline-variant">—</span>
-          <span className="text-outline-variant whitespace-nowrap">
-            {t(timeKey)}
-          </span>
-        </motion.div>
-      </AnimatePresence>
-    </div>
-  );
-}
 
 /* ─── Stagger entrance for cards ─── */
 const staggerVariants = {
@@ -275,21 +204,7 @@ export default function Logos3({
         </div>
       </div>
 
-      {/* Live Activity Feed */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={inView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.5, delay: 0.6, ease: "easeOut" }}
-        className="mt-8 pt-6 border-t border-outline-variant/10 max-w-md mx-auto"
-      >
-        <div className="flex items-center justify-center gap-1.5 mb-3">
-          <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-          <span className="text-[10px] font-medium text-on-surface-variant/50 uppercase tracking-wider">
-            {t("logos.activity-heading")}
-          </span>
-        </div>
-        <LiveActivityFeed inView={inView} />
-      </motion.div>
+
     </section>
   );
 }

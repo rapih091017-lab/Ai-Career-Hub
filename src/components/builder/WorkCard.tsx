@@ -73,7 +73,7 @@ export function WorkCard({
         const bullets = data.suggestions?.map((s: any) => s.bullet) || [];
         if (bullets.length > 0) {
           onAISuggest(
-            `Saran AI — ${work.position || "Posisi " + (index + 1)}`,
+            `Saran AI · ${work.position || "Posisi " + (index + 1)}`,
             data.suggestions,
             (text: string) => {
               onUpdate(index, "description", text);
@@ -106,7 +106,7 @@ export function WorkCard({
         onError(data.message || "Terjadi kesalahan saat menghubungi AI.");
       } else {
         onAIRevise(
-          `Optimalkan — ${work.position || "Posisi " + (index + 1)}`,
+          `Optimalkan · ${work.position || "Posisi " + (index + 1)}`,
           work.description,
           data.versions,
           data.explanation,
@@ -210,7 +210,7 @@ export function WorkCard({
                 <Field label="Pencapaian Utama (opsional)" value={work.achievement || ""} onChange={(v) => onUpdate(index, "achievement", v)} placeholder="Contoh: Meningkatkan penjualan 30% dalam 6 bulan" enableAiPolish fieldName="achievement" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
                 <p className="text-[10px] text-on-surface-variant mt-1 flex items-center gap-1">
                   <span className="material-symbols-outlined text-xs" aria-hidden="true">info</span>
-                  Soroti pencapaian dengan angka/metrik — ini yang paling dilihat HR!
+                  Soroti pencapaian dengan angka/metrik · ini yang paling dilihat HR!
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-4">

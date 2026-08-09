@@ -163,7 +163,8 @@ export async function POST(
         company: body.company || "",
         industry: body.industry || "",
         skills: body.skills || [],
-        description: body.description || "",
+        // Hook useBuilderAI mengirim field `jobDescription` — terima dua-duanya
+        description: body.description || body.jobDescription || "",
       });
 
       const aiResult = await callAI({
@@ -306,8 +307,14 @@ export async function POST(
       .split(/\s+/)
       .filter((w) => w.length > 3);
 
+    // Keyword yang SUDAH ada di teks vs yang MASIH KURANG —
+    // yang kurang inilah yang perlu disisipkan AI untuk optimasi ATS.
+    const normalizedText = currentText.toLowerCase();
     const relevantJdKeywords = jdWords.filter((word) =>
-      currentText.toLowerCase().includes(word)
+      normalizedText.includes(word)
+    );
+    const missingJdKeywords = jdWords.filter((word) =>
+      !normalizedText.includes(word)
     );
 
     // 3. Panggil AI
@@ -316,6 +323,7 @@ export async function POST(
       currentText: currentText,
       jobDescription: cvDoc.jobDescription,
       relevantJdKeywords: relevantJdKeywords,
+      missingJdKeywords: missingJdKeywords,
     });
 
     const aiResult = await callAI({

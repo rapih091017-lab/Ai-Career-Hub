@@ -13,6 +13,7 @@ import { SectionScoreCard } from "@/components/checker/SectionScoreCard";
 import { PdfExportButton } from "@/components/checker/PdfExportButton";
 import { KeywordChip, BulletReviewCard } from "@/components/checker/ResultComponents";
 import { scoreColor, gradeColor, atsBadgeColor, fitLabelMeta, type AnalysisResult, type SkillsSection } from "@/components/checker/types";
+import { anonIdHeaders } from "@/lib/anon-id";
 
 
 
@@ -87,7 +88,11 @@ export default function CheckerPage() {
   const doAnalyze = useCallback(async (extractedText: string) => {
     const res = await fetch("/api/checker/analyze", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        // Fingerprint anonim per-browser — supaya kuota 2x tidak dishare semua user
+        ...anonIdHeaders(),
+      },
       body: JSON.stringify({
         extractedText,
         jobDescription: jdText.trim(),
@@ -144,7 +149,7 @@ export default function CheckerPage() {
       // Process pages one at a time — upload immediately to free memory
       let allText = "";
       for (let i = 1; i <= totalPages; i++) {
-        setOcrProgress(`Halaman ${i}/${totalPages} — render...`);
+        setOcrProgress(`Halaman ${i}/${totalPages} · render...`);
         const page = await pdf.getPage(i);
         const viewport = page.getViewport({ scale: 1.5 }); // 1.5x balance speed/quality
 
@@ -165,7 +170,7 @@ export default function CheckerPage() {
         canvas.width = 0;
         canvas.height = 0;
 
-        setOcrProgress(`Halaman ${i}/${totalPages} — OCR...`);
+        setOcrProgress(`Halaman ${i}/${totalPages} · OCR...`);
         const pageFormData = new FormData();
         pageFormData.append("images", blob, `page_${i}.png`);
 
@@ -429,12 +434,12 @@ export default function CheckerPage() {
 
               {/* ── OCR Button (when scanned PDF detected) ── */}
               {showOcrButton && !ocrLoading && (
-                <div className="bg-violet-50 border border-violet-200 rounded-xl p-4 space-y-3">
+                <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 space-y-3">
                   <div className="flex items-start gap-3">
-                    <span className="material-symbols-outlined text-violet-600 text-sm mt-0.5 select-none">document_scanner</span>
+                    <span className="material-symbols-outlined text-primary text-sm mt-0.5 select-none">document_scanner</span>
                     <div>
-                      <p className="text-sm font-semibold text-violet-800">Atau baca dengan OCR AI</p>
-                      <p className="text-xs text-violet-700 mt-0.5">
+                      <p className="text-sm font-semibold text-primary">Atau baca dengan OCR AI</p>
+                      <p className="text-xs text-primary/80 mt-0.5">
                         Kami akan merender setiap halaman PDF dan membaca teksnya menggunakan AI.
                         Cocok untuk PDF hasil scan/gambar.
                       </p>
@@ -442,7 +447,7 @@ export default function CheckerPage() {
                   </div>
                   <button
                     onClick={handleBrowserOcr}
-                    className="w-full inline-flex items-center justify-center gap-2 bg-violet-600 text-white font-bold px-5 py-2.5 rounded-lg hover:bg-violet-700 active:scale-[0.97] transition-all text-sm"
+                    className="w-full inline-flex items-center justify-center gap-2 bg-primary text-white font-bold px-5 py-2.5 rounded-lg hover:bg-primary/90 active:scale-[0.97] transition-all text-sm"
                   >
                     <span className="material-symbols-outlined text-sm select-none">scan</span>
                     OCR dengan AI (Baca PDF)
@@ -452,16 +457,16 @@ export default function CheckerPage() {
 
               {/* ── OCR Loading State ── */}
               {ocrLoading && (
-                <div className="bg-violet-50 border border-violet-200 rounded-xl p-4 space-y-3">
+                <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 space-y-3">
                   <div className="flex items-center gap-3">
-                    <svg className="animate-spin h-5 w-5 text-violet-600" viewBox="0 0 24 24">
+                    <svg className="animate-spin h-5 w-5 text-primary" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
-                    <span className="text-sm font-medium text-violet-800">{ocrProgress || "Memproses OCR..."}</span>
+                    <span className="text-sm font-medium text-primary">{ocrProgress || "Memproses OCR..."}</span>
                   </div>
-                  <div className="w-full bg-violet-200 rounded-full h-1.5">
-                    <div className="bg-violet-600 h-1.5 rounded-full animate-pulse w-2/3" />
+                  <div className="w-full bg-primary/15 rounded-full h-1.5">
+                    <div className="bg-primary h-1.5 rounded-full w-2/3" />
                   </div>
                 </div>
               )}
@@ -572,6 +577,7 @@ export default function CheckerPage() {
     actionPlan,
     bulletReview,
     missingSections,
+    aiModel,
   } = result;
 
   const color = scoreColor(scores.overall);
@@ -651,7 +657,20 @@ export default function CheckerPage() {
             {fitMeta.desc && (
               <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold ${fitMeta.bg} ${fitMeta.text}`}>
                 <span className="material-symbols-outlined text-lg select-none">{fitMeta.icon}</span>
-                {fitLabel}{fitMeta.desc ? ` — ${fitMeta.desc.split(",")[0]}` : ""}
+                {fitLabel}{fitMeta.desc ? ` · ${fitMeta.desc.split(",")[0]}` : ""}
+              </div>
+            )}
+            {aiModel && (
+              <div
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold border ${
+                  aiModel === "R1"
+                    ? "bg-primary/5 text-primary/80 border-primary/30"
+                    : "bg-blue-50 text-blue-700 border-blue-300"
+                }`}
+                title={aiModel === "R1" ? "DeepSeek Reasoner · analisis mendalam (Premium)" : "DeepSeek Chat · analisis standar"}
+              >
+                <span className="material-symbols-outlined text-lg select-none">{aiModel === "R1" ? "auto_awesome" : "bolt"}</span>
+                {aiModel === "R1" ? "DeepSeek R1" : "DeepSeek V3"}
               </div>
             )}
           </div>
@@ -792,7 +811,7 @@ export default function CheckerPage() {
               {/* Missing critical */}
               {keywordAnalysis.missing_critical.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-red-700 uppercase tracking-wider mb-2">Hilang — Prioritas ({keywordAnalysis.missing_critical.length})</p>
+                  <p className="text-xs font-bold text-red-700 uppercase tracking-wider mb-2">Hilang · Prioritas ({keywordAnalysis.missing_critical.length})</p>
                   <div className="flex flex-wrap gap-1.5">
                     {keywordAnalysis.missing_critical.map((kw, i) => (
                       <KeywordChip key={i} text={kw} variant="missing" />
@@ -804,7 +823,7 @@ export default function CheckerPage() {
               {/* Missing nice-to-have */}
               {keywordAnalysis.missing_nice_to_have.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-yellow-700 uppercase tracking-wider mb-2">Hilang — Tambahan ({keywordAnalysis.missing_nice_to_have.length})</p>
+                  <p className="text-xs font-bold text-yellow-700 uppercase tracking-wider mb-2">Hilang · Tambahan ({keywordAnalysis.missing_nice_to_have.length})</p>
                   <div className="flex flex-wrap gap-1.5">
                     {keywordAnalysis.missing_nice_to_have.map((kw, i) => (
                       <KeywordChip key={i} text={kw} variant="nice" />

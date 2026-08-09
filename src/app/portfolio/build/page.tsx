@@ -10,7 +10,7 @@ import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/components/ui/toast";
 import { ConfirmModal, type ConfirmAction } from "@/components/ui/confirm-modal";
 
-type AccordionKey = "hero" | "about" | "projects" | "skills" | "experience" | "education" | "testimonials" | "contact";
+type AccordionKey = "hero" | "about" | "projects" | "skills" | "experience" | "education" | "certifications" | "organizations" | "hobbies" | "testimonials" | "contact";
 
 
 
@@ -61,6 +61,9 @@ interface ExperienceItem { id: string; company: string; position: string; startD
 interface EducationItem { id: string; institution: string; degree: string; field: string; startDate: string; endDate: string; }
 interface TestimonialItem { id: string; name: string; position: string; testimonial: string; }
 interface ExtraLink { id: string; label: string; url: string; }
+interface CertificationItem { id: string; name: string; issuer: string; year: string; url?: string; }
+interface OrganizationItem { id: string; name: string; role: string; period: string; description: string; }
+interface HobbyItem { id: string; name: string; description: string; }
 
 interface PortfolioFormData {
   heroPhotoUrl: string;
@@ -177,6 +180,15 @@ export default function PortfolioBuildPage() {
   const [educations, setEducations] = useState<EducationItem[]>([
     { id: genId(), institution: "", degree: "", field: "", startDate: "", endDate: "" },
   ]);
+  const [certifications, setCertifications] = useState<CertificationItem[]>([
+    { id: genId(), name: "", issuer: "", year: "", url: "" },
+  ]);
+  const [organizations, setOrganizations] = useState<OrganizationItem[]>([
+    { id: genId(), name: "", role: "", period: "", description: "" },
+  ]);
+  const [hobbies, setHobbies] = useState<HobbyItem[]>([
+    { id: genId(), name: "", description: "" },
+  ]);
   const [profileForFill, setProfileForFill] = useState<MasterProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
   const [aiSuggesting, setAiSuggesting] = useState(false);
@@ -199,6 +211,9 @@ export default function PortfolioBuildPage() {
       projects: ProjectItem[];
       experiences: ExperienceItem[];
       educations: EducationItem[];
+      certifications?: CertificationItem[];
+      organizations?: OrganizationItem[];
+      hobbies?: HobbyItem[];
       testimonials: TestimonialItem[];
       extraLinks: ExtraLink[];
     } | null>(STORAGE_KEY, null);
@@ -207,6 +222,9 @@ export default function PortfolioBuildPage() {
       setProjects(draft.projects);
       setExperiences(draft.experiences);
       setEducations(draft.educations);
+      if (draft.certifications) setCertifications(draft.certifications);
+      if (draft.organizations) setOrganizations(draft.organizations);
+      if (draft.hobbies) setHobbies(draft.hobbies);
       setTestimonials(draft.testimonials);
       setExtraLinks(draft.extraLinks);
       setSaveStatus("saved");
@@ -323,6 +341,9 @@ export default function PortfolioBuildPage() {
         projects,
         experiences: mappedExperiences,
         educations: mappedEducations,
+        certifications,
+        organizations,
+        hobbies,
         testimonials,
         extraLinks,
       };
@@ -458,14 +479,14 @@ export default function PortfolioBuildPage() {
     if (!isHydrated.current) { isHydrated.current = true; return; }
     setSaveStatus("saving");
     const timer = setTimeout(() => {
-      const payload = { formData, projects, experiences, educations, testimonials, extraLinks };
+      const payload = { formData, projects, experiences, educations, certifications, organizations, hobbies, testimonials, extraLinks };
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
         setSaveStatus("saved");
       } catch { /* quota exceeded, silent */ }
     }, 1500);
     return () => clearTimeout(timer);
-  }, [formData, projects, experiences, educations, testimonials, extraLinks]);
+  }, [formData, projects, experiences, educations, certifications, organizations, hobbies, testimonials, extraLinks]);
 
   const update = <K extends keyof PortfolioFormData>(key: K) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({ ...prev, [key]: e.target.value }));
@@ -674,12 +695,12 @@ export default function PortfolioBuildPage() {
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="md:col-span-2">
-                          <label className="block text-label-sm text-on-surface-variant mb-1">Nama Project</label>
+                          <label className="block text-label-sm text-on-surface-variant mb-1">{t("live.form.project-name")}</label>
                           <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Nama project"
                             value={p.name} onChange={e => setProjects(prev => prev.map(x => x.id === p.id ? {...x, name: e.target.value} : x))} />
                         </div>
                         <div className="md:col-span-2 relative">
-                          <label className="block text-label-sm text-on-surface-variant mb-1">Deskripsi</label>
+                          <label className="block text-label-sm text-on-surface-variant mb-1">{t("live.form.description")}</label>
                           <textarea className="w-full px-4 py-3 pr-12 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={2} placeholder="Deskripsi singkat project..." maxLength={500}
                             value={p.description} onChange={e => setProjects(prev => prev.map(x => x.id === p.id ? {...x, description: e.target.value} : x))} />
                           {p.description && (
@@ -689,11 +710,11 @@ export default function PortfolioBuildPage() {
                           )}
                           <CharCounter value={p.description} max={500} />
                         </div>
-                        <Field label="Tech Stack">
+                        <Field label={t("live.form.tech-stack")}>
                           <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="React, Node.js, PostgreSQL"
                             value={p.techStack} onChange={e => setProjects(prev => prev.map(x => x.id === p.id ? {...x, techStack: e.target.value} : x))} />
                         </Field>
-                        <Field label="Link Project">
+                        <Field label={t("live.form.link-optional")}>
                           <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="https://github.com/..."
                             value={p.link} onChange={e => setProjects(prev => prev.map(x => x.id === p.id ? {...x, link: e.target.value} : x))} />
                         </Field>
@@ -757,11 +778,11 @@ export default function PortfolioBuildPage() {
                         </button>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Field label="Nama Perusahaan">
+                        <Field label={t("live.form.company")}>
                           <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Nama perusahaan"
                             value={e.company} onChange={ev => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, company: ev.target.value} : x))} />
                         </Field>
-                        <Field label="Posisi">
+                        <Field label={t("live.form.position")}>
                           <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Frontend Developer"
                             value={e.position} onChange={ev => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, position: ev.target.value} : x))} />
                         </Field>
@@ -776,7 +797,7 @@ export default function PortfolioBuildPage() {
                           </div>
                         </div>
                         <div className="md:col-span-2 relative">
-                          <label className="block text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Deskripsi</label>
+                          <label className="block text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">{t("live.form.description")}</label>
                           <textarea className="w-full px-4 py-3 pr-12 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={3} placeholder="Jelaskan tanggung jawab dan pencapaian..." maxLength={1000}
                             value={e.description} onChange={ev => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, description: ev.target.value} : x))} />
                           {e.description && (
@@ -812,16 +833,16 @@ export default function PortfolioBuildPage() {
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="md:col-span-2">
-                          <Field label="Nama Institusi">
+                          <Field label={t("live.form.institution")}>
                             <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Universitas Gadjah Mada"
                               value={e.institution} onChange={ev => setEducations(prev => prev.map(x => x.id === e.id ? {...x, institution: ev.target.value} : x))} />
                           </Field>
                         </div>
-                        <Field label="Jenjang / Gelar">
+                        <Field label={t("live.form.degree")}>
                           <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Sarjana (S1)"
                             value={e.degree} onChange={ev => setEducations(prev => prev.map(x => x.id === e.id ? {...x, degree: ev.target.value} : x))} />
                         </Field>
-                        <Field label="Bidang Studi">
+                        <Field label={t("live.form.field")}>
                           <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Ilmu Komputer"
                             value={e.field} onChange={ev => setEducations(prev => prev.map(x => x.id === e.id ? {...x, field: ev.target.value} : x))} />
                         </Field>
@@ -842,6 +863,124 @@ export default function PortfolioBuildPage() {
                     className="w-full py-3 rounded-xl border-2 border-dashed border-outline-variant text-on-surface-variant font-label-bold flex items-center justify-center gap-2 hover:bg-surface-container-low hover:border-primary/50 transition-all">
                     <span className="material-symbols-outlined">add</span>
                     {t("live.form.add-education")}
+                  </button>
+                </div>
+              </AccordionItem>
+
+              {/* 6b. Certifications */}
+              <AccordionItem id="certifications" icon="workspace_premium" title="Sertifikat & Penghargaan" isOpen={activeSection === "certifications"} onToggle={toggleSection}>
+                <div className="px-6 space-y-6">
+                  {certifications.map((cert, idx) => (
+                    <div key={cert.id} className="p-4 rounded-xl border border-outline-variant bg-surface-container-low">
+                      <div className="flex justify-between items-start mb-3">
+                        <h4 className="font-label-bold text-primary">Sertifikat {idx + 1}</h4>
+                        <button className="text-error hover:bg-error-container/30 p-1 rounded transition-colors"
+                          onClick={() => setCertifications(prev => prev.filter(x => x.id !== cert.id))}
+                          aria-label="Hapus sertifikat">
+                          <span className="material-symbols-outlined select-none" aria-hidden="true">delete</span>
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Field label="Nama Sertifikat">
+                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="AWS Certified Developer"
+                            value={cert.name} onChange={e => setCertifications(prev => prev.map(x => x.id === cert.id ? {...x, name: e.target.value} : x))} />
+                        </Field>
+                        <Field label="Penerbit">
+                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Amazon Web Services"
+                            value={cert.issuer} onChange={e => setCertifications(prev => prev.map(x => x.id === cert.id ? {...x, issuer: e.target.value} : x))} />
+                        </Field>
+                        <Field label="Tahun">
+                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="2024"
+                            value={cert.year} onChange={e => setCertifications(prev => prev.map(x => x.id === cert.id ? {...x, year: e.target.value} : x))} />
+                        </Field>
+                        <Field label="Link Sertifikat (opsional)">
+                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="https://credential.example.com/..."
+                            value={cert.url || ""} onChange={e => setCertifications(prev => prev.map(x => x.id === cert.id ? {...x, url: e.target.value} : x))} />
+                        </Field>
+                      </div>
+                    </div>
+                  ))}
+                  <button onClick={() => setCertifications(prev => [...prev, { id: genId(), name: "", issuer: "", year: "", url: "" }])}
+                    className="w-full py-3 rounded-xl border-2 border-dashed border-outline-variant text-on-surface-variant font-label-bold flex items-center justify-center gap-2 hover:bg-surface-container-low hover:border-primary/50 transition-all">
+                    <span className="material-symbols-outlined">add</span>
+                    Tambah Sertifikat
+                  </button>
+                </div>
+              </AccordionItem>
+
+              {/* 6c. Organizations */}
+              <AccordionItem id="organizations" icon="groups" title="Organisasi & Kepanitiaan" isOpen={activeSection === "organizations"} onToggle={toggleSection}>
+                <div className="px-6 space-y-6">
+                  {organizations.map((org, idx) => (
+                    <div key={org.id} className="p-4 rounded-xl border border-outline-variant bg-surface-container-low">
+                      <div className="flex justify-between items-start mb-3">
+                        <h4 className="font-label-bold text-primary">Organisasi {idx + 1}</h4>
+                        <button className="text-error hover:bg-error-container/30 p-1 rounded transition-colors"
+                          onClick={() => setOrganizations(prev => prev.filter(x => x.id !== org.id))}
+                          aria-label="Hapus organisasi">
+                          <span className="material-symbols-outlined select-none" aria-hidden="true">delete</span>
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Field label="Nama Organisasi">
+                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Himpunan Mahasiswa Teknik"
+                            value={org.name} onChange={e => setOrganizations(prev => prev.map(x => x.id === org.id ? {...x, name: e.target.value} : x))} />
+                        </Field>
+                        <Field label="Peran / Jabatan">
+                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Ketua Divisi Acara"
+                            value={org.role} onChange={e => setOrganizations(prev => prev.map(x => x.id === org.id ? {...x, role: e.target.value} : x))} />
+                        </Field>
+                        <Field label="Periode">
+                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="2022 - 2024"
+                            value={org.period} onChange={e => setOrganizations(prev => prev.map(x => x.id === org.id ? {...x, period: e.target.value} : x))} />
+                        </Field>
+                        <div className="md:col-span-2">
+                          <label className="block text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Deskripsi Kegiatan</label>
+                          <textarea className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={2} placeholder="Jelaskan tanggung jawab & pencapaian..." maxLength={500}
+                            value={org.description} onChange={e => setOrganizations(prev => prev.map(x => x.id === org.id ? {...x, description: e.target.value} : x))} />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  <button onClick={() => setOrganizations(prev => [...prev, { id: genId(), name: "", role: "", period: "", description: "" }])}
+                    className="w-full py-3 rounded-xl border-2 border-dashed border-outline-variant text-on-surface-variant font-label-bold flex items-center justify-center gap-2 hover:bg-surface-container-low hover:border-primary/50 transition-all">
+                    <span className="material-symbols-outlined">add</span>
+                    Tambah Organisasi
+                  </button>
+                </div>
+              </AccordionItem>
+
+              {/* 6d. Hobbies */}
+              <AccordionItem id="hobbies" icon="favorite" title="Hobi & Minat" isOpen={activeSection === "hobbies"} onToggle={toggleSection}>
+                <div className="px-6 space-y-4">
+                  {hobbies.map((hobby, idx) => (
+                    <div key={hobby.id} className="p-4 rounded-xl border border-outline-variant bg-surface-container-low">
+                      <div className="flex justify-between items-start mb-3">
+                        <h4 className="font-label-bold text-primary">Hobi {idx + 1}</h4>
+                        {hobbies.length > 1 && (
+                          <button className="text-error hover:bg-error-container/30 p-1 rounded transition-colors"
+                            onClick={() => setHobbies(prev => prev.filter(x => x.id !== hobby.id))}
+                            aria-label="Hapus hobi">
+                            <span className="material-symbols-outlined select-none" aria-hidden="true">delete</span>
+                          </button>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Field label="Nama Hobi">
+                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Fotografi"
+                            value={hobby.name} onChange={e => setHobbies(prev => prev.map(x => x.id === hobby.id ? {...x, name: e.target.value} : x))} />
+                        </Field>
+                        <Field label="Deskripsi Singkat (opsional)">
+                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Street photography & landscape"
+                            value={hobby.description} onChange={e => setHobbies(prev => prev.map(x => x.id === hobby.id ? {...x, description: e.target.value} : x))} />
+                        </Field>
+                      </div>
+                    </div>
+                  ))}
+                  <button onClick={() => setHobbies(prev => [...prev, { id: genId(), name: "", description: "" }])}
+                    className="w-full py-3 rounded-xl border-2 border-dashed border-outline-variant text-on-surface-variant font-label-bold flex items-center justify-center gap-2 hover:bg-surface-container-low hover:border-primary/50 transition-all">
+                    <span className="material-symbols-outlined">add</span>
+                    Tambah Hobi
                   </button>
                 </div>
               </AccordionItem>
@@ -874,12 +1013,12 @@ export default function PortfolioBuildPage() {
                               <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Nama pemberi testimoni"
                                 value={item.name} onChange={updateTestimonial(item.id, "name")} />
                             </Field>
-                            <Field label="Posisi / Perusahaan">
+                            <Field label={t("live.form.position-company")}>
                               <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="CTO at TechCorp"
                                 value={item.position} onChange={updateTestimonial(item.id, "position")} />
                             </Field>
                           </div>
-                          <Field label="Testimoni">
+                          <Field label={t("live.form.testimonial")}>
                             <div className="relative">
                               <textarea className="w-full px-4 py-3 pr-12 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={2} placeholder="Apa yang mereka katakan tentangmu?" maxLength={500}
                                 value={item.testimonial} onChange={updateTestimonial(item.id, "testimonial")} />
@@ -1010,6 +1149,9 @@ export default function PortfolioBuildPage() {
                       setProjects([{ id: genId(), name: "", description: "", techStack: "", link: "" }, { id: genId(), name: "", description: "", techStack: "", link: "" }, { id: genId(), name: "", description: "", techStack: "", link: "" }]);
                       setExperiences([{ id: genId(), company: "", position: "", startDate: "", endDate: "", description: "" }, { id: genId(), company: "", position: "", startDate: "", endDate: "", description: "" }]);
                       setEducations([{ id: genId(), institution: "", degree: "", field: "", startDate: "", endDate: "" }]);
+                      setCertifications([{ id: genId(), name: "", issuer: "", year: "", url: "" }]);
+                      setOrganizations([{ id: genId(), name: "", role: "", period: "", description: "" }]);
+                      setHobbies([{ id: genId(), name: "", description: "" }]);
                       setTestimonials([{ id: genId(), name: "", position: "", testimonial: "" }]);
                       setExtraLinks([]);
                       setSaveStatus("idle");
@@ -1022,7 +1164,7 @@ export default function PortfolioBuildPage() {
               <button
                 onClick={async () => {
                   setSaving(true);
-                  const payload = { formData, projects, experiences, educations, testimonials, extraLinks };
+                  const payload = { formData, projects, experiences, educations, certifications, organizations, hobbies, testimonials, extraLinks };
                   try {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
                     setSaveStatus("saved");

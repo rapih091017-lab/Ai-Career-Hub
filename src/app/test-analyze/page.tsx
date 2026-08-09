@@ -1,6 +1,8 @@
 "use client";
 
 import { useRef } from "react";
+import AuthGuard from "@/components/AuthGuard";
+import { anonIdHeaders } from "@/lib/anon-id";
 
 export default function TestAnalyzePage() {
   const cvRef = useRef<HTMLTextAreaElement>(null);
@@ -25,7 +27,11 @@ export default function TestAnalyzePage() {
     try {
       const res = await fetch("/api/checker/analyze", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          // Fingerprint anonim per-browser — supaya kuota 2x tidak dishare semua user
+          ...anonIdHeaders(),
+        },
         body: JSON.stringify({
           extractedText: cvText,
           jobDescription: jdText,
@@ -51,7 +57,8 @@ export default function TestAnalyzePage() {
   };
 
   return (
-    <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
+    <AuthGuard>
+      <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
       <h1 style={{ marginBottom: "1rem" }}>Test Analyze CV</h1>
 
       <div style={{ marginBottom: "1rem" }}>
@@ -102,8 +109,8 @@ export default function TestAnalyzePage() {
           whiteSpace: "pre-wrap",
           wordBreak: "break-word",
           minHeight: "100px",
-        }}
-      />
-    </div>
+        }}      />
+      </div>
+    </AuthGuard>
   );
 }

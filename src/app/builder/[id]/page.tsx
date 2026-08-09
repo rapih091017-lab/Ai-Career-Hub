@@ -153,7 +153,7 @@ export default function BuilderPage() {
         if (result.redirectUrl) {
           addToast({ 
             type: "warning", 
-            message: result.error || "Kuota PDF habis — Upgrade untuk unlimited" 
+            message: result.error || "Kuota PDF habis · Upgrade untuk unlimited" 
           });
           setTimeout(() => router.push(result.redirectUrl!), 1500);
         } else {
@@ -244,7 +244,7 @@ export default function BuilderPage() {
 
   return (
     <AuthGuard>
-      <div className="h-screen flex flex-col bg-background">
+      <div className="h-[100dvh] flex flex-col bg-background">
         <AppHeader />
 
         {/* ── STEPPER (connector lines style) ── */}
@@ -491,7 +491,7 @@ export default function BuilderPage() {
               )}
 
               {activeStep === 6 && (
-                <ReviewStep cvData={cvData} sectionCompletion={sectionCompletion} customSections={customSections} />
+                <ReviewStep cvData={cvData} sectionCompletion={sectionCompletion} customSections={customSections} cvId={cvId} />
               )}
 
             </motion.div>
@@ -619,7 +619,7 @@ export default function BuilderPage() {
                         whiteSpace: 'nowrap',
                         lineHeight: 1,
                       }}>
-                        — {i + 1} —
+                        {i + 1}
                       </span>
                       <span style={{ flex: 1, height: 0, borderTop: '0.5px dashed #ccc' }} />
                     </div>

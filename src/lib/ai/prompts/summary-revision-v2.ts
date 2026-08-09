@@ -70,7 +70,7 @@ ${DELIM.SECTION}
 2. Setiap versi harus LEBIH BAIK dari aslinya — jangan output yang sama.
 3. Pertahankan informasi faktual dari aslinya — jangan mengarang.
 4. Jika aslinya mengandung data spesifik (angka, perusahaan, teknologi), PERTAHANKAN.
-5. BAHASA INGGRIS untuk teks ringkasan, BAHASA INDONESIA untuk context/explanation.
+5. Teks ringkasan mengikuti **Bahasa CV dari USER CONTEXT** ("Bahasa CV: Indonesia" → ringkasan Bahasa Indonesia; "Bahasa CV: English" → ringkasan Bahasa Inggris); context/explanation selalu Bahasa Indonesia. CONTOH di bawah hanya ilustrasi format — bahasa output TETAP mengikuti Bahasa CV.
 6. Jangan gunakan kata ganti orang pertama (I, my, me, saya, aku).
 7. Jika professionalTitle tersedia, gunakan sebagai identitas profesional.
 8. Jika workHistorySummary tersedia, integrasikan konteks pengalaman untuk kredibilitas.
@@ -135,7 +135,7 @@ ${DELIM.SECTION}
 2. Versi improved WAJIB mengandung minimal 1 metrik atau angka [est.].
 3. Versi bold WAJIB mengandung dampak bisnis dan strong action verb.
 4. Variasikan action verb antar versi — jangan pakai verb yang sama.
-5. explanation dalam BAHASA INDONESIA, teks ringkasan dalam BAHASA INGGRIS.
+5. explanation dalam BAHASA INDONESIA; teks ringkasan mengikuti Bahasa CV dari USER CONTEXT (Indonesia/English).
 6. JANGAN mengarang pencapaian — jika data tidak ada, gunakan [est.] dengan catatan.
 
 ${BOUNDARY}

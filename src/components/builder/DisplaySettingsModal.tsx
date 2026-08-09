@@ -32,9 +32,9 @@ const SPACING_OPTIONS = [
 ];
 
 const MARGIN_OPTIONS = [
-  { value: "tight" as const, label: "Mepet", desc: "10mm — memaksimalkan ruang konten" },
-  { value: "normal" as const, label: "Normal", desc: "20mm — margin standar A4" },
-  { value: "wide" as const, label: "Leggar", desc: "30mm — margin luas, terlihat premium" },
+  { value: "tight" as const, label: "Mepet", desc: "10mm · memaksimalkan ruang konten" },
+  { value: "normal" as const, label: "Normal", desc: "20mm · margin standar A4" },
+  { value: "wide" as const, label: "Leggar", desc: "30mm · margin luas, terlihat premium" },
 ];
 
 const PRESET_COLORS = [

@@ -251,6 +251,8 @@ export async function serializePreviewHtml(
       border: 0 !important;
       background: white !important;
       overflow: visible !important;
+      transform: none !important;
+      scale: none !important;
     }
     .a4-preview [data-page-indicator] { display: none !important; }
     .a4-preview [style*="background-image: repeating-linear-gradient"] {
@@ -309,6 +311,19 @@ export async function exportPdfViaServer(
       const err = await res
         .json()
         .catch(() => ({ error: "UNKNOWN", message: "Gagal export PDF" }));
+
+      // PDF server mati/unreachable → fallback ke window.print() agar
+      // user tetap bisa dapat PDF (bukan hanya tampil error).
+      if (err.error === "PDF_SERVER_UNREACHABLE" || err.error === "PDF_SERVER_ERROR") {
+        console.warn("[pdf] pdf-server unreachable, falling back to window.print():", err.message);
+        try {
+          await exportPreviewToPrintPdf(element, fileName, marginMm);
+          return { ok: true, error: "pdf-server unavailable, used browser print fallback" };
+        } catch (fallbackErr) {
+          return { ok: false, error: "Gagal export PDF (server & fallback)" };
+        }
+      }
+
       return { ok: false, error: err.message, redirectUrl: err.redirectUrl };
     }
 
@@ -382,7 +397,12 @@ export async function exportPreviewToPrintPdf(
     // ── Inject dynamic @page rule ──
     const style = document.createElement("style");
     style.id = "print-style-cv";
-    style.textContent = `@page { size: A4 portrait; margin: ${marginMm ?? 20}mm; }`;
+    style.textContent = `
+      @page { size: A4 portrait; margin: ${marginMm ?? 20}mm; }
+      /* Netralkan scale wrapper responsif (LetterPreview) agar surat dicetak ukuran penuh */
+      .printing-cv [style*="transform: scale"] { transform: none !important; }
+      .printing-cv [style*="overflow: hidden"] { overflow: visible !important; height: auto !important; max-height: none !important; }
+    `;
     document.head.appendChild(style);
 
     // ── Mark body for print media queries ──

@@ -2,7 +2,6 @@ import {
   SECURITY_GUARDRAIL,
   BOUNDARY,
   DELIM,
-  COT_TEMPLATE,
   OUTPUT_FORMAT_INSTRUCTION,
 } from "./shared";
 
@@ -43,7 +42,11 @@ Berikan analisis komprehensif yang mencakup:
 9. STAGE-BASED REKOMENDASI: Sesuai level karir (entry/mid/senior/lead)
 ${DELIM.SECTION}
 
-${COT_TEMPLATE}
+--- REASONING INTERNAL ---
+Lakukan seluruh analisis, scoring, dan pertimbangan secara INTERNAL sebelum
+menyusun output. JANGAN menampilkan langkah-langkah reasoning, JANGAN memakai
+blok <think>, JANGAN menambahkan penjelasan apa pun — langsung kembalikan
+HANYA JSON final yang valid sesuai skema di bawah.
 
 ${DELIM.SECTION}
 --- METODOLOGI ANALISIS ATS MODERN ---
@@ -95,7 +98,7 @@ Contoh:
 - JD minta "Docker" → CV punya "Linux, CLI, deployment" → Adjacent ✅ (bisa dipelajari cepat)
 - JD minta "GraphQL" → CV cuma punya "HTML, CSS" → Gap ❌ (jauh)
 
-### 5. ATS PREDICTION — Level Detaill
+### 5. ATS PREDICTION — Level Detail
 
 Bukan hanya "Likely Pass" / "Borderline" / "Likely Fail" — tapi dengan reasoning:
 
@@ -152,9 +155,12 @@ ${DELIM.SECTION}
 4. KONTEKSTUAL: Sesuaikan analisis dengan level karir user (entry/mid/senior/lead)
 5. SEMANTIC: Evaluasi semantic match, bukan hanya exact match keyword
 6. BAHASA: Bahasa Indonesia profesional untuk SEMUA output kecuali skill names (tetap Inggris)
-7. Jika JD KOSONG: Analisis CV secara umum — fokus format ATS, CARI method, dan missing sections
+7. Jika JD KOSONG: Analisis CV secara umum — fokus format ATS, CARI method, dan missing sections. Untuk keyword_analysis: semua array kosong, match_rate_pct & semantic_match_rate_pct = 0, dan ats_prediction.result = "Likely Pass" TANPA konfiden tinggi (match_confidence < 60) karena tidak ada baseline pembanding
 8. Jika CV < 100 kata: Beri tahu user CV terlalu pendek untuk analisis mendalam
 9. JANGAN tambah informasi fiktif — jika kurang data, akui dengan jujur
+10. KONSISTENSI SKOR: overall_score harus mendekati rata-rata terbobot breakdown (Summary 20%, Experience 35%, Skills 25%, Education 10%, Format ATS 10%) — jangan sampai skor bagian kontradiktif dengan overall
+11. bullet_review: maksimal 5 bullet TERPENTING (prioritas High dulu), jangan review semua bullet
+12. Dalam suggested_rewrite: jangan menambahkan angka/metrik yang tidak ada di CV — jika mengestimasi, beri tanda [est.]
 
 ${DELIM.SECTION}
 

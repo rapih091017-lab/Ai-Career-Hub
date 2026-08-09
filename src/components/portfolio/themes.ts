@@ -37,6 +37,9 @@ export const THEMES: Record<string, ThemeDefinition> = {
       education: { primary: "#A78BFA", accent: "#6DD5FA" },
       projects: { primary: "#6DD5FA", accent: "#7C5CFC" },
       skills: { primary: "#7C5CFC", accent: "#6DD5FA" },
+      certifications: { primary: "#6DD5FA", accent: "#A78BFA" },
+      organizations: { primary: "#A78BFA", accent: "#6DD5FA" },
+      hobbies: { primary: "#7C5CFC", accent: "#6DD5FA" },
       testimonials: { primary: "#A78BFA", accent: "#7C5CFC" },
       contact: { primary: "#7C5CFC", accent: "#6DD5FA" },
     },
@@ -94,6 +97,9 @@ export const THEMES: Record<string, ThemeDefinition> = {
       education: { primary: "#33CCFF", accent: "#FF3366" },
       projects: { primary: "#3366FF", accent: "#33CCFF" },
       skills: { primary: "#FF3366", accent: "#3366FF" },
+      certifications: { primary: "#33CCFF", accent: "#FFCC00" },
+      organizations: { primary: "#3366FF", accent: "#FF3366" },
+      hobbies: { primary: "#FFCC00", accent: "#3366FF" },
       testimonials: { primary: "#FFCC00", accent: "#FF3366" },
       contact: { primary: "#3366FF", accent: "#33CCFF" },
     },
@@ -150,6 +156,9 @@ export const THEMES: Record<string, ThemeDefinition> = {
       education: { primary: "#D4A574", accent: "#8FBC8F" },
       projects: { primary: "#8FBC8F", accent: "#B8863C" },
       skills: { primary: "#B8863C", accent: "#8FBC8F" },
+      certifications: { primary: "#D4A574", accent: "#B8863C" },
+      organizations: { primary: "#8FBC8F", accent: "#D4A574" },
+      hobbies: { primary: "#B8863C", accent: "#D4A574" },
       testimonials: { primary: "#D4A574", accent: "#B8863C" },
       contact: { primary: "#B8863C", accent: "#8FBC8F" },
     },
@@ -190,5 +199,6 @@ export const DEFAULT_THEME_ID = "glass";
 
 export const DEFAULT_SECTION_ORDER: SectionId[] = [
   "hero", "about", "stats", "experience", "education",
-  "projects", "skills", "testimonials", "contact",
+  "projects", "skills", "certifications", "organizations", "hobbies",
+  "testimonials", "contact",
 ];

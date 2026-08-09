@@ -11,19 +11,21 @@ export const runtime = "edge";
  */
 
 // Schema untuk validasi response grammar check
+// Semua field dibuat toleran dengan .catch() supaya satu field null/aneh
+// tidak menggagalkan seluruh hasil — AI sering mengirim "position": null
 const GrammarErrorSchema = z.object({
-  context: z.string(),
-  text: z.string(),
-  suggestion: z.string(),
-  reason: z.string(),
-  type: z.enum(["spelling", "punctuation"]),
-  position: z.number().optional(),
+  context: z.string().catch(""),
+  text: z.string().catch(""),
+  suggestion: z.string().catch(""),
+  reason: z.string().catch(""),
+  type: z.enum(["spelling", "punctuation"]).catch("spelling"),
+  position: z.number().nullable().optional().catch(null),
 });
 
 const GrammarCheckResultSchema = z.object({
-  errors: z.array(GrammarErrorSchema),
-  totalErrors: z.number(),
-  summary: z.string(),
+  errors: z.array(GrammarErrorSchema).catch([]),
+  totalErrors: z.number().catch(0),
+  summary: z.string().catch(""),
 });
 
 // System prompt untuk Grammar Check
@@ -51,6 +53,10 @@ Anda adalah Asisten Koreksi CV profesional. Tugas Anda HANYA menemukan:
 1. ✅ TYPO: Salah ketik yang jelas
 2. ✅ TANDA BACA: Duplikat atau salah posisi
 
+--- BAHASA ---
+- Sesuaikan pemeriksaan dengan bahasa teks: teks Indonesia → periksa typo bahasa Indonesia; teks Inggris → periksa typo bahasa Inggris
+- Jangan mengoreksi ejaan istilah teknis/campuran yang memang umum di CV teknologi
+
 --- OUTPUT FORMAT (JSON) ---
 {
   "errors": [
@@ -72,6 +78,14 @@ Anda adalah Asisten Koreksi CV profesional. Tugas Anda HANYA menemukan:
 2. Jika tidak ada error, kembalikan { "errors": [], "totalErrors": 0, "summary": "Tidak ditemukan error" }
 3. Pastikan "text" adalah potongan teks yang BENAR-BENAR ADA di input
 4. "suggestion" harus berisi perbaikan yang lebih baik
+5. "position" selalu null (posisi persis dihitung oleh aplikasi)
+
+--- CONTOH OUTPUT BENAR ---
+Input: "Saya berkuliah di Universitas Indonesia,, jurusan Ilmu Komputer"
+Output: {"errors": [{"context": "Saya berkuliah di Universitas Indonesia,, jurusan Ilmu Komputer", "text": "Indonesia,,", "suggestion": "Indonesia,", "reason": "Tanda baca koma ganda", "type": "punctuation", "position": null}], "totalErrors": 1, "summary": "Ditemukan 1 error tanda baca."}
+
+Input: "Saya mengembangkan aplikasi web menggunakan React dan Node.js, serta menangani testing end-to-end"
+Output: {"errors": [], "totalErrors": 0, "summary": "Tidak ditemukan error"}
 `;
 
 export async function POST(request: NextRequest) {

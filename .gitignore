@@ -51,6 +51,11 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# temp debug artifacts
+/temp_extracted.json
+/temp_payload.json
 
 # vercel
 .vercel
@@ -62,3 +67,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.gstack/

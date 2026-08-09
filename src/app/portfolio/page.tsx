@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { useTranslation } from "@/lib/i18n";
+import { useToast } from "@/components/ui/toast";
 import AuthGuard from "@/components/AuthGuard";
 import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
@@ -15,21 +16,26 @@ const THEME_LIST = Object.values(THEMES);
 export default function PortfolioPage() {
   const { t, lang, toggleLang } = useTranslation();
   const [selectedTheme, setSelectedTheme] = useState<string>(DEFAULT_THEME_ID);
-  const [urlSlug, setUrlSlug] = useState("teguhsurya");
+  const [publishInfo, setPublishInfo] = useState<{ published: boolean; slug?: string; url?: string } | null>(null);
   const [profileData, setProfileData] = useState<any>(null);
+  const { addToast } = useToast();
 
   useEffect(() => {
     fetch("/api/profile")
       .then((res) => res.ok ? res.json() : null)
       .then((data) => setProfileData(data))
       .catch(() => {});
+    fetch("/api/portfolio/publish")
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => setPublishInfo(data))
+      .catch(() => {});
   }, []);
 
   const stats = {
-    name: profileData?.personalInfo?.fullName || "—",
-    workCount: Array.isArray(profileData?.workHistory) ? profileData.workHistory.length : "—",
-    eduCount: Array.isArray(profileData?.education) ? profileData.education.length : "—",
-    skillCount: Array.isArray(profileData?.skills) ? profileData.skills.length : "—",
+    name: profileData?.personalInfo?.fullName || "-",
+    workCount: Array.isArray(profileData?.workHistory) ? profileData.workHistory.length : "-",
+    eduCount: Array.isArray(profileData?.education) ? profileData.education.length : "-",
+    skillCount: Array.isArray(profileData?.skills) ? profileData.skills.length : "-",
   };
 
   return (
@@ -57,18 +63,30 @@ export default function PortfolioPage() {
             {/* Live URL + Quick Actions */}
             <div className="bg-white rounded-2xl p-6 shadow-soft border border-outline-variant/30">
               <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <label className="text-label-bold text-on-surface-variant block mb-1.5">{t("portfolio.url-label")}</label>
-                  <div className="flex items-center gap-2 bg-surface-container-low rounded-xl px-4 py-2 border border-outline-variant">
-                    <span className="text-label-sm text-outline">aicareerhub.com/</span>
-                    <input
-                      value={urlSlug}
-                      onChange={(e) => setUrlSlug(e.target.value)}
-                      className="bg-transparent border-none p-0 focus:ring-0 font-label-bold text-on-surface min-w-0"
-                    />
-                  </div>
+                  {publishInfo?.published ? (
+                    <div className="flex items-center gap-2 bg-green-50 rounded-xl px-4 py-2.5 border border-green-200 min-w-0">
+                      <span className="material-symbols-outlined text-green-600 text-lg shrink-0" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">check_circle</span>
+                      <div className="min-w-0">
+                        <p className="text-[10px] text-green-700 font-semibold uppercase tracking-wider">{t("portfolio.publish-status-live")}</p>
+                        <button
+                          onClick={() => window.open(publishInfo.url, "_blank")}
+                          className="text-sm font-bold text-primary hover:underline truncate block max-w-full"
+                          title={publishInfo.url}
+                        >
+                          {publishInfo.url?.replace(/^https?:\/\//, "")}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 bg-surface-container-low rounded-xl px-4 py-2.5 border border-outline-variant">
+                      <span className="material-symbols-outlined text-outline text-lg shrink-0" aria-hidden="true">public</span>
+                      <p className="text-sm text-on-surface-variant">{t("portfolio.publish-not-live")}</p>
+                    </div>
+                  )}
                 </div>
-                <div className="flex gap-3">
+                <div className="flex gap-3 flex-wrap">
                   <Link href="/portfolio/live" className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-on-primary font-label-bold hover:opacity-90 transition-opacity shadow-md">
                     <span className="material-symbols-outlined text-lg">live_tv</span>
                     <span className="hidden sm:inline">Live Builder</span>
@@ -195,7 +213,7 @@ export default function PortfolioPage() {
             <section className="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/30 flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <span className={`material-symbols-outlined text-2xl ${profileData ? "text-green-600" : "text-primary"}`} aria-hidden="true">{profileData ? "check_circle" : "info"}</span>
-                <p className="text-body-md text-on-surface-variant">{profileData ? t("portfolio.profile-filled") + " " + (stats.name !== "—" ? stats.name.toLowerCase() : t("portfolio.existing-data")) + "." : t("portfolio.profile-empty")}</p>
+                <p className="text-body-md text-on-surface-variant">{profileData ? t("portfolio.profile-filled") + " " + (stats.name !== "-" ? stats.name.toLowerCase() : t("portfolio.existing-data")) + "." : t("portfolio.profile-empty")}</p>
               </div>
               <Link
                 href={profileData ? "/portfolio/build" : "/profile"}
@@ -214,6 +232,33 @@ export default function PortfolioPage() {
                 <span className="material-symbols-outlined text-5xl mb-4 opacity-80" aria-hidden="true" style={{ fontVariationSettings: "'FILL' 1" }}>language</span>
                 <h2 className="font-headline-md text-2xl mb-4">{t("portfolio.deploy-title")}</h2>
                 <p className="font-body-md mb-8 opacity-90 max-w-lg mx-auto">{t("portfolio.deploy-desc")}</p>
+                {publishInfo?.published && (
+                  <div className="mb-8 mx-auto max-w-md bg-white/10 backdrop-blur rounded-xl px-4 py-3 flex items-center gap-3">
+                    <span className="material-symbols-outlined text-green-300 shrink-0" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">check_circle</span>
+                    <div className="min-w-0 text-left">
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-white/80">{t("portfolio.publish-link-share")}</p>
+                      <a
+                        href={publishInfo.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-bold text-white hover:underline truncate block"
+                      >
+                        {publishInfo.url?.replace(/^https?:\/\//, "")}
+                      </a>
+                    </div>
+                    <button
+                      onClick={() => {
+                        if (publishInfo.url) {
+                          navigator.clipboard?.writeText(publishInfo.url);
+                          addToast({ type: "success", message: t("publish.copied") });
+                        }
+                      }}
+                      className="ml-auto shrink-0 px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-xs font-semibold transition-colors"
+                    >
+                      {t("publish.copy")}
+                    </button>
+                  </div>
+                )}
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link
                     href="/portfolio/build"

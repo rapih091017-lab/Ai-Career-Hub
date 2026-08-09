@@ -339,7 +339,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                   }}
                 >
                   <span style={{ fontSize: bodyFontSize, fontWeight: 700, color: "#111111" }}>
-                    {work.company || "—"}{work.location ? `, ${work.location}` : ""}
+                    {work.company || "-"}{work.location ? `, ${work.location}` : ""}
                   </span>
                   <span
                     style={{
@@ -350,7 +350,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                     }}
                   >
                     {formatDate(work.startDate)}
-                    {work.startDate && (work.endDate || work.isCurrent) ? " – " : ""}
+                    {work.startDate && (work.endDate || work.isCurrent) ? " - " : ""}
                     {work.isCurrent ? L("present") : formatDate(work.endDate)}
                   </span>
                 </div>
@@ -363,7 +363,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                     fontSize: bodyFontSize - 1,
                   }}
                 >
-                  {work.position || "—"}
+                  {work.position || "-"}
                 </p>
                 {work.companyDescription && (
                   <p style={{ fontSize: bodyFontSize - 1, color: "#666666", margin: "0 0 5px 0", fontStyle: "italic" }}>
@@ -423,7 +423,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                   }}
                 >
                   <span style={{ fontSize: bodyFontSize }}>
-                    {edu.degree || "—"}{edu.field ? ` — ${edu.field}` : ""}
+                    {edu.degree || "-"}{edu.field ? ` · ${edu.field}` : ""}
                   </span>
                   <span
                     style={{
@@ -434,7 +434,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                     }}
                   >
                     {formatDate(edu.startDate)}
-                    {edu.startDate && edu.endDate ? " – " : ""}
+                    {edu.startDate && edu.endDate ? " - " : ""}
                     {formatDate(edu.endDate)}
                   </span>
                 </div>
@@ -483,7 +483,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                 </p>
                 {data.certifications.map((cert, i) => (
                   <p key={cert.id || i} style={{ margin: "0 0 2px 0", color: "#111111", fontSize: bodyFontSize - 1 }}>
-                    • {cert.name}{cert.issuer ? ` — ${cert.issuer}` : ""}{cert.year ? ` (${cert.year})` : ""}
+                    • {cert.name}{cert.issuer ? ` · ${cert.issuer}` : ""}{cert.year ? ` (${cert.year})` : ""}
                   </p>
                 ))}
               </div>

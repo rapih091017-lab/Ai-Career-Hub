@@ -10,7 +10,7 @@ const EXTERNAL_PORTALS = [
   {
     name: "LinkedIn",
     url: "https://www.linkedin.com/jobs/",
-    description: "Jaringan profesional terbesar — ribuan lowongan dari perusahaan multinasional hingga startup.",
+    description: "Jaringan profesional terbesar, ribuan lowongan dari perusahaan multinasional hingga startup.",
     icon: "⬡",
     color: "bg-blue-50 border-blue-200",
     textColor: "text-blue-700",
@@ -119,8 +119,8 @@ export default function KarirPage() {
                   {[
                     { icon: "search", text: "Rekomendasi lowongan berdasarkan skill & pengalaman" },
                     { icon: "notifications", text: "Notifikasi real-time saat lowongan baru diposting" },
-                    { icon: "bolt", text: "Lamaran cepat — kirim CV langsung dari platform" },
-                    { icon: "auto_awesome", text: "AI Match — skor kecocokan CV dengan lowongan" },
+                    { icon: "bolt", text: "Lamaran cepat · kirim CV langsung dari platform" },
+                    { icon: "auto_awesome", text: "AI Match · skor kecocokan CV dengan lowongan" },
                   ].map((item, i) => (
                     <li key={i} className="flex items-center gap-3">
                       <span className="material-symbols-outlined text-primary text-lg">{item.icon}</span>

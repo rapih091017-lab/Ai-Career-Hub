@@ -93,8 +93,8 @@ export default function AIProposalModal({
   /* ── Mode context labels ── */
   var modeLabel = mode === "suggest" ? "Gaya Baru" : "Optimasi";
   var modeHint = mode === "suggest"
-    ? "Pilih gaya penulisan yang paling cocok — konten fresh dari AI"
-    : "Pilih tingkat perbaikan — teks asli akan ditingkatkan secara progresif";
+    ? "Pilih gaya penulisan yang paling cocok · konten fresh dari AI"
+    : "Pilih tingkat perbaikan · teks asli akan ditingkatkan secara progresif";
   var modeColors = mode === "suggest"
     ? "bg-amber-100 text-amber-700"
     : "bg-primary/10 text-primary";

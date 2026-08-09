@@ -209,17 +209,25 @@ describe("SummarySuggestionResultSchema", () => {
     expect(result.success).toBe(true);
   });
 
-  it("should require exactly 4 suggestions", () => {
+  it("should accept fewer than 4 suggestions (min 1 per schema)", () => {
     const data = { suggestions: MINIMAL_SUMMARY.suggestions.slice(0, 2) };
     const result = SummarySuggestionResultSchema.safeParse(data);
-    expect(result.success).toBe(false); // min 4 items
+    expect(result.success).toBe(true);
   });
 
-  it("should reject invalid style", () => {
+  it("should reject empty suggestions array", () => {
+    const result = SummarySuggestionResultSchema.safeParse({ suggestions: [] });
+    expect(result.success).toBe(false); // min 1 item
+  });
+
+  it("should tolerate invalid style via .catch() default", () => {
     const data = {
       suggestions: MINIMAL_SUMMARY.suggestions.map(s => ({ ...s, style: "invalid" as any })),
     };
     const result = SummarySuggestionResultSchema.safeParse(data);
-    expect(result.success).toBe(false);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.suggestions[0].style).toBe("concise"); // catch default
+    }
   });
 });

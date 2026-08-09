@@ -38,7 +38,7 @@ export function AtsScoreInsight({ score }: AtsScoreInsightProps) {
         <div>
           <h5 className="text-sm font-label-bold text-on-surface mb-0.5">
             ATS Score: {score}%
-            {" — "}
+            {" · "}
             {score >= 70
               ? "CV Siap Lamar!"
               : score >= 40

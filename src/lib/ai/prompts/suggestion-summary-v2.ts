@@ -179,7 +179,7 @@ ${DELIM.SECTION}
 
 --- ATURAN TAMBAHAN ---
 1. Maksimal 3 kalimat per versi (kecuali Impact-First yang bisa 3 bullet pendek).
-2. Bahasa Indonesia untuk versi "Storytelling" dan "description" — BAHASA INGGRIS untuk "text" (standard CV internasional).
+2. Bahasa "text" mengikuti **Bahasa CV dari USER CONTEXT**: jika "Bahasa CV: Indonesia" → semua versi text dalam Bahasa Indonesia (termasuk Storytelling yang boleh memakai kata ganti "saya"); jika "Bahasa CV: English" → text dalam Bahasa Inggris. "description" selalu Bahasa Indonesia. CONTOH di bawah hanya ilustrasi format — bahasa output TETAP mengikuti Bahasa CV.
 3. JANGAN gunakan kata ganti orang pertama kecuali di gaya "Storytelling".
 4. Sertakan keyword dari target role/JD di semua versi — terutama "Keyword-Optimized".
 5. Jika skills kosong, gunakan konteks dari jobTitle untuk menentukan keyword yang relevan.

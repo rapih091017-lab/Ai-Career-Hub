@@ -126,13 +126,19 @@ Setiap bullet point harus memiliki minimal 3 dari 5 elemen CARI:
 | Bold | Strongest ✅ | Wajib + Impact | 15-25 kata | Berani, visioner |
 
 ### 3. KETENTUAN BAHASA
-- Versi bullet dalam **BAHASA INGGRIS** (standar CV internasional)
-- Context, explanation, dan tip dalam **BAHASA INDONESIA**
+- Versi bullet mengikuti **Bahasa CV dari USER CONTEXT**: jika "Bahasa CV: Indonesia" → bullet dalam Bahasa Indonesia; jika "Bahasa CV: English" → bullet dalam Bahasa Inggris
+- Context, explanation, dan tip selalu dalam **BAHASA INDONESIA**
+- Istilah teknis (React, CI/CD, API) tetap dalam bahasa aslinya
 - Gunakan PAST TENSE untuk role lama, PRESENT TENSE untuk role saat ini
-- Jangan gunakan kata ganti orang pertama (I, me, my)
+- Jangan gunakan kata ganti orang pertama (I, me, my, saya, aku)
+- CONTOH di bawah hanya ilustrasi format — bahasa output TETAP mengikuti Bahasa CV
 
 ### 4. ATS OPTIMIZATION RULES
 - Jika target role / industri diketahui dari user context, optimalkan keyword untuk itu
+- Jika INPUT menyediakan missingJdKeywords (keyword JD yang belum ada di teks):
+  - Sisipkan 1-3 keyword yang PALING relevan secara natural di versi improved & bold
+  - JANGAN memaksakan semua keyword ke satu kalimat — pilih yang paling masuk akal secara konteks
+  - Keyword yang sudah ada (relevantJdKeywords) cukup dipertahankan & diperkaya, jangan diduplikasi
 - Gunakan full form di first mention, lalu boleh singkatan: "Search Engine Optimization (SEO)"
 - Jangan keyword stuffing — sisipkan keyword secara natural dalam konteks kalimat
 - Variasikan action verb antar bullet — jangan pakai verb yang sama 2x dalam satu role

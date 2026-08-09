@@ -11,6 +11,7 @@ import { KeywordChip, BulletReviewCard } from "@/components/checker/ResultCompon
 import { PdfExportButton } from "@/components/checker/PdfExportButton";
 import { scoreColor, gradeColor, atsBadgeColor, type AnalysisResult, type SkillsSection } from "@/components/checker/types";
 import MagneticButton from "@/components/MagneticButton";
+import Link from "next/link";
 
 function timeAgo(date: Date): string {
   const now = new Date();
@@ -308,7 +309,7 @@ export default function CheckerDetailPage() {
               )}
               {keywordAnalysis.missing_critical.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-red-700 uppercase tracking-wider mb-2">Hilang — Prioritas ({keywordAnalysis.missing_critical.length})</p>
+                  <p className="text-xs font-bold text-red-700 uppercase tracking-wider mb-2">Hilang · Prioritas ({keywordAnalysis.missing_critical.length})</p>
                   <div className="flex flex-wrap gap-1.5">
                     {keywordAnalysis.missing_critical.map((kw, i) => <KeywordChip key={i} text={kw} variant="missing" />)}
                   </div>
@@ -316,7 +317,7 @@ export default function CheckerDetailPage() {
               )}
               {keywordAnalysis.missing_nice_to_have.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-yellow-700 uppercase tracking-wider mb-2">Hilang — Tambahan ({keywordAnalysis.missing_nice_to_have.length})</p>
+                  <p className="text-xs font-bold text-yellow-700 uppercase tracking-wider mb-2">Hilang · Tambahan ({keywordAnalysis.missing_nice_to_have.length})</p>
                   <div className="flex flex-wrap gap-1.5">
                     {keywordAnalysis.missing_nice_to_have.map((kw, i) => <KeywordChip key={i} text={kw} variant="nice" />)}
                   </div>
@@ -428,6 +429,65 @@ export default function CheckerDetailPage() {
             </div>
           </motion.section>
         )}
+
+        {/* ============================================================ */}
+        {/*  7b. CTA — Surat Lamaran / Motivation Letter                 */}
+        {/* ============================================================ */}
+        <div className="space-y-3">
+          <p className="text-xs font-bold uppercase tracking-wider text-on-surface-variant px-1">
+            Lanjutkan · Buat Surat dari CV Ini
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Link
+              href="/builder/new?next=surat-formal"
+              className="group flex items-center gap-3 bg-surface rounded-xl p-4 border border-outline-variant/50 hover:border-primary/40 hover:shadow-premium-md transition-all active:scale-[0.99]"
+            >
+              <div className="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                <span
+                  className="material-symbols-outlined text-violet-600"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                  aria-hidden="true"
+                >
+                  markunread_mailbox
+                </span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-on-surface">Surat Lamaran</p>
+                <p className="text-[11px] text-on-surface-variant">Formal · Formal Lengkap · ATS · Kasual</p>
+              </div>
+              <span
+                className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors shrink-0"
+                aria-hidden="true"
+              >
+                arrow_forward
+              </span>
+            </Link>
+            <Link
+              href="/builder/new?next=surat-motivation"
+              className="group flex items-center gap-3 bg-surface rounded-xl p-4 border border-outline-variant/50 hover:border-amber-400/60 hover:shadow-premium-md transition-all active:scale-[0.99]"
+            >
+              <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                <span
+                  className="material-symbols-outlined text-amber-600"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                  aria-hidden="true"
+                >
+                  emoji_events
+                </span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-on-surface">Motivation Letter</p>
+                <p className="text-[11px] text-on-surface-variant">Beasiswa · Program · Fresh grad</p>
+              </div>
+              <span
+                className="material-symbols-outlined text-on-surface-variant group-hover:text-amber-500 transition-colors shrink-0"
+                aria-hidden="true"
+              >
+                arrow_forward
+              </span>
+            </Link>
+          </div>
+        </div>
 
         {/* ============================================================ */}
         {/*  8. CTA — Analisis Ulang atau Buat CV                        */}

@@ -142,6 +142,8 @@ const SuggestionItemSchema = z.object({
 
 export const SuggestionResultSchema = z.object({
   suggestions: z.array(SuggestionItemSchema).min(1).max(10),
+  /** Keyword rekomendasi dari target role/JD — dipakai builder untuk keyword chips */
+  keywords: z.array(z.string()).catch([]),
 });
 
 export type SuggestionResult = z.infer<typeof SuggestionResultSchema>;

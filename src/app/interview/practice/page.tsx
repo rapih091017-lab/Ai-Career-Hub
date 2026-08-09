@@ -301,7 +301,7 @@ function SetupScreen({
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           />
           <span className="material-symbols-outlined text-lg relative z-10">bolt</span>
-          <span className="relative z-10">Quick Start — Pilihkan Acak</span>
+          <span className="relative z-10">Quick Start · Pilihkan Acak</span>
         </button>
       </div>
     </div>

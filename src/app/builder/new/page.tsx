@@ -13,6 +13,9 @@ function BuilderNewFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const templateId = searchParams.get("template");
+  // ?next=surat-formal | surat-motivation → setelah CV dibuat, langsung lanjut
+  // ke halaman surat lamaran dengan style terpilih (dipakai CTA hasil checker).
+  const next = searchParams.get("next");
 
   // ── Back to checker review ──
   const [checkerSource] = useState<string | null>(() => {
@@ -64,7 +67,9 @@ function BuilderNewFormContent() {
       const data = await res.json();
 
       if (res.ok) {
-        router.push(`/builder/${data.id}`);
+        if (next === "surat-formal") router.push(`/surat-lamaran/${data.id}?style=formal`);
+        else if (next === "surat-motivation") router.push(`/surat-lamaran/${data.id}?style=motivation`);
+        else router.push(`/builder/${data.id}`);
       } else {
         if (data.error === "PROFILE_NOT_FOUND") {
           setErrorMessage(

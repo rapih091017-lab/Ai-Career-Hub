@@ -169,7 +169,7 @@ export default function CheckoutPage() {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between py-2 border-b border-outline-variant/20">
                       <span className="text-sm text-on-surface-variant">Judul Posisi</span>
-                      <span className="font-label-bold text-sm text-on-surface">{cvData.jobTitle || "—"}</span>
+                      <span className="font-label-bold text-sm text-on-surface">{cvData.jobTitle || "-"}</span>
                     </div>
                     <div className="flex items-center justify-between py-2 border-b border-outline-variant/20">
                       <span className="text-sm text-on-surface-variant">Template</span>
@@ -203,7 +203,7 @@ export default function CheckoutPage() {
                     <h4 className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Yang kamu dapatkan:</h4>
                     <ul className="space-y-2">
                       {[
-                        { icon: "auto_awesome", text: "AI Smart Revision untuk CV ini — tanpa batas" },
+                        { icon: "auto_awesome", text: "AI Smart Revision untuk CV ini · tanpa batas" },
                         { icon: "history", text: "Riwayat revisi tersimpan" },
                         { icon: "calendar_month", text: "Masa berlaku 1 tahun" },
                       ].map((benefit) => (

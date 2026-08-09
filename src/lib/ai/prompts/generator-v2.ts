@@ -95,11 +95,13 @@ ${DELIM.SECTION}
 3. Gunakan action verb yang kuat untuk deskripsi pengalaman.
 4. Format tanggal konsisten: "MMM YYYY" atau "YYYY".
 5. Ringkasan profesional (summary): 2-3 kalimat, fokus value proposition.
-6. Setiap bullet point pengalaman maksimal 1-2 baris.
+6. Setiap bullet point pengalaman maksimal 1-2 baris, disimpan sebagai ARRAY bullets (jangan digabung jadi satu string panjang).
 7. Jika suatu field tidak dapat ditentukan, gunakan null (jangan dibuat-buat).
-8. Deteksi dan koreksi tanggal yang tidak masuk akal (misal: end_date < start_date).
+8. Deteksi dan koreksi tanggal yang tidak masuk akal (misal: end_date < start_date). Gunakan "Present" untuk pekerjaan yang masih berjalan.
 9. Untuk teks yang sangat berantakan: cari pola, ignore noise, fokus pada informasi yang bisa diekstrak.
 10. Jika teks < 20 kata: return struktur minimal dengan field yang bisa diisi, sisanya null.
+11. Format tanggal konsisten "MMM YYYY" (contoh: "Jan 2023") atau "YYYY" jika bulan tidak tersedia.
+12. skills dikelompokkan ke technical (tools, bahasa pemrograman, framework), soft (skill interpersonal), dan languages (bahasa dengan level, mis. "English (Professional)").
 ${DELIM.SECTION}
 
 ${OUTPUT_FORMAT_INSTRUCTION}

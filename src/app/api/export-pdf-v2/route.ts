@@ -56,8 +56,12 @@ export const POST = apiHandler(async (request: NextRequest) => {
 
     const pdfBuffer = await pdfResponse.arrayBuffer();
 
-    // ── 3. Log usage ──
-    await logUsage(userId, "pdf_export", fileName || undefined);
+    // ── 3. Log usage (kegagalan logging jangan sampai menggagalkan PDF yang sudah jadi) ──
+    try {
+      await logUsage(userId, "pdf_export", fileName || undefined);
+    } catch (logErr: any) {
+      console.error("[export-pdf-v2] logUsage failed:", logErr?.message || logErr);
+    }
 
     // ── 4. Return PDF ──
     return new NextResponse(pdfBuffer, {
@@ -69,10 +73,12 @@ export const POST = apiHandler(async (request: NextRequest) => {
       },
     });
   } catch (error: any) {
-    console.error("[export-pdf-v2] Error:", error.message);
+    console.error("[export-pdf-v2] Error:", error.message, error.cause?.code || "");
 
     // Check if PDF server is unreachable
-    if (error.name === "AbortError" || error.code === "ECONNREFUSED") {
+    // undici membungkus koneksi gagal sebagai TypeError: fetch failed dengan
+    // kode di error.cause.code — cek keduanya agar 503 benar-benar terpicu.
+    if (error.name === "AbortError" || error.code === "ECONNREFUSED" || error.cause?.code === "ECONNREFUSED") {
       return errorResponse(
         "PDF_SERVER_UNREACHABLE",
         "Server PDF sedang tidak tersedia. Silakan coba lagi nanti atau gunakan ekspor standar.",
@@ -80,6 +86,6 @@ export const POST = apiHandler(async (request: NextRequest) => {
       );
     }
 
-    return errorResponse("PDF_SERVER_ERROR", "Gagal terhubung ke server PDF", 500);
+    return errorResponse("PDF_SERVER_ERROR", "Gagal menghasilkan PDF", 500);
   }
 });

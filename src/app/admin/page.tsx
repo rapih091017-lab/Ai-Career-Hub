@@ -89,7 +89,7 @@ const formatPrice = (price: number) =>
   "Rp " + price.toLocaleString("id-ID");
 
 const formatDate = (date: string | null) => {
-  if (!date) return "—";
+  if (!date) return "-";
   return new Date(date).toLocaleDateString("id-ID", {
     day: "numeric",
     month: "short",
@@ -98,7 +98,7 @@ const formatDate = (date: string | null) => {
 };
 
 const formatDateTime = (date: string | null) => {
-  if (!date) return "—";
+  if (!date) return "-";
   return new Date(date).toLocaleDateString("id-ID", {
     day: "numeric",
     month: "short",
@@ -647,7 +647,7 @@ export default function AdminDashboardPage() {
                         <tbody>
                           {stats.recentUsers.map((user) => (
                             <tr key={user.id} className="border-b border-outline-variant/20 hover:bg-surface-container-low/50 transition-colors">
-                              <td className="py-3 px-2 text-sm font-medium text-on-surface">{user.name || "—"}</td>
+                              <td className="py-3 px-2 text-sm font-medium text-on-surface">{user.name || "-"}</td>
                               <td className="py-3 px-2 text-sm text-on-surface-variant">{user.email}</td>
                               <td className="py-3 px-2">
                                 <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${
@@ -835,7 +835,7 @@ export default function AdminDashboardPage() {
                                   {pkg.badge}
                                 </span>
                               ) : (
-                                <span className="text-xs text-outline">—</span>
+                                <span className="text-xs text-outline">-</span>
                               )}
                             </td>
                             <td className="px-4 py-3">
@@ -877,8 +877,8 @@ export default function AdminDashboardPage() {
 
                 {packages.length > 0 && (
                   <div className="px-4 py-3 bg-surface-container-low border-t border-outline-variant/30 flex items-center justify-between text-xs text-on-surface-variant">
-                    <span>Total {packages.length} package — {packages.filter(p => p.active).length} aktif</span>
-                    <span>Rentang harga: {formatPrice(Math.min(...packages.map(p => p.price)))} — {formatPrice(Math.max(...packages.map(p => p.price)))}</span>
+                    <span>Total {packages.length} package · {packages.filter(p => p.active).length} aktif</span>
+                    <span>Rentang harga: {formatPrice(Math.min(...packages.map(p => p.price)))} - {formatPrice(Math.max(...packages.map(p => p.price)))}</span>
                   </div>
                 )}
               </div>
@@ -893,7 +893,7 @@ export default function AdminDashboardPage() {
                   <ul className="text-xs text-amber-700 space-y-1 list-disc list-inside">
                     <li>Edit nama atau harga langsung di tabel, lalu klik <strong>Simpan</strong> per baris.</li>
                     <li>Toggle status <strong>aktif/nonaktif</strong> dengan klik icon check/close.</li>
-                    <li>Perubahan <strong>real-time</strong> — semua user langsung melihat harga terbaru.</li>
+                    <li>Perubahan <strong>real-time</strong> · semua user langsung melihat harga terbaru.</li>
                     <li><strong>Seed Data</strong> untuk mengisi data awal (hanya jika tabel kosong).</li>
                   </ul>
                 </div>

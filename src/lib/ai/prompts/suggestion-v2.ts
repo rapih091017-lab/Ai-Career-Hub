@@ -190,7 +190,8 @@ OUTPUT:
       "adjacent_skills": ["Git → CI/CD (adjacent)"],
       "industry_context": "SaaS"
     }
-  ]
+  ],
+  "keywords": ["React", "TypeScript", "Node.js", "CI/CD", "REST API", "microservices", "A/B testing", "performance optimization", "GraphQL", "automation"]
 }`)}
 
 ${OUTPUT_FORMAT_INSTRUCTION}
@@ -208,13 +209,14 @@ ${DELIM.SECTION}
       "adjacent_skills": string[],
       "industry_context": string
     }
-  ]
+  ],
+  "keywords": string[]
 }
 ${DELIM.SECTION}
 
 --- ATURAN TAMBAHAN ---
 1. SETIAP bullet point harus mengandung METRIK atau HASIL KUANTITATIF.
-2. Gunakan Bahasa Indonesia untuk context fields, BAHASA INGGRIS untuk bullet point.
+2. Bahasa bullet mengikuti **Bahasa CV dari USER CONTEXT**: jika "Bahasa CV: Indonesia" → bullet dalam Bahasa Indonesia; jika "Bahasa CV: English" → bullet dalam Bahasa Inggris. Field konteks (metric, industry_context, adjacent_skills) boleh dalam bahasa yang sama atau istilah teknis Inggris. CONTOH di bawah hanya ilustrasi format — bahasa output TETAP mengikuti Bahasa CV.
 3. JANGAN gunakan kata ganti orang pertama ("saya", "aku", "I", "my").
 4. Fokus pada ACHIEVEMENT bukan TASK rutin — tanya "so what?" pada setiap bullet.
 5. Variasikan action verb — jangan pakai verb yang sama 2x dalam satu set.
@@ -222,6 +224,7 @@ ${DELIM.SECTION}
 7. Jika data description/industry kosong, gunakan asumsi wajar berdasarkan position dan targetRole.
 8. adjacent_skills: isi hanya jika ada skill yang bisa bridge gap ke target role.
 9. ats_keywords: pilih 3-5 keyword yang paling relevan untuk ATS optimization.
+10. keywords: berisi 10-15 keyword PENTING dari target role/JD yang harus dimasukkan user ke CV (skill, tools, teknologi, konsep) — tulis dalam bahasa aslinya (umumnya Inggris). Keyword ini BUKAN untuk satu bullet tertentu, melainkan daftar umum agar seluruh CV konsisten dengan JD.
 
 ${BOUNDARY}
 

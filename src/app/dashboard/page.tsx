@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
 import AppHeader from "@/components/AppHeader";
 import { useTranslation } from "@/lib/i18n";
@@ -46,6 +46,26 @@ interface CheckerHistoryItem {
   jobDescription: string;
 }
 
+interface LetterItem {
+  id: string;
+  cvId: string | null;
+  jobTitle: string | null;
+  companyName: string | null;
+  language: "id" | "en";
+  style: string;
+  subject: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+function letterStyleLabel(style: string): string {
+  if (style === "ats") return "Cover (EN)";
+  if (style === "casual") return "Kasual";
+  if (style === "formal_lengkap") return "Formal Lengkap";
+  if (style === "motivation") return "Motivation";
+  return "Formal";
+}
+
 interface ProfileCompleteness {
   score: number;
   sections: { label: string; filled: boolean; key: string }[];
@@ -76,9 +96,31 @@ export default function DashboardPage() {
   const [profileData, setProfileData] = useState<ProfileCompleteness | null>(null);
   const [checkerHistory, setCheckerHistory] = useState<CheckerHistoryItem[]>([]);
   const [checkerHistoryLoading, setCheckerHistoryLoading] = useState(true);
+  const [letters, setLetters] = useState<LetterItem[]>([]);
+  const [lettersLoading, setLettersLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<"all" | "has-title" | "no-title">("all");
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "name-asc" | "name-desc">("newest");
+  const [suratMenuFor, setSuratMenuFor] = useState<string | null>(null);
+  const suratMenuRef = useRef<HTMLDivElement>(null);
+
+  /* ── Tutup dropdown surat: klik di luar menu atau tekan Escape ── */
+  useEffect(() => {
+    if (!suratMenuFor) return;
+    const onPointerDown = (e: PointerEvent) => {
+      const t = e.target as HTMLElement;
+      if (suratMenuRef.current && !suratMenuRef.current.contains(t)) setSuratMenuFor(null);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSuratMenuFor(null);
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [suratMenuFor]);
 
   /* ── Filtered & Sorted CV list ── */
   const filteredCvList = useMemo(() => {
@@ -146,6 +188,15 @@ export default function DashboardPage() {
       .then((data) => setCheckerHistory(Array.isArray(data) ? data : []))
       .catch(() => setCheckerHistory([]))
       .finally(() => setCheckerHistoryLoading(false));
+  }, []);
+
+  /* ── Fetch riwayat surat (semua CV) ── */
+  useEffect(() => {
+    fetch("/api/cover-letter")
+      .then((res) => res.json())
+      .then((data) => setLetters(Array.isArray(data) ? data : []))
+      .catch(() => setLetters([]))
+      .finally(() => setLettersLoading(false));
   }, []);
 
   const handleCreateCV = async (templateId: string, jobTitle?: string) => {
@@ -269,11 +320,12 @@ export default function DashboardPage() {
             </section>
 
             {/* Quick Actions — staggered entry */}
-            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
               {[
                 { icon: "edit_document", label: t("dashboard.new-cv"), desc: t("dashboard.new-cv-desc"), color: "bg-primary-fixed", iconColor: "text-primary", onClick: () => setShowTemplatePicker(true), href: undefined },
                 { icon: "search", label: t("dashboard.check-cv"), desc: t("dashboard.check-cv-desc"), color: "bg-secondary-container/50", iconColor: "text-secondary", onClick: undefined, href: "/checker" },
                 { icon: "grid_view", label: t("dashboard.portfolio"), desc: t("dashboard.portfolio-desc"), color: "bg-surface-container", iconColor: "text-primary", onClick: undefined, href: "/portfolio" },
+                { icon: "mail", label: "Buat Surat", desc: "Surat lamaran & Motivation Letter · dari CV atau dari nol", color: "bg-primary/10", iconColor: "text-primary", onClick: undefined, href: "/surat-lamaran" },
                 { icon: "record_voice_over", label: "Persiapan Interview", desc: "224+ pertanyaan umum untuk 28+ posisi", color: "bg-amber-50", iconColor: "text-amber-600", onClick: undefined, href: "/interview" },
               ].map((card, i) => {
                 const content = (
@@ -399,6 +451,97 @@ export default function DashboardPage() {
               </section>
             )}
 
+            {/* ── Riwayat Surat ── */}
+            <section className="mb-8">
+              <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+                <h2 className="font-headline-md text-on-surface">Riwayat Surat</h2>
+                <div className="flex items-center gap-2">
+                  {letters.length > 0 && (
+                    <span className="text-xs font-semibold text-on-surface-variant">
+                      {letters.length} surat
+                    </span>
+                  )}
+                  <MagneticButton>
+                    <Link
+                      href="/surat-lamaran"
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-violet-50 text-violet-700 font-bold text-xs hover:bg-violet-100 active:scale-[0.97] transition-all"
+                    >
+                      <span className="material-symbols-outlined text-sm">add</span>
+                      Buat Surat
+                    </Link>
+                  </MagneticButton>
+                </div>
+              </div>
+
+              {lettersLoading ? (
+                <div className="space-y-2">
+                  {[1, 2].map((i) => (
+                    <div key={i} className="bg-white rounded-xl p-4 shadow-premium-sm border border-outline-variant/30 flex items-center gap-4 animate-pulse">
+                      <div className="w-10 h-10 rounded-xl bg-surface-container-high shrink-0" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-3 bg-surface-container-high rounded w-2/3" />
+                        <div className="h-2 bg-surface-container-high rounded w-1/3" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : letters.length === 0 ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-white rounded-2xl p-8 border border-dashed border-outline-variant text-center shadow-premium-sm"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-violet-50 flex items-center justify-center mx-auto mb-3">
+                    <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>mail</span>
+                  </div>
+                  <h3 className="font-label-bold text-on-surface mb-1">Belum ada surat</h3>
+                  <p className="text-body-md text-on-surface-variant mb-4">
+                    Buat surat lamaran atau motivation letter dari CV, atau langsung dari nol.
+                  </p>
+                  <MagneticButton>
+                    <Link
+                      href="/surat-lamaran"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white font-bold rounded-xl hover:opacity-90 active:scale-[0.98] transition-all"
+                    >
+                      <span className="material-symbols-outlined text-base">add</span>
+                      Buat Surat Baru
+                    </Link>
+                  </MagneticButton>
+                </motion.div>
+              ) : (
+                <div className="space-y-2">
+                  {letters.slice(0, 5).map((letter, i) => {
+                    const isMotivation = letter.style === "motivation";
+                    return (
+                      <motion.div
+                        key={letter.id}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.25, delay: i * 0.03 }}
+                        className="bg-white rounded-xl p-4 shadow-premium-sm border border-outline-variant/30 hover:shadow-premium-md hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-4 cursor-pointer"
+                        onClick={() => router.push(letter.cvId ? `/surat-lamaran/${letter.cvId}?letter=${letter.id}` : `/surat-lamaran?letter=${letter.id}`)}
+                      >
+                        <div className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center ${isMotivation ? "bg-amber-50" : "bg-violet-50"}`}>
+                          <span className={`material-symbols-outlined text-lg ${isMotivation ? "text-amber-600" : "text-violet-600"}`} style={{ fontVariationSettings: "'FILL' 1" }}>
+                            {isMotivation ? "emoji_events" : "mail"}
+                          </span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-semibold text-on-surface truncate">
+                            {letter.subject || letter.jobTitle || "Surat lamaran"}
+                          </p>
+                          <p className="text-[10px] text-on-surface-variant mt-0.5">
+                            {letterStyleLabel(letter.style)} · {letter.companyName || "-"} · {timeAgo(new Date(letter.createdAt))}
+                          </p>
+                        </div>
+                        <span className="material-symbols-outlined text-on-surface-variant text-sm shrink-0">chevron_right</span>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              )}
+            </section>
+
             {/* CV History */}
             <section>
               <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
@@ -517,6 +660,58 @@ export default function DashboardPage() {
                         {t("dashboard.edit")}
                       </button>
                     </MagneticButton>
+                    <div className="relative" ref={suratMenuRef}>
+                      <MagneticButton>
+                        <button
+                          onClick={() => setSuratMenuFor(suratMenuFor === cv.id ? null : cv.id)}
+                          aria-haspopup="menu"
+                          aria-expanded={suratMenuFor === cv.id}
+                          className={`px-3 py-2 rounded-xl text-label-bold active:scale-[0.97] transition-colors flex items-center gap-1 ${suratMenuFor === cv.id ? "bg-violet-100 text-violet-800" : "bg-violet-50 text-violet-700 hover:bg-violet-100"}`}
+                          title="Buat Surat Lamaran / Cover Letter / Motivation Letter dari CV ini"
+                        >
+                          <span className="material-symbols-outlined text-sm">mail</span>
+                          Surat
+                          <span className={`material-symbols-outlined text-[14px] transition-transform ${suratMenuFor === cv.id ? "rotate-180" : ""}`}>arrow_drop_down</span>
+                        </button>
+                      </MagneticButton>
+                      <AnimatePresence>
+                        {suratMenuFor === cv.id && (
+                          <motion.div
+                            key="surat-menu"
+                            initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                            transition={{ duration: 0.15 }}
+                            role="menu"
+                            className="absolute right-0 top-full mt-1 z-30 w-60 bg-white rounded-xl shadow-premium-lg border border-outline-variant/50 overflow-hidden py-1.5"
+                          >
+                            <p className="px-4 pt-1 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">Buat Surat dari CV ini</p>
+                            <button
+                              role="menuitem"
+                              onClick={() => { setSuratMenuFor(null); router.push(`/surat-lamaran/${cv.id}?style=formal`); }}
+                              className="w-full flex items-start gap-2.5 px-4 py-2.5 text-left hover:bg-surface-container-low transition-colors"
+                            >
+                              <span className="material-symbols-outlined text-violet-600 text-lg mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>markunread_mailbox</span>
+                              <span>
+                                <span className="block text-xs font-bold text-on-surface">Surat Lamaran</span>
+                                <span className="block text-[10px] text-on-surface-variant">Formal · Formal Lengkap · ATS · Kasual</span>
+                              </span>
+                            </button>
+                            <button
+                              role="menuitem"
+                              onClick={() => { setSuratMenuFor(null); router.push(`/surat-lamaran/${cv.id}?style=motivation`); }}
+                              className="w-full flex items-start gap-2.5 px-4 py-2.5 text-left hover:bg-surface-container-low transition-colors"
+                            >
+                              <span className="material-symbols-outlined text-amber-600 text-lg mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>emoji_events</span>
+                              <span>
+                                <span className="block text-xs font-bold text-on-surface">Motivation Letter</span>
+                                <span className="block text-[10px] text-on-surface-variant">Beasiswa · Program · Fresh grad</span>
+                              </span>
+                            </button>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                     <MagneticButton>
                       <button
                         onClick={() => router.push(`/cv/${cv.id}/checkout`)}

@@ -94,7 +94,7 @@ export function noCache(): Record<string, string> {
 /* ─── Quota check helper ─── */
 export async function checkQuota(
   userId: string,
-  actionType: "ai_suggestion" | "ai_revision" | "checker_check" | "cv_build" | "portfolio_generate" | "pdf_export",
+  actionType: "ai_suggestion" | "ai_revision" | "checker_check" | "cv_build" | "portfolio_generate" | "pdf_export" | "cover_letter_generate",
 ): Promise<{ allowed: true } | NextResponse> {
   const access = await getUserAccess(userId);
   // Determine the limit key based on action type
@@ -110,10 +110,13 @@ export async function checkQuota(
       limitKey = "cv_analyzer";
       break;
     case "portfolio_generate":
-      limitKey = "portfolio_generate";
+      limitKey = "portfolio_web";
       break;
     case "pdf_export":
       limitKey = "pdf_export";
+      break;
+    case "cover_letter_generate":
+      limitKey = "cover_letter";
       break;
     default:
       limitKey = actionType;
@@ -158,6 +161,12 @@ export async function checkQuota(
 }
 
 /* ─── Log usage ─── */
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Catat pemakaian fitur. resource_id di DB bertipe UUID — nilai non-UUID
+ * (misal nama file) akan ditolak Postgres (22P02), jadi dinormalisasi ke null.
+ */
 export async function logUsage(
   userId: string,
   actionType: string,
@@ -166,6 +175,6 @@ export async function logUsage(
   await db.insert(usageLogs).values({
     userId,
     actionType,
-    resourceId: resourceId ?? null,
+    resourceId: resourceId && UUID_RE.test(resourceId) ? resourceId : null,
   });
 }

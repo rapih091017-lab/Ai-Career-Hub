@@ -8,6 +8,7 @@ export type Feature =
   | "cv_analyzer"
   | "ai_revision"
   | "ai_suggestion"
+  | "cover_letter"
   | "portfolio_web"
   | "pdf_export"
   | "bulk_analyzer"
@@ -31,47 +32,47 @@ export const PACKAGES: Record<string, PackageDef> = {
   // ── SATUAN ──
   cv_starter: {
     id: "cv_starter", name: "CV Starter", price: 7000, periodDays: 7,
-    limits: { ai_cv_generate: false, cv_analyzer: false, ai_revision: false, ai_suggestion: false, portfolio_web: false, pdf_export: 1, bulk_analyzer: false, white_label: false },
+    limits: { ai_cv_generate: false, cv_analyzer: false, ai_revision: false, ai_suggestion: false, cover_letter: false, portfolio_web: false, pdf_export: 1, bulk_analyzer: false, white_label: false },
   },
   cv_ai_generate: {
     id: "cv_ai_generate", name: "CV + AI Generate", price: 12000, periodDays: 30,
-    limits: { ai_cv_generate: "unlimited", cv_analyzer: false, ai_revision: "unlimited", ai_suggestion: "unlimited", portfolio_web: false, pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
+    limits: { ai_cv_generate: "unlimited", cv_analyzer: false, ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: "unlimited", portfolio_web: false, pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
   },
   cv_analyzer: {
     id: "cv_analyzer", name: "CV Analyzer", price: 9000, periodDays: 30,
-    limits: { ai_cv_generate: false, cv_analyzer: 1, ai_revision: false, ai_suggestion: false, portfolio_web: false, pdf_export: false, bulk_analyzer: false, white_label: false },
+    limits: { ai_cv_generate: false, cv_analyzer: 1, ai_revision: false, ai_suggestion: false, cover_letter: false, portfolio_web: false, pdf_export: false, bulk_analyzer: false, white_label: false },
   },
   portfolio_web: {
     id: "portfolio_web", name: "Portfolio Web", price: 35000, periodDays: 30,
-    limits: { ai_cv_generate: false, cv_analyzer: false, ai_revision: false, ai_suggestion: false, portfolio_web: 1, pdf_export: false, bulk_analyzer: false, white_label: false },
+    limits: { ai_cv_generate: false, cv_analyzer: false, ai_revision: false, ai_suggestion: false, cover_letter: false, portfolio_web: 1, pdf_export: false, bulk_analyzer: false, white_label: false },
   },
   bundle_hemat: {
     id: "bundle_hemat", name: "Bundle Hemat", price: 49000, periodDays: 60,
-    limits: { ai_cv_generate: "unlimited", cv_analyzer: 1, ai_revision: "unlimited", ai_suggestion: "unlimited", portfolio_web: 1, pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
+    limits: { ai_cv_generate: "unlimited", cv_analyzer: 1, ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: "unlimited", portfolio_web: 1, pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
   },
 
   // ── SINGLE CV (legacy) ──
   single_cv: {
     id: "single_cv", name: "Single CV AI Revision", price: 25000, periodDays: 365,
-    limits: { ai_cv_generate: false, cv_analyzer: false, ai_revision: "unlimited", ai_suggestion: "unlimited", portfolio_web: false, pdf_export: false, bulk_analyzer: false, white_label: false },
+    limits: { ai_cv_generate: false, cv_analyzer: false, ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: "unlimited", portfolio_web: false, pdf_export: false, bulk_analyzer: false, white_label: false },
   },
 
   // ── LANGGANAN BULANAN ──
   premium_pass_30d: {
     id: "premium_pass_30d", name: "Premium Pass 30 Hari", price: 119000, periodDays: 30, monthly: true,
-    limits: { ai_cv_generate: "unlimited", cv_analyzer: "unlimited", ai_revision: "unlimited", ai_suggestion: "unlimited", portfolio_web: "unlimited", pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
+    limits: { ai_cv_generate: "unlimited", cv_analyzer: "unlimited", ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: "unlimited", portfolio_web: "unlimited", pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
   },
   starter_monthly: {
     id: "starter_monthly", name: "Starter", price: 15000, periodDays: 30, monthly: true,
-    limits: { ai_cv_generate: 5, cv_analyzer: false, ai_revision: false, ai_suggestion: false, portfolio_web: false, pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
+    limits: { ai_cv_generate: 5, cv_analyzer: false, ai_revision: false, ai_suggestion: false, cover_letter: false, portfolio_web: false, pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
   },
   pro_monthly: {
     id: "pro_monthly", name: "Pro", price: 29000, periodDays: 30, monthly: true,
-    limits: { ai_cv_generate: "unlimited", cv_analyzer: "unlimited", ai_revision: "unlimited", ai_suggestion: "unlimited", portfolio_web: 1, pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
+    limits: { ai_cv_generate: "unlimited", cv_analyzer: "unlimited", ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: "unlimited", portfolio_web: 1, pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
   },
   business_monthly: {
     id: "business_monthly", name: "Business", price: 79000, periodDays: 30, monthly: true,
-    limits: { ai_cv_generate: 20, cv_analyzer: "unlimited", ai_revision: "unlimited", ai_suggestion: "unlimited", portfolio_web: 3, pdf_export: "unlimited", bulk_analyzer: "unlimited", white_label: "unlimited" },
+    limits: { ai_cv_generate: 20, cv_analyzer: "unlimited", ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: "unlimited", portfolio_web: 3, pdf_export: "unlimited", bulk_analyzer: "unlimited", white_label: "unlimited" },
   },
 };
 
@@ -155,6 +156,7 @@ export const FREE_LIMITS: Record<Feature, number | "unlimited" | false> = {
   cv_analyzer: 2,
   ai_revision: 3,
   ai_suggestion: 3,
+  cover_letter: 3,
   portfolio_web: false,
   pdf_export: 2,
   bulk_analyzer: false,
@@ -169,6 +171,10 @@ export interface UserAccess {
   limits: Record<Feature, number | "unlimited" | false>;
   /** Premium flag (has any paid active package) */
   isPremium: boolean;
+  /** Fitur yang benar-benar diberikan paket berbayar (bukan kuota gratis).
+   * Dipakai untuk gate model AI premium — mis. pembeli portfolio_web TIDAK
+   * dapat R1 walau free limit cv_analyzer = 2. */
+  purchasedFeatures: Record<Feature, number | "unlimited" | false>;
   /** Active packages list */
   activePackages: string[];
 }
@@ -193,6 +199,10 @@ export async function getUserAccess(userId: string): Promise<UserAccess> {
 
   const activePackageIds = new Set<string>();
   const merged: Record<Feature, number | "unlimited" | false> = { ...FREE_LIMITS };
+  // Baseline tanpa kuota gratis — hanya fitur yang benar-benar dibeli pengguna.
+  const purchased: Record<Feature, number | "unlimited" | false> = Object.fromEntries(
+    Object.keys(FREE_LIMITS).map((k) => [k, false]),
+  ) as Record<Feature, number | "unlimited" | false>;
   const allPackages = await getPackagesDb();
 
   for (const payment of activePayments) {
@@ -201,13 +211,15 @@ export async function getUserAccess(userId: string): Promise<UserAccess> {
     activePackageIds.add(pkg.id);
 
     for (const [feat, limit] of Object.entries(pkg.limits) as [Feature, number | "unlimited" | false][]) {
-      if (limit === "unlimited") {
-        merged[feat] = "unlimited";
-      } else if (limit !== false && merged[feat] !== "unlimited") {
-        if (typeof merged[feat] === "number") {
-          merged[feat] = Math.max(merged[feat] as number, limit);
-        } else {
-          merged[feat] = limit;
+      for (const acc of [merged, purchased]) {
+        if (limit === "unlimited") {
+          acc[feat] = "unlimited";
+        } else if (limit !== false && acc[feat] !== "unlimited") {
+          if (typeof acc[feat] === "number") {
+            acc[feat] = Math.max(acc[feat] as number, limit);
+          } else {
+            acc[feat] = limit;
+          }
         }
       }
     }
@@ -226,5 +238,5 @@ export async function getUserAccess(userId: string): Promise<UserAccess> {
     }
   }
 
-  return { tierName, limits: merged, isPremium, activePackages };
+  return { tierName, limits: merged, purchasedFeatures: purchased, isPremium, activePackages };
 }

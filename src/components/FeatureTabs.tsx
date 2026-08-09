@@ -53,8 +53,8 @@ const TABS: TabData[] = [
     bullets: ["features.checker-b1", "features.checker-b2", "features.checker-b3"],
     ctaKey: "features.checker-cta",
     href: "/checker",
-    color: "text-[#8B5CF6]",
-    bgColor: "bg-[#8B5CF6]",
+    color: "text-primary",
+    bgColor: "bg-primary",
   },
   {
     id: "analysis",
@@ -66,6 +66,17 @@ const TABS: TabData[] = [
     href: "/checker",
     color: "text-primary",
     bgColor: "bg-primary",
+  },
+  {
+    id: "letters",
+    icon: "mail",
+    titleKey: "features.letters-title",
+    descKey: "features.letters-desc",
+    bullets: ["features.letters-b1", "features.letters-b2", "features.letters-b3"],
+    ctaKey: "features.letters-cta",
+    href: "/dashboard",
+    color: "text-secondary",
+    bgColor: "bg-secondary",
   },
 ];
 
@@ -119,59 +130,6 @@ const cardReveal = {
   },
 };
 
-/* ─── Floating particles per tab ─── */
-const TAB_PARTICLES: Record<string, Array<{ x: string; y: string; size: string; delay: number; color: string; blur: string }>> = {
-  builder: [
-    { x: "10%", y: "20%", size: "w-2 h-2", delay: 0, color: "bg-primary/20", blur: "blur-sm" },
-    { x: "85%", y: "60%", size: "w-3 h-3", delay: 0.7, color: "bg-amber-400/20", blur: "blur-md" },
-    { x: "40%", y: "80%", size: "w-1.5 h-1.5", delay: 1.4, color: "bg-primary/15", blur: "blur-sm" },
-  ],
-  portfolio: [
-    { x: "75%", y: "15%", size: "w-2.5 h-2.5", delay: 0, color: "bg-secondary/25", blur: "blur-sm" },
-    { x: "15%", y: "70%", size: "w-2 h-2", delay: 0.6, color: "bg-cyan-400/20", blur: "blur-md" },
-    { x: "60%", y: "90%", size: "w-3 h-3", delay: 1.2, color: "bg-secondary/15", blur: "blur-sm" },
-  ],
-  checker: [
-    { x: "20%", y: "25%", size: "w-2 h-2", delay: 0, color: "bg-purple-400/20", blur: "blur-sm" },
-    { x: "80%", y: "40%", size: "w-3 h-3", delay: 0.8, color: "bg-indigo-400/15", blur: "blur-md" },
-    { x: "50%", y: "85%", size: "w-1.5 h-1.5", delay: 1.5, color: "bg-purple-400/20", blur: "blur-sm" },
-  ],
-  analysis: [
-    { x: "90%", y: "20%", size: "w-2.5 h-2.5", delay: 0, color: "bg-primary/20", blur: "blur-sm" },
-    { x: "10%", y: "50%", size: "w-2 h-2", delay: 0.5, color: "bg-blue-400/15", blur: "blur-md" },
-    { x: "70%", y: "80%", size: "w-3 h-3", delay: 1, color: "bg-primary/15", blur: "blur-sm" },
-  ],
-};
-
-/* ─── Floating Particles Component ─── */
-function FloatingParticles({ tabId }: { tabId: string }) {
-  const particles = TAB_PARTICLES[tabId] || [];
-  return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-xl">
-      {particles.map((p, i) => (
-        <motion.div
-          key={i}
-          className={`absolute ${p.size} ${p.color} ${p.blur} rounded-full`}
-          style={{ left: p.x, top: p.y }}
-          initial={{ opacity: 0, y: 10, scale: 0 }}
-          animate={{
-            opacity: [0, 0.8, 0.4, 0.6, 0.2],
-            y: [0, -15, 5, -8, 0],
-            x: [0, 8, -5, 3, 0],
-            scale: [0, 1, 0.7, 1.2, 0.8],
-          }}
-          transition={{
-            duration: 5 + i,
-            delay: p.delay,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
 /* ─── Dynamic Section: Analysis ─── */
 function AnalysisInteractive({ t }: { t: (key: string) => string }) {
   return (
@@ -181,7 +139,6 @@ function AnalysisInteractive({ t }: { t: (key: string) => string }) {
       animate="visible"
       className="relative rounded-xl border border-outline-variant/30 bg-surface-container-low/50 p-5 md:p-6 overflow-hidden"
     >
-      <FloatingParticles tabId="analysis" />
 
       <motion.div variants={cardReveal} className="relative z-10 flex flex-col md:flex-row gap-4">
         {/* Upload CV Zone — clickable */}
@@ -194,7 +151,7 @@ function AnalysisInteractive({ t }: { t: (key: string) => string }) {
               <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>upload_file</span>
             </div>
             <p className="text-sm font-medium text-on-surface mb-1 group-hover:text-primary transition-colors">{t("checker.upload-label")}</p>
-            <p className="text-[11px] text-on-surface-variant/60">{t("checker.upload-hint")}</p>
+            <p className="text-[11px] text-on-surface-variant/70">{t("checker.upload-hint")}</p>
           </Link>
         </div>
 
@@ -215,62 +172,14 @@ function AnalysisInteractive({ t }: { t: (key: string) => string }) {
             href="/checker"
             className="w-full px-5 py-3 bg-primary text-on-primary rounded-xl text-sm font-bold hover:brightness-110 transition-all shadow-sm flex items-center justify-center gap-2 group/btn"
           >
-            <motion.span
-              className="material-symbols-outlined text-lg"
-              animate={{ rotate: [0, 5, -5, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            >auto_awesome</motion.span>
+            <span className="material-symbols-outlined text-lg">auto_awesome</span>
             {t("checker.analyze-btn")}
           </Link>
-          <p className="text-[10px] text-on-surface-variant/60 text-center">{t("checker.free-badge")}</p>
+          <p className="text-[10px] text-on-surface-variant/70 text-center">{t("checker.free-badge")}</p>
         </div>
       </motion.div>
 
-      {/* Animated Score Preview */}
-      <motion.div variants={cardReveal} className="relative z-10 mt-4 pt-4 border-t border-outline-variant/20">
-        <div className="flex items-center justify-between text-xs mb-2">
-          <div className="flex items-center gap-2">
-            <motion.span
-              className="w-2 h-2 rounded-full bg-green-500"
-              animate={{ scale: [1, 1.6, 1], opacity: [1, 0.4, 1] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <span className="font-medium text-on-surface-variant">{t("checker.score-label")}</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <motion.span
-              className="flex items-center gap-1 text-green-700 font-bold"
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8L12 2z"/></svg>
-              ATS 92%
-            </motion.span>
-            <span className="text-primary/60">|</span>
-            <motion.span
-              className="text-amber-600 font-bold flex items-center gap-1"
-              animate={{ x: [0, 2, -2, 0] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <span className="material-symbols-outlined text-[14px]">priority_high</span>
-              3 keyword
-            </motion.span>
-          </div>
-        </div>
-        <div className="h-2.5 w-full bg-primary/10 rounded-full overflow-hidden">
-          <motion.div
-            className="h-full bg-gradient-to-r from-green-400 via-primary to-primary rounded-full"
-            initial={{ width: "0%" }}
-            animate={{ width: "78%" }}
-            transition={{ duration: 1.5, ease: "easeOut", delay: 0.3 }}
-          />
-        </div>
-        <div className="flex justify-between text-[10px] text-on-surface-variant/60 mt-1">
-          <span>0%</span>
-          <span>50%</span>
-          <span>100%</span>
-        </div>
-      </motion.div>
+
     </motion.div>
   );
 }
@@ -284,7 +193,6 @@ function BuilderShowcase({ t, router }: { t: (key: string) => string; router: Re
       animate="visible"
       className="relative rounded-xl border border-outline-variant/30 bg-surface-container-low/50 p-5 md:p-6 overflow-hidden"
     >
-      <FloatingParticles tabId="builder" />
 
       <div className="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-3">
         {CV_TEMPLATES.map((template) => (
@@ -305,12 +213,8 @@ function BuilderShowcase({ t, router }: { t: (key: string) => string; router: Re
               href="/builder/new"
               className="block h-full min-h-[120px] rounded-2xl border-2 border-dashed border-outline-variant/30 bg-white/50 flex flex-col items-center justify-center gap-2 p-4 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/[0.02] hover:shadow-md transition-all duration-300 group"
             >
-              <motion.span
-                className="material-symbols-outlined text-outline-variant text-2xl group-hover:text-primary transition-colors"
-                animate={{ rotate: [0, 0, 90, 90] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              >add_circle</motion.span>
-              <p className="text-[11px] text-on-surface-variant/60 leading-relaxed group-hover:text-on-surface transition-colors">
+              <span className="material-symbols-outlined text-outline-variant text-2xl group-hover:text-primary transition-colors">add_circle</span>
+              <p className="text-[11px] text-on-surface-variant/70 leading-relaxed group-hover:text-on-surface transition-colors">
                 {t("features.cv-builder-title")} <br />5 template ATS
               </p>
             </Link>
@@ -330,13 +234,9 @@ function BuilderShowcase({ t, router }: { t: (key: string) => string; router: Re
             {t("features.cv-builder-b3")}
           </span>
         </div>
-        <motion.span
-          className="text-[10px] text-primary font-bold bg-primary/5 px-2.5 py-1 rounded-full"
-          animate={{ scale: [1, 1.05, 1] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        >
-          {t("features.title-highlight")} ✦
-        </motion.span>
+        <span className="text-[10px] text-primary font-bold bg-primary/5 px-2.5 py-1 rounded-full">
+          {t("features.title-highlight")}
+        </span>
       </motion.div>
     </motion.div>
   );
@@ -351,7 +251,6 @@ function PortfolioShowcase({ t }: { t: (key: string) => string }) {
       animate="visible"
       className="relative rounded-xl border border-outline-variant/30 bg-surface-container-low/50 p-5 md:p-6 overflow-hidden"
     >
-      <FloatingParticles tabId="portfolio" />
 
       <div className="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-3">
         {PORTFOLIO_THEMES.map((theme, idx) => (
@@ -378,7 +277,7 @@ function PortfolioShowcase({ t }: { t: (key: string) => string }) {
                 <div className="p-4 flex items-center justify-between">
                   <div>
                     <h4 className="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">{theme.name}</h4>
-                    <p className="text-[10px] text-on-surface-variant/60 mt-0.5">
+                    <p className="text-[10px] text-on-surface-variant/70 mt-0.5">
                       {theme.id === "modern-slate" && t("features.portfolio-b1")}
                       {theme.id === "minimal-dark" && t("features.portfolio-b2")}
                       {theme.id === "modern-blue" && t("features.portfolio-b3")}
@@ -404,6 +303,111 @@ function PortfolioShowcase({ t }: { t: (key: string) => string }) {
   );
 }
 
+/* ─── Dynamic Section: Surat Lamaran / Motivation Letter ─── */
+function LetterShowcase({ t }: { t: (key: string) => string }) {
+  return (
+    <motion.div
+      variants={containerStagger}
+      initial="hidden"
+      animate="visible"
+      className="relative rounded-xl border border-outline-variant/30 bg-surface-container-low/50 p-5 md:p-6 overflow-hidden"
+    >
+
+      <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-3">
+        {/* Surat Lamaran Formal — clickable */}
+        <motion.div variants={cardReveal}>
+          <Link
+            href="/dashboard"
+            className="block bg-white rounded-xl overflow-hidden border border-outline-variant/20 hover:-translate-y-1 hover:shadow-lg hover:border-emerald-300/40 transition-all duration-300 cursor-pointer group"
+          >
+            <div className="px-4 pt-4 pb-3 border-b border-outline-variant/10 flex items-center gap-2">
+              <span className="w-6 h-6 rounded-lg bg-emerald-50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <span className="material-symbols-outlined text-emerald-600 text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>business_center</span>
+              </span>
+              <span className="text-xs font-bold text-on-surface group-hover:text-emerald-600 transition-colors">Surat Lamaran</span>
+            </div>
+            <div className="px-4 py-3 space-y-1.5">
+              <div className="h-2 w-2/3 bg-emerald-100 rounded" />
+              <div className="h-2 w-full bg-outline/10 rounded" />
+              <div className="h-2 w-5/6 bg-outline/10 rounded" />
+              <div className="h-2 w-4/6 bg-outline/10 rounded" />
+              <div className="h-2 w-3/6 bg-outline/10 rounded" />
+            </div>
+            <div className="px-4 pb-3 flex justify-end">
+              <span className="text-[9px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Resmi · BUMN/Korporasi</span>
+            </div>
+          </Link>
+        </motion.div>
+
+        {/* Cover Letter ATS — clickable */}
+        <motion.div variants={cardReveal}>
+          <Link
+            href="/dashboard"
+            className="block bg-white rounded-xl overflow-hidden border border-outline-variant/20 hover:-translate-y-1 hover:shadow-lg hover:border-blue-300/40 transition-all duration-300 cursor-pointer group"
+          >
+            <div className="px-4 pt-4 pb-3 border-b border-outline-variant/10 flex items-center gap-2">
+              <span className="w-6 h-6 rounded-lg bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <span className="material-symbols-outlined text-blue-600 text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+              </span>
+              <span className="text-xs font-bold text-on-surface group-hover:text-blue-600 transition-colors">Cover Letter</span>
+            </div>
+            <div className="px-4 py-3 space-y-1.5">
+              <div className="h-2 w-1/2 bg-blue-100 rounded" />
+              <div className="h-2 w-full bg-outline/10 rounded" />
+              <div className="h-2 w-full bg-outline/10 rounded" />
+              <div className="h-2 w-2/3 bg-outline/10 rounded" />
+            </div>
+            <div className="px-4 pb-3 flex justify-end">
+              <span className="text-[9px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">EN · ATS Optimized</span>
+            </div>
+          </Link>
+        </motion.div>
+
+        {/* Motivation Letter — clickable */}
+        <motion.div variants={cardReveal}>
+          <Link
+            href="/dashboard"
+            className="block bg-white rounded-xl overflow-hidden border border-outline-variant/20 hover:-translate-y-1 hover:shadow-lg hover:border-amber-300/40 transition-all duration-300 cursor-pointer group"
+          >
+            <div className="px-4 pt-4 pb-3 border-b border-outline-variant/10 flex items-center gap-2">
+              <span className="w-6 h-6 rounded-lg bg-amber-50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <span className="material-symbols-outlined text-amber-600 text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>emoji_events</span>
+              </span>
+              <span className="text-xs font-bold text-on-surface group-hover:text-amber-600 transition-colors">Motivation Letter</span>
+            </div>
+            <div className="px-4 py-3 space-y-1.5">
+              <div className="h-2 w-3/4 bg-amber-100 rounded" />
+              <div className="h-2 w-full bg-outline/10 rounded" />
+              <div className="h-2 w-5/6 bg-outline/10 rounded" />
+              <div className="h-2 w-4/6 bg-outline/10 rounded" />
+            </div>
+            <div className="px-4 pb-3 flex justify-end">
+              <span className="text-[9px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">Beasiswa · Program · Passion</span>
+            </div>
+          </Link>
+        </motion.div>
+      </div>
+
+      {/* Feature comparison mini */}
+      <motion.div variants={cardReveal} className="relative z-10 mt-4 pt-3 border-t border-outline-variant/20 flex items-center justify-between">
+        <div className="flex items-center gap-3 text-xs text-on-surface-variant">
+          <span className="flex items-center gap-1">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            {t("features.letters-b3")}
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="material-symbols-outlined text-sm">picture_as_pdf</span>
+            {t("features.letters-pdf")}
+          </span>
+        </div>
+        <span className="text-[10px] text-secondary font-bold bg-secondary/10 px-2.5 py-1 rounded-full">
+          {t("features.letters-free")}
+        </span>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 /* ─── Dynamic Section: Checker ─── */
 function CheckerScoreMockup({ t }: { t: (key: string) => string }) {
   return (
@@ -413,7 +417,6 @@ function CheckerScoreMockup({ t }: { t: (key: string) => string }) {
       animate="visible"
       className="relative rounded-xl border border-outline-variant/30 bg-surface-container-low/50 p-5 md:p-6 overflow-hidden"
     >
-      <FloatingParticles tabId="checker" />
 
       <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-3">
         {/* ATS Score — clickable */}
@@ -423,21 +426,9 @@ function CheckerScoreMockup({ t }: { t: (key: string) => string }) {
             className="block bg-white rounded-xl p-4 border border-outline-variant/20 text-center hover:-translate-y-1 hover:shadow-lg hover:border-primary/30 transition-all duration-300 cursor-pointer group"
           >
             <div className="text-xs text-on-surface-variant font-medium mb-1 group-hover:text-primary transition-colors">{t("checker.score-label")}</div>
-            <motion.div
-              className="text-3xl font-bold text-primary"
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ type: "spring", stiffness: 200, damping: 12, delay: 0.2 }}
-            >
-              92<span className="text-lg text-primary/60">%</span>
-            </motion.div>
+            <p className="text-xs font-semibold text-primary/70 mb-1">Hasil analisis kamu tampil di sini</p>
             <div className="mt-2 h-1.5 w-full bg-primary/10 rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-gradient-to-r from-green-400 to-primary rounded-full"
-                initial={{ width: "0%" }}
-                animate={{ width: "92%" }}
-                transition={{ duration: 1.2, ease: "easeOut", delay: 0.4 }}
-              />
+              <div className="h-full w-3/5 bg-primary/30 rounded-full" />
             </div>
           </Link>
         </motion.div>
@@ -492,7 +483,7 @@ function CheckerScoreMockup({ t }: { t: (key: string) => string }) {
               <span className="material-symbols-outlined text-green-600 text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
             </motion.div>
             <span className="text-sm font-bold text-green-700 group-hover:text-green-600 transition-colors">{t("checker.fit-excellent")}</span>
-            <p className="text-[10px] text-on-surface-variant/60 mt-0.5">{t("checker.ats-format")} ✓</p>
+            <p className="text-[10px] text-on-surface-variant/70 mt-0.5">{t("checker.ats-format")} ✓</p>
           </Link>
         </motion.div>
       </div>
@@ -510,7 +501,7 @@ export default function FeatureTabs() {
     <div className="max-w-4xl mx-auto">
       {/* Tab Bar */}
       <div className="flex justify-center mb-10">
-        <div className="inline-flex bg-white rounded-2xl p-1.5 shadow-premium-sm border border-outline-variant/30">
+        <div className="inline-flex flex-wrap justify-center bg-white rounded-2xl p-1.5 shadow-premium-sm border border-outline-variant/30 max-w-full">
           {TABS.map((tab) => (
             <button
               key={tab.id}
@@ -600,7 +591,7 @@ export default function FeatureTabs() {
                 <div className={`w-16 h-16 ${activeData.bgColor}/10 rounded-3xl flex items-center justify-center`}>
                   <span className={`material-symbols-outlined text-[36px] ${activeData.color}`} style={{ fontVariationSettings: "'FILL' 1" }}>{activeData.icon}</span>
                 </div>
-                <p className="text-[10px] text-on-surface-variant/60 mt-2 text-center max-w-[100px]">
+                <p className="text-[10px] text-on-surface-variant/70 mt-2 text-center max-w-[100px]">
                   {t("features.title-highlight")}
                 </p>
               </div>
@@ -612,6 +603,7 @@ export default function FeatureTabs() {
           {activeTab === "builder" && <BuilderShowcase t={t} router={router} />}
           {activeTab === "portfolio" && <PortfolioShowcase t={t} />}
           {activeTab === "checker" && <CheckerScoreMockup t={t} />}
+          {activeTab === "letters" && <LetterShowcase t={t} />}
         </motion.div>
       </AnimatePresence>
     </div>

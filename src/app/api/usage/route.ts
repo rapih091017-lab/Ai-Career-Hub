@@ -39,7 +39,7 @@ export const GET = apiHandler(async () => {
   firstOfMonth.setDate(1);
   firstOfMonth.setHours(0, 0, 0, 0);
 
-  const actionTypes = ["checker_check", "ai_revision", "ai_suggestion", "cv_build"] as const;
+  const actionTypes = ["checker_check", "ai_revision", "ai_suggestion", "cv_build", "cover_letter_generate"] as const;
   const usageMap: Record<string, number> = {};
   for (const action of actionTypes) {
     const [row] = await db
@@ -106,6 +106,7 @@ export const GET = apiHandler(async () => {
       checkerChecks: usageMap["checker_check"],
       aiRevisions: usageMap["ai_revision"],
       aiSuggestions: usageMap["ai_suggestion"],
+      coverLetters: usageMap["cover_letter_generate"],
     },
     premium: {
       isPremium: access.isPremium,

@@ -8,10 +8,12 @@ import PortfolioCanvas, { SECTION_META } from "@/components/portfolio/PortfolioC
 import DateField from "@/components/portfolio/DateField";
 import PhotoUpload from "@/components/portfolio/PhotoUpload";
 import { AIPolishButton } from "@/components/ai/AIPolishDialog";
+import PublishDialog from "@/components/portfolio/PublishDialog";
 import { THEMES, DEFAULT_THEME_ID, DEFAULT_SECTION_ORDER } from "@/components/portfolio/themes";
 import type {
   SectionId, ThemeId, PortfolioFormData,
   ProjectItem, ExperienceItem, EducationItem,
+  CertificationItem, OrganizationItem, HobbyItem,
   TestimonialItem, ExtraLink, FontSize, TextAlignment,
 } from "@/components/portfolio/types";
 
@@ -23,6 +25,9 @@ import SkillsSection from "@/components/portfolio/sections/SkillsSection";
 import ProjectsSection from "@/components/portfolio/sections/ProjectsSection";
 import ExperienceSection from "@/components/portfolio/sections/ExperienceSection";
 import EducationSection from "@/components/portfolio/sections/EducationSection";
+import CertificationsSection from "@/components/portfolio/sections/CertificationsSection";
+import OrganizationsSection from "@/components/portfolio/sections/OrganizationsSection";
+import HobbiesSection from "@/components/portfolio/sections/HobbiesSection";
 import TestimonialsSection from "@/components/portfolio/sections/TestimonialsSection";
 import ContactSection from "@/components/portfolio/sections/ContactSection";
 
@@ -40,7 +45,8 @@ const DEFAULT_FORM: PortfolioFormData = {
 const DEFAULT_ALIGNMENT: Record<SectionId, TextAlignment> = {
   hero: "center", about: "left", stats: "center",
   experience: "left", education: "left", projects: "left",
-  skills: "left", testimonials: "center", contact: "center",
+  skills: "left", certifications: "left", organizations: "left", hobbies: "left",
+  testimonials: "center", contact: "center",
 };
 
 type TabId = "sections" | "edit" | "design" | "ai";
@@ -52,6 +58,9 @@ interface LiveData {
   projects: ProjectItem[];
   experiences: ExperienceItem[];
   educations: EducationItem[];
+  certifications: CertificationItem[];
+  organizations: OrganizationItem[];
+  hobbies: HobbyItem[];
   testimonials: TestimonialItem[];
   extraLinks: ExtraLink[];
   sectionOrder: SectionId[];
@@ -81,6 +90,9 @@ export default function PortfolioLiveBuilder() {
   const [projects, setProjects] = useState<ProjectItem[]>([{ id: genId(), name: "", description: "", techStack: "", link: "" }]);
   const [experiences, setExperiences] = useState<ExperienceItem[]>([]);
   const [educations, setEducations] = useState<EducationItem[]>([]);
+  const [certifications, setCertifications] = useState<CertificationItem[]>([]);
+  const [organizations, setOrganizations] = useState<OrganizationItem[]>([]);
+  const [hobbies, setHobbies] = useState<HobbyItem[]>([]);
   const [testimonials, setTestimonials] = useState<TestimonialItem[]>([]);
   const [extraLinks, setExtraLinks] = useState<ExtraLink[]>([]);
   const [sectionOrder, setSectionOrder] = useState<SectionId[]>(DEFAULT_SECTION_ORDER);
@@ -95,6 +107,7 @@ export default function PortfolioLiveBuilder() {
   const [showPanel, setShowPanel] = useState(true);
   const [fullscreenForm, setFullscreenForm] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [showPublish, setShowPublish] = useState(false);
 
   // AI generation state
   const [aiLoading, setAiLoading] = useState(false);
@@ -109,6 +122,9 @@ export default function PortfolioLiveBuilder() {
       setProjects(draft.projects);
       setExperiences(draft.experiences);
       setEducations(draft.educations);
+      if (draft.certifications) setCertifications(draft.certifications);
+      if (draft.organizations) setOrganizations(draft.organizations);
+      if (draft.hobbies) setHobbies(draft.hobbies);
       setTestimonials(draft.testimonials);
       setExtraLinks(draft.extraLinks);
       setSectionOrder(draft.sectionOrder);
@@ -124,10 +140,10 @@ export default function PortfolioLiveBuilder() {
   useEffect(() => {
     if (!mounted) return;
     const timer = setTimeout(() => {
-      saveDraft({ formData, projects, experiences, educations, testimonials, extraLinks, sectionOrder, themeId, sectionVisibility, fontSize, alignment });
+      saveDraft({ formData, projects, experiences, educations, certifications, organizations, hobbies, testimonials, extraLinks, sectionOrder, themeId, sectionVisibility, fontSize, alignment });
     }, 1000);
     return () => clearTimeout(timer);
-  }, [formData, projects, experiences, educations, testimonials, extraLinks, sectionOrder, themeId, sectionVisibility, fontSize, alignment, mounted]);
+  }, [formData, projects, experiences, educations, certifications, organizations, hobbies, testimonials, extraLinks, sectionOrder, themeId, sectionVisibility, fontSize, alignment, mounted]);
 
   const toggleSection = useCallback((id: SectionId) => {
     setSectionVisibility(prev => ({ ...prev, [id]: !prev[id] }));
@@ -286,6 +302,9 @@ export default function PortfolioLiveBuilder() {
       case "education": return <EducationSection items={educations} />;
       case "projects": return <ProjectsSection items={projects} />;
       case "skills": return <SkillsSection data={formData} />;
+      case "certifications": return <CertificationsSection items={certifications} />;
+      case "organizations": return <OrganizationsSection items={organizations} />;
+      case "hobbies": return <HobbiesSection items={hobbies} />;
       case "testimonials": return <TestimonialsSection items={testimonials} />;
       case "contact": return <ContactSection data={formData} extraLinks={extraLinks} />;
     }
@@ -471,7 +490,7 @@ export default function PortfolioLiveBuilder() {
                           {t("live.close")}
                         </button>
                       </div>
-                      {renderFormFields(selectedSection, formData, updateForm, setFormData, projects, setProjects, experiences, setExperiences, educations, setEducations, testimonials, setTestimonials, extraLinks, setExtraLinks, handleAiGenerate, t)}
+                      {renderFormFields(selectedSection, formData, updateForm, setFormData, projects, setProjects, experiences, setExperiences, educations, setEducations, certifications, setCertifications, organizations, setOrganizations, hobbies, setHobbies, testimonials, setTestimonials, extraLinks, setExtraLinks, handleAiGenerate, t)}
                     </>
                   ) : (
                     <div className="text-center py-10 text-on-surface-variant">
@@ -640,11 +659,11 @@ export default function PortfolioLiveBuilder() {
                     </div>
                   )}
 
-                  {/* Export */}
-                  <div className="pt-2 border-t" style={{ borderColor: "var(--border, rgba(0,0,0,0.06))" }}>
+                  {/* Export & Publish */}
+                  <div className="pt-2 border-t space-y-2" style={{ borderColor: "var(--border, rgba(0,0,0,0.06))" }}>
                     <button
                       onClick={() => {
-                        const previewData = { formData, projects, experiences, educations, testimonials, extraLinks };
+                        const previewData = { formData, projects, experiences, educations, certifications, organizations, hobbies, testimonials, extraLinks };
                         localStorage.setItem("portfolio_draft", JSON.stringify(previewData));
                         window.open(`/portfolio/preview?template=${themeId}`, "_blank");
                       }}
@@ -654,6 +673,13 @@ export default function PortfolioLiveBuilder() {
                         <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
                       </svg>
                       {t("live.export-preview")}
+                    </button>
+                    <button
+                      onClick={() => setShowPublish(true)}
+                      className="w-full py-3 rounded-xl bg-primary text-on-primary font-semibold text-xs hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-md"
+                    >
+                      <span className="material-symbols-outlined text-[15px]">rocket_launch</span>
+                      {t("portfolio.publish-btn")}
                     </button>
                   </div>
                 </div>
@@ -727,6 +753,15 @@ export default function PortfolioLiveBuilder() {
           </main>
         </div>
       </div>
+
+      {/* Publish dialog */}
+      <PublishDialog
+        open={showPublish}
+        onClose={() => setShowPublish(false)}
+        data={{ formData, projects, experiences, educations, certifications, organizations, hobbies, testimonials, extraLinks }}
+        themeId={themeId}
+        extras={{ sectionOrder, sectionVisibility }}
+      />
     </AuthGuard>
   );
 }
@@ -741,6 +776,9 @@ function renderFormFields(
   projects: ProjectItem[], setProjects: (p: ProjectItem[]) => void,
   experiences: ExperienceItem[], setExperiences: (e: ExperienceItem[]) => void,
   educations: EducationItem[], setEducations: (e: EducationItem[]) => void,
+  certifications: CertificationItem[], setCertifications: (c: CertificationItem[]) => void,
+  organizations: OrganizationItem[], setOrganizations: (o: OrganizationItem[]) => void,
+  hobbies: HobbyItem[], setHobbies: (h: HobbyItem[]) => void,
   testimonials: TestimonialItem[], setTestimonials: (t: TestimonialItem[]) => void,
   extraLinks: ExtraLink[], setExtraLinks: (e: ExtraLink[]) => void,
   handleAiGenerate?: () => void,
@@ -935,6 +973,75 @@ function renderFormFields(
           <button onClick={() => setEducations([...educations, { id: _id(), institution: "", degree: "", field: "", startDate: "", endDate: "" }])}
             className="text-xs text-primary font-semibold hover:underline flex items-center gap-1">
             <span className="material-symbols-outlined text-[14px]">add</span> {L("live.form.add-education")}
+          </button>
+        </div>
+      );
+
+    case "certifications":
+      return (
+        <div className="space-y-3">
+          {certifications.map((cert, i) => (
+            <div key={cert.id} className="p-3 rounded-lg border text-sm">
+              <div className="flex justify-between mb-2"><span className="font-medium text-xs">{L("live.form.certification")} {i + 1}</span>
+                <button className="text-red-500 text-[10px]" onClick={() => setCertifications(certifications.filter(x => x.id !== cert.id))}>{L("live.form.delete")}</button>
+              </div>
+              <div className="space-y-1.5">
+                <input className={inputClass} placeholder={L("live.form.cert-name")} value={cert.name} onChange={e => setCertifications(certifications.map(x => x.id === cert.id ? { ...x, name: e.target.value } : x))} />
+                <input className={inputClass} placeholder={L("live.form.cert-issuer")} value={cert.issuer} onChange={e => setCertifications(certifications.map(x => x.id === cert.id ? { ...x, issuer: e.target.value } : x))} />
+                <div className="flex gap-1.5">
+                  <input className={inputClass} placeholder={L("live.form.cert-year")} value={cert.year} onChange={e => setCertifications(certifications.map(x => x.id === cert.id ? { ...x, year: e.target.value } : x))} />
+                  <input className={inputClass + " flex-1"} type="url" placeholder={L("live.form.cert-url")} value={cert.url || ""} onChange={e => setCertifications(certifications.map(x => x.id === cert.id ? { ...x, url: e.target.value } : x))} />
+                </div>
+              </div>
+            </div>
+          ))}
+          <button onClick={() => setCertifications([...certifications, { id: _id(), name: "", issuer: "", year: "", url: "" }])}
+            className="text-xs text-primary font-semibold hover:underline flex items-center gap-1">
+            <span className="material-symbols-outlined text-[14px]">add</span> {L("live.form.add-certification")}
+          </button>
+        </div>
+      );
+
+    case "organizations":
+      return (
+        <div className="space-y-3">
+          {organizations.map((org, i) => (
+            <div key={org.id} className="p-3 rounded-lg border text-sm">
+              <div className="flex justify-between mb-2"><span className="font-medium text-xs">{L("live.form.organization")} {i + 1}</span>
+                <button className="text-red-500 text-[10px]" onClick={() => setOrganizations(organizations.filter(x => x.id !== org.id))}>{L("live.form.delete")}</button>
+              </div>
+              <div className="space-y-1.5">
+                <input className={inputClass} placeholder={L("live.form.org-name")} value={org.name} onChange={e => setOrganizations(organizations.map(x => x.id === org.id ? { ...x, name: e.target.value } : x))} />
+                <input className={inputClass} placeholder={L("live.form.org-role")} value={org.role} onChange={e => setOrganizations(organizations.map(x => x.id === org.id ? { ...x, role: e.target.value } : x))} />
+                <input className={inputClass} placeholder={L("live.form.org-period")} value={org.period} onChange={e => setOrganizations(organizations.map(x => x.id === org.id ? { ...x, period: e.target.value } : x))} />
+                <textarea className={inputClass} rows={2} placeholder={L("live.form.description")} value={org.description} onChange={e => setOrganizations(organizations.map(x => x.id === org.id ? { ...x, description: e.target.value } : x))} />
+              </div>
+            </div>
+          ))}
+          <button onClick={() => setOrganizations([...organizations, { id: _id(), name: "", role: "", period: "", description: "" }])}
+            className="text-xs text-primary font-semibold hover:underline flex items-center gap-1">
+            <span className="material-symbols-outlined text-[14px]">add</span> {L("live.form.add-organization")}
+          </button>
+        </div>
+      );
+
+    case "hobbies":
+      return (
+        <div className="space-y-3">
+          {hobbies.map((h, i) => (
+            <div key={h.id} className="p-3 rounded-lg border text-sm">
+              <div className="flex justify-between mb-2"><span className="font-medium text-xs">{L("live.form.hobby")} {i + 1}</span>
+                <button className="text-red-500 text-[10px]" onClick={() => setHobbies(hobbies.filter(x => x.id !== h.id))}>{L("live.form.delete")}</button>
+              </div>
+              <div className="space-y-1.5">
+                <input className={inputClass} placeholder={L("live.form.hobby-name")} value={h.name} onChange={e => setHobbies(hobbies.map(x => x.id === h.id ? { ...x, name: e.target.value } : x))} />
+                <textarea className={inputClass} rows={2} placeholder={L("live.form.hobby-desc")} value={h.description} onChange={e => setHobbies(hobbies.map(x => x.id === h.id ? { ...x, description: e.target.value } : x))} />
+              </div>
+            </div>
+          ))}
+          <button onClick={() => setHobbies([...hobbies, { id: _id(), name: "", description: "" }])}
+            className="text-xs text-primary font-semibold hover:underline flex items-center gap-1">
+            <span className="material-symbols-outlined text-[14px]">add</span> {L("live.form.add-hobby")}
           </button>
         </div>
       );
