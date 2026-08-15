@@ -1,6 +1,114 @@
 import { ocrImage } from "@/lib/ocr";
 
 /**
+ * Fallback DOMMatrix/ImageData minimal untuk pdfjs-dist di runtime tanpa DOM.
+ * pdfjs v5 butuh DOMMatrix (biasanya dipolyfill @napi-rs/canvas). Kalau
+ * native module gagal load di serverless, polyfill ini mencegah error
+ * "dommatrix is not defined" saat text extraction.
+ */
+function ensureDomPolyfills() {
+  if (typeof (globalThis as any).DOMMatrix === "undefined") {
+    class DOMMatrix2D {
+      a = 1; b = 0; c = 0; d = 1; e = 0; f = 0;
+      constructor(init?: string | number[]) {
+        if (typeof init === "string" && init.trim()) {
+          const p = init.split(/[\s,]+/).map(Number);
+          if (p.length >= 6) [this.a, this.b, this.c, this.d, this.e, this.f] = p;
+        } else if (Array.isArray(init) && init.length >= 6) {
+          [this.a, this.b, this.c, this.d, this.e, this.f] = init;
+        }
+      }
+      setMatrixValue(v: string) {
+        const p = v.split(/[\s,]+/).map(Number);
+        if (p.length >= 6) [this.a, this.b, this.c, this.d, this.e, this.f] = p;
+        return this;
+      }
+      multiply(other: any) {
+        const m = new DOMMatrix2D();
+        m.a = this.a * other.a + this.c * other.b;
+        m.b = this.b * other.a + this.d * other.b;
+        m.c = this.a * other.c + this.c * other.d;
+        m.d = this.b * other.c + this.d * other.d;
+        m.e = this.a * other.e + this.c * other.f + this.e;
+        m.f = this.b * other.e + this.d * other.f + this.f;
+        return m;
+      }
+      translate(tx: number, ty: number) {
+        this.e += tx; this.f += ty; return this;
+      }
+      scale(sx: number, sy?: number) {
+        const s = sy ?? sx;
+        this.a *= sx; this.b *= s; this.c *= sx; this.d *= s;
+        return this;
+      }
+      rotate(angle: number) {
+        const rad = (angle * Math.PI) / 180;
+        const c = Math.cos(rad), s = Math.sin(rad);
+        const na = this.a * c + this.c * s;
+        const nb = this.b * c + this.d * s;
+        const nc = this.a * -s + this.c * c;
+        const nd = this.b * -s + this.d * c;
+        this.a = na; this.b = nb; this.c = nc; this.d = nd;
+        return this;
+      }
+      transformPoint(pt: any) {
+        return {
+          x: this.a * pt.x + this.c * pt.y + this.e,
+          y: this.b * pt.x + this.d * pt.y + this.f,
+          z: pt.z ?? 0, w: 1,
+        };
+      }
+      inverse() {
+        const det = this.a * this.d - this.b * this.c;
+        if (Math.abs(det) < 1e-12) return new DOMMatrix2D();
+        const m = new DOMMatrix2D();
+        m.a = this.d / det; m.b = -this.b / det;
+        m.c = -this.c / det; m.d = this.a / det;
+        m.e = (this.c * this.f - this.d * this.e) / det;
+        m.f = (this.b * this.e - this.a * this.f) / det;
+        return m;
+      }
+      get m11() { return this.a; }
+      get m12() { return this.b; }
+      get m21() { return this.c; }
+      get m22() { return this.d; }
+      get m41() { return this.e; }
+      get m42() { return this.f; }
+      static fromMatrix(other: any) {
+        const m = new DOMMatrix2D();
+        m.a = other.a; m.b = other.b; m.c = other.c; m.d = other.d; m.e = other.e; m.f = other.f;
+        return m;
+      }
+    }
+    (globalThis as any).DOMMatrix = DOMMatrix2D;
+  }
+  if (typeof (globalThis as any).ImageData === "undefined") {
+    (globalThis as any).ImageData = class ImageDataPolyfill {
+      data: Uint8ClampedArray; width: number; height: number;
+      constructor(
+        dataOrWidth: any,
+        heightOrData?: any,
+        height?: any
+      ) {
+        if (ArrayBuffer.isView(dataOrWidth)) {
+          this.data = new Uint8ClampedArray(
+            dataOrWidth.buffer,
+            dataOrWidth.byteOffset,
+            dataOrWidth.byteLength
+          );
+          this.width = heightOrData;
+          this.height = height ?? 0;
+        } else {
+          this.width = dataOrWidth;
+          this.height = heightOrData;
+          this.data = new Uint8ClampedArray(this.width * this.height * 4);
+        }
+      }
+    };
+  }
+}
+
+/**
  * Coba ekstrak teks dari PDF menggunakan pdfjs-dist.
  * Return { text, errorType, errorDetail }.
  * errorType: null | "SCANNED" | "PASSWORD" | "CORRUPT" | "UNKNOWN"
@@ -11,6 +119,7 @@ async function extractPdfWithPdfjs(buffer: ArrayBuffer): Promise<{
   errorDetail: string | null;
 }> {
   try {
+    ensureDomPolyfills();
     const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
 
     // JANGAN set GlobalWorkerOptions.workerSrc manual:
