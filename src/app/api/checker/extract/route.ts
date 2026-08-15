@@ -1,4 +1,3 @@
-import { readFileSync } from "fs";
 import { ocrImage } from "@/lib/ocr";
 
 /**
@@ -14,12 +13,13 @@ async function extractPdfWithPdfjs(buffer: ArrayBuffer): Promise<{
   try {
     const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
 
-    const workerPath =
-      process.cwd() + "/node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs";
-    const workerContent = readFileSync(workerPath, "utf8");
-    const workerB64 = Buffer.from(workerContent).toString("base64");
-    pdfjs.GlobalWorkerOptions.workerSrc =
-      `data:application/javascript;base64,${workerB64}`;
+    // JANGAN set GlobalWorkerOptions.workerSrc manual:
+    // - Di Node.js, pdfjs legacy build otomatis memakai fake worker,
+    //   jadi tidak perlu worker file sama sekali.
+    // - Memuat worker lewat data:base64 (1.5MB+) sering GAGAL di runtime
+    //   serverless (Vercel) karena path node_modules tidak selalu tersedia
+    //   di process.cwd() / ukuran fungsi. Itu penyebab umum error
+    //   "Gagal membaca file PDF" yang tidak terklasifikasi.
 
     // Convert ArrayBuffer to Uint8Array for pdfjs-dist type compatibility
     const uint8Array = new Uint8Array(buffer);
@@ -236,7 +236,7 @@ export async function POST(request: Request) {
         return buildErrorResponse(
           "SCANNED_PDF",
           "PDF ini tidak memiliki teks yang bisa dipilih (kemungkinan hasil scan/gambar). " +
-            "Solusi: (1) Tempel teks CV langsung di bawah, atau (2) Klik tombol OCR untuk baca dengan AI, atau (3) Konversi ke DOCX.",
+            "Solusi: (1) Klik tombol OCR untuk baca dengan AI, atau (2) Tempel teks CV langsung di bawah, atau (3) Konversi ke DOCX.",
           { suggestPaste: true, suggestOcr: true }
         );
       }
@@ -246,27 +246,25 @@ export async function POST(request: Request) {
         return buildErrorResponse(
           "PDF_PASSWORD_PROTECTED",
           "File PDF dilindungi password. Harap hapus password dari file PDF terlebih dahulu.",
-          { suggestPaste: true }
+          { suggestPaste: true, suggestOcr: true }
         );
       }
 
-      // Corrupted
-      if (result1.errorType === "CORRUPT") {
-        return buildErrorResponse(
-          "PDF_CORRUPT",
-          "File PDF rusak atau tidak valid. Coba buka di browser/PDF viewer untuk memverifikasi, atau gunakan file lain.",
-          { suggestPaste: true }
-        );
-      }
-
-      // Unknown error — give generic message + paste suggestion
-      console.error("[extract] pdfjs-dist unknown error:", result1.errorDetail);
+      // Corrupted / Unknown — selalu tawarkan OCR browser (renders halaman
+      // di browser lalu OCR server-side, jadi bisa membaca scanned PDF yang
+      // gagal diekstrak server). Jangan biarkan user mentok.
+      const isCorrupt = result1.errorType === "CORRUPT";
+      console.error(
+        `[extract] pdfjs-dist ${isCorrupt ? "corrupt" : "unknown"} error:`,
+        result1.errorDetail
+      );
       return buildErrorResponse(
-        "PDF_PARSE_FAILED",
-        "Gagal membaca file PDF. " +
-          "Kemungkinan: (1) PDF hasil scan/gambar — tempel teks langsung, (2) File rusak — coba file lain, " +
-          "(3) Format tidak didukung.",
-        { suggestPaste: true }
+        isCorrupt ? "PDF_CORRUPT" : "PDF_PARSE_FAILED",
+        isCorrupt
+          ? "File PDF rusak atau tidak valid. Coba buka di browser untuk memverifikasi, atau klik tombol OCR di bawah untuk membaca lewat AI."
+          : "Gagal membaca file PDF. " +
+              "Klik tombol OCR di bawah untuk membaca lewat AI, atau tempel teks CV langsung.",
+        { suggestPaste: true, suggestOcr: true }
       );
     }
 
