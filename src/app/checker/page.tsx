@@ -125,23 +125,14 @@ export default function CheckerPage() {
     setError("");
 
     try {
-      // Dynamically import pdfjs-dist from CDN (browser build)
+      // Load pdfjs-dist dari bundle lokal (tidak pakai CDN eksternal —
+      // jsdelivr/unpkg sering diblokir atau lambat di Indonesia).
       setOcrProgress("Memuat engine PDF...");
-      let pdfjs: any;
-      try {
-        const cdnUrl = `https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.296/build/pdf.min.mjs`;
-        pdfjs = await import(cdnUrl);
-      } catch {
-        // CDN fallback — coba unpkg
-        try {
-          const unpkgUrl = `https://unpkg.com/pdfjs-dist@5.4.296/build/pdf.min.mjs`;
-          pdfjs = await import(unpkgUrl);
-        } catch {
-          throw new Error(
-            "Gagal memuat engine PDF. Silakan tempel teks CV manual."
-          );
-        }
-      }
+      const pdfjs: any = await import("pdfjs-dist/build/pdf.mjs");
+      // Worker disajikan dari domain sendiri (public/pdf.worker.min.mjs) —
+      // tidak fetch dari CDN eksternal (jsdelivr/unpkg sering diblokir/lambat
+      // di Indonesia) dan tidak bergantung bundling ?url.
+      pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
       const arrayBuffer = await file.arrayBuffer();
       const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
