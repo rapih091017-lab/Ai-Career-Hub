@@ -32,7 +32,11 @@ export interface LetterData {
 }
 
 const A4_WIDTH_MM = 210;
-const A4_HEIGHT_MM = 261; // 297 - (2 x 18mm margin pdf-server)
+// Tinggi A4 penuh (297mm). Surat di-export dengan margin 0mm (padding elemen
+// A4 yang menyediakan ruang), jadi preview harus 297mm penuh agar MATCH PDF.
+// Sebelumnya 261mm (297 - 2x18mm) membuat preview lebih pendek dari PDF,
+// sehingga PDF punya strip putih di bawah yang tidak terlihat di preview.
+const A4_HEIGHT_MM = 297;
 const MM_TO_PX = 96 / 25.4;
 
 const DEFAULT_FORMAT: NonNullable<LetterTemplate["format"]> = {
@@ -55,6 +59,10 @@ export const LetterPreview = forwardRef<
 
   // ── Scale responsif: ukur lebar container, sesuaikan scale ──
   const wrapRef = useRef<HTMLDivElement>(null);
+  // Tinggi konten AKTUAL elemen A4 (dalam px) — bukan A4_HEIGHT tetap,
+  // karena surat bisa lebih panjang dari satu halaman dan TIDAK boleh
+  // terpotong di bawah. Wrapper height = kontenH * scale.
+  const [contentHeightPx, setContentHeightPx] = useState(A4_HEIGHT_MM * MM_TO_PX);
   const [scale, setScale] = useState(1);
 
   useEffect(() => {
@@ -71,6 +79,21 @@ export const LetterPreview = forwardRef<
     return () => ro.disconnect();
   }, [maxWidth]);
 
+  // Ukur tinggi aktual elemen A4 (follow konten, bukan fixed 261mm).
+  // Pakai max(offsetHeight, scrollHeight): offsetHeight = tinggi item
+  // (bisa dipaksa stretch oleh flex parent height:0), scrollHeight =
+  // tinggi konten penuh — pilih yang lebih besar agar surat panjang TIDAK
+  // terpotong di bawah.
+  useEffect(() => {
+    const el = (ref as React.RefObject<HTMLDivElement | null>).current;
+    if (!el) return;
+    const measure = () => setContentHeightPx(Math.max(el.offsetHeight, el.scrollHeight));
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [ref, letter.content]);
+
   // Pecah paragraf: baris kosong ganda = paragraf baru
   // Guard ?? "" — content bisa null/undefined untuk surat lama / daftar tanpa detail
   const paragraphs = (letter.content ?? "")
@@ -86,7 +109,7 @@ export const LetterPreview = forwardRef<
     <div
       ref={wrapRef}
       className="w-full flex justify-center overflow-hidden"
-      style={{ height: `${A4_HEIGHT_MM * MM_TO_PX * scale}px` }}
+      style={{ height: `${contentHeightPx * scale}px` }}
     >
       <div
         style={{
@@ -96,11 +119,15 @@ export const LetterPreview = forwardRef<
           height: 0,
           display: "flex",
           justifyContent: "center",
+          // align-items flex-start: jangan stretch elemen A4 ke tinggi 0
+          // (parent height:0) — biarkan elemen tumbuh mengikuti isi surat
+          // agar surat panjang tidak terpotong.
+          alignItems: "flex-start",
         }}
       >
         <div
           ref={ref}
-          className="a4-preview shrink-0"
+          className="a4-preview a4-letter shrink-0"
           style={{
             width: `${maxWidth}mm`,
             minHeight: `${A4_HEIGHT_MM}mm`,
@@ -113,6 +140,8 @@ export const LetterPreview = forwardRef<
             lineHeight: 1.6,
             color: "#111111",
             boxSizing: "border-box",
+            height: "auto",
+            overflow: "visible",
           }}
         >
           {isLetterhead ? (

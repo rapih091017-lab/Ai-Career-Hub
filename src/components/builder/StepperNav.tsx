@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslation } from "@/lib/i18n";
+
 interface StepperProps {
   steps: string[];
   activeStep: number;
@@ -74,6 +76,7 @@ export function BottomNav({
   isSaving,
   sectionMeta,
 }: StepperProps & { handleSave: () => void; isSaving: boolean }) {
+  const { t } = useTranslation();
   const iconNames = ["person", "work_history", "work", "school", "groups", "star", "visibility"];
 
   return (
@@ -112,7 +115,7 @@ export function BottomNav({
                 className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-outline/30 text-sm font-medium text-on-surface hover:bg-surface-container-high transition-colors"
               >
                 <span className="material-symbols-outlined text-base">chevron_left</span>
-                <span className="hidden sm:inline">Sebelumnya</span>
+                <span className="hidden sm:inline">{t("builder.prev")}</span>
                 <kbd className="hidden md:inline-flex text-[8px] font-bold text-outline/60 bg-outline-variant/20 px-1 py-0.5 rounded ml-1 border border-outline-variant/30">Ctrl+←</kbd>
               </button>
             )}
@@ -138,7 +141,7 @@ export function BottomNav({
               <button type="button" onClick={() => setActiveStep(Math.min(steps.length - 1, activeStep + 1))}
                 className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-primary text-on-primary text-sm font-medium hover:brightness-110 transition-[filter,transform] active:scale-95"
               >
-                <span className="hidden sm:inline">Selanjutnya</span>
+                <span className="hidden sm:inline">{t("builder.next")}</span>
                 <kbd className="hidden md:inline-flex text-[8px] font-bold text-outline/60 bg-outline-variant/20 px-1 py-0.5 rounded ml-1 border border-outline-variant/30">Ctrl+→</kbd>
                 <span className="material-symbols-outlined text-base">chevron_right</span>
               </button>
@@ -147,7 +150,7 @@ export function BottomNav({
                 className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-primary text-on-primary text-sm font-medium hover:brightness-110 transition-[filter,transform,opacity] disabled:opacity-50 active:scale-95"
               >
                 <span className="material-symbols-outlined text-base">save</span>
-                {isSaving ? "Menyimpan\u2026" : "Simpan CV"}
+                {isSaving ? t("builder.saving") : t("builder.save")}
                 <kbd className="hidden md:inline-flex text-[8px] font-bold text-outline/60 bg-outline-variant/20 px-1 py-0.5 rounded ml-1 border border-outline-variant/30">Ctrl+Enter</kbd>
               </button>
             )}

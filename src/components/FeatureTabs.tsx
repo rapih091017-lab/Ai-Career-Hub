@@ -74,7 +74,7 @@ const TABS: TabData[] = [
     descKey: "features.letters-desc",
     bullets: ["features.letters-b1", "features.letters-b2", "features.letters-b3"],
     ctaKey: "features.letters-cta",
-    href: "/dashboard",
+    href: "/surat-lamaran",
     color: "text-secondary",
     bgColor: "bg-secondary",
   },
@@ -317,7 +317,7 @@ function LetterShowcase({ t }: { t: (key: string) => string }) {
         {/* Surat Lamaran Formal — clickable */}
         <motion.div variants={cardReveal}>
           <Link
-            href="/dashboard"
+            href="/surat-lamaran?style=formal"
             className="block bg-white rounded-xl overflow-hidden border border-outline-variant/20 hover:-translate-y-1 hover:shadow-lg hover:border-emerald-300/40 transition-all duration-300 cursor-pointer group"
           >
             <div className="px-4 pt-4 pb-3 border-b border-outline-variant/10 flex items-center gap-2">
@@ -342,7 +342,7 @@ function LetterShowcase({ t }: { t: (key: string) => string }) {
         {/* Cover Letter ATS — clickable */}
         <motion.div variants={cardReveal}>
           <Link
-            href="/dashboard"
+            href="/surat-lamaran?style=ats"
             className="block bg-white rounded-xl overflow-hidden border border-outline-variant/20 hover:-translate-y-1 hover:shadow-lg hover:border-blue-300/40 transition-all duration-300 cursor-pointer group"
           >
             <div className="px-4 pt-4 pb-3 border-b border-outline-variant/10 flex items-center gap-2">
@@ -366,7 +366,7 @@ function LetterShowcase({ t }: { t: (key: string) => string }) {
         {/* Motivation Letter — clickable */}
         <motion.div variants={cardReveal}>
           <Link
-            href="/dashboard"
+            href="/surat-lamaran?style=motivation"
             className="block bg-white rounded-xl overflow-hidden border border-outline-variant/20 hover:-translate-y-1 hover:shadow-lg hover:border-amber-300/40 transition-all duration-300 cursor-pointer group"
           >
             <div className="px-4 pt-4 pb-3 border-b border-outline-variant/10 flex items-center gap-2">
@@ -573,7 +573,7 @@ export default function FeatureTabs() {
                   <Link
                     href={activeData.href}
                     className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-label-bold transition-all active:scale-[0.97] ${
-                      activeTab === "checker"
+                      activeTab === "checker" || activeTab === "letters"
                         ? `${activeData.bgColor} text-on-primary hover:brightness-110 shadow-md`
                         : "border-2 border-primary/40 text-primary hover:bg-primary/5"
                     }`}

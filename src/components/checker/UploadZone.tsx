@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useToast } from "@/components/ui/toast";
 
 interface UploadZoneProps {
   file: File | null;
@@ -17,12 +18,17 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 export function UploadZone({ file, dragActive, onFileChange, onDragStateChange, label, hint, loading, error }: UploadZoneProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { addToast } = useToast();
 
   const validateAndSet = (f: File | null) => {
     if (!f) return;
     if (f.size > MAX_FILE_SIZE) {
       onFileChange(null);
-      alert("Ukuran file maksimal 10MB. Pilih file yang lebih kecil.");
+      addToast({
+        type: "error",
+        message: "Ukuran file maksimal 10MB. Pilih file yang lebih kecil.",
+        duration: 3000,
+      });
       return;
     }
     onFileChange(f);

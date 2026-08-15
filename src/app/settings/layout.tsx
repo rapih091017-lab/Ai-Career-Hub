@@ -7,7 +7,7 @@ import AppHeader from "@/components/AppHeader";
 import { useTranslation } from "@/lib/i18n";
 
 const MENU_ITEMS = [
-  { labelKey: "settings.profile", icon: "person", href: "/settings/profile" },
+  { labelKey: "settings.profile", icon: "person", href: "/profile" },
   { labelKey: "settings.security", icon: "lock", href: "/settings/security" },
   { labelKey: "settings.billing", icon: "credit_card", href: "/settings/billing" },
   { labelKey: "settings.payment-history", icon: "receipt_long", href: "/settings/payment-history" },

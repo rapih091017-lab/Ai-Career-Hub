@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { AtsScoreRing } from "@/components/builder/AtsScoreRing";
 import MagneticButton from "@/components/MagneticButton";
 import { PdfExportButton } from "@/components/checker/PdfExportButton";
+import { useTranslation } from "@/lib/i18n";
 
 interface FormatToolbarProps {
   cvCompleteness: number;
@@ -46,10 +47,11 @@ export function FormatToolbar({
   onNavigateToCheckout,
   onExportPdf,
 }: FormatToolbarProps) {
+  const { t } = useTranslation();
   return (
     <div className="h-auto px-3 md:px-4 py-2 border-b border-outline-variant/30 flex flex-wrap items-center gap-2 bg-white shadow-sm z-20 shrink-0">
       {/* CV Completeness Bar */}
-      <div className="flex items-center gap-1.5 shrink-0" title={`CV ${cvCompleteness}% lengkap`}>
+      <div className="flex items-center gap-1.5 shrink-0" title={`CV ${cvCompleteness}% ${t("builder.complete")}`}>
         <div className="w-12 h-1.5 bg-outline-variant/30 rounded-full overflow-hidden">
           <div
             className={`h-full rounded-full transition-[width,background-color] duration-500 ${
@@ -79,7 +81,7 @@ export function FormatToolbar({
               {saveStatus === "saving" ? "sync" : saveStatus === "saved" ? "check_circle" : "error"}
             </span>
             <span>
-              {saveStatus === "saving" ? "Menyimpan..." : saveStatus === "saved" ? "Tersimpan" : "Gagal simpan"}
+              {saveStatus === "saving" ? t("builder.saving-short") : saveStatus === "saved" ? t("builder.saved") : t("builder.save-error")}
             </span>
             {saveStatus === "saved" && lastSaved && (
               <span className="text-[9px] text-green-600/60 font-normal ml-0.5">
@@ -106,11 +108,11 @@ export function FormatToolbar({
 
       {/* Font size */}
       <div className="flex items-center gap-1 bg-surface-container-low rounded-lg px-1.5 py-1">
-        <button onClick={() => onFontSizeChange(Math.max(9, fontSize - 1))} className="p-0.5 hover:bg-white rounded text-on-surface-variant" aria-label="Perkecil ukuran font">
+        <button onClick={() => onFontSizeChange(Math.max(9, fontSize - 1))} className="p-0.5 hover:bg-white rounded text-on-surface-variant" aria-label={t("builder.font-small")}>
           <span className="material-symbols-outlined text-sm">remove</span>
         </button>
         <span className="text-xs font-bold w-6 text-center select-none">{fontSize}pt</span>
-        <button onClick={() => onFontSizeChange(Math.min(12, fontSize + 1))} className="p-0.5 hover:bg-white rounded text-on-surface-variant" aria-label="Perbesar ukuran font">
+        <button onClick={() => onFontSizeChange(Math.min(12, fontSize + 1))} className="p-0.5 hover:bg-white rounded text-on-surface-variant" aria-label={t("builder.font-large")}>
           <span className="material-symbols-outlined text-sm">add</span>
         </button>
       </div>
@@ -120,7 +122,7 @@ export function FormatToolbar({
         {(["left", "center", "right", "justify"] as const).map((align) => (
           <button key={align} onClick={() => onTextAlignChange(align)}
             className={`p-1 rounded ${textAlign === align ? "bg-white shadow-sm" : "hover:bg-white/50"}`}
-            title={`Rata ${align === "left" ? "kiri" : align === "center" ? "tengah" : align === "right" ? "kanan" : "kanan kiri"}`}
+            title={align === "left" ? t("builder.align-left") : align === "center" ? t("builder.align-center") : align === "right" ? t("builder.align-right") : t("builder.align-justify")}
           >
             <span className="material-symbols-outlined text-sm">{align === "left" ? "format_align_left" : align === "center" ? "format_align_center" : align === "right" ? "format_align_right" : "format_align_justify"}</span>
           </button>
@@ -130,28 +132,28 @@ export function FormatToolbar({
       {/* Divider toggle */}
       <button onClick={onDividersToggle}
         className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-medium transition-colors ${showDividers ? "bg-primary/10 text-primary" : "bg-surface-container-low text-on-surface-variant hover:bg-surface-variant"}`}
-        title="Tampilkan garis pembatas antar section"
+        title={t("builder.dividers-tip")}
       >
         <span className="material-symbols-outlined text-sm">horizontal_rule</span>
-        <span className="hidden sm:inline">Divider</span>
+        <span className="hidden sm:inline">{t("builder.dividers")}</span>
       </button>
 
       {/* Section order */}
       <button onClick={onOpenSectionOrder}
         className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-medium bg-surface-container-low text-on-surface-variant hover:bg-surface-variant transition-colors"
-        title="Atur urutan section"
+        title={t("builder.section-order-tip")}
       >
         <span className="material-symbols-outlined text-sm">reorder</span>
-        <span className="hidden sm:inline">Urutan</span>
+        <span className="hidden sm:inline">{t("builder.section-order")}</span>
       </button>
 
       {/* Display Settings */}
       <button onClick={onOpenDisplaySettings}
         className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-medium bg-surface-container-low text-on-surface-variant hover:bg-surface-variant transition-colors"
-        title="Pengaturan tampilan CV"
+        title={t("builder.display-tip")}
       >
         <span className="material-symbols-outlined text-sm">palette</span>
-        <span className="hidden sm:inline">Tampilan</span>
+        <span className="hidden sm:inline">{t("builder.display")}</span>
       </button>
 
       {/* AI Revision — FAB Style */}
@@ -159,11 +161,11 @@ export function FormatToolbar({
         <button onClick={onNavigateToCheckout}
           className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow-md overflow-hidden"
           style={{ background: "linear-gradient(135deg, #00897B, #26A69A)" }}
-          title="Optimalkan CV dengan AI"
+          title={t("builder.ai-opt-tip")}
         >
           <span className={`absolute inset-0 rounded-lg ${reducedMotion ? "opacity-30" : "animate-ping"} opacity-30`} style={{ background: "linear-gradient(135deg, #00897B, #26A69A)" }} />
           <span className="material-symbols-outlined text-sm relative z-10" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
-          <span className="relative z-10 hidden sm:inline">AI Rev</span>
+          <span className="relative z-10 hidden sm:inline">{t("builder.ai-opt")}</span>
         </button>
       </MagneticButton>
 

@@ -6,10 +6,12 @@ import { useRouter } from "next/navigation";
 import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
 import AuthGuard from "@/components/AuthGuard";
-import { QCategoryIcon } from "@/components/interview/QCategoryIcon";
+import { useToast } from "@/components/ui/toast";
+import { QCategoryIcon, getQCategoryFilters } from "@/components/interview/QCategoryIcon";
+import { useTranslation } from "@/lib/i18n";
 import {
-  POSITION_QUESTIONS,
-  QUESTION_CATEGORIES,
+  getInterviewPositions,
+  getInterviewCategories,
   getDifficulty,
   type InterviewQuestion,
   type PositionQuestions,
@@ -34,24 +36,24 @@ interface SessionResult {
 }
 
 type RatingOption = "good" | "okay" | "weak";
-const RATING_OPTIONS: { value: RatingOption; label: string; icon: string; color: string }[] = [
-  { value: "good", label: "Udah Bisa", icon: "check_circle", color: "bg-emerald-100 text-emerald-700 border-emerald-300 hover:bg-emerald-200" },
-  { value: "okay", label: "Kurang", icon: "trending_flat", color: "bg-amber-100 text-amber-700 border-amber-300 hover:bg-amber-200" },
-  { value: "weak", label: "Belum", icon: "highlight_off", color: "bg-red-100 text-red-700 border-red-300 hover:bg-red-200" },
+const RATING_OPTIONS: { value: RatingOption; labelId: string; labelEn: string; icon: string; color: string }[] = [
+  { value: "good", labelId: "Udah Bisa", labelEn: "Good", icon: "check_circle", color: "bg-emerald-100 text-emerald-700 border-emerald-300 hover:bg-emerald-200" },
+  { value: "okay", labelId: "Kurang", labelEn: "Fair", icon: "trending_flat", color: "bg-amber-100 text-amber-700 border-amber-300 hover:bg-amber-200" },
+  { value: "weak", labelId: "Belum", labelEn: "Not Yet", icon: "highlight_off", color: "bg-red-100 text-red-700 border-red-300 hover:bg-red-200" },
 ];
 
-const DIFFICULTY_LABELS: Record<string, { label: string; icon: string; color: string }> = {
-  easy: { label: "Mudah", icon: "signal_cellular_alt_1_bar", color: "bg-emerald-100 text-emerald-700" },
-  medium: { label: "Sedang", icon: "signal_cellular_alt_2_bar", color: "bg-amber-100 text-amber-700" },
-  hard: { label: "Sulit", icon: "signal_cellular_alt_3_bar", color: "bg-red-100 text-red-700" },
+const DIFFICULTY_LABELS: Record<string, { labelId: string; labelEn: string; icon: string; color: string }> = {
+  easy: { labelId: "Mudah", labelEn: "Easy", icon: "signal_cellular_alt_1_bar", color: "bg-emerald-100 text-emerald-700" },
+  medium: { labelId: "Sedang", labelEn: "Medium", icon: "signal_cellular_alt_2_bar", color: "bg-amber-100 text-amber-700" },
+  hard: { labelId: "Sulit", labelEn: "Hard", icon: "signal_cellular_alt_3_bar", color: "bg-red-100 text-red-700" },
 };
 
 /* ── Timer Options ── */
-const TIMER_OPTIONS: { value: TimerOption; label: string }[] = [
-  { value: 60, label: "1 menit" },
-  { value: 120, label: "2 menit" },
-  { value: 180, label: "3 menit" },
-  { value: 300, label: "5 menit" },
+const TIMER_OPTIONS: { value: TimerOption; labelId: string; labelEn: string }[] = [
+  { value: 60, labelId: "1 menit", labelEn: "1 min" },
+  { value: 120, labelId: "2 menit", labelEn: "2 min" },
+  { value: 180, labelId: "3 menit", labelEn: "3 min" },
+  { value: 300, labelId: "5 menit", labelEn: "5 min" },
 ];
 
 /* ── Practice Setup Screen ── */
@@ -80,9 +82,12 @@ function SetupScreen({
   onStart: () => void;
   onQuickStart: () => void;
 }) {
+  const { lang } = useTranslation();
+  const allPositions = getInterviewPositions(lang);
+  const categories = getInterviewCategories(lang);
   const totalSelected = selectedPositions.size;
   const totalQuestions = useMemo(() => {
-    return POSITION_QUESTIONS.filter((p) => selectedPositions.has(p.id))
+    return allPositions.filter((p) => selectedPositions.has(p.id))
       .reduce((acc, p) => {
         let qs = p.questions;
         if (!selectedCategories.has("all")) {
@@ -90,21 +95,22 @@ function SetupScreen({
         }
         return acc + qs.length;
       }, 0);
-  }, [selectedPositions, selectedCategories]);
+  }, [allPositions, selectedPositions, selectedCategories]);
 
   return (
     <div className="max-w-[600px] mx-auto">
       <div className="text-center mb-10">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold mb-4 border border-emerald-200">
           <span className="material-symbols-outlined text-[14px]">play_circle</span>
-          Latihan Interview
+          {lang === "en" ? "Interview Practice" : "Latihan Interview"}
         </div>
         <h1 className="text-[28px] md:text-[36px] font-bold tracking-tight text-on-background mb-3">
-          Mode Latihan
+          {lang === "en" ? "Practice Mode" : "Mode Latihan"}
         </h1>
         <p className="text-sm text-on-surface-variant max-w-[400px] mx-auto">
-          Pilih posisi dan atur timer. Dapatkan pertanyaan acak dan latih
-          jawabanmu seperti wawancara sungguhan.
+          {lang === "en"
+            ? "Pick a position and set a timer. Get random questions and practice answering like a real interview."
+            : "Pilih posisi dan atur timer. Dapatkan pertanyaan acak dan latih jawabanmu seperti wawancara sungguhan."}
         </p>
       </div>
 
@@ -113,9 +119,9 @@ function SetupScreen({
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-bold text-on-surface flex items-center gap-2">
             <span className="w-6 h-6 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center">1</span>
-            Pilih Posisi
+            {lang === "en" ? "Choose Position" : "Pilih Posisi"}
             <span className="text-[10px] text-on-surface-variant font-normal">
-              ({totalSelected} dipilih)
+              ({totalSelected} {lang === "en" ? "selected" : "dipilih"})
             </span>
           </h2>
           {totalSelected > 0 && (
@@ -124,14 +130,14 @@ function SetupScreen({
               className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-semibold text-outline hover:text-red-600 hover:bg-red-50 transition-all border border-transparent hover:border-red-200"
             >
               <span className="material-symbols-outlined text-[11px]">clear</span>
-              Hapus Semua
+              {lang === "en" ? "Clear All" : "Hapus Semua"}
             </button>
           )}
         </div>
 
         <div className="space-y-2">
-          {QUESTION_CATEGORIES.map((cat) => {
-            const positions = POSITION_QUESTIONS.filter((p) => p.categorySlug === cat.slug);
+          {categories.map((cat) => {
+            const positions = allPositions.filter((p) => p.categorySlug === cat.slug);
             if (positions.length === 0) return null;
             const catSelected = positions.every((p) => selectedPositions.has(p.id));
 
@@ -164,24 +170,26 @@ function SetupScreen({
                     <span className={`text-[9px] font-medium ${
                       catSelected ? "text-outline" : "text-primary"
                     }`}>
-                      {catSelected ? "Hapus Semua" : "Pilih Semua"}
+                      {catSelected
+                        ? (lang === "en" ? "Clear All" : "Hapus Semua")
+                        : (lang === "en" ? "Select All" : "Pilih Semua")}
                     </span>
                   </div>
                 </button>
 
-                <div className="px-2 pb-2 pt-1 flex flex-wrap gap-1.5">
+                <div className="px-2 pb-2 pt-1 grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                   {positions.map((pos) => (
                     <button
                       key={pos.id}
                       onClick={() => onTogglePosition(pos.id)}
-                      className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold border transition-all ${
+                      className={`flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-[10px] font-semibold border transition-all text-left ${
                         selectedPositions.has(pos.id)
                           ? "bg-primary text-on-primary border-primary"
                           : "bg-white text-on-surface-variant border-outline-variant/40 hover:border-primary/30"
                       }`}
                     >
-                      <span className="material-symbols-outlined text-[11px]">{pos.icon}</span>
-                      {pos.title}
+                      <span className="material-symbols-outlined text-[11px] shrink-0">{pos.icon}</span>
+                      <span className="truncate">{pos.title}</span>
                     </button>
                   ))}
                 </div>
@@ -191,73 +199,64 @@ function SetupScreen({
         </div>
       </section>
 
-      {/* ── Step 2: Filter Kategori Pertanyaan ── */}
-      <section className="mb-8">
-        <h2 className="text-sm font-bold text-on-surface mb-3 flex items-center gap-2">
-          <span className="w-6 h-6 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center">2</span>
-          Kategori Pertanyaan
-        </h2>
-        <div className="flex flex-wrap gap-2">
-          {[
-            { slug: "all", label: "Semua", color: "bg-surface-container-low text-on-surface-variant" },
-            { slug: "hr", label: "HR / General", color: "bg-purple-100 text-purple-700 border-purple-200" },
-            { slug: "technical", label: "Teknis", color: "bg-blue-100 text-blue-700 border-blue-200" },
-            { slug: "role-specific", label: "Role-Specific", color: "bg-emerald-100 text-emerald-700 border-emerald-200" },
-          ].map((cat) => (
-            <button
-              key={cat.slug}
-              onClick={() => {
-                onToggleCategory(cat.slug);
-                if (cat.slug === "all") {
-                  // Unselect all others
-                }
-              }}
-              className={`px-3 py-1.5 rounded-lg text-[10px] font-semibold border transition-all ${
-                selectedCategories.has(cat.slug)
-                  ? "bg-primary text-on-primary border-primary"
-                  : cat.color + " border-outline-variant/40 hover:border-primary/30"
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
-      </section>
+      {/* ── Step 2+3: Filter Kategori & Kesulitan (berdampingan di desktop) ── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <section>
+          <h2 className="text-sm font-bold text-on-surface mb-3 flex items-center gap-2">
+            <span className="w-6 h-6 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center">2</span>
+            {lang === "en" ? "Question Category" : "Kategori Pertanyaan"}
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {getQCategoryFilters(lang).map((cat) => (
+              <button
+                key={cat.slug}
+                onClick={() => onToggleCategory(cat.slug)}
+                className={`px-3 py-1.5 rounded-lg text-[10px] font-semibold border transition-all ${
+                  selectedCategories.has(cat.slug)
+                    ? "bg-primary text-on-primary border-primary"
+                    : cat.color + " border-outline-variant/40 hover:border-primary/30"
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+        </section>
 
-      {/* ── Step 3: Filter Kesulitan ── */}
-      <section className="mb-8">
-        <h2 className="text-sm font-bold text-on-surface mb-3 flex items-center gap-2">
-          <span className="w-6 h-6 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center">3</span>
-          Tingkat Kesulitan
-        </h2>
-        <div className="flex flex-wrap gap-2">
-          {[
-            { slug: "all", label: "Semua" },
-            { slug: "easy", label: "Mudah", icon: "signal_cellular_alt_1_bar" },
-            { slug: "medium", label: "Sedang", icon: "signal_cellular_alt_2_bar" },
-            { slug: "hard", label: "Sulit", icon: "signal_cellular_alt_3_bar" },
-          ].map((d) => (
-            <button
-              key={d.slug}
-              onClick={() => onToggleDifficulty(d.slug)}
-              className={`px-3 py-1.5 rounded-lg text-[10px] font-semibold border transition-all flex items-center gap-1 ${
-                selectedDifficulties.has(d.slug)
-                  ? "bg-primary text-on-primary border-primary"
-                  : "bg-white text-on-surface-variant border-outline-variant/40 hover:border-primary/30"
-              }`}
-            >
-              {d.icon && <span className="material-symbols-outlined text-[11px]">{d.icon}</span>}
-              {d.label}
-            </button>
-          ))}
-        </div>
-      </section>
+        <section>
+          <h2 className="text-sm font-bold text-on-surface mb-3 flex items-center gap-2">
+            <span className="w-6 h-6 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center">3</span>
+            {lang === "en" ? "Difficulty" : "Tingkat Kesulitan"}
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { slug: "all", label: lang === "en" ? "All" : "Semua" },
+              { slug: "easy", label: lang === "en" ? "Easy" : "Mudah", icon: "signal_cellular_alt_1_bar" },
+              { slug: "medium", label: lang === "en" ? "Medium" : "Sedang", icon: "signal_cellular_alt_2_bar" },
+              { slug: "hard", label: lang === "en" ? "Hard" : "Sulit", icon: "signal_cellular_alt_3_bar" },
+            ].map((d) => (
+              <button
+                key={d.slug}
+                onClick={() => onToggleDifficulty(d.slug)}
+                className={`px-3 py-1.5 rounded-lg text-[10px] font-semibold border transition-all flex items-center gap-1 ${
+                  selectedDifficulties.has(d.slug)
+                    ? "bg-primary text-on-primary border-primary"
+                    : "bg-white text-on-surface-variant border-outline-variant/40 hover:border-primary/30"
+                }`}
+              >
+                {d.icon && <span className="material-symbols-outlined text-[11px]">{d.icon}</span>}
+                {d.label}
+              </button>
+            ))}
+          </div>
+        </section>
+      </div>
 
       {/* ── Step 4: Timer ── */}
       <section className="mb-6">
         <h2 className="text-sm font-bold text-on-surface mb-3 flex items-center gap-2">
           <span className="w-6 h-6 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center">4</span>
-          Timer per Pertanyaan
+          {lang === "en" ? "Timer per Question" : "Timer per Pertanyaan"}
         </h2>
         <div className="flex gap-2">
           {TIMER_OPTIONS.map((opt) => (
@@ -270,23 +269,33 @@ function SetupScreen({
                   : "bg-white text-on-surface-variant border-outline-variant/40 hover:border-primary/30"
               }`}
             >
-              {opt.label}
+              {lang === "en" ? opt.labelEn : opt.labelId}
             </button>
           ))}
         </div>
       </section>
 
       {/* ── Action Buttons ── */}
+      {totalSelected > 0 && totalQuestions === 0 && (
+        <div className="mb-3 p-3 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-2">
+          <span className="material-symbols-outlined text-amber-600 text-base mt-0.5">info</span>
+          <p className="text-[11px] text-amber-800">
+            {lang === "en"
+              ? "The selected category & difficulty combination produces no questions. Try different filters or add positions."
+              : "Kombinasi kategori & kesulitan yang dipilih tidak menghasilkan pertanyaan. Coba pilih ulang filter atau tambah posisi."}
+          </p>
+        </div>
+      )}
       <div className="space-y-3">
         <button
           onClick={onStart}
-          disabled={totalSelected === 0}
+          disabled={totalSelected === 0 || totalQuestions === 0}
           className="w-full py-3.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed bg-primary text-white hover:opacity-90 active:scale-[0.98] shadow-premium-md"
         >
           <span className="material-symbols-outlined text-lg">play_arrow</span>
-          Mulai Latihan
+          {lang === "en" ? "Start Practice" : "Mulai Latihan"}
           {totalSelected > 0 && (
-            <span className="text-[10px] opacity-80">({totalQuestions} pertanyaan)</span>
+            <span className="text-[10px] opacity-80">({totalQuestions} {lang === "en" ? "questions" : "pertanyaan"})</span>
           )}
         </button>
 
@@ -301,7 +310,7 @@ function SetupScreen({
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           />
           <span className="material-symbols-outlined text-lg relative z-10">bolt</span>
-          <span className="relative z-10">Quick Start · Pilihkan Acak</span>
+          <span className="relative z-10">{lang === "en" ? "Quick Start · Pick Randomly" : "Quick Start · Pilihkan Acak"}</span>
         </button>
       </div>
     </div>
@@ -338,6 +347,7 @@ function RunningScreen({
   onEnd: () => void;
   onRate: (qId: string, rating: RatingOption) => void;
 }) {
+  const { lang } = useTranslation();
   const diff = getDifficulty(currentQuestion.question);
   const diffMeta = DIFFICULTY_LABELS[diff];
 
@@ -368,7 +378,7 @@ function RunningScreen({
             <span className="material-symbols-outlined text-outline text-lg">close</span>
           </button>
           <div>
-            <p className="text-[10px] text-on-surface-variant">Progress</p>
+            <p className="text-[10px] text-on-surface-variant">{lang === "en" ? "Progress" : "Progress"}</p>
             <p className="text-xs font-bold text-on-surface">
               {questionIndex + 1} / {totalQuestions}
             </p>
@@ -409,7 +419,7 @@ function RunningScreen({
           >
             <p className="text-sm font-bold text-red-700 flex items-center justify-center gap-2">
               <span className="material-symbols-outlined text-lg">timer_off</span>
-              Waktu habis! Menampilkan jawaban...
+              {lang === "en" ? "Time's up! Showing the answer..." : "Waktu habis! Menampilkan jawaban..."}
             </p>
           </motion.div>
         )}
@@ -438,7 +448,7 @@ function RunningScreen({
             {/* Difficulty badge */}
             <span className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[9px] font-semibold ${diffMeta.color}`}>
               <span className="material-symbols-outlined text-[10px]">{diffMeta.icon}</span>
-              {diffMeta.label}
+              {lang === "en" ? diffMeta.labelEn : diffMeta.labelId}
             </span>
             <div className="ml-auto">
               <QCategoryIcon cat={currentQuestion.question.category} />
@@ -464,7 +474,7 @@ function RunningScreen({
                 <div className="px-5 py-4 space-y-3">
                   <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wider flex items-center gap-1">
                     <span className="material-symbols-outlined text-[12px]">lightbulb</span>
-                    Jawaban Referensi
+                    {lang === "en" ? "Reference Answer" : "Jawaban Referensi"}
                   </p>
                   <div className="p-3.5 bg-surface-container-low rounded-xl border-l-2 border-primary">
                     <p className="text-xs text-on-surface leading-relaxed whitespace-pre-line">
@@ -489,10 +499,22 @@ function RunningScreen({
                     </div>
                   )}
 
+                  {currentQuestion.question.followUp && (
+                    <div className="bg-blue-50 rounded-xl p-3 border border-blue-200">
+                      <p className="text-[10px] font-bold text-blue-700 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[12px]">forum</span>
+                        Pertanyaan Lanjutan
+                      </p>
+                      <p className="text-[11px] text-blue-800 leading-relaxed">
+                        {currentQuestion.question.followUp}
+                      </p>
+                    </div>
+                  )}
+
                   {/* ── Self Rating ── */}
                   <div className="pt-2 border-t border-outline-variant/20">
                     <p className="text-[10px] font-bold text-on-surface-variant mb-2 text-center">
-                      Bagaimana jawabanmu?
+                      {lang === "en" ? "How was your answer?" : "Bagaimana jawabanmu?"}
                     </p>
                     <div className="flex gap-2 justify-center">
                       {RATING_OPTIONS.map((opt) => {
@@ -508,7 +530,7 @@ function RunningScreen({
                             }`}
                           >
                             <span className="material-symbols-outlined text-[12px]">{opt.icon}</span>
-                            {opt.label}
+                            {lang === "en" ? opt.labelEn : opt.labelId}
                           </button>
                         );
                       })}
@@ -516,7 +538,9 @@ function RunningScreen({
                   </div>
 
                   <div className="text-[10px] text-on-surface-variant text-center pt-1">
-                    Gunakan sebagai referensi. Jawab dengan kata-katamu sendiri!
+                    {lang === "en"
+                      ? "Use as a reference. Answer in your own words!"
+                      : "Gunakan sebagai referensi. Jawab dengan kata-katamu sendiri!"}
                   </div>
                 </div>
               </motion.div>
@@ -539,7 +563,7 @@ function RunningScreen({
                 >
                   <span className="flex items-center justify-center gap-1.5">
                     <span className="material-symbols-outlined text-[14px]">lightbulb</span>
-                    Lihat Jawaban
+                    {lang === "en" ? "Show Answer" : "Lihat Jawaban"}
                   </span>
                 </button>
               </>
@@ -549,7 +573,9 @@ function RunningScreen({
                 className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-primary text-white hover:opacity-90 active:scale-[0.98] transition-all"
               >
                 <span className="flex items-center justify-center gap-1.5">
-                  {questionIndex + 1 < totalQuestions ? "Pertanyaan Selanjutnya" : "Lihat Hasil"}
+                  {questionIndex + 1 < totalQuestions
+                    ? (lang === "en" ? "Next Question" : "Pertanyaan Selanjutnya")
+                    : (lang === "en" ? "View Results" : "Lihat Hasil")}
                   <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
                 </span>
               </button>
@@ -559,7 +585,7 @@ function RunningScreen({
               onClick={onEnd}
               className="px-4 py-2.5 rounded-xl text-xs font-semibold bg-surface-container-low text-on-surface-variant hover:bg-surface-container-hover transition-all"
             >
-              Akhiri
+              {lang === "en" ? "End" : "Akhiri"}
             </button>
           </div>
         </motion.div>
@@ -607,10 +633,49 @@ function FinishedScreen({
   const okay = results.filter((r) => r.rating === "okay").length;
   const weak = results.filter((r) => r.rating === "weak").length;
 
+  const router = useRouter();
+  const { lang } = useTranslation();
+  const { addToast } = useToast();
+  const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
+  const [copied, setCopied] = useState(false);
+
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60);
     const sec = s % 60;
     return `${m}m ${sec}d`;
+  };
+
+  const handleShare = async () => {
+    const en = lang === "en";
+    const lines = en
+      ? [
+          "🎯 Finished an interview practice session on AI Career Hub!",
+          `Answered ${answered} of ${totalQuestions} questions in ${formatTime(totalTime)}.`,
+        ]
+      : [
+          "🎯 Selesai latihan interview di AI Career Hub!",
+          `Jawab ${answered} dari ${totalQuestions} pertanyaan dalam ${formatTime(totalTime)}.`,
+        ];
+    if (rated > 0) {
+      lines.push(en
+        ? `Self evaluation: ${good} good, ${okay} fair, ${weak} not yet.`
+        : `Evaluasi diri: ${good} udah bisa, ${okay} kurang, ${weak} belum.`);
+    }
+    lines.push(en
+      ? "Free practice at https://aicareerhub.com/interview"
+      : "Latihan gratis di https://aicareerhub.com/interview");
+    try {
+      await navigator.clipboard.writeText(lines.join("\n"));
+      setCopied(true);
+      addToast({
+        type: "success",
+        message: en ? "Results copied! Just paste into chat/WA." : "Hasil disalin! Tinggal paste ke chat/WA.",
+        duration: 2500,
+      });
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      addToast({ type: "error", message: en ? "Failed to copy results" : "Gagal menyalin hasil" });
+    }
   };
 
   return (
@@ -618,24 +683,28 @@ function FinishedScreen({
       <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
         <span className="material-symbols-outlined text-emerald-600 text-3xl">check_circle</span>
       </div>
-      <h1 className="text-2xl font-bold text-on-background mb-2">Sesi Selesai!</h1>
+      <h1 className="text-2xl font-bold text-on-background mb-2">
+        {lang === "en" ? "Session Complete!" : "Sesi Selesai!"}
+      </h1>
       <p className="text-sm text-on-surface-variant mb-8">
-        Kamu telah menyelesaikan sesi latihan interview.
+        {lang === "en"
+          ? "You've completed your interview practice session."
+          : "Kamu telah menyelesaikan sesi latihan interview."}
       </p>
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3 mb-8">
         <div className="bg-white rounded-xl p-4 border border-outline-variant/30 shadow-premium-sm">
           <p className="text-xl font-bold text-on-surface">{totalQuestions}</p>
-          <p className="text-[9px] text-on-surface-variant mt-0.5">Total Pertanyaan</p>
+          <p className="text-[9px] text-on-surface-variant mt-0.5">{lang === "en" ? "Total Questions" : "Total Pertanyaan"}</p>
         </div>
         <div className="bg-white rounded-xl p-4 border border-outline-variant/30 shadow-premium-sm">
           <p className="text-xl font-bold text-on-surface">{answered}</p>
-          <p className="text-[9px] text-on-surface-variant mt-0.5">Lihat Jawaban</p>
+          <p className="text-[9px] text-on-surface-variant mt-0.5">{lang === "en" ? "Answers Shown" : "Lihat Jawaban"}</p>
         </div>
         <div className="bg-white rounded-xl p-4 border border-outline-variant/30 shadow-premium-sm">
           <p className="text-xl font-bold text-on-surface">{formatTime(totalTime)}</p>
-          <p className="text-[9px] text-on-surface-variant mt-0.5">Total Waktu</p>
+          <p className="text-[9px] text-on-surface-variant mt-0.5">{lang === "en" ? "Total Time" : "Total Waktu"}</p>
         </div>
       </div>
 
@@ -643,12 +712,12 @@ function FinishedScreen({
       {rated > 0 && (
         <div className="bg-white rounded-xl border border-outline-variant/30 shadow-premium-sm p-4 mb-8 text-left">
           <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-3">
-            Evaluasi Diri ({rated} dinilai)
+            {lang === "en" ? `Self Evaluation (${rated} rated)` : `Evaluasi Diri (${rated} dinilai)`}
           </p>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-              <span className="text-[11px] text-on-surface-variant flex-1">Udah Bisa</span>
+              <span className="text-[11px] text-on-surface-variant flex-1">{lang === "en" ? "Good" : "Udah Bisa"}</span>
               <span className="text-xs font-bold text-on-surface tabular-nums">{good}</span>
               <span className="text-[10px] text-on-surface-variant tabular-nums">
                 ({totalQuestions > 0 ? Math.round((good / rated) * 100) : 0}%)
@@ -656,7 +725,7 @@ function FinishedScreen({
             </div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
-              <span className="text-[11px] text-on-surface-variant flex-1">Kurang</span>
+              <span className="text-[11px] text-on-surface-variant flex-1">{lang === "en" ? "Fair" : "Kurang"}</span>
               <span className="text-xs font-bold text-on-surface tabular-nums">{okay}</span>
               <span className="text-[10px] text-on-surface-variant tabular-nums">
                 ({totalQuestions > 0 ? Math.round((okay / rated) * 100) : 0}%)
@@ -664,7 +733,7 @@ function FinishedScreen({
             </div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
-              <span className="text-[11px] text-on-surface-variant flex-1">Belum</span>
+              <span className="text-[11px] text-on-surface-variant flex-1">{lang === "en" ? "Not Yet" : "Belum"}</span>
               <span className="text-xs font-bold text-on-surface tabular-nums">{weak}</span>
               <span className="text-[10px] text-on-surface-variant tabular-nums">
                 ({totalQuestions > 0 ? Math.round((weak / rated) * 100) : 0}%)
@@ -674,45 +743,120 @@ function FinishedScreen({
         </div>
       )}
 
-      {/* Question history */}
-      <div className="bg-white rounded-xl border border-outline-variant/30 shadow-premium-sm mb-8 text-left">
-        <div className="px-4 py-3 border-b border-outline-variant/20">
-          <p className="text-xs font-bold text-on-surface">Riwayat Pertanyaan</p>
+      {/* Question history — klik untuk review jawaban */}
+      <div className="bg-white rounded-xl border border-outline-variant/30 shadow-premium-sm mb-6 text-left">
+        <div className="px-4 py-3 border-b border-outline-variant/20 flex items-center justify-between">
+          <p className="text-xs font-bold text-on-surface">{lang === "en" ? "Question History" : "Riwayat Pertanyaan"}</p>
+          <span className="text-[9px] text-on-surface-variant">{lang === "en" ? "Click to view answer" : "Klik untuk lihat jawaban"}</span>
         </div>
-        <div className="divide-y divide-outline-variant/10 max-h-[240px] overflow-y-auto">
-          {results.map((r, i) => (
-            <div key={i} className="px-4 py-2.5 flex items-start gap-3">
-              <span className="shrink-0 w-5 h-5 rounded-full bg-primary/10 text-primary text-[9px] font-bold flex items-center justify-center mt-0.5">
-                {i + 1}
-              </span>
-              <div className="flex-1 min-w-0">
-                <p className="text-[11px] font-medium text-on-surface truncate">
-                  {r.question.question.question}
-                </p>
-                <p className="text-[9px] text-on-surface-variant mt-0.5 flex items-center gap-2 flex-wrap">
-                  <span>{r.question.positionTitle}</span>
-                  <span>·</span>
-                  <span>{formatTime(r.timeSpent)}</span>
-                  {r.revealedAnswer && (
-                    <>
+        <div className="divide-y divide-outline-variant/10 max-h-[320px] overflow-y-auto">
+          {results.map((r, i) => {
+            const open = expandedIdx === i;
+            return (
+              <div key={i} className={open ? "bg-surface-container-low/60" : ""}>
+                <button
+                  onClick={() => setExpandedIdx(open ? null : i)}
+                  className="w-full px-4 py-2.5 flex items-start gap-3 text-left hover:bg-surface-container-low transition-colors"
+                  aria-expanded={open}
+                >
+                  <span className="shrink-0 w-5 h-5 rounded-full bg-primary/10 text-primary text-[9px] font-bold flex items-center justify-center mt-0.5">
+                    {i + 1}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] font-medium text-on-surface truncate">
+                      {r.question.question.question}
+                    </p>
+                    <p className="text-[9px] text-on-surface-variant mt-0.5 flex items-center gap-2 flex-wrap">
+                      <span>{r.question.positionTitle}</span>
                       <span>·</span>
-                      <span className="text-emerald-600">Lihat jawaban</span>
-                    </>
+                      <span>{formatTime(r.timeSpent)}</span>
+                      {r.revealedAnswer && (
+                        <>
+                          <span>·</span>
+                          <span className="text-emerald-600">Lihat jawaban</span>
+                        </>
+                      )}
+                      {r.rating && (
+                        <span className={`text-[8px] font-semibold px-1.5 py-0.5 rounded-full ${
+                          r.rating === "good" ? "bg-emerald-100 text-emerald-700" :
+                          r.rating === "okay" ? "bg-amber-100 text-amber-700" :
+                          "bg-red-100 text-red-700"
+                        }`}>
+                          {r.rating === "good" ? "✅" : r.rating === "okay" ? "🔄" : "❌"}
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                  <span
+                    className={`material-symbols-outlined text-outline text-sm shrink-0 mt-0.5 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+                  >
+                    expand_more
+                  </span>
+                </button>
+                <AnimatePresence initial={false}>
+                  {open && (
+                    <motion.div
+                      key="answer"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25, ease: "easeInOut" }}
+                      className="overflow-hidden"
+                    >
+                      <div className="px-4 pb-3 pl-12 space-y-2">
+                        <div className="p-3 bg-white rounded-lg border-l-2 border-primary">
+                          <p className="text-[11px] text-on-surface leading-relaxed whitespace-pre-line">
+                            {r.question.question.answer}
+                          </p>
+                        </div>
+                        {r.question.question.followUp && (
+                          <p className="text-[10px] text-blue-700 bg-blue-50 rounded-lg p-2 border border-blue-200 leading-relaxed">
+                            <strong>{lang === "en" ? "Follow-up: " : "Pertanyaan lanjutan: "}</strong>
+                            {r.question.question.followUp}
+                          </p>
+                        )}
+                      </div>
+                    </motion.div>
                   )}
-                  {r.rating && (
-                    <span className={`text-[8px] font-semibold px-1.5 py-0.5 rounded-full ${
-                      r.rating === "good" ? "bg-emerald-100 text-emerald-700" :
-                      r.rating === "okay" ? "bg-amber-100 text-amber-700" :
-                      "bg-red-100 text-red-700"
-                    }`}>
-                      {r.rating === "good" ? "✅" : r.rating === "okay" ? "🔄" : "❌"}
-                    </span>
-                  )}
-                </p>
+                </AnimatePresence>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
+      </div>
+
+      {/* Share result */}
+      <button
+        onClick={handleShare}
+        className="w-full mb-3 py-3 rounded-xl text-xs font-bold bg-white border border-emerald-500 text-emerald-600 hover:bg-emerald-50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-premium-sm"
+      >
+        <span className="material-symbols-outlined text-[16px]">{copied ? "check" : "share"}</span>
+        {copied
+          ? (lang === "en" ? "Copied!" : "Tersalin!")
+          : (lang === "en" ? "Share Practice Results" : "Bagikan Hasil Latihan")}
+      </button>
+
+      {/* Cross-sell — CTA ke Checker CV */}
+      <div className="mb-6 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white p-5 text-left shadow-premium-md">
+        <p className="text-[10px] font-bold uppercase tracking-wider text-white/80 mb-1 flex items-center gap-1.5">
+          <span className="material-symbols-outlined text-[12px]">auto_awesome</span>
+          {lang === "en" ? "Next Step" : "Langkah Berikutnya"}
+        </p>
+        <p className="text-sm font-bold mb-1">
+          {lang === "en" ? "Is your CV ready to use?" : "CV kamu sudah siap untuk dipakai?"}
+        </p>
+        <p className="text-[11px] text-white/85 leading-relaxed mb-3">
+          {lang === "en"
+            ? "Check your CV's ATS score and get specific improvement tips."
+            : "Cek skor ATS CV kamu dan dapatkan saran perbaikan yang spesifik."}
+        </p>
+        <button
+          onClick={() => router.push("/checker")}
+          className="w-full py-2.5 rounded-xl bg-white text-emerald-600 text-xs font-bold hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
+        >
+          {lang === "en" ? "Check My CV Now" : "Cek CV Sekarang"}
+          <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+        </button>
       </div>
 
       {/* Actions */}
@@ -721,14 +865,14 @@ function FinishedScreen({
           onClick={onBack}
           className="flex-1 py-3 rounded-xl text-xs font-semibold bg-surface-container-low text-on-surface-variant hover:bg-surface-container-hover transition-all border border-outline-variant/40"
         >
-          Kembali
+          {lang === "en" ? "Back" : "Kembali"}
         </button>
         <button
           onClick={onRestart}
           className="flex-1 py-3 rounded-xl text-xs font-bold bg-primary text-white hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
         >
           <span className="material-symbols-outlined text-[14px]">refresh</span>
-          Latihan Lagi
+          {lang === "en" ? "Practice Again" : "Latihan Lagi"}
         </button>
       </div>
     </div>
@@ -738,6 +882,7 @@ function FinishedScreen({
 /* ── Main Practice Page ── */
 export default function PracticePage() {
   const router = useRouter();
+  const { lang } = useTranslation();
 
   // ── Deteksi apakah URL punya ?position=xxx — untuk auto-start ──
   const [hasAutoStartParam] = useState(() => {
@@ -754,7 +899,7 @@ export default function PracticePage() {
       const params = new URLSearchParams(window.location.search);
       const positionParam = params.get("position");
       if (positionParam) {
-        const pos = POSITION_QUESTIONS.find((p) => p.id === positionParam);
+        const pos = getInterviewPositions(lang).find((p) => p.id === positionParam);
         if (pos) return new Set([pos.id]);
       }
     }
@@ -813,11 +958,9 @@ export default function PracticePage() {
 
   const onToggleDifficulty = useCallback((diff: string) => {
     setSelectedDifficulties((prev) => {
+      // "Semua" bersifat eksklusif: klik selalu kembali ke semua kesulitan
+      if (diff === "all") return new Set(["all"]);
       const next = new Set(prev);
-      if (diff === "all") {
-        if (next.has("all")) return new Set();
-        return new Set(["all"]);
-      }
       next.delete("all");
       if (next.has(diff)) next.delete(diff);
       else next.add(diff);
@@ -827,11 +970,9 @@ export default function PracticePage() {
 
   const onToggleCategory = useCallback((cat: string) => {
     setSelectedCategories((prev) => {
+      // "Semua" bersifat eksklusif: klik selalu kembali ke semua kategori
+      if (cat === "all") return new Set(["all"]);
       const next = new Set(prev);
-      if (cat === "all") {
-        if (next.has("all")) return new Set(); // unselect all
-        return new Set(["all"]);
-      }
       next.delete("all");
       if (next.has(cat)) next.delete(cat);
       else next.add(cat);
@@ -841,7 +982,7 @@ export default function PracticePage() {
 
   const generateQuestions = useCallback(() => {
     const allQuestions: PracticeQuestion[] = [];
-    const positions = POSITION_QUESTIONS.filter((p) => selectedPositions.has(p.id));
+    const positions = getInterviewPositions(lang).filter((p) => selectedPositions.has(p.id));
 
     positions.forEach((pos) => {
       let qs = pos.questions;
@@ -867,7 +1008,7 @@ export default function PracticePage() {
     }
 
     return allQuestions;
-  }, [selectedPositions, selectedCategories]);
+  }, [selectedPositions, selectedCategories, selectedDifficulties, lang]);
 
   const startTimer = useCallback((duration: number) => {
     setTimerRemaining(duration);
@@ -891,7 +1032,8 @@ export default function PracticePage() {
 
   // ── Quick start: pick random position, start immediately ──
   const handleQuickStart = useCallback(() => {
-    const randomPos = POSITION_QUESTIONS[Math.floor(Math.random() * POSITION_QUESTIONS.length)];
+    const langPositions = getInterviewPositions(lang);
+    const randomPos = langPositions[Math.floor(Math.random() * langPositions.length)];
     if (!randomPos) return;
     setSelectedPositions(new Set([randomPos.id]));
     setSelectedCategories(new Set(["all"]));
@@ -918,7 +1060,7 @@ export default function PracticePage() {
     setSessionStartTime(Date.now());
     setQuestionStartTime(Date.now());
     startTimer(quickTimer);
-  }, [startTimer]);
+  }, [startTimer, lang]);
 
   const handleStart = useCallback(() => {
     const questions = generateQuestions();
@@ -1084,19 +1226,30 @@ export default function PracticePage() {
 
         <main className="flex-1 pt-24 pb-20 px-margin-mobile md:px-gutter">
           {session === "setup" && (
-            <SetupScreen
-              selectedPositions={selectedPositions}
-              onTogglePosition={onTogglePosition}
-              selectedCategories={selectedCategories}
-              onToggleCategory={onToggleCategory}
-              selectedDifficulties={selectedDifficulties}
-              onToggleDifficulty={onToggleDifficulty}
-              onClearAll={onClearAllPositions}
-              timerDuration={timerDuration}
-              onTimerChange={setTimerDuration}
-              onStart={handleStart}
-              onQuickStart={handleQuickStart}
-            />
+            <>
+              <div className="mb-4 max-w-[600px] mx-auto">
+                <button
+                  onClick={() => router.push("/interview")}
+                  className="flex items-center gap-1.5 text-[10px] text-on-surface-variant hover:text-primary transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[12px]">arrow_back</span>
+                  {lang === "en" ? "Back to position list" : "Kembali ke daftar posisi"}
+                </button>
+              </div>
+              <SetupScreen
+                selectedPositions={selectedPositions}
+                onTogglePosition={onTogglePosition}
+                selectedCategories={selectedCategories}
+                onToggleCategory={onToggleCategory}
+                selectedDifficulties={selectedDifficulties}
+                onToggleDifficulty={onToggleDifficulty}
+                onClearAll={onClearAllPositions}
+                timerDuration={timerDuration}
+                onTimerChange={setTimerDuration}
+                onStart={handleStart}
+                onQuickStart={handleQuickStart}
+              />
+            </>
           )}
 
           {session === "running" && sessionQuestions.length > 0 && (
@@ -1107,7 +1260,7 @@ export default function PracticePage() {
                   className="flex items-center gap-1.5 text-[10px] text-on-surface-variant hover:text-primary transition-colors"
                 >
                   <span className="material-symbols-outlined text-[12px]">arrow_back</span>
-                  Kembali ke Interview
+                  {lang === "en" ? "Back to Interviews" : "Kembali ke Interview"}
                 </button>
               </div>
               <RunningScreen

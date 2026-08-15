@@ -8,27 +8,29 @@ import AppFooter from "@/components/AppFooter";
 import { ScoreDonut } from "@/components/checker/ScoreDonut";
 import { SectionScoreCard } from "@/components/checker/SectionScoreCard";
 import { KeywordChip, BulletReviewCard } from "@/components/checker/ResultComponents";
-import { PdfExportButton } from "@/components/checker/PdfExportButton";
+import { ImprovementChecklist } from "@/components/checker/ImprovementChecklist";
 import { scoreColor, gradeColor, atsBadgeColor, type AnalysisResult, type SkillsSection } from "@/components/checker/types";
 import MagneticButton from "@/components/MagneticButton";
 import Link from "next/link";
+import { useTranslation } from "@/lib/i18n";
 
-function timeAgo(date: Date): string {
+function timeAgo(date: Date, t: (key: string) => string): string {
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const mins = Math.floor(diffMs / 60000);
-  if (mins < 1) return "Baru saja";
-  if (mins < 60) return `${mins} menit lalu`;
+  if (mins < 1) return t("checker.detail.time-now");
+  if (mins < 60) return `${mins} ${t("checker.detail.time-min")}`;
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours} jam lalu`;
+  if (hours < 24) return `${hours} ${t("checker.detail.time-hour")}`;
   const days = Math.floor(hours / 24);
-  if (days < 7) return `${days} hari lalu`;
+  if (days < 7) return `${days} ${t("checker.detail.time-day")}`;
   return date.toLocaleDateString("id-ID");
 }
 
 export default function CheckerDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { t } = useTranslation();
   const id = params?.id as string;
 
   const [result, setResult] = useState<AnalysisResult | null>(null);
@@ -46,8 +48,8 @@ export default function CheckerDetailPage() {
       .then(async (res) => {
         const text = await res.text();
         let data: any;
-        try { data = JSON.parse(text); } catch { throw new Error("Gagal memuat data"); }
-        if (!res.ok) throw new Error(data.error || "Gagal memuat hasil analisis");
+        try { data = JSON.parse(text); } catch { throw new Error(t("checker.detail.load-failed")); }
+        if (!res.ok) throw new Error(data.error || t("checker.detail.load-error"));
         return data;
       })
       .then((data) => {
@@ -87,7 +89,7 @@ export default function CheckerDetailPage() {
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, t]);
 
   // ── Loading State ──
   if (loading) {
@@ -127,14 +129,14 @@ export default function CheckerDetailPage() {
             <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto">
               <span className="material-symbols-outlined text-red-500 text-3xl">error_outline</span>
             </div>
-            <h1 className="text-xl font-bold text-on-surface">Hasil Tidak Ditemukan</h1>
-            <p className="text-sm text-on-surface-variant">{error || "Hasil analisis tidak ditemukan atau sudah dihapus."}</p>
+            <h1 className="text-xl font-bold text-on-surface">{t("checker.detail.not-found-title")}</h1>
+            <p className="text-sm text-on-surface-variant">{error || t("checker.detail.not-found-desc")}</p>
             <MagneticButton>
               <button
                 onClick={() => router.push("/checker")}
                 className="px-6 py-3 bg-primary text-on-primary font-semibold rounded-xl hover:opacity-90 transition-opacity"
               >
-                Analisis CV Baru
+                {t("checker.detail.analyze-new")}
               </button>
             </MagneticButton>
           </div>
@@ -161,13 +163,12 @@ export default function CheckerDetailPage() {
             onClick={() => router.push("/dashboard")}
           >
             <span className="material-symbols-outlined text-lg select-none">arrow_back</span>
-            Dashboard
+            {t("checker.detail.back-dashboard")}
           </button>
           <div className="flex items-center gap-2">
             {createdAt && (
-              <span className="text-[10px] text-on-surface-variant hidden sm:inline">{timeAgo(new Date(createdAt))}</span>
+              <span className="text-[10px] text-on-surface-variant hidden sm:inline">{timeAgo(new Date(createdAt), t)}</span>
             )}
-            <PdfExportButton targetRef={resultsRef} fileName="cv-analysis-detail.pdf" />
           </div>
         </div>
 
@@ -177,11 +178,11 @@ export default function CheckerDetailPage() {
         {/*  1. SCORE OVERVIEW                                            */}
         {/* ============================================================ */}
         <section className="flex flex-col items-center">
-          <ScoreDonut score={scores.overall} color={color} label="Skor CV" />
+          <ScoreDonut score={scores.overall} color={color} label={t("checker.score-label")} />
 
-          <h1 className="text-[32px] leading-10 font-bold text-center mb-2">Hasil Analisis CV</h1>
+          <h1 className="text-[32px] leading-10 font-bold text-center mb-2">{t("checker.detail.title")}</h1>
           <p className="text-base text-on-surface-variant text-center mb-4 max-w-[480px]">
-            {summary?.slice(0, 120) || "Analisis CV telah selesai. Lihat detail di bawah untuk saran perbaikan."}
+            {summary?.slice(0, 120) || t("checker.detail.summary-fallback")}
           </p>
 
           {/* Grade + ATS Prediction */}
@@ -210,12 +211,12 @@ export default function CheckerDetailPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.15 }}
           >
-            <h2 className="text-xl font-bold text-on-surface px-1">Skor Per Section</h2>
-            <SectionScoreCard title="Ringkasan Profil" score={breakdown.summary.score} issues={breakdown.summary.issues} suggestions={breakdown.summary.suggestions} delay={0.2} />
-            <SectionScoreCard title="Pengalaman Kerja" score={breakdown.experience.score} issues={breakdown.experience.issues} suggestions={breakdown.experience.suggestions} delay={0.25} />
-            <SectionScoreCard title="Keahlian" score={breakdown.skills.score} issues={(breakdown.skills as SkillsSection).missing_skills} suggestions={(breakdown.skills as SkillsSection).recommendations} delay={0.3} />
-            <SectionScoreCard title="Pendidikan" score={breakdown.education.score} issues={[breakdown.education.relevance]} suggestions={breakdown.education.suggestions} delay={0.35} />
-            <SectionScoreCard title="Format & ATS" score={breakdown.format_ats.score} issues={breakdown.format_ats.issues} suggestions={breakdown.format_ats.tips} delay={0.4} />
+            <h2 className="text-xl font-bold text-on-surface px-1">{t("checker.detail.section-breakdown")}</h2>
+            <SectionScoreCard title={t("checker.detail.section-summary")} score={breakdown.summary.score} issues={breakdown.summary.issues} suggestions={breakdown.summary.suggestions} delay={0.2} />
+            <SectionScoreCard title={t("checker.detail.section-experience")} score={breakdown.experience.score} issues={breakdown.experience.issues} suggestions={breakdown.experience.suggestions} delay={0.25} />
+            <SectionScoreCard title={t("checker.detail.section-skills")} score={breakdown.skills.score} issues={(breakdown.skills as SkillsSection).missing_skills} suggestions={(breakdown.skills as SkillsSection).recommendations} delay={0.3} />
+            <SectionScoreCard title={t("checker.detail.section-education")} score={breakdown.education.score} issues={[breakdown.education.relevance]} suggestions={breakdown.education.suggestions} delay={0.35} />
+            <SectionScoreCard title={t("checker.detail.section-format")} score={breakdown.format_ats.score} issues={breakdown.format_ats.issues} suggestions={breakdown.format_ats.tips} delay={0.4} />
           </motion.section>
         )}
 
@@ -229,7 +230,7 @@ export default function CheckerDetailPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.3 }}
           >
-            <h2 className="text-xl font-bold text-on-surface">Review oleh AI</h2>
+            <h2 className="text-xl font-bold text-on-surface">{t("checker.detail.review-title")}</h2>
             <div className="bg-surface-container-low rounded-xl p-4 border-l-4 border-primary">
               <p className="text-sm text-on-surface leading-relaxed">{narrativeFeedback.overall_assessment}</p>
             </div>
@@ -237,7 +238,7 @@ export default function CheckerDetailPage() {
               {narrativeFeedback.strengths.length > 0 && (
                 <div className="bg-green-50 rounded-xl p-4 border border-green-200">
                   <h3 className="text-xs font-bold text-green-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-sm select-none">check_circle</span>Kelebihan
+                    <span className="material-symbols-outlined text-sm select-none">check_circle</span>{t("checker.detail.strengths")}
                   </h3>
                   <ul className="space-y-1.5">
                     {narrativeFeedback.strengths.map((s, i) => (
@@ -249,7 +250,7 @@ export default function CheckerDetailPage() {
               {narrativeFeedback.areas_for_improvement.length > 0 && (
                 <div className="bg-red-50 rounded-xl p-4 border border-red-200">
                   <h3 className="text-xs font-bold text-red-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-sm select-none">warning</span>Perlu Diperbaiki
+                    <span className="material-symbols-outlined text-sm select-none">warning</span>{t("checker.detail.improve")}
                   </h3>
                   <ul className="space-y-1.5">
                     {narrativeFeedback.areas_for_improvement.map((a, i) => (
@@ -261,8 +262,7 @@ export default function CheckerDetailPage() {
             </div>
             {narrativeFeedback.ats_recommendations.length > 0 && (
               <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                <h3 className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-sm select-none">description</span>Rekomendasi ATS
+                <h3 className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">                    <span className="material-symbols-outlined text-sm select-none">description</span>{t("checker.detail.ats-recs")}
                 </h3>
                 <ul className="space-y-1">
                   {narrativeFeedback.ats_recommendations.map((r, i) => (
@@ -285,7 +285,7 @@ export default function CheckerDetailPage() {
             transition={{ duration: 0.4, delay: 0.35 }}
           >
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-on-surface">Keyword Analysis</h2>
+              <h2 className="text-xl font-bold text-on-surface">{t("checker.detail.keyword-title")}</h2>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-bold text-on-surface">{keywordAnalysis.match_rate_pct}%</span>
                 <div className="w-16 h-2 bg-surface-container rounded-full overflow-hidden">
@@ -301,7 +301,7 @@ export default function CheckerDetailPage() {
             <div className="space-y-4">
               {keywordAnalysis.matched.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-green-700 uppercase tracking-wider mb-2">Ditemukan ({keywordAnalysis.matched.length})</p>
+                  <p className="text-xs font-bold text-green-700 uppercase tracking-wider mb-2">{t("checker.detail.keyword-found")} ({keywordAnalysis.matched.length})</p>
                   <div className="flex flex-wrap gap-1.5">
                     {keywordAnalysis.matched.map((kw, i) => <KeywordChip key={i} text={kw} variant="found" />)}
                   </div>
@@ -309,7 +309,7 @@ export default function CheckerDetailPage() {
               )}
               {keywordAnalysis.missing_critical.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-red-700 uppercase tracking-wider mb-2">Hilang · Prioritas ({keywordAnalysis.missing_critical.length})</p>
+                  <p className="text-xs font-bold text-red-700 uppercase tracking-wider mb-2">{t("checker.detail.keyword-missing-critical")} ({keywordAnalysis.missing_critical.length})</p>
                   <div className="flex flex-wrap gap-1.5">
                     {keywordAnalysis.missing_critical.map((kw, i) => <KeywordChip key={i} text={kw} variant="missing" />)}
                   </div>
@@ -317,7 +317,7 @@ export default function CheckerDetailPage() {
               )}
               {keywordAnalysis.missing_nice_to_have.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-yellow-700 uppercase tracking-wider mb-2">Hilang · Tambahan ({keywordAnalysis.missing_nice_to_have.length})</p>
+                  <p className="text-xs font-bold text-yellow-700 uppercase tracking-wider mb-2">{t("checker.detail.keyword-missing-nice")} ({keywordAnalysis.missing_nice_to_have.length})</p>
                   <div className="flex flex-wrap gap-1.5">
                     {keywordAnalysis.missing_nice_to_have.map((kw, i) => <KeywordChip key={i} text={kw} variant="nice" />)}
                   </div>
@@ -325,7 +325,7 @@ export default function CheckerDetailPage() {
               )}
               {keywordAnalysis.synonym_suggestions.length > 0 && (
                 <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                  <p className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2">Saran Sinonim</p>
+                  <p className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2">{t("checker.detail.keyword-synonyms")}</p>
                   <ul className="space-y-1">
                     {keywordAnalysis.synonym_suggestions.map((s, i) => (
                       <li key={i} className="text-xs text-blue-800 flex items-start gap-2"><span className="text-blue-500 mt-0.5 select-none">→</span>{s}</li>
@@ -338,56 +338,13 @@ export default function CheckerDetailPage() {
         )}
 
         {/* ============================================================ */}
-        {/*  5. ACTION PLAN                                               */}
+        {/*  5. IMPROVEMENT CHECKLIST — langkah perbaikan interaktif      */}
         {/* ============================================================ */}
-        {actionPlan && (
-          <motion.section
-            className="bg-surface rounded-2xl border border-surface-container-high shadow-premium-md p-6 space-y-5"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.4 }}
-          >
-            <h2 className="text-xl font-bold text-on-surface">Rencana Tindakan</h2>
-            <div className="space-y-4">
-              {actionPlan.quick_wins.length > 0 && (
-                <div className="bg-green-50 rounded-xl p-4 border border-green-200">
-                  <h3 className="text-xs font-bold text-green-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-sm select-none">bolt</span>Quick Wins (5-10 menit)
-                  </h3>
-                  <ul className="space-y-1.5">
-                    {actionPlan.quick_wins.map((item, i) => (
-                      <li key={i} className="text-xs text-green-800 flex items-start gap-2"><span className="text-green-500 mt-0.5 select-none">✓</span>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              {actionPlan.short_term.length > 0 && (
-                <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                  <h3 className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-sm select-none">schedule</span>Jangka Pendek (1-2 jam)
-                  </h3>
-                  <ul className="space-y-1.5">
-                    {actionPlan.short_term.map((item, i) => (
-                      <li key={i} className="text-xs text-blue-800 flex items-start gap-2"><span className="text-blue-500 mt-0.5 select-none">→</span>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              {actionPlan.long_term.length > 0 && (
-                <div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
-                  <h3 className="text-xs font-bold text-purple-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-sm select-none">flag</span>Jangka Panjang (Restrukturisasi)
-                  </h3>
-                  <ul className="space-y-1.5">
-                    {actionPlan.long_term.map((item, i) => (
-                      <li key={i} className="text-xs text-purple-800 flex items-start gap-2"><span className="text-purple-500 mt-0.5 select-none">★</span>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          </motion.section>
-        )}
+        <ImprovementChecklist
+          actionPlan={actionPlan}
+          missingSections={missingSections}
+          keywordAnalysis={keywordAnalysis}
+        />
 
         {/* ============================================================ */}
         {/*  6. BULLET REVIEW — per poin pengalaman                       */}
@@ -399,7 +356,7 @@ export default function CheckerDetailPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.45 }}
           >
-            <h2 className="text-xl font-bold text-on-surface px-1">Review Poin Pengalaman ({bulletReview.length})</h2>
+            <h2 className="text-xl font-bold text-on-surface px-1">{t("checker.detail.bullet-title")} ({bulletReview.length})</h2>
             <div className="space-y-2">
               {bulletReview.map((item, i) => (
                 <BulletReviewCard key={i} item={item} index={i} />
@@ -409,33 +366,11 @@ export default function CheckerDetailPage() {
         )}
 
         {/* ============================================================ */}
-        {/*  7. MISSING SECTIONS                                          */}
-        {/* ============================================================ */}
-        {missingSections && missingSections.length > 0 && (
-          <motion.section
-            className="bg-surface rounded-2xl border border-surface-container-high shadow-premium-md p-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.5 }}
-          >
-            <h2 className="text-xl font-bold text-on-surface mb-3">Section yang Belum Ada</h2>
-            <div className="flex flex-wrap gap-2">
-              {missingSections.map((sec, i) => (
-                <span key={i} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-orange-50 text-orange-700 border border-orange-200 text-xs font-medium">
-                  <span className="material-symbols-outlined text-sm select-none">add_circle</span>
-                  {sec}
-                </span>
-              ))}
-            </div>
-          </motion.section>
-        )}
-
-        {/* ============================================================ */}
-        {/*  7b. CTA — Surat Lamaran / Motivation Letter                 */}
+        {/*  6. CTA — Surat Lamaran / Motivation Letter                  */}
         {/* ============================================================ */}
         <div className="space-y-3">
           <p className="text-xs font-bold uppercase tracking-wider text-on-surface-variant px-1">
-            Lanjutkan · Buat Surat dari CV Ini
+            {t("checker.detail.cta-letters")}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Link
@@ -452,8 +387,8 @@ export default function CheckerDetailPage() {
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-on-surface">Surat Lamaran</p>
-                <p className="text-[11px] text-on-surface-variant">Formal · Formal Lengkap · ATS · Kasual</p>
+                <p className="text-sm font-bold text-on-surface">{t("checker.detail.cover-letter")}</p>
+                <p className="text-[11px] text-on-surface-variant">{t("checker.detail.cover-formats")}</p>
               </div>
               <span
                 className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors shrink-0"
@@ -476,8 +411,8 @@ export default function CheckerDetailPage() {
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-on-surface">Motivation Letter</p>
-                <p className="text-[11px] text-on-surface-variant">Beasiswa · Program · Fresh grad</p>
+                <p className="text-sm font-bold text-on-surface">{t("checker.detail.motivation-letter")}</p>
+                <p className="text-[11px] text-on-surface-variant">{t("checker.detail.motivation-formats")}</p>
               </div>
               <span
                 className="material-symbols-outlined text-on-surface-variant group-hover:text-amber-500 transition-colors shrink-0"
@@ -497,12 +432,12 @@ export default function CheckerDetailPage() {
           <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="text-center md:text-left">
               <h2 className="text-[32px] leading-10 font-bold text-white mb-2">
-                {scores.overall >= 70 ? "Skor CV Kamu Sudah Baik!" : "Masih Bisa Ditingkatkan!"}
+                {scores.overall >= 70 ? t("checker.detail.cta-good") : t("checker.detail.cta-improve")}
               </h2>
               <p className="text-base text-white/90 max-w-[320px]">
                 {scores.overall >= 70
-                  ? "Gunakan insight di atas untuk fine-tuning CV-mu."
-                  : "Terapkan saran perbaikan di atas untuk naikkan skor CV-mu."}
+                  ? t("checker.detail.cta-good-desc")
+                  : t("checker.detail.cta-improve-desc")}
               </p>
             </div>
             <MagneticButton>
@@ -510,7 +445,7 @@ export default function CheckerDetailPage() {
                 onClick={() => router.push("/checker")}
                 className="bg-white text-primary px-8 py-4 rounded-full text-sm font-semibold shadow-premium-md hover:bg-gray-100 active:scale-95 transition-[transform,background-color] flex items-center gap-2"
               >
-                Analisis Ulang
+                {t("checker.detail.reanalyze")}
                 <span className="material-symbols-outlined text-sm select-none">refresh</span>
               </button>
             </MagneticButton>

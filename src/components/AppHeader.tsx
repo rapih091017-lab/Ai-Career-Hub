@@ -11,6 +11,7 @@ import LogoutConfirmModal from "@/components/ui/LogoutConfirmModal";
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard" },
   { label: "My Resumes", href: "/dashboard" },
+  { label: "Surat", href: "/surat-lamaran" },
   { label: "Templates", href: "/builder/new" },
   { label: "Resources", href: "/checker" },
 ];
@@ -19,7 +20,7 @@ export default function AppHeader() {
   const router = useRouter();
   const pathname = usePathname();
   const { data: session } = useSession();
-  const { t } = useTranslation();
+  const { t, lang, toggleLang } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -62,11 +63,14 @@ export default function AppHeader() {
           </span>
         </Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
+        {/* Desktop Nav — lg:flex agar 5 item (Dashboard, My Resumes, Surat, Templates, Resources)
+         * tidak bertabrakan dengan menu user di layar md (768-1024px) */}
+        <nav className="hidden lg:flex items-center gap-6 xl:gap-8 absolute left-1/2 -translate-x-1/2">
           {NAV_ITEMS.map((item) => {
-            const isActive = pathname === item.href || 
-              (item.href === "/builder/new" && pathname.startsWith("/builder"));
+            const isActive =
+              pathname === item.href ||
+              (item.href === "/builder/new" && pathname.startsWith("/builder")) ||
+              (item.href === "/surat-lamaran" && pathname.startsWith("/surat-lamaran"));
             return (
               <Link
                 key={item.label}
@@ -86,6 +90,17 @@ export default function AppHeader() {
         {/* Actions */}
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-4 md:gap-6">
+
+            {/* Language Toggle */}
+            <button
+              onClick={toggleLang}
+              title={t("header.lang-toggle")}
+              className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors"
+              aria-label={t("header.lang-toggle")}
+            >
+              <span className="material-symbols-outlined text-[16px]">translate</span>
+              <span>{lang === "id" ? "EN" : "ID"}</span>
+            </button>
 
             {/* User Menu */}
             <div className="relative" ref={dropdownRef}>
@@ -124,6 +139,13 @@ export default function AppHeader() {
                   >
                     <span className="material-symbols-outlined text-lg text-on-surface-variant">dashboard</span>
                     Dashboard
+                  </button>
+                  <button
+                    className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-high transition-colors"
+                    onClick={() => { setIsDropdownOpen(false); router.push("/surat-lamaran"); }}
+                  >
+                    <span className="material-symbols-outlined text-lg text-on-surface-variant">mail</span>
+                    Surat & Motivation Letter
                   </button>
                   <button
                     className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-high transition-colors"
@@ -191,6 +213,13 @@ export default function AppHeader() {
                 );
               })}
               <hr className="border-outline-variant/30 my-2" />
+              <button
+                onClick={() => { setIsMobileMenuOpen(false); toggleLang(); }}
+                className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors font-label-bold"
+              >
+                <span className="material-symbols-outlined text-lg">translate</span>
+                {t("header.lang-full")}
+              </button>
               <Link
                 href="/settings/profile"
                 className="block px-4 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors font-label-bold"

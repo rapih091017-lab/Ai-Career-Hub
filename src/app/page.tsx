@@ -10,7 +10,6 @@ import Logos3 from "@/components/blocks/logos3";
 import PricingSection from "@/components/PricingSection";
 import ScrollProgress from "@/components/ScrollProgress";
 import CountUp from "@/components/CountUp";
-import AnimatedNotification from "@/components/AnimatedNotification";
 import MouseGlow from "@/components/MouseGlow";
 import TiltCard from "@/components/TiltCard";
 import ScrollSectionIndicator from "@/components/ScrollSectionIndicator";
@@ -79,20 +78,10 @@ export default function Home() {
     return () => window.removeEventListener("popstate", handleRoute);
   }, []);
 
-  // Floating notification state
-  const [showNotif, setShowNotif] = useState(false);
-  useEffect(() => {
-    const timer = setTimeout(() => setShowNotif(true), 8000);
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
     <>
       <ScrollProgress />
       <ScrollSectionIndicator />
-
-      {/* ── Floating Social Proof Notification ── */}
-      <AnimatedNotification show={showNotif} onClose={() => setShowNotif(false)} />
 
       {/* ── Navigation (Floating) ── */}
       <nav className="fixed top-0 md:top-4 left-0 md:left-1/2 right-0 md:-translate-x-1/2 z-50 bg-white/80 backdrop-blur-lg shadow-sm md:shadow-lg border-b md:border border-outline-variant/10 md:rounded-2xl md:max-w-7xl md:w-[calc(100%-32px)] transition-all">
@@ -396,7 +385,7 @@ export default function Home() {
                     className="w-full px-3.5 py-2.5 bg-white/60 border border-outline-variant/30 rounded-xl text-sm text-on-surface/80 placeholder:text-outline-variant/60 cursor-not-allowed select-none"
                     readOnly disabled
                   />
-                  <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-outline-variant font-medium bg-white/80 px-1.5 rounded">Preview</span>
+                  <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-outline-variant font-medium bg-white/80 px-1.5 rounded">{t("hero.demo-preview")}</span>
                 </div>
                 <Link href="/checker" className="px-4 py-2.5 bg-primary text-on-primary rounded-xl text-xs font-bold hover:brightness-110 transition-all whitespace-nowrap shadow-sm cursor-pointer inline-flex items-center">
                   {t("hero.demo-analyze")}

@@ -10,8 +10,8 @@ import MagneticButton from "@/components/MagneticButton";
 import { UploadZone } from "@/components/checker/UploadZone";
 import { ScoreDonut } from "@/components/checker/ScoreDonut";
 import { SectionScoreCard } from "@/components/checker/SectionScoreCard";
-import { PdfExportButton } from "@/components/checker/PdfExportButton";
 import { KeywordChip, BulletReviewCard } from "@/components/checker/ResultComponents";
+import { ImprovementChecklist } from "@/components/checker/ImprovementChecklist";
 import { scoreColor, gradeColor, atsBadgeColor, fitLabelMeta, type AnalysisResult, type SkillsSection } from "@/components/checker/types";
 import { anonIdHeaders } from "@/lib/anon-id";
 
@@ -624,7 +624,6 @@ export default function CheckerPage() {
                 </div>
               )}
             </div>
-            <PdfExportButton targetRef={resultsRef} />
           </div>
         </div>
 
@@ -851,74 +850,13 @@ export default function CheckerPage() {
         )}
 
         {/* ============================================================ */}
-        {/*  5. ACTION PLAN                                               */}
+        {/*  5. IMPROVEMENT CHECKLIST — langkah perbaikan interaktif      */}
         {/* ============================================================ */}
-        {actionPlan && (
-          <motion.section
-            className="bg-surface rounded-2xl border border-surface-container-high shadow-premium-md p-6 space-y-5"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.4 }}
-          >
-            <h2 className="text-xl font-bold text-on-surface">Rencana Tindakan</h2>
-
-            <div className="space-y-4">
-              {/* Quick wins */}
-              {actionPlan.quick_wins.length > 0 && (
-                <div className="bg-green-50 rounded-xl p-4 border border-green-200">
-                  <h3 className="text-xs font-bold text-green-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-sm select-none">bolt</span>
-                    Quick Wins (5-10 menit)
-                  </h3>
-                  <ul className="space-y-1.5">
-                    {actionPlan.quick_wins.map((item, i) => (
-                      <li key={i} className="text-xs text-green-800 flex items-start gap-2">
-                        <span className="text-green-500 mt-0.5 select-none">✓</span>
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Short term */}
-              {actionPlan.short_term.length > 0 && (
-                <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                  <h3 className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-sm select-none">schedule</span>
-                    Jangka Pendek (1-2 jam)
-                  </h3>
-                  <ul className="space-y-1.5">
-                    {actionPlan.short_term.map((item, i) => (
-                      <li key={i} className="text-xs text-blue-800 flex items-start gap-2">
-                        <span className="text-blue-500 mt-0.5 select-none">→</span>
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Long term */}
-              {actionPlan.long_term.length > 0 && (
-                <div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
-                  <h3 className="text-xs font-bold text-purple-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-sm select-none">flag</span>
-                    Jangka Panjang (Restrukturisasi)
-                  </h3>
-                  <ul className="space-y-1.5">
-                    {actionPlan.long_term.map((item, i) => (
-                      <li key={i} className="text-xs text-purple-800 flex items-start gap-2">
-                        <span className="text-purple-500 mt-0.5 select-none">★</span>
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          </motion.section>
-        )}
+        <ImprovementChecklist
+          actionPlan={actionPlan}
+          missingSections={missingSections}
+          keywordAnalysis={keywordAnalysis}
+        />
 
         {/* ============================================================ */}
         {/*  6. BULLET REVIEW                                             */}
@@ -940,29 +878,7 @@ export default function CheckerPage() {
         )}
 
         {/* ============================================================ */}
-        {/*  7. MISSING SECTIONS                                          */}
-        {/* ============================================================ */}
-        {missingSections && missingSections.length > 0 && (
-          <motion.section
-            className="bg-surface rounded-2xl border border-surface-container-high shadow-premium-md p-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.5 }}
-          >
-            <h2 className="text-xl font-bold text-on-surface mb-3">Section yang Belum Ada</h2>
-            <div className="flex flex-wrap gap-2">
-              {missingSections.map((sec, i) => (
-                <span key={i} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-orange-50 text-orange-700 border border-orange-200 text-xs font-medium">
-                  <span className="material-symbols-outlined text-sm select-none">add_circle</span>
-                  {sec}
-                </span>
-              ))}
-            </div>
-          </motion.section>
-        )}
-
-        {/* ============================================================ */}
-        {/*  8. CTA BANNER — score-based routing                          */}
+        {/*  7. CTA BANNER — score-based routing                          */}
         {/* ============================================================ */}
         {(() => {
           const score = scores?.overall ?? 0;

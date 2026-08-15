@@ -440,8 +440,11 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
     if (!previewRef.current) return;
     setExporting(true);
     try {
-      const name = `${cvData?.fullName || manual.fullName || "Surat"}_Surat_Lamaran.pdf`;
-      const result = await exportPdfViaServer(previewRef.current, name, 18);
+      const sender = cvData?.fullName || manual.fullName || "";
+      const name = sender ? `${sender}_Surat_Lamaran.pdf` : "Surat_Lamaran.pdf";
+      // Margin 0: elemen A4 surat membawa padding sendiri (20mm 22mm),
+      // sehingga hasil PDF sama persis dengan preview — tanpa margin ganda.
+      const result = await exportPdfViaServer(previewRef.current, name, 0);
       if (!result.ok) {
         addToast({ type: result.redirectUrl ? "warning" : "error", message: result.error || "Gagal export PDF" });
       } else {

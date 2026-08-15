@@ -1,7 +1,13 @@
 /* ─────────────────────────────────────────────────────────────────── */
-/*  Interview Question Database - Static Templates                    */
-/*  ~30 positions × 8 questions (4 HR + 4 Technical/Role-specific)   */
+/*  Interview Question Database - Static Templates (Indonesian)      */
+/*  ⚠️ Add new positions to BOTH files (id + en)                     */
+/*  English version: interview-questions-en.ts                       */
 /* ─────────────────────────────────────────────────────────────────── */
+
+import {
+  POSITION_QUESTIONS_EN,
+  QUESTION_CATEGORIES_EN,
+} from "./interview-questions-en";
 
 export type Difficulty = "easy" | "medium" | "hard";
 
@@ -12,6 +18,8 @@ export interface InterviewQuestion {
   question: string;
   answer: string;
   tips?: string[];
+  /** Pertanyaan lanjutan yang sering diajukan pewawancara setelah jawaban utama */
+  followUp?: string;
 }
 
 /* ─── Helper: get difficulty (compute from answer length jika tidak explicit) ─── */
@@ -2001,21 +2009,387 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
       },
     ],
   },
+  {
+    id: "business-analyst",
+    title: "Business Analyst",
+    categorySlug: "business",
+    icon: "query_stats",
+    questions: [
+      ...hrQuestions,
+      {
+        id: "ba-role-1",
+        category: "role-specific",
+        question: "Apa perbedaan antara Business Analyst dan Data Analyst?",
+        answer:
+          "Data Analyst fokus pada mengolah dan menyajikan data (statistik, visualisasi, insight dari data). Business Analyst lebih fokus pada memahami kebutuhan bisnis, menganalisis proses, dan menjembatani antara stakeholder dengan tim teknis — data adalah salah satu alatnya untuk mendukung rekomendasi solusi.",
+        tips: ["Jelaskan dengan contoh nyata dari pengalaman kerja Anda"],
+        followUp: "Kalau Anda harus memilih salah satu, peran mana yang lebih Anda kuasai?",
+      },
+      {
+        id: "ba-role-2",
+        category: "role-specific",
+        question: "Bagaimana cara Anda mengumpulkan dan menganalisis kebutuhan stakeholder?",
+        answer:
+          "1) Wawancara dan workshop dengan stakeholder untuk memahami pain point. 2) Observasi proses bisnis langsung. 3) Analisis dokumen dan data yang ada. 4) Buat user story / requirement specification. 5) Validasi berulang (review loop) sampai semua pihak sepakat. 6) Prioritaskan kebutuhan dengan MoSCoW atau impact-effort matrix.",
+        tips: ["Tunjukkan bahwa Anda bisa berkomunikasi dengan tim non-teknis dan teknis"],
+      },
+      {
+        id: "ba-role-3",
+        category: "role-specific",
+        question: "Apa itu BRD, FRD, dan SRS? Apa perbedaannya?",
+        answer:
+          "BRD (Business Requirement Document): kebutuhan dari sisi bisnis - tujuan, ruang lingkup, manfaat. FRD (Functional Requirement Document): rincian fungsi yang harus dimiliki sistem. SRS (Software Requirement Specification): spesifikasi teknis lengkap yang menjadi acuan developer - gabungan kebutuhan fungsional dan non-fungsional.",
+        tips: [],
+        followUp: "Dokumen mana yang paling sering Anda gunakan di proyek terakhir?",
+      },
+      {
+        id: "ba-role-4",
+        category: "role-specific",
+        question: "Bagaimana Anda menangani stakeholder yang sering mengubah requirement di tengah proyek?",
+        answer:
+          "1) Selalu catat perubahan dan dampaknya (scope, waktu, biaya) secara tertulis. 2) Lakukan impact analysis sebelum menyetujui. 3) Komunikasikan trade-off ke stakeholder. 4) Gunakan change request process yang formal. 5) Jika perubahan kecil, tampung dulu dan gabung dalam iterasi berikutnya (phase 2). Tujuannya menjaga proyek tetap on-track tanpa merusak hubungan.",
+        tips: [],
+      },
+    ],
+  },
+  {
+    id: "financial-analyst",
+    title: "Financial Analyst",
+    categorySlug: "finance",
+    icon: "trending_up",
+    questions: [
+      ...hrQuestions,
+      {
+        id: "fa-role-1",
+        category: "role-specific",
+        question: "Jelaskan laporan keuangan apa saja yang wajib dipahami seorang financial analyst.",
+        answer:
+          "1) Laporan Laba Rugi (Income Statement) - pendapatan dan beban, menghasilkan laba bersih. 2) Neraca (Balance Sheet) - aset, liabilitas, ekuitas pada satu titik waktu. 3) Laporan Arus Kas (Cash Flow) - operasi, investasi, pendanaan. 4) Laporan Perubahan Ekuitas. Analis harus bisa membaca hubungan antar laporan dan menilai kesehatan keuangan perusahaan.",
+        tips: ["Sebutkan rasio yang sering Anda hitung: likuiditas, profitabilitas, solvabilitas"],
+        followUp: "Kalau perusahaan punya laba tinggi tapi arus kas negatif, apa artinya?",
+      },
+      {
+        id: "fa-role-2",
+        category: "role-specific",
+        question: "Apa itu variance analysis dan bagaimana Anda menggunakannya?",
+        answer:
+          "Variance analysis adalah perbandingan antara hasil aktual dengan target/budget. Langkah: 1) Hitung selisih (favorable/unfavorable). 2) Analisis penyebab - volume, harga, efisiensi. 3) Bedakan variance yang bisa dikendalikan vs tidak. 4) Laporkan ke manajemen dengan rekomendasi tindakan. Tujuannya bukan mencari salah, tapi perbaikan perencanaan.",
+        tips: [],
+      },
+      {
+        id: "fa-role-3",
+        category: "role-specific",
+        question: "Bagaimana cara Anda menilai kelayakan investasi sebuah proyek?",
+        answer:
+          "Menggunakan beberapa metode: 1) NPV (Net Present Value) - nilai sekarang arus kas masa depan dikurangi investasi awal, positif = layak. 2) IRR (Internal Rate of Return) - bandingkan dengan cost of capital. 3) Payback period. 4) Analisis sensitivitas untuk skenario terbaik/terburuk. Keputusan final mempertimbangkan faktor kualitatif juga, bukan cuma angka.",
+        tips: [],
+        followUp: "Apa kelemahan metode payback period?",
+      },
+      {
+        id: "fa-role-4",
+        category: "role-specific",
+        question: "Tools apa yang Anda kuasai untuk analisis keuangan?",
+        answer:
+          "Excel/Google Sheets adalah keharusan - pivot table, VLOOKUP/XLOOKUP, formula keuangan (NPV, IRR), Power Query. Untuk skala lebih besar: SQL untuk mengambil data dari database, Power BI/Tableau untuk dashboard visualisasi. Jika ada pengalaman ERP (SAP, Oracle), sebutkan juga.",
+        tips: ["Bawa contoh dashboard atau model Excel yang pernah Anda buat"],
+      },
+    ],
+  },
+  {
+    id: "tax-consultant",
+    title: "Konsultan Pajak",
+    categorySlug: "finance",
+    icon: "account_balance",
+    questions: [
+      ...hrQuestions,
+      {
+        id: "tc-role-1",
+        category: "role-specific",
+        question: "Apa saja jenis PPh yang umum dan siapa pemotongnya?",
+        answer:
+          "PPh 21: pajak atas penghasilan karyawan, dipotong pemberi kerja. PPh 22: pemungutan atas kegiatan impor dan penjualan barang tertentu. PPh 23: atas dividen, bunga, royalti, sewa - dipotong pihak pembayar. PPh 25: angsuran pajak penghasilan. PPh 29: kurang bayar saat pelaporan tahunan. PPh Final: misal 0,5% untuk UMKM sesuai PP 55/2022.",
+        tips: ["Tunjukkan pemahaman terbaru: ketentuan PPN 11-12% dan coretax"],
+        followUp: "Bagaimana perlakuan PPN atas ekspor jasa?",
+      },
+      {
+        id: "tc-role-2",
+        category: "role-specific",
+        question: "Apa perbedaan tax planning, tax avoidance, dan tax evasion?",
+        answer:
+          "Tax planning: perencanaan pajak yang sah untuk meminimalkan beban pajak (memanfaatkan insentif, struktur yang efisien). Tax avoidance: upaya mengurangi pajak dengan memanfaatkan celah hukum (gray area). Tax evasion: penggelapan pajak dengan melanggar hukum (tidak melaporkan penghasilan). Konsultan pajak harus berpegang pada planning yang legal dan etis.",
+        tips: ["Tekankan integritas - risiko hukum dan reputasi sangat besar"],
+      },
+      {
+        id: "tc-role-3",
+        category: "role-specific",
+        question: "Apa yang Anda ketahui tentang program Tax Amnesty Jilid II?",
+        answer:
+          "Program Pengungkapan Sukarela (PPS) atau Tax Amnesty Jilid II berlaku 1 Januari - 30 Juni 2022. Wajib pajak bisa mengungkapkan harta yang belum dilaporkan di SPT dengan tarif lebih rendah (6-14%) tanpa sanksi pidana. Kini program berakhir, tapi pemahaman tentang PPS penting untuk melayani klien dengan riwayat harta yang belum dilaporkan.",
+        tips: [],
+      },
+      {
+        id: "tc-role-4",
+        category: "role-specific",
+        question: "Bagaimana Anda menangani klien yang tidak mau melaporkan penghasilan sebenarnya?",
+        answer:
+          "Saya akan menjelaskan risiko hukum, sanksi administrasi, dan bunga atas keterlambatan. Sebagai konsultan, saya berkewajiban membantu klien mematuhi aturan, bukan menghindarinya. Saya akan menawarkan solusi legal untuk mengurangi beban pajak (insentif, struktur yang tepat) sehingga klien tidak perlu menyembunyikan penghasilan. Jika klien tetap memaksa, saya tidak bisa melanjutkan.",
+        tips: ["Ini pertanyaan uji integritas - jawab dengan tegas dan profesional"],
+      },
+    ],
+  },
+  {
+    id: "pharmacist",
+    title: "Apoteker",
+    categorySlug: "healthcare",
+    icon: "medication",
+    questions: [
+      ...hrQuestions,
+      {
+        id: "ph-role-1",
+        category: "role-specific",
+        question: "Bagaimana Anda menangani resep yang tidak terbaca atau dosis yang mencurigakan?",
+        answer:
+          "1) Jangan menebak - konfirmasi langsung ke dokter penulis resep. 2) Tanyakan riwayat alergi dan obat yang sedang dikonsumsi pasien. 3) Cek interaksi obat. 4) Jika dosis di luar standar, tanyakan alasannya (bisa jadi terapi khusus). 5) Dokumentasikan konfirmasi. Keselamatan pasien adalah prioritas utama - apoteker berhak menolak jika meragukan.",
+        tips: ["Tekankan patient safety - ini nilai inti profesi apoteker"],
+        followUp: "Apa yang Anda lakukan jika dokter tidak bisa dihubungi?",
+      },
+      {
+        id: "ph-role-2",
+        category: "role-specific",
+        question: "Apa yang Anda lakukan jika terjadi medication error di apotek?",
+        answer:
+          "1) Tetap tenang dan jangan menyembunyikan. 2) Segera cek kondisi pasien - jika obat sudah dikonsumsi, hubungi dokter/RS untuk penanganan. 3) Laporkan ke atasan dan catat insidennya. 4) Analisis akar masalah (salah baca resep, salah etiket, salah obat) 5) Perbaiki SOP agar tidak terulang. 6) Hubungi pasien untuk klarifikasi dan permintaan maaf yang tulus.",
+        tips: [],
+      },
+      {
+        id: "ph-role-3",
+        category: "role-specific",
+        question: "Bagaimana cara Anda memberikan konseling obat kepada pasien?",
+        answer:
+          "Gunakan metode yang sederhana: 1) Jelaskan nama obat dan fungsinya. 2) Aturan pakai (dosis, waktu, cara konsumsi - sebelum/sesudah makan). 3) Efek samping yang umum dan apa yang harus dilakukan. 4) Interaksi dengan makanan/obat lain. 5) Penyimpanan yang benar. 6) Pastikan pasien paham - minta mereka mengulang. Sesuaikan bahasa dengan tingkat pemahaman pasien.",
+        tips: ["Contohkan dengan bahasa yang mudah dipahami orang awam"],
+        followUp: "Bagaimana jika pasien bertanya tentang obat yang tidak diresepkan?",
+      },
+    ],
+  },
+  {
+    id: "nutritionist",
+    title: "Ahli Gizi",
+    categorySlug: "healthcare",
+    icon: "nutrition",
+    questions: [
+      ...hrQuestions,
+      {
+        id: "nu-role-1",
+        category: "role-specific",
+        question: "Bagaimana cara Anda menyusun program diet untuk pasien dengan kondisi medis tertentu (misal diabetes)?",
+        answer:
+          "1) Kaji riwayat kesehatan, hasil lab, dan kebiasaan makan pasien. 2) Hitung kebutuhan kalori dan makronutrien sesuai kondisi. 3) Untuk diabetes: perhatikan indeks glikemik, porsi karbohidrat, pola makan teratur. 4) Buat menu yang realistis dengan makanan yang tersedia dan disukai pasien. 5) Edukasi pasien dan keluarga. 6) Evaluasi berkala dan sesuaikan.",
+        tips: ["Tunjukkan pendekatan individual - tidak ada diet satu ukuran untuk semua"],
+        followUp: "Bagaimana menangani pasien yang susah mengubah pola makan?",
+      },
+      {
+        id: "nu-role-2",
+        category: "role-specific",
+        question: "Apa itu gizi seimbang dan apa pedoman 'Isi Piringku'?",
+        answer:
+          "Gizi seimbang adalah susunan pangan sehari-hari yang mengandung zat gizi dalam jenis dan jumlah yang sesuai kebutuhan tubuh. Pedoman Isi Piringku (Kemenkes): setengah piring buah dan sayur, setengah lainnya sumber protein dan karbohidrat. Ditambah minum 8 gelas air, aktivitas fisik, dan cuci tangan.",
+        tips: [],
+      },
+      {
+        id: "nu-role-3",
+        category: "role-specific",
+        question: "Bagaimana Anda menangani pasien dengan gangguan makan (eating disorder)?",
+        answer:
+          "1) Pendekatan empati tanpa menghakimi. 2) Rujuk ke psikolog/psikiater karena eating disorder butuh penanganan multidisiplin. 3) Fokus pada memperbaiki hubungan dengan makanan secara bertahap. 4) Libatkan keluarga sebagai support system. 5) Evaluasi fisik secara berkala (berat badan, lab). Saya tidak menangani sendirian - kerja sama tim adalah kunci.",
+        tips: ["Pahami batas kompetensi - tahu kapan harus merujuk"],
+        followUp: "Apa tanda-tanda awal seseorang mengalami eating disorder?",
+      },
+    ],
+  },
+  {
+    id: "content-creator",
+    title: "Content Creator",
+    categorySlug: "design",
+    icon: "video_library",
+    questions: [
+      ...hrQuestions,
+      {
+        id: "cc-role-1",
+        category: "role-specific",
+        question: "Bagaimana proses Anda membuat konten dari ide sampai publish?",
+        answer:
+          "1) Riset tren dan kebutuhan audiens. 2) Brainstorming ide - buat angle yang unik. 3) Buat script/storyboard. 4) Produksi (shoot/desain/edit). 5) Review dan revisi. 6) Jadwalkan publish di waktu optimal. 7) Pantau performa (views, engagement) dan evaluasi untuk konten berikutnya. Prosesnya siklus - selalu belajar dari data.",
+        tips: ["Sebutkan portofolio dan metrik yang pernah Anda capai"],
+        followUp: "Berapa lama waktu yang Anda butuhkan untuk satu konten?",
+      },
+      {
+        id: "cc-role-2",
+        category: "role-specific",
+        question: "Bagaimana cara Anda membuat konten yang viral di media sosial?",
+        answer:
+          "Tidak ada formula pasti untuk viral, tapi ada pola: 1) Hook kuat di 3 detik pertama. 2) Konten relevan dengan tren terkini. 3) Emosi - lucu, kaget, atau relatable. 4) Format yang sesuai platform (reels, story, feed). 5) Konsistensi posting. 6) Manfaatkan audio/musik yang sedang tren. Yang terpenting: fokus pada nilai yang dirasakan audiens, viral adalah bonus.",
+        tips: ["Jangan janji viral - tekankan strategi dan konsistensi"],
+      },
+      {
+        id: "cc-role-3",
+        category: "role-specific",
+        question: "Tools apa saja yang Anda kuasai untuk membuat konten?",
+        answer:
+          "Editing video: CapCut, Premiere Pro, atau DaVinci Resolve. Desain: Canva, Figma. Penjadwalan: Meta Business Suite, Buffer. Analitik: Instagram Insights, TikTok Analytics, Google Analytics. AI tools (ChatGPT, Midjourney) untuk ide dan visual pendukung. Sesuaikan dengan kebutuhan dan budget tim.",
+        tips: [],
+      },
+      {
+        id: "cc-role-4",
+        category: "role-specific",
+        question: "Bagaimana Anda mengukur kesuksesan sebuah konten?",
+        answer:
+          "Tergantung tujuannya (KPI): Awareness - reach dan impressions. Engagement - likes, comments, shares, save. Konversi - klik link, penjualan. Retention - watch time. Saya bandingkan performa dengan konten sebelumnya dan benchmark industri. Yang terpenting: apakah konten mencapai tujuan bisnis, bukan cuma angka vanity.",
+        tips: [],
+        followUp: "Metrik apa yang paling penting untuk campaign brand awareness?",
+      },
+    ],
+  },
+  {
+    id: "videographer-editor",
+    title: "Videographer / Video Editor",
+    categorySlug: "design",
+    icon: "videocam",
+    questions: [
+      ...hrQuestions,
+      {
+        id: "ve-role-1",
+        category: "role-specific",
+        question: "Software editing apa yang Anda kuasai dan kapan Anda menggunakannya?",
+        answer:
+          "Premiere Pro untuk editing video profesional dan kolaborasi tim. DaVinci Resolve untuk color grading yang lebih detail (terutama untuk film/iklan). After Effects untuk motion graphics dan VFX. CapCut untuk konten fast-paced media sosial yang butuh cepat. Pilihan software tergantung kebutuhan proyek dan format output.",
+        tips: ["Bawa showreel - bukti lebih kuat daripada klaim"],
+        followUp: "Bagaimana Anda menangani deadline editing yang sangat singkat?",
+      },
+      {
+        id: "ve-role-2",
+        category: "role-specific",
+        question: "Bagaimana alur kerja Anda dari footage mentah sampai video final?",
+        answer:
+          "1) Review dan seleksi footage (take terbaik). 2) Rough cut - susun struktur cerita. 3) Fine cut - refine timing dan transisi. 4) Sound design - musik, sound effect, voice over. 5) Color grading. 6) Motion graphics dan teks. 7) Rendering dan format sesuai platform. 8) Review dengan klien dan revisi.",
+        tips: ["Tekankan manajemen file: backup dan organisasi project yang rapi"],
+      },
+      {
+        id: "ve-role-3",
+        category: "role-specific",
+        question: "Bagaimana Anda menangani kritik dari klien terhadap hasil video Anda?",
+        answer:
+          "Saya anggap kritik sebagai bagian dari proses. 1) Dengarkan dulu tanpa defensif. 2) Klarifikasi poin yang kurang jelas. 3) Tanyakan referensi contoh yang mereka inginkan. 4) Terjemahkan feedback menjadi action item teknis. 5) Berikan estimasi revisi yang realistis. Jika ada feedback yang menurut saya kurang tepat, sampaikan pendapat dengan data dan alasan profesional.",
+        tips: [],
+      },
+      {
+        id: "ve-role-4",
+        category: "role-specific",
+        question: "Apa yang Anda perhatikan dalam komposisi dan pencahayaan saat shooting?",
+        answer:
+          "Komposisi: rule of thirds, headroom, leading lines, framing yang sesuai pesan. Pencahayaan: kualitas cahaya (hard/soft), arah cahaya, white balance, dan kontras. Untuk interview: three-point lighting dasar. Saya juga selalu memikirkan continuity dan kebutuhan edit di tahap post-production.",
+        tips: [],
+      },
+    ],
+  },
+  {
+    id: "hotel-front-office",
+    title: "Staff Front Office / Perhotelan",
+    categorySlug: "operations",
+    icon: "hotel",
+    questions: [
+      ...hrQuestions,
+      {
+        id: "ho-role-1",
+        category: "role-specific",
+        question: "Bagaimana Anda menangani tamu yang marah karena kamar belum siap saat check-in?",
+        answer:
+          "1) Tetap tenang dan dengarkan keluhan tamu sampai selesai. 2) Minta maaf dengan tulus tanpa menyalahkan pihak lain. 3) Cari solusi: kamar lain yang siap, upgrade (jika tersedia), tawarkan menyimpan barang dan menunggu di lounge. 4) Komunikasikan perkiraan waktu secara jelas. 5) Follow up sampai tamu puas. Tujuan: mengubah pengalaman buruk menjadi kesan positif.",
+        tips: ["Service recovery adalah skill utama front office - tunjukkan contoh nyata"],
+        followUp: "Bagaimana jika semua kamar penuh?",
+      },
+      {
+        id: "ho-role-2",
+        category: "role-specific",
+        question: "Software PMS (Property Management System) apa yang Anda kuasai?",
+        answer:
+          "PMS umum di industri: Opera (paling luas digunakan hotel besar), VHP, Amadeus, atau Frontdesk. Proses yang harus dikuasai: check-in/check-out, reservasi, billing, housekeeping status, dan shift report. Jika belum familiar dengan PMS tertentu, saya cepat belajar karena logikanya mirip antar sistem.",
+        tips: ["Jujur tentang tingkat keahlian - dan tunjukkan kesediaan belajar"],
+      },
+      {
+        id: "ho-role-3",
+        category: "role-specific",
+        question: "Bagaimana cara Anda menangani overbooking di hotel?",
+        answer:
+          "1) Jangan panik - cek ketersediaan kamar semua tipe. 2) Koordinasi dengan front office manager dan housekeeping (kamar yang bisa dipercepat). 3) Jika tetap tidak muat: cari hotel mitra terdekat dengan standar setara atau lebih baik, tanggung transportasi. 4) Komunikasikan dengan tamu secara empatik dan berikan kompensasi. 5) Dokumentasikan kejadian untuk evaluasi.",
+        tips: [],
+      },
+    ],
+  },
+  {
+    id: "mechanical-engineer",
+    title: "Mechanical Engineer",
+    categorySlug: "manufacturing",
+    icon: "settings",
+    questions: [
+      ...hrQuestions,
+      {
+        id: "me-role-1",
+        category: "role-specific",
+        question: "Jelaskan pengalaman Anda dalam merancang atau memelihara sistem mekanis.",
+        answer:
+          "Fokus pada: 1) Cakupan proyek (mesin apa, industri apa). 2) Tahapan: analisis kebutuhan, desain (CAD - SolidWorks/AutoCAD), perhitungan (kekuatan material, beban), fabrikasi, instalasi, commissioning. 3) Untuk maintenance: preventive dan predictive maintenance, analisis kegagalan (RCA). 4) Hasil yang terukur: pengurangan downtime, penghematan biaya, peningkatan umur mesin.",
+        tips: ["Gunakan angka konkret: downtime turun X%, umur bearing naik Y bulan"],
+        followUp: "Software CAD/CAE apa yang paling Anda kuasai?",
+      },
+      {
+        id: "me-role-2",
+        category: "role-specific",
+        question: "Bagaimana Anda menganalisis penyebab kerusakan mesin (Root Cause Analysis)?",
+        answer:
+          "1) Kumpulkan data: gejala, riwayat perawatan, kondisi operasi. 2) Inspeksi fisik komponen yang rusak. 3) Gunakan metode: 5 Whys, Fishbone (Ishikawa), atau FMEA untuk menelusuri akar masalah. 4) Bedakan sebab langsung dan sebab kontributor. 5) Susun rekomendasi: perbaikan desain, perubahan prosedur, atau jadwal maintenance. 6) Pantau hasil setelah perbaikan.",
+        tips: ["Contohkan studi kasus nyata yang pernah Anda tangani"],
+      },
+      {
+        id: "me-role-3",
+        category: "role-specific",
+        question: "Apa yang Anda ketahui tentang preventive maintenance dan predictive maintenance?",
+        answer:
+          "Preventive maintenance: perawatan terjadwal berdasarkan interval waktu atau jam operasi (misal ganti oli setiap 500 jam) untuk mencegah kegagalan. Predictive maintenance: memantau kondisi mesin secara real-time (vibration analysis, thermography, oil analysis) untuk memprediksi kapan komponen akan gagal, sehingga perawatan dilakukan tepat waktu - lebih efisien dan mengurangi downtime tak terjadwal.",
+        tips: [],
+        followUp: "Kapan predictive maintenance lebih tepat daripada preventive?",
+      },
+    ],
+  },
 ];
+
+/* ─── i18n support ─── */
+
+export type InterviewLang = "id" | "en";
+
+/** Pilih array posisi sesuai bahasa (default: Indonesia) */
+export function getInterviewPositions(lang: InterviewLang = "id"): PositionQuestions[] {
+  return lang === "en" ? POSITION_QUESTIONS_EN : POSITION_QUESTIONS;
+}
+
+/** Pilih daftar kategori sesuai bahasa */
+export function getInterviewCategories(lang: InterviewLang = "id"): QuestionCategory[] {
+  return lang === "en" ? QUESTION_CATEGORIES_EN : QUESTION_CATEGORIES;
+}
 
 /* ─── Helper ─── */
 
-export function getPositionsByCategory(slug: string): PositionQuestions[] {
-  return POSITION_QUESTIONS.filter((p) => p.categorySlug === slug);
+export function getPositionsByCategory(slug: string, lang: InterviewLang = "id"): PositionQuestions[] {
+  return getInterviewPositions(lang).filter((p) => p.categorySlug === slug);
 }
 
-export function getPositionById(id: string): PositionQuestions | undefined {
-  return POSITION_QUESTIONS.find((p) => p.id === id);
+export function getPositionById(id: string, lang: InterviewLang = "id"): PositionQuestions | undefined {
+  return getInterviewPositions(lang).find((p) => p.id === id);
 }
 
-export function searchPositions(query: string): PositionQuestions[] {
+export function searchPositions(query: string, lang: InterviewLang = "id"): PositionQuestions[] {
   const q = query.toLowerCase();
-  return POSITION_QUESTIONS.filter(
+  return getInterviewPositions(lang).filter(
     (p) =>
       p.title.toLowerCase().includes(q) ||
       p.questions.some((qst) => qst.question.toLowerCase().includes(q))

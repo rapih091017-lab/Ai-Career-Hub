@@ -24,6 +24,7 @@ import { ReviewStep } from "@/components/builder/ReviewStep";
 import { SectionOrderModal } from "@/components/builder/SectionOrderModal";
 import { AtsScoreInsight } from "@/components/builder/AtsScoreInsight";
 import { BuilderLoadingSkeleton, BuilderErrorState } from "@/components/builder/BuilderSkeleton";
+import { useTranslation } from "@/lib/i18n";
 import { useBuilderHelpers } from "@/hooks/useBuilderHelpers";
 import { useBuilderAI } from "@/hooks/useBuilderAI";
 import { useBuilderFormat } from "@/hooks/useBuilderFormat";
@@ -31,14 +32,14 @@ import { useAutoSave } from "@/hooks/useAutoSave";
 import { useFetchCvData } from "@/hooks/useFetchCvData";
 
 
-const steps = [
-  "Data Pribadi",
-  "Target Pekerjaan",
-  "Pengalaman Kerja",
-  "Pendidikan",
-  "Organisasi",
-  "Skill & Lainnya",
-  "Review",
+const STEP_KEYS = [
+  "builder.step-personal",
+  "builder.step-target",
+  "builder.step-experience",
+  "builder.step-education",
+  "builder.step-org",
+  "builder.step-skills",
+  "builder.step-review",
 ];
 
 /* ───────── component ───────── */
@@ -50,6 +51,8 @@ export default function BuilderPage() {
 
   const [activeStep, setActiveStep] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
+  const { t } = useTranslation();
+  const steps = STEP_KEYS.map((k) => t(k));
   const [collapsedWorkIds, setCollapsedWorkIds] = useState<Set<string>>(new Set());
   const { addToast } = useToast();
 
@@ -153,16 +156,16 @@ export default function BuilderPage() {
         if (result.redirectUrl) {
           addToast({ 
             type: "warning", 
-            message: result.error || "Kuota PDF habis · Upgrade untuk unlimited" 
+            message: result.error || t("builder.pdf-quota") 
           });
           setTimeout(() => router.push(result.redirectUrl!), 1500);
         } else {
-          addToast({ type: "error", message: result.error || "Gagal mengekspor PDF" });
+          addToast({ type: "error", message: result.error || t("builder.pdf-export-failed") });
         }
       }
     } catch (err) {
       console.error("PDF Export Error:", err);
-      addToast({ type: "error", message: "Gagal mengekspor PDF. Silakan coba lagi." });
+      addToast({ type: "error", message: t("builder.pdf-export-error") });
     } finally {
       setIsPdfExporting(false);
     }
@@ -180,25 +183,25 @@ export default function BuilderPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(cvData),
       });
-      if (!res.ok) throw new Error(`Gagal menyimpan (${res.status})`);
-      addToast({ type: "success", message: "CV berhasil disimpan!" });
+      if (!res.ok) throw new Error(`${t("builder.save-failed")} (${res.status})`);
+      addToast({ type: "success", message: t("builder.save-success") });
     } catch (err: any) {
       addToast({ type: "error", message: err.message });
     } finally {
       setIsSaving(false);
     }
-  }, [cvId, cvData, addToast]);
+  }, [cvId, cvData, addToast, t]);
 
   /* ── section title helper ── */
 
   const sectionMeta = [
-    { title: "Data Pribadi", desc: "Lengkapi informasi diri kamu untuk memulai CV.", icon: "person" },
-    { title: "Target Pekerjaan", desc: "Masukkan posisi yang dilamar dan deskripsi pekerjaan.", icon: "work_history" },
-    { title: "Pengalaman Kerja", desc: "Cantumkan riwayat pekerjaan yang relevan.", icon: "work" },
-    { title: "Pendidikan", desc: "Tambahkan latar belakang pendidikan formal kamu.", icon: "school" },
-    { title: "Organisasi", desc: "Masukkan pengalaman organisasi atau kepanitiaan.", icon: "groups" },
-    { title: "Skill & Lainnya", desc: "Tuliskan keahlian, sertifikasi, dan bahasa yang dikuasai.", icon: "star" },
-    { title: "Review", desc: "Periksa kembali data CV sebelum menyimpan.", icon: "visibility" },
+    { title: t("builder.step-personal"), desc: t("builder.desc-personal"), icon: "person" },
+    { title: t("builder.step-target"), desc: t("builder.desc-target"), icon: "work_history" },
+    { title: t("builder.step-experience"), desc: t("builder.desc-experience"), icon: "work" },
+    { title: t("builder.step-education"), desc: t("builder.desc-education"), icon: "school" },
+    { title: t("builder.step-org"), desc: t("builder.desc-org"), icon: "groups" },
+    { title: t("builder.step-skills"), desc: t("builder.desc-skills"), icon: "star" },
+    { title: t("builder.step-review"), desc: t("builder.desc-review"), icon: "visibility" },
   ];
 
 
@@ -274,7 +277,7 @@ export default function BuilderPage() {
               <div className="flex flex-wrap items-center gap-2 px-1 py-2 mb-2 bg-primary/5 border border-primary/10 rounded-xl">
                 <div className="flex items-center gap-1.5 text-[11px] font-semibold text-primary shrink-0">
                   <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">travel_explore</span>
-                  <span>Kata Kunci:</span>
+                  <span>{t("builder.keywords-label")}</span>
                 </div>
                 {aiJdKeywords.slice(0, 10).map((kw, i) => (
                   <span key={i} className="px-2 py-0.5 bg-white rounded-full text-[10px] font-medium text-primary border border-primary/20 cursor-default hover:bg-primary/10 transition-colors">
@@ -282,7 +285,7 @@ export default function BuilderPage() {
                   </span>
                 ))}
                 {aiJdKeywords.length > 10 && (
-                  <span className="text-[10px] text-outline">+{aiJdKeywords.length - 10} lainnya</span>
+                  <span className="text-[10px] text-outline">+{aiJdKeywords.length - 10} {t("builder.keywords-more").replace("{n}", String(aiJdKeywords.length - 10))}</span>
                 )}
               </div>
             )}
@@ -298,13 +301,13 @@ export default function BuilderPage() {
             >
               {activeStep === 0 && (
                 <div className="bg-white rounded-xl p-6 shadow-soft space-y-5">
-                  <Field label="Nama Lengkap" value={cvData.fullName} onChange={(v) => updateField("fullName", v)} />
-                  <Field label="No. Telepon" type="tel" value={cvData.phone} onChange={(v) => updateField("phone", v)} />
-                  <Field label="Email" type="email" value={cvData.email} onChange={(v) => updateField("email", v)} />
-                  <Field label="Alamat" value={cvData.address} onChange={(v) => updateField("address", v)} />
-                  <Field label="LinkedIn (opsional)" value={cvData.linkedin} onChange={(v) => updateField("linkedin", v)} />
-                  <Field label="Portofolio / Website (opsional)" type="url" value={cvData.portfolioUrl || ""} onChange={(v) => updateField("portfolioUrl", v)} />
-                  <Field label="Moto / Jabatan Profesional (opsional)" value={cvData.professionalTitle || ""} onChange={(v) => updateField("professionalTitle", v)} />
+                  <Field label={t("builder.field-fullname")} value={cvData.fullName} onChange={(v) => updateField("fullName", v)} />
+                  <Field label={t("builder.field-phone")} type="tel" value={cvData.phone} onChange={(v) => updateField("phone", v)} />
+                  <Field label={t("builder.field-email")} type="email" value={cvData.email} onChange={(v) => updateField("email", v)} />
+                  <Field label={t("builder.field-address")} value={cvData.address} onChange={(v) => updateField("address", v)} />
+                  <Field label={t("builder.field-linkedin")} value={cvData.linkedin} onChange={(v) => updateField("linkedin", v)} />
+                  <Field label={t("builder.field-portfolio")} type="url" value={cvData.portfolioUrl || ""} onChange={(v) => updateField("portfolioUrl", v)} />
+                  <Field label={t("builder.field-motto")} value={cvData.professionalTitle || ""} onChange={(v) => updateField("professionalTitle", v)} />
                   
                   <SummarySection
                     employmentStatus={cvData.employmentStatus || ""}
@@ -325,7 +328,7 @@ export default function BuilderPage() {
                       setAiModal({
                         open: true,
                         mode: "suggest",
-                        title: "Saran AI \u2014 Ringkasan Profesional",
+                        title: t("builder.ai-suggest-title"),
                         suggestions: texts.map((s: any) => ({
                           bullet: s.text,
                           actionVerb: s.label,
@@ -343,7 +346,7 @@ export default function BuilderPage() {
                       setAiModal({
                         open: true,
                         mode: "revise",
-                        title: "Optimalkan \u2014 Ringkasan Profesional",
+                        title: t("builder.ai-revise-title"),
                         original: cvData.summary,
                         versions,
                         explanation,
@@ -402,7 +405,7 @@ export default function BuilderPage() {
                   <button type="button" onClick={addWork}
                     className="w-full border-2 border-dashed border-outline/30 rounded-xl py-4 flex items-center justify-center gap-2 text-body-md text-outline hover:border-primary/50 hover:text-primary transition-colors duration-200"
                   >
-                    <span className="material-symbols-outlined text-lg">add</span> Tambah Pengalaman
+                    <span className="material-symbols-outlined text-lg">add</span> {t("builder.add-experience")}
                   </button>
                 </div>
               )}
@@ -436,7 +439,7 @@ export default function BuilderPage() {
                   <button type="button" onClick={addEducation}
                     className="w-full border-2 border-dashed border-outline/30 rounded-xl py-4 flex items-center justify-center gap-2 text-body-md text-outline hover:border-primary/50 hover:text-primary transition-colors duration-200"
                   >
-                    <span className="material-symbols-outlined text-lg">add</span> Tambah Pendidikan
+                    <span className="material-symbols-outlined text-lg">add</span> {t("builder.add-education")}
                   </button>
                 </div>
               )}
@@ -468,7 +471,7 @@ export default function BuilderPage() {
                   <button type="button" onClick={addOrganization}
                     className="w-full border-2 border-dashed border-outline/30 rounded-xl py-4 flex items-center justify-center gap-2 text-body-md text-outline hover:border-primary/50 hover:text-primary transition-colors duration-200"
                   >
-                    <span className="material-symbols-outlined text-lg">add</span> Tambah Organisasi
+                    <span className="material-symbols-outlined text-lg">add</span> {t("builder.add-org")}
                   </button>
                 </div>
               )}
@@ -529,7 +532,7 @@ export default function BuilderPage() {
                 {allPageCount > 1 && (
                   <div className="mb-3 flex items-center gap-2 text-[11px] font-medium text-outline bg-white/80 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-outline-variant/20 shadow-sm w-fit">
                     <span className="material-symbols-outlined text-sm">description</span>
-                    CV {allPageCount} halaman · margin {marginMode === "tight" ? "10" : marginMode === "normal" ? "20" : "30"}mm
+                    {t("builder.page-badge").replace("{pages}", String(allPageCount)).replace("{margin}", marginMode === "tight" ? "10" : marginMode === "normal" ? "20" : "30")}
                   </div>
                 )}
                 {/* A4 Paper Preview — scrollable continuous paper */}

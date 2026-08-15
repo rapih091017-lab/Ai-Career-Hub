@@ -8,11 +8,12 @@ import AppFooter from "@/components/AppFooter";
 import AuthGuard from "@/components/AuthGuard";
 import { useBookmarks } from "@/hooks/useBookmarks";
 import { QuestionCard } from "@/components/interview/QuestionCard";
-import { QUESTION_CATEGORY_FILTERS } from "@/components/interview/QCategoryIcon";
+import { getQCategoryFilters } from "@/components/interview/QCategoryIcon";
 import { ShareButton } from "@/components/interview/ShareButton";
+import { useTranslation } from "@/lib/i18n";
 import {
-  POSITION_QUESTIONS,
-  QUESTION_CATEGORIES,
+  getInterviewPositions,
+  getInterviewCategories,
 } from "@/data/interview-questions";
 import { notFound } from "next/navigation";
 
@@ -21,23 +22,25 @@ type SortMode = "default" | "category";
 export default function PositionDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { lang } = useTranslation();
   const { isBookmarked, toggleBookmark } = useBookmarks();
 
   const [qFilter, setQFilter] = useState<string>("all");
   const [sortMode, setSortMode] = useState<SortMode>("default");
 
-  const position = POSITION_QUESTIONS.find((p) => p.id === params.id);
+  const positions = getInterviewPositions(lang);
+  const position = positions.find((p) => p.id === params.id);
   if (!position) notFound();
 
-  const currentIndex = POSITION_QUESTIONS.findIndex((p) => p.id === position.id);
-  const prevPosition = currentIndex > 0 ? POSITION_QUESTIONS[currentIndex - 1] : null;
+  const currentIndex = positions.findIndex((p) => p.id === position.id);
+  const prevPosition = currentIndex > 0 ? positions[currentIndex - 1] : null;
   const nextPosition =
-    currentIndex < POSITION_QUESTIONS.length - 1
-      ? POSITION_QUESTIONS[currentIndex + 1]
+    currentIndex < positions.length - 1
+      ? positions[currentIndex + 1]
       : null;
 
   const categoryName =
-    QUESTION_CATEGORIES.find((c) => c.slug === position.categorySlug)?.name ||
+    getInterviewCategories(lang).find((c) => c.slug === position.categorySlug)?.name ||
     position.categorySlug;
 
   const categoryCounts = useMemo(() => {
@@ -77,7 +80,7 @@ export default function PositionDetailPage() {
               <span className="material-symbols-outlined text-[14px] group-hover:-translate-x-0.5 transition-transform">
                 arrow_back
               </span>
-              Kembali ke daftar posisi
+              {lang === "en" ? "Back to position list" : "Kembali ke daftar posisi"}
             </button>
 
             {/* ── Hero ── */}
@@ -89,7 +92,7 @@ export default function PositionDetailPage() {
                 <div className="flex-1 min-w-0">
                   <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-semibold mb-1">
                     <span className="material-symbols-outlined text-[12px]">auto_awesome</span>
-                    Template Interview
+                    {lang === "en" ? "Interview Template" : "Template Interview"}
                   </div>
                   <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-on-background">
                     {position.title}
@@ -102,7 +105,7 @@ export default function PositionDetailPage() {
                   {categoryName}
                 </span>
                 <span>·</span>
-                <span>{position.questions.length} pertanyaan</span>
+                <span>{position.questions.length} {lang === "en" ? "questions" : "pertanyaan"}</span>
                 {savedCount > 0 && (
                   <>
                     <span>·</span>
@@ -113,7 +116,7 @@ export default function PositionDetailPage() {
                       >
                         bookmark
                       </span>
-                      {savedCount} tersimpan
+                      {savedCount} {lang === "en" ? "saved" : "tersimpan"}
                     </span>
                   </>
                 )}
@@ -146,8 +149,10 @@ export default function PositionDetailPage() {
                     <span className="material-symbols-outlined text-lg">play_circle</span>
                   </motion.div>
                   <div className="text-left">
-                    <p className="text-sm font-bold">Latihan Interview {position.title}</p>
-                    <p className="text-[10px] text-white/80">Timer, pertanyaan acak, dan evaluasi jawaban</p>
+                    <p className="text-sm font-bold">{lang === "en" ? "Practice" : "Latihan Interview"} {position.title}</p>
+                    <p className="text-[10px] text-white/80">
+                      {lang === "en" ? "Timer, random questions, and answer evaluation" : "Timer, pertanyaan acak, dan evaluasi jawaban"}
+                    </p>
                   </div>
                 </div>
                 <motion.span
@@ -163,7 +168,7 @@ export default function PositionDetailPage() {
             {/* ── Question Filter + Sort ── */}
             <section className="mb-6">
               <div className="flex items-center gap-2 overflow-x-auto hide-scrollbar">
-                {QUESTION_CATEGORY_FILTERS.map((f) => (
+                {getQCategoryFilters(lang).map((f) => (
                   <button
                     key={f.slug}
                     onClick={() => {
@@ -196,7 +201,9 @@ export default function PositionDetailPage() {
                     title={sortMode === "category" ? "Urut default" : "Urut berdasarkan kategori"}
                   >
                     <span className="material-symbols-outlined text-[12px]">sort</span>
-                    {sortMode === "category" ? "Kategori" : "Default"}
+                    {sortMode === "category"
+                      ? (lang === "en" ? "Category" : "Kategori")
+                      : "Default"}
                   </button>
                 </div>
               </div>
@@ -207,7 +214,7 @@ export default function PositionDetailPage() {
               <div className="bg-white rounded-2xl py-12 border border-dashed border-outline-variant text-center shadow-premium-sm">
                 <span className="material-symbols-outlined text-outline text-3xl mb-2 block">filter_none</span>
                 <p className="text-xs text-on-surface-variant">
-                  Tidak ada pertanyaan dengan filter ini
+                  {lang === "en" ? "No questions match this filter" : "Tidak ada pertanyaan dengan filter ini"}
                 </p>
               </div>
             ) : (
@@ -235,7 +242,7 @@ export default function PositionDetailPage() {
                 >
                   <span className="text-[9px] text-on-surface-variant flex items-center gap-1 mb-1">
                     <span className="material-symbols-outlined text-[10px]">arrow_back</span>
-                    Sebelumnya
+                    {lang === "en" ? "Previous" : "Sebelumnya"}
                   </span>
                   <p className="text-xs font-semibold text-on-surface truncate group-hover:text-primary transition-colors">
                     {prevPosition.title}
@@ -253,7 +260,7 @@ export default function PositionDetailPage() {
                   whileTap={{ scale: 0.98 }}
                 >
                   <span className="text-[9px] text-on-surface-variant flex items-center gap-1 justify-end mb-1">
-                    Selanjutnya
+                    {lang === "en" ? "Next" : "Selanjutnya"}
                     <span className="material-symbols-outlined text-[10px]">arrow_forward</span>
                   </span>
                   <p className="text-xs font-semibold text-on-surface truncate group-hover:text-primary transition-colors">
@@ -273,14 +280,16 @@ export default function PositionDetailPage() {
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-on-surface mb-1">
-                    Tips Interview untuk {position.title}
+                    {lang === "en" ? `Interview Tips for ${position.title}` : `Tips Interview untuk ${position.title}`}
                   </h3>
                   <p className="text-xs text-on-surface-variant leading-relaxed">
-                    Jawab dengan contoh konkret dari pengalaman nyata. Gunakan
-                    jawaban di sini sebagai kerangka, bukan untuk dihafal.
-                    Klik icon{" "}
+                    {lang === "en"
+                      ? "Answer with concrete examples from real experience. Use these answers as a framework, not something to memorize. Click the"
+                      : "Jawab dengan contoh konkret dari pengalaman nyata. Gunakan jawaban di sini sebagai kerangka, bukan untuk dihafal. Klik icon"}{" "}
                     <span className="material-symbols-outlined text-[12px] text-amber-500 align-middle">bookmark</span>{" "}
-                    untuk menyimpan pertanyaan favorit.
+                    {lang === "en"
+                      ? "to save favorite questions."
+                      : "untuk menyimpan pertanyaan favorit."}
                   </p>
                 </div>
               </div>

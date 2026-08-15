@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { sectionScoreColor } from "./types";
+import { useTranslation } from "@/lib/i18n";
 
 /** Section breakdown score bar with expandable issues/suggestions */
 export function SectionScoreCard({ title, score, issues, suggestions, delay }: {
@@ -13,6 +14,7 @@ export function SectionScoreCard({ title, score, issues, suggestions, delay }: {
   delay: number;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const { t } = useTranslation();
   const barColor = sectionScoreColor(score);
 
   return (
@@ -61,7 +63,7 @@ export function SectionScoreCard({ title, score, issues, suggestions, delay }: {
             <div className="px-4 pb-4 space-y-2 border-t border-surface-container-high pt-3">
               {issues && issues.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-red-600 uppercase tracking-wider mb-1">Issues</p>
+                  <p className="text-xs font-bold text-red-600 uppercase tracking-wider mb-1">{t("checker.detail.issues")}</p>
                   <ul className="space-y-1">
                     {issues.map((iss, i) => (
                       <li key={i} className="text-xs text-on-surface-variant flex items-start gap-1.5">
@@ -74,7 +76,7 @@ export function SectionScoreCard({ title, score, issues, suggestions, delay }: {
               )}
               {suggestions && suggestions.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">Saran</p>
+                  <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">{t("checker.detail.suggestions")}</p>
                   <ul className="space-y-1">
                     {suggestions.map((sug, i) => (
                       <li key={i} className="text-xs text-on-surface-variant flex items-start gap-1.5">
@@ -86,7 +88,7 @@ export function SectionScoreCard({ title, score, issues, suggestions, delay }: {
                 </div>
               )}
               {(!issues || issues.length === 0) && (!suggestions || suggestions.length === 0) && (
-                <p className="text-xs text-on-surface-variant italic">Tidak ada catatan tambahan.</p>
+                <p className="text-xs text-on-surface-variant italic">{t("checker.detail.no-notes")}</p>
               )}
             </div>
           </motion.div>

@@ -1,10 +1,13 @@
 "use client";
 
+import { useTranslation } from "@/lib/i18n";
+
 interface AtsScoreInsightProps {
   score: number;
 }
 
 export function AtsScoreInsight({ score }: AtsScoreInsightProps) {
+  const { t } = useTranslation();
   return (
     <div className="w-[80%] my-8">
       <div
@@ -40,17 +43,17 @@ export function AtsScoreInsight({ score }: AtsScoreInsightProps) {
             ATS Score: {score}%
             {" · "}
             {score >= 70
-              ? "CV Siap Lamar!"
+              ? t("builder.ats-ready")
               : score >= 40
-                ? "Perlu Optimalisasi"
-                : "Butuh Perbaikan Besar"}
+                ? t("builder.ats-optimize")
+                : t("builder.ats-major")}
           </h5>
           <p className="text-xs text-on-surface-variant">
             {score < 40
-              ? "Tambahkan kata kunci dari deskripsi pekerjaan ke dalam pengalaman dan skill kamu."
+              ? t("builder.ats-desc-low")
               : score < 70
-                ? "Beberapa kata kunci masih kurang. Gunakan fitur Saran AI atau Optimalkan di tiap deskripsi pekerjaan."
-                : "CV kamu sudah sangat cocok dengan deskripsi pekerjaan. Siap dilanjutkan ke tahap melamar!"}
+                ? t("builder.ats-desc-mid")
+                : t("builder.ats-desc-high")}
           </p>
         </div>
       </div>

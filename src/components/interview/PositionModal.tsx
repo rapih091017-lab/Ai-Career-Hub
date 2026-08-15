@@ -4,12 +4,12 @@ import { useState, useMemo } from "react";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { QuestionCard } from "./QuestionCard";
-import { QUESTION_CATEGORY_FILTERS } from "./QCategoryIcon";
+import { getQCategoryFilters } from "./QCategoryIcon";
 import { ShareButton } from "./ShareButton";
 import MagneticButton from "@/components/MagneticButton";
+import { useTranslation } from "@/lib/i18n";
 import {
-  POSITION_QUESTIONS,
-  QUESTION_CATEGORIES,
+  getInterviewCategories,
   type PositionQuestions,
 } from "@/data/interview-questions";
 
@@ -49,11 +49,12 @@ export function PositionModal({
     return counts;
   }, [position.questions]);
 
-  const categoryName =
-    QUESTION_CATEGORIES.find((c) => c.slug === position.categorySlug)?.name ||
-    position.categorySlug;
-
   const router = useRouter();
+  const { lang } = useTranslation();
+
+  const categoryName =
+    getInterviewCategories(lang).find((c) => c.slug === position.categorySlug)?.name ||
+    position.categorySlug;
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
@@ -100,7 +101,7 @@ export function PositionModal({
 
             {/* ── Question Category Filter + Sort ── */}
             <div className="px-4 pb-3 flex items-center gap-2 overflow-x-auto hide-scrollbar">
-              {QUESTION_CATEGORY_FILTERS.map((f) => (
+              {getQCategoryFilters(lang).map((f) => (
                 <button
                   key={f.slug}
                   onClick={() => {
@@ -142,8 +143,9 @@ export function PositionModal({
           {/* Questions */}
           <div className="p-4 space-y-3">
             <p className="text-xs text-on-surface-variant mb-4">
-              {filteredQuestions.length} pertanyaan
-              {qFilter !== "all" && ` (dari ${position.questions.length})`} untuk posisi{" "}
+              {filteredQuestions.length} {lang === "en" ? "questions" : "pertanyaan"}
+              {qFilter !== "all" && ` (${lang === "en" ? "of" : "dari"} ${position.questions.length})`}{" "}
+              {lang === "en" ? "for position" : "untuk posisi"}{" "}
               <strong className="text-on-surface">{position.title}</strong>
             </p>
 
@@ -151,7 +153,7 @@ export function PositionModal({
               <div className="py-8 text-center">
                 <span className="material-symbols-outlined text-outline text-3xl mb-2 block">filter_none</span>
                 <p className="text-xs text-on-surface-variant">
-                  Tidak ada pertanyaan dengan filter ini
+                  {lang === "en" ? "No questions match this filter" : "Tidak ada pertanyaan dengan filter ini"}
                 </p>
               </div>
             ) : (
@@ -181,7 +183,7 @@ export function PositionModal({
                   className="px-4 py-2 rounded-xl text-[10px] font-semibold bg-surface-container-low text-on-surface-variant hover:bg-surface-container-hover hover:text-primary transition-all flex items-center gap-1"
                 >
                   <span className="material-symbols-outlined text-[12px]">open_in_new</span>
-                  Buka Halaman
+                  {lang === "en" ? "Open Page" : "Buka Halaman"}
                 </button>
               </MagneticButton>
 
@@ -190,7 +192,7 @@ export function PositionModal({
                   onClick={onClose}
                   className="px-6 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:opacity-90 active:scale-[0.97] transition-all"
                 >
-                  Tutup
+                  {lang === "en" ? "Close" : "Tutup"}
                 </button>
               </MagneticButton>
             </div>

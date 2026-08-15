@@ -9,9 +9,10 @@ import AuthGuard from "@/components/AuthGuard";
 import { AnimatedButton } from "@/components/ui/AnimatedButton";
 import { useBookmarks } from "@/hooks/useBookmarks";
 import { PositionModal } from "@/components/interview/PositionModal";
+import { useTranslation } from "@/lib/i18n";
 import {
-  POSITION_QUESTIONS,
-  QUESTION_CATEGORIES,
+  getInterviewPositions,
+  getInterviewCategories,
   getPositionsByCategory,
   searchPositions,
   type PositionQuestions,
@@ -20,6 +21,7 @@ import {
 /* ── Main Page ── */
 export default function InterviewPage() {
   const router = useRouter();
+  const { lang } = useTranslation();
   const [activeCategory, setActiveCategory] = useState("all");
   const [search, setSearch] = useState("");
   const [selectedPosition, setSelectedPosition] =
@@ -28,17 +30,17 @@ export default function InterviewPage() {
 
   const positions = useMemo(() => {
     if (activeCategory === "saved") {
-      return POSITION_QUESTIONS.filter((p) =>
+      return getInterviewPositions(lang).filter((p) =>
         p.questions.some((q) => isBookmarked(q.id))
       );
     }
-    if (search.trim()) return searchPositions(search);
-    if (activeCategory === "all") return POSITION_QUESTIONS;
-    return getPositionsByCategory(activeCategory);
-  }, [activeCategory, search, isBookmarked]);
+    if (search.trim()) return searchPositions(search, lang);
+    if (activeCategory === "all") return getInterviewPositions(lang);
+    return getPositionsByCategory(activeCategory, lang);
+  }, [activeCategory, search, isBookmarked, lang]);
 
-  const totalPositions = POSITION_QUESTIONS.length;
-  const totalQuestions = POSITION_QUESTIONS.reduce(
+  const totalPositions = getInterviewPositions(lang).length;
+  const totalQuestions = getInterviewPositions(lang).reduce(
     (acc, p) => acc + p.questions.length,
     0
   );
@@ -54,15 +56,15 @@ export default function InterviewPage() {
             <section className="mb-10 text-center">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-4">
                 <span className="material-symbols-outlined text-[14px]">auto_awesome</span>
-                Gratis · Template Siap Pakai
+                {lang === "en" ? "Free · Ready-to-Use Templates" : "Gratis · Template Siap Pakai"}
               </div>
               <h1 className="text-[32px] md:text-[40px] font-bold tracking-tight text-on-background mb-3">
-                Persiapan Interview
+                {lang === "en" ? "Interview Prep" : "Persiapan Interview"}
               </h1>
               <p className="text-base md:text-lg text-on-surface-variant max-w-[550px] mx-auto mb-6">
-                {totalQuestions} pertanyaan umum untuk{" "}
-                {totalPositions} posisi berbeda. Lengkap dengan tips
-                cara menjawabnya.
+                {lang === "en"
+                  ? `${totalQuestions} common questions for ${totalPositions} different positions, complete with answering tips.`
+                  : `${totalQuestions} pertanyaan umum untuk ${totalPositions} posisi berbeda. Lengkap dengan tips cara menjawabnya.`}
               </p>
 
               {/* Practice Mode CTA */}
@@ -78,7 +80,7 @@ export default function InterviewPage() {
                 }
                 className="mb-4"
               >
-                Mode Latihan · Timer & Pertanyaan Acak
+                {lang === "en" ? "Practice Mode · Timer & Random Questions" : "Mode Latihan · Timer & Pertanyaan Acak"}
               </AnimatedButton>
 
               {/* Search */}
@@ -93,14 +95,14 @@ export default function InterviewPage() {
                     setSearch(e.target.value);
                     if (e.target.value) setActiveCategory("all");
                   }}
-                  placeholder="Cari posisi atau pertanyaan..."
+                  placeholder={lang === "en" ? "Search positions or questions..." : "Cari posisi atau pertanyaan..."}
                   className="w-full pl-10 pr-10 py-3 rounded-xl bg-white border border-outline-variant/50 shadow-premium-sm text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-shadow"
                 />
                 {search && (
                   <button
                     onClick={() => setSearch("")}
                     className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full hover:bg-surface-container-low flex items-center justify-center transition-colors"
-                    aria-label="Hapus pencarian"
+                    aria-label={lang === "en" ? "Clear search" : "Hapus pencarian"}
                   >
                     <span className="material-symbols-outlined text-sm text-outline">close</span>
                   </button>
@@ -122,9 +124,9 @@ export default function InterviewPage() {
                       : "bg-white text-on-surface-variant border-outline-variant/40 hover:border-primary/30 hover:text-primary"
                   }`}
                 >
-                  Semua Posisi
+                  {lang === "en" ? "All Positions" : "Semua Posisi"}
                 </button>
-                {QUESTION_CATEGORIES.map((cat) => (
+                {getInterviewCategories(lang).map((cat) => (
                   <button
                     key={cat.slug}
                     onClick={() => {
@@ -159,7 +161,7 @@ export default function InterviewPage() {
                   >
                     bookmark
                   </span>
-                  Tersimpan
+                  {lang === "en" ? "Saved" : "Tersimpan"}
                   {bookmarkCount > 0 && (
                     <span
                       className={`ml-0.5 inline-flex items-center justify-center min-w-[18px] h-[18px] rounded-full text-[9px] font-bold px-1 ${
@@ -185,13 +187,13 @@ export default function InterviewPage() {
                 </div>
                 <h3 className="font-label-bold text-on-surface mb-1">
                   {activeCategory === "saved"
-                    ? "Belum ada pertanyaan tersimpan"
-                    : "Posisi tidak ditemukan"}
+                    ? (lang === "en" ? "No saved questions yet" : "Belum ada pertanyaan tersimpan")
+                    : (lang === "en" ? "Position not found" : "Posisi tidak ditemukan")}
                 </h3>
                 <p className="text-xs text-on-surface-variant">
                   {activeCategory === "saved"
-                    ? "Klik icon bookmark pada pertanyaan untuk menyimpannya"
-                    : "Coba gunakan kata kunci lain atau pilih kategori yang berbeda"}
+                    ? (lang === "en" ? "Click the bookmark icon on a question to save it" : "Klik icon bookmark pada pertanyaan untuk menyimpannya")
+                    : (lang === "en" ? "Try another keyword or choose a different category" : "Coba gunakan kata kunci lain atau pilih kategori yang berbeda")}
                 </p>
               </div>
             ) : (
@@ -220,10 +222,10 @@ export default function InterviewPage() {
                             {pos.title}
                           </h3>
                           <p className="text-[10px] text-on-surface-variant">
-                            {pos.questions.length} pertanyaan
+                            {pos.questions.length} {lang === "en" ? "questions" : "pertanyaan"}
                             {savedCount > 0 && (
                               <span className="text-amber-600 ml-1.5">
-                                &middot; {savedCount} tersimpan
+                                &middot; {savedCount} {lang === "en" ? "saved" : "tersimpan"}
                               </span>
                             )}
                           </p>
@@ -236,7 +238,7 @@ export default function InterviewPage() {
                       {/* Category badge + Lihat Detail link */}
                       <div className="flex items-center justify-between">
                         <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-semibold bg-surface-container-low text-on-surface-variant">
-                          {QUESTION_CATEGORIES.find((c) => c.slug === pos.categorySlug)?.name ||
+                          {getInterviewCategories(lang).find((c) => c.slug === pos.categorySlug)?.name ||
                             pos.categorySlug}
                         </span>
                         <span
@@ -246,7 +248,7 @@ export default function InterviewPage() {
                           }}
                           className="text-[10px] font-semibold text-primary opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5"
                         >
-                          Lihat Detail
+                          {lang === "en" ? "View Details" : "Lihat Detail"}
                           <span className="material-symbols-outlined text-[10px]">open_in_new</span>
                         </span>
                       </div>
@@ -264,14 +266,16 @@ export default function InterviewPage() {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-sm font-bold text-on-surface mb-1">
-                    Tips Menggunakan Database Interview Ini
+                    {lang === "en" ? "Tips for Using This Interview Database" : "Tips Menggunakan Database Interview Ini"}
                   </h3>
                   <p className="text-xs text-on-surface-variant leading-relaxed">
-                    Template ini adalah panduan umum. Jawablah dengan cerita dan
-                    pengalaman nyata Anda. Klik icon{" "}
+                    {lang === "en"
+                      ? "These templates are general guides. Answer with your own stories and real experience. Click the"
+                      : "Template ini adalah panduan umum. Jawablah dengan cerita dan pengalaman nyata Anda. Klik icon"}{" "}
                     <span className="material-symbols-outlined text-[12px] text-amber-500 align-middle">bookmark</span>{" "}
-                    untuk menyimpan pertanyaan favorit, atau buka halaman detail
-                    setiap posisi untuk navigasi yang lebih nyaman.
+                    {lang === "en"
+                      ? "to save favorite questions, or open each position's detail page for easier navigation."
+                      : "untuk menyimpan pertanyaan favorit, atau buka halaman detail setiap posisi untuk navigasi yang lebih nyaman."}
                   </p>
                 </div>
               </div>

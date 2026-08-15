@@ -1,16 +1,13 @@
-import { Metadata } from "next";
-import Link from "next/link";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Info Karir | AI Career Hub",
-  description: "Cari lowongan kerja? Kami sedang menyiapkan job board khusus untuk Anda. Sementara itu, jelajahi portal lowongan eksternal.",
-};
+import Link from "next/link";
+import { useTranslation } from "@/lib/i18n";
 
 const EXTERNAL_PORTALS = [
   {
     name: "LinkedIn",
     url: "https://www.linkedin.com/jobs/",
-    description: "Jaringan profesional terbesar, ribuan lowongan dari perusahaan multinasional hingga startup.",
+    descriptionKey: "karir.portal-linkedin",
     icon: "⬡",
     color: "bg-blue-50 border-blue-200",
     textColor: "text-blue-700",
@@ -19,7 +16,7 @@ const EXTERNAL_PORTALS = [
   {
     name: "Glints",
     url: "https://glints.com/id/opportunities/jobs",
-    description: "Platform karir populer untuk fresh graduate dan profesional muda di Indonesia & Asia.",
+    descriptionKey: "karir.portal-glints",
     icon: "✦",
     color: "bg-amber-50 border-amber-200",
     textColor: "text-amber-700",
@@ -28,7 +25,7 @@ const EXTERNAL_PORTALS = [
   {
     name: "Jobstreet",
     url: "https://www.jobstreet.co.id/",
-    description: "Portal lowongan terpercaya dengan ribuan posisi dari berbagai industri di Indonesia.",
+    descriptionKey: "karir.portal-jobstreet",
     icon: "◆",
     color: "bg-red-50 border-red-200",
     textColor: "text-red-700",
@@ -37,7 +34,7 @@ const EXTERNAL_PORTALS = [
   {
     name: "Karir.com",
     url: "https://www.karir.com/",
-    description: "Platform pencarian kerja yang fokus pada pasar tenaga kerja Indonesia.",
+    descriptionKey: "karir.portal-karircom",
     icon: "●",
     color: "bg-green-50 border-green-200",
     textColor: "text-green-700",
@@ -46,7 +43,7 @@ const EXTERNAL_PORTALS = [
   {
     name: "Indeed",
     url: "https://id.indeed.com/",
-    description: "Mesin pencari lowongan global dengan agregasi dari ribuan sumber dan perusahaan.",
+    descriptionKey: "karir.portal-indeed",
     icon: "⬢",
     color: "bg-indigo-50 border-indigo-200",
     textColor: "text-indigo-700",
@@ -55,7 +52,7 @@ const EXTERNAL_PORTALS = [
   {
     name: "TechInAsia",
     url: "https://www.techinasia.com/jobs",
-    description: "Lowongan khusus industri teknologi dan startup di Asia Tenggara.",
+    descriptionKey: "karir.portal-techinasia",
     icon: "▲",
     color: "bg-emerald-50 border-emerald-200",
     textColor: "text-emerald-700",
@@ -64,6 +61,8 @@ const EXTERNAL_PORTALS = [
 ];
 
 export default function KarirPage() {
+  const { t } = useTranslation();
+
   return (
     <main className="min-h-screen bg-background">
       {/* ── Hero ── */}
@@ -71,16 +70,15 @@ export default function KarirPage() {
         <div className="max-w-3xl mx-auto px-6 py-20 md:py-24">
           <Link href="/" className="inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors mb-6 text-sm">
             <span className="material-symbols-outlined text-lg">arrow_back</span>
-            Kembali ke Beranda
+            {t("karir.back-home")}
           </Link>
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/15 rounded-full text-xs font-bold tracking-wider mb-6">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            Segera Hadir
+            {t("karir.soon")}
           </div>
-          <h1 className="font-headline-lg text-3xl md:text-4xl font-bold mb-3">Pusat Info Karir</h1>
+          <h1 className="font-headline-lg text-3xl md:text-4xl font-bold mb-3">{t("karir.title")}</h1>
           <p className="text-white/80 text-lg max-w-xl">
-            Kami sedang menyiapkan job board khusus untuk membantu Anda menemukan lowongan yang tepat.
-            Pantau terus halaman ini untuk update terbaru!
+            {t("karir.subtitle")}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
@@ -88,14 +86,14 @@ export default function KarirPage() {
               className="inline-flex items-center gap-2 px-6 py-3 bg-white text-primary font-bold rounded-xl hover:bg-white/90 active:scale-[0.97] transition-all shadow-lg"
             >
               <span className="material-symbols-outlined text-lg">edit_note</span>
-              Siapkan CV-mu Sekarang
+              {t("karir.prepare-cv")}
             </Link>
             <Link
               href="/interview"
               className="inline-flex items-center gap-2 px-6 py-3 bg-white/15 text-white font-bold rounded-xl hover:bg-white/25 active:scale-[0.97] transition-all border border-white/20"
             >
               <span className="material-symbols-outlined text-lg">record_voice_over</span>
-              Latihan Interview
+              {t("karir.interview-practice")}
             </Link>
           </div>
         </div>
@@ -110,17 +108,16 @@ export default function KarirPage() {
                 <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>construction</span>
               </div>
               <div>
-                <h2 className="font-headline-md text-xl text-on-surface mb-2">Apa yang Akan Hadir?</h2>
+                <h2 className="font-headline-md text-xl text-on-surface mb-2">{t("karir.coming-title")}</h2>
                 <p className="text-body-md text-on-surface-variant leading-relaxed mb-4">
-                  Tim kami sedang membangun fitur Job Board yang akan membantu kamu menemukan 
-                  lowongan pekerjaan terbaru yang sesuai dengan profil dan preferensimu.
+                  {t("karir.coming-desc")}
                 </p>
                 <ul className="space-y-3">
                   {[
-                    { icon: "search", text: "Rekomendasi lowongan berdasarkan skill & pengalaman" },
-                    { icon: "notifications", text: "Notifikasi real-time saat lowongan baru diposting" },
-                    { icon: "bolt", text: "Lamaran cepat · kirim CV langsung dari platform" },
-                    { icon: "auto_awesome", text: "AI Match · skor kecocokan CV dengan lowongan" },
+                    { icon: "search", text: t("karir.coming-1") },
+                    { icon: "notifications", text: t("karir.coming-2") },
+                    { icon: "bolt", text: t("karir.coming-3") },
+                    { icon: "auto_awesome", text: t("karir.coming-4") },
                   ].map((item, i) => (
                     <li key={i} className="flex items-center gap-3">
                       <span className="material-symbols-outlined text-primary text-lg">{item.icon}</span>
@@ -138,11 +135,11 @@ export default function KarirPage() {
           <div className="text-center mb-8">
             <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary/5 text-primary text-xs font-bold tracking-wider rounded-full mb-4">
               <span className="material-symbols-outlined text-sm">link</span>
-              Sumber Terpercaya
+              {t("karir.trusted-source")}
             </span>
-            <h2 className="font-headline-md text-xl text-on-surface mb-2">Portal Lowongan Eksternal</h2>
+            <h2 className="font-headline-md text-xl text-on-surface mb-2">{t("karir.portals-title")}</h2>
             <p className="text-body-md text-on-surface-variant">
-              Sambil menunggu job board kami rilis, Anda bisa mencari lowongan di portal-portal berikut:
+              {t("karir.portals-desc")}
             </p>
           </div>
 
@@ -159,7 +156,7 @@ export default function KarirPage() {
                   <span className="text-xl">{portal.icon}</span>
                   <h3 className="font-label-bold text-on-surface group-hover:text-primary transition-colors">{portal.name}</h3>
                 </div>
-                <p className="text-xs text-on-surface-variant leading-relaxed mb-3">{portal.description}</p>
+                <p className="text-xs text-on-surface-variant leading-relaxed mb-3">{t(portal.descriptionKey)}</p>
                 <div className="flex items-center gap-1 text-[10px] font-medium">
                   <span className="material-symbols-outlined text-xs">open_in_new</span>
                   {portal.label}
@@ -175,17 +172,16 @@ export default function KarirPage() {
             <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <span className="material-symbols-outlined text-primary text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>description</span>
             </div>
-            <h2 className="font-headline-md text-xl text-on-surface mb-2">Siap Melamar?</h2>
+            <h2 className="font-headline-md text-xl text-on-surface mb-2">{t("karir.cta-title")}</h2>
             <p className="text-body-md text-on-surface-variant mb-6">
-              Sembari menunggu job board rilis, gunakan CV Builder kami untuk membuat CV 
-              ATS-friendly yang siap dikirim ke perusahaan impianmu.
+              {t("karir.cta-desc")}
             </p>
             <Link
               href="/builder/new"
               className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary text-on-primary font-bold rounded-xl hover:brightness-110 active:scale-[0.97] transition-all shadow-md"
             >
               <span className="material-symbols-outlined text-lg">add</span>
-              Buat CV Baru
+              {t("karir.cta-btn")}
             </Link>
           </div>
         </section>

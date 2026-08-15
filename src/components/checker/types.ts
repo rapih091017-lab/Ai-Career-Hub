@@ -49,6 +49,8 @@ export interface ActionPlan {
 export interface BulletItem {
   section: string;
   original_text: string;
+  /** Skor CARI (Context-Action-Result-Impact) 0-100 dari AI — belum tentu ada di hasil lama */
+  cari_score?: number;
   issues: string[];
   suggested_rewrite: string;
   priority: "High" | "Medium" | "Low";

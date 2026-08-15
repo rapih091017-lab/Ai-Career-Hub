@@ -241,12 +241,28 @@ export async function serializePreviewHtml(
   const allCss = cssParts.filter(Boolean).join("\n\n");
 
   // ── A4 preview overrides untuk PDF server ──
+  // Catatan: surat lamaran (class a4-letter) membawa padding sendiri pada
+  // elemen A4 (20mm 22mm) — jangan di-nol-kan, agar PDF match preview.
+  // CV builder (a4-preview tanpa a4-letter) memang ingin padding 0 karena
+  // ruang kosong dihasilkan oleh @page margin pdf-server.
   const printOverrides = `
-    .a4-preview {
+    .a4-preview:not(.a4-letter) {
       width: 210mm;
       min-height: 297mm;
       margin: 0 auto;
       padding: 0 !important;
+      box-shadow: none !important;
+      border: 0 !important;
+      background: white !important;
+      overflow: visible !important;
+      transform: none !important;
+      scale: none !important;
+    }
+    .a4-preview.a4-letter {
+      width: 210mm;
+      min-height: 297mm !important;
+      height: auto !important;
+      margin: 0 auto;
       box-shadow: none !important;
       border: 0 !important;
       background: white !important;
@@ -402,6 +418,18 @@ export async function exportPreviewToPrintPdf(
       /* Netralkan scale wrapper responsif (LetterPreview) agar surat dicetak ukuran penuh */
       .printing-cv [style*="transform: scale"] { transform: none !important; }
       .printing-cv [style*="overflow: hidden"] { overflow: visible !important; height: auto !important; max-height: none !important; }
+      /* Surat lamaran: elemen A4 penuh (297mm) + padding elemen menyediakan ruang.
+         Konsisten dengan jalur pdf-server (serializePreviewHtml). */
+      .printing-cv .a4-preview.a4-letter {
+        width: 210mm !important;
+        min-height: 297mm !important;
+        height: auto !important;
+        margin: 0 auto !important;
+        box-shadow: none !important;
+        border: 0 !important;
+        overflow: visible !important;
+        transform: none !important;
+      }
     `;
     document.head.appendChild(style);
 
