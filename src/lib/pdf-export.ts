@@ -307,9 +307,10 @@ export async function serializePreviewHtml(
 export async function exportPdfViaServer(
   element: HTMLElement,
   fileName?: string,
-  marginMm?: number
+  marginMm?: number,
+  contentAreaMm?: number
 ): Promise<{ ok: boolean; error?: string; redirectUrl?: string }> {
-  // ── Try Puppeteer server first (auto-download) ──
+  // ── Try Puppeteer server first (auto-download, ATS-readable text) ──
   const html = await serializePreviewHtml(element);
 
   try {
@@ -328,13 +329,13 @@ export async function exportPdfViaServer(
         .json()
         .catch(() => ({ error: "UNKNOWN", message: "Gagal export PDF" }));
 
-      // PDF server mati/unreachable → fallback ke window.print() agar
-      // user tetap bisa dapat PDF (bukan hanya tampil error).
+      // PDF server mati/unreachable → fallback ke html2canvas (auto-download,
+      // tanpa dialog print). Hasil tetap A4 rapi sesuai preview.
       if (err.error === "PDF_SERVER_UNREACHABLE" || err.error === "PDF_SERVER_ERROR") {
-        console.warn("[pdf] pdf-server unreachable, falling back to window.print():", err.message);
+        console.warn("[pdf] pdf-server unreachable, falling back to html2canvas:", err.message);
         try {
-          await exportPreviewToPrintPdf(element, fileName, marginMm);
-          return { ok: true, error: "pdf-server unavailable, used browser print fallback" };
+          await exportPreviewToPdf(element, fileName, contentAreaMm, marginMm);
+          return { ok: true, error: "pdf-server unavailable, used html2canvas fallback" };
         } catch (fallbackErr) {
           return { ok: false, error: "Gagal export PDF (server & fallback)" };
         }
@@ -356,11 +357,11 @@ export async function exportPdfViaServer(
 
     return { ok: true };
   } catch (err) {
-    // ── Fallback: server unreachable — gunakan window.print() ──
-    console.warn("[pdf] Server unreachable, falling back to window.print():", err);
+    // ── Fallback: server unreachable — html2canvas (auto-download) ──
+    console.warn("[pdf] Server unreachable, falling back to html2canvas:", err);
     try {
-      await exportPreviewToPrintPdf(element, fileName, marginMm);
-      return { ok: true, error: "pdf-server unavailable, used browser print fallback" };
+      await exportPreviewToPdf(element, fileName, contentAreaMm, marginMm);
+      return { ok: true, error: "pdf-server unavailable, used html2canvas fallback" };
     } catch (fallbackErr) {
       return { ok: false, error: "Gagal export PDF (server & fallback)" };
     }

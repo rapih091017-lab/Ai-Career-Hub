@@ -522,7 +522,9 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
       const name = sender ? `${sender}_Surat_Lamaran.pdf` : "Surat_Lamaran.pdf";
       // Margin 0: elemen A4 surat membawa padding sendiri (20mm 22mm),
       // sehingga hasil PDF sama persis dengan preview — tanpa margin ganda.
-      const result = await exportPdfViaServer(previewRef.current, name, 0);
+      // contentAreaMm = 297: satu slice = satu halaman A4 penuh (fallback
+      // html2canvas slicing per halaman, auto-download tanpa dialog print).
+      const result = await exportPdfViaServer(previewRef.current, name, 0, 297);
       if (!result.ok) {
         addToast({ type: result.redirectUrl ? "warning" : "error", message: result.error || "Gagal export PDF" });
       } else {

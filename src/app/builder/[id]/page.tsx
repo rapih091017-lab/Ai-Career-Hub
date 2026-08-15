@@ -150,7 +150,8 @@ export default function BuilderPage() {
       const result = await exportPdfViaServer(
         el,
         `${cvData.fullName || "CV"}_AI_Career_Hub.pdf`,
-        marginPadding
+        marginPadding,
+        contentAreaMm
       );
       if (!result.ok) {
         if (result.redirectUrl) {

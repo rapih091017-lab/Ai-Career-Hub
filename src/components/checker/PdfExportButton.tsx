@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { exportElementToPdf, exportPreviewToPrintPdf } from "@/lib/pdf-export";
+import { exportElementToPdf, exportPreviewToPdf } from "@/lib/pdf-export";
 
 interface PdfExportButtonProps {
   targetRef: React.RefObject<HTMLDivElement | null>;
@@ -13,13 +13,11 @@ interface PdfExportButtonProps {
   onBuilderExport?: () => Promise<void>;
   /** Builder-only: loading state from parent */
   externalLoading?: boolean;
-}
-
-/**
- * Unified PDF export button.
- * Primary: html2canvas (auto-download, no dialog).
- * Fallback: window.print() (browser dialog, text selectable).
- */
+}  /**
+   * Unified PDF export button.
+   * Primary: html2canvas (auto-download, no dialog).
+   * Fallback: html2canvas multi-page A4 (auto-download, no dialog).
+   */
 export function PdfExportButton({
   targetRef,
   fileName = "cv-analysis-report.pdf",
@@ -48,11 +46,11 @@ export function PdfExportButton({
       // Primary: html2canvas — auto-download, no dialog
       await exportElementToPdf(targetRef.current, fileName);
     } catch (err) {
-      console.warn("[pdf] html2canvas failed, trying window.print():", err);
+      console.warn("[pdf] html2canvas failed, trying A4 fallback:", err);
       try {
-        // Fallback: window.print() — text selectable, browser dialog
+        // Fallback: html2canvas multi-page A4 — tetap auto-download, no dialog
         setIsFallback(true);
-        await exportPreviewToPrintPdf(targetRef.current, fileName, 15);
+        await exportPreviewToPdf(targetRef.current, fileName);
         // Reset fallback label after 3s
         setTimeout(() => setIsFallback(false), 3000);
       } catch (fallbackErr) {
@@ -70,7 +68,7 @@ export function PdfExportButton({
         onClick={handleExport}
         disabled={loading}
         className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-on-primary text-sm font-semibold hover:brightness-110 active:scale-[0.97] transition-[filter,transform,opacity] disabled:opacity-60 shadow-premium-sm"
-        title={isFallback ? "Menggunakan mode cetak browser" : "Download PDF hasil analisis"}
+        title={isFallback ? "Menggunakan mode A4" : "Download PDF hasil analisis"}
       >
         {loading ? (
           <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
@@ -80,7 +78,7 @@ export function PdfExportButton({
         ) : (
           <span className="material-symbols-outlined text-lg select-none">download</span>
         )}
-        {isFallback ? "Cetak (Print)" : label}
+        {isFallback ? "Mengunduh A4..." : label}
       </button>
       {errorMsg && (
         <div className="absolute top-full mt-2 right-0 bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg p-3 shadow-premium-md w-64 z-10">
