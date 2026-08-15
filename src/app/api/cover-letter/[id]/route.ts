@@ -35,7 +35,7 @@ export const PUT = apiHandler(async (request: NextRequest, { params }: Params) =
 
   const { id } = await params;
   const body = await request.json();
-  const { content, subject, companyName, recipientName, letterNumber, attachment } = body;
+  const { content, subject, companyName, recipientName, letterNumber, attachment, jobSource, companyAddress, motivationReason, futurePlan } = body;
 
   if (typeof content !== "string" || content.trim().length === 0) {
     return errorResponse("INVALID_INPUT", "Field 'content' wajib diisi", 400);
@@ -60,6 +60,10 @@ export const PUT = apiHandler(async (request: NextRequest, { params }: Params) =
       recipientName: typeof recipientName === "string" ? recipientName : undefined,
       letterNumber: typeof letterNumber === "string" ? letterNumber.trim() || null : undefined,
       attachment: typeof attachment === "string" ? attachment.trim() || null : undefined,
+      jobSource: typeof jobSource === "string" ? jobSource.trim() || null : undefined,
+      companyAddress: typeof companyAddress === "string" ? companyAddress.trim() || null : undefined,
+      motivationReason: typeof motivationReason === "string" ? motivationReason.trim() || null : undefined,
+      futurePlan: typeof futurePlan === "string" ? futurePlan.trim() || null : undefined,
       updatedAt: new Date(),
     })
     .where(eq(coverLetters.id, id))

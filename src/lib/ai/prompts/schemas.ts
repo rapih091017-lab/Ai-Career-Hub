@@ -8,32 +8,66 @@ const ScoreField = () => z.number().int().min(0).max(100).catch(50);
 const StringField = (min = 1) => z.string().min(min).catch("");
 const StringArr = () => z.array(z.string()).catch([]);
 
+/* Issue dengan bukti kutipan (excerpt anchoring). Backward-compat:
+ * AI lama masih mengirim string polos, AI baru mengirim { text, source_excerpt }.
+ * Union dipakai agar keduanya lolos validasi. */
+const IssueOrString = () =>
+  z.union([
+    z.string(),
+    z.object({
+      text: z.string().catch(""),
+      source_excerpt: z.string().nullable().catch(null),
+    }),
+  ]);
+const IssueArr = () => z.array(IssueOrString()).catch([]);
+
+/** Bobot per-section (desimal 0-1, mis. 0.20) sesuai role category —
+ * dipakai transparansi skor di UI. BUKAN ScoreField karena bobot bukan integer. */
+const WeightField = () => z.number().min(0).max(1).catch(0);
+const ROLE_CATEGORIES = ["tech", "creative", "sales_marketing", "fresh_graduate", "general"] as const;
+const WeightsAppliedSchema = z.object({
+  role_category: z.enum(ROLE_CATEGORIES).catch("general"),
+  summary_weight: WeightField(),
+  experience_weight: WeightField(),
+  skills_weight: WeightField(),
+  education_weight: WeightField(),
+  format_ats_weight: WeightField(),
+}).catch({
+  role_category: "general",
+  summary_weight: 0.2,
+  experience_weight: 0.35,
+  skills_weight: 0.25,
+  education_weight: 0.1,
+  format_ats_weight: 0.1,
+});
+
 export const AnalysisResultSchema = z.object({
   // ── Overall ──
   overall_score: ScoreField(),
   grade: z.enum(["A", "B", "C", "D"]).catch("C"),
+  weights_applied: WeightsAppliedSchema.optional(),
   verdict: StringField(5).catch("Analisis AI telah selesai. Lihat breakdown untuk detail."),
   ats_prediction: z.union([
     z.string(),
     z.object({
       result: z.enum(["Likely Pass", "Borderline", "Likely Fail"]).catch("Borderline"),
       match_confidence: ScoreField(),
-      risk_factors: StringArr(),
+      risk_factors: IssueArr(),
       strengths: StringArr(),
     }).catch({ result: "Borderline", match_confidence: 50, risk_factors: [], strengths: [] }),
   ]).catch("Borderline"),
 
   // ── Per-section breakdown ──
   breakdown: z.object({
-    summary: z.object({ score: ScoreField(), issues: StringArr(), suggestions: StringArr() })
+    summary: z.object({ score: ScoreField(), issues: IssueArr(), suggestions: StringArr() })
       .catch({ score: 50, issues: [], suggestions: [] }),
-    experience: z.object({ score: ScoreField(), issues: StringArr(), suggestions: StringArr() })
+    experience: z.object({ score: ScoreField(), issues: IssueArr(), suggestions: StringArr() })
       .catch({ score: 50, issues: [], suggestions: [] }),
     skills: z.object({ score: ScoreField(), missing_skills: StringArr(), adjacent_skills: StringArr().optional(), recommendations: StringArr() })
       .catch({ score: 50, missing_skills: [], adjacent_skills: [], recommendations: [] }),
     education: z.object({ score: ScoreField(), relevance: StringField(), suggestions: StringArr() })
       .catch({ score: 50, relevance: "", suggestions: [] }),
-    format_ats: z.object({ score: ScoreField(), issues: StringArr(), tips: StringArr() })
+    format_ats: z.object({ score: ScoreField(), issues: IssueArr(), tips: StringArr() })
       .catch({ score: 50, issues: [], tips: [] }),
   }).catch({
     summary: { score: 50, issues: [], suggestions: [] },

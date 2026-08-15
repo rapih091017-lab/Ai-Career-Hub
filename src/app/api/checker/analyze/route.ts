@@ -28,7 +28,11 @@ export const POST = apiHandler(async (request: NextRequest) => {
   }
 
   const body = await request.json();
-  const { extractedText, jobDescription } = body;
+  const { extractedText, jobDescription, roleCategory } = body;
+
+  // Kategori posisi → bobot per-section dinamis (lihat prompt analysis-v3 ROLE CATEGORY).
+  const VALID_ROLE_CATEGORIES = ["tech", "creative", "sales_marketing", "fresh_graduate", "general"];
+  const roleCat = VALID_ROLE_CATEGORIES.includes(roleCategory) ? roleCategory : "general";
 
   // ── 0.5 VALIDASI INPUT ───────────────────────────────────────────
   // Cegah payload tak lengkap (undefined/non-string/kosong) dari crash
@@ -50,8 +54,8 @@ export const POST = apiHandler(async (request: NextRequest) => {
   const session = await auth();
 
   // ── 2. CEK KUOTA USER (jika login) ───────────────────────────────
-  // Model analyzer: pembeli paket yang memberi fitur CV Analyzer → deepseek-reasoner (R1);
-  // free / paket tanpa analyzer → deepseek-chat (V3). Diputuskan di sini.
+  // Model analyzer: pembeli paket yang memberi fitur CV Analyzer → deepseek-v4-pro (thinking);
+  // free / paket tanpa analyzer → deepseek-v4-flash. Diputuskan di sini.
   let useReasoner = false;
   if (session?.user?.id) {
     const access = await getUserAccess(session.user.id);
@@ -159,14 +163,11 @@ export const POST = apiHandler(async (request: NextRequest) => {
   let aiAnalysis: AnalysisResult | null = null;
   try {
     aiAnalysis = await callAI<AnalysisResult>({
-      systemPrompt: ANALYSIS_PROMPT_V3,
-      userPrompt: `${extractedText}
-
-=== JOB DESCRIPTION ===
-${jd || "Tidak ada deskripsi pekerjaan."}`,
+      systemPrompt: ANALYSIS_PROMPT_V3.replace(/\{\{ROLE_CATEGORY\}\}/g, roleCat),
+      userPrompt: `=== ROLE CATEGORY: ${roleCat} ===\n\n=== CV KANDIDAT ===\n${extractedText}\n\n=== JOB DESCRIPTION TARGET ===\n${jd || "Tidak ada deskripsi pekerjaan."}`,
       temperature: 0.3,
-      // Model: premium → deepseek-reasoner (R1) untuk analisis mendalam;
-      // free/anonymous → deepseek-chat (V3) agar biaya terkontrol.
+      // Model: premium → deepseek-v4-pro (thinking) untuk analisis mendalam;
+      // free/anonymous → deepseek-v4-flash agar biaya terkontrol.
       // Catatan: R1 tidak mendukung response_format json_object — JSON dipaksa
       // via prompt analysis-v3 dan ditangani adapter (isReasoner).
       model: useReasoner ? MODELS.REASONER : MODELS.CHAT,
@@ -235,6 +236,7 @@ ${jd || "Tidak ada deskripsi pekerjaan."}`,
     bulletReview: aiAnalysis?.bullet_review ?? [],
     missingSections: aiAnalysis?.missing_sections ?? [],
     grade: aiAnalysis?.grade ?? null,
+    weightsApplied: aiAnalysis?.weights_applied ?? null,
     atsPrediction: normalizedAtsPrediction,
   };
 
@@ -276,7 +278,7 @@ ${jd || "Tidak ada deskripsi pekerjaan."}`,
       // Model yang dipakai — ditampilkan sebagai badge di UI hasil analisis.
       // Hanya dikirim jika AI benar-benar berhasil (aiAnalysis non-null),
       // supaya badge tidak muncul di response fallback tanpa analisis AI.
-      aiModel: aiAnalysis ? (useReasoner ? "R1" : "V3") : undefined,
+      aiModel: aiAnalysis ? (useReasoner ? "V4 Pro" : "V4 Flash") : undefined,
       ...aiStructuredData,
     },
     { status: 200 },

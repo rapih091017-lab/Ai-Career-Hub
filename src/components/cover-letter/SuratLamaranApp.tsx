@@ -27,6 +27,10 @@ interface LetterItem {
   subject: string | null;
   letterNumber: string | null;
   attachment: string | null;
+  jobSource?: string | null;
+  companyAddress?: string | null;
+  motivationReason?: string | null;
+  futurePlan?: string | null;
   content: string;
   createdAt: string;
   updatedAt: string;
@@ -149,6 +153,10 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
   const [recipientName, setRecipientName] = useState("");
   const [letterNumber, setLetterNumber] = useState("");
   const [attachment, setAttachment] = useState("");
+  const [jobSource, setJobSource] = useState("");
+  const [companyAddress, setCompanyAddress] = useState("");
+  const [motivationReason, setMotivationReason] = useState("");
+  const [futurePlan, setFuturePlan] = useState("");
 
   // Result state
   const [letters, setLetters] = useState<LetterItem[]>([]);
@@ -156,6 +164,64 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
   const [subject, setSubject] = useState("");
   const [content, setContent] = useState("");
   const [dirty, setDirty] = useState(false);
+
+  /* ── Editor blok paragraf (ergonomi ala builder CV) ──
+   * content = sumber kebenaran (disimpan ke DB). ParaBlocks adalah tampilan
+   * terstruktur utk editing: di-split per paragraf (\n\n), lalu di-join
+   * kembali saat commit. lastContentRef mencegah loop: hanya perubahan
+   * content dari LUAR (generate/load) yang menyegarkan blok; edit user
+   * lewat blok TIDAK memicu re-split. */
+  const [paraBlocks, setParaBlocks] = useState<string[]>([]);
+  const lastContentRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (lastContentRef.current !== content) {
+      lastContentRef.current = content;
+      setParaBlocks(
+        (content ?? "")
+          .split(/\n\s*\n/)
+          .map((p) => p.trim())
+          .filter(Boolean)
+      );
+    }
+  }, [content]);
+
+  const commitBlocks = useCallback((blocks: string[]) => {
+    const joined = blocks.join("\n\n");
+    lastContentRef.current = joined;
+    setParaBlocks(blocks);
+    setContent(joined);
+    setDirty(true);
+  }, []);
+
+  const updateBlock = useCallback(
+    (i: number, value: string) => {
+      commitBlocks(paraBlocks.map((b, j) => (j === i ? value : b)));
+    },
+    [paraBlocks, commitBlocks]
+  );
+
+  const moveBlock = useCallback(
+    (i: number, dir: -1 | 1) => {
+      const j = i + dir;
+      if (j < 0 || j >= paraBlocks.length) return;
+      const next = [...paraBlocks];
+      [next[i], next[j]] = [next[j], next[i]];
+      commitBlocks(next);
+    },
+    [paraBlocks, commitBlocks]
+  );
+
+  const removeBlock = useCallback(
+    (i: number) => {
+      commitBlocks(paraBlocks.filter((_, j) => j !== i));
+    },
+    [paraBlocks, commitBlocks]
+  );
+
+  const addBlock = useCallback(() => {
+    setParaBlocks((p) => [...p, ""]);
+  }, []);
   const [generating, setGenerating] = useState(false);
   const [saving, setSaving] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -272,6 +338,10 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
           setRecipientName(full.recipientName || "");
           setLetterNumber(full.letterNumber || "");
           setAttachment(full.attachment || "");
+          setJobSource(full.jobSource || "");
+          setCompanyAddress(full.companyAddress || "");
+          setMotivationReason(full.motivationReason || "");
+          setFuturePlan(full.futurePlan || "");
           setDirty(false);
           setActiveStep(2);
         })
@@ -305,6 +375,10 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
         recipientName: recipientName.trim(),
         letterNumber: letterNumber.trim(),
         attachment: attachment.trim(),
+        jobSource: jobSource.trim(),
+        companyAddress: companyAddress.trim(),
+        motivationReason: motivationReason.trim(),
+        futurePlan: futurePlan.trim(),
       };
       if (sourceCvId) {
         body.cvId = sourceCvId;
@@ -368,6 +442,10 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
         content: data.content,
         letterNumber: data.letterNumber || null,
         attachment: data.attachment || null,
+        jobSource: data.jobSource || null,
+        companyAddress: data.companyAddress || null,
+        motivationReason: data.motivationReason || null,
+        futurePlan: data.futurePlan || null,
         createdAt: data.createdAt,
         updatedAt: data.createdAt,
       };
@@ -393,12 +471,12 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
       const res = await fetch(`/api/cover-letter/${activeLetter.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content, subject, letterNumber, attachment }),
+        body: JSON.stringify({ content, subject, letterNumber, attachment, jobSource, companyAddress, motivationReason, futurePlan }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Gagal menyimpan");
       setDirty(false);
-      setActiveLetter((prev) => (prev ? { ...prev, content, subject, letterNumber, attachment, updatedAt: new Date().toISOString() } : prev));
+      setActiveLetter((prev) => (prev ? { ...prev, content, subject, letterNumber, attachment, jobSource, companyAddress, motivationReason, futurePlan, updatedAt: new Date().toISOString() } : prev));
       loadLetters();
       addToast({ type: "success", message: "Perubahan tersimpan" });
     } catch (err: any) {
@@ -625,6 +703,30 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                           Perihal: Lorem ipsum dolor sit amet, consectetur...
                                         </div>
                                       </div>
+                                    ) : tpl.format.headerStyle === "cover" ? (
+                                      <div className="h-full">
+                                        <div className="flex items-center justify-between mb-1" style={{ borderBottom: `1.5px solid ${tpl.format.accentColor}`, paddingBottom: 1 }}>
+                                          <span style={{ fontSize: 5.5, fontWeight: 700, color: tpl.format.accentColor }}>
+                                            {senderName || "Nama"}
+                                          </span>
+                                          <span className="rounded-full" style={{ width: 3.5, height: 3.5, background: `${tpl.format.accentColor}22`, border: `1px solid ${tpl.format.accentColor}` }} />
+                                        </div>
+                                        <div style={{ fontSize: 4.5, color: "#444", lineHeight: 1.4 }}>
+                                          Re: Application for ... consectetur adipiscing elit...
+                                        </div>
+                                      </div>
+                                    ) : tpl.format.headerStyle === "classic" ? (
+                                      <div className="h-full">
+                                        <div
+                                          className="pb-0.5 mb-1"
+                                          style={{ fontSize: 5.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.4, color: tpl.format.accentColor, borderBottom: `1px solid #111`, width: "100%" }}
+                                        >
+                                          Perihal
+                                        </div>
+                                        <div style={{ fontSize: 4.5, color: "#444", lineHeight: 1.4 }}>
+                                          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor...
+                                        </div>
+                                      </div>
                                     ) : tpl.format.headerStyle === "modern" ? (
                                       <div className="h-full">
                                         <div
@@ -639,8 +741,11 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                       </div>
                                     ) : (
                                       <div className="h-full">
-                                        <div className="mb-1" style={{ fontSize: 5.5, fontWeight: 700, color: tpl.format.accentColor }}>
-                                          {tpl.label.split(" ")[0]}
+                                        <div className="flex gap-1 mb-1">
+                                          <span className="rounded-sm" style={{ width: 1.5, height: 8, background: tpl.format.accentColor }} />
+                                          <span className="mb-1" style={{ fontSize: 5.5, fontWeight: 700, color: tpl.format.accentColor, lineHeight: 1.2 }}>
+                                            {tpl.label.split(" ")[0]}
+                                          </span>
                                         </div>
                                         <div style={{ fontSize: 4.5, color: "#444", lineHeight: 1.4 }}>
                                           Lorem ipsum dolor sit amet, consectetur adipiscing elit...
@@ -1097,6 +1202,57 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                   className="w-full rounded-lg border border-outline bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                                 />
                               </div>
+
+                              {/* Field spesifik jenis surat — biar AI punya data & hasilnya bukan generik */}
+                              {style === "motivation" ? (
+                                <>
+                                  <div>
+                                    <label className="text-sm font-semibold text-on-surface-variant block mb-1">Alasan Utama Memilih Program Ini (opsional)</label>
+                                    <textarea
+                                      value={motivationReason}
+                                      onChange={(e) => setMotivationReason(e.target.value)}
+                                      rows={2}
+                                      placeholder="cth: pengalaman organisasi yang menumbuhkan minat, masalah yang ingin diselesaikan"
+                                      className="w-full rounded-lg border border-outline bg-background px-3 py-2 text-sm leading-relaxed focus:ring-2 focus:ring-primary focus:border-primary outline-none resize-y"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-sm font-semibold text-on-surface-variant block mb-1">Rencana / Kontribusi Jika Diterima (opsional)</label>
+                                    <textarea
+                                      value={futurePlan}
+                                      onChange={(e) => setFuturePlan(e.target.value)}
+                                      rows={2}
+                                      placeholder="cth: rencana studi, kontribusi untuk masyarakat/institusi, dampak jangka panjang"
+                                      className="w-full rounded-lg border border-outline bg-background px-3 py-2 text-sm leading-relaxed focus:ring-2 focus:ring-primary focus:border-primary outline-none resize-y"
+                                    />
+                                  </div>
+                                </>
+                              ) : (
+                                <>
+                                  <div>
+                                    <label className="text-sm font-semibold text-on-surface-variant block mb-1">Sumber Info Lowongan (opsional)</label>
+                                    <input
+                                      type="text"
+                                      value={jobSource}
+                                      onChange={(e) => setJobSource(e.target.value)}
+                                      placeholder="cth: LinkedIn, Jobstreet, job fair, referensi teman"
+                                      className="w-full rounded-lg border border-outline bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                                    />
+                                    <p className="text-[11px] text-on-surface-variant mt-1">Dipakai AI di paragraf pembuka (&ldquo;berdasarkan informasi lowongan yang saya peroleh dari...&rdquo;)</p>
+                                  </div>
+                                  <div>
+                                    <label className="text-sm font-semibold text-on-surface-variant block mb-1">Alamat Perusahaan (opsional)</label>
+                                    <input
+                                      type="text"
+                                      value={companyAddress}
+                                      onChange={(e) => setCompanyAddress(e.target.value)}
+                                      placeholder="cth: Jl. Sudirman No. 1, Jakarta Selatan"
+                                      className="w-full rounded-lg border border-outline bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                                    />
+                                  </div>
+                                </>
+                              )}
+
                               {(style === "formal_lengkap" || template.format.letterhead) && (
                                 <>
                                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1229,14 +1385,72 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                   </div>
                                 </div>
                               )}
+                              {/* Isi surat — editor blok paragraf (ergonomi ala builder CV) */}
                               <div>
-                                <label className="text-sm font-semibold text-on-surface-variant block mb-1">Isi Surat</label>
-                                <textarea
-                                  value={content}
-                                  onChange={(e) => { setContent(e.target.value); setDirty(true); }}
-                                  rows={16}
-                                  className="w-full rounded-lg border border-outline bg-background p-3 text-sm font-mono leading-relaxed focus:ring-2 focus:ring-primary focus:border-primary outline-none resize-y"
-                                />
+                                <div className="flex items-center justify-between mb-2">
+                                  <label className="text-sm font-semibold text-on-surface-variant">Isi Surat</label>
+                                  <button
+                                    type="button"
+                                    onClick={addBlock}
+                                    className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:bg-primary/10 px-2 py-1 rounded-lg transition-colors"
+                                  >
+                                    <span className="material-symbols-outlined text-sm">add</span>
+                                    Tambah Paragraf
+                                  </button>
+                                </div>
+                                {paraBlocks.length === 0 ? (
+                                  <div className="rounded-xl border border-dashed border-outline-variant p-4 text-center text-xs text-on-surface-variant">
+                                    Belum ada isi surat. Klik &ldquo;Tambah Paragraf&rdquo; untuk mulai menulis, atau Generate AI dulu.
+                                  </div>
+                                ) : (
+                                  <div className="space-y-3">
+                                    {paraBlocks.map((block, i) => (
+                                      <div key={i} className="rounded-xl border border-outline-variant/50 p-3 space-y-2 bg-surface-container-low/40">
+                                        <div className="flex items-center justify-between">
+                                          <span className="text-[10px] font-bold uppercase tracking-wide text-outline">
+                                            Paragraf {i + 1}
+                                          </span>
+                                          <div className="flex items-center gap-1">
+                                            <button
+                                              type="button"
+                                              onClick={() => moveBlock(i, -1)}
+                                              disabled={i === 0}
+                                              title="Pindah ke atas"
+                                              className="w-6 h-6 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                            >
+                                              <span className="material-symbols-outlined text-sm">arrow_upward</span>
+                                            </button>
+                                            <button
+                                              type="button"
+                                              onClick={() => moveBlock(i, 1)}
+                                              disabled={i === paraBlocks.length - 1}
+                                              title="Pindah ke bawah"
+                                              className="w-6 h-6 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                            >
+                                              <span className="material-symbols-outlined text-sm">arrow_downward</span>
+                                            </button>
+                                            <button
+                                              type="button"
+                                              onClick={() => removeBlock(i)}
+                                              disabled={paraBlocks.length === 1}
+                                              title="Hapus paragraf"
+                                              className="w-6 h-6 flex items-center justify-center rounded-lg text-error hover:bg-error-container/30 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                            >
+                                              <span className="material-symbols-outlined text-sm">delete</span>
+                                            </button>
+                                          </div>
+                                        </div>
+                                        <textarea
+                                          value={block}
+                                          onChange={(e) => updateBlock(i, e.target.value)}
+                                          rows={Math.max(3, Math.min(10, block.split("\n").length + 1))}
+                                          placeholder="Tulis paragraf di sini..."
+                                          className="w-full rounded-lg border border-outline bg-background p-3 text-sm leading-relaxed focus:ring-2 focus:ring-primary focus:border-primary outline-none resize-y"
+                                        />
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
                               <div className="flex items-center gap-2 flex-wrap">
                                 <button

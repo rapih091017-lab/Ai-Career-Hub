@@ -22,7 +22,14 @@ export interface LetterTemplate {
   format: {
     fontFamily: string;
     accentColor: string;
-    headerStyle: "kop" | "modern" | "warm";
+    /** Gaya visual header surat:
+     *  - kop     : kop surat lengkap (nomor, lampiran, perihal) untuk BUMN/korporat
+     *  - classic : "Perihal" klasik dgn garis bawah (serif, justify) utk surat lamaran resmi ID
+     *  - modern  : pill "Perihal" (aksen berwarna) utk gaya kasual/startup
+     *  - cover   : header blok pengirim + accent bar utk cover letter EN/ATS
+     *  - warm    : judul besar tanpa prefix "Perihal" utk motivation letter
+     */
+    headerStyle: "kop" | "classic" | "modern" | "cover" | "warm";
     subjectUppercase: boolean;
     bodyAlign: "justify" | "left";
     bodySize: string;
@@ -43,7 +50,7 @@ export const LETTER_TEMPLATES: LetterTemplate[] = [
     format: {
       fontFamily: "'Times New Roman', 'Georgia', 'Calibri', serif",
       accentColor: "#111111",
-      headerStyle: "modern",
+      headerStyle: "classic",
       subjectUppercase: true,
       bodyAlign: "justify",
       bodySize: "12pt",
@@ -80,8 +87,8 @@ export const LETTER_TEMPLATES: LetterTemplate[] = [
     format: {
       fontFamily: "'Calibri', 'Segoe UI', 'Helvetica', sans-serif",
       accentColor: "#0d7377",
-      headerStyle: "modern",
-      subjectUppercase: true,
+      headerStyle: "cover",
+      subjectUppercase: false,
       bodyAlign: "left",
       bodySize: "11pt",
     },
@@ -100,7 +107,7 @@ export const LETTER_TEMPLATES: LetterTemplate[] = [
       accentColor: "#b45309",
       headerStyle: "warm",
       subjectUppercase: false,
-      bodyAlign: "justify",
+      bodyAlign: "left",
       bodySize: "12pt",
     },
   },

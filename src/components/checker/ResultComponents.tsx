@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { priorityBadge, type BulletItem } from "./types";
+import { priorityBadge, toIssueItems, type BulletItem } from "./types";
 import { useTranslation } from "@/lib/i18n";
 
 /** Keyword tag chip */
@@ -82,6 +82,8 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
   };
 
   const cari = typeof item.cari_score === "number" ? item.cari_score : null;
+  // Normalisasi bentuk issue lama (string) & baru ({ text, source_excerpt })
+  const issues = toIssueItems(item.issues);
 
   return (
     <motion.div
@@ -143,14 +145,21 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
                 </div>
               )}
 
-              {item.issues.length > 0 && (
+              {issues.length > 0 && (
                 <div>
                   <p className="text-xs font-bold text-red-600 uppercase tracking-wider mb-1">{t("checker.detail.issues-found")}</p>
                   <ul className="space-y-1">
-                    {item.issues.map((iss, i) => (
+                    {issues.map((iss, i) => (
                       <li key={i} className="text-xs text-on-surface-variant flex items-start gap-1.5 bg-red-50/50 rounded-lg px-2.5 py-1.5">
                         <span className="text-red-400 mt-0.5 select-none">⚠</span>
-                        {iss}
+                        <span className="min-w-0">
+                          <span>{iss.text}</span>
+                          {iss.source_excerpt && (
+                            <span className="block mt-1 text-[11px] italic text-on-surface-variant/70 bg-white rounded-md px-2 py-1 border-l-2 border-red-300">
+                              &ldquo;{iss.source_excerpt}&rdquo;
+                            </span>
+                          )}
+                        </span>
                       </li>
                     ))}
                   </ul>

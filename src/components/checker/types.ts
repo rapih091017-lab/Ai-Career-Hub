@@ -2,9 +2,54 @@
 
 /* ── Types ── */
 
+/** Issue dengan bukti kutipan verbatim dari CV (excerpt anchoring).
+ *  AI baru mengirim { text, source_excerpt }; hasil lama masih string polos. */
+export interface IssueItem {
+  text: string;
+  source_excerpt: string | null;
+}
+
+/** Normalisasi issue dari bentuk lama (string[]) maupun baru ({text, source_excerpt}[]). */
+export function toIssueItems(v: unknown): IssueItem[] {
+  if (!Array.isArray(v)) return [];
+  return v
+    .map((item): IssueItem | null => {
+      if (typeof item === "string") return { text: item, source_excerpt: null };
+      if (item && typeof item === "object") {
+        const obj = item as Record<string, unknown>;
+        if (typeof obj.text === "string") {
+          return {
+            text: obj.text,
+            source_excerpt: typeof obj.source_excerpt === "string" ? obj.source_excerpt : null,
+          };
+        }
+      }
+      return null;
+    })
+    .filter((x): x is IssueItem => x !== null);
+}
+
+/** Bobot per-section yang dipakai AI (transparansi skor) */
+export interface WeightsApplied {
+  role_category: "tech" | "creative" | "sales_marketing" | "fresh_graduate" | "general" | string;
+  summary_weight: number;
+  experience_weight: number;
+  skills_weight: number;
+  education_weight: number;
+  format_ats_weight: number;
+}
+
+export const ROLE_CATEGORY_OPTIONS = [
+  { value: "general", label: "Umum (default)", desc: "Bobot standar untuk semua posisi" },
+  { value: "tech", label: "Teknologi / IT", desc: "Experience 35% · Skills 25%" },
+  { value: "creative", label: "Kreatif / Design", desc: "Skills 35% (portofolio & craft lebih menentukan)" },
+  { value: "sales_marketing", label: "Sales / Marketing", desc: "Experience 40% (hasil terukur paling kuat)" },
+  { value: "fresh_graduate", label: "Fresh Graduate", desc: "Education 25% (tidak menghukum experience pendek)" },
+] as const;
+
 export interface BreakdownSection {
   score: number;
-  issues: string[];
+  issues: (string | IssueItem)[];
   suggestions: string[];
 }
 
@@ -21,7 +66,7 @@ export interface EducationSection {
 
 export interface FormatAtsSection {
   score: number;
-  issues: string[];
+  issues: (string | IssueItem)[];
   tips: string[];
 }
 
@@ -51,7 +96,7 @@ export interface BulletItem {
   original_text: string;
   /** Skor CARI (Context-Action-Result-Impact) 0-100 dari AI — belum tentu ada di hasil lama */
   cari_score?: number;
-  issues: string[];
+  issues: (string | IssueItem)[];
   suggested_rewrite: string;
   priority: "High" | "Medium" | "Low";
 }
@@ -93,8 +138,10 @@ export interface AnalysisResult {
   actionPlan?: ActionPlan | null;
   bulletReview?: BulletItem[];
   missingSections?: string[];
-  /** Model AI yang dipakai analisis: "R1" (deepseek-reasoner, premium) atau "V3" (deepseek-chat) */
-  aiModel?: "R1" | "V3";
+  /** Bobot per-section yang dipakai AI — tampilkan sebagai tooltip skor */
+  weightsApplied?: WeightsApplied | null;
+  /** Model AI yang dipakai analisis: "V4 Pro" (deepseek-v4-pro, premium) atau "V4 Flash" (deepseek-v4-flash) */
+  aiModel?: "V4 Pro" | "V4 Flash";
 }
 
 /* ── Helpers ── */

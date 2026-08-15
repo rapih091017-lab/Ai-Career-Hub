@@ -12,7 +12,7 @@ import { ScoreDonut } from "@/components/checker/ScoreDonut";
 import { SectionScoreCard } from "@/components/checker/SectionScoreCard";
 import { KeywordChip, BulletReviewCard } from "@/components/checker/ResultComponents";
 import { ImprovementChecklist } from "@/components/checker/ImprovementChecklist";
-import { scoreColor, gradeColor, atsBadgeColor, fitLabelMeta, type AnalysisResult, type SkillsSection } from "@/components/checker/types";
+import { scoreColor, gradeColor, atsBadgeColor, fitLabelMeta, ROLE_CATEGORY_OPTIONS, type AnalysisResult, type SkillsSection } from "@/components/checker/types";
 import { anonIdHeaders } from "@/lib/anon-id";
 
 
@@ -26,6 +26,7 @@ export default function CheckerPage() {
   const [pageState, setPageState] = useState<"input" | "results">("input");
   const [file, setFile] = useState<File | null>(null);
   const [jdText, setJdText] = useState("");
+  const [roleCategory, setRoleCategory] = useState("general");
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -96,6 +97,7 @@ export default function CheckerPage() {
       body: JSON.stringify({
         extractedText,
         jobDescription: jdText.trim(),
+        roleCategory,
         originalFileName: file?.name ?? "cv.pdf",
       }),
     });
@@ -112,7 +114,7 @@ export default function CheckerPage() {
       throw new Error(data.message || data.error || t("checker.error-failed"));
     }
     return data as AnalysisResult;
-  }, [jdText, file, t]);
+  }, [jdText, roleCategory, file, t]);
 
   /* ---- Analyze with pasted text (skip extract) ---- */
   /* ---- Handle Browser-based OCR for scanned PDFs ---- */
@@ -415,6 +417,27 @@ export default function CheckerPage() {
                 />
               </div>
 
+              {/* Kategori posisi → bobot penilaian per-section (transparansi skor) */}
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-on-surface-variant ml-1">
+                  Kategori Posisi
+                </label>
+                <select
+                  value={roleCategory}
+                  onChange={(e) => setRoleCategory(e.target.value)}
+                  className="w-full rounded-lg border border-outline bg-background px-3 py-3 text-base text-on-background focus:ring-2 focus:ring-primary focus:border-primary transition-[box-shadow,border-color]"
+                >
+                  {ROLE_CATEGORY_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label} · {opt.desc}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-[11px] text-on-surface-variant ml-1">
+                  Bobot penilaian menyesuaikan kategori (mis. fresh graduate tidak dihukum karena pengalaman singkat).
+                </p>
+              </div>
+
               {error && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-3">
                   <span className="material-symbols-outlined text-red-500 text-sm mt-0.5 select-none">error</span>
@@ -577,6 +600,7 @@ export default function CheckerPage() {
     actionPlan,
     bulletReview,
     missingSections,
+    weightsApplied,
     aiModel,
   } = result;
 
@@ -662,17 +686,25 @@ export default function CheckerPage() {
             {aiModel && (
               <div
                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold border ${
-                  aiModel === "R1"
+                  aiModel === "V4 Pro"
                     ? "bg-primary/5 text-primary/80 border-primary/30"
                     : "bg-blue-50 text-blue-700 border-blue-300"
                 }`}
-                title={aiModel === "R1" ? "DeepSeek Reasoner · analisis mendalam (Premium)" : "DeepSeek Chat · analisis standar"}
+                title={aiModel === "V4 Pro" ? "DeepSeek V4 Pro · analisis mendalam (Premium)" : "DeepSeek V4 Flash · analisis standar"}
               >
-                <span className="material-symbols-outlined text-lg select-none">{aiModel === "R1" ? "auto_awesome" : "bolt"}</span>
-                {aiModel === "R1" ? "DeepSeek R1" : "DeepSeek V3"}
+                <span className="material-symbols-outlined text-lg select-none">{aiModel === "V4 Pro" ? "auto_awesome" : "bolt"}</span>
+                {aiModel === "V4 Pro" ? "DeepSeek V4 Pro" : "DeepSeek V4 Flash"}
               </div>
             )}
           </div>
+
+          {/* Transparansi bobot penilaian (role category) */}
+          {weightsApplied && weightsApplied.role_category !== "general" && (
+            <p className="text-[11px] text-on-surface-variant/70 text-center mt-3 flex items-center justify-center gap-1 flex-wrap">
+              <span className="material-symbols-outlined text-[13px] select-none">tune</span>
+              Skor dihitung dengan bobot {weightsApplied.role_category.replace("_", " ")}: Experience {Math.round((weightsApplied.experience_weight || 0) * 100)}% · Skills {Math.round((weightsApplied.skills_weight || 0) * 100)}% · Education {Math.round((weightsApplied.education_weight || 0) * 100)}%
+            </p>
+          )}
         </section>
 
         {/* ============================================================ */}

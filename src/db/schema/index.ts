@@ -131,6 +131,14 @@ export const coverLetters = pgTable("cover_letters", {
   subject: text("subject"),
   letterNumber: text("letter_number"),
   attachment: text("attachment"),
+  /** Sumber info lowongan (mis. LinkedIn, job fair, referensi) — dipakai paragraf pembuka */
+  jobSource: text("job_source"),
+  /** Alamat perusahaan tujuan */
+  companyAddress: text("company_address"),
+  /** Alasan utama memilih program (khusus motivation letter) */
+  motivationReason: text("motivation_reason"),
+  /** Rencana jika diterima (khusus motivation letter) */
+  futurePlan: text("future_plan"),
   content: text("content").notNull(),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
   updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow(),

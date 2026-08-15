@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { jobTitle, jobDescription, templateId, useProfile = true, rawText } = body;
+  const { jobTitle, jobDescription, templateId, useProfile = true, rawText, targetLanguage } = body;
 
   // Always fetch profile to get a valid FK id (masterProfileId is NOT NULL in schema)
   const [masterProfile] = await db
@@ -47,15 +47,21 @@ export async function POST(request: NextRequest) {
 
   // ── AI GENERATION: if rawText provided, parse with AI ──
   let aiGeneratedData: any = null;
+  let aiNote: string | null = null; // consolidation_suggestion dari AI
   if (rawText && typeof rawText === "string" && rawText.trim().length > 20) {
     try {
+      // {{CURRENT_DATE}} & {{TARGET_LANGUAGE}} di prompt — wajib di-inject di sini
+      // (adapter hanya mengganti {{INPUT_DATA}}/{{CV_TEXT}}/{{JD_TEXT}}/{{PROFILE_DATA}}).
+      const todayDate = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+      const targetLang = typeof targetLanguage === "string" ? targetLanguage.trim() : "";
       aiGeneratedData = await callAI({
-        systemPrompt: GENERATOR_PROMPT_V2,
+        systemPrompt: GENERATOR_PROMPT_V2.replace("{{CURRENT_DATE}}", todayDate).replace("{{TARGET_LANGUAGE}}", targetLang),
         userPrompt: rawText.trim(),
         temperature: 0.2,
         model: MODELS.CHAT,
         maxTokens: 4096,
       });
+      aiNote = aiGeneratedData?.consolidation_suggestion || null;
     } catch (err) {
       console.error("AI Generator error (non-fatal):", err);
       // Non-fatal — tetap lanjut tanpa AI data
@@ -200,5 +206,5 @@ export async function POST(request: NextRequest) {
     })
     .returning();
 
-  return NextResponse.json(newDoc, { status: 201 });
+  return NextResponse.json({ ...newDoc, consolidationSuggestion: aiNote }, { status: 201 });
 }

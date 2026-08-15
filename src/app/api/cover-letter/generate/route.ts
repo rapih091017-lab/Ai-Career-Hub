@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { cvDocuments, coverLetters } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { callAI, MODELS, buildUserContext } from "@/lib/ai/adapter";
-import { COVER_LETTER_PROMPT_V1, buildCoverLetterUserPrompt, type CoverLetterInput } from "@/lib/ai/prompts/cover-letter-v1";
+import { getLetterSystemPrompt, buildCoverLetterUserPrompt, type CoverLetterInput } from "@/lib/ai/prompts/cover-letter-v1";
 
 /**
  * POST /api/cover-letter/generate
@@ -30,9 +30,13 @@ export const POST = apiHandler(async (request: NextRequest) => {
     language = "id",
     style = "formal",
     companyName,
+    companyAddress,
     recipientName,
     letterNumber,
     attachment,
+    jobSource,
+    motivationReason,
+    futurePlan,
     // Data manual — dipakai saat membuat surat dari nol (tanpa cvId)
     position: bodyPosition,
     fullName,
@@ -97,6 +101,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
     input = {
       language,
       style,
+      dataSource: "cv",
       todayDate,
       fullName: personalInfo.fullName || "",
       phone: personalInfo.phone || "",
@@ -105,7 +110,11 @@ export const POST = apiHandler(async (request: NextRequest) => {
       summary: tc?.summary || "",
       position,
       companyName: companyName || "",
+      companyAddress: typeof companyAddress === "string" ? companyAddress.trim() : "",
       recipientName: recipientName || "",
+      jobSource: typeof jobSource === "string" ? jobSource.trim() : "",
+      motivationReason: typeof motivationReason === "string" ? motivationReason.trim() : "",
+      futurePlan: typeof futurePlan === "string" ? futurePlan.trim() : "",
       jobDescription: cvDoc.jobDescription || "",
       workHistory: (wh || []).map((w: any) => ({
         position: w.position || "",
@@ -128,6 +137,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
     input = {
       language,
       style,
+      dataSource: "manual",
       todayDate,
       fullName: typeof fullName === "string" ? fullName.trim() : "",
       phone: typeof phone === "string" ? phone.trim() : "",
@@ -136,7 +146,11 @@ export const POST = apiHandler(async (request: NextRequest) => {
       summary: typeof summary === "string" ? summary.trim() : "",
       position,
       companyName: typeof companyName === "string" ? companyName.trim() : "",
+      companyAddress: typeof companyAddress === "string" ? companyAddress.trim() : "",
       recipientName: typeof recipientName === "string" ? recipientName.trim() : "",
+      jobSource: typeof jobSource === "string" ? jobSource.trim() : "",
+      motivationReason: typeof motivationReason === "string" ? motivationReason.trim() : "",
+      futurePlan: typeof futurePlan === "string" ? futurePlan.trim() : "",
       jobDescription: typeof jobDescription === "string" ? jobDescription.trim() : "",
       workHistory: Array.isArray(workHistory) ? workHistory : [],
       education: Array.isArray(education) ? education : [],
@@ -153,7 +167,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
   });
 
   const content = await callAI<string>({
-    systemPrompt: COVER_LETTER_PROMPT_V1,
+    systemPrompt: getLetterSystemPrompt(style),
     userPrompt: buildCoverLetterUserPrompt(input),
     temperature: style === "casual" || style === "motivation" ? 0.8 : 0.6,
     maxTokens: 1536,
@@ -188,6 +202,10 @@ export const POST = apiHandler(async (request: NextRequest) => {
       subject,
       letterNumber: typeof letterNumber === "string" ? letterNumber.trim() || null : null,
       attachment: typeof attachment === "string" ? attachment.trim() || null : null,
+      jobSource: typeof jobSource === "string" ? jobSource.trim() || null : null,
+      companyAddress: typeof companyAddress === "string" ? companyAddress.trim() || null : null,
+      motivationReason: typeof motivationReason === "string" ? motivationReason.trim() || null : null,
+      futurePlan: typeof futurePlan === "string" ? futurePlan.trim() || null : null,
       content,
     })
     .returning();
@@ -204,6 +222,10 @@ export const POST = apiHandler(async (request: NextRequest) => {
       style,
       letterNumber: letter.letterNumber,
       attachment: letter.attachment,
+      jobSource: letter.jobSource,
+      companyAddress: letter.companyAddress,
+      motivationReason: letter.motivationReason,
+      futurePlan: letter.futurePlan,
       createdAt: letter.createdAt,
     },
     { status: 201 },

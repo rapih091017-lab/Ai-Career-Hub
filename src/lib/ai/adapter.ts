@@ -41,11 +41,14 @@ interface CallAIParams {
 }
 
 /* ─── Model routing ─────────────────────────────────────── */
+/* DeepSeek menonaktifkan nama model lama (deepseek-chat & deepseek-reasoner)
+ * sejak 24 Juli 2026. Penggantinya: deepseek-v4-flash (chat) & deepseek-v4-pro
+ * (reasoning/thinking). Nama V4 sudah dipakai di seluruh fitur AI. */
 export const MODELS = {
-  /** Analisis mendalam — reasoning model (deepseek-reasoner/R1) */
-  REASONER: "deepseek-reasoner",
-  /** General purpose — deepseek-chat (V3) */
-  CHAT: "deepseek-chat",
+  /** Analisis mendalam — reasoning model (deepseek-v4-pro) */
+  REASONER: "deepseek-v4-pro",
+  /** General purpose — deepseek-v4-flash */
+  CHAT: "deepseek-v4-flash",
 } as const;
 
 /** Recommended temperature per task type */
@@ -109,8 +112,8 @@ function parseAIResponse<T>(
 ): { ok: true; data: T } | { ok: false; error: string } {
   try {
     // Buang markdown code fence (```json ... ```) + teks pengantar yang kadang
-    // dibungkus model — terutama deepseek-reasoner yang tidak punya
-    // response_format json_object. Potong ke bagian JSON saja (dari { pertama).
+    // dibungkus model — terutama deepseek-v4-pro yang memakai thinking mode.
+    // Potong ke bagian JSON saja (dari { pertama).
     let cleaned = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
     const start = cleaned.indexOf("{");
     const end = cleaned.lastIndexOf("}");
@@ -172,12 +175,12 @@ export async function callAI<T = unknown>({
   const isReasoner = finalModel === MODELS.REASONER;
   const schema = taskType ? AI_SCHEMAS[taskType] : undefined;
 
-  // deepseek-reasoner TIDAK mendukung response_format json_object (400 error),
-  // dan menampilkan reasoning secara internal. Tambahkan instruksi agar model
-  // mengembalikan HANYA output akhir — reasoning berjalan internal.
+  // deepseek-v4-pro memakai thinking mode dan TIDAK mendukung response_format
+  // json_object (400 error). Tambahkan instruksi agar model mengembalikan
+  // HANYA output akhir — reasoning berjalan internal.
   const effectiveSystemPrompt = isReasoner
     ? systemPromptWithData +
-      "\n\n--- CATATAN MODEL ---\nAnda adalah model reasoning (deepseek-reasoner). Lakukan seluruh analisis dan pemikiran secara INTERNAL — TANPA menampilkan langkah-langkah, TANPA blok <think>, TANPA penjelasan. Kembalikan HANYA output akhir yang valid sesuai skema yang diminta."
+      "\n\n--- CATATAN MODEL ---\nAnda adalah model reasoning (deepseek-v4-pro). Lakukan seluruh analisis dan pemikiran secara INTERNAL — TANPA menampilkan langkah-langkah, TANPA blok <think>, TANPA penjelasan. Kembalikan HANYA output akhir yang valid sesuai skema yang diminta."
     : systemPromptWithData;
 
   // Petunjuk tambahan saat retry — meminta model mengembalikan JSON valid
@@ -200,7 +203,7 @@ export async function callAI<T = unknown>({
           { role: "user", content: attempt === 0 ? enrichedUserPrompt : enrichedUserPrompt + retryInstruction },
         ],
         // Text mode: TANPA response_format json_object (DeepSeek 400 jika dipaksa).
-        // deepseek-reasoner: json_object TIDAK didukung — JSON dipaksa via prompt.
+        // deepseek-v4-pro (thinking): json_object TIDAK didukung — JSON dipaksa via prompt.
         response_format: isTextMode || isReasoner ? undefined : { type: "json_object" },
       });
 

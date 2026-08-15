@@ -2,20 +2,22 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { sectionScoreColor } from "./types";
+import { sectionScoreColor, toIssueItems, type IssueItem } from "./types";
 import { useTranslation } from "@/lib/i18n";
 
 /** Section breakdown score bar with expandable issues/suggestions */
 export function SectionScoreCard({ title, score, issues, suggestions, delay }: {
   title: string;
   score: number;
-  issues?: string[];
+  issues?: unknown;
   suggestions?: string[];
   delay: number;
 }) {
   const [expanded, setExpanded] = useState(false);
   const { t } = useTranslation();
   const barColor = sectionScoreColor(score);
+  // Normalisasi bentuk lama (string[]) & baru ({text, source_excerpt}[])
+  const issueItems: IssueItem[] = toIssueItems(issues);
 
   return (
     <motion.div
@@ -61,14 +63,21 @@ export function SectionScoreCard({ title, score, issues, suggestions, delay }: {
             className="overflow-hidden"
           >
             <div className="px-4 pb-4 space-y-2 border-t border-surface-container-high pt-3">
-              {issues && issues.length > 0 && (
+              {issueItems.length > 0 && (
                 <div>
                   <p className="text-xs font-bold text-red-600 uppercase tracking-wider mb-1">{t("checker.detail.issues")}</p>
                   <ul className="space-y-1">
-                    {issues.map((iss, i) => (
+                    {issueItems.map((iss, i) => (
                       <li key={i} className="text-xs text-on-surface-variant flex items-start gap-1.5">
                         <span className="text-red-400 mt-0.5 select-none">•</span>
-                        {iss}
+                        <span className="min-w-0">
+                          <span>{iss.text}</span>
+                          {iss.source_excerpt && (
+                            <span className="block mt-1 text-[11px] italic text-on-surface-variant/70 bg-surface-container-low rounded-md px-2 py-1 border-l-2 border-red-300">
+                              &ldquo;{iss.source_excerpt}&rdquo;
+                            </span>
+                          )}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -87,7 +96,7 @@ export function SectionScoreCard({ title, score, issues, suggestions, delay }: {
                   </ul>
                 </div>
               )}
-              {(!issues || issues.length === 0) && (!suggestions || suggestions.length === 0) && (
+              {issueItems.length === 0 && (!suggestions || suggestions.length === 0) && (
                 <p className="text-xs text-on-surface-variant italic">{t("checker.detail.no-notes")}</p>
               )}
             </div>

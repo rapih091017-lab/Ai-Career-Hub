@@ -104,6 +104,15 @@ export const LetterPreview = forwardRef<
   const accent = fmt.accentColor;
   const isWarm = fmt.headerStyle === "warm";
   const isModern = fmt.headerStyle === "modern";
+  const isClassic = fmt.headerStyle === "classic";
+  const isCover = fmt.headerStyle === "cover";
+
+  // Paragraf "Perihal:" di dalam isi surat (ditulis AI untuk gaya classic)
+  // distyling sebagai judul klasik: bold + garis bawah, bukan paragraf biasa.
+  const isPerihalLine = (p: string) => /^perihal\s*:/i.test(p.trim());
+  const isSignatureLine = (p: string) =>
+    /^(hormat saya|sincerely|with best regards|best regards|terima kasih)/i.test(p.trim()) &&
+    p.trim().length < 40;
 
   return (
     <div
@@ -131,13 +140,13 @@ export const LetterPreview = forwardRef<
           style={{
             width: `${maxWidth}mm`,
             minHeight: `${A4_HEIGHT_MM}mm`,
-            padding: isLetterhead ? "14mm 20mm" : "20mm 22mm",
+            padding: isLetterhead ? "14mm 20mm" : isCover ? "18mm 20mm" : "20mm 22mm",
             background: "#ffffff",
             boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
             margin: "0 auto",
             fontFamily: fmt.fontFamily,
             fontSize: fmt.bodySize,
-            lineHeight: 1.6,
+            lineHeight: isWarm ? 1.75 : 1.6,
             color: "#111111",
             boxSizing: "border-box",
             height: "auto",
@@ -194,9 +203,65 @@ export const LetterPreview = forwardRef<
                 </div>
               </div>
             </>
+          ) : isCover ? (
+            /* ═══ COVER LETTER (EN/ATS): header blok pengirim + accent bar ═══ */
+            <>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: "6mm",
+                  marginBottom: "8mm",
+                  paddingBottom: "4mm",
+                  borderBottom: `2pt solid ${accent}`,
+                }}
+              >
+                <div>
+                  <div
+                    style={{
+                      fontSize: "13pt",
+                      fontWeight: 700,
+                      letterSpacing: 0.3,
+                      color: accent,
+                    }}
+                  >
+                    {sender.fullName || "[Full Name]"}
+                  </div>
+                  <div style={{ fontSize: "9.5pt", marginTop: "1mm", color: "#444444" }}>
+                    {[sender.email, sender.phone, sender.address]
+                      .filter(Boolean)
+                      .join("  •  ")}
+                  </div>
+                </div>
+                <div
+                  style={{
+                    width: "6mm",
+                    height: "6mm",
+                    borderRadius: "50%",
+                    background: `${accent}22`,
+                    border: `1.5pt solid ${accent}`,
+                    flexShrink: 0,
+                  }}
+                />
+              </div>
+              {letter.subject && (
+                <div
+                  style={{
+                    marginBottom: "5mm",
+                    fontSize: "10.5pt",
+                    fontWeight: 600,
+                    letterSpacing: 0.2,
+                    color: accent,
+                  }}
+                >
+                  Re: {letter.subject}
+                </div>
+              )}
+            </>
           ) : (
-            /* Subject — Perihal (gaya modern / warm) */
-            <div style={{ marginBottom: "6mm" }}>
+            /* Subject — Perihal (gaya classic / modern / warm) */
+            <div style={{ marginBottom: isClassic ? 0 : isWarm ? "8mm" : "6mm" }}>
               {isModern ? (
                 <div
                   style={{
@@ -213,21 +278,37 @@ export const LetterPreview = forwardRef<
                 >
                   {letter.language === "id" ? "Perihal" : "Subject"}: {letter.subject}
                 </div>
+              ) : isClassic ? (
+                /* Klasik: tanpa header tambahan — tempat/tanggal & "Perihal:"
+                 * sudah ditulis AI di dalam isi, dan paragraf "Perihal:"
+                 * digayakan sebagai judul klasik oleh renderer body di bawah. */
+                <span style={{ display: "none" }} />
               ) : (
-                <span
-                  style={{
-                    fontSize: "11pt",
-                    fontWeight: 700,
-                    textTransform: fmt.subjectUppercase ? "uppercase" : "none",
-                    letterSpacing: 0.5,
-                    color: isWarm ? accent : "#111111",
-                  }}
-                >
-                  {letter.language === "id" ? "Perihal" : "Subject"}:{" "}
-                </span>
-              )}
-              {!isModern && (
-                <span style={{ fontSize: "11pt", fontWeight: 600 }}>{letter.subject}</span>
+                /* Warm (motivation): judul besar tanpa prefix "Perihal" */
+                <div style={{ display: "flex", gap: "3mm", alignItems: "flex-start" }}>
+                  <span
+                    style={{
+                      flexShrink: 0,
+                      marginTop: "2mm",
+                      width: "2.5mm",
+                      height: "14mm",
+                      borderRadius: "2mm",
+                      background: accent,
+                    }}
+                  />
+                  <span
+                    style={{
+                      fontSize: "15pt",
+                      fontWeight: 700,
+                      lineHeight: 1.35,
+                      textTransform: fmt.subjectUppercase ? "uppercase" : "none",
+                      letterSpacing: 0.2,
+                      color: accent,
+                    }}
+                  >
+                    {letter.subject || (letter.language === "id" ? "Surat Motivasi" : "Motivation Letter")}
+                  </span>
+                </div>
               )}
             </div>
           )}
@@ -235,11 +316,31 @@ export const LetterPreview = forwardRef<
           {/* Body */}
           <div style={{ whiteSpace: "pre-wrap" }}>
             {paragraphs.length > 0 ? (
-              paragraphs.map((p, i) => (
-                <p key={i} style={{ margin: "0 0 4mm 0", textAlign: fmt.bodyAlign }}>
-                  {p}
-                </p>
-              ))
+              paragraphs.map((p, i) => {
+                const isPerihal = isClassic && isPerihalLine(p);
+                const isSign = isClassic && isSignatureLine(p) && i === paragraphs.length - 1;
+                return (
+                  <p
+                    key={i}
+                    style={{
+                      margin: "0 0 4mm 0",
+                      textAlign: fmt.bodyAlign,
+                      ...(isPerihal
+                        ? {
+                            fontWeight: 700,
+                            letterSpacing: 0.5,
+                            paddingBottom: "1.5mm",
+                            borderBottom: "1pt solid #111111",
+                            marginBottom: "5mm",
+                          }
+                        : {}),
+                      ...(isSign ? { marginTop: "2mm" } : {}),
+                    }}
+                  >
+                    {p}
+                  </p>
+                );
+              })
             ) : (
               <p style={{ margin: 0, color: "#999999" }}>
                 {letter.language === "id"
