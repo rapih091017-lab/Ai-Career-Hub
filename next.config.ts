@@ -1,7 +1,13 @@
 import type { NextConfig } from "next";
 
 let nextConfig: NextConfig = {
-  serverExternalPackages: ["postgres", "pdfjs-dist", "@napi-rs/canvas"],
+  serverExternalPackages: [
+    "postgres",
+    "pdfjs-dist",
+    "@napi-rs/canvas",
+    "puppeteer-core",
+    "@sparticuz/chromium",
+  ],
 
   // Optimasi gambar: remotePatterns untuk CDN eksternal
   images: {
