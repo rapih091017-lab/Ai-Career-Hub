@@ -309,7 +309,7 @@ export async function exportPdfViaServer(
   fileName?: string,
   marginMm?: number,
   contentAreaMm?: number
-): Promise<{ ok: boolean; error?: string; redirectUrl?: string }> {
+): Promise<{ ok: boolean; error?: string; redirectUrl?: string; usedFallback?: boolean }> {
   // ── Try Puppeteer server first (auto-download, ATS-readable text) ──
   const html = await serializePreviewHtml(element);
 
@@ -335,7 +335,7 @@ export async function exportPdfViaServer(
         console.warn("[pdf] pdf-server unreachable, falling back to html2canvas:", err.message);
         try {
           await exportPreviewToPdf(element, fileName, contentAreaMm, marginMm);
-          return { ok: true, error: "pdf-server unavailable, used html2canvas fallback" };
+          return { ok: true, error: "pdf-server unavailable, used html2canvas fallback", usedFallback: true };
         } catch (fallbackErr) {
           return { ok: false, error: "Gagal export PDF (server & fallback)" };
         }
@@ -361,7 +361,7 @@ export async function exportPdfViaServer(
     console.warn("[pdf] Server unreachable, falling back to html2canvas:", err);
     try {
       await exportPreviewToPdf(element, fileName, contentAreaMm, marginMm);
-      return { ok: true, error: "pdf-server unavailable, used html2canvas fallback" };
+      return { ok: true, error: "pdf-server unavailable, used html2canvas fallback", usedFallback: true };
     } catch (fallbackErr) {
       return { ok: false, error: "Gagal export PDF (server & fallback)" };
     }

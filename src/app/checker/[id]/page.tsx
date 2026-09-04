@@ -9,7 +9,8 @@ import { ScoreDonut } from "@/components/checker/ScoreDonut";
 import { SectionScoreCard } from "@/components/checker/SectionScoreCard";
 import { KeywordChip, BulletReviewCard } from "@/components/checker/ResultComponents";
 import { ImprovementChecklist } from "@/components/checker/ImprovementChecklist";
-import { scoreColor, gradeColor, atsBadgeColor, type AnalysisResult, type SkillsSection } from "@/components/checker/types";
+import { ImpactForecastCard } from "@/components/checker/ImpactForecastCard";
+import { scoreColor, gradeColor, atsBadgeColor, type AnalysisResult, type ExperienceSection, type SkillsSection } from "@/components/checker/types";
 import MagneticButton from "@/components/MagneticButton";
 import Link from "next/link";
 import { useTranslation } from "@/lib/i18n";
@@ -85,6 +86,7 @@ export default function CheckerDetailPage() {
           actionPlan: (full?.actionPlan as any) ?? null,
           bulletReview: (full?.bulletReview as any) ?? [],
           missingSections: (full?.missingSections as any) ?? [],
+          impactForecast: (full?.impactForecast as any) ?? null,
         });
       })
       .catch((err) => setError(err.message))
@@ -146,10 +148,21 @@ export default function CheckerDetailPage() {
     );
   }
 
-  const { scores, summary, grade, atsPrediction, breakdown, keywordAnalysis, narrativeFeedback, actionPlan, bulletReview, missingSections } = result;
+  const { scores, summary, grade, atsPrediction, breakdown, keywordAnalysis, narrativeFeedback, actionPlan, bulletReview, missingSections, impactForecast } = result;
   const color = scoreColor(scores.overall);
   const gc = gradeColor(grade);
   const atsBadge = atsBadgeColor(atsPrediction);
+
+  // v4 — chip "X% terkuantifikasi" pada kartu Experience
+  const quantPct = (breakdown?.experience as ExperienceSection | undefined)?.quantification_pct;
+  const quantChip = typeof quantPct === "number"
+    ? {
+        label: t("checker.quant-label"),
+        value: `${quantPct}% ${t("checker.quant-label").toLowerCase()}`,
+        hint: t("checker.quant-hint").replace("{pct}", String(quantPct)),
+        tone: (quantPct >= 50 ? "green" : quantPct >= 25 ? "amber" : "red") as "green" | "amber" | "red",
+      }
+    : undefined;
 
   return (
     <div className="min-h-screen flex flex-col bg-surface-container-low/50 text-on-background">
@@ -202,6 +215,11 @@ export default function CheckerDetailPage() {
         </section>
 
         {/* ============================================================ */}
+        {/*  1b. IMPACT FORECAST (v4) — proyeksi skor                    */}
+        {/* ============================================================ */}
+        {impactForecast && <ImpactForecastCard forecast={impactForecast} />}
+
+        {/* ============================================================ */}
         {/*  2. PER-SECTION BREAKDOWN                                     */}
         {/* ============================================================ */}
         {breakdown && (
@@ -213,7 +231,7 @@ export default function CheckerDetailPage() {
           >
             <h2 className="text-xl font-bold text-on-surface px-1">{t("checker.detail.section-breakdown")}</h2>
             <SectionScoreCard title={t("checker.detail.section-summary")} score={breakdown.summary.score} issues={breakdown.summary.issues} suggestions={breakdown.summary.suggestions} delay={0.2} />
-            <SectionScoreCard title={t("checker.detail.section-experience")} score={breakdown.experience.score} issues={breakdown.experience.issues} suggestions={breakdown.experience.suggestions} delay={0.25} />
+            <SectionScoreCard title={t("checker.detail.section-experience")} score={breakdown.experience.score} issues={breakdown.experience.issues} suggestions={breakdown.experience.suggestions} delay={0.25} statChip={quantChip} />
             <SectionScoreCard title={t("checker.detail.section-skills")} score={breakdown.skills.score} issues={(breakdown.skills as SkillsSection).missing_skills} suggestions={(breakdown.skills as SkillsSection).recommendations} delay={0.3} />
             <SectionScoreCard title={t("checker.detail.section-education")} score={breakdown.education.score} issues={[breakdown.education.relevance]} suggestions={breakdown.education.suggestions} delay={0.35} />
             <SectionScoreCard title={t("checker.detail.section-format")} score={breakdown.format_ats.score} issues={breakdown.format_ats.issues} suggestions={breakdown.format_ats.tips} delay={0.4} />

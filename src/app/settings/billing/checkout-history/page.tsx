@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useTranslation } from "@/lib/i18n";
 
 interface PaymentRecord {
   id: string;
@@ -15,6 +16,7 @@ interface PaymentRecord {
 }
 
 export default function CheckoutHistoryPage() {
+  const { t, lang } = useTranslation();
   const [payments, setPayments] = useState<PaymentRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +29,7 @@ export default function CheckoutHistoryPage() {
         const allPayments: PaymentRecord[] = json.payments?.history ?? [];
         setPayments(allPayments);
       })
-      .catch(() => setError("Gagal memuat riwayat checkout"))
+      .catch(() => setError(t("checkout.load-failed")))
       .finally(() => setIsLoading(false));
   }, []);
 
@@ -39,7 +41,7 @@ export default function CheckoutHistoryPage() {
 
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return "-";
-    return new Date(dateStr).toLocaleDateString("id-ID", {
+    return new Date(dateStr).toLocaleDateString(lang === "en" ? "en-US" : "id-ID", {
       day: "numeric",
       month: "short",
       year: "numeric",
@@ -51,11 +53,11 @@ export default function CheckoutHistoryPage() {
   const getStatus = (status: string) => {
     switch (status) {
       case "success":
-        return { label: "Aktif", class: "bg-green-100 text-green-700" };
+        return { label: t("billing.active"), class: "bg-green-100 text-green-700" };
       case "pending":
         return { label: "Pending", class: "bg-amber-100 text-amber-700" };
       case "failed":
-        return { label: "Gagal", class: "bg-red-100 text-red-700" };
+        return { label: t("billing.failed"), class: "bg-red-100 text-red-700" };
       default:
         return { label: status, class: "bg-surface-container-high text-outline" };
     }
@@ -69,8 +71,8 @@ export default function CheckoutHistoryPage() {
             <span className="material-symbols-outlined">shopping_cart_checkout</span>
           </div>
           <div>
-            <h2 className="font-headline-md text-lg text-on-surface">Riwayat Checkout</h2>
-            <p className="text-label-sm text-on-surface-variant">Daftar pembelian Single CV AI Revision</p>
+            <h2 className="font-headline-md text-lg text-on-surface">{t("settings.checkout-history")}</h2>
+            <p className="text-label-sm text-on-surface-variant">{t("billing.checkout-subtitle")}</p>
           </div>
         </div>
 
@@ -85,25 +87,25 @@ export default function CheckoutHistoryPage() {
             {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="p-5 rounded-xl bg-surface-container-low border border-outline-variant/30">
-                <p className="text-label-sm text-on-surface-variant">Total Single CV Dibeli</p>
+                <p className="text-label-sm text-on-surface-variant">{t("billing.single-cv-total")}</p>
                 <p className="text-headline-md text-secondary mt-1">{singleCvPayments.length}</p>
-                <p className="text-label-sm text-on-surface-variant mt-1">Semua waktu</p>
+                <p className="text-label-sm text-on-surface-variant mt-1">{t("billing.all-time")}</p>
               </div>
               <div className="p-5 rounded-xl bg-surface-container-low border border-outline-variant/30">
-                <p className="text-label-sm text-on-surface-variant">Aktif</p>
+                <p className="text-label-sm text-on-surface-variant">{t("billing.active")}</p>
                 <p className="text-headline-md text-green-600 mt-1">{activeSingleCv.length}</p>
-                <p className="text-label-sm text-on-surface-variant mt-1">Masa berlaku belum habis</p>
+                <p className="text-label-sm text-on-surface-variant mt-1">{t("billing.valid-period")}</p>
               </div>
               <div className="p-5 rounded-xl bg-surface-container-low border border-outline-variant/30">
-                <p className="text-label-sm text-on-surface-variant">Total Pengeluaran</p>
+                <p className="text-label-sm text-on-surface-variant">{t("billing.total-spent")}</p>
                 <p className="text-headline-md text-on-surface mt-1">
                   Rp {singleCvPayments
                     .filter((p) => p.paymentStatus === "success")
                     .reduce((sum, p) => sum + p.amount, 0)
-                    .toLocaleString("id-ID")}
+                    .toLocaleString(lang === "en" ? "en-US" : "id-ID")}
                 </p>
                 <p className="text-label-sm text-on-surface-variant mt-1">
-                  {activeSingleCv.length} CV aktif
+                  {t("billing.active-cvs").replace("{n}", String(activeSingleCv.length))}
                 </p>
               </div>
             </div>
@@ -121,7 +123,7 @@ export default function CheckoutHistoryPage() {
                   }`}
                 >
                   {f === "all"
-                    ? "Semua"
+                    ? t("dashboard.all")
                     : f === "single_cv"
                       ? "Single CV"
                       : "Premium Pass"}
@@ -137,12 +139,12 @@ export default function CheckoutHistoryPage() {
                 </span>
                 <p className="font-label-bold text-on-surface-variant">
                   {filter === "single_cv"
-                    ? "Belum ada pembelian Single CV"
-                    : "Belum ada transaksi"}
+                    ? t("billing.no-single-cv-purchase")
+                    : t("billing.no-transactions")}
                 </p>
                 <p className="text-label-sm text-on-surface-variant mt-1">
                   {filter === "single_cv" &&
-                    "Pilih CV dari dashboard untuk membeli AI Revision."}
+                    t("billing.pick-cv-from-dashboard")}
                 </p>
               </div>
             ) : (
@@ -150,12 +152,12 @@ export default function CheckoutHistoryPage() {
                 <table className="w-full text-left">
                   <thead>
                     <tr className="text-label-sm text-on-surface-variant border-b border-outline-variant/30">
-                      <th className="pb-3 font-bold px-2">Tanggal</th>
-                      <th className="pb-3 font-bold px-2">Paket</th>
-                      <th className="pb-3 font-bold px-2">Order ID</th>
-                      <th className="pb-3 font-bold px-2">Jumlah</th>
-                      <th className="pb-3 font-bold px-2">Status</th>
-                      <th className="pb-3 font-bold px-2"></th>
+                      <th className="pb-3 font-bold px-2">{t("billing.date")}</th>
+                      <th className="pb-3 font-bold px-2">{t("billing.package")}</th>
+                      <th className="pb-3 font-bold px-2">{t("billing.order-id")}</th>
+                      <th className="pb-3 font-bold px-2">{t("billing.amount-short")}</th>
+                      <th className="pb-3 font-bold px-2">{t("billing.status")}</th>
+                      <th className="pb-3 font-bold px-2">{t("billing.payment-method")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -180,7 +182,7 @@ export default function CheckoutHistoryPage() {
                                 {isSingleCv ? "description" : "workspace_premium"}
                               </span>
                               <span className="font-label-bold text-sm text-on-surface">
-                                {isSingleCv ? "Single CV AI Revision" : "Premium Pass 30 Hari"}
+                                {isSingleCv ? t("billing.single-cv-title") : t("billing.premium-30d")}
                               </span>
                             </div>
                           </td>
@@ -190,7 +192,7 @@ export default function CheckoutHistoryPage() {
                             </code>
                           </td>
                           <td className="py-3 px-2 font-label-bold text-on-surface">
-                            Rp {tx.amount.toLocaleString("id-ID")}
+                            Rp {tx.amount.toLocaleString(lang === "en" ? "en-US" : "id-ID")}
                           </td>
                           <td className="py-3 px-2">
                             <span
@@ -219,11 +221,11 @@ export default function CheckoutHistoryPage() {
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-secondary">info</span>
                 <p className="text-sm text-on-surface-variant">
-                  Ingin beli AI Revision untuk CV lain?{" "}
+                  {t("billing.buy-ai-rev")}{" "}
                   <Link href="/dashboard" className="text-secondary font-bold underline">
-                    Buka Dashboard
+                    {t("billing.open-dashboard")}
                   </Link>{" "}
-                  dan klik tombol <strong>AI Rev</strong> di CV yang diinginkan.
+                  {t("billing.click-ai-rev")} <strong>AI Rev</strong> {t("billing.on-desired-cv")}.
                 </p>
               </div>
             </div>

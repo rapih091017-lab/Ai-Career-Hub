@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/components/ui/toast";
 import type { PortfolioData } from "@/components/portfolio/types";
@@ -12,6 +13,13 @@ interface PublishDialogProps {
   themeId: string;
   /** Tambahan data live-builder (sectionOrder / visibility) */
   extras?: { sectionOrder?: string[]; sectionVisibility?: Record<string, boolean> };
+}
+
+interface PortfolioPlan {
+  entitled: boolean;
+  trialUsed: boolean;
+  trialAvailable: boolean;
+  upgradeUrl: string;
 }
 
 const SLUG_REGEX = /^[a-z0-9][a-z0-9-]{2,49}$/;
@@ -27,32 +35,38 @@ function slugifyName(name: string): string {
 export default function PublishDialog({ open, onClose, data, themeId, extras }: PublishDialogProps) {
   const { t } = useTranslation();
   const { addToast } = useToast();
+  const router = useRouter();
 
   const [slug, setSlug] = useState("");
   const [publishedUrl, setPublishedUrl] = useState<string | null>(null);
+  const [plan, setPlan] = useState<PortfolioPlan | null>(null);
+  const [updateMode, setUpdateMode] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [unpublishing, setUnpublishing] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
 
-  // Cek status saat dialog dibuka
+  // Cek status publish + entitlement saat dialog dibuka
   const refresh = useCallback(async () => {
     try {
       const res = await fetch("/api/portfolio/publish");
       if (res.ok) {
         const body = await res.json();
+        setPlan(body.plan ?? null);
         if (body.published) {
           setPublishedUrl(body.url);
           setSlug(body.slug);
         } else {
           setPublishedUrl(null);
         }
+      } else {
+        // Server error — asumsikan trial masih tersedia agar publish tidak terkunci
+        setPlan({ entitled: false, trialUsed: false, trialAvailable: true, upgradeUrl: "/settings/billing?plan=portfolio-web" });
       }
     } catch {
-      /* server down — biarkan default */
+      setPlan({ entitled: false, trialUsed: false, trialAvailable: true, upgradeUrl: "/settings/billing?plan=portfolio-web" });
     } finally {
-      // Selalu aktifkan tombol Publish, walau status fetch gagal
       setChecked(true);
     }
   }, []);
@@ -64,11 +78,12 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
       setError(null);
       setCopied(false);
       setChecked(false);
+      setPlan(null);
+      setUpdateMode(false);
       setPublishedUrl(null);
       const name = [data?.formData?.heroFirstName, data?.formData?.heroLastName].filter(Boolean).join(" ") || "";
       setSlug(slugifyName(name) || "portofolio-saya");
       refresh();
-      // Fokus ke input slug untuk aksesibilitas keyboard
       setTimeout(() => slugInputRef.current?.focus(), 50);
     }
   }, [open, data, refresh]);
@@ -110,10 +125,16 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
       const body = await res.json();
       if (!res.ok) {
         setError(body.message || "Gagal publish");
+        // Kena gating paket → paksa tampilan upgrade
+        if (body.error === "PORTFOLIO_PACKAGE_REQUIRED" && body.upgradeUrl) {
+          setPlan({ entitled: false, trialUsed: true, trialAvailable: false, upgradeUrl: body.upgradeUrl });
+          setUpdateMode(false);
+        }
         return;
       }
       setPublishedUrl(body.url);
       setSlug(body.slug);
+      setUpdateMode(false);
       addToast({ type: "success", message: t("publish.success") });
     } catch {
       setError(t("publish.error-network"));
@@ -129,6 +150,7 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
       const res = await fetch("/api/portfolio/publish", { method: "DELETE" });
       if (!res.ok) throw new Error("unpublish failed");
       setPublishedUrl(null);
+      setUpdateMode(false);
       addToast({ type: "info", message: t("publish.unpublished") });
     } catch {
       setError(t("publish.error-network"));
@@ -148,7 +170,24 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
     }
   };
 
+  const goUpgrade = () => {
+    const url = plan?.upgradeUrl || "/settings/billing?plan=portfolio-web";
+    router.push(url);
+  };
+
   if (!open) return null;
+
+  const canUpdate = plan?.entitled === true;
+  const trialCanPublish = !publishedUrl && plan?.trialAvailable === true;
+  const entitledCanPublish = plan?.entitled === true;
+  // Form muncul saat: (a) publish pertama tersedia, atau (b) user berbayar
+  // sedang memperbarui konten/ganti link.
+  const showForm =
+    !publishedUrl
+      ? entitledCanPublish || trialCanPublish
+      : updateMode && canUpdate;
+  // User bebas (bukan premium/paid) yang sudah publish — butuh upgrade utk update.
+  const showUpgradeGate = !plan?.entitled && plan?.trialUsed === true;
 
   return (
     <div
@@ -181,8 +220,8 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
           </button>
         </div>
 
-        {publishedUrl ? (
-          /* ── Sudah publish: tampilkan link ── */
+        {/* ── SUDAH LIVE: kelola link / update konten ── */}
+        {publishedUrl && (
           <div className="space-y-4">
             <div className="p-4 rounded-xl bg-green-50 border border-green-200">
               <p className="text-sm font-semibold text-green-700 flex items-center gap-1.5 mb-1">
@@ -214,6 +253,38 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
               </button>
             </div>
 
+            {/* User berbayar bisa update konten / ganti link */}
+            {canUpdate && (
+              <button
+                onClick={() => { setUpdateMode((prev) => !prev); setError(null); if (!updateMode) setTimeout(() => slugInputRef.current?.focus(), 50); }}
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary-fixed text-primary font-label-bold hover:brightness-95 active:scale-95 transition-all"
+              >
+                <span className="material-symbols-outlined text-lg">{updateMode ? "close" : "edit"}</span>
+                {updateMode ? t("publish.cancel-update") : t("publish.update-content")}
+              </button>
+            )}
+
+            {/* User free yang trial-nya sudah terpakai → upgrade */}
+            {showUpgradeGate && !updateMode && (
+              <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 space-y-3">
+                <div className="flex items-start gap-2">
+                  <span className="material-symbols-outlined text-amber-600 text-lg shrink-0">lock</span>
+                  <div>
+                    <p className="text-sm font-bold text-amber-800">{t("publish.upgrade-title")}</p>
+                    <p className="text-xs text-amber-700 mt-0.5 leading-relaxed">{t("publish.upgrade-desc")}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={goUpgrade}
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-on-primary font-label-bold hover:opacity-90 active:scale-95 transition-all"
+                >
+                  <span className="material-symbols-outlined text-lg">workspace_premium</span>
+                  {t("publish.upgrade-btn")}
+                  <span className="text-xs opacity-80">{t("publish.upgrade-price")}</span>
+                </button>
+              </div>
+            )}
+
             <button
               onClick={handleUnpublish}
               disabled={unpublishing}
@@ -227,9 +298,47 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
               {t("publish.unpublish")}
             </button>
           </div>
-        ) : (
-          /* ── Belum publish: form slug ── */
+        )}
+
+        {/* ── Upgrade gate (free, trial habis, belum live) ── */}
+        {!publishedUrl && showUpgradeGate && (
           <div className="space-y-4">
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 space-y-3">
+              <div className="flex items-start gap-2">
+                <span className="material-symbols-outlined text-amber-600 text-2xl shrink-0">lock</span>
+                <div>
+                  <p className="font-label-bold text-amber-800">{t("publish.upgrade-title")}</p>
+                  <p className="text-xs text-amber-700 mt-0.5 leading-relaxed">{t("publish.upgrade-desc-empty")}</p>
+                </div>
+              </div>
+              <button
+                onClick={goUpgrade}
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary text-on-primary font-label-bold hover:opacity-90 active:scale-95 transition-all"
+              >
+                <span className="material-symbols-outlined text-lg">workspace_premium</span>
+                {t("publish.upgrade-btn")}
+                <span className="text-xs opacity-80">{t("publish.upgrade-price")}</span>
+              </button>
+            </div>
+
+            {error && (
+              <p className="text-xs text-error flex items-center gap-1.5 bg-error-container/20 rounded-lg px-3 py-2">
+                <span className="material-symbols-outlined text-sm">error</span>
+                {error}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* ── Form slug (publish pertama / update oleh user berbayar) ── */}
+        {showForm && (
+          <div className="space-y-4">
+            {publishedUrl && updateMode && (
+              <p className="text-xs font-semibold text-primary bg-primary/5 border border-primary/20 rounded-lg px-3 py-2 flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-sm">edit</span>
+                {t("publish.updating-note")}
+              </p>
+            )}
             <div>
               <label className="text-label-sm text-on-surface-variant block mb-1.5">{t("publish.slug-label")}</label>
               <div className="flex items-center gap-2 bg-surface-container-low rounded-xl px-4 py-2.5 border border-outline-variant focus-within:border-primary transition-colors">
@@ -266,12 +375,26 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
               ) : (
                 <>
                   <span className="material-symbols-outlined text-lg">rocket_launch</span>
-                  {t("publish.btn")}
+                  {publishedUrl && updateMode ? t("publish.btn-update") : t("publish.btn")}
                 </>
               )}
             </button>
 
-            <p className="text-[11px] text-on-surface-variant text-center leading-relaxed">{t("publish.free-note")}</p>
+            <p className="text-[11px] text-on-surface-variant text-center leading-relaxed">
+              {publishedUrl && updateMode
+                ? t("publish.update-note")
+                : trialCanPublish
+                  ? t("publish.trial-note")
+                  : t("publish.paid-note")}
+            </p>
+          </div>
+        )}
+
+        {/* ── Loading status saat dialog baru dibuka ── */}
+        {!publishedUrl && !showUpgradeGate && !showForm && (
+          <div className="py-6 flex flex-col items-center gap-3 text-on-surface-variant">
+            <span className="material-symbols-outlined text-2xl animate-spin">sync</span>
+            <p className="text-sm">Memeriksa status publish...</p>
           </div>
         )}
       </div>

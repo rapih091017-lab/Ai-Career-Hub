@@ -527,8 +527,14 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
       const result = await exportPdfViaServer(previewRef.current, name, 0, 297);
       if (!result.ok) {
         addToast({ type: result.redirectUrl ? "warning" : "error", message: result.error || "Gagal export PDF" });
+      } else if (result.usedFallback) {
+        // Versi gambar (fallback) — beri tahu user jujur
+        addToast({
+          type: "warning",
+          message: "Server PDF teks sedang sibuk — file yang terunduh versi gambar. Coba lagi sebentar untuk versi teks.",
+        });
       } else {
-        addToast({ type: "success", message: "PDF berhasil diunduh!" });
+        addToast({ type: "success", message: "PDF teks berhasil diunduh!" });
       }
     } catch (err) {
       addToast({ type: "error", message: "Gagal export PDF" });

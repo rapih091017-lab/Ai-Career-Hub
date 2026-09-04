@@ -16,18 +16,18 @@ import { useToast } from "@/components/ui/toast";
 import { ConfirmModal, type ConfirmAction } from "@/components/ui/confirm-modal";
 import { DashboardStats } from "@/components/dashboard/DashboardStats";
 
-/* ── Relative time helper ── */
-function timeAgo(date: Date): string {
+/* ── Relative time helper (ikuti bahasa aktif) ── */
+function timeAgo(date: Date, t: (k: string) => string, lang: string): string {
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const mins = Math.floor(diffMs / 60000);
-  if (mins < 1) return "Baru saja";
-  if (mins < 60) return `${mins} menit lalu`;
+  if (mins < 1) return t("dashboard.time-just-now");
+  if (mins < 60) return t("dashboard.time-minutes").replace("{n}", String(mins));
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours} jam lalu`;
+  if (hours < 24) return t("dashboard.time-hours").replace("{n}", String(hours));
   const days = Math.floor(hours / 24);
-  if (days < 7) return `${days} hari lalu`;
-  return date.toLocaleDateString("id-ID");
+  if (days < 7) return t("dashboard.time-days").replace("{n}", String(days));
+  return date.toLocaleDateString(lang === "en" ? "en-US" : "id-ID");
 }
 
 interface CVItem {
@@ -58,12 +58,12 @@ interface LetterItem {
   updatedAt: string;
 }
 
-function letterStyleLabel(style: string): string {
+function letterStyleLabel(style: string, t: (k: string) => string): string {
   if (style === "ats") return "Cover (EN)";
-  if (style === "casual") return "Kasual";
-  if (style === "formal_lengkap") return "Formal Lengkap";
-  if (style === "motivation") return "Motivation";
-  return "Formal";
+  if (style === "casual") return t("dashboard.style-casual");
+  if (style === "formal_lengkap") return t("dashboard.style-full-formal");
+  if (style === "motivation") return t("dashboard.style-motivation");
+  return t("dashboard.style-formal");
 }
 
 interface ProfileCompleteness {
@@ -72,20 +72,20 @@ interface ProfileCompleteness {
   hasProfile: boolean;
 }
 
-function computeCompleteness(data: any): ProfileCompleteness {
+function computeCompleteness(data: any, t: (k: string) => string): ProfileCompleteness {
   const sections = [
-    { label: "Data Pribadi", key: "personal", filled: !!(data?.personalInfo?.fullName || data?.personalInfo?.phone || data?.personalInfo?.email) },
-    { label: "Pengalaman Kerja", key: "work", filled: Array.isArray(data?.workHistory) && data.workHistory.length > 0 },
-    { label: "Pendidikan", key: "education", filled: Array.isArray(data?.education) && data.education.length > 0 },
-    { label: "Organisasi", key: "orgs", filled: Array.isArray(data?.organisations) && data.organisations.length > 0 },
-    { label: "Skill", key: "skills", filled: Array.isArray(data?.skills) && data.skills.length > 0 },
+    { label: t("dashboard.section-personal"), key: "personal", filled: !!(data?.personalInfo?.fullName || data?.personalInfo?.phone || data?.personalInfo?.email) },
+    { label: t("dashboard.section-work"), key: "work", filled: Array.isArray(data?.workHistory) && data.workHistory.length > 0 },
+    { label: t("dashboard.section-education"), key: "education", filled: Array.isArray(data?.education) && data.education.length > 0 },
+    { label: t("dashboard.section-org"), key: "orgs", filled: Array.isArray(data?.organisations) && data.organisations.length > 0 },
+    { label: t("dashboard.section-skills"), key: "skills", filled: Array.isArray(data?.skills) && data.skills.length > 0 },
   ];
   const filledCount = sections.filter((s) => s.filled).length;
   return { score: Math.round((filledCount / sections.length) * 100), sections, hasProfile: true };
 }
 
 export default function DashboardPage() {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const { addToast } = useToast();
   const router = useRouter();
   const [cvList, setCvList] = useState<CVItem[]>([]);
@@ -98,9 +98,6 @@ export default function DashboardPage() {
   const [checkerHistoryLoading, setCheckerHistoryLoading] = useState(true);
   const [letters, setLetters] = useState<LetterItem[]>([]);
   const [lettersLoading, setLettersLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filterStatus, setFilterStatus] = useState<"all" | "has-title" | "no-title">("all");
-  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "name-asc" | "name-desc">("newest");
   const [suratMenuFor, setSuratMenuFor] = useState<string | null>(null);
   const suratMenuRef = useRef<HTMLDivElement>(null);
 
@@ -121,28 +118,6 @@ export default function DashboardPage() {
       document.removeEventListener("keydown", onKey);
     };
   }, [suratMenuFor]);
-
-  /* ── Filtered & Sorted CV list ── */
-  const filteredCvList = useMemo(() => {
-    let list = cvList;
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      list = list.filter((cv) => (cv.jobTitle || "").toLowerCase().includes(q));
-    }
-    if (filterStatus === "has-title") list = list.filter((cv) => !!cv.jobTitle);
-    if (filterStatus === "no-title") list = list.filter((cv) => !cv.jobTitle);
-    // Sort
-    list = [...list].sort((a, b) => {
-      switch (sortBy) {
-        case "newest": return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-        case "oldest": return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
-        case "name-asc": return (a.jobTitle || "").localeCompare(b.jobTitle || "");
-        case "name-desc": return (b.jobTitle || "").localeCompare(a.jobTitle || "");
-        default: return 0;
-      }
-    });
-    return list;
-  }, [cvList, searchQuery, filterStatus, sortBy]);
 
   /* ── Stats for the dashboard ── */
   const stats = useMemo(() => {
@@ -173,7 +148,7 @@ export default function DashboardPage() {
       .then(async (res) => {
         if (res.ok) {
           const data = await res.json();
-          setProfileData(computeCompleteness(data));
+          setProfileData(computeCompleteness(data, t));
         } else if (res.status === 404) {
           setProfileData({ score: 0, sections: [], hasProfile: false });
         }
@@ -229,16 +204,16 @@ export default function DashboardPage() {
 
   const handleDelete = async (id: string) => {
     setConfirmAction({
-      title: "Hapus CV",
+      title: t("dashboard.delete-cv"),
       message: t("dashboard.confirm-delete"),
       variant: "danger",
-      confirmLabel: "Hapus",
+      confirmLabel: t("dashboard.delete"),
       onConfirm: async () => {
         try {
           const res = await fetch(`/api/cv-documents/${id}`, { method: "DELETE" });
           if (res.ok) {
             setCvList((prev) => prev.filter((cv) => cv.id !== id));
-            addToast({ type: "success", message: "CV berhasil dihapus" });
+            addToast({ type: "success", message: t("dashboard.deleted-cv") });
           } else addToast({ type: "error", message: t("dashboard.delete-failed") });
         } catch { addToast({ type: "error", message: t("dashboard.delete-failed") }); }
       },
@@ -325,8 +300,8 @@ export default function DashboardPage() {
                 { icon: "edit_document", label: t("dashboard.new-cv"), desc: t("dashboard.new-cv-desc"), color: "bg-primary-fixed", iconColor: "text-primary", onClick: () => setShowTemplatePicker(true), href: undefined },
                 { icon: "search", label: t("dashboard.check-cv"), desc: t("dashboard.check-cv-desc"), color: "bg-secondary-container/50", iconColor: "text-secondary", onClick: undefined, href: "/checker" },
                 { icon: "grid_view", label: t("dashboard.portfolio"), desc: t("dashboard.portfolio-desc"), color: "bg-surface-container", iconColor: "text-primary", onClick: undefined, href: "/portfolio" },
-                { icon: "mail", label: "Buat Surat", desc: "Surat lamaran & Motivation Letter · dari CV atau dari nol", color: "bg-primary/10", iconColor: "text-primary", onClick: undefined, href: "/surat-lamaran" },
-                { icon: "record_voice_over", label: "Persiapan Interview", desc: "224+ pertanyaan umum untuk 28+ posisi", color: "bg-amber-50", iconColor: "text-amber-600", onClick: undefined, href: "/interview" },
+                { icon: "mail", label: t("dashboard.create-letter"), desc: t("dashboard.create-letter-desc"), color: "bg-primary/10", iconColor: "text-primary", onClick: undefined, href: "/surat-lamaran" },
+                { icon: "record_voice_over", label: t("dashboard.interview-prep"), desc: t("dashboard.interview-desc"), color: "bg-amber-50", iconColor: "text-amber-600", onClick: undefined, href: "/interview" },
               ].map((card, i) => {
                 const content = (
                   <div className="bg-white rounded-2xl p-6 shadow-premium-md border border-outline-variant/50 hover:shadow-premium-lg hover:-translate-y-0.5 transition-[transform,box-shadow] duration-300 group active:scale-[0.98]">
@@ -363,7 +338,7 @@ export default function DashboardPage() {
             {/* Recent Activity */}
             {recentActivity.length > 0 && (
               <section className="mb-8">
-                <h2 className="font-headline-md text-on-surface mb-3">Aktivitas Terkini</h2>
+                <h2 className="font-headline-md text-on-surface mb-3">{t("dashboard.recent-activity")}</h2>
                 <div className="bg-white rounded-2xl p-4 shadow-premium-sm border border-outline-variant/50 space-y-2">
                   {recentActivity.map((cv, i) => (
                     <motion.div
@@ -378,15 +353,17 @@ export default function DashboardPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-semibold text-on-surface truncate">
-                          {cv.jobTitle ? `Membuat CV untuk "${cv.jobTitle}"` : "Membuat CV baru"}
+                          {cv.jobTitle
+                            ? t("dashboard.activity-created-for").replace("{title}", cv.jobTitle)
+                            : t("dashboard.activity-created")}
                         </p>
-                        <p className="text-[10px] text-on-surface-variant">{timeAgo(new Date(cv.updatedAt))}</p>
+                        <p className="text-[10px] text-on-surface-variant">{timeAgo(new Date(cv.updatedAt), t, lang)}</p>
                       </div>
                       <button
                         onClick={() => router.push(`/builder/${cv.id}`)}
                         className="text-[10px] font-semibold text-primary hover:underline shrink-0"
                       >
-                        Buka
+                        {t("dashboard.open")}
                       </button>
                     </motion.div>
                   ))}
@@ -397,7 +374,7 @@ export default function DashboardPage() {
             {/* ── Checker History ── */}
             {checkerHistoryLoading ? (
               <section className="mb-8">
-                <h2 className="font-headline-md text-on-surface mb-3">Riwayat Analisis CV</h2>
+                <h2 className="font-headline-md text-on-surface mb-3">{t("dashboard.checker-history")}</h2>
                 <div className="space-y-2">
                   {[1,2,3].map((i) => (
                     <div key={i} className="bg-white rounded-xl p-4 shadow-premium-sm border border-outline-variant/30 flex items-center gap-4 animate-pulse">
@@ -412,7 +389,7 @@ export default function DashboardPage() {
               </section>
             ) : checkerHistory.length > 0 && (
               <section className="mb-8">
-                <h2 className="font-headline-md text-on-surface mb-3">Riwayat Analisis CV</h2>
+                <h2 className="font-headline-md text-on-surface mb-3">{t("dashboard.checker-history")}</h2>
                 <div className="space-y-2">
                   {checkerHistory.map((item, i) => {
                     const score = item.scores.overall;
@@ -435,10 +412,10 @@ export default function DashboardPage() {
                         {/* Info */}
                         <div className="flex-1 min-w-0">
                           <p className="text-xs font-semibold text-on-surface truncate">
-                            {item.aiFeedback.summary?.slice(0, 80) || "Analisis CV selesai"}
+                            {item.aiFeedback.summary?.slice(0, 80) || t("dashboard.analysis-done")}
                           </p>
                           <p className="text-[10px] text-on-surface-variant mt-0.5">
-                            {timeAgo(new Date(item.createdAt))}
+                            {timeAgo(new Date(item.createdAt), t, lang)}
                           </p>
                         </div>
 
@@ -454,11 +431,11 @@ export default function DashboardPage() {
             {/* ── Riwayat Surat ── */}
             <section className="mb-8">
               <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
-                <h2 className="font-headline-md text-on-surface">Riwayat Surat</h2>
+                <h2 className="font-headline-md text-on-surface">{t("dashboard.letters-history")}</h2>
                 <div className="flex items-center gap-2">
                   {letters.length > 0 && (
                     <span className="text-xs font-semibold text-on-surface-variant">
-                      {letters.length} surat
+                      {t("dashboard.letters-count").replace("{n}", String(letters.length))}
                     </span>
                   )}
                   <MagneticButton>
@@ -467,7 +444,7 @@ export default function DashboardPage() {
                       className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-violet-50 text-violet-700 font-bold text-xs hover:bg-violet-100 active:scale-[0.97] transition-all"
                     >
                       <span className="material-symbols-outlined text-sm">add</span>
-                      Buat Surat
+                      {t("dashboard.create-letter")}
                     </Link>
                   </MagneticButton>
                 </div>
@@ -494,9 +471,9 @@ export default function DashboardPage() {
                   <div className="w-12 h-12 rounded-xl bg-violet-50 flex items-center justify-center mx-auto mb-3">
                     <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>mail</span>
                   </div>
-                  <h3 className="font-label-bold text-on-surface mb-1">Belum ada surat</h3>
+                  <h3 className="font-label-bold text-on-surface mb-1">{t("dashboard.no-letters")}</h3>
                   <p className="text-body-md text-on-surface-variant mb-4">
-                    Buat surat lamaran atau motivation letter dari CV, atau langsung dari nol.
+                    {t("dashboard.no-letters-desc")}
                   </p>
                   <MagneticButton>
                     <Link
@@ -504,7 +481,7 @@ export default function DashboardPage() {
                       className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white font-bold rounded-xl hover:opacity-90 active:scale-[0.98] transition-all"
                     >
                       <span className="material-symbols-outlined text-base">add</span>
-                      Buat Surat Baru
+                      {t("dashboard.letter-new")}
                     </Link>
                   </MagneticButton>
                 </motion.div>
@@ -528,10 +505,10 @@ export default function DashboardPage() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-xs font-semibold text-on-surface truncate">
-                            {letter.subject || letter.jobTitle || "Surat lamaran"}
+                            {letter.subject || letter.jobTitle || t("dashboard.letter-application")}
                           </p>
                           <p className="text-[10px] text-on-surface-variant mt-0.5">
-                            {letterStyleLabel(letter.style)} · {letter.companyName || "-"} · {timeAgo(new Date(letter.createdAt))}
+                            {letterStyleLabel(letter.style, t)} · {letter.companyName || "-"} · {timeAgo(new Date(letter.createdAt), t, lang)}
                           </p>
                         </div>
                         <span className="material-symbols-outlined text-on-surface-variant text-sm shrink-0">chevron_right</span>
@@ -542,61 +519,18 @@ export default function DashboardPage() {
               )}
             </section>
 
-            {/* CV History */}
+            {/* Recent CVs — manager lengkap ada di /my-resumes */}
             <section>
               <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-                <h2 className="font-headline-md text-on-surface">{t("dashboard.cv-history")}</h2>
-                <div className="flex items-center gap-2">
-                  {/* Search */}
-                  <div className="relative">
-                    <span className="material-symbols-outlined text-sm text-outline absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none">search</span>
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Cari CV..."
-                      className="w-36 md:w-48 pl-7 pr-2 py-1.5 rounded-lg bg-surface-container-low border border-outline-variant/30 text-xs focus:ring-1 focus:ring-primary outline-none"
-                    />
-                  </div>
-                  {/* Filter status */}
-                  <select
-                    value={filterStatus}
-                    onChange={(e) => setFilterStatus(e.target.value as "all" | "has-title" | "no-title")}
-                    className="bg-surface-container-low border border-outline-variant/30 rounded-lg text-xs px-2 py-1.5 focus:ring-1 focus:ring-primary"
-                  >
-                    <option value="all">Semua</option>
-                    <option value="has-title">Sudah diisi</option>
-                    <option value="no-title">Belum diisi</option>
-                  </select>
-                  {/* Sort */}
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as "newest" | "oldest" | "name-asc" | "name-desc")}
-                    className="bg-surface-container-low border border-outline-variant/30 rounded-lg text-xs px-2 py-1.5 focus:ring-1 focus:ring-primary"
-                    title="Urutkan"
-                  >
-                    <option value="newest">Terbaru</option>
-                    <option value="oldest">Terlama</option>
-                    <option value="name-asc">A-Z</option>
-                    <option value="name-desc">Z-A</option>
-                  </select>
-                  <MagneticButton>
-                    <button
-                      onClick={() => setShowTemplatePicker(true)}
-                      className="text-label-bold text-primary hover:underline flex items-center gap-1 text-xs"
-                    >
-                      <span className="material-symbols-outlined text-[16px]">add</span>
-                      {t("dashboard.create-new")}
-                    </button>
-                  </MagneticButton>
-                </div>
+                <h2 className="font-headline-md text-on-surface">{t("dashboard.recent-cvs")}</h2>
+                <Link
+                  href="/my-resumes"
+                  className="text-label-bold text-primary hover:underline flex items-center gap-1 text-xs"
+                >
+                  {t("dashboard.view-all-cvs")}
+                  <span className="material-symbols-outlined text-[14px] select-none">arrow_forward</span>
+                </Link>
               </div>
-
-              {searchQuery && filteredCvList.length === 0 && (
-                <div className="bg-white rounded-2xl p-8 border border-dashed border-outline-variant text-center shadow-premium-sm mb-4">
-                  <p className="text-sm text-on-surface-variant">Tidak ada CV dengan judul &ldquo;{searchQuery}&rdquo;</p>
-                </div>
-              )}
 
               {isLoading ? (
                 <div className="space-y-3">
@@ -640,7 +574,7 @@ export default function DashboardPage() {
                 </motion.div>
               ) : (
                 <div className="space-y-3">
-                  {filteredCvList.map((cv) => (
+                  {cvList.slice(0, 4).map((cv) => (
                     <div
                       key={cv.id}
                       className="bg-white rounded-2xl p-5 shadow-premium-sm border border-outline-variant/50 flex items-center justify-between gap-4 hover:shadow-premium-md hover:-translate-y-0.5 transition-[transform,box-shadow] duration-300 group"
@@ -648,7 +582,7 @@ export default function DashboardPage() {
                       <div className="flex-1 min-w-0">
                         <h3 className="font-label-bold text-on-surface truncate">{cv.jobTitle || t("dashboard.untitled-cv")}</h3>
                         <p className="text-label-sm text-on-surface-variant mt-0.5">
-                          {CV_TEMPLATES.find(t => t.id === cv.templateId)?.name || "Template standar"} &middot; {new Date(cv.createdAt).toLocaleDateString("id-ID")}
+                          {CV_TEMPLATES.find((tmpl) => tmpl.id === cv.templateId)?.name || t("dashboard.template-default")} &middot; {new Date(cv.createdAt).toLocaleDateString(lang === "en" ? "en-US" : "id-ID")}
                         </p>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
@@ -667,10 +601,10 @@ export default function DashboardPage() {
                           aria-haspopup="menu"
                           aria-expanded={suratMenuFor === cv.id}
                           className={`px-3 py-2 rounded-xl text-label-bold active:scale-[0.97] transition-colors flex items-center gap-1 ${suratMenuFor === cv.id ? "bg-violet-100 text-violet-800" : "bg-violet-50 text-violet-700 hover:bg-violet-100"}`}
-                          title="Buat Surat Lamaran / Cover Letter / Motivation Letter dari CV ini"
+                          title={t("dashboard.surat-title")}
                         >
                           <span className="material-symbols-outlined text-sm">mail</span>
-                          Surat
+                          {t("dashboard.letters")}
                           <span className={`material-symbols-outlined text-[14px] transition-transform ${suratMenuFor === cv.id ? "rotate-180" : ""}`}>arrow_drop_down</span>
                         </button>
                       </MagneticButton>
@@ -685,7 +619,7 @@ export default function DashboardPage() {
                             role="menu"
                             className="absolute right-0 top-full mt-1 z-30 w-60 bg-white rounded-xl shadow-premium-lg border border-outline-variant/50 overflow-hidden py-1.5"
                           >
-                            <p className="px-4 pt-1 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">Buat Surat dari CV ini</p>
+                            <p className="px-4 pt-1 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">{t("dashboard.create-letter-from-cv")}</p>
                             <button
                               role="menuitem"
                               onClick={() => { setSuratMenuFor(null); router.push(`/surat-lamaran/${cv.id}?style=formal`); }}
@@ -693,8 +627,8 @@ export default function DashboardPage() {
                             >
                               <span className="material-symbols-outlined text-violet-600 text-lg mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>markunread_mailbox</span>
                               <span>
-                                <span className="block text-xs font-bold text-on-surface">Surat Lamaran</span>
-                                <span className="block text-[10px] text-on-surface-variant">Formal · Formal Lengkap · ATS · Kasual</span>
+                                <span className="block text-xs font-bold text-on-surface">{t("dashboard.application-letter")}</span>
+                                <span className="block text-[10px] text-on-surface-variant">{t("dashboard.styles-hint")}</span>
                               </span>
                             </button>
                             <button
@@ -704,8 +638,8 @@ export default function DashboardPage() {
                             >
                               <span className="material-symbols-outlined text-amber-600 text-lg mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>emoji_events</span>
                               <span>
-                                <span className="block text-xs font-bold text-on-surface">Motivation Letter</span>
-                                <span className="block text-[10px] text-on-surface-variant">Beasiswa · Program · Fresh grad</span>
+                                <span className="block text-xs font-bold text-on-surface">{t("dashboard.motivation-letter")}</span>
+                                <span className="block text-[10px] text-on-surface-variant">{t("dashboard.motivation-hint")}</span>
                               </span>
                             </button>
                           </motion.div>
@@ -716,7 +650,7 @@ export default function DashboardPage() {
                       <button
                         onClick={() => router.push(`/cv/${cv.id}/checkout`)}
                         className="px-3 py-2 rounded-xl bg-secondary/10 text-secondary text-label-bold hover:bg-secondary/20 active:scale-[0.97] transition-colors flex items-center gap-1"
-                        title="Beli AI Revision untuk CV ini"
+                        title={t("dashboard.ai-rev-title")}
                       >
                         <span className="material-symbols-outlined text-sm">auto_awesome</span>
                         AI Rev
@@ -725,7 +659,7 @@ export default function DashboardPage() {
                         <button
                           onClick={() => handleDelete(cv.id)}
                           className="p-2 rounded-xl text-error hover:bg-error-container/30 active:scale-[0.95] transition-colors"
-                          aria-label="Hapus CV"
+                          aria-label={t("dashboard.delete-cv-aria")}
                         >
                           <span className="material-symbols-outlined text-lg">delete</span>
                         </button>

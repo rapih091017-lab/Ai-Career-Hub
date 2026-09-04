@@ -10,11 +10,32 @@ import LogoutConfirmModal from "@/components/ui/LogoutConfirmModal";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard" },
-  { label: "My Resumes", href: "/dashboard" },
+  { label: "My Resumes", href: "/my-resumes" },
   { label: "Surat", href: "/surat-lamaran" },
   { label: "Templates", href: "/builder/new" },
   { label: "Resources", href: "/checker" },
 ];
+
+/**
+ * Per-item active matching — tiap link punya cakupan halaman sendiri supaya
+ * tidak ada dua menu yang ter-highlight bersamaan.
+ * - Dashboard  → hanya /dashboard
+ * - My Resumes → /my-resumes + editor CV (/builder/[id], /cv/*)
+ * - Templates  → hanya /builder/new (pilih template)
+ */
+function isNavActive(href: string, pathname: string): boolean {
+  if (href === "/dashboard") return pathname === "/dashboard";
+  if (href === "/my-resumes")
+    return (
+      pathname === "/my-resumes" ||
+      /^\/builder\/[^/]+/.test(pathname) ||
+      pathname.startsWith("/cv/")
+    );
+  if (href === "/builder/new") return pathname === "/builder/new";
+  if (href === "/surat-lamaran") return pathname.startsWith("/surat-lamaran");
+  if (href === "/checker") return pathname === "/checker" || pathname.startsWith("/checker/");
+  return pathname === href;
+}
 
 export default function AppHeader() {
   const router = useRouter();
@@ -67,10 +88,7 @@ export default function AppHeader() {
          * tidak bertabrakan dengan menu user di layar md (768-1024px) */}
         <nav className="hidden lg:flex items-center gap-6 xl:gap-8 absolute left-1/2 -translate-x-1/2">
           {NAV_ITEMS.map((item) => {
-            const isActive =
-              pathname === item.href ||
-              (item.href === "/builder/new" && pathname.startsWith("/builder")) ||
-              (item.href === "/surat-lamaran" && pathname.startsWith("/surat-lamaran"));
+            const isActive = isNavActive(item.href, pathname);
             return (
               <Link
                 key={item.label}
@@ -142,13 +160,6 @@ export default function AppHeader() {
                   </button>
                   <button
                     className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-high transition-colors"
-                    onClick={() => { setIsDropdownOpen(false); router.push("/surat-lamaran"); }}
-                  >
-                    <span className="material-symbols-outlined text-lg text-on-surface-variant">mail</span>
-                    Surat & Motivation Letter
-                  </button>
-                  <button
-                    className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-high transition-colors"
                     onClick={() => { setIsDropdownOpen(false); router.push("/profile"); }}
                   >
                     <span className="material-symbols-outlined text-lg text-on-surface-variant">person</span>
@@ -156,7 +167,7 @@ export default function AppHeader() {
                   </button>
                   <button
                     className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-high transition-colors"
-                    onClick={() => { setIsDropdownOpen(false); router.push("/settings/profile"); }}
+                    onClick={() => { setIsDropdownOpen(false); router.push("/settings/security"); }}
                   >
                     <span className="material-symbols-outlined text-lg text-on-surface-variant">settings</span>
                     {t("header.settings")}
@@ -196,7 +207,7 @@ export default function AppHeader() {
           >
             <div className="px-margin-mobile py-4 space-y-3">
               {NAV_ITEMS.map((item) => {
-                const isActive = pathname === item.href;
+                const isActive = isNavActive(item.href, pathname);
                 return (
                   <Link
                     key={item.label}
@@ -221,7 +232,7 @@ export default function AppHeader() {
                 {t("header.lang-full")}
               </button>
               <Link
-                href="/settings/profile"
+                href="/settings/security"
                 className="block px-4 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors font-label-bold"
                 onClick={() => setIsMobileMenuOpen(false)}
               >

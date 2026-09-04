@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { exportElementToPdf, exportPreviewToPdf } from "@/lib/pdf-export";
+import { useTranslation } from "@/lib/i18n";
 
 interface PdfExportButtonProps {
   targetRef: React.RefObject<HTMLDivElement | null>;
@@ -29,6 +30,7 @@ export function PdfExportButton({
   const [localLoading, setLocalLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isFallback, setIsFallback] = useState(false);
+  const { t } = useTranslation();
   const loading = externalLoading ?? localLoading;
 
   const handleExport = async () => {
@@ -55,7 +57,7 @@ export function PdfExportButton({
         setTimeout(() => setIsFallback(false), 3000);
       } catch (fallbackErr) {
         console.error("[pdf] Both methods failed:", fallbackErr);
-        setErrorMsg("Gagal export PDF. Coba gunakan browser lain atau screenshot manual.");
+        setErrorMsg(t("pdfbtn.failed-msg"));
       }
     } finally {
       setLocalLoading(false);
@@ -68,7 +70,7 @@ export function PdfExportButton({
         onClick={handleExport}
         disabled={loading}
         className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-on-primary text-sm font-semibold hover:brightness-110 active:scale-[0.97] transition-[filter,transform,opacity] disabled:opacity-60 shadow-premium-sm"
-        title={isFallback ? "Menggunakan mode A4" : "Download PDF hasil analisis"}
+        title={isFallback ? t("pdfbtn.fallback-title") : t("pdfbtn.dl-title")}
       >
         {loading ? (
           <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
@@ -78,17 +80,17 @@ export function PdfExportButton({
         ) : (
           <span className="material-symbols-outlined text-lg select-none">download</span>
         )}
-        {isFallback ? "Mengunduh A4..." : label}
+        {isFallback ? t("pdfbtn.downloading") : label}
       </button>
       {errorMsg && (
         <div className="absolute top-full mt-2 right-0 bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg p-3 shadow-premium-md w-64 z-10">
-          <p className="font-semibold mb-1">Export Gagal</p>
+          <p className="font-semibold mb-1">{t("pdfbtn.export-failed-title")}</p>
           <p>{errorMsg}</p>
           <button
             onClick={() => setErrorMsg(null)}
             className="mt-1 text-red-500 hover:text-red-700 underline text-[11px]"
           >
-            Tutup
+            {t("pdfbtn.close")}
           </button>
         </div>
       )}

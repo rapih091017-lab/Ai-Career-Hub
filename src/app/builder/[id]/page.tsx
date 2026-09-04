@@ -163,6 +163,14 @@ export default function BuilderPage() {
         } else {
           addToast({ type: "error", message: result.error || t("builder.pdf-export-failed") });
         }
+      } else if (result.usedFallback) {
+        // File ter-download versi gambar (fallback). Beri tahu user jujur.
+        addToast({
+          type: "warning",
+          message: "Server PDF teks sedang sibuk — file yang terunduh versi gambar. Coba lagi sebentar untuk versi teks yang bisa di-select ATS.",
+        });
+      } else {
+        addToast({ type: "success", message: "PDF teks berhasil diunduh!" });
       }
     } catch (err) {
       console.error("PDF Export Error:", err);

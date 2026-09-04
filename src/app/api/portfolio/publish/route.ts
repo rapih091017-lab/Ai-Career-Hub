@@ -1,15 +1,52 @@
 import { NextRequest, NextResponse } from "next/server";
 import { apiHandler, errorResponse, withAuth } from "@/lib/api-utils";
 import { db } from "@/db";
-import { portfolioPages } from "@/db/schema";
+import { portfolioPages, portfolioTrialUses } from "@/db/schema";
 import { eq, or } from "drizzle-orm";
 import { THEMES } from "@/components/portfolio/themes";
 import { isValidSlug } from "@/lib/portfolio-safety";
+import { getUserAccess } from "@/lib/access";
 
-/* ─── GET /api/portfolio/publish — status publish user ─── */
+const UPGRADE_URL = "/settings/billing?plan=portfolio-web";
+
+/** Hasil entitlement portfolio user (tanpa melihat apakah sudah ada halaman live). */
+async function portfolioEntitlement(userId: string): Promise<{
+  entitled: boolean;
+  trialUsed: boolean;
+  trialAvailable: boolean;
+}> {
+  const access = await getUserAccess(userId);
+  const lim = access.limits.portfolio_web;
+  const entitled =
+    lim === "unlimited" || (typeof lim === "number" && lim > 0);
+
+  if (entitled) return { entitled: true, trialUsed: false, trialAvailable: false };
+
+  const [trial] = await db
+    .select({ id: portfolioTrialUses.id })
+    .from(portfolioTrialUses)
+    .where(eq(portfolioTrialUses.userId, userId))
+    .limit(1);
+
+  const trialUsed = !!trial;
+  return { entitled: false, trialUsed, trialAvailable: !trialUsed };
+}
+
+function upgradeBody() {
+  return errorResponse(
+    "PORTFOLIO_PACKAGE_REQUIRED",
+    "Publish gratis hanya berlaku 1x percobaan. Aktifkan paket Portfolio Web untuk terus live atau memperbarui konten.",
+    403,
+    { upgradeUrl: UPGRADE_URL },
+  );
+}
+
+/* ─── GET /api/portfolio/publish — status publish + entitlement user ─── */
 export const GET = apiHandler(async () => {
   const auth = await withAuth();
   if (auth instanceof NextResponse) return auth;
+
+  const ent = await portfolioEntitlement(auth.userId);
 
   const [row] = await db
     .select({ slug: portfolioPages.slug, theme: portfolioPages.theme, publishedAt: portfolioPages.publishedAt, updatedAt: portfolioPages.updatedAt })
@@ -17,8 +54,19 @@ export const GET = apiHandler(async () => {
     .where(eq(portfolioPages.userId, auth.userId))
     .limit(1);
 
+  // Trial dianggap terpakai jika pernah publish (mencakup user lama yang
+  // publish saat fitur masih gratis penuh).
+  const effectiveTrialUsed = !ent.entitled && (ent.trialUsed || !!row);
+
+  const plan = {
+    entitled: ent.entitled,
+    trialUsed: effectiveTrialUsed,
+    trialAvailable: !ent.entitled && !effectiveTrialUsed,
+    upgradeUrl: UPGRADE_URL,
+  };
+
   if (!row) {
-    return NextResponse.json({ published: false });
+    return NextResponse.json({ published: false, plan });
   }
 
   return NextResponse.json({
@@ -28,6 +76,7 @@ export const GET = apiHandler(async () => {
     url: `${getBaseUrl()}/p/${row.slug}`,
     publishedAt: row.publishedAt,
     updatedAt: row.updatedAt,
+    plan,
   });
 });
 
@@ -62,14 +111,26 @@ export const POST = apiHandler(async (request: NextRequest) => {
     return errorResponse("INVALID_DATA", "Data portfolio tidak lengkap (butuh formData)", 400);
   }
 
-  const now = new Date();
+  // ── Gating: 1x trial gratis, publish/update berikutnya butuh paket ──
+  const ent = await portfolioEntitlement(auth.userId);
 
-  // Cek slug dipakai user lain?
   const [existing] = await db
     .select({ id: portfolioPages.id, userId: portfolioPages.userId })
     .from(portfolioPages)
     .where(or(eq(portfolioPages.slug, slug), eq(portfolioPages.userId, auth.userId)))
     .limit(1);
+
+  const isUpdate = !!existing && existing.userId === auth.userId;
+  // Trial dianggap terpakai kalau user sudah pernah punya halaman live
+  // (termasuk user lama era gratis) atau sudah memakai trial sebelumnya.
+  const effectiveTrialUsed =
+    ent.trialUsed || (!ent.entitled && isUpdate);
+
+  if (!ent.entitled && effectiveTrialUsed) {
+    return upgradeBody();
+  }
+
+  const now = new Date();
 
   if (existing) {
     if (existing.userId !== auth.userId) {
@@ -97,6 +158,18 @@ export const POST = apiHandler(async (request: NextRequest) => {
     } catch (err) {
       return uniqueViolation(err);
     }
+
+    // Catat pemakaian trial (hanya untuk user non-berbayar yang publish pertama kali)
+    if (!ent.entitled) {
+      try {
+        await db
+          .insert(portfolioTrialUses)
+          .values({ userId: auth.userId })
+          .onConflictDoNothing();
+      } catch (trialErr) {
+        console.error("[portfolio-publish] gagal mencatat trial:", trialErr);
+      }
+    }
   }
 
   return NextResponse.json({
@@ -108,7 +181,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
   });
 });
 
-/* ─── DELETE /api/portfolio/publish — unpublish ─── */
+/* ─── DELETE /api/portfolio/publish — unpublish (selalu boleh) ─── */
 export const DELETE = apiHandler(async () => {
   const auth = await withAuth();
   if (auth instanceof NextResponse) return auth;

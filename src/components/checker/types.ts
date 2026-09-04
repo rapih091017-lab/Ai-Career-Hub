@@ -3,10 +3,11 @@
 /* ── Types ── */
 
 /** Issue dengan bukti kutipan verbatim dari CV (excerpt anchoring).
- *  AI baru mengirim { text, source_excerpt }; hasil lama masih string polos. */
+ *  AI baru mengirim { text, source_excerpt, severity }; hasil lama string polos / tanpa severity. */
 export interface IssueItem {
   text: string;
   source_excerpt: string | null;
+  severity?: "critical" | "high" | "medium" | "low";
 }
 
 /** Normalisasi issue dari bentuk lama (string[]) maupun baru ({text, source_excerpt}[]). */
@@ -21,12 +22,33 @@ export function toIssueItems(v: unknown): IssueItem[] {
           return {
             text: obj.text,
             source_excerpt: typeof obj.source_excerpt === "string" ? obj.source_excerpt : null,
+            severity:
+              obj.severity === "critical" || obj.severity === "high" || obj.severity === "medium" || obj.severity === "low"
+                ? obj.severity
+                : undefined,
           };
         }
       }
       return null;
     })
     .filter((x): x is IssueItem => x !== null);
+}
+
+/* ── Severity badge (v4) — warna & label netral bahasa (label via i18n) ── */
+export function severityMeta(sev?: IssueItem["severity"], tFn?: (k: string) => string) {
+  const t2 = tFn || ((k: string) => k);
+  switch (sev) {
+    case "critical":
+      return { label: t2("checker.sev-critical"), cls: "bg-red-100 text-red-700 border-red-300", dot: "bg-red-500" };
+    case "high":
+      return { label: t2("checker.sev-high"), cls: "bg-orange-100 text-orange-700 border-orange-300", dot: "bg-orange-500" };
+    case "medium":
+      return { label: t2("checker.sev-medium"), cls: "bg-amber-100 text-amber-700 border-amber-300", dot: "bg-amber-500" };
+    case "low":
+      return { label: t2("checker.sev-low"), cls: "bg-blue-100 text-blue-700 border-blue-300", dot: "bg-blue-500" };
+    default:
+      return null;
+  }
 }
 
 /** Bobot per-section yang dipakai AI (transparansi skor) */
@@ -40,11 +62,11 @@ export interface WeightsApplied {
 }
 
 export const ROLE_CATEGORY_OPTIONS = [
-  { value: "general", label: "Umum (default)", desc: "Bobot standar untuk semua posisi" },
-  { value: "tech", label: "Teknologi / IT", desc: "Experience 35% · Skills 25%" },
-  { value: "creative", label: "Kreatif / Design", desc: "Skills 35% (portofolio & craft lebih menentukan)" },
-  { value: "sales_marketing", label: "Sales / Marketing", desc: "Experience 40% (hasil terukur paling kuat)" },
-  { value: "fresh_graduate", label: "Fresh Graduate", desc: "Education 25% (tidak menghukum experience pendek)" },
+  { value: "general", labelKey: "checker.role-opt-general", descKey: "checker.role-desc-general" },
+  { value: "tech", labelKey: "checker.role-opt-tech", descKey: "checker.role-desc-tech" },
+  { value: "creative", labelKey: "checker.role-opt-creative", descKey: "checker.role-desc-creative" },
+  { value: "sales_marketing", labelKey: "checker.role-opt-sales", descKey: "checker.role-desc-sales" },
+  { value: "fresh_graduate", labelKey: "checker.role-opt-fresh", descKey: "checker.role-desc-fresh" },
 ] as const;
 
 export interface BreakdownSection {
@@ -56,6 +78,11 @@ export interface BreakdownSection {
 export interface SkillsSection extends BreakdownSection {
   missing_skills?: string[];
   recommendations?: string[];
+}
+
+export interface ExperienceSection extends BreakdownSection {
+  /** v4 — persentase bullet experience yang punya metrik/angka (0-100) */
+  quantification_pct?: number;
 }
 
 export interface EducationSection {
@@ -89,6 +116,13 @@ export interface ActionPlan {
   quick_wins: string[];
   short_term: string[];
   long_term: string[];
+}
+
+/** v4 — proyeksi skor jika saran dieksekusi (monoton, dari AI) */
+export interface ImpactForecast {
+  current_score: number;
+  projected_after_quick_wins: number;
+  projected_after_all_fixes: number;
 }
 
 export interface BulletItem {
@@ -128,7 +162,7 @@ export interface AnalysisResult {
   atsPrediction?: "Likely Pass" | "Borderline" | "Likely Fail" | null;
   breakdown?: {
     summary: BreakdownSection;
-    experience: BreakdownSection;
+    experience: ExperienceSection;
     skills: SkillsSection;
     education: EducationSection;
     format_ats: FormatAtsSection;
@@ -140,6 +174,8 @@ export interface AnalysisResult {
   missingSections?: string[];
   /** Bobot per-section yang dipakai AI — tampilkan sebagai tooltip skor */
   weightsApplied?: WeightsApplied | null;
+  /** v4 — proyeksi skor setelah perbaikan (motivasi user) */
+  impactForecast?: ImpactForecast | null;
   /** Model AI yang dipakai analisis: "V4 Pro" (deepseek-v4-pro, premium) atau "V4 Flash" (deepseek-v4-flash) */
   aiModel?: "V4 Pro" | "V4 Flash";
 }

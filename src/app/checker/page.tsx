@@ -10,10 +10,78 @@ import MagneticButton from "@/components/MagneticButton";
 import { UploadZone } from "@/components/checker/UploadZone";
 import { ScoreDonut } from "@/components/checker/ScoreDonut";
 import { SectionScoreCard } from "@/components/checker/SectionScoreCard";
+import { ImpactForecastCard } from "@/components/checker/ImpactForecastCard";
 import { KeywordChip, BulletReviewCard } from "@/components/checker/ResultComponents";
 import { ImprovementChecklist } from "@/components/checker/ImprovementChecklist";
-import { scoreColor, gradeColor, atsBadgeColor, fitLabelMeta, ROLE_CATEGORY_OPTIONS, type AnalysisResult, type SkillsSection } from "@/components/checker/types";
+import { scoreColor, gradeColor, atsBadgeColor, fitLabelMeta, ROLE_CATEGORY_OPTIONS, type AnalysisResult, type ExperienceSection, type SkillsSection } from "@/components/checker/types";
 import { anonIdHeaders } from "@/lib/anon-id";
+
+/**
+ * OCR di browser — semua aset (worker, core wasm, data bahasa) di-host
+ * lokal di domain sendiri (/tesseract, /tessdata). Tidak ada fetch ke CDN
+ * eksternal (jsdelivr/unpkg sering diblokir/lambat di Indonesia) dan tidak
+ * bergantung pada Tesseract serverless (cold start + batas waktu fungsi).
+ */
+interface OcrMsgs {
+  preparing: string;
+  core: string;
+  lang: string;
+  init: string;
+  reading: (p: number) => string;
+  page: (i: number, total: number) => string;
+}
+
+/** Teks status OCR default (bahasa) — call site bisa mengirim terjemahan sendiri. */
+const DEFAULT_OCR_MSGS: OcrMsgs = {
+  preparing: "Menyiapkan mesin OCR...",
+  core: "Memuat mesin OCR...",
+  lang: "Memuat kamus bahasa (sekali saja)...",
+  init: "Menginisialisasi OCR...",
+  reading: (p) => `Membaca teks... ${p}%`,
+  page: (i, total) => `Membaca halaman ${i}/${total}...`,
+};
+
+async function runClientOcr(
+  inputs: Array<Blob | File>,
+  onStatus: (status: string) => void,
+  msgs: OcrMsgs = DEFAULT_OCR_MSGS
+): Promise<string> {
+  const { createWorker } = await import("tesseract.js");
+  onStatus(msgs.preparing);
+  const worker = await createWorker("eng+ind", 1 /* OEM.LSTM_ONLY */, {
+    workerPath: "/tesseract/worker.min.js",
+    corePath: "/tesseract/",
+    langPath: "/tessdata/",
+    logger: (m: any) => {
+      if (!m || !m.status) return;
+      const status = String(m.status);
+      if (status === "recognizing text" && typeof m.progress === "number") {
+        onStatus(msgs.reading(Math.round(m.progress * 100)));
+      } else if (status === "loading tesseract core") {
+        onStatus(msgs.core);
+      } else if (status === "loading language traineddata") {
+        onStatus(msgs.lang);
+      } else if (status === "initializing tesseract") {
+        onStatus(msgs.init);
+      }
+    },
+  });
+
+  try {
+    const parts: string[] = [];
+    for (let i = 0; i < inputs.length; i++) {
+      if (inputs.length > 1) onStatus(msgs.page(i + 1, inputs.length));
+      const { data } = await worker.recognize(inputs[i]);
+      parts.push((data.text || "").trim());
+    }
+    return parts.join("\n\n").trim();
+  } finally {
+    try {
+      await worker.terminate();
+    } catch {}
+  }
+}
+
 
 
 
@@ -22,7 +90,7 @@ import { anonIdHeaders } from "@/lib/anon-id";
 /* ------------------------------------------------------------------ */
 export default function CheckerPage() {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const [pageState, setPageState] = useState<"input" | "results">("input");
   const [file, setFile] = useState<File | null>(null);
   const [jdText, setJdText] = useState("");
@@ -43,7 +111,18 @@ export default function CheckerPage() {
   const donutRef = useRef<HTMLDivElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
   const extractedTextRef = useRef<string | null>(null); // simpan untuk retry
-  
+
+  /* ── Pesan status OCR mengikuti bahasa aktif ── */
+  const ocrMsgs: OcrMsgs = {
+    preparing: t("checker.ocr.preparing"),
+    core: t("checker.ocr.core"),
+    lang: t("checker.ocr.lang"),
+    init: t("checker.ocr.init"),
+    reading: (p: number) => t("checker.ocr.reading").replace("{p}", String(p)),
+    page: (i: number, total: number) =>
+      t("checker.ocr.page").replace("{i}", String(i)).replace("{total}", String(total)),
+  };
+
   /* ---- Donut entrance animation (dengan cleanup agar bisa repeat) ---- */
   useEffect(() => {
     if (pageState === "results" && donutRef.current) {
@@ -98,6 +177,7 @@ export default function CheckerPage() {
         extractedText,
         jobDescription: jdText.trim(),
         roleCategory,
+        lang,
         originalFileName: file?.name ?? "cv.pdf",
       }),
     });
@@ -114,37 +194,57 @@ export default function CheckerPage() {
       throw new Error(data.message || data.error || t("checker.error-failed"));
     }
     return data as AnalysisResult;
-  }, [jdText, roleCategory, file, t]);
+  }, [jdText, roleCategory, file, lang, t]);
 
   /* ---- Analyze with pasted text (skip extract) ---- */
-  /* ---- Handle Browser-based OCR for scanned PDFs ---- */
+  /* ---- OCR (PDF scan / gambar) sepenuhnya di browser, aset lokal ---- */
   const handleBrowserOcr = useCallback(async () => {
     if (!file) return;
     setOcrLoading(true);
-    setOcrProgress("Memuat PDF...");
+    setOcrProgress(t("checker.ocr.reading-file"));
     setError("");
+    setShowPasteFallback(false);
 
     try {
-      // Load pdfjs-dist dari bundle lokal (tidak pakai CDN eksternal —
-      // jsdelivr/unpkg sering diblokir atau lambat di Indonesia).
-      setOcrProgress("Memuat engine PDF...");
+      // Gambar langsung di-OCR (tanpa render PDF)
+      const isImageFile =
+        file.type.startsWith("image/") ||
+        /\.(png|jpe?g|webp|bmp|tiff?)$/i.test(file.name);
+      if (isImageFile) {
+        const text = await runClientOcr([file], setOcrProgress, ocrMsgs);
+        if (text.length < 20) {
+          throw new Error(t("checker.ocr.img-empty"));
+        }
+        extractedTextRef.current = text;
+        setOcrProgress("");
+        setOcrLoading(false);
+        setLoading(true);
+        try {
+          const data = await doAnalyze(text);
+          setResult(data);
+          setPageState("results");
+        } catch (err: any) {
+          setError(err.message || t("checker.error-analysis"));
+        } finally {
+          setLoading(false);
+        }
+        return;
+      }
+
+      // PDF — render tiap halaman di browser (pdfjs lokal) lalu OCR di browser
+      setOcrProgress(t("checker.ocr.engine"));
       const pdfjs: any = await import("pdfjs-dist/build/pdf.mjs");
-      // Worker disajikan dari domain sendiri (public/pdf.worker.min.mjs) —
-      // tidak fetch dari CDN eksternal (jsdelivr/unpkg sering diblokir/lambat
-      // di Indonesia) dan tidak bergantung bundling ?url.
       pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
       const arrayBuffer = await file.arrayBuffer();
       const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
       const totalPages = Math.min(pdf.numPages, 5); // Max 5 halaman untuk performa
-      setOcrProgress(`Merender ${totalPages} halaman...`);
 
-      // Process pages one at a time — upload immediately to free memory
-      let allText = "";
+      const pageBlobs: Blob[] = [];
       for (let i = 1; i <= totalPages; i++) {
-        setOcrProgress(`Halaman ${i}/${totalPages} · render...`);
+        setOcrProgress(t("checker.ocr.render").replace("{i}", String(i)).replace("{total}", String(totalPages)));
         const page = await pdf.getPage(i);
-        const viewport = page.getViewport({ scale: 1.5 }); // 1.5x balance speed/quality
+        const viewport = page.getViewport({ scale: 1.5 });
 
         const canvas = document.createElement("canvas");
         canvas.width = viewport.width;
@@ -153,68 +253,45 @@ export default function CheckerPage() {
 
         await page.render({ canvasContext: ctx, viewport }).promise;
 
-        // Convert to Blob and upload immediately
         const blob = await new Promise<Blob | null>((resolve) =>
           canvas.toBlob((b) => resolve(b), "image/png")
         );
-        if (!blob) continue;
-
-        // Free canvas memory
         canvas.width = 0;
         canvas.height = 0;
-
-        setOcrProgress(`Halaman ${i}/${totalPages} · OCR...`);
-        const pageFormData = new FormData();
-        pageFormData.append("images", blob, `page_${i}.png`);
-
-        const ocrRes = await fetch("/api/checker/ocr", {
-          method: "POST",
-          body: pageFormData,
-        });
-
-        const ocrText = await ocrRes.text();
-        let ocrData: any;
-        try {
-          ocrData = JSON.parse(ocrText);
-        } catch {
-          throw new Error("[ocr] Server error: " + ocrText.slice(0, 200));
-        }
-
-        if (!ocrRes.ok) {
-          throw new Error(ocrData.message || `OCR gagal di halaman ${i}`);
-        }
-
-        const pageText = (ocrData.extractedText || "").trim();
-        allText += pageText + "\n\n";
+        if (blob) pageBlobs.push(blob);
       }
 
-      const extractedText = allText.trim();
+      if (pageBlobs.length === 0) {
+        throw new Error(t("checker.ocr.render-failed"));
+      }
+
+      const extractedText = await runClientOcr(pageBlobs, setOcrProgress, ocrMsgs);
       if (extractedText.length < 20) {
-        throw new Error("Tidak dapat membaca teks dari PDF. Pastikan halaman tidak kosong.");
+        throw new Error(t("checker.ocr.pdf-empty"));
       }
 
       extractedTextRef.current = extractedText;
       setOcrProgress("");
       setOcrLoading(false);
 
-      // Now analyze with the OCR text
+      // Lanjut analisis dengan hasil OCR
       setLoading(true);
       try {
         const data = await doAnalyze(extractedText);
         setResult(data);
         setPageState("results");
       } catch (err: any) {
-        setError(err.message || "Terjadi kesalahan saat analisis");
+        setError(err.message || t("checker.error-analysis"));
       } finally {
         setLoading(false);
       }
     } catch (err: any) {
       setOcrLoading(false);
       setOcrProgress("");
-      setError(err.message || "OCR gagal. Tempel teks CV manual sebagai alternatif.");
+      setError(err.message || t("checker.ocr.failed"));
       setShowPasteFallback(true);
     }
-  }, [file, doAnalyze]);
+  }, [file, doAnalyze, ocrMsgs, t]);
 
   const handlePasteAnalyze = useCallback(async () => {
     if (!pastedText.trim()) {
@@ -256,6 +333,36 @@ export default function CheckerPage() {
 
     setLoading(true);
     try {
+      // ── Step 0: File gambar → OCR langsung di browser (aset lokal, tanpa CDN) ──
+      const isImageFile =
+        file.type.startsWith("image/") ||
+        /\.(png|jpe?g|webp|bmp|tiff?)$/i.test(file.name);
+      if (isImageFile && !extractedTextRef.current) {
+        setLoading(false);
+        setOcrLoading(true);
+        try {
+          setOcrProgress(t("checker.ocr.reading-image"));
+          const imgText = await runClientOcr([file], setOcrProgress, ocrMsgs);
+          setOcrProgress("");
+          setOcrLoading(false);
+          if (imgText.length < 20) {
+            setError(t("checker.ocr.img-empty-paste"));
+            setShowPasteFallback(true);
+            return;
+          }
+          extractedTextRef.current = imgText;
+          const data = await doAnalyze(imgText);
+          setResult(data);
+          setPageState("results");
+        } catch (err: any) {
+          setOcrLoading(false);
+          setOcrProgress("");
+          setError(err.message || t("checker.ocr.failed"));
+          setShowPasteFallback(true);
+        }
+        return;
+      }
+
       // ── Step 1: Extract ──
       const cachedText = extractedTextRef.current;
       let extractedText: string;
@@ -359,7 +466,7 @@ export default function CheckerPage() {
             </div>
             <p className="text-center text-sm text-on-surface-variant">
               <span className="material-symbols-outlined text-lg align-middle mr-1 animate-spin select-none">sync</span>
-              Menganalisis CV dengan AI...
+              {t("checker.analyzing-full")}
             </p>
           </main>
           <AppFooter />
@@ -411,7 +518,7 @@ export default function CheckerPage() {
               {/* Kategori posisi → bobot penilaian per-section (transparansi skor) */}
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-semibold text-on-surface-variant ml-1">
-                  Kategori Posisi
+                  {t("checker.role-label")}
                 </label>
                 <select
                   value={roleCategory}
@@ -420,12 +527,12 @@ export default function CheckerPage() {
                 >
                   {ROLE_CATEGORY_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
-                      {opt.label} · {opt.desc}
+                      {t(opt.labelKey)} · {t(opt.descKey)}
                     </option>
                   ))}
                 </select>
                 <p className="text-[11px] text-on-surface-variant ml-1">
-                  Bobot penilaian menyesuaikan kategori (mis. fresh graduate tidak dihukum karena pengalaman singkat).
+                  {t("checker.role-hint")}
                 </p>
               </div>
 
@@ -439,7 +546,7 @@ export default function CheckerPage() {
                         onClick={handleRetry}
                         className="mt-1 text-xs text-red-600 underline hover:text-red-800"
                       >
-                        Coba Lagi
+                        {t("checker.retry")}
                       </button>
                     )}
                   </div>
@@ -452,11 +559,8 @@ export default function CheckerPage() {
                   <div className="flex items-start gap-3">
                     <span className="material-symbols-outlined text-primary text-sm mt-0.5 select-none">document_scanner</span>
                     <div>
-                      <p className="text-sm font-semibold text-primary">Atau baca dengan OCR AI</p>
-                      <p className="text-xs text-primary/80 mt-0.5">
-                        Kami akan merender setiap halaman PDF dan membaca teksnya menggunakan AI.
-                        Cocok untuk PDF hasil scan/gambar.
-                      </p>
+                      <p className="text-sm font-semibold text-primary">{t("checker.ocr.title")}</p>
+                      <p className="text-xs text-primary/80 mt-0.5">{t("checker.ocr.desc")}</p>
                     </div>
                   </div>
                   <button
@@ -464,7 +568,7 @@ export default function CheckerPage() {
                     className="w-full inline-flex items-center justify-center gap-2 bg-primary text-white font-bold px-5 py-2.5 rounded-lg hover:bg-primary/90 active:scale-[0.97] transition-all text-sm"
                   >
                     <span className="material-symbols-outlined text-sm select-none">scan</span>
-                    OCR dengan AI (Baca PDF)
+                    {t("checker.ocr.btn")}
                   </button>
                 </div>
               )}
@@ -477,7 +581,7 @@ export default function CheckerPage() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
-                    <span className="text-sm font-medium text-primary">{ocrProgress || "Memproses OCR..."}</span>
+                    <span className="text-sm font-medium text-primary">{ocrProgress || t("checker.ocr.processing")}</span>
                   </div>
                   <div className="w-full bg-primary/15 rounded-full h-1.5">
                     <div className="bg-primary h-1.5 rounded-full w-2/3" />
@@ -491,16 +595,14 @@ export default function CheckerPage() {
                   <div className="flex items-start gap-3">
                     <span className="material-symbols-outlined text-amber-600 text-sm mt-0.5 select-none">content_paste</span>
                     <div>
-                      <p className="text-sm font-semibold text-amber-800">Atau tempel teks CV Anda di sini</p>
-                      <p className="text-xs text-amber-700 mt-0.5">
-                        Salin seluruh teks dari CV Anda (bisa dari Word, Google Docs, atau PDF viewer) dan tempel di bawah.
-                      </p>
+                      <p className="text-sm font-semibold text-amber-800">{t("checker.paste.title")}</p>
+                      <p className="text-xs text-amber-700 mt-0.5">{t("checker.paste.desc")}</p>
                     </div>
                   </div>
                   <textarea
                     className="w-full rounded-lg border border-amber-300 bg-white p-4 text-sm text-on-background focus:ring-2 focus:ring-primary focus:border-primary transition-[box-shadow,border-color] resize-none"
                     rows={8}
-                    placeholder="Tempel teks CV Anda di sini...\n\nContoh:\nNama: Andi Pratama\nPengalaman: ...\nPendidikan: ..."
+                    placeholder={t("checker.paste.placeholder")}
                     value={pastedText}
                     onChange={(e) => setPastedText(e.target.value)}
                   />
@@ -516,12 +618,12 @@ export default function CheckerPage() {
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                           </svg>
-                          Menganalisis...
+                          {t("checker.paste.analyzing")}
                         </>
                       ) : (
                         <>
                           <span className="material-symbols-outlined text-sm select-none">auto_awesome</span>
-                          Analisis dengan Teks
+                          {t("checker.paste.analyze-btn")}
                         </>
                       )}
                     </button>
@@ -592,6 +694,7 @@ export default function CheckerPage() {
     bulletReview,
     missingSections,
     weightsApplied,
+    impactForecast,
     aiModel,
   } = result;
 
@@ -599,6 +702,17 @@ export default function CheckerPage() {
   const gc = gradeColor(grade);
   const atsBadge = atsBadgeColor(atsPrediction);
   const fitMeta = fitLabelMeta(fitLabel, t);
+
+  // v4 — chip "X% terkuantifikasi" pada kartu Experience (kalau AI mengirimnya)
+  const quantPct = (breakdown?.experience as ExperienceSection | undefined)?.quantification_pct;
+  const quantChip = typeof quantPct === "number"
+    ? {
+        label: t("checker.quant-label"),
+        value: `${quantPct}% ${t("checker.quant-label").toLowerCase()}`,
+        hint: t("checker.quant-hint").replace("{pct}", String(quantPct)),
+        tone: (quantPct >= 50 ? "green" : quantPct >= 25 ? "amber" : "red") as "green" | "amber" | "red",
+      }
+    : undefined;
 
   return (
     <div className="min-h-screen flex flex-col bg-surface-container-low/50 text-on-background">
@@ -628,14 +742,14 @@ export default function CheckerPage() {
                   } catch {}
                 }}
                 className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-outline-variant text-on-surface-variant text-sm font-medium hover:bg-surface-container-low hover:text-primary transition-all active:scale-[0.97]"
-                title="Salin link hasil analisis"
+                title={t("checker.share-title")}
               >
                 <span className="material-symbols-outlined text-lg select-none">share</span>
-                <span className="hidden sm:inline">Bagikan</span>
+                <span className="hidden sm:inline">{t("checker.share")}</span>
               </button>
               {showShareToast && (
                 <div className="absolute top-full mt-2 right-0 bg-green-600 text-white text-xs rounded-lg px-3 py-2 shadow-premium-md whitespace-nowrap z-10">
-                  Link tersalin! ✓
+                  {t("checker.link-copied")}
                 </div>
               )}
             </div>
@@ -681,7 +795,7 @@ export default function CheckerPage() {
                     ? "bg-primary/5 text-primary/80 border-primary/30"
                     : "bg-blue-50 text-blue-700 border-blue-300"
                 }`}
-                title={aiModel === "V4 Pro" ? "DeepSeek V4 Pro · analisis mendalam (Premium)" : "DeepSeek V4 Flash · analisis standar"}
+                title={aiModel === "V4 Pro" ? t("checker.model-v4pro") : t("checker.model-v4flash")}
               >
                 <span className="material-symbols-outlined text-lg select-none">{aiModel === "V4 Pro" ? "auto_awesome" : "bolt"}</span>
                 {aiModel === "V4 Pro" ? "DeepSeek V4 Pro" : "DeepSeek V4 Flash"}
@@ -693,10 +807,19 @@ export default function CheckerPage() {
           {weightsApplied && weightsApplied.role_category !== "general" && (
             <p className="text-[11px] text-on-surface-variant/70 text-center mt-3 flex items-center justify-center gap-1 flex-wrap">
               <span className="material-symbols-outlined text-[13px] select-none">tune</span>
-              Skor dihitung dengan bobot {weightsApplied.role_category.replace("_", " ")}: Experience {Math.round((weightsApplied.experience_weight || 0) * 100)}% · Skills {Math.round((weightsApplied.skills_weight || 0) * 100)}% · Education {Math.round((weightsApplied.education_weight || 0) * 100)}%
+              {t("checker.weights-note")
+                .replace("{cat}", weightsApplied.role_category.replace("_", " "))
+                .replace("{ex}", String(Math.round((weightsApplied.experience_weight || 0) * 100)))
+                .replace("{sk}", String(Math.round((weightsApplied.skills_weight || 0) * 100)))
+                .replace("{ed}", String(Math.round((weightsApplied.education_weight || 0) * 100)))}
             </p>
           )}
         </section>
+
+        {/* ============================================================ */}
+        {/*  1b. IMPACT FORECAST (v4) — proyeksi skor                    */}
+        {/* ============================================================ */}
+        {impactForecast && <ImpactForecastCard forecast={impactForecast} />}
 
         {/* ============================================================ */}
         {/*  2. PER-SECTION BREAKDOWN                                     */}
@@ -708,12 +831,12 @@ export default function CheckerPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.15 }}
           >
-            <h2 className="text-xl font-bold text-on-surface px-1">Skor Per Section</h2>
-            <SectionScoreCard title="Ringkasan Profil" score={breakdown.summary.score} issues={breakdown.summary.issues} suggestions={breakdown.summary.suggestions} delay={0.2} />
-            <SectionScoreCard title="Pengalaman Kerja" score={breakdown.experience.score} issues={breakdown.experience.issues} suggestions={breakdown.experience.suggestions} delay={0.25} />
-            <SectionScoreCard title="Keahlian" score={breakdown.skills.score} issues={(breakdown.skills as SkillsSection).missing_skills} suggestions={(breakdown.skills as SkillsSection).recommendations} delay={0.3} />
-            <SectionScoreCard title="Pendidikan" score={breakdown.education.score} issues={[breakdown.education.relevance]} suggestions={breakdown.education.suggestions} delay={0.35} />
-            <SectionScoreCard title="Format & ATS" score={breakdown.format_ats.score} issues={breakdown.format_ats.issues} suggestions={breakdown.format_ats.tips} delay={0.4} />
+            <h2 className="text-xl font-bold text-on-surface px-1">{t("checker.sec-title")}</h2>
+            <SectionScoreCard title={t("checker.sec-summary")} score={breakdown.summary.score} issues={breakdown.summary.issues} suggestions={breakdown.summary.suggestions} delay={0.2} />
+            <SectionScoreCard title={t("checker.sec-experience")} score={breakdown.experience.score} issues={breakdown.experience.issues} suggestions={breakdown.experience.suggestions} delay={0.25} statChip={quantChip} />
+            <SectionScoreCard title={t("checker.sec-skills")} score={breakdown.skills.score} issues={(breakdown.skills as SkillsSection).missing_skills} suggestions={(breakdown.skills as SkillsSection).recommendations} delay={0.3} />
+            <SectionScoreCard title={t("checker.sec-education")} score={breakdown.education.score} issues={[breakdown.education.relevance]} suggestions={breakdown.education.suggestions} delay={0.35} />
+            <SectionScoreCard title={t("checker.sec-format")} score={breakdown.format_ats.score} issues={breakdown.format_ats.issues} suggestions={breakdown.format_ats.tips} delay={0.4} />
           </motion.section>
         )}
 
@@ -727,7 +850,7 @@ export default function CheckerPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.3 }}
           >
-            <h2 className="text-xl font-bold text-on-surface">Review oleh AI</h2>
+            <h2 className="text-xl font-bold text-on-surface">{t("checker.ai-review")}</h2>
 
             {/* Overall assessment */}
             <div className="bg-surface-container-low rounded-xl p-4 border-l-4 border-primary">
@@ -740,7 +863,7 @@ export default function CheckerPage() {
                 <div className="bg-green-50 rounded-xl p-4 border border-green-200">
                   <h3 className="text-xs font-bold text-green-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                     <span className="material-symbols-outlined text-sm select-none">check_circle</span>
-                    Kelebihan
+                    {t("checker.strengths")}
                   </h3>
                   <ul className="space-y-1.5">
                     {narrativeFeedback.strengths.map((s, i) => (
@@ -758,7 +881,7 @@ export default function CheckerPage() {
                 <div className="bg-red-50 rounded-xl p-4 border border-red-200">
                   <h3 className="text-xs font-bold text-red-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                     <span className="material-symbols-outlined text-sm select-none">warning</span>
-                    Perlu Diperbaiki
+                    {t("checker.improvements")}
                   </h3>
                   <ul className="space-y-1.5">
                     {narrativeFeedback.areas_for_improvement.map((a, i) => (
@@ -777,7 +900,7 @@ export default function CheckerPage() {
               <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
                 <h3 className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                   <span className="material-symbols-outlined text-sm select-none">description</span>
-                  Rekomendasi ATS
+                  {t("checker.ats-recs")}
                 </h3>
                 <ul className="space-y-1">
                   {narrativeFeedback.ats_recommendations.map((r, i) => (
@@ -821,7 +944,7 @@ export default function CheckerPage() {
               {/* Matched */}
               {keywordAnalysis.matched.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-green-700 uppercase tracking-wider mb-2">Ditemukan ({keywordAnalysis.matched.length})</p>
+                  <p className="text-xs font-bold text-green-700 uppercase tracking-wider mb-2">{t("checker.kw-found").replace("{n}", String(keywordAnalysis.matched.length))}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {keywordAnalysis.matched.map((kw, i) => (
                       <KeywordChip key={i} text={kw} variant="found" />
@@ -833,7 +956,7 @@ export default function CheckerPage() {
               {/* Missing critical */}
               {keywordAnalysis.missing_critical.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-red-700 uppercase tracking-wider mb-2">Hilang · Prioritas ({keywordAnalysis.missing_critical.length})</p>
+                  <p className="text-xs font-bold text-red-700 uppercase tracking-wider mb-2">{t("checker.kw-critical").replace("{n}", String(keywordAnalysis.missing_critical.length))}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {keywordAnalysis.missing_critical.map((kw, i) => (
                       <KeywordChip key={i} text={kw} variant="missing" />
@@ -845,7 +968,7 @@ export default function CheckerPage() {
               {/* Missing nice-to-have */}
               {keywordAnalysis.missing_nice_to_have.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-yellow-700 uppercase tracking-wider mb-2">Hilang · Tambahan ({keywordAnalysis.missing_nice_to_have.length})</p>
+                  <p className="text-xs font-bold text-yellow-700 uppercase tracking-wider mb-2">{t("checker.kw-nice").replace("{n}", String(keywordAnalysis.missing_nice_to_have.length))}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {keywordAnalysis.missing_nice_to_have.map((kw, i) => (
                       <KeywordChip key={i} text={kw} variant="nice" />
@@ -857,7 +980,7 @@ export default function CheckerPage() {
               {/* Synonym suggestions */}
               {keywordAnalysis.synonym_suggestions.length > 0 && (
                 <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                  <p className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2">Saran Sinonim</p>
+                  <p className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2">{t("checker.kw-synonym")}</p>
                   <ul className="space-y-1">
                     {keywordAnalysis.synonym_suggestions.map((s, i) => (
                       <li key={i} className="text-xs text-blue-800 flex items-start gap-2">
@@ -891,7 +1014,7 @@ export default function CheckerPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.45 }}
           >
-            <h2 className="text-xl font-bold text-on-surface px-1">Review Poin Pengalaman ({bulletReview.length})</h2>
+            <h2 className="text-xl font-bold text-on-surface px-1">{t("checker.bullet-title").replace("{n}", String(bulletReview.length))}</h2>
             <div className="space-y-2">
               {bulletReview.map((item, i) => (
                 <BulletReviewCard key={i} item={item} index={i} />
@@ -908,12 +1031,12 @@ export default function CheckerPage() {
           const isHighScore = score >= 90;
           const targetRoute = isHighScore ? "/karir" : "/builder/new";
           const ctaTitle = isHighScore
-            ? "Skor CV Kamu Istimewa! 🎉"
+            ? t("checker.cta-high-title")
             : t("checker.cta-title");
           const ctaSubtitle = isHighScore
-            ? "CV kamu sudah sangat siap. Langsung cari lowongan yang cocok!"
+            ? t("checker.cta-high-subtitle")
             : t("checker.cta-subtitle");
-          const ctaBtn = isHighScore ? "Cari Lowongan Sekarang" : t("checker.cta-btn");
+          const ctaBtn = isHighScore ? t("checker.cta-high-btn") : t("checker.cta-btn");
           const gradientBg = isHighScore
             ? "bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500"
             : "bg-gradient-to-br from-primary via-primary-container to-primary-deep";

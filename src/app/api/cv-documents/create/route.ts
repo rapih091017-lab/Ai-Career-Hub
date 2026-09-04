@@ -35,13 +35,14 @@ export async function POST(request: NextRequest) {
   }
 
   // Only copy profile content when useProfile=true
-  const tailoredContent = useProfile
+  const tailoredContent: any = useProfile
     ? {
         personalInfo: masterProfile.personalInfo ?? null,
         workHistory: masterProfile.workHistory ?? null,
         education: masterProfile.education ?? null,
         organisations: masterProfile.organisations ?? null,
         skills: masterProfile.skills ?? null,
+        certifications: (masterProfile as any).certifications ?? null,
       }
     : null;
 

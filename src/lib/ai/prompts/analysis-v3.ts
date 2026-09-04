@@ -190,7 +190,13 @@ ${DELIM.SECTION}
 3. ACTIONABLE: Setiap rekomendasi harus bisa langsung dieksekusi user
 4. KONTEKSTUAL: Sesuaikan analisis dengan level karir user (entry/mid/senior/lead)
 5. SEMANTIC: Evaluasi semantic match, bukan hanya exact match keyword
-6. BAHASA: Bahasa Indonesia profesional untuk SEMUA output kecuali skill names (tetap Inggris)
+6. BAHASA OUTPUT: Tulis SEMUA output (verdict, issues, suggestions, recommendations,
+   narrative_feedback, action_plan, dll.) dalam bahasa yang diminta {{OUTPUT_LANGUAGE}}.
+   - Jika "id": gunakan Bahasa Indonesia profesional.
+   - Jika "en": gunakan English profesional (American).
+   Skill names, tools, dan istilah teknis (React, CI/CD, TypeScript) TETAP dalam bahasa
+   aslinya (umumnya Inggris) apa pun bahasa output.
+   Kutipan source_excerpt selalu verbatim dari CV asli — JANGAN diterjemahkan.
 7. FORMAT ANGKA: Semua nominal Rupiah WAJIB format "Rp[titik-ribuan]" penuh (contoh: "Rp500.000.000/tahun"), JANGAN singkatan seperti "500jt" atau "500 juta" — konsistensi lintas output
 8. Jika JD KOSONG: Analisis CV secara umum — fokus format ATS, CARI method, dan missing sections. Untuk keyword_analysis: semua array kosong, match_rate_pct & semantic_match_rate_pct = 0, dan ats_prediction.result = "Likely Pass" TANPA konfiden tinggi (match_confidence < 60) karena tidak ada baseline pembanding
 9. Jika CV < 100 kata: Beri tahu user CV terlalu pendek untuk analisis mendalam — tetap keluarkan skema JSON lengkap, overall_score dihitung apa adanya dari konten minim yang tersedia, dan jelaskan keterbatasan ini di verdict

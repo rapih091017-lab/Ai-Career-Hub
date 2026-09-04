@@ -29,7 +29,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
   }
 
   const body = await request.json();
-  const { personalInfo, workHistory, education, organisations, skills } = body;
+  const { personalInfo, workHistory, education, organisations, skills, certifications } = body;
 
   const [newProfile] = await db
     .insert(masterProfiles)
@@ -40,6 +40,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
       education: education ?? null,
       organisations: organisations ?? null,
       skills: skills ?? null,
+      certifications: certifications ?? null,
     })
     .returning();
 

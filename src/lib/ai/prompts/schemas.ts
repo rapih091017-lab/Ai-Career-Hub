@@ -1,17 +1,30 @@
 import { z } from "zod";
 
-/* ─── Schema: CV CHECKER ANALYSIS v3 ────────────────────── */
+/* ─── Schema: CV CHECKER ANALYSIS v4 ────────────────────── */
 /* ── Using .catch() defaults on every field so partial AI responses
    still pass validation instead of failing entirely ── */
 
 const ScoreField = () => z.number().int().min(0).max(100).catch(50);
 const StringField = (min = 1) => z.string().min(min).catch("");
 const StringArr = () => z.array(z.string()).catch([]);
+const SEVERITIES = ["critical", "high", "medium", "low"] as const;
 
-/* Issue dengan bukti kutipan (excerpt anchoring). Backward-compat:
- * AI lama masih mengirim string polos, AI baru mengirim { text, source_excerpt }.
- * Union dipakai agar keduanya lolos validasi. */
+/* Issue dengan bukti kutipan (excerpt anchoring) + severity (v4). Backward-compat:
+ * AI lama mengirim string polos / { text, source_excerpt } tanpa severity —
+ * union + field optional dipakai agar semua bentuk lolos validasi. */
 const IssueOrString = () =>
+  z.union([
+    z.string(),
+    z.object({
+      text: z.string().catch(""),
+      source_excerpt: z.string().nullable().catch(null),
+      severity: z.enum(SEVERITIES).optional(),
+    }),
+  ]);
+const IssueArr = () => z.array(IssueOrString()).catch([]);
+
+/* Strength dengan excerpt anchoring opsional (v4) — tetap string polos juga diterima. */
+const StrengthOrString = () =>
   z.union([
     z.string(),
     z.object({
@@ -19,7 +32,7 @@ const IssueOrString = () =>
       source_excerpt: z.string().nullable().catch(null),
     }),
   ]);
-const IssueArr = () => z.array(IssueOrString()).catch([]);
+const StrengthArr = () => z.array(StrengthOrString()).catch([]);
 
 /** Bobot per-section (desimal 0-1, mis. 0.20) sesuai role category —
  * dipakai transparansi skor di UI. BUKAN ScoreField karena bobot bukan integer. */
@@ -42,6 +55,21 @@ const WeightsAppliedSchema = z.object({
 });
 
 export const AnalysisResultSchema = z.object({
+  // ── Meta (v4) — konteks analisis untuk kalibrasi & debugging ──
+  meta: z.object({
+    role_category: z.enum(ROLE_CATEGORIES).catch("general"),
+    detected_seniority: z.enum(["entry", "mid", "senior", "lead"]).catch("mid"),
+    cv_word_count: z.number().int().min(0).catch(0),
+    jd_present: z.boolean().catch(false),
+    analysis_confidence: z.number().int().min(0).max(100).catch(60),
+  }).catch({
+    role_category: "general",
+    detected_seniority: "mid",
+    cv_word_count: 0,
+    jd_present: false,
+    analysis_confidence: 60,
+  }).optional(),
+
   // ── Overall ──
   overall_score: ScoreField(),
   grade: z.enum(["A", "B", "C", "D"]).catch("C"),
@@ -53,7 +81,7 @@ export const AnalysisResultSchema = z.object({
       result: z.enum(["Likely Pass", "Borderline", "Likely Fail"]).catch("Borderline"),
       match_confidence: ScoreField(),
       risk_factors: IssueArr(),
-      strengths: StringArr(),
+      strengths: StrengthArr(),
     }).catch({ result: "Borderline", match_confidence: 50, risk_factors: [], strengths: [] }),
   ]).catch("Borderline"),
 
@@ -61,7 +89,7 @@ export const AnalysisResultSchema = z.object({
   breakdown: z.object({
     summary: z.object({ score: ScoreField(), issues: IssueArr(), suggestions: StringArr() })
       .catch({ score: 50, issues: [], suggestions: [] }),
-    experience: z.object({ score: ScoreField(), issues: IssueArr(), suggestions: StringArr() })
+    experience: z.object({ score: ScoreField(), quantification_pct: z.number().int().min(0).max(100).catch(0).optional(), issues: IssueArr(), suggestions: StringArr() })
       .catch({ score: 50, issues: [], suggestions: [] }),
     skills: z.object({ score: ScoreField(), missing_skills: StringArr(), adjacent_skills: StringArr().optional(), recommendations: StringArr() })
       .catch({ score: 50, missing_skills: [], adjacent_skills: [], recommendations: [] }),
@@ -94,6 +122,7 @@ export const AnalysisResultSchema = z.object({
     title_progression: z.enum(["Strong Upward", "Upward", "Stable", "Sideways", "Declining"]).catch("Stable"),
     responsibility_arc: StringField(),
     growth_rate: z.enum(["Fast", "Normal", "Slow"]).catch("Normal"),
+    red_flags: StringArr().optional(),
     recommendations: StringArr(),
   }).catch({
     time_in_role_analysis: "",
@@ -127,6 +156,13 @@ export const AnalysisResultSchema = z.object({
     suggested_rewrite: StringField(),
     priority: z.enum(["High", "Medium", "Low"]).catch("Medium"),
   })).catch([]),
+
+  // ── Impact forecast (v4) — proyeksi skor jika saran dieksekusi ──
+  impact_forecast: z.object({
+    current_score: ScoreField(),
+    projected_after_quick_wins: ScoreField(),
+    projected_after_all_fixes: ScoreField(),
+  }).catch({ current_score: 50, projected_after_quick_wins: 55, projected_after_all_fixes: 60 }).optional(),
 
   // ── Missing sections + section order ──
   missing_sections: StringArr(),

@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useToast } from "@/components/ui/toast";
+import { useTranslation } from "@/lib/i18n";
 
 interface UploadZoneProps {
   file: File | null;
@@ -19,6 +20,7 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 export function UploadZone({ file, dragActive, onFileChange, onDragStateChange, label, hint, loading, error }: UploadZoneProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { addToast } = useToast();
+  const { t } = useTranslation();
 
   const validateAndSet = (f: File | null) => {
     if (!f) return;
@@ -26,7 +28,7 @@ export function UploadZone({ file, dragActive, onFileChange, onDragStateChange, 
       onFileChange(null);
       addToast({
         type: "error",
-        message: "Ukuran file maksimal 10MB. Pilih file yang lebih kecil.",
+        message: t("upload.size-error"),
         duration: 3000,
       });
       return;
@@ -102,7 +104,7 @@ export function UploadZone({ file, dragActive, onFileChange, onDragStateChange, 
           )}
         </div>
         <p className="text-sm font-semibold text-on-background text-center mb-1">
-          {loading ? "Memproses file..." : file && !error ? file.name : label}
+          {loading ? t("upload.processing") : file && !error ? file.name : label}
         </p>
         <p className={`text-xs ${error ? "text-red-500" : "text-on-surface-variant"}`}>{error || hint}</p>
       </div>

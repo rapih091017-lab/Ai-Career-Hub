@@ -60,6 +60,7 @@ export const masterProfiles = pgTable("master_profiles", {
     startDate: string | null;
     endDate: string | null;
     description: string | null;
+    isPresent?: boolean;
   }>>(),
   education: jsonb("education").$type<Array<{
     id: string;
@@ -68,6 +69,8 @@ export const masterProfiles = pgTable("master_profiles", {
     field: string | null;
     startDate: string | null;
     endDate: string | null;
+    gpa?: string | null;
+    isPresent?: boolean;
   }>>(),
   organisations: jsonb("organisations").$type<Array<{
     id: string;
@@ -81,6 +84,12 @@ export const masterProfiles = pgTable("master_profiles", {
     id: string;
     name: string;
     level: "beginner" | "intermediate" | "advanced";
+  }>>(),
+  certifications: jsonb("certifications").$type<Array<{
+    id: string;
+    name: string;
+    issuer: string;
+    year: string;
   }>>(),
   schemaVersion: varchar("schema_version", { length: 10 }).default("1.0"),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
@@ -206,6 +215,16 @@ export const portfolioPages = pgTable("portfolio_pages", {
   data: jsonb("data").$type<Record<string, unknown>>().notNull(),
   publishedAt: timestamp("published_at", { mode: "date" }).defaultNow(),
   updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow(),
+});
+
+/** Penanda pemakaian trial publish portfolio (1x gratis per akun, permanen).
+ * Dipakai supaya unpublish → publish ulang tidak bisa mem-bypass trial.
+ * User berbayar (paket portfolio_web / premium / bundle / business) tidak
+ * perlu baris ini — entitlement dihitung dari paket aktif. */
+export const portfolioTrialUses = pgTable("portfolio_trial_uses", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().unique().references(() => users.id, { onDelete: "cascade" }),
+  usedAt: timestamp("used_at", { mode: "date" }).defaultNow(),
 });
 
 export const slugHistory = pgTable("slug_history", {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import AppHeader from "@/components/AppHeader";
 import AuthGuard from "@/components/AuthGuard";
 import { useTranslation } from "@/lib/i18n";
@@ -33,6 +34,15 @@ interface EducationItem {
   field: string;
   startDate: string;
   endDate: string;
+  gpa?: string;
+  isPresent?: boolean;
+}
+
+interface CertificationItem {
+  id: string;
+  name: string;
+  issuer: string;
+  year: string;
 }
 
 interface OrganisationItem {
@@ -51,12 +61,12 @@ interface SkillItem {
   level: "beginner" | "intermediate" | "advanced";
 }
 
-function HelpIcon() {
+function HelpIcon({ hint }: { hint: string }) {
   return (
     <div className="relative group inline-block ml-1 align-middle">
       <span className="material-symbols-outlined text-[16px] text-outline cursor-help select-none">help_outline</span>
       <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-inverse-surface text-inverse-on-surface text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 w-56 text-left shadow-lg z-[100]">
-        Contoh: Memimpin tim 5 orang untuk mengembangkan fitur baru, menghasilkan peningkatan konversi sebesar 15%.
+        {hint}
         <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-inverse-surface" />
       </div>
     </div>
@@ -79,6 +89,8 @@ export default function ProfilePage() {
   const [education, setEducation] = useState<EducationItem[]>([]);
   const [organisations, setOrganisation] = useState<OrganisationItem[]>([]);
   const [skills, setSkills] = useState<SkillItem[]>([]);
+  const [certifications, setCertifications] = useState<CertificationItem[]>([]);
+  const [justSaved, setJustSaved] = useState(false);
 
   useEffect(() => {
     fetch("/api/profile")
@@ -92,6 +104,7 @@ export default function ProfilePage() {
           if (data.education) setEducation(data.education);
           if (data.organisations) setOrganisation(data.organisations);
           if (data.skills) setSkills(data.skills);
+          if (data.certifications) setCertifications(data.certifications);
         }
       })
       .catch(() => {})
@@ -135,7 +148,7 @@ export default function ProfilePage() {
 
   const updateEdu = (id: string, field: keyof EducationItem, value: string) => setEducation((prev) => prev.map((e) => (e.id === id ? { ...e, [field]: value } : e)));
   const deleteEdu = (id: string) => setEducation((prev) => prev.filter((e) => e.id !== id));
-  const addEdu = () => { setEducation((prev) => [...prev, { id: "edu_" + Date.now(), institution: "", degree: "", field: "", startDate: "", endDate: "" }]); setActiveSection("section-education"); };
+  const addEdu = () => { setEducation((prev) => [...prev, { id: "edu_" + Date.now(), institution: "", degree: "", field: "", startDate: "", endDate: "", gpa: "", isPresent: false }]); setActiveSection("section-education"); };
 
   const updateOrg = (id: string, field: keyof OrganisationItem, value: string) => setOrganisation((prev) => prev.map((o) => (o.id === id ? { ...o, [field]: value } : o)));
   const toggleOrgPresent = (id: string, present: boolean) => setOrganisation((prev) => prev.map((o) => o.id === id ? { ...o, isPresent: present, endDate: present ? "" : o.endDate } : o));
@@ -146,6 +159,10 @@ export default function ProfilePage() {
   const deleteSkill = (id: string) => setSkills((prev) => prev.filter((s) => s.id !== id));
   const addSkill = () => { setSkills((prev) => [...prev, { id: "sk_" + Date.now(), name: "", level: "intermediate" }]); setActiveSection("section-skills"); };
 
+  const updateCert = (id: string, field: keyof CertificationItem, value: string) => setCertifications((prev) => prev.map((c) => (c.id === id ? { ...c, [field]: value } : c)));
+  const deleteCert = (id: string) => setCertifications((prev) => prev.filter((c) => c.id !== id));
+  const addCert = () => { setCertifications((prev) => [...prev, { id: "cert_" + Date.now(), name: "", issuer: "", year: "" }]); setActiveSection("section-certification"); };
+
   const handleSave = async () => {
     setIsSaving(true);
     try {
@@ -154,7 +171,7 @@ export default function ProfilePage() {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ personalInfo, workHistory, education, organisations, skills }),
+        body: JSON.stringify({ personalInfo, workHistory, education, organisations, skills, certifications }),
       });
       if (res.ok) {
         const data = await res.json();
@@ -164,12 +181,16 @@ export default function ProfilePage() {
         if (data.education) setEducation(data.education);
         if (data.organisations) setOrganisation(data.organisations);
         if (data.skills) setSkills(data.skills);
+        if (data.certifications) setCertifications(data.certifications);
+        // Animasi konfirmasi sukses
+        setJustSaved(true);
+        window.setTimeout(() => setJustSaved(false), 2400);
       } else {
         const err = await res.json();
-        addToast({ type: "error", message: "Gagal menyimpan: " + (err.message || "Error") });
+        addToast({ type: "error", message: t("profile.save-failed").replace("{msg}", err.message || "Error") });
       }
     } catch {
-      addToast({ type: "error", message: "Gagal menyimpan. Periksa koneksi Anda." });
+      addToast({ type: "error", message: t("profile.save-error") });
     } finally { setIsSaving(false); }
   };
 
@@ -205,17 +226,17 @@ export default function ProfilePage() {
               {/* 1. Personal Info */}
               <Accordion id="section-personal" icon="person" title={t("profile.personal-info")} isOpen={activeSection === "section-personal"} onToggle={toggleSection}>
                 <div className="px-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Field label={t("profile.full-name")}><Input value={personalInfo.fullName} onChange={(e) => updatePersonal("fullName", e.target.value)} placeholder="Masukkan nama lengkap" /></Field>
+                  <Field label={t("profile.full-name")}><Input value={personalInfo.fullName} onChange={(e) => updatePersonal("fullName", e.target.value)} placeholder={t("profile.placeholder-full-name")} /></Field>
                   <Field label={t("profile.email")}><Input value={personalInfo.email} onChange={(e) => updatePersonal("email", e.target.value)} placeholder="email@domain.com" type="email" /></Field>
                   <Field label={t("profile.phone")}><Input value={personalInfo.phone} onChange={(e) => updatePersonal("phone", e.target.value)} placeholder="08xxx" type="tel" /></Field>
-                  <Field label={t("profile.location")}><Input value={personalInfo.address} onChange={(e) => updatePersonal("address", e.target.value)} placeholder="Kota, Provinsi" /></Field>
+                  <Field label={t("profile.location")}><Input value={personalInfo.address} onChange={(e) => updatePersonal("address", e.target.value)} placeholder={t("profile.placeholder-location")} /></Field>
                   <div className="flex flex-col gap-1.5 md:col-span-2">
                     <label className="text-label-bold text-on-surface-variant">{t("profile.linkedin")}</label>
                     <Input value={personalInfo.linkedin} onChange={(e) => updatePersonal("linkedin", e.target.value)} placeholder="https://linkedin.com/in/..." type="url" />
                   </div>
                   <div className="flex flex-col gap-1.5 md:col-span-2">
                     <label className="text-label-bold text-on-surface-variant">{t("profile.summary")}</label>
-                    <textarea className="w-full p-3 rounded-xl border border-outline-variant bg-background text-body-md resize-none" placeholder="Ceritakan singkat tentang diri Anda..." rows={4} value={personalInfo.summary} onChange={(e) => updatePersonal("summary", e.target.value)} />
+                    <textarea className="w-full p-3 rounded-xl border border-outline-variant bg-background text-body-md resize-none" placeholder={t("profile.placeholder-summary")} rows={4} value={personalInfo.summary} onChange={(e) => updatePersonal("summary", e.target.value)} />
                   </div>
                 </div>
               </Accordion>
@@ -236,8 +257,8 @@ export default function ProfilePage() {
                   {education.map((item) => (
                     <div key={item.id} className="p-5 rounded-xl border border-outline-variant bg-surface-container-low">
                       <div className="flex justify-between items-start mb-4">
-                        <h4 className="text-label-bold text-primary">{item.degree || "Pendidikan Baru"}</h4>
-                        <button className="text-error hover:bg-error-container/30 p-1 rounded transition-colors" onClick={() => deleteEdu(item.id)} aria-label="Hapus pendidikan">
+                        <h4 className="text-label-bold text-primary">{item.degree || t("profile.new-education")}</h4>
+                        <button className="text-error hover:bg-error-container/30 p-1 rounded transition-colors" onClick={() => deleteEdu(item.id)} aria-label={t("profile.delete-education")}>
                           <span className="material-symbols-outlined select-none" aria-hidden="true">delete</span>
                         </button>
                       </div>
@@ -247,16 +268,52 @@ export default function ProfilePage() {
                           <Input value={item.institution} onChange={(e) => updateEdu(item.id, "institution", e.target.value)} />
                         </div>
                         <Field label={t("profile.degree")}><Input value={item.degree} onChange={(e) => updateEdu(item.id, "degree", e.target.value)} /></Field>
-                        <Field label={t("profile.field")}><Input value={item.field} onChange={(e) => updateEdu(item.id, "field", e.target.value)} placeholder="Opsional" /></Field>
+                        <Field label={t("profile.field")}><Input value={item.field} onChange={(e) => updateEdu(item.id, "field", e.target.value)} placeholder={t("profile.optional")} /></Field>
+                        <Field label={t("profile.gpa")}><Input value={item.gpa || ""} onChange={(e) => updateEdu(item.id, "gpa", e.target.value)} placeholder={t("profile.gpa-example")} /></Field>
                         <Field label={t("profile.start-date")}><Input value={item.startDate} onChange={(e) => updateEdu(item.id, "startDate", e.target.value)} type="month" /></Field>
-                        <Field label={t("profile.end-date")}><Input value={item.endDate} onChange={(e) => updateEdu(item.id, "endDate", e.target.value)} type="month" /></Field>
+                        <Field label={t("profile.end-date")}>
+                          {item.isPresent ? (
+                            <div className="w-full p-3 rounded-xl border border-outline-variant bg-surface-container-low text-body-md text-on-surface-variant">{t("profile.current")}</div>
+                          ) : (
+                            <Input value={item.endDate} onChange={(e) => updateEdu(item.id, "endDate", e.target.value)} type="month" />
+                          )}
+                          <label className="flex items-center gap-2 mt-1 cursor-pointer group">
+                            <input type="checkbox" checked={item.isPresent ?? false}
+                              onChange={(e) => toggleWorkPresentEdu(item.id, e.target.checked)}
+                              className="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary/30"
+                            />
+                            <span className="text-xs text-on-surface-variant group-hover:text-on-surface transition-colors">{t("profile.current")}</span>
+                          </label>
+                        </Field>
                       </div>
                     </div>
                   ))}                    <AddBtn onClick={addEdu} label={t("profile.add-education")} />
                 </div>
               </Accordion>
 
-              {/* 4. Organizations */}
+              {/* 4. Certification / License */}
+              <Accordion id="section-certification" icon="workspace_premium" title={t("profile.certifications")} isOpen={activeSection === "section-certification"} onToggle={toggleSection}>
+                <div className="px-6 flex flex-col gap-4">
+                  {certifications.map((item) => (
+                    <div key={item.id} className="p-5 rounded-xl border border-outline-variant bg-surface-container-low">
+                      <div className="flex justify-between items-start mb-4">
+                        <h4 className="text-label-bold text-primary">{item.name || t("profile.new-certification")}</h4>
+                        <button className="text-error hover:bg-error-container/30 p-1 rounded transition-colors" onClick={() => deleteCert(item.id)} aria-label={t("profile.delete-certification")}>
+                          <span className="material-symbols-outlined select-none" aria-hidden="true">delete</span>
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Field label={t("profile.cert-name")}><Input value={item.name} onChange={(e) => updateCert(item.id, "name", e.target.value)} placeholder={t("profile.cert-name-example")} /></Field>
+                        <Field label={t("profile.cert-issuer")}><Input value={item.issuer} onChange={(e) => updateCert(item.id, "issuer", e.target.value)} placeholder={t("profile.cert-issuer-example")} /></Field>
+                        <Field label={t("profile.cert-year")}><Input value={item.year} onChange={(e) => updateCert(item.id, "year", e.target.value)} placeholder={t("profile.cert-year-example")} /></Field>
+                      </div>
+                    </div>
+                  ))}
+                  <AddBtn onClick={addCert} label={t("profile.add-certification")} />
+                </div>
+              </Accordion>
+
+              {/* 5. Organizations */}
               <Accordion id="section-organisation" icon="groups" title={t("profile.organization")} isOpen={activeSection === "section-organisation"} onToggle={toggleSection}>
                 <div className="px-6 flex flex-col gap-6">
                   {organisations.map((item) => (
@@ -266,18 +323,18 @@ export default function ProfilePage() {
                 </div>
               </Accordion>
 
-              {/* 5. Skills */}
+              {/* 6. Skills */}
               <Accordion id="section-skills" icon="stars" title={t("profile.skills")} isOpen={activeSection === "section-skills"} onToggle={toggleSection}>
                 <div className="px-6 flex flex-col gap-4">
                   {skills.map((item) => (
                     <div key={item.id} className="flex items-center gap-3 border border-outline-variant rounded-xl p-3 bg-background">
-                      <input className="flex-1 p-2 rounded-lg border border-outline-variant bg-white text-body-md" placeholder="Nama skill..." value={item.name} onChange={(e) => updateSkill(item.id, "name", e.target.value)} />
+                      <input className="flex-1 p-2 rounded-lg border border-outline-variant bg-white text-body-md" placeholder={t("profile.placeholder-skill")} value={item.name} onChange={(e) => updateSkill(item.id, "name", e.target.value)} />
                       <select className="p-2 rounded-lg border border-outline-variant bg-white text-body-md" value={item.level} onChange={(e) => updateSkill(item.id, "level", e.target.value)}>
                         <option value="beginner">Beginner</option>
                         <option value="intermediate">Intermediate</option>
                         <option value="advanced">Advanced</option>
                       </select>
-                      <button className="text-error hover:bg-error-container/30 p-1 rounded" onClick={() => deleteSkill(item.id)} aria-label="Hapus skill">
+                      <button className="text-error hover:bg-error-container/30 p-1 rounded" onClick={() => deleteSkill(item.id)} aria-label={t("profile.delete-skill")}>
                         <span className="material-symbols-outlined select-none" aria-hidden="true">close</span>
                       </button>
                     </div>
@@ -307,6 +364,35 @@ export default function ProfilePage() {
             </MagneticButton>
           </div>
         </footer>
+
+        {/* Konfirmasi tersimpan — animasi sukses */}
+        <AnimatePresence>
+          {justSaved && (
+            <motion.div
+              initial={{ opacity: 0, y: 24, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 12, scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 300, damping: 22 }}
+              className="fixed bottom-24 right-6 z-[90] flex items-center gap-3 bg-emerald-600 text-white pl-4 pr-6 py-3 rounded-2xl shadow-premium-lg"
+              role="status"
+              aria-live="polite"
+            >
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.1, type: "spring", stiffness: 400, damping: 15 }}
+                className="material-symbols-outlined text-2xl select-none"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                check_circle
+              </motion.span>
+              <div>
+                <p className="font-label-bold text-sm">{t("profile.saved-success-title")}</p>
+                <p className="text-[11px] text-emerald-100">{t("profile.saved-success-desc")}</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </AuthGuard>
   );
@@ -357,8 +443,8 @@ function WorkCard({ item, updateWork, deleteWork, onPresentChange }: { item: Wor
   return (
     <div className="p-5 rounded-xl border border-outline-variant bg-surface-container-low">
       <div className="flex justify-between items-start mb-4">
-        <h4 className="text-label-bold text-primary">{item.position || "Posisi Baru"}</h4>
-        <button className="text-error hover:bg-error-container/30 p-1 rounded transition-colors" onClick={() => deleteWork(item.id)} aria-label="Hapus pengalaman">
+        <h4 className="text-label-bold text-primary">{item.position || t("profile.new-position")}</h4>
+        <button className="text-error hover:bg-error-container/30 p-1 rounded transition-colors" onClick={() => deleteWork(item.id)} aria-label={t("profile.delete-experience")}>
           <span className="material-symbols-outlined select-none" aria-hidden="true">delete</span>
         </button>
       </div>
@@ -369,7 +455,7 @@ function WorkCard({ item, updateWork, deleteWork, onPresentChange }: { item: Wor
           <label className="text-label-sm text-on-surface-variant uppercase tracking-wider">{t("profile.start-date")} - {t("profile.end-date")}</label>
           <div className="flex items-center gap-2">
             <Input value={item.startDate} onChange={(e) => updateWork(item.id, "startDate", e.target.value)} type="month" />
-            <span className="text-on-surface-variant">ke</span>
+            <span className="text-on-surface-variant">{t("profile.to")}</span>
             {item.isPresent ? (
               <div className="w-full p-3 rounded-xl border border-outline-variant bg-surface-container-low text-body-md text-on-surface-variant">{t("profile.current")}</div>
             ) : (
@@ -378,7 +464,7 @@ function WorkCard({ item, updateWork, deleteWork, onPresentChange }: { item: Wor
           </div>
           <label className="flex items-center gap-2 mt-1 cursor-pointer group">
             <input type="checkbox" checked={item.isPresent ?? false}
-              onChange={e => updateWork(item.id, "endDate", e.target.checked ? "" : item.endDate)}
+              onChange={e => onPresentChange ? onPresentChange(e.target.checked) : updateWork(item.id, "endDate", e.target.checked ? "" : item.endDate)}
               className="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary/30"
             />
             <span className="text-xs text-on-surface-variant group-hover:text-on-surface transition-colors">{t("profile.current")}</span>
@@ -386,9 +472,9 @@ function WorkCard({ item, updateWork, deleteWork, onPresentChange }: { item: Wor
         </div>
         <div className="flex flex-col gap-1.5 md:col-span-2">
           <label className="text-label-sm text-on-surface-variant uppercase tracking-wider flex items-center">
-            {t("profile.responsibility")} <HelpIcon />
+            {t("profile.responsibility")} <HelpIcon hint={t("profile.help-hint")} />
           </label>
-          <textarea className="w-full p-3 rounded-xl border border-outline-variant bg-background text-body-md resize-none" placeholder="Tuliskan pencapaian dan tanggung jawab utama Anda..." rows={3} value={item.description} onChange={(e) => updateWork(item.id, "description", e.target.value)} />
+          <textarea className="w-full p-3 rounded-xl border border-outline-variant bg-background text-body-md resize-none" placeholder={t("profile.placeholder-work-desc")} rows={3} value={item.description} onChange={(e) => updateWork(item.id, "description", e.target.value)} />
         </div>
       </div>
     </div>
@@ -400,18 +486,18 @@ function OrgCard({ item, updateOrg, deleteOrg, onPresentChange }: { item: Organi
   return (
     <div className="p-5 rounded-xl border border-outline-variant bg-surface-container-low">
       <div className="flex justify-between items-start mb-4">
-        <h4 className="text-label-bold text-primary">{item.name || "Organisasi Baru"}</h4>
-        <button className="text-error hover:bg-error-container/30 p-1 rounded transition-colors" onClick={() => deleteOrg(item.id)} aria-label="Hapus organisasi">
+        <h4 className="text-label-bold text-primary">{item.name || t("profile.new-organization")}</h4>
+        <button className="text-error hover:bg-error-container/30 p-1 rounded transition-colors" onClick={() => deleteOrg(item.id)} aria-label={t("profile.delete-organization")}>
           <span className="material-symbols-outlined select-none" aria-hidden="true">delete</span>
         </button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Field label={t("profile.organization")}><Input value={item.name} onChange={(e) => updateOrg(item.id, "name", e.target.value)} /></Field>
         <Field label={t("profile.position")}><Input value={item.position} onChange={(e) => updateOrg(item.id, "position", e.target.value)} /></Field>          <div className="flex flex-col gap-1.5 md:col-span-2">
-          <label className="text-label-sm text-on-surface-variant uppercase tracking-wider">Tanggal Mulai - Selesai</label>
+          <label className="text-label-sm text-on-surface-variant uppercase tracking-wider">{t("profile.date-range").replace("{from}", t("profile.start-date")).replace("{to}", t("profile.end-date"))}</label>
           <div className="flex items-center gap-2">
             <Input value={item.startDate} onChange={(e) => updateOrg(item.id, "startDate", e.target.value)} type="month" />
-            <span className="text-on-surface-variant">ke</span>
+            <span className="text-on-surface-variant">{t("profile.to")}</span>
             {item.isPresent ? (
               <div className="w-full p-3 rounded-xl border border-outline-variant bg-surface-container-low text-body-md text-on-surface-variant">{t("profile.current")}</div>
             ) : (
@@ -420,7 +506,7 @@ function OrgCard({ item, updateOrg, deleteOrg, onPresentChange }: { item: Organi
           </div>
           <label className="flex items-center gap-2 mt-1 cursor-pointer group">
             <input type="checkbox" checked={item.isPresent ?? false}
-              onChange={e => updateOrg(item.id, "endDate", e.target.checked ? "" : item.endDate)}
+              onChange={e => onPresentChange ? onPresentChange(e.target.checked) : updateOrg(item.id, "endDate", e.target.checked ? "" : item.endDate)}
               className="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary/30"
             />
             <span className="text-xs text-on-surface-variant group-hover:text-on-surface transition-colors">{t("profile.current")}</span>
@@ -428,9 +514,9 @@ function OrgCard({ item, updateOrg, deleteOrg, onPresentChange }: { item: Organi
         </div>
         <div className="flex flex-col gap-1.5 md:col-span-2">
           <label className="text-label-sm text-on-surface-variant uppercase tracking-wider flex items-center">
-            {t("profile.description")} <HelpIcon />
+            {t("profile.description")} <HelpIcon hint={t("profile.help-hint")} />
           </label>
-          <textarea className="w-full p-3 rounded-xl border border-outline-variant bg-background text-body-md resize-none" placeholder="Deskripsikan peran dan kontribusi Anda..." rows={3} value={item.description} onChange={(e) => updateOrg(item.id, "description", e.target.value)} />
+          <textarea className="w-full p-3 rounded-xl border border-outline-variant bg-background text-body-md resize-none" placeholder={t("profile.placeholder-org-desc")} rows={3} value={item.description} onChange={(e) => updateOrg(item.id, "description", e.target.value)} />
         </div>
       </div>
     </div>

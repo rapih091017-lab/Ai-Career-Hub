@@ -6,6 +6,7 @@ import { useTranslation } from "@/lib/i18n";
 
 const pageTitles: Record<string, { id: string; en: string }> = {
   "/dashboard": { id: "Dashboard", en: "Dashboard" },
+  "/my-resumes": { id: "My Resumes", en: "My Resumes" },
   "/checker": { id: "Cek Skor CV", en: "Check CV Score" },
   "/builder/new": { id: "Buat CV Baru", en: "Create New CV" },
   "/portfolio": { id: "Portofolio", en: "Portfolio" },
@@ -24,6 +25,7 @@ const pageTitles: Record<string, { id: string; en: string }> = {
 
 const pageDescriptions: Record<string, { id: string; en: string }> = {
   "/dashboard": { id: "Kelola CV dan pantau progress kariermu dalam satu dashboard.", en: "Manage your CVs and track career progress in one dashboard." },
+  "/my-resumes": { id: "Semua CV kamu dalam satu tempat — buat, edit, kelola.", en: "All your CVs in one place — create, edit, manage." },
   "/checker": { id: "Analisis CV-mu dengan AI dan dapatkan skor ATS lengkap dengan rekomendasi perbaikan.", en: "Analyze your CV with AI and get a complete ATS score with improvement suggestions." },
   "/builder/new": { id: "Buat CV ATS-friendly dengan bantuan AI, pilih template profesional dan isi data langkah demi langkah.", en: "Create an ATS-friendly CV with AI assistance, choose professional templates and fill data step by step." },
   "/portfolio": { id: "Buat portofolio website profesional dalam hitungan menit, tampilkan karya terbaikmu.", en: "Build a professional portfolio website in minutes, showcase your best work." },

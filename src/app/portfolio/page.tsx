@@ -16,7 +16,7 @@ const THEME_LIST = Object.values(THEMES);
 export default function PortfolioPage() {
   const { t, lang, toggleLang } = useTranslation();
   const [selectedTheme, setSelectedTheme] = useState<string>(DEFAULT_THEME_ID);
-  const [publishInfo, setPublishInfo] = useState<{ published: boolean; slug?: string; url?: string } | null>(null);
+  const [publishInfo, setPublishInfo] = useState<{ published: boolean; slug?: string; url?: string; plan?: { entitled: boolean; trialUsed: boolean; trialAvailable: boolean; upgradeUrl: string } } | null>(null);
   const [profileData, setProfileData] = useState<any>(null);
   const { addToast } = useToast();
 
@@ -77,12 +77,27 @@ export default function PortfolioPage() {
                         >
                           {publishInfo.url?.replace(/^https?:\/\//, "")}
                         </button>
+                        {publishInfo.plan && !publishInfo.plan.entitled && (
+                          <a
+                            href={publishInfo.plan.upgradeUrl || "/settings/billing?plan=portfolio-web"}
+                            className="text-[10px] font-semibold text-amber-700 hover:underline block mt-0.5"
+                          >
+                            Trial 1x terpakai · perbarui konten butuh Portfolio Web &rarr;
+                          </a>
+                        )}
                       </div>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2 bg-surface-container-low rounded-xl px-4 py-2.5 border border-outline-variant">
                       <span className="material-symbols-outlined text-outline text-lg shrink-0" aria-hidden="true">public</span>
-                      <p className="text-sm text-on-surface-variant">{t("portfolio.publish-not-live")}</p>
+                      <div>
+                        <p className="text-sm text-on-surface-variant">{t("portfolio.publish-not-live")}</p>
+                        {publishInfo?.plan?.trialAvailable && (
+                          <p className="text-[11px] text-primary mt-0.5 font-medium">
+                            Publish pertama GRATIS &middot; update berikutnya butuh paket Portfolio Web
+                          </p>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>

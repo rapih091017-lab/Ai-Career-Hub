@@ -5,7 +5,7 @@ import { checkerResults, usageLogs } from "@/db/schema";
 import { eq, and, sql, count } from "drizzle-orm";
 import { callAI, MODELS, buildUserContext } from "@/lib/ai/adapter";
 import { getUserAccess } from "@/lib/access";
-import { ANALYSIS_PROMPT_V3 } from "@/lib/ai/prompts/analysis-v3";
+import { ANALYSIS_PROMPT_V4 } from "@/lib/ai/prompts/analysis-v4";
 import type { AnalysisResult } from "@/lib/ai/prompts/schemas";
 import { apiHandler } from "@/lib/api-utils";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limiter";
@@ -28,7 +28,12 @@ export const POST = apiHandler(async (request: NextRequest) => {
   }
 
   const body = await request.json();
-  const { extractedText, jobDescription, roleCategory } = body;
+  const { extractedText, jobDescription, roleCategory, lang } = body;
+
+  // Bahasa output analisis mengikuti bahasa UI user (id/en). Default "id" untuk
+  // klien lama & backward-compat. Diteruskan ke prompt analysis-v3 {{OUTPUT_LANGUAGE}}.
+  const outputLang = lang === "en" ? "en" : "id";
+  const t = (id: string, en: string) => (outputLang === "en" ? en : id);
 
   // Kategori posisi → bobot per-section dinamis (lihat prompt analysis-v3 ROLE CATEGORY).
   const VALID_ROLE_CATEGORIES = ["tech", "creative", "sales_marketing", "fresh_graduate", "general"];
@@ -39,7 +44,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
   // toLowerCase, prompt AI berisi "undefined", atau insert DB gagal.
   if (typeof extractedText !== "string" || !extractedText.trim()) {
     return NextResponse.json(
-      { error: "BAD_REQUEST", message: "Teks CV wajib diisi." },
+      { error: "BAD_REQUEST", message: t("Teks CV wajib diisi.", "CV text is required.") },
       { status: 400 },
     );
   }
@@ -66,7 +71,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
 
     if (cvAnalyzerLimit === false) {
       return NextResponse.json(
-        { error: "FEATURE_NOT_AVAILABLE", message: "CV Analyzer tidak tersedia di paket kamu. Upgrade untuk mengakses." },
+        { error: "FEATURE_NOT_AVAILABLE", message: t("CV Analyzer tidak tersedia di paket kamu. Upgrade untuk mengakses.", "CV Analyzer is not available on your plan. Upgrade to access it.") },
         { status: 403 },
       );
     }
@@ -86,7 +91,10 @@ export const POST = apiHandler(async (request: NextRequest) => {
         return NextResponse.json(
           {
             error: "QUOTA_EXCEEDED",
-            message: `Batas gratis pengecekan (${cvAnalyzerLimit}x) sudah habis. Upgrade ke Premium untuk unlimited.`,
+            message: t(
+              `Batas gratis pengecekan (${cvAnalyzerLimit}x) sudah habis. Upgrade ke Premium untuk unlimited.`,
+              `Free check limit (${cvAnalyzerLimit}x) reached. Upgrade to Premium for unlimited checks.`
+            ),
           },
           { status: 403 },
         );
@@ -124,8 +132,10 @@ export const POST = apiHandler(async (request: NextRequest) => {
       return NextResponse.json(
         {
           error: "QUOTA_EXCEEDED",
-          message:
+          message: t(
             "Batas gratis 2x pengecekan sudah habis. Silakan login untuk melanjutkan.",
+            "Your 2 free checks are used up. Please log in to continue."
+          ),
         },
         { status: 403 },
       );
@@ -163,8 +173,12 @@ export const POST = apiHandler(async (request: NextRequest) => {
   let aiAnalysis: AnalysisResult | null = null;
   try {
     aiAnalysis = await callAI<AnalysisResult>({
-      systemPrompt: ANALYSIS_PROMPT_V3.replace(/\{\{ROLE_CATEGORY\}\}/g, roleCat),
-      userPrompt: `=== ROLE CATEGORY: ${roleCat} ===\n\n=== CV KANDIDAT ===\n${extractedText}\n\n=== JOB DESCRIPTION TARGET ===\n${jd || "Tidak ada deskripsi pekerjaan."}`,
+      systemPrompt: ANALYSIS_PROMPT_V4
+        .replace(/\{\{ROLE_CATEGORY\}\}/g, roleCat)
+        .replace(/\{\{OUTPUT_LANGUAGE\}\}/g, outputLang)
+        // Kedalaman bullet review mengikuti tier akses — hemat token untuk free/flash.
+        .replace(/\{\{BULLET_MAX\}\}/g, useReasoner ? "5" : "3"),
+      userPrompt: `=== ROLE CATEGORY: ${roleCat} ===\n\n=== CV KANDIDAT ===\n${extractedText}\n\n=== JOB DESCRIPTION TARGET ===\n${jd || (outputLang === "en" ? "No job description provided." : "Tidak ada deskripsi pekerjaan.")}`,
       temperature: 0.3,
       // Model: premium → deepseek-v4-pro (thinking) untuk analisis mendalam;
       // free/anonymous → deepseek-v4-flash agar biaya terkontrol.
@@ -220,24 +234,34 @@ export const POST = apiHandler(async (request: NextRequest) => {
 
   const aiFeedback = {
     keywordGap: aiAnalysis?.keyword_analysis
-      ? `Ditemukan ${aiAnalysis.keyword_analysis.matched.length} keyword cocok, ${aiAnalysis.keyword_analysis.missing_critical.length} critical hilang.`
-      : "Tidak dapat menganalisis keyword gap. Silakan coba lagi.",
-    contextRelevance: aiAnalysis?.narrative_feedback?.overall_assessment?.slice(0, 200) ?? "Tidak dapat menganalisis relevansi. Silakan coba lagi.",
-    atsRules: normalizedAtsPrediction ?? "Tidak dapat menganalisis kepatuhan ATS.",
-    summary: aiAnalysis?.verdict ?? "Analisis AI tidak tersedia.",
+      ? t(
+          `Ditemukan ${aiAnalysis.keyword_analysis.matched.length} keyword cocok, ${aiAnalysis.keyword_analysis.missing_critical.length} critical hilang.`,
+          `Found ${aiAnalysis.keyword_analysis.matched.length} matching keywords, ${aiAnalysis.keyword_analysis.missing_critical.length} critical missing.`
+        )
+      : t("Tidak dapat menganalisis keyword gap. Silakan coba lagi.", "Unable to analyze keyword gap. Please try again."),
+    contextRelevance: aiAnalysis?.narrative_feedback?.overall_assessment?.slice(0, 200) ?? t("Tidak dapat menganalisis relevansi. Silakan coba lagi.", "Unable to analyze relevance. Please try again."),
+    atsRules: normalizedAtsPrediction ?? t("Tidak dapat menganalisis kepatuhan ATS.", "Unable to analyze ATS compliance."),
+    summary: aiAnalysis?.verdict ?? t("Analisis AI tidak tersedia.", "AI analysis is unavailable."),
   };
 
-  // Data struktur lengkap dari AI — dikirim ke frontend (atsPrediction sudah dinormalisasi)
+  // Data struktur lengkap dari AI — dikirim ke frontend (atsPrediction sudah dinormalisasi).
+  // V4: risk_factors membawa severity + source_excerpt (object), jadi simpan juga objek asli
+  // supaya UI bisa render badge severity. Field ini additive — hasil V3 lama tetap aman.
   const aiStructuredData = {
     breakdown: aiAnalysis?.breakdown ?? null,
     keywordAnalysis: aiAnalysis?.keyword_analysis ?? null,
     narrativeFeedback: aiAnalysis?.narrative_feedback ?? null,
+    careerVelocity: aiAnalysis?.career_velocity ?? null,
     actionPlan: aiAnalysis?.action_plan ?? null,
     bulletReview: aiAnalysis?.bullet_review ?? [],
     missingSections: aiAnalysis?.missing_sections ?? [],
     grade: aiAnalysis?.grade ?? null,
     weightsApplied: aiAnalysis?.weights_applied ?? null,
+    impactForecast: aiAnalysis?.impact_forecast ?? null,
     atsPrediction: normalizedAtsPrediction,
+    atsPredictionDetail: aiAnalysis?.ats_prediction && typeof aiAnalysis.ats_prediction === "object"
+      ? aiAnalysis.ats_prediction
+      : null,
   };
 
   // ── 8. SIMPAN KE DATABASE ────────────────────────────────────────

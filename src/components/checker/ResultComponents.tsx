@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { priorityBadge, toIssueItems, type BulletItem } from "./types";
+import { priorityBadge, severityMeta, toIssueItems, type BulletItem } from "./types";
 import { useTranslation } from "@/lib/i18n";
 
 /** Keyword tag chip */
@@ -149,19 +149,30 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
                 <div>
                   <p className="text-xs font-bold text-red-600 uppercase tracking-wider mb-1">{t("checker.detail.issues-found")}</p>
                   <ul className="space-y-1">
-                    {issues.map((iss, i) => (
-                      <li key={i} className="text-xs text-on-surface-variant flex items-start gap-1.5 bg-red-50/50 rounded-lg px-2.5 py-1.5">
-                        <span className="text-red-400 mt-0.5 select-none">⚠</span>
-                        <span className="min-w-0">
-                          <span>{iss.text}</span>
-                          {iss.source_excerpt && (
-                            <span className="block mt-1 text-[11px] italic text-on-surface-variant/70 bg-white rounded-md px-2 py-1 border-l-2 border-red-300">
-                              &ldquo;{iss.source_excerpt}&rdquo;
+                    {issues.map((iss, i) => {
+                      const sev = severityMeta(iss.severity, t);
+                      return (
+                        <li key={i} className="text-xs text-on-surface-variant flex items-start gap-1.5 bg-red-50/50 rounded-lg px-2.5 py-1.5">
+                          <span className="text-red-400 mt-0.5 select-none">⚠</span>
+                          <span className="min-w-0 flex-1">
+                            <span className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+                              <span>{iss.text}</span>
+                              {sev && (
+                                <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[9px] font-bold uppercase tracking-wide ${sev.cls}`}>
+                                  <span className={`w-1.5 h-1.5 rounded-full ${sev.dot}`} />
+                                  {sev.label}
+                                </span>
+                              )}
                             </span>
-                          )}
-                        </span>
-                      </li>
-                    ))}
+                            {iss.source_excerpt && (
+                              <span className="block mt-1 text-[11px] italic text-on-surface-variant/70 bg-white rounded-md px-2 py-1 border-l-2 border-red-300">
+                                &ldquo;{iss.source_excerpt}&rdquo;
+                              </span>
+                            )}
+                          </span>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               )}
