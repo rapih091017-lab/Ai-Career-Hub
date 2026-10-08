@@ -394,3 +394,35 @@ export const starScores = pgTable("star_scores", {
 }, (table) => [
   uniqueIndex("star_scores_user_question_idx").on(table.userId, table.questionId),
 ]);
+
+/* ─── Admin Users ────────────────────────────────────────────────
+ * Admin tambahan di luar ADMIN_EMAILS, dikelola dari /admin/admins
+ * supaya penambahan admin tidak perlu ubah env dan deploy ulang. */
+
+export const adminUsers = pgTable("admin_users", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  /** Selalu disimpan lowercase untuk pencocokan yang konsisten. */
+  email: varchar("email", { length: 200 }).notNull().unique(),
+  note: varchar("note", { length: 200 }),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
+});
+
+/* ─── Career Paths ───────────────────────────────────────────────
+ * Jalur karier per posisi (jenjang, skill, langkah). Konten tumbuh seiring
+ * data bertambah dan seluruhnya dikelola dari /admin/career-path. */
+
+export const careerPaths = pgTable("career_paths", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  slug: varchar("slug", { length: 80 }).notNull().unique(),
+  role: varchar("role", { length: 120 }).notNull(),
+  category: varchar("category", { length: 80 }).notNull(),
+  summary: text("summary"),
+  /** [{ level, years, salaryRange, focus }] */
+  levels: jsonb("levels").$type<Array<{ level: string; years: string; salaryRange: string; focus: string }>>(),
+  skills: jsonb("skills").$type<string[]>(),
+  steps: jsonb("steps").$type<string[]>(),
+  isPublished: boolean("is_published").notNull().default(true),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow(),
+});

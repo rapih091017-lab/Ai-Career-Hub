@@ -435,6 +435,20 @@ export default function AdminDashboardPage() {
               Insights
             </button>
             <button
+              onClick={() => router.push("/admin/career-path")}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline-variant text-xs font-medium text-on-surface hover:bg-surface-container transition-all"
+            >
+              <span className="material-symbols-outlined text-sm">route</span>
+              Jalur Karier
+            </button>
+            <button
+              onClick={() => router.push("/admin/admins")}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline-variant text-xs font-medium text-on-surface hover:bg-surface-container transition-all"
+            >
+              <span className="material-symbols-outlined text-sm">shield_person</span>
+              Kelola Admin
+            </button>
+            <button
               onClick={() => router.push("/admin/settings")}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline-variant text-xs font-medium text-on-surface hover:bg-surface-container transition-all"
             >

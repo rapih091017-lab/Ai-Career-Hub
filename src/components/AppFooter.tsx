@@ -53,9 +53,11 @@ export default function AppFooter({ variant = "simple", bordered = false }: AppF
                 <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/builder/new">{t("footer.cv-builder")}</Link></li>
                 <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/checker">{t("footer.resume-checker")}</Link></li>
                 <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/portfolio">{t("footer.portfolio")}</Link></li>
-                <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/interview">{t("footer.career-path")}</Link></li>
+                <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/interview">{t("footer.interview")}</Link></li>
                 <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/sinonim">{t("footer.sinonim")}</Link></li>
                 <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href={lang === "en" ? "/cv-examples" : "/contoh-cv"}>{t("footer.contoh-cv")}</Link></li>
+                <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/career-hub">{t("footer.career-hub")}</Link></li>
+                <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/career-path">{t("footer.career-paths")}</Link></li>
               </ul>
             </div>
             <div>

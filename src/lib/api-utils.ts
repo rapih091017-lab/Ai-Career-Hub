@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { usageLogs } from "@/db/schema";
+import { adminUsers, usageLogs } from "@/db/schema";
 import { eq, and, count as countFn, gte } from "drizzle-orm";
 import { getUserAccess } from "@/lib/access";
 
@@ -51,10 +51,27 @@ export async function withAdmin(): Promise<
   }
   const raw = process.env.ADMIN_EMAILS || "";
   const adminEmails = raw.split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
-  if (!adminEmails.includes(session.user.email.toLowerCase())) {
-    return errorResponse("UNAUTHORIZED", "Hanya admin yang bisa mengakses endpoint ini.", 403) as NextResponse;
+  const email = session.user.email.toLowerCase();
+  if (adminEmails.includes(email)) {
+    return { userId: session.user.id, email: session.user.email };
   }
-  return { userId: session.user.id, email: session.user.email };
+
+  // Admin tambahan dari dashboard (tabel admin_users), supaya menambah admin
+  // tidak perlu mengubah environment variable dan deploy ulang.
+  try {
+    const [row] = await db
+      .select({ id: adminUsers.id })
+      .from(adminUsers)
+      .where(eq(adminUsers.email, email))
+      .limit(1);
+    if (row) {
+      return { userId: session.user.id, email: session.user.email };
+    }
+  } catch (dbError) {
+    console.error("[withAdmin] gagal memeriksa admin_users:", dbError instanceof Error ? dbError.message : dbError);
+  }
+
+  return errorResponse("UNAUTHORIZED", "Hanya admin yang bisa mengakses endpoint ini.", 403) as NextResponse;
 }
 
 /* ─── Error boundary wrapper ─── */
