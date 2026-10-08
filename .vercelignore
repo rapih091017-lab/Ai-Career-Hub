@@ -1,0 +1,47 @@
+# .vercelignore — apa yang TIDAK di-upload saat deploy dari CLI.
+# Vercel CLI meng-upload folder lokal (bukan git), jadi file debug dan
+# rahasia di mesin dev harus dikecualikan di sini.
+
+# ── Rahasia & konfigurasi lokal (WAJIB) ──
+.env
+.env.*
+!.env.example
+
+# ── File debug yang memblokir build (import path absolut lokal) ──
+pdf-render-check.tsx
+src/app/pdf-test
+src/app/api/pdf-test-save
+
+# ── Skrip & artefak sementara di mesin dev ──
+.tmp-*.mjs
+scripts/tmp-*
+temp_extracted.json
+temp_payload.json
+check_db.js
+nul
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# ── Artefak uji & dokumentasi internal (tidak dibutuhkan runtime) ──
+docs/research
+docs/screenshots
+docs/visual-diff-preview.png
+docs/visual-diff-pdf.png
+docs/visual-diff-heat.png
+docs/visual-diff.pdf
+docs/contoh-export-pdf-teks.pdf
+
+# ── Tooling agen & skill (dev-only) ──
+.skills
+skills/
+anti-slop/
+antislop.md
+.agents/
+.impeccable/
+.gstack/
+.deepseek/
+
+# ── Standar Vercel ──
+.git
+node_modules
+.next
