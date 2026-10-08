@@ -167,7 +167,7 @@ export function FormatToolbar({
         <span className="hidden sm:inline">{t("builder.display")}</span>
       </button>
 
-      {/* AI Revision — FAB Style */}
+      {/* AI Revision, FAB Style */}
       <MagneticButton>
         <button onClick={onNavigateToCheckout}
           className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow-md overflow-hidden"
@@ -179,7 +179,7 @@ export function FormatToolbar({
         </button>
       </MagneticButton>
 
-      {/* Export PDF — using shared PdfExportButton */}
+      {/* Export PDF, using shared PdfExportButton */}
       <div className="ml-auto">
         <PdfExportButton
           targetRef={{ current: null }}

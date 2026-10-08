@@ -26,7 +26,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
           <div className="w-full max-w-[1100px] flex flex-col md:flex-row gap-8">
             {/* Sidebar */}
             <aside className="w-full md:w-64 shrink-0">
-              <div className="bg-white rounded-2xl shadow-soft border border-outline-variant/30 overflow-hidden sticky top-28">
+              <div className="bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/30 overflow-hidden sticky top-28">
                 <div className="p-5 border-b border-outline-variant/30">
                   <h2 className="font-headline-md text-lg text-on-surface">{t("settings.title")}</h2>
                   <p className="text-label-sm text-on-surface-variant mt-0.5">{t("settings.subtitle")}</p>

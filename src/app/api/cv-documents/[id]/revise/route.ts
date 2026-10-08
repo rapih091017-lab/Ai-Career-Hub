@@ -57,7 +57,7 @@ export async function POST(
       experienceLevel: cvData?.experienceLevel || undefined,
     });
 
-    // ── Mode: SUGGEST — Summary ──
+    // ── Mode: SUGGEST, Summary ──
     if (mode === "suggest" && section === "summary") {
       const access = await getUserAccess(session.user.id);
       const suggestLimit = access.limits.ai_suggestion;
@@ -119,7 +119,7 @@ export async function POST(
       return NextResponse.json(aiResult, { status: 200 });
     }
 
-    // ── Mode: SUGGEST (generate bullet suggestions from job context — work history) ──
+    // ── Mode: SUGGEST (generate bullet suggestions from job context, work history) ──
     if (mode === "suggest") {
       if (!body.position && !body.jobTitle) {
         return NextResponse.json(
@@ -128,7 +128,7 @@ export async function POST(
         );
       }
 
-      // Cek kuota suggestion — menggunakan getUserAccess
+      // Cek kuota suggestion, menggunakan getUserAccess
       const access = await getUserAccess(session.user.id);
       const suggestLimit = access.limits.ai_suggestion;
 
@@ -163,7 +163,7 @@ export async function POST(
         company: body.company || "",
         industry: body.industry || "",
         skills: body.skills || [],
-        // Hook useBuilderAI mengirim field `jobDescription` — terima dua-duanya
+        // Hook useBuilderAI mengirim field `jobDescription`, terima dua-duanya
         description: body.description || body.jobDescription || "",
       });
 
@@ -186,7 +186,7 @@ export async function POST(
       return NextResponse.json(aiResult, { status: 200 });
     }
 
-    // ── Mode: REVISE — Summary ──
+    // ── Mode: REVISE, Summary ──
     if (mode === "revise" && section === "summary") {
       // Cek Kuota Revision
       const access = await getUserAccess(session.user.id);
@@ -255,7 +255,7 @@ export async function POST(
       return NextResponse.json(aiResult, { status: 200 });
     }
 
-    // ── Mode: REVISE (default — perbaiki teks yang sudah ada) ──
+    // ── Mode: REVISE (default, perbaiki teks yang sudah ada) ──
     if (!currentText) {
       return NextResponse.json(
         { error: "INVALID_REQUEST", message: "Teks tidak boleh kosong" },
@@ -307,7 +307,7 @@ export async function POST(
       .split(/\s+/)
       .filter((w) => w.length > 3);
 
-    // Keyword yang SUDAH ada di teks vs yang MASIH KURANG —
+    // Keyword yang SUDAH ada di teks vs yang MASIH KURANG, 
     // yang kurang inilah yang perlu disisipkan AI untuk optimasi ATS.
     const normalizedText = currentText.toLowerCase();
     const relevantJdKeywords = jdWords.filter((word) =>

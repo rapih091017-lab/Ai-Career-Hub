@@ -141,7 +141,7 @@ function AnalysisInteractive({ t }: { t: (key: string) => string }) {
     >
 
       <motion.div variants={cardReveal} className="relative z-10 flex flex-col md:flex-row gap-4">
-        {/* Upload CV Zone — clickable */}
+        {/* Upload CV Zone, clickable */}
         <div className="flex-1">
           <Link
             href="/checker"
@@ -161,12 +161,12 @@ function AnalysisInteractive({ t }: { t: (key: string) => string }) {
             <textarea
               readOnly
               placeholder={t("checker.jd-placeholder")}
-              className="w-full h-[120px] px-4 py-3 bg-white border border-outline-variant/30 rounded-xl text-sm text-on-surface placeholder:text-outline-variant resize-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
+              className="w-full h-[120px] px-4 py-3 bg-surface-container-lowest border border-outline-variant/30 rounded-xl text-sm text-on-surface placeholder:text-outline-variant resize-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
             />
           </div>
         </div>
 
-        {/* Analyze Button — clickable */}
+        {/* Analyze Button, clickable */}
         <div className="flex flex-col items-center justify-center gap-3 min-w-[140px]">
           <Link
             href="/checker"
@@ -206,12 +206,12 @@ function BuilderShowcase({ t, router }: { t: (key: string) => string; router: Re
             </TiltCard>
           </motion.div>
         ))}
-        {/* Placeholder — clickable to /builder/new */}
+        {/* Placeholder, clickable to /builder/new */}
         <motion.div variants={cardReveal} className="[perspective:800px]">
           <TiltCard tiltOptions={{ maxAngle: 6, scale: 1.03, glare: true }}>
             <Link
               href="/builder/new"
-              className="block h-full min-h-[120px] rounded-2xl border-2 border-dashed border-outline-variant/30 bg-white/50 flex flex-col items-center justify-center gap-2 p-4 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/[0.02] hover:shadow-md transition-all duration-300 group"
+              className="block h-full min-h-[120px] rounded-2xl border-2 border-dashed border-outline-variant/30 bg-surface-container-lowest/50 flex flex-col items-center justify-center gap-2 p-4 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/[0.02] hover:shadow-md transition-all duration-300 group"
             >
               <span className="material-symbols-outlined text-outline-variant text-2xl group-hover:text-primary transition-colors">add_circle</span>
               <p className="text-[11px] text-on-surface-variant leading-relaxed group-hover:text-on-surface transition-colors">
@@ -258,7 +258,7 @@ function PortfolioShowcase({ t }: { t: (key: string) => string }) {
             <TiltCard tiltOptions={{ maxAngle: 6, scale: 1.03, glare: true }}>
               <Link
                 href="/portfolio"
-                className="block rounded-2xl border border-outline-variant/30 bg-white overflow-hidden group hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 cursor-pointer"
+                className="block rounded-2xl border border-outline-variant/30 bg-surface-container-lowest overflow-hidden group hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 cursor-pointer"
               >
                 {/* Color swatch strip with overlay glow on hover */}
                 <div className="h-20 relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${theme.primary}, ${theme.accent})` }}>
@@ -314,11 +314,11 @@ function LetterShowcase({ t }: { t: (key: string) => string }) {
     >
 
       <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-3">
-        {/* Surat Lamaran Formal — clickable */}
+        {/* Surat Lamaran Formal, clickable */}
         <motion.div variants={cardReveal}>
           <Link
             href="/surat-lamaran?style=formal"
-            className="block bg-white rounded-xl overflow-hidden border border-outline-variant/20 hover:-translate-y-1 hover:shadow-lg hover:border-emerald-300/40 transition-all duration-300 cursor-pointer group"
+            className="block bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/20 hover:-translate-y-1 hover:shadow-lg hover:border-emerald-300/40 transition-all duration-300 cursor-pointer group"
           >
             <div className="px-4 pt-4 pb-3 border-b border-outline-variant/10 flex items-center gap-2">
               <span className="w-6 h-6 rounded-lg bg-emerald-50 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -339,11 +339,11 @@ function LetterShowcase({ t }: { t: (key: string) => string }) {
           </Link>
         </motion.div>
 
-        {/* Cover Letter ATS — clickable */}
+        {/* Cover Letter ATS, clickable */}
         <motion.div variants={cardReveal}>
           <Link
             href="/surat-lamaran?style=ats"
-            className="block bg-white rounded-xl overflow-hidden border border-outline-variant/20 hover:-translate-y-1 hover:shadow-lg hover:border-blue-300/40 transition-all duration-300 cursor-pointer group"
+            className="block bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/20 hover:-translate-y-1 hover:shadow-lg hover:border-blue-300/40 transition-all duration-300 cursor-pointer group"
           >
             <div className="px-4 pt-4 pb-3 border-b border-outline-variant/10 flex items-center gap-2">
               <span className="w-6 h-6 rounded-lg bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -363,11 +363,11 @@ function LetterShowcase({ t }: { t: (key: string) => string }) {
           </Link>
         </motion.div>
 
-        {/* Motivation Letter — clickable */}
+        {/* Motivation Letter, clickable */}
         <motion.div variants={cardReveal}>
           <Link
             href="/surat-lamaran?style=motivation"
-            className="block bg-white rounded-xl overflow-hidden border border-outline-variant/20 hover:-translate-y-1 hover:shadow-lg hover:border-amber-300/40 transition-all duration-300 cursor-pointer group"
+            className="block bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/20 hover:-translate-y-1 hover:shadow-lg hover:border-amber-300/40 transition-all duration-300 cursor-pointer group"
           >
             <div className="px-4 pt-4 pb-3 border-b border-outline-variant/10 flex items-center gap-2">
               <span className="w-6 h-6 rounded-lg bg-amber-50 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -419,11 +419,11 @@ function CheckerScoreMockup({ t }: { t: (key: string) => string }) {
     >
 
       <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-3">
-        {/* ATS Score — clickable */}
+        {/* ATS Score, clickable */}
         <motion.div variants={cardReveal}>
           <Link
             href="/checker"
-            className="block bg-white rounded-xl p-4 border border-outline-variant/20 text-center hover:-translate-y-1 hover:shadow-lg hover:border-primary/30 transition-all duration-300 cursor-pointer group"
+            className="block bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/20 text-center hover:-translate-y-1 hover:shadow-lg hover:border-primary/30 transition-all duration-300 cursor-pointer group"
           >
             <div className="text-xs text-on-surface-variant font-medium mb-1 group-hover:text-primary transition-colors">{t("checker.score-label")}</div>
             <p className="text-xs font-semibold text-primary/70 mb-1">Hasil analisis kamu tampil di sini</p>
@@ -433,11 +433,11 @@ function CheckerScoreMockup({ t }: { t: (key: string) => string }) {
           </Link>
         </motion.div>
 
-        {/* Keyword Match — clickable */}
+        {/* Keyword Match, clickable */}
         <motion.div variants={cardReveal}>
           <Link
             href="/checker"
-            className="block bg-white rounded-xl p-4 border border-outline-variant/20 hover:-translate-y-1 hover:shadow-lg hover:border-amber-300/40 transition-all duration-300 cursor-pointer group"
+            className="block bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/20 hover:-translate-y-1 hover:shadow-lg hover:border-amber-300/40 transition-all duration-300 cursor-pointer group"
           >
             <div className="text-xs text-on-surface-variant font-medium mb-2 group-hover:text-amber-700 transition-colors">{t("checker.keyword-gap")}</div>
             <div className="flex flex-wrap gap-1.5">
@@ -468,11 +468,11 @@ function CheckerScoreMockup({ t }: { t: (key: string) => string }) {
           </Link>
         </motion.div>
 
-        {/* Fit Label — clickable */}
+        {/* Fit Label, clickable */}
         <motion.div variants={cardReveal}>
           <Link
             href="/checker"
-            className="block bg-white rounded-xl p-4 border border-outline-variant/20 flex flex-col items-center justify-center hover:-translate-y-1 hover:shadow-lg hover:border-green-300/40 transition-all duration-300 cursor-pointer group"
+            className="block bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/20 flex flex-col items-center justify-center hover:-translate-y-1 hover:shadow-lg hover:border-green-300/40 transition-all duration-300 cursor-pointer group"
           >
             <motion.div
               className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center mb-1.5 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-green-200/50 transition-all duration-300"
@@ -501,7 +501,7 @@ export default function FeatureTabs() {
     <div className="max-w-4xl mx-auto">
       {/* Tab Bar */}
       <div className="flex justify-center mb-10">
-        <div className="inline-flex flex-wrap justify-center bg-white rounded-2xl p-1.5 shadow-premium-sm border border-outline-variant/30 max-w-full">
+        <div className="inline-flex flex-wrap justify-center bg-surface-container-lowest rounded-2xl p-1.5 shadow-premium-sm border border-outline-variant/30 max-w-full">
           {TABS.map((tab) => (
             <button
               key={tab.id}
@@ -536,7 +536,7 @@ export default function FeatureTabs() {
         >
           {/* ── Upper Panel: Title + Bullets + CTA ── */}
           <TiltCard tiltOptions={{ maxAngle: 4, scale: 1.005, glare: false }}>
-            <div className="group relative flex flex-col md:flex-row rounded-2xl border border-outline-variant/40 bg-white shadow-premium-sm overflow-hidden hover:shadow-premium-md transition-shadow duration-300">
+            <div className="group relative flex flex-col md:flex-row rounded-2xl border border-outline-variant/40 bg-surface-container-lowest shadow-premium-sm overflow-hidden hover:shadow-premium-md transition-shadow duration-300">
               {/* Accent strip */}
               <div className={`absolute top-0 left-0 right-0 h-1 ${activeData.bgColor}/60`} />
 

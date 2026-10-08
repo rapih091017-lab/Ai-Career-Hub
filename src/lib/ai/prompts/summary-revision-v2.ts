@@ -25,13 +25,13 @@ ${BOUNDARY}
 ${DELIM.SECTION}
 --- TUGAS UTAMA ---
 Tulis ulang ringkasan profesional CV yang sudah ada menjadi 3 versi
-dengan tingkat kekuatan berbeda. JANGAN generate dari awal — REVISE
+dengan tingkat kekuatan berbeda. JANGAN generate dari awal, REVISE
 teks yang sudah ada.
 
 Versi:
-1. conservative — Perbaiki grammar, struktur, dan pilihan kata. Pertahankan esensi aslinya.
-2. improved — Tingkatkan dampak. Tambahkan metrik/kuantifikasi [est.] jika relevan.
-3. bold — Paling kuat. Gunakan strong action verbs. Fokus pada leadership & impact.
+1. conservative, Perbaiki grammar, struktur, dan pilihan kata. Pertahankan esensi aslinya.
+2. improved, Tingkatkan dampak. Tambahkan metrik/kuantifikasi [est.] jika relevan.
+3. bold, Paling kuat. Gunakan strong action verbs. Fokus pada leadership & impact.
 ${DELIM.SECTION}
 
 ${COT_TEMPLATE}
@@ -54,7 +54,7 @@ ${DELIM.SECTION}
 ${DELIM.SECTION}
 --- ADJACENT SKILL INTEGRATION ---
 Jika target role membutuhkan skill yang tidak ada di profil user,
-integrasikan ADJACENT SKILLS — skill yang secara konsep dekat:
+integrasikan ADJACENT SKILLS, skill yang secara konsep dekat:
 
 | Di Profil → Target Role | Strategi Summary |
 |------------------------|------------------|
@@ -66,11 +66,11 @@ ${DELIM.SECTION}
 ${DELIM.SECTION}
 --- ATURAN REVISION ---
 
-1. JANGAN generate dari awal — selalu REVISE teks yang sudah ada (currentText).
-2. Setiap versi harus LEBIH BAIK dari aslinya — jangan output yang sama.
-3. Pertahankan informasi faktual dari aslinya — jangan mengarang.
+1. JANGAN generate dari awal, selalu REVISE teks yang sudah ada (currentText).
+2. Setiap versi harus LEBIH BAIK dari aslinya, jangan output yang sama.
+3. Pertahankan informasi faktual dari aslinya, jangan mengarang.
 4. Jika aslinya mengandung data spesifik (angka, perusahaan, teknologi), PERTAHANKAN.
-5. Teks ringkasan mengikuti **Bahasa CV dari USER CONTEXT** ("Bahasa CV: Indonesia" → ringkasan Bahasa Indonesia; "Bahasa CV: English" → ringkasan Bahasa Inggris); context/explanation selalu Bahasa Indonesia. CONTOH di bawah hanya ilustrasi format — bahasa output TETAP mengikuti Bahasa CV.
+5. Teks ringkasan mengikuti **Bahasa CV dari USER CONTEXT** ("Bahasa CV: Indonesia" → ringkasan Bahasa Indonesia; "Bahasa CV: English" → ringkasan Bahasa Inggris); context/explanation selalu Bahasa Indonesia. CONTOH di bawah hanya ilustrasi format, bahasa output TETAP mengikuti Bahasa CV.
 6. Jangan gunakan kata ganti orang pertama (I, my, me, saya, aku).
 7. Jika professionalTitle tersedia, gunakan sebagai identitas profesional.
 8. Jika workHistorySummary tersedia, integrasikan konteks pengalaman untuk kredibilitas.
@@ -131,12 +131,12 @@ ${DELIM.SECTION}
 ${DELIM.SECTION}
 
 --- ATURAN TAMBAHAN ---
-1. Versi conservative harus TETAP LEBIH BAIK dari aslinya — perbaiki grammar, struktur, flow.
+1. Versi conservative harus TETAP LEBIH BAIK dari aslinya, perbaiki grammar, struktur, flow.
 2. Versi improved WAJIB mengandung minimal 1 metrik atau angka [est.].
 3. Versi bold WAJIB mengandung dampak bisnis dan strong action verb.
-4. Variasikan action verb antar versi — jangan pakai verb yang sama.
+4. Variasikan action verb antar versi, jangan pakai verb yang sama.
 5. explanation dalam BAHASA INDONESIA; teks ringkasan mengikuti Bahasa CV dari USER CONTEXT (Indonesia/English).
-6. JANGAN mengarang pencapaian — jika data tidak ada, gunakan [est.] dengan catatan.
+6. JANGAN mengarang pencapaian, jika data tidak ada, gunakan [est.] dengan catatan.
 
 ${BOUNDARY}
 

@@ -6,7 +6,7 @@ import { eq, and } from "drizzle-orm";
 
 type Params = { params: Promise<{ id: string }> };
 
-/** GET /api/cover-letter/[id] — detail satu surat */
+/** GET /api/cover-letter/[id], detail satu surat */
 export const GET = apiHandler(async (request: NextRequest, { params }: Params) => {
   const auth = await withAuth();
   if (auth instanceof NextResponse) return auth;
@@ -27,7 +27,7 @@ export const GET = apiHandler(async (request: NextRequest, { params }: Params) =
   return NextResponse.json(letter, { status: 200 });
 });
 
-/** PUT /api/cover-letter/[id] — update konten setelah diedit user */
+/** PUT /api/cover-letter/[id], update konten setelah diedit user */
 export const PUT = apiHandler(async (request: NextRequest, { params }: Params) => {
   const auth = await withAuth();
   if (auth instanceof NextResponse) return auth;

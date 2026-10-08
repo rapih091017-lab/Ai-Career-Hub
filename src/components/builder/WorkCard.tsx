@@ -152,7 +152,7 @@ export function WorkCard({
           </div>
         </div>
         <div className="flex items-center gap-1 shrink-0 ml-2">
-          {/* Visibility toggle — dedicated boolean handler */}
+          {/* Visibility toggle, dedicated boolean handler */}
           <button
             type="button"
             onClick={() => onToggleVisibility(index)}

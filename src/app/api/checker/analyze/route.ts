@@ -49,12 +49,12 @@ export const POST = apiHandler(async (request: NextRequest) => {
     );
   }
 
-  // Job description opsional — normalisasi ke string kosong agar aman
+  // Job description opsional, normalisasi ke string kosong agar aman
   // untuk cleanWords, prompt AI, dan insert DB (kolom NOT NULL).
   const jd = typeof jobDescription === "string" ? jobDescription : "";
 
   // ── 1. CEK SESSION DULU ──────────────────────────────────────────
-  // Session dicek sebelum kuota anonim — supaya user yang sudah login
+  // Session dicek sebelum kuota anonim, supaya user yang sudah login
   // tidak ikut dihitung kuota anonim dari riwayat anonymous sebelumnya.
   const session = await auth();
 
@@ -107,7 +107,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
   const userAgent = request.headers.get("user-agent") ?? "unknown";
   const cookieHash = userAgent;
   // x-anon-id: UUID per browser yang dikirim client (localStorage).
-  // Ini jadi fingerprint utama — supaya kuota 2x tidak dishare semua user
+  // Ini jadi fingerprint utama, supaya kuota 2x tidak dishare semua user
   // yang kebetulan pakai IP/User-Agent sama (masalah di localhost & NAT).
   const anonId = request.headers.get("x-anon-id")?.trim() || null;
 
@@ -176,13 +176,13 @@ export const POST = apiHandler(async (request: NextRequest) => {
       systemPrompt: ANALYSIS_PROMPT_V4
         .replace(/\{\{ROLE_CATEGORY\}\}/g, roleCat)
         .replace(/\{\{OUTPUT_LANGUAGE\}\}/g, outputLang)
-        // Kedalaman bullet review mengikuti tier akses — hemat token untuk free/flash.
+        // Kedalaman bullet review mengikuti tier akses, hemat token untuk free/flash.
         .replace(/\{\{BULLET_MAX\}\}/g, useReasoner ? "5" : "3"),
       userPrompt: `=== ROLE CATEGORY: ${roleCat} ===\n\n=== CV KANDIDAT ===\n${extractedText}\n\n=== JOB DESCRIPTION TARGET ===\n${jd || (outputLang === "en" ? "No job description provided." : "Tidak ada deskripsi pekerjaan.")}`,
       temperature: 0.3,
       // Model: premium → deepseek-v4-pro (thinking) untuk analisis mendalam;
       // free/anonymous → deepseek-v4-flash agar biaya terkontrol.
-      // Catatan: R1 tidak mendukung response_format json_object — JSON dipaksa
+      // Catatan: R1 tidak mendukung response_format json_object, JSON dipaksa
       // via prompt analysis-v3 dan ditangani adapter (isReasoner).
       model: useReasoner ? MODELS.REASONER : MODELS.CHAT,
       // R1: token reasoning ikut menghabiskan budget max_tokens → 16K agar
@@ -244,9 +244,9 @@ export const POST = apiHandler(async (request: NextRequest) => {
     summary: aiAnalysis?.verdict ?? t("Analisis AI tidak tersedia.", "AI analysis is unavailable."),
   };
 
-  // Data struktur lengkap dari AI — dikirim ke frontend (atsPrediction sudah dinormalisasi).
+  // Data struktur lengkap dari AI, dikirim ke frontend (atsPrediction sudah dinormalisasi).
   // V4: risk_factors membawa severity + source_excerpt (object), jadi simpan juga objek asli
-  // supaya UI bisa render badge severity. Field ini additive — hasil V3 lama tetap aman.
+  // supaya UI bisa render badge severity. Field ini additive, hasil V3 lama tetap aman.
   const aiStructuredData = {
     breakdown: aiAnalysis?.breakdown ?? null,
     keywordAnalysis: aiAnalysis?.keyword_analysis ?? null,
@@ -299,7 +299,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
       scores,
       aiFeedback,
       summary: aiFeedback.summary,
-      // Model yang dipakai — ditampilkan sebagai badge di UI hasil analisis.
+      // Model yang dipakai, ditampilkan sebagai badge di UI hasil analisis.
       // Hanya dikirim jika AI benar-benar berhasil (aiAnalysis non-null),
       // supaya badge tidak muncul di response fallback tanpa analisis AI.
       aiModel: aiAnalysis ? (useReasoner ? "V4 Pro" : "V4 Flash") : undefined,

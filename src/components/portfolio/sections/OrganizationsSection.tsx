@@ -6,7 +6,7 @@ import { usePortfolioTheme } from "../PortfolioCanvas";
 
 interface Props { items: OrganizationItem[]; }
 
-/* ═══ GLASS — timeline cards ═══ */
+/* ═══ GLASS, timeline cards ═══ */
 function GlassOrganizations({ items }: { items: OrganizationItem[] }) {
   const theme = usePortfolioTheme();
   const filtered = items.filter(o => o.name);
@@ -80,7 +80,7 @@ function GlassOrganizations({ items }: { items: OrganizationItem[] }) {
   );
 }
 
-/* ═══ BRUTAL — bold rows with tag markers ═══ */
+/* ═══ BRUTAL, bold rows with tag markers ═══ */
 function BrutalOrganizations({ items }: { items: OrganizationItem[] }) {
   const theme = usePortfolioTheme();
   const filtered = items.filter(o => o.name);
@@ -136,7 +136,7 @@ function BrutalOrganizations({ items }: { items: OrganizationItem[] }) {
   );
 }
 
-/* ═══ LUXE — elegant numbered list ═══ */
+/* ═══ LUXE, elegant numbered list ═══ */
 function LuxeOrganizations({ items }: { items: OrganizationItem[] }) {
   const theme = usePortfolioTheme();
   const filtered = items.filter(o => o.name);

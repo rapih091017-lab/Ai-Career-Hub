@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useTranslation } from "@/lib/i18n";
 import LogoutConfirmModal from "@/components/ui/LogoutConfirmModal";
+import { AdminMenuItem } from "@/components/AdminMenuItem";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard" },
@@ -18,7 +19,7 @@ const NAV_ITEMS = [
 ];
 
 /**
- * Per-item active matching — tiap link punya cakupan halaman sendiri supaya
+ * Per-item active matching, tiap link punya cakupan halaman sendiri supaya
  * tidak ada dua menu yang ter-highlight bersamaan.
  * - Dashboard  → hanya /dashboard
  * - My Resumes → /my-resumes + editor CV (/builder/[id], /cv/*)
@@ -73,7 +74,7 @@ export default function AppHeader() {
         open={showLogoutConfirm}
         onClose={() => setShowLogoutConfirm(false)}
       />
-      <header className="fixed top-0 left-0 right-0 z-50 w-full bg-white shadow-sm border-b border-outline-variant/10">
+      <header className="fixed top-0 left-0 right-0 z-50 w-full bg-surface-container-lowest shadow-sm border-b border-outline-variant/10">
       <div className="max-w-7xl mx-auto px-margin-mobile md:px-gutter py-4 flex items-center justify-between">
         {/* Brand */}
         <Link href="/" className="flex items-center gap-2">
@@ -85,7 +86,7 @@ export default function AppHeader() {
           </span>
         </Link>
 
-        {/* Desktop Nav — lg:flex agar 5 item (Dashboard, My Resumes, Surat, Templates, Resources)
+        {/* Desktop Nav, lg:flex agar 5 item (Dashboard, My Resumes, Surat, Templates, Resources)
          * tidak bertabrakan dengan menu user di layar md (768-1024px) */}
         <nav className="hidden lg:flex items-center gap-6 xl:gap-8 absolute left-1/2 -translate-x-1/2">
           {NAV_ITEMS.map((item) => {
@@ -146,7 +147,7 @@ export default function AppHeader() {
               </button>
 
               {isDropdownOpen && (
-                <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-outline-variant/30 py-2 z-[100]">
+                <div className="absolute top-full right-0 mt-2 w-56 bg-surface-container-lowest rounded-xl shadow-lg border border-outline-variant/30 py-2 z-[100]">
                   {session?.user?.name && (
                     <p className="px-4 py-2 text-xs text-on-surface-variant border-b border-outline-variant/30 mb-1">
                       {session.user.email}
@@ -180,6 +181,8 @@ export default function AppHeader() {
                     <span className="material-symbols-outlined text-lg text-on-surface-variant">redeem</span>
                     {t("header.affiliate")}
                   </button>
+                  {/* Hanya tampil untuk akun admin */}
+                  <AdminMenuItem onNavigate={() => setIsDropdownOpen(false)} />
                   <div className="border-t border-outline-variant/30 my-1" />
                   <button
                     className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-error hover:bg-error-container/30 transition-colors"
@@ -203,7 +206,7 @@ export default function AppHeader() {
         </div>
       </div>
 
-      {/* Mobile Nav — with AnimatePresence */}
+      {/* Mobile Nav, with AnimatePresence */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
@@ -211,7 +214,7 @@ export default function AppHeader() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2, ease: "easeInOut" }}
-            className="md:hidden overflow-hidden bg-white border-t border-outline-variant/10"
+            className="md:hidden overflow-hidden bg-surface-container-lowest border-t border-outline-variant/10"
           >
             <div className="px-margin-mobile py-4 space-y-3">
               {NAV_ITEMS.map((item) => {

@@ -66,7 +66,7 @@ export function Field({
           } ${enableAiPolish && !disabled ? "pr-10" : ""}`}
         />
         
-        {/* AI Polish Button — inline, one-click */}
+        {/* AI Polish Button, inline, one-click */}
         {enableAiPolish && !disabled && (
           <span className="absolute right-2 top-1/2 -translate-y-1/2">
             <AIPolishButton

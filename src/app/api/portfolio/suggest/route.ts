@@ -46,13 +46,13 @@ interface SuggestResponse {
 /* ── Build a text context block from CV data (CvData format) ── */
 function buildCvContext(cv: any): string {
   const workLines = (cv.workHistory || []).map(
-    (w: any) => `${w.position || "—"} at ${w.company || "—"} — ${w.description || ""}`,
+    (w: any) => `${w.position || "-"} at ${w.company || "-"}, ${w.description || ""}`,
   );
   const eduLines = (cv.education || []).map(
-    (e: any) => `${e.degree || ""} ${e.field || ""} at ${e.institution || "—"}`,
+    (e: any) => `${e.degree || ""} ${e.field || ""} at ${e.institution || "-"}`,
   );
   const orgLines = (cv.organisations || []).map(
-    (o: any) => `${o.position || ""} at ${o.name || "—"} — ${o.description || ""}`,
+    (o: any) => `${o.position || ""} at ${o.name || "-"}, ${o.description || ""}`,
   );
   const skillNames = (cv.skills || []).map((s: any) => s.name).filter(Boolean);
 
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
   }
 
   // ── Cek kuota ──
-  // Pakai limit dari sistem akses (getUserAccess) — konsisten dengan fitur lain.
+  // Pakai limit dari sistem akses (getUserAccess), konsisten dengan fitur lain.
   // FREE_LIMITS.portfolio_web = false → user free tidak bisa; paket portfolio_web/pro/business/premium membuka kuotanya.
   const access = await getUserAccess(session.user.id);
   const portfolioLimit = access.limits.portfolio_web;
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (portfolioLimit !== "unlimited") {
-    // Hitung pemakaian bulan berjalan — konsisten dengan checkQuota di fitur lain
+    // Hitung pemakaian bulan berjalan, konsisten dengan checkQuota di fitur lain
     const firstOfMonth = new Date();
     firstOfMonth.setDate(1);
     firstOfMonth.setHours(0, 0, 0, 0);
@@ -170,14 +170,14 @@ export async function POST(request: NextRequest) {
     const fullName = pi.fullName || "";
     const summary = pi.summary || "";
     const workHistory = (profile.workHistory || []).map(
-      (w: any) => `${w.position} at ${w.company} — ${w.description || ""}`,
+      (w: any) => `${w.position} at ${w.company}, ${w.description || ""}`,
     );
     const education = (profile.education || []).map(
       (e: any) => `${e.degree} ${e.field || ""} at ${e.institution}`,
     );
     const skills = (profile.skills || []).map((s: any) => s.name);
     const organisations = (profile.organisations || []).map(
-      (o: any) => `${o.position} at ${o.name} — ${o.description || ""}`,
+      (o: any) => `${o.position} at ${o.name}, ${o.description || ""}`,
     );
 
     profileContext = `

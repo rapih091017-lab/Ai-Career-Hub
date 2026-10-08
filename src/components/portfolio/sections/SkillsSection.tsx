@@ -7,7 +7,7 @@ import { usePortfolioTheme } from "../PortfolioCanvas";
 interface Props { data: PortfolioFormData; }
 
 /* ═══════════════════════════════════════════════
- * GLASS — Horizontal scrollable chip carousel
+ * GLASS, Horizontal scrollable chip carousel
  *          with frosted glass pills + smooth scroll
  * ═══════════════════════════════════════════════ */
 function GlassSkills({ f }: { f: PortfolioFormData }) {
@@ -82,7 +82,7 @@ function GlassSkills({ f }: { f: PortfolioFormData }) {
 }
 
 /* ═══════════════════════════════════════════════
- * BRUTAL — Bold block grid (keep unique layout)
+ * BRUTAL, Bold block grid (keep unique layout)
  *          with shadow box offsets
  * ═══════════════════════════════════════════════ */
 function BrutalSkills({ f }: { f: PortfolioFormData }) {
@@ -128,7 +128,7 @@ function BrutalSkills({ f }: { f: PortfolioFormData }) {
 }
 
 /* ═══════════════════════════════════════════════
- * LUXE — Categorized skill groupings with gold
+ * LUXE, Categorized skill groupings with gold
  *        ornamental dividers and decorative icons
  * ═══════════════════════════════════════════════ */
 function LuxeSkills({ f }: { f: PortfolioFormData }) {

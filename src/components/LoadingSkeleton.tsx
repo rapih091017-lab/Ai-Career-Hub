@@ -15,7 +15,7 @@ export function Skeleton({ className = "" }: { className?: string }) {
 
 export function CardSkeleton() {
   return (
-    <div className="animate-pulse rounded-xl border border-gray-200 bg-white p-6">
+    <div className="animate-pulse rounded-xl border border-gray-200 bg-surface-container-lowest p-6">
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-xl bg-gray-200" />
         <div className="space-y-2 flex-1">
@@ -51,7 +51,7 @@ export function FeaturesGridSkeleton() {
   return (
     <div className="animate-pulse grid grid-cols-1 md:grid-cols-3 gap-4 max-w-6xl mx-auto">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="rounded-xl border border-gray-200 bg-white p-6 space-y-4">
+        <div key={i} className="rounded-xl border border-gray-200 bg-surface-container-lowest p-6 space-y-4">
           <div className="w-10 h-10 bg-gray-200 rounded-xl" />
           <div className="h-5 w-28 bg-gray-200 rounded" />
           <div className="h-3 w-full bg-gray-200 rounded" />

@@ -48,5 +48,5 @@ export const GET = apiHandler(async (request: NextRequest) => {
 });
 
 /**
- * GET /api/cover-letter/[id] — detail satu surat (via [id]/route.ts)
+ * GET /api/cover-letter/[id], detail satu surat (via [id]/route.ts)
  */

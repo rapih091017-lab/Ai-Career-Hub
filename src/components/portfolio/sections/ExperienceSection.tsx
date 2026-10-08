@@ -71,7 +71,7 @@ function GlassExperience({ items }: { items: ExperienceItem[] }) {
                           {exp.position || "Posisi"}
                         </h3>
                         <span className="text-xs font-medium" style={{ color: theme.colors.primary }}>
-                          {exp.startDate}{exp.startDate ? " — " : ""}{exp.isPresent ? "Sekarang" : exp.endDate || ""}
+                          {exp.startDate}{exp.startDate ? ", " : ""}{exp.isPresent ? "Sekarang" : exp.endDate || ""}
                         </span>
                       </div>
                       <div className="text-sm font-medium mb-2" style={{ color: theme.colors.textSecondary }}>
@@ -152,7 +152,7 @@ function BrutalExperience({ items }: { items: ExperienceItem[] }) {
                             {exp.position || "Posisi"}
                           </h3>
                           <span className="text-xs font-bold" style={{ color: theme.colors.primary }}>
-                            {exp.startDate}{exp.startDate ? " — " : ""}{exp.isPresent ? "Sekarang" : exp.endDate || ""}
+                            {exp.startDate}{exp.startDate ? ", " : ""}{exp.isPresent ? "Sekarang" : exp.endDate || ""}
                           </span>
                         </div>
                         <div className="text-sm font-semibold mb-2" style={{ color: theme.colors.textMuted }}>
@@ -243,7 +243,7 @@ function LuxeExperience({ items }: { items: ExperienceItem[] }) {
                       </div>
                       <div className="text-xs font-medium py-1 px-3 rounded-full text-center md:text-right"
                         style={{ background: `${theme.colors.primary}0A`, color: theme.colors.primary }}>
-                        {exp.startDate}{exp.startDate ? " — " : ""}{exp.isPresent ? "Present" : exp.endDate || ""}
+                        {exp.startDate}{exp.startDate ? ", " : ""}{exp.isPresent ? "Present" : exp.endDate || ""}
                       </div>
                     </div>
                   </div>

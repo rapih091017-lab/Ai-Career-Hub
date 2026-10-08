@@ -139,7 +139,7 @@ export async function exportPreviewToPdf(
   const pdfW = 210;
   const pdfH = 297;
   const margin = marginMm ?? 15;
-  const imgW = pdfW - margin * 2; // lebar gambar di PDF — dinamis sesuai margin
+  const imgW = pdfW - margin * 2; // lebar gambar di PDF, dinamis sesuai margin
   const ELEMENT_WIDTH = 210; // lebar asli previewRef (mm)
 
   // ── Kalkulasi dalam pixel canvas ──
@@ -231,7 +231,7 @@ export async function serializePreviewHtml(
     cssParts.push(el.innerHTML);
   });
 
-  // 2. <link rel="stylesheet"> tags — fetch contentnya
+  // 2. <link rel="stylesheet"> tags, fetch contentnya
   const linkPromises = Array.from(
     document.querySelectorAll('link[rel="stylesheet"]')
   ).map(async (link) => {
@@ -243,7 +243,7 @@ export async function serializePreviewHtml(
         cssParts.push(await res.text());
       }
     } catch {
-      // CORS error — skip, Tailwind CDN di pdf-server akan handle
+      // CORS error, skip, Tailwind CDN di pdf-server akan handle
     }
   });
   await Promise.allSettled(linkPromises);
@@ -265,7 +265,7 @@ export async function serializePreviewHtml(
 
   // ── A4 preview overrides untuk PDF server ──
   // Catatan: surat lamaran (class a4-letter) membawa padding sendiri pada
-  // elemen A4 (20mm 22mm) — jangan di-nol-kan, agar PDF match preview.
+  // elemen A4 (20mm 22mm), jangan di-nol-kan, agar PDF match preview.
   // CV builder (a4-preview tanpa a4-letter) memang ingin padding 0 karena
   // ruang kosong dihasilkan oleh @page margin pdf-server.
   const printOverrides = `
@@ -325,7 +325,7 @@ export async function serializePreviewHtml(
 
 /**
  * Export preview element to PDF via Puppeteer server.
- * Auto-downloads — no print dialog. ATS-readable text PDF.
+ * Auto-downloads, no print dialog. ATS-readable text PDF.
  *
  * FALLBACK: Jika server Puppeteer mati/unreachable,
  * otomatis fallback ke window.print() (dengan dialog, tapi ATS-readable).
@@ -386,7 +386,7 @@ export async function exportPdfViaServer(
 
     return { ok: true };
   } catch (err) {
-    // ── Fallback: server tidak terjangkau — dialog cetak (PDF teks) ──
+    // ── Fallback: server tidak terjangkau, dialog cetak (PDF teks) ──
     console.warn("[pdf] Server tidak terjangkau, membuka dialog cetak:", err);
     try {
       await exportPreviewToPrintPdf(element, fileName, marginMm);
@@ -402,7 +402,7 @@ export async function exportPdfViaServer(
  * instead of html2canvas.
  *
  * Advantages:
- * - Native browser print engine — text is SELECTABLE, not a screenshot
+ * - Native browser print engine, text is SELECTABLE, not a screenshot
  * - No html2canvas/jspdf dependencies for this code path
  * - Smaller file size, better quality
  * - Respects @page CSS margins (matches the user's margin mode)

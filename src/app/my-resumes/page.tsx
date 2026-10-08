@@ -176,13 +176,13 @@ export default function MyResumesPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder={t("dashboard.search-cv")}
-                    className="w-36 md:w-48 pl-7 pr-2 py-1.5 rounded-lg bg-white border border-outline-variant/30 text-xs shadow-premium-sm focus:ring-1 focus:ring-primary outline-none"
+                    className="w-36 md:w-48 pl-7 pr-2 py-1.5 rounded-lg bg-surface-container-lowest border border-outline-variant/30 text-xs shadow-premium-sm focus:ring-1 focus:ring-primary outline-none"
                   />
                 </div>
                 <select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value as "all" | "has-title" | "no-title")}
-                  className="bg-white border border-outline-variant/30 rounded-lg text-xs px-2 py-1.5 shadow-premium-sm focus:ring-1 focus:ring-primary"
+                  className="bg-surface-container-lowest border border-outline-variant/30 rounded-lg text-xs px-2 py-1.5 shadow-premium-sm focus:ring-1 focus:ring-primary"
                 >
                   <option value="all">{t("dashboard.all")}</option>
                   <option value="has-title">{t("dashboard.has-title")}</option>
@@ -191,7 +191,7 @@ export default function MyResumesPage() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as "newest" | "oldest" | "name-asc" | "name-desc")}
-                  className="bg-white border border-outline-variant/30 rounded-lg text-xs px-2 py-1.5 shadow-premium-sm focus:ring-1 focus:ring-primary"
+                  className="bg-surface-container-lowest border border-outline-variant/30 rounded-lg text-xs px-2 py-1.5 shadow-premium-sm focus:ring-1 focus:ring-primary"
                   title={t("dashboard.sort")}
                 >
                   <option value="newest">{t("dashboard.newest")}</option>
@@ -208,7 +208,7 @@ export default function MyResumesPage() {
             </section>
 
             {searchQuery && filteredCvList.length === 0 && (
-              <div className="bg-white rounded-2xl p-8 border border-dashed border-outline-variant text-center shadow-premium-sm mb-4">
+              <div className="bg-surface-container-lowest rounded-2xl p-8 border border-dashed border-outline-variant text-center shadow-premium-sm mb-4">
                 <p className="text-sm text-on-surface-variant">{t("dashboard.no-search-result").replace("{q}", searchQuery)}</p>
               </div>
             )}
@@ -218,7 +218,7 @@ export default function MyResumesPage() {
                 {[1, 2, 3].map((i) => (
                   <div
                     key={i}
-                    className="bg-white rounded-2xl p-5 shadow-premium-sm border border-outline-variant/50 flex items-center justify-between gap-4 animate-pulse"
+                    className="bg-surface-container-lowest rounded-2xl p-5 shadow-premium-sm border border-outline-variant/50 flex items-center justify-between gap-4 animate-pulse"
                   >
                     <div className="flex-1 space-y-2">
                       <div className="h-4 bg-surface-container-high rounded w-1/3" />
@@ -236,7 +236,7 @@ export default function MyResumesPage() {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.1 }}
-                className="bg-white rounded-2xl p-12 border border-dashed border-outline-variant text-center shadow-premium-sm"
+                className="bg-surface-container-lowest rounded-2xl p-12 border border-dashed border-outline-variant text-center shadow-premium-sm"
               >
                 <div className="w-16 h-16 rounded-full bg-primary-fixed flex items-center justify-center mx-auto mb-4">
                   <span className="material-symbols-outlined text-primary text-3xl select-none">description</span>
@@ -258,7 +258,7 @@ export default function MyResumesPage() {
                 {filteredCvList.map((cv) => (
                   <div
                     key={cv.id}
-                    className="bg-white rounded-2xl p-5 shadow-premium-sm border border-outline-variant/50 flex items-center justify-between gap-4 hover:shadow-premium-md hover:-translate-y-0.5 transition-[transform,box-shadow] duration-300 group"
+                    className="bg-surface-container-lowest rounded-2xl p-5 shadow-premium-sm border border-outline-variant/50 flex items-center justify-between gap-4 hover:shadow-premium-md hover:-translate-y-0.5 transition-[transform,box-shadow] duration-300 group"
                   >
                     <div className="flex-1 min-w-0">
                       <h3 className="font-label-bold text-on-surface truncate">{cv.jobTitle || t("dashboard.untitled-cv")}</h3>
@@ -298,7 +298,7 @@ export default function MyResumesPage() {
                               exit={{ opacity: 0, y: -6, scale: 0.98 }}
                               transition={{ duration: 0.15 }}
                               role="menu"
-                              className="absolute right-0 top-full mt-1 z-30 w-60 bg-white rounded-xl shadow-premium-lg border border-outline-variant/50 overflow-hidden py-1.5"
+                              className="absolute right-0 top-full mt-1 z-30 w-60 bg-surface-container-lowest rounded-xl shadow-premium-lg border border-outline-variant/50 overflow-hidden py-1.5"
                             >
                               <p className="px-4 pt-1 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">{t("dashboard.create-letter-from-cv")}</p>
                               <button

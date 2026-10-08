@@ -5,8 +5,8 @@ import { useTranslation } from "@/lib/i18n";
 import type { ImpactForecast } from "./types";
 
 /**
- * ImpactForecastCard — proyeksi skor jika saran dieksekusi (v4).
- * Sumber: AI (impact_forecast) — dijamin monoton oleh prompt:
+ * ImpactForecastCard, proyeksi skor jika saran dieksekusi (v4).
+ * Sumber: AI (impact_forecast), dijamin monoton oleh prompt:
  * current ≤ quick_wins ≤ all_fixes ≤ 96.
  */
 export function ImpactForecastCard({ forecast }: { forecast: ImpactForecast }) {

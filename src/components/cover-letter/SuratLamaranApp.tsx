@@ -74,22 +74,22 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
 
   /* ── Stepper ── */
   // Jika datang dengan cvId (dari dashboard/dropdown) atau style (dari ReviewStep),
-  // langsung ke Step 2 (Data Surat) — template sudah ditentukan dari URL.
+  // langsung ke Step 2 (Data Surat), template sudah ditentukan dari URL.
   const [activeStep, setActiveStep] = useState(cvId || styleFromUrl ? 1 : 0);
 
   const [cvData, setCvData] = useState<CvData | null>(null);
   const [cvLoading, setCvLoading] = useState(true);
 
-  // Mode sumber data — default MANUAL agar form nama/data selalu terlihat.
+  // Mode sumber data, default MANUAL agar form nama/data selalu terlihat.
   // (Sebelumnya default "cv" membuat user tanpa CV terjebak: form tersembunyi
   // + tombol generate terkunci "Pilih CV dulu di atas" padahal tidak ada CV.)
   const [sourceMode, setSourceMode] = useState<"cv" | "manual">("manual");
   const [cvOptions, setCvOptions] = useState<CvOption[]>([]);
   const [cvOptionsLoading, setCvOptionsLoading] = useState(false);
 
-  // Data manual — dipakai saat membuat surat dari nol (tanpa CV)
+  // Data manual, dipakai saat membuat surat dari nol (tanpa CV)
   // Field kaya (pengalaman, pendidikan, skill, deskripsi lowongan) membuat
-  // hasil AI jauh lebih relevan — route generate sudah mendukung semua ini.
+  // hasil AI jauh lebih relevan, route generate sudah mendukung semua ini.
   const [manual, setManual] = useState({
     fullName: "",
     position: "",
@@ -113,7 +113,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
     },
     []
   );
-  // Batas atas entri dinamis — cegah form meledak & surat terlalu panjang
+  // Batas atas entri dinamis, cegah form meledak & surat terlalu panjang
   const MAX_WORK = 5;
   const MAX_EDU = 4;
   const addManualEntry = useCallback((key: "workHistory" | "education") => {
@@ -280,7 +280,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
   }, [cvId, addToast]);
 
   /* ── Load daftar CV user (untuk pemilih sumber "Dari CV") ──
-   * Selalu fetch saat halaman standalone (!cvId) — TIDAK digate oleh
+   * Selalu fetch saat halaman standalone (!cvId), TIDAK digate oleh
    * sourceMode, karena default mode sekarang "manual" dan tombol
    * "Dari CV" butuh daftar ini sudah terisi saat diklik. */
   useEffect(() => {
@@ -319,7 +319,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
   }, [loadLetters]);
 
   /* ── Fetch detail surat (dengan content) saat surat aktif dipilih ──
-   * List API (/api/cover-letter) TIDAK mengembalikan content — hanya detail
+   * List API (/api/cover-letter) TIDAK mengembalikan content, hanya detail
    * (/api/cover-letter/[id]) yang lengkap. Tanpa ini, activeLetter.content
    * undefined → LetterPreview crash .split(). */
   const loadLetterDetail = useCallback(
@@ -346,7 +346,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
           setActiveStep(2);
         })
         .catch(() => {
-          /* server down — biarkan default */
+          /* server down, biarkan default */
         });
     },
     [styleFromUrl]
@@ -521,17 +521,17 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
       const sender = cvData?.fullName || manual.fullName || "";
       const name = sender ? `${sender}_Surat_Lamaran.pdf` : "Surat_Lamaran.pdf";
       // Margin 0: elemen A4 surat membawa padding sendiri (20mm 22mm),
-      // sehingga hasil PDF sama persis dengan preview — tanpa margin ganda.
+      // sehingga hasil PDF sama persis dengan preview, tanpa margin ganda.
       // contentAreaMm = 297: satu slice = satu halaman A4 penuh (fallback
       // html2canvas slicing per halaman, auto-download tanpa dialog print).
       const result = await exportPdfViaServer(previewRef.current, name, 0, 297);
       if (!result.ok) {
         addToast({ type: result.redirectUrl ? "warning" : "error", message: result.error || "Gagal export PDF" });
       } else if (result.usedFallback) {
-        // Versi gambar (fallback) — beri tahu user jujur
+        // Versi gambar (fallback), beri tahu user jujur
         addToast({
           type: "warning",
-          message: "Server PDF teks sedang sibuk — file yang terunduh versi gambar. Coba lagi sebentar untuk versi teks.",
+          message: "Server PDF teks sedang sibuk, file yang terunduh versi gambar. Coba lagi sebentar untuk versi teks.",
         });
       } else {
         addToast({ type: "success", message: "PDF teks berhasil diunduh!" });
@@ -627,7 +627,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
             </div>
 
             {/* ── STEPPER ── */}
-            <div className="bg-white rounded-2xl border border-outline-variant/50 shadow-premium-sm px-3 py-3 md:px-5 flex items-center gap-1 overflow-x-auto custom-scrollbar">
+            <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/50 shadow-premium-sm px-3 py-3 md:px-5 flex items-center gap-1 overflow-x-auto custom-scrollbar">
               {STEPS.map((label, i) => (
                 <button
                   key={label}
@@ -693,12 +693,12 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                   className={`w-full flex items-start gap-4 p-4 rounded-2xl border text-left transition-all group ${
                                     active
                                       ? "border-primary bg-primary/5 shadow-premium-sm"
-                                      : "border-outline-variant/50 hover:border-primary/40 hover:bg-white"
+                                      : "border-outline-variant/50 hover:border-primary/40 hover:bg-surface-container-lowest"
                                   }`}
                                 >
                                   {/* Mini preview format */}
                                   <div
-                                    className="w-14 h-[76px] shrink-0 rounded-lg border border-outline-variant/40 bg-white p-2 overflow-hidden"
+                                    className="w-14 h-[76px] shrink-0 rounded-lg border border-outline-variant/40 bg-surface-container-lowest p-2 overflow-hidden"
                                     style={{ fontFamily: tpl.format.fontFamily }}
                                   >
                                     {tpl.format.letterhead ? (
@@ -807,11 +807,11 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                       {/* ── STEP 2: DATA & CONFIG ── */}
                       {activeStep === 1 && (
                         <div className="space-y-5">
-                          {/* Pemilih sumber data — tampil selalu saat buat dari nol.
+                          {/* Pemilih sumber data, tampil selalu saat buat dari nol.
                            * (Tanpa !activeLetter: surat manual lama tidak boleh
                            * menyembunyikan form, supaya Generate ulang tetap bisa.) */}
                           {!cvId && (
-                            <motion.section className="bg-white rounded-2xl p-6 shadow-premium-md border border-outline-variant/50">
+                            <motion.section className="bg-surface-container-lowest rounded-2xl p-6 shadow-premium-md border border-outline-variant/50">
                               <div className="flex items-center gap-3 mb-1">
                                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                                   <span className="material-symbols-outlined text-primary text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>travel_explore</span>
@@ -827,7 +827,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                   type="button"
                                   onClick={() => {
                                     if (cvOptions.length === 0 && !cvOptionsLoading) {
-                                      // Tidak ada CV untuk dipilih — jangan kunci form manual
+                                      // Tidak ada CV untuk dipilih, jangan kunci form manual
                                       setSourceMode("manual");
                                       addToast({ type: "warning", message: "Kamu belum punya CV. Isi data manual di bawah, atau buat CV baru dulu." });
                                       return;
@@ -918,10 +918,10 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                             </motion.section>
                           )}
 
-                          {/* Form data manual — tampil saat mode manual (atau surat
+                          {/* Form data manual, tampil saat mode manual (atau surat
                            * manual lama dibuka: tetap bisa isi ulang data) */}
                           {!cvId && sourceMode === "manual" && (
-                            <motion.section className="bg-white rounded-2xl p-6 shadow-premium-md border border-outline-variant/50 space-y-4">
+                            <motion.section className="bg-surface-container-lowest rounded-2xl p-6 shadow-premium-md border border-outline-variant/50 space-y-4">
                               <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                                   <span className="material-symbols-outlined text-primary text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>person</span>
@@ -1145,7 +1145,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                           )}
 
                           {/* Konfigurasi surat */}
-                          <motion.section className="bg-white rounded-2xl p-6 shadow-premium-md border border-outline-variant/50 space-y-5">
+                          <motion.section className="bg-surface-container-lowest rounded-2xl p-6 shadow-premium-md border border-outline-variant/50 space-y-5">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                                 <span className="material-symbols-outlined text-primary text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>mail</span>
@@ -1211,7 +1211,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                 />
                               </div>
 
-                              {/* Field spesifik jenis surat — biar AI punya data & hasilnya bukan generik */}
+                              {/* Field spesifik jenis surat, biar AI punya data & hasilnya bukan generik */}
                               {style === "motivation" ? (
                                 <>
                                   <div>
@@ -1328,7 +1328,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                       {activeStep === 2 && (
                         <div className="space-y-5">
                           {!activeLetter && !content ? (
-                            <div className="bg-white rounded-2xl p-10 shadow-premium-md border border-outline-variant/50 text-center">
+                            <div className="bg-surface-container-lowest rounded-2xl p-10 shadow-premium-md border border-outline-variant/50 text-center">
                               <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                                 <span className="material-symbols-outlined text-primary text-[28px]">auto_awesome</span>
                               </div>
@@ -1347,7 +1347,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                               </MagneticButton>
                             </div>
                           ) : (
-                            <motion.section className="bg-white rounded-2xl p-6 shadow-premium-md border border-outline-variant/50 space-y-4">
+                            <motion.section className="bg-surface-container-lowest rounded-2xl p-6 shadow-premium-md border border-outline-variant/50 space-y-4">
                               <div className="flex items-center justify-between">
                                 <h2 className="font-label-bold text-on-surface">Edit Surat</h2>
                                 <div className="flex items-center gap-2">
@@ -1393,7 +1393,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                   </div>
                                 </div>
                               )}
-                              {/* Isi surat — editor blok paragraf (ergonomi ala builder CV) */}
+                              {/* Isi surat, editor blok paragraf (ergonomi ala builder CV) */}
                               <div>
                                 <div className="flex items-center justify-between mb-2">
                                   <label className="text-sm font-semibold text-on-surface-variant">Isi Surat</label>
@@ -1506,7 +1506,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                 <div className="space-y-5 lg:sticky lg:top-24">
                   {/* Riwayat */}
                   {letters.length > 0 && (
-                    <section className="bg-white rounded-2xl p-4 shadow-premium-sm border border-outline-variant/50">
+                    <section className="bg-surface-container-lowest rounded-2xl p-4 shadow-premium-sm border border-outline-variant/50">
                       <h3 className="text-sm font-bold text-on-surface mb-3 flex items-center gap-2">
                         <span className="material-symbols-outlined text-base text-primary">history</span>
                         Riwayat Surat ({letters.length})
@@ -1530,11 +1530,11 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                     </section>
                   )}
 
-                  {/* Preview A4 — mirip preview builder CV: kertas mengambang di atas
+                  {/* Preview A4, mirip preview builder CV: kertas mengambang di atas
                    * permukaan dim (bukan di dalam kartu berbingkai tebal), dengan
                    * header ramping ala FormatToolbar di builder. */}
                   <div className="rounded-2xl overflow-hidden bg-surface-dim/20 border border-outline-variant/30">
-                    <div className="flex items-center justify-between gap-2 px-4 py-2.5 bg-white/80 backdrop-blur-sm border-b border-outline-variant/20">
+                    <div className="flex items-center justify-between gap-2 px-4 py-2.5 bg-surface-container-lowest/80 backdrop-blur-sm border-b border-outline-variant/20">
                       <span className="text-xs font-semibold text-on-surface-variant flex items-center gap-1.5">
                         <span className="material-symbols-outlined text-sm text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>visibility</span>
                         Preview A4 · {template.label}

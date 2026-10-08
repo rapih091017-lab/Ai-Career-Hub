@@ -1,8 +1,8 @@
 /**
- * CvPdfDocument — Client-side vector PDF renderer (via @react-pdf/renderer).
+ * CvPdfDocument, Client-side vector PDF renderer (via @react-pdf/renderer).
  *
  * Why: produces a TRUE text PDF (selectable, ATS-readable, crisp at any zoom)
- * entirely in the browser — no server, no cold start, works on any Vercel plan.
+ * entirely in the browser, no server, no cold start, works on any Vercel plan.
  * Mirrors the on-screen AtsBaseRenderer layout so the PDF matches the preview.
  *
  * Imported ONLY via dynamic import (keeps the main bundle lean).
@@ -75,12 +75,12 @@ export interface CvPdfDocumentProps {
   data: CvData;
   /** Resolved TemplateStyle (already overridden with builder font/size/align). */
   templateStyle: TemplateStyle;
-  /** Section ordering — controls which sections appear & in what order. */
+  /** Section ordering, controls which sections appear & in what order. */
   sectionOrder?: (SectionKey | string)[];
   showDividers?: boolean;
   headerLayout?: "centered" | "left";
   lineHeight?: number;
-  /** Page margin in mm — matches the builder's margin mode. */
+  /** Page margin in mm, matches the builder's margin mode. */
   marginMm?: number;
   lang?: "id" | "en";
 }

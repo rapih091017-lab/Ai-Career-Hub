@@ -1,10 +1,10 @@
 /**
- * OCR utility — extract text from images using Tesseract.js.
+ * OCR utility, extract text from images using Tesseract.js.
  *
  * Thread-safe: uses a processing queue (promise chain) so concurrent
  * requests don't race on the same worker.
  *
- * Timeout-safe: no Promise.race — let the HTTP timeout handle hangs.
+ * Timeout-safe: no Promise.race, let the HTTP timeout handle hangs.
  */
 
 import type { Worker } from "tesseract.js";
@@ -21,12 +21,12 @@ async function getWorker(): Promise<Worker> {
   if (!workerPromise) {
     workerPromise = (async () => {
       const Tesseract = await import("tesseract.js");
-      // TANPA langPath custom — pakai CDN bawaan tesseract.js (jsdelivr).
+      // TANPA langPath custom, pakai CDN bawaan tesseract.js (jsdelivr).
       // Di Vercel serverless /tmp/tessdata kosong & ephemeral → path lokal
       // membuat load traineddata gagal (OCR error). CDN default otomatis
       // mengunduh eng+ind.traineddata saat worker pertama kali dibuat.
       const worker = await Tesseract.createWorker("eng+ind", 1, {
-        // Logger — hanya di development
+        // Logger, hanya di development
         logger:
           process.env.NODE_ENV === "development"
             ? (m: any) => {

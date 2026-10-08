@@ -4,7 +4,7 @@ import { forwardRef, useEffect, useRef, useState } from "react";
 import type { LetterTemplate } from "./letterTemplates";
 
 /**
- * A4 Letter Preview — render surat lamaran/cover letter dalam format A4.
+ * A4 Letter Preview, render surat lamaran/cover letter dalam format A4.
  * Menggunakan inline styles (bukan Tailwind) agar serialisasi HTML ke
  * pdf-server menghasilkan layout yang sama persis.
  *
@@ -12,7 +12,7 @@ import type { LetterTemplate } from "./letterTemplates";
  *
  * Scaling: transform scale() DIKELOLA oleh wrapper luar (bukan element
  * A4 itu sendiri). Ini penting karena:
- *  1. Preview selalu muat di kolom sempit (mobile/tablet) — tidak "gepeng".
+ *  1. Preview selalu muat di kolom sempit (mobile/tablet), tidak "gepeng".
  *  2. Element A4 yang di-ref tetap bebas transform → serializePreviewHtml
  *     tidak membawa scale ke PDF.
  */
@@ -59,7 +59,7 @@ export const LetterPreview = forwardRef<
 
   // ── Scale responsif: ukur lebar container, sesuaikan scale ──
   const wrapRef = useRef<HTMLDivElement>(null);
-  // Tinggi konten AKTUAL elemen A4 (dalam px) — bukan A4_HEIGHT tetap,
+  // Tinggi konten AKTUAL elemen A4 (dalam px), bukan A4_HEIGHT tetap,
   // karena surat bisa lebih panjang dari satu halaman dan TIDAK boleh
   // terpotong di bawah. Wrapper height = kontenH * scale.
   const [contentHeightPx, setContentHeightPx] = useState(A4_HEIGHT_MM * MM_TO_PX);
@@ -82,7 +82,7 @@ export const LetterPreview = forwardRef<
   // Ukur tinggi aktual elemen A4 (follow konten, bukan fixed 261mm).
   // Pakai max(offsetHeight, scrollHeight): offsetHeight = tinggi item
   // (bisa dipaksa stretch oleh flex parent height:0), scrollHeight =
-  // tinggi konten penuh — pilih yang lebih besar agar surat panjang TIDAK
+  // tinggi konten penuh, pilih yang lebih besar agar surat panjang TIDAK
   // terpotong di bawah.
   useEffect(() => {
     const el = (ref as React.RefObject<HTMLDivElement | null>).current;
@@ -95,7 +95,7 @@ export const LetterPreview = forwardRef<
   }, [ref, letter.content]);
 
   // Pecah paragraf: baris kosong ganda = paragraf baru
-  // Guard ?? "" — content bisa null/undefined untuk surat lama / daftar tanpa detail
+  // Guard ?? "", content bisa null/undefined untuk surat lama / daftar tanpa detail
   const paragraphs = (letter.content ?? "")
     .split(/\n\s*\n/)
     .map((p) => p.trim())
@@ -129,7 +129,7 @@ export const LetterPreview = forwardRef<
           display: "flex",
           justifyContent: "center",
           // align-items flex-start: jangan stretch elemen A4 ke tinggi 0
-          // (parent height:0) — biarkan elemen tumbuh mengikuti isi surat
+          // (parent height:0), biarkan elemen tumbuh mengikuti isi surat
           // agar surat panjang tidak terpotong.
           alignItems: "flex-start",
         }}
@@ -260,7 +260,7 @@ export const LetterPreview = forwardRef<
               )}
             </>
           ) : (
-            /* Subject — Perihal (gaya classic / modern / warm) */
+            /* Subject, Perihal (gaya classic / modern / warm) */
             <div style={{ marginBottom: isClassic ? 0 : isWarm ? "8mm" : "6mm" }}>
               {isModern ? (
                 <div
@@ -279,7 +279,7 @@ export const LetterPreview = forwardRef<
                   {letter.language === "id" ? "Perihal" : "Subject"}: {letter.subject}
                 </div>
               ) : isClassic ? (
-                /* Klasik: tanpa header tambahan — tempat/tanggal & "Perihal:"
+                /* Klasik: tanpa header tambahan, tempat/tanggal & "Perihal:"
                  * sudah ditulis AI di dalam isi, dan paragraf "Perihal:"
                  * digayakan sebagai judul klasik oleh renderer body di bawah. */
                 <span style={{ display: "none" }} />

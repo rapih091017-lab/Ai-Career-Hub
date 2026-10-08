@@ -54,7 +54,7 @@ interface UsageResponse {
 }
 
 // Map dari feature key (API) ke display label
-// Dead FEATURE_LABELS removed — unused
+// Dead FEATURE_LABELS removed, unused
 
 interface CvItem {
   id: string;
@@ -103,7 +103,7 @@ export default function SettingsBillingPage() {
     const params = new URLSearchParams(window.location.search);
     const plan = params.get("plan");
 
-    // Plan pre-selected from PricingSection — trigger checkout
+    // Plan pre-selected from PricingSection, trigger checkout
     if (plan) {
       if (plan === "single_cv") {
         handleSingleCvClick();
@@ -199,7 +199,7 @@ export default function SettingsBillingPage() {
   return (
     <div className="flex flex-col gap-8">
       {/* Section: Langganan & Penagihan */}
-      <section className="bg-white rounded-2xl shadow-soft border border-outline-variant/30 overflow-hidden">
+      <section className="bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/30 overflow-hidden">
         <div className="px-6 py-5 border-b border-outline-variant/30 flex items-center gap-4">
           <div className="w-10 h-10 rounded-xl bg-primary-fixed flex items-center justify-center text-primary">
             <span className="material-symbols-outlined">credit_card</span>
@@ -434,7 +434,7 @@ export default function SettingsBillingPage() {
       {/* ── Single CV Picker Modal ── */}
       {showCvPicker && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onClick={(e) => { if (e.target === e.currentTarget) setShowCvPicker(false); }}>
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-surface-container-lowest rounded-2xl shadow-xl w-full max-w-md overflow-hidden" onClick={(e) => e.stopPropagation()}>
             <div className="px-6 py-5 border-b border-outline-variant/30 flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-secondary-container/50 flex items-center justify-center text-secondary">
                 <span className="material-symbols-outlined">description</span>
@@ -506,7 +506,7 @@ export default function SettingsBillingPage() {
       )}
 
       {/* How to Pay Info */}
-      <section className="bg-white rounded-2xl shadow-soft border border-outline-variant/30 p-6">
+      <section className="bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/30 p-6">
         <div className="flex items-start gap-4">
           <div className="w-10 h-10 rounded-xl bg-secondary-container/50 flex items-center justify-center text-secondary shrink-0">
             <span className="material-symbols-outlined">info</span>

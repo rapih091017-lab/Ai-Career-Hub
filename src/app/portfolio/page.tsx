@@ -61,7 +61,7 @@ export default function PortfolioPage() {
             </div>
 
             {/* Live URL + Quick Actions */}
-            <div className="bg-white rounded-2xl p-6 shadow-soft border border-outline-variant/30">
+            <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-soft border border-outline-variant/30">
               <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
                 <div className="flex-1 min-w-0">
                   <label className="text-label-bold text-on-surface-variant block mb-1.5">{t("portfolio.url-label")}</label>
@@ -114,7 +114,7 @@ export default function PortfolioPage() {
               </div>
             </div>
 
-            {/* Templates / Theme Picker — real previews */}
+            {/* Templates / Theme Picker, real previews */}
             <motion.section
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -138,7 +138,7 @@ export default function PortfolioPage() {
                         className={`w-full rounded-2xl border-2 overflow-hidden text-left transition-[transform,border-color] theme-card-hover active:scale-[0.98] ${
                           selectedTheme === theme.id
                             ? "border-primary bg-primary-fixed/10"
-                            : "border-outline-variant/30 bg-white hover:border-primary/50"
+                            : "border-outline-variant/30 bg-surface-container-lowest hover:border-primary/50"
                         }`}
                       >
                         {/* Live preview with dummy data */}
@@ -193,7 +193,7 @@ export default function PortfolioPage() {
               </div>
             </motion.section>
 
-            {/* Stats — staggered card entry */}
+            {/* Stats, staggered card entry */}
             <motion.section
               className="grid grid-cols-1 md:grid-cols-4 gap-4"
               initial={{ opacity: 0 }}
@@ -209,7 +209,7 @@ export default function PortfolioPage() {
               ].map((s, i) => (
                 <motion.div
                   key={s.icon}
-                  className="bg-white rounded-2xl p-6 shadow-soft border border-outline-variant/30 hover:shadow-md hover:-translate-y-0.5 transition-[transform,box-shadow] duration-200"
+                  className="bg-surface-container-lowest rounded-2xl p-6 shadow-soft border border-outline-variant/30 hover:shadow-md hover:-translate-y-0.5 transition-[transform,box-shadow] duration-200"
                   initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -224,7 +224,7 @@ export default function PortfolioPage() {
               ))}
             </motion.section>
 
-            {/* CTA — konek ke profile */}
+            {/* CTA, konek ke profile */}
             <section className="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/30 flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <span className={`material-symbols-outlined text-2xl ${profileData ? "text-green-600" : "text-primary"}`} aria-hidden="true">{profileData ? "check_circle" : "info"}</span>
@@ -239,16 +239,16 @@ export default function PortfolioPage() {
               </Link>
             </section>
 
-            {/* CTA — Generate & Deploy */}
+            {/* CTA, Generate & Deploy */}
             <section className="bg-gradient-to-br from-primary via-primary to-secondary rounded-2xl p-8 md:p-12 text-white text-center relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-24 -mt-24 pointer-events-none"></div>
-              <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-2xl -ml-16 -mb-16 pointer-events-none"></div>
+              <div className="absolute top-0 right-0 w-64 h-64 bg-surface-container-lowest/10 rounded-full blur-3xl -mr-24 -mt-24 pointer-events-none"></div>
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-surface-container-lowest/5 rounded-full blur-2xl -ml-16 -mb-16 pointer-events-none"></div>
               <div className="relative z-10">
                 <span className="material-symbols-outlined text-5xl mb-4 opacity-80" aria-hidden="true" style={{ fontVariationSettings: "'FILL' 1" }}>language</span>
                 <h2 className="font-headline-md text-2xl mb-4">{t("portfolio.deploy-title")}</h2>
                 <p className="font-body-md mb-8 opacity-90 max-w-lg mx-auto">{t("portfolio.deploy-desc")}</p>
                 {publishInfo?.published && (
-                  <div className="mb-8 mx-auto max-w-md bg-white/10 backdrop-blur rounded-xl px-4 py-3 flex items-center gap-3">
+                  <div className="mb-8 mx-auto max-w-md bg-surface-container-lowest/10 backdrop-blur rounded-xl px-4 py-3 flex items-center gap-3">
                     <span className="material-symbols-outlined text-green-300 shrink-0" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">check_circle</span>
                     <div className="min-w-0 text-left">
                       <p className="text-[10px] font-semibold uppercase tracking-wider text-white/80">{t("portfolio.publish-link-share")}</p>
@@ -268,7 +268,7 @@ export default function PortfolioPage() {
                           addToast({ type: "success", message: t("publish.copied") });
                         }
                       }}
-                      className="ml-auto shrink-0 px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-xs font-semibold transition-colors"
+                      className="ml-auto shrink-0 px-3 py-1.5 rounded-lg bg-surface-container-lowest/20 hover:bg-surface-container-lowest/30 text-xs font-semibold transition-colors"
                     >
                       {t("publish.copy")}
                     </button>
@@ -277,14 +277,14 @@ export default function PortfolioPage() {
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link
                     href="/portfolio/build"
-                    className="inline-flex items-center gap-2 px-10 py-4 rounded-2xl bg-white text-primary font-bold text-lg hover:shadow-xl hover:scale-105 transition-[transform,box-shadow]"
+                    className="inline-flex items-center gap-2 px-10 py-4 rounded-2xl bg-surface-container-lowest text-primary font-bold text-lg hover:shadow-xl hover:scale-105 transition-[transform,box-shadow]"
                   >
                     <span className="material-symbols-outlined" aria-hidden="true">edit</span>
                     {t("portfolio.create-portfolio")}
                   </Link>
                   <Link
                     href={`/portfolio/preview?template=${selectedTheme}`}
-                    className="inline-flex items-center gap-2 px-10 py-4 rounded-2xl bg-white/20 text-white font-bold text-lg border-2 border-white/30 hover:bg-white/30 hover:scale-105 transition-[transform,background-color]"
+                    className="inline-flex items-center gap-2 px-10 py-4 rounded-2xl bg-surface-container-lowest/20 text-white font-bold text-lg border-2 border-white/30 hover:bg-surface-container-lowest/30 hover:scale-105 transition-[transform,background-color]"
                   >
                     <span className="material-symbols-outlined" aria-hidden="true">preview</span>
                     {t("portfolio.view-preview")}

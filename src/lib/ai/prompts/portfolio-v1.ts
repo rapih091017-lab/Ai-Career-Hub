@@ -22,12 +22,12 @@ ${BOUNDARY}
 ${DELIM.SECTION}
 --- TUGAS UTAMA ---
 Berdasarkan data CV user, buat konten untuk 6 section portfolio:
-1. Hero — Headline, subheadline, CTA
-2. About — Meta description + narasi karir
-3. Experience Highlights — Top 3 pengalaman paling relevan
-4. Skills Display — Primary, secondary, tagline
-5. Contact CTA — Ajakan untuk dihubungi
-6. SEO — Page title & keywords
+1. Hero, Headline, subheadline, CTA
+2. About, Meta description + narasi karir
+3. Experience Highlights, Top 3 pengalaman paling relevan
+4. Skills Display, Primary, secondary, tagline
+5. Contact CTA, Ajakan untuk dihubungi
+6. SEO, Page title & keywords
 ${DELIM.SECTION}
 
 ${COT_TEMPLATE}
@@ -50,7 +50,7 @@ ABOUT:
 
 EXPERIENCE HIGHLIGHTS:
 - Pilih 3 pengalaman PALING RELEVAN dan IMPRESIF
-- Bukan copy paste dari CV — tulis ulang dengan narasi kuat
+- Bukan copy paste dari CV, tulis ulang dengan narasi kuat
 - Headline: 1 kalimat paling impresif dari role ini
 - Impact: 1-2 kalimat dampak konkret dengan angka jika ada
 
@@ -83,13 +83,13 @@ OUTPUT:
 {
   "hero": {
     "headline": "Membangun Frontend yang Cepat, Scalable, & User-Friendly",
-    "subheadline": "Frontend Engineer dengan 3+ tahun pengalaman di React, TypeScript, dan arsitektur modern — siap membawa produk Anda ke level berikutnya.",
+    "subheadline": "Frontend Engineer dengan 3+ tahun pengalaman di React, TypeScript, dan arsitektur modern, siap membawa produk Anda ke level berikutnya.",
     "cta_primary": "Lihat Portfolio",
     "cta_secondary": "Download CV"
   },
   "about": {
     "meta_description": "Frontend Engineer spesialis React & TypeScript. Berpengalaman membangun dashboard real-time dan meningkatkan performa aplikasi hingga 40%.",
-    "paragraph_1": "Halo, saya Andi. Saya seorang Frontend Engineer yang percaya bahwa kode yang baik adalah kode yang tidak terlihat — pengguna tidak perlu memikirkan teknologi di balik layar, yang mereka butuhkan adalah pengalaman yang mulus.",
+    "paragraph_1": "Halo, saya Andi. Saya seorang Frontend Engineer yang percaya bahwa kode yang baik adalah kode yang tidak terlihat, pengguna tidak perlu memikirkan teknologi di balik layar, yang mereka butuhkan adalah pengalaman yang mulus.",
     "paragraph_2": "Dalam 3 tahun terakhir, saya telah berkontribusi di dua perusahaan teknologi, dari startup hingga korporasi. Pencapaian yang paling saya banggakan adalah membangun dashboard analytics real-time yang meningkatkan efisiensi tim operasional hingga 40%.",
     "paragraph_3": "Saat ini saya tertarik pada opportunity yang memungkinkan saya untuk terus berkembang di bidang frontend architecture dan developer experience."
   },
@@ -163,8 +163,8 @@ ${DELIM.SECTION}
 ${DELIM.SECTION}
 
 --- ATURAN TAMBAHAN ---
-1. TONE: Profesional tapi tetap manusiawi dan personal — hindari jargon korporat berlebihan.
-2. JANGAN copy-paste dari CV — tulis ulang dengan narasi yang mengalir.
+1. TONE: Profesional tapi tetap manusiawi dan personal, hindari jargon korporat berlebihan.
+2. JANGAN copy-paste dari CV, tulis ulang dengan narasi yang mengalir.
 3. Headline, subheadline, dan tagline harus UNIK dan MENCERMINKAN individu.
 4. Jika data kurang (nama kosong, tidak ada pengalaman), akui dengan jujur.
 5. Bahasa Indonesia untuk SEMUA konten, kecuali skill names (tetap Inggris).

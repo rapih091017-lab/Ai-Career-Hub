@@ -1,9 +1,9 @@
 /**
- * generate-cv-pdf — Client-side vector PDF generation.
+ * generate-cv-pdf, Client-side vector PDF generation.
  *
  * Uses @react-pdf/renderer to produce a TRUE text PDF (ATS-readable,
  * selectable, crisp at any zoom) entirely in the browser.
- * Auto-download — no print dialog, no server, no cold start, works on
+ * Auto-download, no print dialog, no server, no cold start, works on
  * every Vercel plan.
  *
  * Both modules are dynamic-imported so the main bundle stays lean.
@@ -13,11 +13,11 @@ import type { CvData, SectionKey, TemplateStyle } from "@/components/cv-template
 
 export interface GenerateCvPdfOptions {
   fileName?: string;
-  /** Page margin in mm — matches the builder's margin mode. */
+  /** Page margin in mm, matches the builder's margin mode. */
   marginMm?: number;
   /** Section ordering (already filtered by visibility). */
   sectionOrder?: (SectionKey | string)[];
-  /** Resolved TemplateStyle — mirrors the builder preview exactly. */
+  /** Resolved TemplateStyle, mirrors the builder preview exactly. */
   templateStyle: TemplateStyle;
   showDividers?: boolean;
   headerLayout?: "centered" | "left";

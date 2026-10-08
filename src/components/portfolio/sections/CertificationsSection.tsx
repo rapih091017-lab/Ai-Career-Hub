@@ -6,7 +6,7 @@ import { usePortfolioTheme } from "../PortfolioCanvas";
 
 interface Props { items: CertificationItem[]; }
 
-/* ═══ GLASS — badge grid with glow icons ═══ */
+/* ═══ GLASS, badge grid with glow icons ═══ */
 function GlassCertifications({ items }: { items: CertificationItem[] }) {
   const theme = usePortfolioTheme();
   const filtered = items.filter(c => c.name);
@@ -82,7 +82,7 @@ function GlassCertifications({ items }: { items: CertificationItem[] }) {
   );
 }
 
-/* ═══ BRUTAL — bold bordered cards with stamp ═══ */
+/* ═══ BRUTAL, bold bordered cards with stamp ═══ */
 function BrutalCertifications({ items }: { items: CertificationItem[] }) {
   const theme = usePortfolioTheme();
   const filtered = items.filter(c => c.name);
@@ -149,7 +149,7 @@ function BrutalCertifications({ items }: { items: CertificationItem[] }) {
   );
 }
 
-/* ═══ LUXE — editorial list with serif titles ═══ */
+/* ═══ LUXE, editorial list with serif titles ═══ */
 function LuxeCertifications({ items }: { items: CertificationItem[] }) {
   const theme = usePortfolioTheme();
   const filtered = items.filter(c => c.name);

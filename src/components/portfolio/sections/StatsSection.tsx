@@ -7,7 +7,7 @@ import { usePortfolioTheme } from "../PortfolioCanvas";
 interface Props { data: PortfolioFormData; }
 
 /* ═══════════════════════════════════════════════
- * GLASS — Staggered floating bubbles with
+ * GLASS, Staggered floating bubbles with
  *          connecting gradient lines (NOT grid)
  * ═══════════════════════════════════════════════ */
 function GlassStats({ stats }: { stats: { value: string; label: string; icon: string }[] }) {
@@ -74,7 +74,7 @@ function GlassStats({ stats }: { stats: { value: string; label: string; icon: st
 }
 
 /* ═══════════════════════════════════════════════
- * BRUTAL — Horizontal bar with inline numbers,
+ * BRUTAL, Horizontal bar with inline numbers,
  *          bold accent bar, no cards at all
  * ═══════════════════════════════════════════════ */
 function BrutalStats({ stats }: { stats: { value: string; label: string; icon: string }[] }) {
@@ -89,7 +89,7 @@ function BrutalStats({ stats }: { stats: { value: string; label: string; icon: s
           transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
           className="relative"
         >
-          {/* Horizontal bar — full width with sections */}
+          {/* Horizontal bar, full width with sections */}
           <div className="p-2" style={{ background: theme.colors.border, borderRadius: "100px" }}>
             <div className="flex items-stretch rounded-[calc(100px-4px)] overflow-hidden" style={{ background: theme.colors.bg }}>
               {stats.map((s, i) => (
@@ -121,7 +121,7 @@ function BrutalStats({ stats }: { stats: { value: string; label: string; icon: s
 }
 
 /* ═══════════════════════════════════════════════
- * LUXE — Inline prose stats integrated into
+ * LUXE, Inline prose stats integrated into
  *        the text flow with serif numbers
  * ═══════════════════════════════════════════════ */
 function LuxeStats({ stats }: { stats: { value: string; label: string; icon: string }[] }) {

@@ -142,7 +142,7 @@ export const coverLetters = pgTable("cover_letters", {
   subject: text("subject"),
   letterNumber: text("letter_number"),
   attachment: text("attachment"),
-  /** Sumber info lowongan (mis. LinkedIn, job fair, referensi) — dipakai paragraf pembuka */
+  /** Sumber info lowongan (mis. LinkedIn, job fair, referensi), dipakai paragraf pembuka */
   jobSource: text("job_source"),
   /** Alamat perusahaan tujuan */
   companyAddress: text("company_address"),
@@ -174,9 +174,9 @@ export const payments = pgTable("payments", {
   packageType: varchar("package_type", { length: 50 }).notNull(),
   packageName: varchar("package_name", { length: 255 }),
   amount: integer("amount").notNull(),
-  /** Snapshot limits paket saat dibeli — definisi fitur terkunci, tidak ikut perubahan katalog */
+  /** Snapshot limits paket saat dibeli, definisi fitur terkunci, tidak ikut perubahan katalog */
   limits: jsonb("limits").$type<Record<string, number | "unlimited" | false>>(),
-  /** Redirect URL Snap transaksi — dipakai untuk resume pembayaran pending (anti double-order) */
+  /** Redirect URL Snap transaksi, dipakai untuk resume pembayaran pending (anti double-order) */
   redirectUrl: text("redirect_url"),
   /** Kode referral yang aktif saat order dibuat (atribusi affiliate, cookie 25 hari) */
   referralCode: varchar("referral_code", { length: 30 }),
@@ -229,7 +229,7 @@ export const portfolioPages = pgTable("portfolio_pages", {
 /** Penanda pemakaian trial publish portfolio (1x gratis per akun, permanen).
  * Dipakai supaya unpublish → publish ulang tidak bisa mem-bypass trial.
  * User berbayar (paket portfolio_web / premium / bundle / business) tidak
- * perlu baris ini — entitlement dihitung dari paket aktif. */
+ * perlu baris ini, entitlement dihitung dari paket aktif. */
 export const portfolioTrialUses = pgTable("portfolio_trial_uses", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").notNull().unique().references(() => users.id, { onDelete: "cascade" }),
@@ -259,7 +259,7 @@ export const jobStages = pgTable("job_stages", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   name: varchar("name", { length: 60 }).notNull(),
-  /** Token palet (mis. "teal", "amber"), bukan hex bebas — dipetakan ke
+  /** Token palet (mis. "teal", "amber"), bukan hex bebas, dipetakan ke
    * kelas Tailwind di UI supaya warna tetap konsisten dengan design system. */
   color: varchar("color", { length: 20 }).notNull().default("slate"),
   sortOrder: integer("sort_order").notNull().default(0),
@@ -279,13 +279,13 @@ export const trackedJobs = pgTable("tracked_jobs", {
   location: text("location"),
   /** URL lowongan asli, opsional */
   url: text("url"),
-  /** Requirement/JD — bahan untuk tailoring CV dan checker saat dibutuhkan */
+  /** Requirement/JD, bahan untuk tailoring CV dan checker saat dibutuhkan */
   description: text("description"),
   salaryNote: varchar("salary_note", { length: 120 }),
   notes: text("notes"),
   contactName: varchar("contact_name", { length: 120 }),
   contactInfo: varchar("contact_info", { length: 255 }),
-  /** Tanggal melamar — diisi manual user, bukan otomatis */
+  /** Tanggal melamar, diisi manual user, bukan otomatis */
   appliedAt: timestamp("applied_at", { mode: "date" }),
   /** Urutan kartu di dalam kolomnya (ascending) */
   position: integer("position").notNull().default(0),

@@ -3,7 +3,7 @@
  * Semua user content WAJIB melewati esc() / safeUrl() sebelum masuk ke HTML.
  */
 
-/** Escape HTML entities — wajib untuk semua user content (anti-XSS). */
+/** Escape HTML entities, wajib untuk semua user content (anti-XSS). */
 export function esc(v: unknown): string {
   return String(v ?? "")
     .replace(/&/g, "&amp;")
@@ -13,7 +13,7 @@ export function esc(v: unknown): string {
     .replace(/'/g, "&#39;");
 }
 
-/** Validasi & sanitasi URL — hanya http/https/mailto/tel yang diizinkan, javascript: ditolak. */
+/** Validasi & sanitasi URL, hanya http/https/mailto/tel yang diizinkan, javascript: ditolak. */
 export function safeUrl(v: string): string {
   const t = v.trim();
   if (/^(https?:\/\/|mailto:|tel:)/i.test(t)) return esc(t);

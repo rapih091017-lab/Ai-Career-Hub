@@ -172,7 +172,7 @@ export interface UserAccess {
   /** Premium flag (has any paid active package) */
   isPremium: boolean;
   /** Fitur yang benar-benar diberikan paket berbayar (bukan kuota gratis).
-   * Dipakai untuk gate model AI premium — mis. pembeli portfolio_web TIDAK
+   * Dipakai untuk gate model AI premium, mis. pembeli portfolio_web TIDAK
    * dapat R1 walau free limit cv_analyzer = 2. */
   purchasedFeatures: Record<Feature, number | "unlimited" | false>;
   /** Active packages list */
@@ -199,7 +199,7 @@ export async function getUserAccess(userId: string): Promise<UserAccess> {
 
   const activePackageIds = new Set<string>();
   const merged: Record<Feature, number | "unlimited" | false> = { ...FREE_LIMITS };
-  // Baseline tanpa kuota gratis — hanya fitur yang benar-benar dibeli pengguna.
+  // Baseline tanpa kuota gratis, hanya fitur yang benar-benar dibeli pengguna.
   const purchased: Record<Feature, number | "unlimited" | false> = Object.fromEntries(
     Object.keys(FREE_LIMITS).map((k) => [k, false]),
   ) as Record<Feature, number | "unlimited" | false>;
@@ -210,7 +210,7 @@ export async function getUserAccess(userId: string): Promise<UserAccess> {
     if (!pkg) continue;
     activePackageIds.add(pkg.id);
 
-    // Snapshot limits diambil saat order dibuat — definisi fitur terkunci apa
+    // Snapshot limits diambil saat order dibuat, definisi fitur terkunci apa
     // adanya saat user bayar. Fallback ke katalog saat ini untuk order lama
     // (sebelum fitur snapshot ada).
     const effectiveLimits =

@@ -1,7 +1,7 @@
 import { SECURITY_GUARDRAIL, BOUNDARY, DELIM } from "./shared";
 
 /**
- * PROMPT SURAT v2 — TIGA system prompt terpisah.
+ * PROMPT SURAT v2, TIGA system prompt terpisah.
  *
  * v1 memakai SATU system prompt dengan instruksi bersyarat per gaya, yang
  * rawan "instruksi silang" (model mencampur aturan surat lamaran formal
@@ -14,7 +14,7 @@ import { SECURITY_GUARDRAIL, BOUNDARY, DELIM } from "./shared";
  *
  * Pemilihan prompt dilakukan di route generate berdasarkan `style`.
  *
- * CATATAN GAYA: teks prompt sengaja BEBAS em-dash/en-dash (—/–). Model
+ * CATATAN GAYA: teks prompt sengaja BEBAS em-dash/en-dash (-/–). Model
  * cenderung meniru tanda baca di instruksinya sendiri.
  *
  * Output: TEKS MURNI (bukan JSON). Dipanggil dengan responseFormat: "text".
@@ -47,14 +47,14 @@ export interface CoverLetterInput {
 
 const STYLE_LABEL: Record<string, string> = {
   formal: "Formal (resmi & baku)",
-  formal_lengkap: "Formal Lengkap (kop surat, nomor, lampiran — ditampilkan aplikasi)",
+  formal_lengkap: "Formal Lengkap (kop surat, nomor, lampiran, ditampilkan aplikasi)",
   casual: "Kasual (hangat namun profesional)",
   ats: "ATS-optimized (padat, keyword dari JD)",
   motivation: "Motivation Letter (surat motivasi: beasiswa/program/passion)",
 };
 
 /* ────────────────────────────────────────────────────────────
- * INPUT BUILDER — dipakai semua jenis surat
+ * INPUT BUILDER, dipakai semua jenis surat
  * ──────────────────────────────────────────────────────────── */
 export function buildCoverLetterUserPrompt(input: CoverLetterInput): string {
   const profile = {
@@ -111,7 +111,7 @@ export function buildCoverLetterUserPrompt(input: CoverLetterInput): string {
 }
 
 /* ────────────────────────────────────────────────────────────
- * SYSTEM PROMPT 1 — SURAT LAMARAN KERJA (formal Indonesia)
+ * SYSTEM PROMPT 1, SURAT LAMARAN KERJA (formal Indonesia)
  * ──────────────────────────────────────────────────────────── */
 export const SURAT_LAMARAN_PROMPT = `
 ${SECURITY_GUARDRAIL}
@@ -158,12 +158,12 @@ urut dan lengkap:
 4. Tujuan surat: "Kepada Yth. HRD {{COMPANY_NAME}}{{COMPANY_ADDRESS_LINE}}"
    (alamat perusahaan hanya jika tersedia di data).
 5. Salam pembuka formal ("Dengan hormat,").
-6. Paragraf 1 — pembuka: sumber informasi lowongan ({{JOB_SOURCE}}, mis.
+6. Paragraf 1, pembuka: sumber informasi lowongan ({{JOB_SOURCE}}, mis.
    LinkedIn, job fair, referensi; jika kosong, tulis kalimat umum yang
    wajar) + maksud melamar posisi {{POSITION}}.
-7. Paragraf 2 — data diri singkat: nama, alamat, kontak (telepon/email),
+7. Paragraf 2, data diri singkat: nama, alamat, kontak (telepon/email),
    pendidikan terakhir, dalam format NARATIF (bukan poin-poin).
-8. Paragraf 3 — kesesuaian singkat dengan posisi berdasarkan pengalaman
+8. Paragraf 3, kesesuaian singkat dengan posisi berdasarkan pengalaman
    dan pendidikan (2-3 kalimat saja, JANGAN berlebihan seperti cover letter).
 9. Paragraf penutup: harapan dipertimbangkan + kesediaan wawancara +
    ucapan terima kasih.
@@ -180,7 +180,7 @@ ${DELIM.SECTION}
 3. Gunakan ejaan baku sesuai PUEBI untuk bahasa Indonesia. Bahasa: gunakan
    "saya", formal tapi tidak kaku.
 4. Panjang maksimal 1 halaman (sekitar 300-400 kata untuk versi Indonesia).
-5. DILARANG KERAS em-dash (—) / en-dash (–) di tengah kalimat. Ganti
+5. DILARANG KERAS em-dash (-) / en-dash (–) di tengah kalimat. Ganti
    dengan koma, titik, kata sambung (yang, karena, sehingga, serta), atau
    dua kalimat terpisah. HANYA tanda hubung (-) dalam kata majemuk atau
    rentang angka yang diperbolehkan.
@@ -204,7 +204,7 @@ ${DELIM.INPUT_CLOSE}
 `;
 
 /* ────────────────────────────────────────────────────────────
- * SYSTEM PROMPT 2 — COVER LETTER (English, ATS-optimized)
+ * SYSTEM PROMPT 2, COVER LETTER (English, ATS-optimized)
  * ──────────────────────────────────────────────────────────── */
 export const COVER_LETTER_PROMPT = `
 ${SECURITY_GUARDRAIL}
@@ -234,7 +234,7 @@ ${DELIM.SECTION}
 --- TUGAS ---
 Susun cover letter berbahasa {{LANGUAGE}} dengan struktur:
 1. Salam pembuka profesional ("Dear Hiring Manager," / "Dear [Nama HR]")
-   — tanpa header kontak, karena aplikasi menampilkannya di atas surat.
+  , tanpa header kontak, karena aplikasi menampilkannya di atas surat.
 2. Paragraf hook pembuka (2-3 kalimat): perkenalan singkat + posisi yang
    dituju + SATU pernyataan yang langsung menunjukkan value. HINDARI
    kalimat generik seperti "I am writing to apply for...".
@@ -260,8 +260,8 @@ ${DELIM.SECTION}
    pencapaian secara eksplisit dengan requirement di deskripsi tersebut.
 4. Nada profesional-persuasif, percaya diri, bukan arogan.
 5. Panjang maksimal 1 halaman (sekitar 250-350 kata).
-6. DILARANG KERAS em-dash (—) / en-dash (–) di tengah kalimat.
-7. Jangan menyebut "surat lamaran" atau "application letter" — ini cover
+6. DILARANG KERAS em-dash (-) / en-dash (–) di tengah kalimat.
+7. Jangan menyebut "surat lamaran" atau "application letter", ini cover
    letter.
 ${DELIM.SECTION}
 
@@ -278,7 +278,7 @@ ${DELIM.INPUT_CLOSE}
 `;
 
 /* ────────────────────────────────────────────────────────────
- * SYSTEM PROMPT 3 — MOTIVATION LETTER (naratif personal)
+ * SYSTEM PROMPT 3, MOTIVATION LETTER (naratif personal)
  * ──────────────────────────────────────────────────────────── */
 export const MOTIVATION_LETTER_PROMPT = `
 ${SECURITY_GUARDRAIL}
@@ -302,7 +302,7 @@ Karakteristik motivation letter:
 - Menghubungkan pengalaman masa lalu dengan tujuan masa depan dan dampak
   yang ingin diberikan.
 - Untuk beasiswa, program studi, organisasi non-profit, exchange program
-  — BUKAN lamaran kerja korporat standar.
+ , BUKAN lamaran kerja korporat standar.
 - JANGAN meniru struktur surat lamaran (tanpa baris "Perihal:", tanpa
   daftar kualifikasi kaku).
 ${DELIM.SECTION}
@@ -319,9 +319,9 @@ Susun motivation letter berbahasa {{LANGUAGE}} dengan struktur:
 3. Paragraf isi (2-3 paragraf, bagian terpanjang):
    a. Elaborasi pengalaman & pencapaian relevan dalam bentuk CERITA
       (bukan daftar poin), tunjukkan progres/pembelajaran. JANGAN
-      menduplikasi CV secara verbatim — jelaskan MAKNA di baliknya.
+      menduplikasi CV secara verbatim, jelaskan MAKNA di baliknya.
    b. Hubungkan pengalaman tersebut dengan alasan spesifik memilih program
-      ini — harus terasa personal, bukan generik.
+      ini, harus terasa personal, bukan generik.
 4. Paragraf rencana masa depan: uraikan {{FUTURE_PLAN}} secara konkret
    dan realistis, termasuk dampak jangka panjang yang diharapkan.
 5. Paragraf penutup: pernyataan percaya diri (bukan memohon berlebihan) +
@@ -335,13 +335,13 @@ ${DELIM.SECTION}
 2. JANGAN mengarang pengalaman, prestasi, atau detail institusi yang tidak
    ada di data. Jika informasi institusi/program tidak lengkap, gunakan
    bahasa umum yang aman alih-alih detail spesifik yang berisiko salah.
-3. WAJIB ada elemen storytelling di paragraf isi — bukan daftar pencapaian
+3. WAJIB ada elemen storytelling di paragraf isi, bukan daftar pencapaian
    berurutan.
 4. Nada personal namun tetap profesional, TIDAK kaku seperti surat lamaran.
 5. Hindari klise berlebihan ("saya bermimpi sejak kecil...") kecuali
    didukung data.
 6. Panjang: sekitar 400-600 kata (boleh lebih panjang dari surat lamaran).
-7. DILARANG KERAS em-dash (—) / en-dash (–) di tengah kalimat.
+7. DILARANG KERAS em-dash (-) / en-dash (–) di tengah kalimat.
 ${DELIM.SECTION}
 
 ${BOUNDARY}

@@ -10,7 +10,7 @@ const StringArr = () => z.array(z.string()).catch([]);
 const SEVERITIES = ["critical", "high", "medium", "low"] as const;
 
 /* Issue dengan bukti kutipan (excerpt anchoring) + severity (v4). Backward-compat:
- * AI lama mengirim string polos / { text, source_excerpt } tanpa severity —
+ * AI lama mengirim string polos / { text, source_excerpt } tanpa severity, 
  * union + field optional dipakai agar semua bentuk lolos validasi. */
 const IssueOrString = () =>
   z.union([
@@ -23,7 +23,7 @@ const IssueOrString = () =>
   ]);
 const IssueArr = () => z.array(IssueOrString()).catch([]);
 
-/* Strength dengan excerpt anchoring opsional (v4) — tetap string polos juga diterima. */
+/* Strength dengan excerpt anchoring opsional (v4), tetap string polos juga diterima. */
 const StrengthOrString = () =>
   z.union([
     z.string(),
@@ -34,7 +34,7 @@ const StrengthOrString = () =>
   ]);
 const StrengthArr = () => z.array(StrengthOrString()).catch([]);
 
-/** Bobot per-section (desimal 0-1, mis. 0.20) sesuai role category —
+/** Bobot per-section (desimal 0-1, mis. 0.20) sesuai role category, 
  * dipakai transparansi skor di UI. BUKAN ScoreField karena bobot bukan integer. */
 const WeightField = () => z.number().min(0).max(1).catch(0);
 const ROLE_CATEGORIES = ["tech", "creative", "sales_marketing", "fresh_graduate", "general"] as const;
@@ -55,7 +55,7 @@ const WeightsAppliedSchema = z.object({
 });
 
 export const AnalysisResultSchema = z.object({
-  // ── Meta (v4) — konteks analisis untuk kalibrasi & debugging ──
+  // ── Meta (v4), konteks analisis untuk kalibrasi & debugging ──
   meta: z.object({
     role_category: z.enum(ROLE_CATEGORIES).catch("general"),
     detected_seniority: z.enum(["entry", "mid", "senior", "lead"]).catch("mid"),
@@ -157,7 +157,7 @@ export const AnalysisResultSchema = z.object({
     priority: z.enum(["High", "Medium", "Low"]).catch("Medium"),
   })).catch([]),
 
-  // ── Impact forecast (v4) — proyeksi skor jika saran dieksekusi ──
+  // ── Impact forecast (v4), proyeksi skor jika saran dieksekusi ──
   impact_forecast: z.object({
     current_score: ScoreField(),
     projected_after_quick_wins: ScoreField(),
@@ -212,7 +212,7 @@ const SuggestionItemSchema = z.object({
 
 export const SuggestionResultSchema = z.object({
   suggestions: z.array(SuggestionItemSchema).min(1).max(10),
-  /** Keyword rekomendasi dari target role/JD — dipakai builder untuk keyword chips */
+  /** Keyword rekomendasi dari target role/JD, dipakai builder untuk keyword chips */
   keywords: z.array(z.string()).catch([]),
 });
 

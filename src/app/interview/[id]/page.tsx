@@ -142,7 +142,7 @@ export default function PositionDetailPage() {
                 />
                 <div className="flex items-center gap-3 relative z-10">
                   <motion.div
-                    className="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center"
+                    className="w-9 h-9 rounded-lg bg-surface-container-lowest/20 flex items-center justify-center"
                     animate={{ scale: [1, 1.08, 1] }}
                     transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                   >
@@ -179,7 +179,7 @@ export default function PositionDetailPage() {
                       qFilter === f.slug
                         ? "bg-primary text-on-primary border-primary"
                         : f.slug === "all"
-                          ? "bg-white text-on-surface-variant border-outline-variant/40 hover:border-primary/30"
+                          ? "bg-surface-container-lowest text-on-surface-variant border-outline-variant/40 hover:border-primary/30"
                           : f.color
                     }`}
                   >
@@ -196,7 +196,7 @@ export default function PositionDetailPage() {
                     className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold border transition-all ${
                       sortMode === "category"
                         ? "bg-primary text-on-primary border-primary"
-                        : "bg-white text-on-surface-variant border-outline-variant/40 hover:border-primary/30"
+                        : "bg-surface-container-lowest text-on-surface-variant border-outline-variant/40 hover:border-primary/30"
                     }`}
                     title={sortMode === "category" ? "Urut default" : "Urut berdasarkan kategori"}
                   >
@@ -211,7 +211,7 @@ export default function PositionDetailPage() {
 
             {/* ── Questions List ── */}
             {filteredQuestions.length === 0 ? (
-              <div className="bg-white rounded-2xl py-12 border border-dashed border-outline-variant text-center shadow-premium-sm">
+              <div className="bg-surface-container-lowest rounded-2xl py-12 border border-dashed border-outline-variant text-center shadow-premium-sm">
                 <span className="material-symbols-outlined text-outline text-3xl mb-2 block">filter_none</span>
                 <p className="text-xs text-on-surface-variant">
                   {lang === "en" ? "No questions match this filter" : "Tidak ada pertanyaan dengan filter ini"}
@@ -236,7 +236,7 @@ export default function PositionDetailPage() {
               {prevPosition ? (
                 <motion.button
                   onClick={() => router.push(`/interview/${prevPosition.id}`)}
-                  className="bg-white rounded-xl p-4 border border-outline-variant/30 shadow-premium-sm hover:shadow-premium-md hover:-translate-y-0.5 transition-all text-left group focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                  className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/30 shadow-premium-sm hover:shadow-premium-md hover:-translate-y-0.5 transition-all text-left group focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -255,7 +255,7 @@ export default function PositionDetailPage() {
               {nextPosition ? (
                 <motion.button
                   onClick={() => router.push(`/interview/${nextPosition.id}`)}
-                  className="bg-white rounded-xl p-4 border border-outline-variant/30 shadow-premium-sm hover:shadow-premium-md hover:-translate-y-0.5 transition-all text-right group focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                  className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/30 shadow-premium-sm hover:shadow-premium-md hover:-translate-y-0.5 transition-all text-right group focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -273,7 +273,7 @@ export default function PositionDetailPage() {
             </section>
 
             {/* ── Bottom info ── */}
-            <section className="mt-8 bg-white rounded-2xl p-5 border border-outline-variant/30 shadow-premium-sm">
+            <section className="mt-8 bg-surface-container-lowest rounded-2xl p-5 border border-outline-variant/30 shadow-premium-sm">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-xl bg-secondary-container/50 flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-secondary">lightbulb</span>

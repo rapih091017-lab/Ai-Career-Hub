@@ -31,13 +31,13 @@ const variantStyles: Record<ButtonVariant, string> = {
   emerald:
     "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-premium-md hover:shadow-premium-lg",
   ghost:
-    "bg-white text-on-surface border border-outline-variant/30 shadow-premium-sm hover:shadow-premium-md hover:-translate-y-0.5",
+    "bg-surface-container-lowest text-on-surface border border-outline-variant/30 shadow-premium-sm hover:shadow-premium-md hover:-translate-y-0.5",
   secondary:
     "bg-on-background text-white shadow-premium-md hover:shadow-premium-lg",
 };
 
 /**
- * AnimatedButton — reusable CTA button with optional
+ * AnimatedButton, reusable CTA button with optional
  * shimmer overlay, icon pulse, and arrow bounce animations.
  *
  * Variants:

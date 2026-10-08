@@ -10,7 +10,7 @@ interface CvTemplateCardProps {
 }
 
 /**
- * CvTemplateCard — Mini preview CV template card.
+ * CvTemplateCard, Mini preview CV template card.
  * Shows a miniature A4-like preview with the actual
  * AtsBaseRenderer rendering, scaled down to fit.
  */
@@ -24,7 +24,7 @@ export default function CvTemplateCard({ template, onClick, compact }: CvTemplat
       <div
         className={`
           relative overflow-hidden rounded-2xl border-2 border-outline-variant/40
-          bg-white transition-[transform,box-shadow,border-color] duration-300
+          bg-surface-container-lowest transition-[transform,box-shadow,border-color] duration-300
           ${onClick ? "cursor-pointer hover:-translate-y-1.5 hover:shadow-xl hover:border-gray-400" : ""}
           ${compact ? "p-2" : "p-3"}
         `}
@@ -32,7 +32,7 @@ export default function CvTemplateCard({ template, onClick, compact }: CvTemplat
         {/* Real Rendered Preview */}
         <div
           className={`
-            relative mx-auto rounded-lg overflow-hidden bg-white
+            relative mx-auto rounded-lg overflow-hidden bg-surface-container-lowest
             ${compact ? "h-24 w-full" : "h-36 sm:h-44 w-full"}
           `}
         >

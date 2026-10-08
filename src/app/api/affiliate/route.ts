@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withAuth, apiHandler } from "@/lib/api-utils";
+import { withAuth, apiHandler, errorResponse } from "@/lib/api-utils";
 import { db } from "@/db";
 import { referralClicks, referralConversions } from "@/db/schema";
 import { count, desc, eq, sql } from "drizzle-orm";
 import { applyAffiliate, getAffiliate } from "@/lib/affiliate.server";
+import {
+  bankLabelFromValue,
+  isValidAccountHolder,
+  isValidAccountNumber,
+  isValidBank,
+  normalizeAccountNumber,
+} from "@/lib/affiliate";
 
 /**
  * GET /api/affiliate: status program affiliate milik user.
@@ -73,13 +80,26 @@ export const POST = apiHandler(async (request: NextRequest) => {
   const body = await request.json().catch(() => null);
   const note = typeof body?.note === "string" ? body.note.trim().slice(0, 1000) : null;
 
-  // Data rekening dipakai admin untuk mencairkan komisi; dikirim saat daftar.
+  // Data rekening dipakai admin untuk mencairkan komisi. Validasi ketat di
+  // server: bank harus dari daftar resmi (whitelist), nomor hanya digit
+  // 8-20 karakter, dan nama pemilik hanya huruf/tanda umum.
+  const bankValue = typeof body?.bank === "string" ? body.bank.trim() : "";
+  const accountNumber =
+    typeof body?.bankAccountNumber === "string" ? body.bankAccountNumber : "";
+  const holder = typeof body?.bankAccountHolder === "string" ? body.bankAccountHolder.trim() : "";
+
+  if (!isValidBank(bankValue) || !isValidAccountNumber(accountNumber) || !isValidAccountHolder(holder)) {
+    return errorResponse(
+      "INVALID_BANK",
+      "Data rekening belum valid. Pilih bank dari daftar, isi nomor rekening 8-20 digit, dan nama pemilik sesuai buku tabungan.",
+      400,
+    );
+  }
+
   const bank = {
-    bankName: typeof body?.bankName === "string" ? body.bankName.trim().slice(0, 100) || null : null,
-    bankAccountNumber:
-      typeof body?.bankAccountNumber === "string" ? body.bankAccountNumber.trim().slice(0, 50) || null : null,
-    bankAccountHolder:
-      typeof body?.bankAccountHolder === "string" ? body.bankAccountHolder.trim().slice(0, 150) || null : null,
+    bankName: bankLabelFromValue(bankValue),
+    bankAccountNumber: normalizeAccountNumber(accountNumber),
+    bankAccountHolder: holder,
   };
 
   const affiliate = await applyAffiliate(auth.userId, note, bank);

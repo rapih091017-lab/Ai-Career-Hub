@@ -96,7 +96,7 @@ export default function InterviewPage() {
                     if (e.target.value) setActiveCategory("all");
                   }}
                   placeholder={lang === "en" ? "Search positions or questions..." : "Cari posisi atau pertanyaan..."}
-                  className="w-full pl-10 pr-10 py-3 rounded-xl bg-white border border-outline-variant/50 shadow-premium-sm text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-shadow"
+                  className="w-full pl-10 pr-10 py-3 rounded-xl bg-surface-container-lowest border border-outline-variant/50 shadow-premium-sm text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-shadow"
                 />
                 {search && (
                   <button
@@ -121,7 +121,7 @@ export default function InterviewPage() {
                   className={`shrink-0 px-4 py-2 rounded-xl text-xs font-semibold transition-all border ${
                     activeCategory === "all"
                       ? "bg-primary text-on-primary border-primary shadow-premium-sm"
-                      : "bg-white text-on-surface-variant border-outline-variant/40 hover:border-primary/30 hover:text-primary"
+                      : "bg-surface-container-lowest text-on-surface-variant border-outline-variant/40 hover:border-primary/30 hover:text-primary"
                   }`}
                 >
                   {lang === "en" ? "All Positions" : "Semua Posisi"}
@@ -136,7 +136,7 @@ export default function InterviewPage() {
                     className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-all border ${
                       activeCategory === cat.slug
                         ? "bg-primary text-on-primary border-primary shadow-premium-sm"
-                        : "bg-white text-on-surface-variant border-outline-variant/40 hover:border-primary/30 hover:text-primary"
+                        : "bg-surface-container-lowest text-on-surface-variant border-outline-variant/40 hover:border-primary/30 hover:text-primary"
                     }`}
                   >
                     <span className="material-symbols-outlined text-[14px]">{cat.icon}</span>
@@ -152,7 +152,7 @@ export default function InterviewPage() {
                   className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-all border ${
                     activeCategory === "saved"
                       ? "bg-amber-500 text-white border-amber-500 shadow-premium-sm"
-                      : "bg-white text-on-surface-variant border-outline-variant/40 hover:border-amber-400 hover:text-amber-600"
+                      : "bg-surface-container-lowest text-on-surface-variant border-outline-variant/40 hover:border-amber-400 hover:text-amber-600"
                   }`}
                 >
                   <span
@@ -166,7 +166,7 @@ export default function InterviewPage() {
                     <span
                       className={`ml-0.5 inline-flex items-center justify-center min-w-[18px] h-[18px] rounded-full text-[9px] font-bold px-1 ${
                         activeCategory === "saved"
-                          ? "bg-white/25 text-white"
+                          ? "bg-surface-container-lowest/25 text-white"
                           : "bg-amber-100 text-amber-700"
                       }`}
                     >
@@ -179,7 +179,7 @@ export default function InterviewPage() {
 
             {/* ── Position Grid ── */}
             {positions.length === 0 ? (
-              <div className="bg-white rounded-2xl p-12 border border-dashed border-outline-variant text-center shadow-premium-sm">
+              <div className="bg-surface-container-lowest rounded-2xl p-12 border border-dashed border-outline-variant text-center shadow-premium-sm">
                 <div className="w-14 h-14 rounded-full bg-primary-fixed flex items-center justify-center mx-auto mb-4">
                   <span className="material-symbols-outlined text-primary text-2xl">
                     {activeCategory === "saved" ? "bookmark_border" : "search_off"}
@@ -209,7 +209,7 @@ export default function InterviewPage() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: i * 0.03 }}
                       onClick={() => setSelectedPosition(pos)}
-                      className="bg-white rounded-xl p-4 border border-outline-variant/30 shadow-premium-sm hover:shadow-premium-md hover:-translate-y-0.5 hover:border-primary/30 active:scale-[0.98] transition-all text-left group focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                      className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/30 shadow-premium-sm hover:shadow-premium-md hover:-translate-y-0.5 hover:border-primary/30 active:scale-[0.98] transition-all text-left group focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                     >
                       <div className="flex items-start gap-3 mb-2">
                         <div className="w-9 h-9 rounded-lg bg-primary-fixed flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
@@ -259,7 +259,7 @@ export default function InterviewPage() {
             )}
 
             {/* ── Bottom info ── */}
-            <section className="mt-10 bg-white rounded-2xl p-6 border border-outline-variant/30 shadow-premium-sm">
+            <section className="mt-10 bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30 shadow-premium-sm">
               <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
                 <div className="w-12 h-12 rounded-xl bg-secondary-container/50 flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-secondary">lightbulb</span>

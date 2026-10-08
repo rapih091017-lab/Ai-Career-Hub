@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import { useToast } from "@/components/ui/toast";
 
 /**
- * AI Polish Button — Inline one-click polish
+ * AI Polish Button, Inline one-click polish
  * Klik → polish → apply. Tanpa dialog, tanpa side-by-side.
  * Menerima CV context untuk hasil lebih relevan.
  */

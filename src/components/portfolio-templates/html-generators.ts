@@ -38,7 +38,7 @@ export function generatePortoPremiumHtml(
 
   const expHtml = experiences.filter(e => e.company || e.position).map(e =>
     `<div class="exp-item">
-      <div class="exp-header"><span class="exp-title">${esc(e.position || "Posisi")}</span><span class="exp-date">${esc(e.startDate || "")}${e.startDate && e.endDate ? " — " : ""}${esc(e.endDate || (e.startDate ? "Sekarang" : ""))}</span></div>
+      <div class="exp-header"><span class="exp-title">${esc(e.position || "Posisi")}</span><span class="exp-date">${esc(e.startDate || "")}${e.startDate && e.endDate ? ", " : ""}${esc(e.endDate || (e.startDate ? "Sekarang" : ""))}</span></div>
       <div class="exp-company">${esc(e.company || "")}</div>
       ${e.description ? `<p class="exp-desc">${esc(e.description)}</p>` : ""}
     </div>`
@@ -46,7 +46,7 @@ export function generatePortoPremiumHtml(
 
   const eduHtml = educations.filter(e => e.institution || e.degree).map(e =>
     `<div class="exp-item">
-      <div class="exp-header"><span class="exp-title">${esc(e.degree || "Gelar")}</span><span class="exp-date">${esc(e.startDate || "")}${e.startDate && e.endDate ? " — " : ""}${esc(e.endDate || "")}</span></div>
+      <div class="exp-header"><span class="exp-title">${esc(e.degree || "Gelar")}</span><span class="exp-date">${esc(e.startDate || "")}${e.startDate && e.endDate ? ", " : ""}${esc(e.endDate || "")}</span></div>
       <div class="exp-company">${esc(e.institution || "")}</div>
       ${e.field ? `<p class="exp-desc">${esc(e.field)}</p>` : ""}
     </div>`
@@ -77,7 +77,7 @@ export function generatePortoPremiumHtml(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${name} — Portfolio</title>
+  <title>${name}, Portfolio</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -275,7 +275,7 @@ export function generateColorfulHtml(
 
   const expHtml = experiences.filter(e => e.company || e.position).map(e =>
     `<div class="exp-item">
-      <div class="exp-header"><span class="exp-title">${esc(e.position || "Posisi")}</span><span class="exp-date">${esc(e.startDate || "")}${e.startDate && e.endDate ? " — " : ""}${esc(e.endDate || (e.startDate ? "Sekarang" : ""))}</span></div>
+      <div class="exp-header"><span class="exp-title">${esc(e.position || "Posisi")}</span><span class="exp-date">${esc(e.startDate || "")}${e.startDate && e.endDate ? ", " : ""}${esc(e.endDate || (e.startDate ? "Sekarang" : ""))}</span></div>
       <div class="exp-company">${esc(e.company || "")}</div>
       ${e.description ? `<p class="exp-desc">${esc(e.description)}</p>` : ""}
     </div>`
@@ -283,7 +283,7 @@ export function generateColorfulHtml(
 
   const eduHtml = educations.filter(e => e.institution || e.degree).map(e =>
     `<div class="exp-item">
-      <div class="exp-header"><span class="exp-title">${esc(e.degree || "Gelar")}</span><span class="exp-date">${esc(e.startDate || "")}${e.startDate && e.endDate ? " — " : ""}${esc(e.endDate || "")}</span></div>
+      <div class="exp-header"><span class="exp-title">${esc(e.degree || "Gelar")}</span><span class="exp-date">${esc(e.startDate || "")}${e.startDate && e.endDate ? ", " : ""}${esc(e.endDate || "")}</span></div>
       <div class="exp-company">${esc(e.institution || "")}${e.field ? ` &middot; ${esc(e.field)}` : ""}</div>
     </div>`
   ).join("") || "";
@@ -313,7 +313,7 @@ export function generateColorfulHtml(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${name} — Portfolio</title>
+  <title>${name}, Portfolio</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -528,7 +528,7 @@ export function generateModernHtml(
 
   const expHtml = experiences.filter(e => e.company || e.position).map(e =>
     `<div class="list-item">
-      <div class="list-header"><span class="list-title">${esc(e.position || "Posisi")}</span><span class="list-date">${esc(e.startDate || "")}${e.startDate && e.endDate ? " — " : ""}${esc(e.endDate || (e.startDate ? "Sekarang" : ""))}</span></div>
+      <div class="list-header"><span class="list-title">${esc(e.position || "Posisi")}</span><span class="list-date">${esc(e.startDate || "")}${e.startDate && e.endDate ? ", " : ""}${esc(e.endDate || (e.startDate ? "Sekarang" : ""))}</span></div>
       <div class="list-sub">${esc(e.company || "")}</div>
       ${e.description ? `<p class="list-desc">${esc(e.description)}</p>` : ""}
     </div>`
@@ -536,7 +536,7 @@ export function generateModernHtml(
 
   const eduHtml = educations.filter(e => e.institution || e.degree).map(e =>
     `<div class="list-item">
-      <div class="list-header"><span class="list-title">${esc(e.degree || "Gelar")}</span><span class="list-date">${esc(e.startDate || "")}${e.startDate && e.endDate ? " — " : ""}${esc(e.endDate || "")}</span></div>
+      <div class="list-header"><span class="list-title">${esc(e.degree || "Gelar")}</span><span class="list-date">${esc(e.startDate || "")}${e.startDate && e.endDate ? ", " : ""}${esc(e.endDate || "")}</span></div>
       <div class="list-sub">${esc(e.institution || "")}</div>
       ${e.field ? `<p class="list-desc">${esc(e.field)}</p>` : ""}
     </div>`
@@ -567,7 +567,7 @@ export function generateModernHtml(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${name} — Portfolio</title>
+  <title>${name}, Portfolio</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif; background: #FBF8FE; color: #1B1B1F; line-height: 1.6; }

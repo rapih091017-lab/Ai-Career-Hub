@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * AiLoadingOverlay — animated shimmer overlay shown on textarea/card
+ * AiLoadingOverlay, animated shimmer overlay shown on textarea/card
  * while AI is processing. Reusable across SummarySection and WorkCard.
  * Parent controls visibility with AnimatePresence.
  */

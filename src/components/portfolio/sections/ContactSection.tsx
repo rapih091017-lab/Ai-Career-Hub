@@ -25,7 +25,7 @@ function ContactButton({ href, label }: { href: string; label: string }) {
 }
 
 /* ═══════════════════════════════════════════════
- * GLASS — CTA button array with glass cards,
+ * GLASS, CTA button array with glass cards,
  *          contact info pills, social grid
  * ═══════════════════════════════════════════════ */
 function GlassContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: ExtraLink[] }) {
@@ -55,7 +55,7 @@ function GlassContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: Ext
                 Punya ide menarik atau butuh bantuan? Jangan ragu untuk menghubungi saya.
               </p>
 
-              {/* Contact method pills — inline, not wrapped */}
+              {/* Contact method pills, inline, not wrapped */}
               <div className="flex flex-wrap justify-center gap-3 mb-6">
                 {f.contactEmail && <ContactButton href={`mailto:${f.contactEmail}`} label="Email" />}
                 {f.contactLinkedin && <ContactButton href={`https://${f.contactLinkedin.replace(/^https?:\/\//, "")}`} label="LinkedIn" />}
@@ -83,7 +83,7 @@ function GlassContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: Ext
 }
 
 /* ═══════════════════════════════════════════════
- * BRUTAL — Full-width bold background block,
+ * BRUTAL, Full-width bold background block,
  *          inline CTAs with shadow box
  * ═══════════════════════════════════════════════ */
 function BrutalContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: ExtraLink[] }) {
@@ -130,7 +130,7 @@ function BrutalContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: Ex
 }
 
 /* ═══════════════════════════════════════════════
- * LUXE — Elegant centered call-to-action with
+ * LUXE, Elegant centered call-to-action with
  *        subtle decorative elements and serif
  * ═══════════════════════════════════════════════ */
 function LuxeContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: ExtraLink[] }) {

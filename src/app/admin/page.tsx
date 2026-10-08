@@ -211,8 +211,27 @@ export default function AdminDashboardPage() {
     }
     if (sessionStatus === "loading") return;
 
-    fetchStats();
-    fetchPackages();
+    // Dashboard ini hanya untuk akun admin. Endpoint admin tetap punya guard
+    // sendiri; pemeriksaan ini menjaga tampilan tidak muncul untuk user biasa.
+    let active = true;
+    fetch("/api/me/role")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (!active) return;
+        if (!data?.isAdmin) {
+          addToast({ type: "error", message: "Halaman ini khusus admin." });
+          router.push("/dashboard");
+          return;
+        }
+        fetchStats();
+        fetchPackages();
+      })
+      .catch(() => {
+        if (active) router.push("/dashboard");
+      });
+    return () => {
+      active = false;
+    };
   }, [sessionStatus, session]);
 
   /* ── Fetch Stats ── */
@@ -364,7 +383,7 @@ export default function AdminDashboardPage() {
               </button>
 
               {exportOpen && (
-                <div className="absolute right-0 top-full mt-1 z-50 min-w-[180px] bg-white rounded-xl shadow-premium-md border border-outline-variant/30 overflow-hidden">
+                <div className="absolute right-0 top-full mt-1 z-50 min-w-[180px] bg-surface-container-lowest rounded-xl shadow-premium-md border border-outline-variant/30 overflow-hidden">
                   {[
                     { type: "revenue", label: "Revenue CSV", icon: "payments" },
                     { type: "users", label: "Users CSV", icon: "group" },
@@ -384,6 +403,9 @@ export default function AdminDashboardPage() {
               )}
             </div>
 
+            <span className="hidden text-xs text-on-surface-variant md:inline">
+              Masuk sebagai {session?.user?.email ?? session?.user?.name}
+            </span>
             <button
               onClick={() => router.push("/admin/jobs")}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline-variant text-xs font-medium text-on-surface hover:bg-surface-container transition-all"
@@ -440,7 +462,7 @@ export default function AdminDashboardPage() {
               onClick={() => setActiveTab(tab)}
               className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${
                 activeTab === tab
-                  ? "bg-white text-primary shadow-sm"
+                  ? "bg-surface-container-lowest text-primary shadow-sm"
                   : "text-on-surface-variant hover:text-on-surface"
               }`}
             >
@@ -459,7 +481,7 @@ export default function AdminDashboardPage() {
             {statsLoading ? (
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="bg-white rounded-2xl p-5 shadow-soft border border-outline-variant/30 animate-pulse">
+                  <div key={i} className="bg-surface-container-lowest rounded-2xl p-5 shadow-soft border border-outline-variant/30 animate-pulse">
                     <div className="h-3 bg-surface-container-high rounded w-16 mb-3" />
                     <div className="h-7 bg-surface-container-high rounded w-20 mb-2" />
                     <div className="h-2.5 bg-surface-container-high rounded w-12" />
@@ -518,7 +540,7 @@ export default function AdminDashboardPage() {
                 </div>
 
                 {/* ── Trends Chart ── */}
-                <div className="bg-white rounded-2xl p-6 shadow-soft border border-outline-variant/30">
+                <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-soft border border-outline-variant/30">
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-2">
                       <span className="material-symbols-outlined text-primary text-lg">trending_up</span>
@@ -581,7 +603,7 @@ export default function AdminDashboardPage() {
                 {/* ── Bottom Grid ── */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Package Sales */}
-                  <div className="bg-white rounded-2xl p-6 shadow-soft border border-outline-variant/30">
+                  <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-soft border border-outline-variant/30">
                     <div className="flex items-center gap-2 mb-4">
                       <span className="material-symbols-outlined text-primary text-lg">shopping_bag</span>
                       <h2 className="font-label-bold text-on-surface">Penjualan Package</h2>
@@ -620,7 +642,7 @@ export default function AdminDashboardPage() {
                   </div>
 
                   {/* Recent Transactions */}
-                  <div className="bg-white rounded-2xl p-6 shadow-soft border border-outline-variant/30">
+                  <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-soft border border-outline-variant/30">
                     <div className="flex items-center gap-2 mb-4">
                       <span className="material-symbols-outlined text-primary text-lg">receipt_long</span>
                       <h2 className="font-label-bold text-on-surface">Transaksi Terbaru</h2>
@@ -659,7 +681,7 @@ export default function AdminDashboardPage() {
                 </div>
 
                 {/* ── Recent Users ── */}
-                <div className="bg-white rounded-2xl p-6 shadow-soft border border-outline-variant/30">
+                <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-soft border border-outline-variant/30">
                   <div className="flex items-center gap-2 mb-4">
                     <span className="material-symbols-outlined text-primary text-lg">group</span>
                     <h2 className="font-label-bold text-on-surface">User Terbaru</h2>
@@ -785,7 +807,7 @@ export default function AdminDashboardPage() {
                 <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
               </div>
             ) : !pkgError && (
-              <div className="bg-white rounded-2xl shadow-soft border border-outline-variant/30 overflow-hidden">
+              <div className="bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/30 overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
                     <thead>
@@ -965,7 +987,7 @@ function StatCard({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="bg-white rounded-2xl p-5 shadow-soft border border-outline-variant/30 hover:shadow-premium-md hover:-translate-y-0.5 transition-all duration-300"
+      className="bg-surface-container-lowest rounded-2xl p-5 shadow-soft border border-outline-variant/30 hover:shadow-premium-md hover:-translate-y-0.5 transition-all duration-300"
     >
       <div className={`w-9 h-9 rounded-xl ${iconBg} flex items-center justify-center mb-3`}>
         <span className={`material-symbols-outlined text-lg ${iconColor}`} style={{ fontVariationSettings: "'FILL' 1" }}>

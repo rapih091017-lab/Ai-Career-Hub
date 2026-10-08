@@ -23,7 +23,7 @@ export function SectionScoreCard({ title, score, issues, suggestions, delay, sta
 
   return (
     <motion.div
-      className="bg-white rounded-xl border border-surface-container-high shadow-premium-sm overflow-hidden"
+      className="bg-surface-container-lowest rounded-xl border border-surface-container-high shadow-premium-sm overflow-hidden"
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay }}

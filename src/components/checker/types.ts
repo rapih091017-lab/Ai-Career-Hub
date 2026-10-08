@@ -34,7 +34,7 @@ export function toIssueItems(v: unknown): IssueItem[] {
     .filter((x): x is IssueItem => x !== null);
 }
 
-/* ── Severity badge (v4) — warna & label netral bahasa (label via i18n) ── */
+/* ── Severity badge (v4), warna & label netral bahasa (label via i18n) ── */
 export function severityMeta(sev?: IssueItem["severity"], tFn?: (k: string) => string) {
   const t2 = tFn || ((k: string) => k);
   switch (sev) {
@@ -81,7 +81,7 @@ export interface SkillsSection extends BreakdownSection {
 }
 
 export interface ExperienceSection extends BreakdownSection {
-  /** v4 — persentase bullet experience yang punya metrik/angka (0-100) */
+  /** v4, persentase bullet experience yang punya metrik/angka (0-100) */
   quantification_pct?: number;
 }
 
@@ -118,7 +118,7 @@ export interface ActionPlan {
   long_term: string[];
 }
 
-/** v4 — proyeksi skor jika saran dieksekusi (monoton, dari AI) */
+/** v4, proyeksi skor jika saran dieksekusi (monoton, dari AI) */
 export interface ImpactForecast {
   current_score: number;
   projected_after_quick_wins: number;
@@ -128,7 +128,7 @@ export interface ImpactForecast {
 export interface BulletItem {
   section: string;
   original_text: string;
-  /** Skor CARI (Context-Action-Result-Impact) 0-100 dari AI — belum tentu ada di hasil lama */
+  /** Skor CARI (Context-Action-Result-Impact) 0-100 dari AI, belum tentu ada di hasil lama */
   cari_score?: number;
   issues: (string | IssueItem)[];
   suggested_rewrite: string;
@@ -172,9 +172,9 @@ export interface AnalysisResult {
   actionPlan?: ActionPlan | null;
   bulletReview?: BulletItem[];
   missingSections?: string[];
-  /** Bobot per-section yang dipakai AI — tampilkan sebagai tooltip skor */
+  /** Bobot per-section yang dipakai AI, tampilkan sebagai tooltip skor */
   weightsApplied?: WeightsApplied | null;
-  /** v4 — proyeksi skor setelah perbaikan (motivasi user) */
+  /** v4, proyeksi skor setelah perbaikan (motivasi user) */
   impactForecast?: ImpactForecast | null;
   /** Model AI yang dipakai analisis: "V4 Pro" (deepseek-v4-pro, premium) atau "V4 Flash" (deepseek-v4-flash) */
   aiModel?: "V4 Pro" | "V4 Flash";

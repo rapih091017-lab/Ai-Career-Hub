@@ -6,7 +6,7 @@ import { useTranslation } from "@/lib/i18n";
 import type { ActionPlan, KeywordAnalysis } from "./types";
 
 /**
- * ImprovementChecklist — mengubah rekomendasi analisis CV menjadi langkah
+ * ImprovementChecklist, mengubah rekomendasi analisis CV menjadi langkah
  * perbaikan yang bisa ditandai satu per satu (checklist interaktif).
  *
  * Input: actionPlan (quick_wins/short_term/long_term), missingSections,
@@ -73,7 +73,7 @@ export function ImprovementChecklist({ actionPlan, missingSections, keywordAnaly
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // clipboard unavailable — fallback diam
+      // clipboard unavailable, fallback diam
     }
   }, [items, t]);
 
@@ -81,7 +81,7 @@ export function ImprovementChecklist({ actionPlan, missingSections, keywordAnaly
 
   return (
     <motion.section
-      className="bg-white rounded-2xl border border-surface-container-high shadow-premium-md p-6 space-y-5"
+      className="bg-surface-container-lowest rounded-2xl border border-surface-container-high shadow-premium-md p-6 space-y-5"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.42 }}
@@ -146,7 +146,7 @@ export function ImprovementChecklist({ actionPlan, missingSections, keywordAnaly
                           className={`shrink-0 w-5 h-5 mt-0.5 rounded-md border-2 flex items-center justify-center transition-all ${
                             isChecked
                               ? "bg-green-500 border-green-500 text-white"
-                              : "border-outline-variant bg-white"
+                              : "border-outline-variant bg-surface-container-lowest"
                           }`}
                         >
                           {isChecked && (

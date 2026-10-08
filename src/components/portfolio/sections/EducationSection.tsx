@@ -7,7 +7,7 @@ import { usePortfolioTheme } from "../PortfolioCanvas";
 interface Props { items: EducationItem[]; }
 
 /* ═══════════════════════════════════════════════
- * GLASS — Asymmetrical bento masonry with
+ * GLASS, Asymmetrical bento masonry with
  *          varying card sizes (1/2 + 1/3 + 2/3)
  * ═══════════════════════════════════════════════ */
 function GlassEducation({ items }: { items: EducationItem[] }) {
@@ -29,7 +29,7 @@ function GlassEducation({ items }: { items: EducationItem[] }) {
           </h2>
         </motion.div>
 
-        {/* Bento masonry — first item wide, rest in 2-col sub-grid */}
+        {/* Bento masonry, first item wide, rest in 2-col sub-grid */}
         <div className="space-y-4">
           {filtered.map((edu, i) => (
               <motion.div
@@ -65,7 +65,7 @@ function GlassEducation({ items }: { items: EducationItem[] }) {
                             {edu.degree || "Gelar"}
                           </h3>
                           <span className="text-[11px] font-medium flex-shrink-0" style={{ color: theme.colors.accent }}>
-                            {edu.startDate}{edu.startDate ? " — " : ""}{edu.isPresent ? "Sekarang" : edu.endDate || ""}
+                            {edu.startDate}{edu.startDate ? ", " : ""}{edu.isPresent ? "Sekarang" : edu.endDate || ""}
                           </span>
                         </div>
                         <p className="text-sm font-medium mt-0.5" style={{ color: theme.colors.primary }}>
@@ -89,7 +89,7 @@ function GlassEducation({ items }: { items: EducationItem[] }) {
 }
 
 /* ═══════════════════════════════════════════════
- * BRUTAL — Vertical stepper with bold date
+ * BRUTAL, Vertical stepper with bold date
  *          badges, number markers, corner shadows
  * ═══════════════════════════════════════════════ */
 function BrutalEducation({ items }: { items: EducationItem[] }) {
@@ -148,7 +148,7 @@ function BrutalEducation({ items }: { items: EducationItem[] }) {
                         {edu.degree || "Gelar"}
                       </h3>
                       <span className="text-[11px] font-bold px-2 py-0.5" style={{ background: theme.colors.accent, color: "#1A1A1A" }}>
-                        {edu.startDate}{edu.startDate ? " — " : ""}{edu.isPresent ? "Sekarang" : edu.endDate || ""}
+                        {edu.startDate}{edu.startDate ? ", " : ""}{edu.isPresent ? "Sekarang" : edu.endDate || ""}
                       </span>
                     </div>
                     <p className="text-sm font-semibold mb-1" style={{ color: theme.colors.primary }}>
@@ -171,7 +171,7 @@ function BrutalEducation({ items }: { items: EducationItem[] }) {
 }
 
 /* ═══════════════════════════════════════════════
- * LUXE — Gallery-style with year markers,
+ * LUXE, Gallery-style with year markers,
  *        elegant serif, decorative timeline dots
  * ═══════════════════════════════════════════════ */
 function LuxeEducation({ items }: { items: EducationItem[] }) {
@@ -222,7 +222,7 @@ function LuxeEducation({ items }: { items: EducationItem[] }) {
                 {/* Year as badge */}
                 <span className="inline-block text-[11px] font-medium px-3 py-0.5 rounded-full mb-2"
                   style={{ background: `${theme.colors.primary}0A`, color: theme.colors.primary, border: `1px solid ${theme.colors.border}` }}>
-                  {edu.startDate || "—"} {edu.endDate ? `– ${edu.endDate}` : edu.isPresent ? "– Present" : ""}
+                  {edu.startDate || "-"} {edu.endDate ? `– ${edu.endDate}` : edu.isPresent ? "– Present" : ""}
                 </span>
 
                 <div className="p-1" style={{ background: theme.colors.bgSecondary, borderRadius: "1.5rem", border: `1px solid ${theme.colors.border}` }}>

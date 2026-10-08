@@ -108,7 +108,7 @@ export default function KarirPage() {
             <span className="material-symbols-outlined text-lg">arrow_back</span>
             {t("karir.back-home")}
           </Link>
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/15 rounded-full text-xs font-bold tracking-wider mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-surface-container-lowest/15 rounded-full text-xs font-bold tracking-wider mb-6">
             <span className={`w-2 h-2 rounded-full ${hasJobs ? "bg-emerald-400" : "bg-emerald-400 animate-pulse"}`} />
             {hasJobs ? t("karir.badge-open") : t("karir.soon")}
           </div>
@@ -119,14 +119,14 @@ export default function KarirPage() {
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/builder/new"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white text-primary font-bold rounded-xl hover:bg-white/90 active:scale-[0.97] transition-all shadow-lg"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-surface-container-lowest text-primary font-bold rounded-xl hover:bg-surface-container-lowest/90 active:scale-[0.97] transition-all shadow-lg"
             >
               <span className="material-symbols-outlined text-lg">edit_note</span>
               {t("karir.prepare-cv")}
             </Link>
             <Link
               href="/interview"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white/15 text-white font-bold rounded-xl hover:bg-white/25 active:scale-[0.97] transition-all border border-white/20"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-surface-container-lowest/15 text-white font-bold rounded-xl hover:bg-surface-container-lowest/25 active:scale-[0.97] transition-all border border-white/20"
             >
               <span className="material-symbols-outlined text-lg">record_voice_over</span>
               {t("karir.interview-practice")}
@@ -151,7 +151,7 @@ export default function KarirPage() {
               {jobs.map((job) => (
                 <article
                   key={job.id}
-                  className="flex flex-col gap-3 rounded-2xl border border-outline-variant/40 bg-white p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+                  className="flex flex-col gap-3 rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
                 >
                   <div className="flex items-start gap-4">
                     {job.imageUrl ? (

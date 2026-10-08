@@ -6,13 +6,13 @@ import { z } from "zod";
 export const runtime = "edge";
 
 /**
- * AI Grammar Check API — Endpoint untuk memeriksa ejaan dan tanda baca pada CV
+ * AI Grammar Check API, Endpoint untuk memeriksa ejaan dan tanda baca pada CV
  * Mengembalikan structured JSON untuk inline error highlighting
  */
 
 // Schema untuk validasi response grammar check
 // Semua field dibuat toleran dengan .catch() supaya satu field null/aneh
-// tidak menggagalkan seluruh hasil — AI sering mengirim "position": null
+// tidak menggagalkan seluruh hasil, AI sering mengirim "position": null
 const GrammarErrorSchema = z.object({
   context: z.string().catch(""),
   text: z.string().catch(""),
@@ -34,14 +34,14 @@ ${SECURITY_GUARDRAIL}
 
 --- PERAN ---
 Anda adalah Asisten Koreksi CV profesional. Tugas Anda HANYA menemukan:
-1. ✅ Typo (salah ketik) — contoh: "sebgai" seharusnya "sebagai"
-2. ✅ Error tanda baca serius — hanya yang duplikat (seperti ",," atau "..") atau posisi salah
+1. ✅ Typo (salah ketik), contoh: "sebgai" seharusnya "sebagai"
+2. ✅ Error tanda baca serius, hanya yang duplikat (seperti ",," atau "..") atau posisi salah
 
 --- STRICT DILARANG ---
 1. ❌ DILARANG memberi saran gaya, nada, optimasi, atau rewrite
-2. ❌ DILARANG report "tidak ada error" — jika bersih, array errors harus KOSONG
+2. ❌ DILARANG report "tidak ada error", jika bersih, array errors harus KOSONG
 3. ❌ DILARANG over-correct istilah teknis kecuali sangat yakin itu typo
-4. ❌ DILARANG melaporkan penggunaan campuran bahasa sebagai error — DIIZINKAN di CV teknologi
+4. ❌ DILARANG melaporkan penggunaan campuran bahasa sebagai error, DIIZINKAN di CV teknologi
 5. ❌ DILARANG melaporkan spasi antara karakter sebagai error
 
 --- EXCEPTIONS (JANGAN REPORT) ---
@@ -74,7 +74,7 @@ Anda adalah Asisten Koreksi CV profesional. Tugas Anda HANYA menemukan:
 }
 
 --- ATURAN OUTPUT ---
-1. Kembalikan HANYA JSON yang valid — tanpa markdown, tanpa backticks
+1. Kembalikan HANYA JSON yang valid, tanpa markdown, tanpa backticks
 2. Jika tidak ada error, kembalikan { "errors": [], "totalErrors": 0, "summary": "Tidak ditemukan error" }
 3. Pastikan "text" adalah potongan teks yang BENAR-BENAR ADA di input
 4. "suggestion" harus berisi perbaikan yang lebih baik
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
       detectedLanguage = hasIndonesian ? "id" : "en";
     }
 
-    // Panggil AI — tanpa taskType, kita handle validasi sendiri
+    // Panggil AI, tanpa taskType, kita handle validasi sendiri
     const aiResponse = await callAI<unknown>({
       systemPrompt: GRAMMAR_CHECK_SYSTEM_PROMPT,
       userPrompt: content,

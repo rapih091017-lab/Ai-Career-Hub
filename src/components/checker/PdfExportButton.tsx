@@ -45,12 +45,12 @@ export function PdfExportButton({
     setIsFallback(false);
 
     try {
-      // Primary: html2canvas — auto-download, no dialog
+      // Primary: html2canvas, auto-download, no dialog
       await exportElementToPdf(targetRef.current, fileName);
     } catch (err) {
       console.warn("[pdf] html2canvas failed, trying A4 fallback:", err);
       try {
-        // Fallback: html2canvas multi-page A4 — tetap auto-download, no dialog
+        // Fallback: html2canvas multi-page A4, tetap auto-download, no dialog
         setIsFallback(true);
         await exportPreviewToPdf(targetRef.current, fileName);
         // Reset fallback label after 3s

@@ -10,7 +10,7 @@ export const maxDuration = 60;
  * POST /api/export-pdf-v2
  *
  * Server-side PDF generation via headless Chromium (puppeteer-core +
- * @sparticuz/chromium) — jalan LANGSUNG di Vercel serverless,
+ * @sparticuz/chromium), jalan LANGSUNG di Vercel serverless,
  * tanpa server Puppeteer terpisah (Railway).
  *
  * - Free users: checked against pdf_export quota (2x/bln)
@@ -102,7 +102,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
         },
       });
     } finally {
-      // Selalu tutup browser — di serverless instance menggantung = memori bocor
+      // Selalu tutup browser, di serverless instance menggantung = memori bocor
       await browser.close().catch(() => {});
     }
   } catch (error) {

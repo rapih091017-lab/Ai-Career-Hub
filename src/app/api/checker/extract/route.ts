@@ -366,7 +366,7 @@ export async function POST(request: Request) {
         );
       }
 
-      // Scanned / no text — give actionable error
+      // Scanned / no text, give actionable error
       if (result1.errorType === "SCANNED") {
         return buildErrorResponse(
           "SCANNED_PDF",
@@ -385,7 +385,7 @@ export async function POST(request: Request) {
         );
       }
 
-      // Corrupted / Unknown — selalu tawarkan OCR browser (renders halaman
+      // Corrupted / Unknown, selalu tawarkan OCR browser (renders halaman
       // di browser lalu OCR server-side, jadi bisa membaca scanned PDF yang
       // gagal diekstrak server). Jangan biarkan user mentok.
       const isCorrupt = result1.errorType === "CORRUPT";

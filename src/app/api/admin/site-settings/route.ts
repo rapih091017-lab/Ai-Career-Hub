@@ -14,7 +14,7 @@ export const GET = apiHandler(async () => {
 });
 
 /** PUT /api/admin/site-settings: simpan perubahan pengaturan.
- * Body: { settings: Record<string, string> } — hanya kunci yang dikenal. */
+ * Body: { settings: Record<string, string> }, hanya kunci yang dikenal. */
 export const PUT = apiHandler(async (request: NextRequest) => {
   const auth = await withAdmin();
   if (auth instanceof NextResponse) return auth;

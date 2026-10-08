@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     // datang terlambat setelah "settlement").
     if (payment.paymentStatus === "success") {
       console.log(
-        `Midtrans: Order ${order_id} already success — ignoring duplicate notification (${transaction_status})`,
+        `Midtrans: Order ${order_id} already success, ignoring duplicate notification (${transaction_status})`,
       );
       return NextResponse.json({ status: "OK", ignored: true });
     }

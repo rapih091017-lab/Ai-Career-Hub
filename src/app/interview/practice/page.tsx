@@ -143,7 +143,7 @@ function SetupScreen({
             const catSelected = positions.every((p) => selectedPositions.has(p.id));
 
             return (
-              <div key={cat.slug} className="bg-white rounded-xl border border-outline-variant/30 shadow-premium-sm overflow-hidden">
+              <div key={cat.slug} className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-premium-sm overflow-hidden">
                 <button
                   onClick={() => {
                     // Toggle all positions in this category
@@ -186,7 +186,7 @@ function SetupScreen({
                       className={`flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-[10px] font-semibold border transition-all text-left ${
                         selectedPositions.has(pos.id)
                           ? "bg-primary text-on-primary border-primary"
-                          : "bg-white text-on-surface-variant border-outline-variant/40 hover:border-primary/30"
+                          : "bg-surface-container-lowest text-on-surface-variant border-outline-variant/40 hover:border-primary/30"
                       }`}
                     >
                       <span className="material-symbols-outlined text-[11px] shrink-0">{pos.icon}</span>
@@ -242,7 +242,7 @@ function SetupScreen({
                 className={`px-3 py-1.5 rounded-lg text-[10px] font-semibold border transition-all flex items-center gap-1 ${
                   selectedDifficulties.has(d.slug)
                     ? "bg-primary text-on-primary border-primary"
-                    : "bg-white text-on-surface-variant border-outline-variant/40 hover:border-primary/30"
+                    : "bg-surface-container-lowest text-on-surface-variant border-outline-variant/40 hover:border-primary/30"
                 }`}
               >
                 {d.icon && <span className="material-symbols-outlined text-[11px]">{d.icon}</span>}
@@ -267,7 +267,7 @@ function SetupScreen({
               className={`flex-1 px-3 py-2.5 rounded-xl text-xs font-semibold border transition-all ${
                 timerDuration === opt.value
                   ? "bg-primary text-on-primary border-primary shadow-premium-sm"
-                  : "bg-white text-on-surface-variant border-outline-variant/40 hover:border-primary/30"
+                  : "bg-surface-container-lowest text-on-surface-variant border-outline-variant/40 hover:border-primary/30"
               }`}
             >
               {lang === "en" ? opt.labelEn : opt.labelId}
@@ -434,7 +434,7 @@ function RunningScreen({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -20, scale: 0.98 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
-          className="bg-white rounded-2xl border border-outline-variant/30 shadow-premium-md overflow-hidden"
+          className="bg-surface-container-lowest rounded-2xl border border-outline-variant/30 shadow-premium-md overflow-hidden"
         >
           {/* Position badge + difficulty */}
           <div className="px-5 pt-4 pb-2 flex items-center gap-2 flex-wrap">
@@ -534,7 +534,7 @@ function RunningScreen({
                             className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-[10px] font-semibold border transition-all ${
                               isActive
                                 ? opt.color + " border-current shadow-premium-sm"
-                                : "bg-white text-on-surface-variant border-outline-variant/40 hover:border-current"
+                                : "bg-surface-container-lowest text-on-surface-variant border-outline-variant/40 hover:border-current"
                             }`}
                           >
                             <span className="material-symbols-outlined text-[12px]">{opt.icon}</span>
@@ -702,15 +702,15 @@ function FinishedScreen({
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3 mb-8">
-        <div className="bg-white rounded-xl p-4 border border-outline-variant/30 shadow-premium-sm">
+        <div className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/30 shadow-premium-sm">
           <p className="text-xl font-bold text-on-surface">{totalQuestions}</p>
           <p className="text-[9px] text-on-surface-variant mt-0.5">{lang === "en" ? "Total Questions" : "Total Pertanyaan"}</p>
         </div>
-        <div className="bg-white rounded-xl p-4 border border-outline-variant/30 shadow-premium-sm">
+        <div className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/30 shadow-premium-sm">
           <p className="text-xl font-bold text-on-surface">{answered}</p>
           <p className="text-[9px] text-on-surface-variant mt-0.5">{lang === "en" ? "Answers Shown" : "Lihat Jawaban"}</p>
         </div>
-        <div className="bg-white rounded-xl p-4 border border-outline-variant/30 shadow-premium-sm">
+        <div className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/30 shadow-premium-sm">
           <p className="text-xl font-bold text-on-surface">{formatTime(totalTime)}</p>
           <p className="text-[9px] text-on-surface-variant mt-0.5">{lang === "en" ? "Total Time" : "Total Waktu"}</p>
         </div>
@@ -718,7 +718,7 @@ function FinishedScreen({
 
       {/* Self Rating Summary */}
       {rated > 0 && (
-        <div className="bg-white rounded-xl border border-outline-variant/30 shadow-premium-sm p-4 mb-8 text-left">
+        <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-premium-sm p-4 mb-8 text-left">
           <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-3">
             {lang === "en" ? `Self Evaluation (${rated} rated)` : `Evaluasi Diri (${rated} dinilai)`}
           </p>
@@ -751,8 +751,8 @@ function FinishedScreen({
         </div>
       )}
 
-      {/* Question history — klik untuk review jawaban */}
-      <div className="bg-white rounded-xl border border-outline-variant/30 shadow-premium-sm mb-6 text-left">
+      {/* Question history, klik untuk review jawaban */}
+      <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-premium-sm mb-6 text-left">
         <div className="px-4 py-3 border-b border-outline-variant/20 flex items-center justify-between">
           <p className="text-xs font-bold text-on-surface">{lang === "en" ? "Question History" : "Riwayat Pertanyaan"}</p>
           <span className="text-[9px] text-on-surface-variant">{lang === "en" ? "Click to view answer" : "Klik untuk lihat jawaban"}</span>
@@ -812,7 +812,7 @@ function FinishedScreen({
                       className="overflow-hidden"
                     >
                       <div className="px-4 pb-3 pl-12 space-y-2">
-                        <div className="p-3 bg-white rounded-lg border-l-2 border-primary">
+                        <div className="p-3 bg-surface-container-lowest rounded-lg border-l-2 border-primary">
                           <p className="text-[11px] text-on-surface leading-relaxed whitespace-pre-line">
                             {r.question.question.answer}
                           </p>
@@ -836,7 +836,7 @@ function FinishedScreen({
       {/* Share result */}
       <button
         onClick={handleShare}
-        className="w-full mb-3 py-3 rounded-xl text-xs font-bold bg-white border border-emerald-500 text-emerald-600 hover:bg-emerald-50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-premium-sm"
+        className="w-full mb-3 py-3 rounded-xl text-xs font-bold bg-surface-container-lowest border border-emerald-500 text-emerald-600 hover:bg-emerald-50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-premium-sm"
       >
         <span className="material-symbols-outlined text-[16px]">{copied ? "check" : "share"}</span>
         {copied
@@ -844,7 +844,7 @@ function FinishedScreen({
           : (lang === "en" ? "Share Practice Results" : "Bagikan Hasil Latihan")}
       </button>
 
-      {/* Cross-sell — CTA ke Checker CV */}
+      {/* Cross-sell, CTA ke Checker CV */}
       <div className="mb-6 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white p-5 text-left shadow-premium-md">
         <p className="text-[10px] font-bold uppercase tracking-wider text-white/80 mb-1 flex items-center gap-1.5">
           <span className="material-symbols-outlined text-[12px]">auto_awesome</span>
@@ -860,7 +860,7 @@ function FinishedScreen({
         </p>
         <button
           onClick={() => router.push("/checker")}
-          className="w-full py-2.5 rounded-xl bg-white text-emerald-600 text-xs font-bold hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
+          className="w-full py-2.5 rounded-xl bg-surface-container-lowest text-emerald-600 text-xs font-bold hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
         >
           {lang === "en" ? "Check My CV Now" : "Cek CV Sekarang"}
           <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
@@ -892,7 +892,7 @@ export default function PracticePage() {
   const router = useRouter();
   const { lang } = useTranslation();
 
-  // ── Deteksi apakah URL punya ?position=xxx — untuk auto-start ──
+  // ── Deteksi apakah URL punya ?position=xxx, untuk auto-start ──
   const [hasAutoStartParam] = useState(() => {
     if (typeof window !== "undefined") {
       return !!new URLSearchParams(window.location.search).get("position");
@@ -915,7 +915,7 @@ export default function PracticePage() {
   });
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set(["all"]));
   const [selectedDifficulties, setSelectedDifficulties] = useState<Set<string>>(new Set(["all"]));
-  // Rating state — persist to localStorage
+  // Rating state, persist to localStorage
   const [questionRatings, setQuestionRatings] = useState<Record<string, RatingOption>>(() => {
     if (typeof window !== "undefined") {
       try {
@@ -1207,7 +1207,7 @@ export default function PracticePage() {
     return () => stopTimer();
   }, [stopTimer]);
 
-  // Auto-advance when timer reaches 0 — with time's up animation
+  // Auto-advance when timer reaches 0, with time's up animation
   const timeUpShownRef = useRef(false);
   useEffect(() => {
     if (timerRemaining === 0 && session === "running" && !answered && !timeUpShownRef.current) {

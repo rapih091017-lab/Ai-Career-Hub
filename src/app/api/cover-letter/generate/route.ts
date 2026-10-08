@@ -37,7 +37,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
     jobSource,
     motivationReason,
     futurePlan,
-    // Data manual — dipakai saat membuat surat dari nol (tanpa cvId)
+    // Data manual, dipakai saat membuat surat dari nol (tanpa cvId)
     position: bodyPosition,
     fullName,
     phone,
@@ -132,7 +132,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
       certifications: (certs || []).map((c: any) => ({ name: c.name || "" })),
     };
   } else {
-    // Surat dari nol — data dikirim langsung dari form
+    // Surat dari nol, data dikirim langsung dari form
     position = typeof bodyPosition === "string" ? bodyPosition.trim() : "";
     input = {
       language,
@@ -177,7 +177,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
   });
 
   // ── 4. SIMPAN ──
-  // Subject menyesuaikan style — motivation letter bukan lamaran kerja,
+  // Subject menyesuaikan style, motivation letter bukan lamaran kerja,
   // jadi labelnya "Surat Motivasi" / "Motivation Letter".
   const isMotivation = style === "motivation";
   const target = companyName ? (language === "id" ? ` di ${companyName}` : ` at ${companyName}`) : "";

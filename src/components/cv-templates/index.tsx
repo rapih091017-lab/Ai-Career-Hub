@@ -6,7 +6,7 @@ export interface WorkEntry {
   id: string;
   position: string;
   company: string;
-  /** Optional company description — e.g., industry, size, or brief context */
+  /** Optional company description, e.g., industry, size, or brief context */
   companyDescription?: string;
   location: string;
   startDate: string;
@@ -15,7 +15,7 @@ export interface WorkEntry {
   /** Key achievement / metric highlight for this role */
   achievement?: string;
   isCurrent?: boolean;
-  /** Visibility toggle — hide this entry from CV without deleting */
+  /** Visibility toggle, hide this entry from CV without deleting */
   visible?: boolean;
   /** Optional project/portfolio URL */
   projectUrl?: string;
@@ -28,9 +28,9 @@ export interface EducationEntry {
   field: string;
   startDate: string;
   endDate: string;
-  /** Grade Point Average — useful for fresh graduates */
+  /** Grade Point Average, useful for fresh graduates */
   gpa?: string;
-  /** Visibility toggle — hide this entry from CV without deleting */
+  /** Visibility toggle, hide this entry from CV without deleting */
   visible?: boolean;
 }
 
@@ -42,7 +42,7 @@ export interface OrganizationEntry {
   endDate: string;
   description: string;
   isPresent?: boolean;
-  /** Visibility toggle — hide this entry from CV without deleting */
+  /** Visibility toggle, hide this entry from CV without deleting */
   visible?: boolean;
 }
 
@@ -70,7 +70,7 @@ export interface CustomFieldEntry {
 export interface CustomSectionEntry {
   id: string;
   title: string;
-  /** Content lines — each entry is a bullet point or paragraph */
+  /** Content lines, each entry is a bullet point or paragraph */
   content: string;
   /** @default "bullets" */
   contentType?: "paragraph" | "bullets";
@@ -85,14 +85,14 @@ export interface CvData {
   /** Optional portfolio/website URL */
   portfolioUrl?: string;
   summary: string;
-  /** Self evaluation / objective — separate from summary */
+  /** Self evaluation / objective, separate from summary */
   selfEvaluation?: string;
-  /** Employment status — "Mencari Kerja", "Bekerja", "Freelance", etc. */
+  /** Employment status, "Mencari Kerja", "Bekerja", "Freelance", etc. */
   employmentStatus?: string;
-  /** Target position for AI guidance — NOT shown on CV paper */
+  /** Target position for AI guidance, NOT shown on CV paper */
   jobTitle: string;
   jobDescription: string;
-  /** Professional title/motto shown on CV header (below name) — optional */
+  /** Professional title/motto shown on CV header (below name), optional */
   professionalTitle?: string;
   workHistory: WorkEntry[];
   education: EducationEntry[];
@@ -106,7 +106,7 @@ export interface CvData {
   customSections?: CustomSectionEntry[];
   /** @default "id" */
   cvLang?: "id" | "en";
-  /** Custom section labels — user can rename section titles */
+  /** Custom section labels, user can rename section titles */
   sectionLabels?: Record<string, string>;
 }
 
@@ -231,13 +231,13 @@ function formatDate(dateStr: string): string {
 interface RendererProps {
   data: CvData;
   style: TemplateStyle;
-  /** Section ordering — controls which sections appear & in what order */
+  /** Section ordering, controls which sections appear & in what order */
   sectionOrder?: (SectionKey | string)[];
   /** Show horizontal dividers between sections */
   showDividers?: boolean;
-  /** Language override — defaults to data.cvLang or "id" */
+  /** Language override, defaults to data.cvLang or "id" */
   lang?: "id" | "en";
-  /** Click handler for sections — maps section key to edit step */
+  /** Click handler for sections, maps section key to edit step */
   onSectionClick?: (sectionKey: string) => void;
 }
 
@@ -330,7 +330,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
             <SectionHeader title={L("experience")} style={style} />
             {visibleWork.map((work, i) => (
               <div key={work.id || i} style={{ marginBottom: 12, pageBreakInside: "avoid", textAlign }}>
-                {/* Company + Location — BOLD, primary row with date */}
+                {/* Company + Location, BOLD, primary row with date */}
                 <div
                   style={{
                     display: "flex",
@@ -354,7 +354,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                     {work.isCurrent ? L("present") : formatDate(work.endDate)}
                   </span>
                 </div>
-                {/* Position — italic, smaller, below company */}
+                {/* Position, italic, smaller, below company */}
                 <p
                   style={{
                     fontStyle: "italic",
@@ -499,7 +499,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
             <SectionHeader title={L("organizations")} style={style} />
             {visibleOrgs.map((org, i) => (
               <div key={org.id || i} style={{ marginBottom: 12, pageBreakInside: "avoid", textAlign }}>
-                {/* Organization name — BOLD, primary row with date */}
+                {/* Organization name, BOLD, primary row with date */}
                 <div
                   style={{
                     display: "flex",
@@ -508,7 +508,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                   }}
                 >
                   <span style={{ fontSize: bodyFontSize, fontWeight: 700, color: "#111111" }}>
-                    {org.name || "—"}
+                    {org.name || "-"}
                   </span>
                   <span
                     style={{
@@ -523,7 +523,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                     {formatDate(org.endDate)}
                   </span>
                 </div>
-                {/* Position — italic, smaller, below org name */}
+                {/* Position, italic, smaller, below org name */}
                 <p
                   style={{
                     fontStyle: "italic",
@@ -532,7 +532,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                     fontSize: bodyFontSize - 1,
                   }}
                 >
-                  {org.position || "—"}
+                  {org.position || "-"}
                 </p>
                 {org.description && (
                   <ul style={{ margin: "0 0 8px 0", paddingLeft: 20, listStyle: "disc" }}>
@@ -588,7 +588,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
         >
           {data.fullName || "NAMA LENGKAP ANDA"}
         </h1>
-        {/* Professional title (motto/jabatan profesional) — BUKAN jobTitle */}
+        {/* Professional title (motto/jabatan profesional), BUKAN jobTitle */}
         {data.professionalTitle && (
           <p
             style={{
@@ -649,7 +649,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
           const sr = sectionRenderers[key as SectionKey];
           content = sr?.render() ?? null;
         } else {
-          // Custom section — look up by ID
+          // Custom section, look up by ID
           const customSection = data.customSections?.find(cs => cs.id === key);
           if (customSection) {
             const lines = customSection.content.split('\n').filter(Boolean);

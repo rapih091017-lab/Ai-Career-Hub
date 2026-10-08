@@ -78,7 +78,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={{ toasts, addToast, removeToast }}>
       {children}
-      {/* Toast Container — fixed bottom-right */}
+      {/* Toast Container, fixed bottom-right */}
       <div
         aria-live="polite"
         aria-label="Notifications"

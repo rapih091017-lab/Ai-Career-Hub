@@ -45,19 +45,19 @@ interface CallAIParams {
  * sejak 24 Juli 2026. Penggantinya: deepseek-v4-flash (chat) & deepseek-v4-pro
  * (reasoning/thinking). Nama V4 sudah dipakai di seluruh fitur AI. */
 export const MODELS = {
-  /** Analisis mendalam — reasoning model (deepseek-v4-pro) */
+  /** Analisis mendalam, reasoning model (deepseek-v4-pro) */
   REASONER: "deepseek-v4-pro",
-  /** General purpose — deepseek-v4-flash */
+  /** General purpose, deepseek-v4-flash */
   CHAT: "deepseek-v4-flash",
 } as const;
 
 /** Recommended temperature per task type */
 const TEMPERATURE_MAP: Record<string, number> = {
   analysis: 0.1, // Low temp = konsisten, presisi tinggi
-  revision: 0.5, // Medium-low — butuh kreativitas terkontrol
+  revision: 0.5, // Medium-low, butuh kreativitas terkontrol
   suggestion: 0.4, // Medium-low
   summary_suggestion: 0.5,
-  portfolio: 0.75, // Higher — butuh kreativitas naratif
+  portfolio: 0.75, // Higher, butuh kreativitas naratif
 };
 
 /** Recommended model per task type */
@@ -92,7 +92,7 @@ function sanitizeText(text: string): string {
 
 /* ─── Inject input data into prompt ─────────────────────── */
 function injectInputData(prompt: string, data: string): string {
-  // Ekstrak CV dan JD dari data — pake indexOf biar toleran terhadap whitespace
+  // Ekstrak CV dan JD dari data, pake indexOf biar toleran terhadap whitespace
   const JD_MARKER = "=== JOB DESCRIPTION ===";
   const jdIndex = data.indexOf(JD_MARKER);
   const cvText = sanitizeText(jdIndex === -1 ? data : data.slice(0, jdIndex).trim());
@@ -112,7 +112,7 @@ function parseAIResponse<T>(
 ): { ok: true; data: T } | { ok: false; error: string } {
   try {
     // Buang markdown code fence (```json ... ```) + teks pengantar yang kadang
-    // dibungkus model — terutama deepseek-v4-pro yang memakai thinking mode.
+    // dibungkus model, terutama deepseek-v4-pro yang memakai thinking mode.
     // Potong ke bagian JSON saja (dari { pertama).
     let cleaned = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
     const start = cleaned.indexOf("{");
@@ -156,7 +156,7 @@ export async function callAI<T = unknown>({
   // (lihat src/lib/ai/prompts/shared.ts + tiap file prompt).
   // Jaga-jaga: beri peringatan keras di dev jika ada prompt baru yang lupa.
   if (!systemPrompt.includes("GUARDRAIL KEAMANAN")) {
-    console.warn("[AI] systemPrompt tanpa SECURITY_GUARDRAIL — sisipkan dari src/lib/ai/prompts/shared.ts");
+    console.warn("[AI] systemPrompt tanpa SECURITY_GUARDRAIL, sisipkan dari src/lib/ai/prompts/shared.ts");
   }
 
   // Inject user context & input data ke system prompt
@@ -165,7 +165,7 @@ export async function callAI<T = unknown>({
     userPrompt,
   );
 
-  // Sanitize user prompt — userPrompt berisi data aktual (CV/JD) yang mungkin
+  // Sanitize user prompt, userPrompt berisi data aktual (CV/JD) yang mungkin
   // mengandung karakter lone surrogate yang bikin DeepSeek API 400 error
   const enrichedUserPrompt = sanitizeText(userPrompt);
 
@@ -177,13 +177,13 @@ export async function callAI<T = unknown>({
 
   // deepseek-v4-pro memakai thinking mode dan TIDAK mendukung response_format
   // json_object (400 error). Tambahkan instruksi agar model mengembalikan
-  // HANYA output akhir — reasoning berjalan internal.
+  // HANYA output akhir, reasoning berjalan internal.
   const effectiveSystemPrompt = isReasoner
     ? systemPromptWithData +
-      "\n\n--- CATATAN MODEL ---\nAnda adalah model reasoning (deepseek-v4-pro). Lakukan seluruh analisis dan pemikiran secara INTERNAL — TANPA menampilkan langkah-langkah, TANPA blok <think>, TANPA penjelasan. Kembalikan HANYA output akhir yang valid sesuai skema yang diminta."
+      "\n\n--- CATATAN MODEL ---\nAnda adalah model reasoning (deepseek-v4-pro). Lakukan seluruh analisis dan pemikiran secara INTERNAL, TANPA menampilkan langkah-langkah, TANPA blok <think>, TANPA penjelasan. Kembalikan HANYA output akhir yang valid sesuai skema yang diminta."
     : systemPromptWithData;
 
-  // Petunjuk tambahan saat retry — meminta model mengembalikan JSON valid
+  // Petunjuk tambahan saat retry, meminta model mengembalikan JSON valid
   const retryInstruction =
     "\n\n⚠️ PERHATIAN: Respons AI sebelumnya TIDAK valid (bukan JSON valid / tidak sesuai skema)." +
     " Mohon kembalikan HANYA JSON yang valid sesuai SKEMA OUTPUT WAJIB yang diminta, tanpa teks lain.";
@@ -203,19 +203,19 @@ export async function callAI<T = unknown>({
           { role: "user", content: attempt === 0 ? enrichedUserPrompt : enrichedUserPrompt + retryInstruction },
         ],
         // Text mode: TANPA response_format json_object (DeepSeek 400 jika dipaksa).
-        // deepseek-v4-pro (thinking): json_object TIDAK didukung — JSON dipaksa via prompt.
+        // deepseek-v4-pro (thinking): json_object TIDAK didukung, JSON dipaksa via prompt.
         response_format: isTextMode || isReasoner ? undefined : { type: "json_object" },
       });
 
       const raw = response.choices[0]?.message?.content ?? "";
 
       if (isTextMode) {
-        // Text mode — return teks mentah (tanpa JSON.parse); retry jika kosong
+        // Text mode, return teks mentah (tanpa JSON.parse); retry jika kosong
         const text = raw.trim();
         if (text) return text as T;
         lastError = "Empty text response";
       } else {
-        // JSON mode — parse + validasi Zod
+        // JSON mode, parse + validasi Zod
         const parsed = parseAIResponse<T>(raw, schema as ZodSchema<T> | undefined);
         if (parsed.ok) return parsed.data;
         lastError = parsed.error;

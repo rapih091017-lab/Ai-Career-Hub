@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
   let aiNote: string | null = null; // consolidation_suggestion dari AI
   if (rawText && typeof rawText === "string" && rawText.trim().length > 20) {
     try {
-      // {{CURRENT_DATE}} & {{TARGET_LANGUAGE}} di prompt — wajib di-inject di sini
+      // {{CURRENT_DATE}} & {{TARGET_LANGUAGE}} di prompt, wajib di-inject di sini
       // (adapter hanya mengganti {{INPUT_DATA}}/{{CV_TEXT}}/{{JD_TEXT}}/{{PROFILE_DATA}}).
       const todayDate = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
       const targetLang = typeof targetLanguage === "string" ? targetLanguage.trim() : "";
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
       aiNote = aiGeneratedData?.consolidation_suggestion || null;
     } catch (err) {
       console.error("AI Generator error (non-fatal):", err);
-      // Non-fatal — tetap lanjut tanpa AI data
+      // Non-fatal, tetap lanjut tanpa AI data
     }
   }
 
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
     }));
 
     // skills bisa array [{name}] ATAU objek {technical, soft, languages}
-    // level di-default "intermediate" — konsisten dengan builder (useFetchCvData)
+    // level di-default "intermediate", konsisten dengan builder (useFetchCvData)
     const rawSkills = ai.skills;
     const skills: { name: string; level: "beginner" | "intermediate" | "advanced"; category?: "technical" | "soft" | "tools" }[] = [];
     if (Array.isArray(rawSkills)) {
@@ -157,7 +157,7 @@ export async function POST(request: NextRequest) {
 
   // Merge AI-generated structured data into tailoredContent
   // AI data overrides profile data; profil dipakai sebagai fallback per-field.
-  // Kolom tailoredContent di DB adalah JSON — tipe longgar (any) agar
+  // Kolom tailoredContent di DB adalah JSON, tipe longgar (any) agar
   // menyatu dengan shape masterProfile & shape hasil normalisasi AI.
   let mergedContent: any = tailoredContent;
   if (aiGeneratedData) {

@@ -15,7 +15,7 @@ const HOBBY_ICONS = [
   <path key="f" d="M12 3v18M3 12h18" />,
 ];
 
-/* ═══ GLASS — chip cloud ═══ */
+/* ═══ GLASS, chip cloud ═══ */
 function GlassHobbies({ items }: { items: HobbyItem[] }) {
   const theme = usePortfolioTheme();
   const filtered = items.filter(h => h.name);
@@ -54,7 +54,7 @@ function GlassHobbies({ items }: { items: HobbyItem[] }) {
                 </svg>
                 <span className="text-sm font-medium" style={{ color: theme.colors.text }}>{hobby.name}</span>
                 {hobby.description && (
-                  <span className="text-xs hidden sm:inline" style={{ color: theme.colors.textMuted }}>— {hobby.description}</span>
+                  <span className="text-xs hidden sm:inline" style={{ color: theme.colors.textMuted }}>, {hobby.description}</span>
                 )}
               </div>
             </motion.div>
@@ -65,7 +65,7 @@ function GlassHobbies({ items }: { items: HobbyItem[] }) {
   );
 }
 
-/* ═══ BRUTAL — boxed tags ═══ */
+/* ═══ BRUTAL, boxed tags ═══ */
 function BrutalHobbies({ items }: { items: HobbyItem[] }) {
   const theme = usePortfolioTheme();
   const filtered = items.filter(h => h.name);
@@ -118,7 +118,7 @@ function BrutalHobbies({ items }: { items: HobbyItem[] }) {
   );
 }
 
-/* ═══ LUXE — editorial list ═══ */
+/* ═══ LUXE, editorial list ═══ */
 function LuxeHobbies({ items }: { items: HobbyItem[] }) {
   const theme = usePortfolioTheme();
   const filtered = items.filter(h => h.name);

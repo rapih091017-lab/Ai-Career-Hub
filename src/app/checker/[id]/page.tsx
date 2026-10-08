@@ -153,7 +153,7 @@ export default function CheckerDetailPage() {
   const gc = gradeColor(grade);
   const atsBadge = atsBadgeColor(atsPrediction);
 
-  // v4 — chip "X% terkuantifikasi" pada kartu Experience
+  // v4, chip "X% terkuantifikasi" pada kartu Experience
   const quantPct = (breakdown?.experience as ExperienceSection | undefined)?.quantification_pct;
   const quantChip = typeof quantPct === "number"
     ? {
@@ -215,7 +215,7 @@ export default function CheckerDetailPage() {
         </section>
 
         {/* ============================================================ */}
-        {/*  1b. IMPACT FORECAST (v4) — proyeksi skor                    */}
+        {/*  1b. IMPACT FORECAST (v4), proyeksi skor                    */}
         {/* ============================================================ */}
         {impactForecast && <ImpactForecastCard forecast={impactForecast} />}
 
@@ -356,7 +356,7 @@ export default function CheckerDetailPage() {
         )}
 
         {/* ============================================================ */}
-        {/*  5. IMPROVEMENT CHECKLIST — langkah perbaikan interaktif      */}
+        {/*  5. IMPROVEMENT CHECKLIST, langkah perbaikan interaktif      */}
         {/* ============================================================ */}
         <ImprovementChecklist
           actionPlan={actionPlan}
@@ -365,7 +365,7 @@ export default function CheckerDetailPage() {
         />
 
         {/* ============================================================ */}
-        {/*  6. BULLET REVIEW — per poin pengalaman                       */}
+        {/*  6. BULLET REVIEW, per poin pengalaman                       */}
         {/* ============================================================ */}
         {bulletReview && bulletReview.length > 0 && (
           <motion.section
@@ -384,7 +384,7 @@ export default function CheckerDetailPage() {
         )}
 
         {/* ============================================================ */}
-        {/*  6. CTA — Surat Lamaran / Motivation Letter                  */}
+        {/*  6. CTA, Surat Lamaran / Motivation Letter                  */}
         {/* ============================================================ */}
         <div className="space-y-3">
           <p className="text-xs font-bold uppercase tracking-wider text-on-surface-variant px-1">
@@ -443,10 +443,10 @@ export default function CheckerDetailPage() {
         </div>
 
         {/* ============================================================ */}
-        {/*  8. CTA — Analisis Ulang atau Buat CV                        */}
+        {/*  8. CTA, Analisis Ulang atau Buat CV                        */}
         {/* ============================================================ */}
         <div className="relative overflow-hidden rounded-2xl p-8 md:p-10 shadow-premium-lg bg-gradient-to-br from-primary via-primary-container to-primary-deep">
-          <div className="absolute -right-12 -top-12 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+          <div className="absolute -right-12 -top-12 w-64 h-64 bg-surface-container-lowest/10 rounded-full blur-3xl" />
           <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="text-center md:text-left">
               <h2 className="text-[32px] leading-10 font-bold text-white mb-2">
@@ -461,7 +461,7 @@ export default function CheckerDetailPage() {
             <MagneticButton>
               <button
                 onClick={() => router.push("/checker")}
-                className="bg-white text-primary px-8 py-4 rounded-full text-sm font-semibold shadow-premium-md hover:bg-gray-100 active:scale-95 transition-[transform,background-color] flex items-center gap-2"
+                className="bg-surface-container-lowest text-primary px-8 py-4 rounded-full text-sm font-semibold shadow-premium-md hover:bg-gray-100 active:scale-95 transition-[transform,background-color] flex items-center gap-2"
               >
                 {t("checker.detail.reanalyze")}
                 <span className="material-symbols-outlined text-sm select-none">refresh</span>

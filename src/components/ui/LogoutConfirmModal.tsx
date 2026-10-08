@@ -111,7 +111,7 @@ export default function LogoutConfirmModal({ open, onClose }: LogoutConfirmModal
             role="alertdialog"
             aria-labelledby="logout-title"
             aria-describedby="logout-description"
-            className="relative w-full max-w-sm bg-white rounded-3xl shadow-2xl border border-outline-variant/30 overflow-hidden"
+            className="relative w-full max-w-sm bg-surface-container-lowest rounded-3xl shadow-2xl border border-outline-variant/30 overflow-hidden"
           >
             {/* Top gradient accent */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-400 via-red-500 to-red-600" />
@@ -180,7 +180,7 @@ export default function LogoutConfirmModal({ open, onClose }: LogoutConfirmModal
                 <button
                   ref={cancelRef}
                   onClick={onClose}
-                  className="flex-1 py-3 rounded-2xl border border-outline-variant/50 text-sm font-semibold text-on-surface bg-white hover:bg-surface-container-high hover:border-outline-variant transition-all duration-200 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                  className="flex-1 py-3 rounded-2xl border border-outline-variant/50 text-sm font-semibold text-on-surface bg-surface-container-lowest hover:bg-surface-container-high hover:border-outline-variant transition-all duration-200 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                 >
                   Batal
                 </button>

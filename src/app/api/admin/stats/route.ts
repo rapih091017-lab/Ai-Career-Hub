@@ -92,8 +92,8 @@ export const GET = apiHandler(async () => {
         ),
       );
 
-    /* ── 2. Trends — 7 days (optimized: 4 parallel GROUP BY queries) ── */
-    // TO_CHAR returns string "YYYY-MM-DD" directly — no .slice() needed
+    /* ── 2. Trends, 7 days (optimized: 4 parallel GROUP BY queries) ── */
+    // TO_CHAR returns string "YYYY-MM-DD" directly, no .slice() needed
     const dayToChar = sql<string>`TO_CHAR(date_trunc('day', ${users.createdAt}), 'YYYY-MM-DD')`;
     const cvToChar = sql<string>`TO_CHAR(date_trunc('day', ${cvDocuments.createdAt}), 'YYYY-MM-DD')`;
     const payToChar = sql<string>`TO_CHAR(date_trunc('day', ${payments.paidAt}), 'YYYY-MM-DD')`;
@@ -126,7 +126,7 @@ export const GET = apiHandler(async () => {
         .orderBy(ulToChar),
     ]);
 
-    // Build lookup maps — dates are already "YYYY-MM-DD" strings from TO_CHAR
+    // Build lookup maps, dates are already "YYYY-MM-DD" strings from TO_CHAR
     const regMap = new Map(regTrends.map((r) => [r.date, r.value]));
     const cvMap = new Map(cvTrends.map((r) => [r.date, r.value]));
     const revMap = new Map(revTrends.map((r) => [r.date, Number(r.value)]));

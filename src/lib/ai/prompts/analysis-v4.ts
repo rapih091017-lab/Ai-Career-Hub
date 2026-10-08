@@ -6,7 +6,7 @@ import {
 } from "./shared";
 
 /*
- * ANALYSIS PROMPT V4 — hemat token, skor stabil, output selaras UI.
+ * ANALYSIS PROMPT V4, hemat token, skor stabil, output selaras UI.
  *
  * Beda dari V3 (yang penting):
  *  1. SCORING ANCHORS per-section (4 band) → skor tidak melayang antar-run.
@@ -14,11 +14,11 @@ import {
  *  3. SEVERITY (critical/high/medium/low) di tiap issue & risk factor → UI badge.
  *  4. quantification_pct di Experience (bukti metrik) → UI stat.
  *  5. impact_forecast (proyeksi skor) + red_flags → UI motiva. monoton terverifikasi.
- *  6. Bahasa output dinamis {{OUTPUT_LANGUAGE}} — selaras toggle UI id/en.
+ *  6. Bahasa output dinamis {{OUTPUT_LANGUAGE}}, selaras toggle UI id/en.
  *
  * Skema OUTPUT KOMPATIBEL dengan v3 (UI tidak pecah): field lama tetap ada dengan
  * bentuk sama; field baru (severity, quantification_pct, dst) bersifat additive.
- * Label/badge UI TIDAK dikirim AI — UI menurunkan sendiri dari angka (hemat token,
+ * Label/badge UI TIDAK dikirim AI, UI menurunkan sendiri dari angka (hemat token,
  * konsisten lintas bahasa).
  */
 export const ANALYSIS_PROMPT_V4 = `
@@ -51,16 +51,16 @@ ${DELIM.SECTION}
    section berbeda bila memungkinkan (jangan semua dari satu experience). Urutkan
    hasilnya dari yang paling berdampak ke paling kecil. suggested_rewrite BOLEH
    memakai metrik estimasi konservatif TANPA menambah fakta baru, asal bertanda
-   "[est.]" — jangan menulis angka pasti untuk hal yang tidak ada di CV.
+   "[est.]", jangan menulis angka pasti untuk hal yang tidak ada di CV.
 8. impact_forecast WAJIB monoton: current_score ≤ projected_after_quick_wins ≤
    projected_after_all_fixes ≤ 96.
 9. Semua field skema wajib terisi ([] atau "" bila kosong). Jangan null/undefined.
-10. Nominal Rupiah format penuh "Rp500.000.000/tahun" — dilarang "500jt".
+10. Nominal Rupiah format penuh "Rp500.000.000/tahun", dilarang "500jt".
 ${DELIM.SECTION}
 
 ${DELIM.SECTION}
 --- ROLE CATEGORY: {{ROLE_CATEGORY}} ---
-Bobot per-section dari tabel ini — final, menggantikan bobot fixed apa pun:
+Bobot per-section dari tabel ini, final, menggantikan bobot fixed apa pun:
 
 | ROLE_CATEGORY    | Summary | Experience | Skills | Education | Format ATS |
 |------------------|---------|------------|--------|-----------|------------|
@@ -91,7 +91,7 @@ matching, bukan keyword counting):
 9. Action plan terukur (quick wins / short-term / long-term)
 10. Missing sections + urutan section yang disarankan
 
-Ini bounded scoring task dengan skema jelas — bukan eksplorasi terbuka. Reasoning
+Ini bounded scoring task dengan skema jelas, bukan eksplorasi terbuka. Reasoning
 internal, langsung kembalikan JSON final.
 ${DELIM.SECTION}
 
@@ -100,7 +100,7 @@ ${DELIM.SECTION}
 ATS modern (2024-2026) memakai vector embeddings + NLP: mereka MEMAHAMI konten,
 bukan mencocokkan string. Seluruh penilaian wajib mencerminkan itu.
 
-### SKOR PER SECTION — pakai ANCHOR ini (cegah skor melayang):
+### SKOR PER SECTION, pakai ANCHOR ini (cegah skor melayang):
 
 Summary:
 - 85-100: positioning tajam di kalimat pertama, value proposition terukur, keyword inti JD hadir natural
@@ -113,7 +113,7 @@ Experience:
 - 70-84: 50-74% bullet terkuantifikasi, mayoritas CARI 50-69
 - 50-69: campuran tugas & pencapaian, metrik <50%, verb moderate
 - <50: daftar tugas harian, verb lemah ("bertanggung jawab"), nyaris tanpa metrik
-- Hitung quantification_pct = (bullet dengan angka/metrik / total bullet) × 100 — isi ke breakdown.experience.
+- Hitung quantification_pct = (bullet dengan angka/metrik / total bullet) × 100, isi ke breakdown.experience.
 
 Skills:
 - 85-100: match tinggi + depth terbukti di experience (bukan list tanpa konteks)
@@ -127,7 +127,7 @@ Education:
 - 50-69: gelar kurang relevan tapi terkompensasi pengalaman/sertifikasi
 - <50: tidak ada data pendidikan atau tidak relevan
 
-Format ATS — mulai 100, kurangi PENALTI DETERMINISTIK (gunakan kata "terindikasi"
+Format ATS, mulai 100, kurangi PENALTI DETERMINISTIK (gunakan kata "terindikasi"
 jika sinyal tidak pasti dari teks mentah):
 - Tabel/multi-kolom: -15 s.d. -25
 - Kontak penting di header/footer: -10
@@ -145,7 +145,7 @@ jika sinyal tidak pasti dari teks mentah):
    → intent ("mengurangi biaya server"≈"cost optimization").
 4. match_rate_pct = (exact+semantic+intent) / total_jd_keywords × 100.
 
-### CARI (Context-Action-Result-Impact) — SATU-SATUNYA definisi yang berlaku
+### CARI (Context-Action-Result-Impact), SATU-SATUNYA definisi yang berlaku
 | Dimensi | Kriteria | Skor |
 |---------|----------|------|
 | Context | Situasi/tantangan jelas? | 0-25 |
@@ -170,7 +170,7 @@ delivered, optimized, diagnosed. Skill/tool names tetap bahasa aslinya.
 ### KALIBRASI SENIORITY
 Deteksi seniority dari total pengalaman, scope, title. Jangan hukum entry/fresh
 graduate karena tak punya metrik leadership. Senior/lead tanpa metrik dampak =
-penalti besar. Jika industri CV ≠ JD, akui jujur di verdict — skor rendah wajar.
+penalti besar. Jika industri CV ≠ JD, akui jujur di verdict, skor rendah wajar.
 
 ### ANTI-PATTERN PENYEBAB ATS REJECTION
 Keyword stuffing · verb lemah · task-oriented bukan impact · acronym tanpa bentuk
@@ -179,13 +179,13 @@ ${DELIM.SECTION}
 
 ${DELIM.SECTION}
 --- PEDOMAN OUTPUT ---
-1. SPESIFIK: kutip teks CV sebagai bukti — jangan generalisasi.
+1. SPESIFIK: kutip teks CV sebagai bukti, jangan generalisasi.
 2. JUJUR: jangan inflate skor.
 3. ACTIONABLE: setiap saran langsung bisa dieksekusi.
 4. KONTEKSTUAL: kalibrasi dengan seniority terdeteksi.
-5. BAHASA: {{OUTPUT_LANGUAGE}} — jika "id" pakai Bahasa Indonesia profesional; jika
+5. BAHASA: {{OUTPUT_LANGUAGE}}, jika "id" pakai Bahasa Indonesia profesional; jika
    "en" pakai professional English. Skill names tetap Inggris. source_excerpt selalu
-   verbatim dari CV (aturan #6) — jangan diterjemahkan.
+   verbatim dari CV (aturan #6), jangan diterjemahkan.
 6. JD kosong: semua array keyword kosong, rate = 0, ats_prediction.result = "Likely
    Pass" dengan match_confidence < 60 (tanpa baseline), fokus format/CARI/missing
    sections, jelaskan keterbatasan di verdict.
@@ -193,7 +193,7 @@ ${DELIM.SECTION}
 8. CV bukan dokumen CV valid (teks acak/artikel): overall_score=0, grade="D",
    result="Likely Fail", array kosong, verdict menjelaskan.
 9. CV > 1500 kata: fokus 3 pengalaman paling relevan, sebutkan di verdict.
-10. bullets/issues/rekomendasi: JANGAN memaksakan panjang — kutip yang berdampak,
+10. bullets/issues/rekomendasi: JANGAN memaksakan panjang, kutip yang berdampak,
     jangan padding demi jumlah.
 
 --- VERIFIKASI AKHIR (internal, sebelum output) ---
@@ -293,7 +293,7 @@ ${DELIM.SECTION}
 ${DELIM.SECTION}
 
 ${DELIM.SECTION}
---- CONTOH (sebagian — tiru bentuk & kedalaman ini, konten sesuaikan CV) ---
+--- CONTOH (sebagian, tiru bentuk & kedalaman ini, konten sesuaikan CV) ---
 { "meta": { "role_category": "tech", "detected_seniority": "mid", "cv_word_count": 420, "jd_present": true, "analysis_confidence": 82 },
   "overall_score": 62, "grade": "C",
   "verdict": "Fondasi React solid, namun ada gap semantik signifikan dengan JD: TypeScript (muncul 6x) tidak tercantum sama sekali. Career velocity positif, tapi bullet belum menunjukkan impact untuk level Senior.",
@@ -301,25 +301,25 @@ ${DELIM.SECTION}
   "ats_prediction": {
     "result": "Borderline", "match_confidence": 55,
     "risk_factors": [
-      { "text": "TypeScript tidak ada — muncul 6x di JD sebagai hard requirement", "severity": "critical", "source_excerpt": "JavaScript, React, CSS" },
-      { "text": "Terindikasi tabel di section Pendidikan — reading order bisa rusak", "severity": "high", "source_excerpt": null }
+      { "text": "TypeScript tidak ada, muncul 6x di JD sebagai hard requirement", "severity": "critical", "source_excerpt": "JavaScript, React, CSS" },
+      { "text": "Terindikasi tabel di section Pendidikan, reading order bisa rusak", "severity": "high", "source_excerpt": null }
     ],
     "strengths": ["Career velocity positif: Junior → Mid dalam 2 tahun", "React + Node.js relevan dengan stack JD"]
   },
   "breakdown": {
-    "summary": { "score": 55, "issues": [{ "text": "Summary tidak menyebut TypeScript — keyword kritis JD", "severity": "high", "source_excerpt": "Frontend Developer dengan 4 tahun pengalaman" }], "suggestions": ["Tambahkan TypeScript di kalimat pertama"] },
+    "summary": { "score": 55, "issues": [{ "text": "Summary tidak menyebut TypeScript, keyword kritis JD", "severity": "high", "source_excerpt": "Frontend Developer dengan 4 tahun pengalaman" }], "suggestions": ["Tambahkan TypeScript di kalimat pertama"] },
     "experience": { "score": 60, "quantification_pct": 20, "issues": [{ "text": "3 dari 5 bullet tanpa metrik", "severity": "high", "source_excerpt": null }], "suggestions": ["Ganti 'membangun fitur' dengan pola aksi + hasil terukur"] },
-    "skills": { "score": 70, "missing_skills": ["TypeScript", "Next.js", "CI/CD", "GraphQL", "Docker"], "adjacent_skills": ["JavaScript → TypeScript (migrasi incremental)", "Git → CI/CD (versioning → automation)"], "recommendations": ["TypeScript prioritas #1 — muncul 6x di JD"] },
-    "education": { "score": 80, "relevance": "S1 Ilmu Komputer — relevan untuk Software Engineer", "suggestions": [] },
+    "skills": { "score": 70, "missing_skills": ["TypeScript", "Next.js", "CI/CD", "GraphQL", "Docker"], "adjacent_skills": ["JavaScript → TypeScript (migrasi incremental)", "Git → CI/CD (versioning → automation)"], "recommendations": ["TypeScript prioritas #1, muncul 6x di JD"] },
+    "education": { "score": 80, "relevance": "S1 Ilmu Komputer, relevan untuk Software Engineer", "suggestions": [] },
     "format_ats": { "score": 45, "issues": [{ "text": "Terindikasi tabel di Pendidikan", "severity": "high", "source_excerpt": null }, { "text": "Kontak di header dokumen", "severity": "medium", "source_excerpt": "budi@email.com | 0812-xxxx" }], "tips": ["Ganti tabel dengan baris standar", "Pindahkan kontak ke body"] }
   },
   "keyword_analysis": { "matched": ["React", "JavaScript", "Node.js", "CSS", "Git"], "semantic_matched": ["ReactJS (React)"], "missing_critical": ["TypeScript", "Next.js", "CI/CD"], "missing_nice_to_have": ["AWS"], "synonym_suggestions": [], "match_rate_pct": 42, "semantic_match_rate_pct": 48 },
-  "career_velocity": { "time_in_role_analysis": "Junior 1.5 thn → Mid 2 thn — wajar", "title_progression": "Upward", "responsibility_arc": "Task execution → feature ownership, belum ada leadership", "growth_rate": "Normal", "red_flags": [], "recommendations": ["Tunjukkan mentoring/tech leadership untuk level Senior"] },
-  "narrative_feedback": { "overall_assessment": "Trajectory baik dan fondasi teknis solid; kuantifikasi nyaris tidak ada dan TypeScript — keyword kritis — tidak tercantum.", "strengths": ["Growth positif", "Stack relevan"], "areas_for_improvement": ["Kuantifikasi rendah", "TypeScript absen"], "ats_recommendations": ["Tambah TypeScript di Skills + Experience", "Tambah metrik di minimal 3 bullet"] },
+  "career_velocity": { "time_in_role_analysis": "Junior 1.5 thn → Mid 2 thn, wajar", "title_progression": "Upward", "responsibility_arc": "Task execution → feature ownership, belum ada leadership", "growth_rate": "Normal", "red_flags": [], "recommendations": ["Tunjukkan mentoring/tech leadership untuk level Senior"] },
+  "narrative_feedback": { "overall_assessment": "Trajectory baik dan fondasi teknis solid; kuantifikasi nyaris tidak ada dan TypeScript, keyword kritis, tidak tercantum.", "strengths": ["Growth positif", "Stack relevan"], "areas_for_improvement": ["Kuantifikasi rendah", "TypeScript absen"], "ats_recommendations": ["Tambah TypeScript di Skills + Experience", "Tambah metrik di minimal 3 bullet"] },
   "impact_forecast": { "current_score": 62, "projected_after_quick_wins": 68, "projected_after_all_fixes": 80 },
   "action_plan": {
-    "quick_wins": ["Tambah TypeScript, GraphQL, Docker di Skills — keyword kritis JD", "Pindahkan kontak dari header ke body"],
-    "short_term": ["Rewrite bullet dengan CARI — tambah metrik ([est.] bila data tidak ada)", "Tambahkan link portfolio/GitHub"],
+    "quick_wins": ["Tambah TypeScript, GraphQL, Docker di Skills, keyword kritis JD", "Pindahkan kontak dari header ke body"],
+    "short_term": ["Rewrite bullet dengan CARI, tambah metrik ([est.] bila data tidak ada)", "Tambahkan link portfolio/GitHub"],
     "long_term": ["Sertifikasi AWS/Docker untuk tutup gap infrastruktur"]
   },
   "bullet_review": [

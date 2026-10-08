@@ -82,7 +82,7 @@ export default function ScrollSectionIndicator() {
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
           />
           {/* Label tooltip */}
-          <span className="absolute right-full mr-3 px-2 py-1 bg-white border border-outline-variant/30 rounded-lg text-[10px] font-medium text-on-surface-variant whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-sm pointer-events-none">
+          <span className="absolute right-full mr-3 px-2 py-1 bg-surface-container-lowest border border-outline-variant/30 rounded-lg text-[10px] font-medium text-on-surface-variant whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-sm pointer-events-none">
             {t(labelKeys[sectionId] || sectionId)}
           </span>
         </button>

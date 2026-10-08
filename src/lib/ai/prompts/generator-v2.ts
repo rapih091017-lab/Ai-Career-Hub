@@ -44,12 +44,12 @@ ${DELIM.SECTION}
 ### 1. PERSONAL INFO
 - Name: dari bagian paling atas CV
 - Title: jika tidak disebut eksplisit, infer dari pengalaman terakhir dan
-  set "title_inferred": true — user harus tahu ini tebakan, bukan fakta
-- Email/Phone/Location: validasi format — email valid, phone +62 atau 08
-- LinkedIn: validasi URL — harus mengandung "linkedin.com/in/"
-- Portfolio: validasi URL — harus "http://" atau "https://"; jika bukan URL
+  set "title_inferred": true, user harus tahu ini tebakan, bukan fakta
+- Email/Phone/Location: validasi format, email valid, phone +62 atau 08
+- LinkedIn: validasi URL, harus mengandung "linkedin.com/in/"
+- Portfolio: validasi URL, harus "http://" atau "https://"; jika bukan URL
   valid (cuma nama tanpa link), set null
-- Summary: 2-3 kalimat, fokus value proposition — HANYA dari fakta yang ada
+- Summary: 2-3 kalimat, fokus value proposition, HANYA dari fakta yang ada
   di experience/skills hasil ekstraksi. JANGAN kalimat generik tanpa isi
   spesifik. DILARANG klise tanpa bukti konkret: "profesional yang berdedikasi",
   "pekerja keras", "team player yang solid", "passion di bidang ini",
@@ -60,29 +60,29 @@ ${DELIM.SECTION}
 - Company + Position: koreksi jika terbalik
 - Dates: format "MMM YYYY" (contoh "Jan 2023") atau "YYYY"
   - "Present" untuk pekerjaan saat ini
-  - Validasi kronologi — end_date TIDAK boleh sebelum start_date
+  - Validasi kronologi, end_date TIDAK boleh sebelum start_date
   - end_date TIDAK boleh melebihi {{CURRENT_DATE}} kecuali "Present"
-- Bullets: maksimal 6 per experience. TIDAK ADA minimum paksa — jika raw text
+- Bullets: maksimal 6 per experience. TIDAK ADA minimum paksa, jika raw text
   hanya memuat 1 info valid, keluarkan 1 bullet saja. JANGAN mengarang bullet
   demi memenuhi kuota.
   - Naikkan action verb (lihat tabel) TANPA mengubah makna asli
-  - DILARANG menambah angka/persentase/metrik yang tidak disebut raw text —
+  - DILARANG menambah angka/persentase/metrik yang tidak disebut raw text, 
     memperkuat kata kerja BOLEH, menambah angka fiktif TIDAK BOLEH
-  - Jika bullet asli sudah punya angka, salin persis — jangan dibulatkan/diubah
+  - Jika bullet asli sudah punya angka, salin persis, jangan dibulatkan/diubah
   - Hapus duplikat antar bullet dalam entry yang sama
 - Urutan: array experience WAJIB terbaru → terlama berdasarkan start_date
   (role "Present"/masih berjalan selalu teratas)
 
 ### 3. EDUCATION
 - Institution + Degree + Field: pisahkan jelas
-- GPA: hanya jika disebut — jangan mengarang
-- Dates: format "YYYY" — jika bulan tidak disebut, tahun saja
+- GPA: hanya jika disebut, jangan mengarang
+- Dates: format "YYYY", jika bulan tidak disebut, tahun saja
 - Urutan: array education WAJIB terbaru → terlama
 
 ### 4. SKILLS
 - Technical: tools, programming languages, frameworks, software
 - Soft: interpersonal skills (jika disebut eksplisit)
-- Languages: format "Bahasa (Level)" — contoh "English (Professional Working)"
+- Languages: format "Bahasa (Level)", contoh "English (Professional Working)"
 - Kategorisasi: jika user daftar panjang, kelompokkan logis
 - Dedup: hapus entri sama makna meski beda penulisan (mis. "Ms Excel" dan
   "Microsoft Excel" → gabung jadi satu, pakai penulisan paling umum)
@@ -90,8 +90,8 @@ ${DELIM.SECTION}
   taruh di depan (paling relevan), bukan urutan sembarang raw text
 
 ### 5. CERTIFICATIONS
-- Name + Issuer: validasi — pastikan benar-benar ada di raw text
-- Date: format "YYYY" — jika tidak disebut, null
+- Name + Issuer: validasi, pastikan benar-benar ada di raw text
+- Date: format "YYYY", jika tidak disebut, null
 - Dedup: hapus duplikasi sertifikasi yang sama
 
 ${DELIM.SECTION}
@@ -113,7 +113,7 @@ ${DELIM.SECTION}
 | improve sistem | Improved / Refined the system |
 
 PENTING: tabel ganti KATA KERJA saja. Substansi kalimat (apa yang dikerjakan,
-hasil yang dicapai) tetap identik dengan raw text — hanya diksi yang naik kelas.
+hasil yang dicapai) tetap identik dengan raw text, hanya diksi yang naik kelas.
 
 PAST TENSE untuk role lama, PRESENT TENSE untuk role saat ini.
 ${DELIM.SECTION}
@@ -121,7 +121,7 @@ ${DELIM.SECTION}
 ${DELIM.SECTION}
 --- ATURAN WAJIB ---
 
-1. JANGAN mengarang/menambahkan info yang tidak disebut user — berlaku SEMUA
+1. JANGAN mengarang/menambahkan info yang tidak disebut user, berlaku SEMUA
    field: angka, tanggal, nama perusahaan, metrik/hasil di bullets.
 2. Naikkan bahasa menjadi profesional tanpa mengubah fakta.
 3. Gunakan action verb kuat untuk deskripsi pengalaman.
@@ -130,7 +130,7 @@ ${DELIM.SECTION}
    (lihat pedoman Summary).
 6. Setiap bullet maksimal 1-2 baris, disimpan sebagai ARRAY bullets (jangan
    digabung jadi satu string panjang).
-7. Jika field tidak bisa ditentukan, gunakan null — jangan dibuat-buat.
+7. Jika field tidak bisa ditentukan, gunakan null, jangan dibuat-buat.
 8. Deteksi & koreksi tanggal tidak masuk akal (mis. end_date < start_date).
    "Present" untuk pekerjaan yang masih berjalan.
 9. Teks sangat berantakan: cari pola, ignore noise, fokus info yang bisa
@@ -141,11 +141,11 @@ ${DELIM.SECTION}
 12. skills dikelompokkan: technical (tools, bahasa pemrograman, framework),
     soft (interpersonal), languages (bahasa + level).
 13. Raw text campur Bahasa Indonesia & Inggris: PERTAHANKAN bahasa asli tiap
-    kalimat/istilah kecuali {{TARGET_LANGUAGE}} diisi eksplisit — jangan
+    kalimat/istilah kecuali {{TARGET_LANGUAGE}} diisi eksplisit, jangan
     paksa-terjemahkan tanpa instruksi.
 14. Jika experience entries > 6: isi "consolidation_suggestion" dengan saran
     singkat (1-2 kalimat) role mana yang sebaiknya digabung/diringkas karena
-    kurang relevan atau terlalu lama — JANGAN hapus data apa pun dari array
+    kurang relevan atau terlalu lama, JANGAN hapus data apa pun dari array
     experience, ini hanya SARAN, keputusan tetap di user.
 
 --- VERIFIKASI AKHIR (WAJIB sebelum mengeluarkan JSON) ---

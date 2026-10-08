@@ -547,7 +547,7 @@ export default function BuilderPage() {
               onExportPdf={handleExportPdf}
             />
 
-            {/* ── PREVIEW AREA — scrollable continuous with page break indicators ── */}
+            {/* ── PREVIEW AREA, scrollable continuous with page break indicators ── */}
             <div className="flex-1 flex flex-col items-center bg-surface-dim/20 custom-scrollbar" style={{ minHeight: 0, overflowY: 'auto' }}>
               <div className="w-full max-w-[210mm] px-[15mm] py-4 md:py-6">
                 {/* Page count badge */}
@@ -557,7 +557,7 @@ export default function BuilderPage() {
                     {t("builder.page-badge").replace("{pages}", String(allPageCount)).replace("{margin}", marginMode === "tight" ? "10" : marginMode === "normal" ? "20" : "30")}
                   </div>
                 )}
-                {/* A4 Paper Preview — scrollable continuous paper */}
+                {/* A4 Paper Preview, scrollable continuous paper */}
                 <div
                   ref={previewRef}
                   className="a4-preview origin-top scale-[0.85] lg:scale-100 max-w-full shrink-0"

@@ -223,7 +223,7 @@ export default function ProfilePage() {
         <main className="pt-20 pb-32 px-margin-mobile md:px-gutter flex justify-center">
           <div className="w-full max-w-[800px] flex flex-col gap-6">
             {/* Progress */}
-            <section className="bg-white rounded-xl p-8 shadow-soft border-t-4 border-primary">
+            <section className="bg-surface-container-lowest rounded-xl p-8 shadow-soft border-t-4 border-primary">
               <div className="flex justify-between items-end mb-4">
                 <div>
                   <h1 className="font-headline-lg text-on-background mb-1">{t("profile.title")}</h1>
@@ -356,8 +356,8 @@ export default function ProfilePage() {
                 <div className="px-6 flex flex-col gap-4">
                   {skills.map((item) => (
                     <div key={item.id} className="flex items-center gap-3 border border-outline-variant rounded-xl p-3 bg-background">
-                      <input className="flex-1 p-2 rounded-lg border border-outline-variant bg-white text-body-md" placeholder={t("profile.placeholder-skill")} value={item.name} onChange={(e) => updateSkill(item.id, "name", e.target.value)} />
-                      <select className="p-2 rounded-lg border border-outline-variant bg-white text-body-md" value={item.level} onChange={(e) => updateSkill(item.id, "level", e.target.value)}>
+                      <input className="flex-1 p-2 rounded-lg border border-outline-variant bg-surface-container-lowest text-body-md" placeholder={t("profile.placeholder-skill")} value={item.name} onChange={(e) => updateSkill(item.id, "name", e.target.value)} />
+                      <select className="p-2 rounded-lg border border-outline-variant bg-surface-container-lowest text-body-md" value={item.level} onChange={(e) => updateSkill(item.id, "level", e.target.value)}>
                         <option value="beginner">Beginner</option>
                         <option value="intermediate">Intermediate</option>
                         <option value="advanced">Advanced</option>
@@ -375,7 +375,7 @@ export default function ProfilePage() {
         </main>
 
         {/* Sticky Save */}
-        <footer className="fixed bottom-0 left-0 w-full z-50 bg-white shadow-lg border-t border-outline-variant/10">
+        <footer className="fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest shadow-lg border-t border-outline-variant/10">
           <div className="max-w-[1200px] mx-auto px-5 md:px-10 h-20 flex items-center justify-between">
             <div className="flex items-center gap-2 text-on-surface-variant">
               <span className="material-symbols-outlined text-primary text-xl select-none">save</span>
@@ -393,7 +393,7 @@ export default function ProfilePage() {
           </div>
         </footer>
 
-        {/* Konfirmasi tersimpan — animasi sukses */}
+        {/* Konfirmasi tersimpan, animasi sukses */}
         <AnimatePresence>
           {justSaved && (
             <motion.div
@@ -438,7 +438,7 @@ function Accordion({ id, icon, title, isOpen, onToggle, children }: {
   id: string; icon: string; title: string; isOpen: boolean; onToggle: (id: string) => void; children: React.ReactNode;
 }) {
   return (
-    <div className="bg-white rounded-xl shadow-soft">
+    <div className="bg-surface-container-lowest rounded-xl shadow-soft">
       <button className="w-full flex items-center justify-between p-6 text-left" onClick={() => onToggle(id)}>
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary">

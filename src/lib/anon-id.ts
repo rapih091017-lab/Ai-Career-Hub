@@ -5,7 +5,7 @@
  *
  * Setiap browser mendapat UUID unik yang disimpan di localStorage, lalu
  * dikirim sebagai header `x-anon-id`. Server memakai ini sebagai fingerprint
- * kuota — jadi kuota 2x tidak dishare antar user yang kebetulan punya
+ * kuota, jadi kuota 2x tidak dishare antar user yang kebetulan punya
  * IP / User-Agent yang sama (masalah umum di localhost & jaringan NAT).
  */
 const STORAGE_KEY = "ai-career-hub-anon-id";
@@ -22,14 +22,14 @@ export function getAnonId(): string {
       localStorage.setItem(STORAGE_KEY, cached);
     }
   } catch {
-    // localStorage tidak tersedia (privacy mode) — pakai id ephemeral
+    // localStorage tidak tersedia (privacy mode), pakai id ephemeral
     cached = `anon-${Date.now()}-${Math.random().toString(36).slice(2)}`;
   }
 
   return cached;
 }
 
-/** Header helper — pakai di fetch yang butuh kuota anonim. */
+/** Header helper, pakai di fetch yang butuh kuota anonim. */
 export function anonIdHeaders(): Record<string, string> {
   return { "x-anon-id": getAnonId() };
 }

@@ -58,7 +58,7 @@ export default function CssThumbnail({ templateId, className = "" }: CssThumbnai
 
   return (
     <div
-      className={`relative w-full overflow-hidden rounded-lg bg-white ${className}`}
+      className={`relative w-full overflow-hidden rounded-lg bg-surface-container-lowest ${className}`}
       style={{ aspectRatio: "210 / 297", fontFamily: style.bodyFont }}
     >
       {/* Header area */}

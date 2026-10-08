@@ -57,7 +57,7 @@ export function ShareButton({
   return (
     <button
       onClick={handleShare}
-      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-semibold border border-outline-variant/40 bg-white text-on-surface-variant hover:border-primary/30 hover:text-primary transition-all active:scale-[0.97] ${className}`}
+      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-semibold border border-outline-variant/40 bg-surface-container-lowest text-on-surface-variant hover:border-primary/30 hover:text-primary transition-all active:scale-[0.97] ${className}`}
       title={copied ? "Tersalin!" : label}
     >
       <span className="material-symbols-outlined text-[12px]">{copied ? "check" : "share"}</span>

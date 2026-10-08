@@ -70,7 +70,7 @@ export function ConfirmModal({ confirm, onClose }: ConfirmModalProps) {
             role="alertdialog"
             aria-labelledby="confirm-title"
             aria-describedby="confirm-message"
-            className="relative bg-white rounded-2xl shadow-premium-xl border border-outline-variant/50 p-6 w-[90vw] max-w-sm mx-4"
+            className="relative bg-surface-container-lowest rounded-2xl shadow-premium-xl border border-outline-variant/50 p-6 w-[90vw] max-w-sm mx-4"
           >
             {/* Icon */}
             <div

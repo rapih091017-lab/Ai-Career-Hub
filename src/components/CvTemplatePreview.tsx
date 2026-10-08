@@ -76,7 +76,7 @@ export default function CvTemplatePreview({ templateId = "industrial-pro" }: CvT
 
   return (
     <div
-      className="relative w-full overflow-hidden rounded-lg bg-white"
+      className="relative w-full overflow-hidden rounded-lg bg-surface-container-lowest"
       style={{ aspectRatio: "210 / 297" /* A4 ratio */ }}
     >
       {/* Clipped container that shows only the top portion */}

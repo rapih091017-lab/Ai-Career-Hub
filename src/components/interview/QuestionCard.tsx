@@ -141,7 +141,7 @@ export function QuestionCard({
   return (
     <motion.div
       layout
-      className={`bg-white rounded-xl border overflow-hidden transition-colors ${
+      className={`bg-surface-container-lowest rounded-xl border overflow-hidden transition-colors ${
         isBookmarked
           ? "border-amber-300 shadow-premium-sm"
           : "border-outline-variant/30 shadow-premium-sm"

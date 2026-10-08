@@ -135,10 +135,10 @@ export default function Logos3({
         </motion.p>
       </div>
 
-      {/* Auto-scroll Carousel — Trust Badges (no numbers) */}
+      {/* Auto-scroll Carousel, Trust Badges (no numbers) */}
       <div className="pt-2 md:pt-4">
         <div className="relative mx-auto flex items-center justify-center lg:max-w-5xl">
-          {/* Carousel — z-[1] so it sits above fade edges */}
+          {/* Carousel, z-[1] so it sits above fade edges */}
           <div className="relative z-[1] w-full">
             <Carousel
               opts={{ loop: true, dragFree: true }}
@@ -156,7 +156,7 @@ export default function Logos3({
                       animate={inView ? "visible" : "hidden"}
                       className="mx-2 md:mx-4"
                     >
-                      <div className="group relative w-[140px] sm:w-[160px] md:w-[180px] rounded-2xl border border-outline-variant/20 bg-white p-3 md:p-4 text-center cursor-default
+                      <div className="group relative w-[140px] sm:w-[160px] md:w-[180px] rounded-2xl border border-outline-variant/20 bg-surface-container-lowest p-3 md:p-4 text-center cursor-default
                         shadow-[0_2px_8px_-2px_rgba(0,0,0,0.06),0_6px_16px_-4px_rgba(0,0,0,0.08),0_12px_24px_-6px_rgba(0,0,0,0.04)]
                         hover:shadow-[0_4px_12px_-2px_rgba(0,0,0,0.1),0_12px_28px_-4px_rgba(0,0,0,0.12),0_20px_40px_-8px_rgba(0,0,0,0.06)]
                         [transform-style:preserve-3d] hover:[transform:perspective(600px)_rotateX(2deg)_rotateY(-1deg)_translateY(-8px)_scale(1.02)]
@@ -198,7 +198,7 @@ export default function Logos3({
             </Carousel>
           </div>
 
-          {/* Fade edges — z-[2] but pointer-events-none so they don't block interaction */}
+          {/* Fade edges, z-[2] but pointer-events-none so they don't block interaction */}
           <div className="absolute inset-y-0 left-0 w-10 sm:w-20 bg-gradient-to-r from-surface-container-low via-surface-container-low/80 to-transparent pointer-events-none z-[2]" />
           <div className="absolute inset-y-0 right-0 w-10 sm:w-20 bg-gradient-to-l from-surface-container-low via-surface-container-low/80 to-transparent pointer-events-none z-[2]" />
         </div>

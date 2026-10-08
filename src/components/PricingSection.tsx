@@ -195,7 +195,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
 
   return (
     <section id="pricing" className="relative overflow-hidden bg-gradient-to-b from-white via-[#f0fafb] to-white dark:from-[#0F0F0F] dark:via-[#1A1A2E] dark:to-[#0F0F0F] py-24 md:py-32">
-      {/* Satu orb ambient statis — kedalaman halus tanpa loop (R-01/R-19) */}
+      {/* Satu orb ambient statis, kedalaman halus tanpa loop (R-01/R-19) */}
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none dark:bg-primary/10" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-margin-mobile md:px-gutter">
@@ -212,7 +212,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
 
         {/* ─── TOGGLE ─── */}
         <div className="flex justify-center mb-10">
-          <motion.div className="inline-flex bg-white dark:bg-[#1F1F2E] rounded-2xl p-1.5 shadow-premium-md border border-outline-variant/30 dark:border-gray-700"
+          <motion.div className="inline-flex bg-surface-container-lowest dark:bg-[#1F1F2E] rounded-2xl p-1.5 shadow-premium-md border border-outline-variant/30 dark:border-gray-700"
             initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.1 }}>
             {(["satuan", "langganan"] as const).map((m) => (
               <button key={m} onClick={() => setMode(m)}
@@ -357,7 +357,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
             {showComparison && (
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: "easeInOut" }} className="overflow-hidden">
-                <div className="bg-white rounded-2xl border border-outline-variant/30 overflow-hidden shadow-premium-sm mt-2">
+                <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/30 overflow-hidden shadow-premium-sm mt-2">
                   <div className="overflow-x-auto">
                     <table className="w-full text-left">
                       <thead>
@@ -371,7 +371,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
                       </thead>
                       <tbody>
                         {COMPARISON_ROW_KEYS.map((row, i) => (
-                          <tr key={row.labelKey} className={`border-b border-outline-variant/10 ${i % 2 === 0 ? "bg-white" : "bg-surface-container-low/50"}`}>
+                          <tr key={row.labelKey} className={`border-b border-outline-variant/10 ${i % 2 === 0 ? "bg-surface-container-lowest" : "bg-surface-container-low/50"}`}>
                             <td className="p-4 text-sm font-medium text-on-surface">{t(row.labelKey)}</td>
                             <td className="p-4 text-sm text-on-surface-variant">{row.free}</td>
                             <td className="p-4 text-sm text-on-surface-variant">{row.starter}</td>
@@ -392,7 +392,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
         <motion.div className="mt-16"
           initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.1 }}>
           <h3 className="font-headline-md text-center text-on-surface dark:text-white mb-8">{t("pricing.faq-title")}</h3>
-          <div className="max-w-2xl mx-auto divide-y divide-outline-variant/20 dark:divide-gray-700 bg-white dark:bg-[#1A1A2E] rounded-2xl border border-outline-variant/30 dark:border-gray-700 shadow-premium-sm overflow-hidden">
+          <div className="max-w-2xl mx-auto divide-y divide-outline-variant/20 dark:divide-gray-700 bg-surface-container-lowest dark:bg-[#1A1A2E] rounded-2xl border border-outline-variant/30 dark:border-gray-700 shadow-premium-sm overflow-hidden">
             {FAQ_KEYS.map((idx) => (
               <div key={idx}>
                 <button onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
@@ -448,7 +448,7 @@ function PricingCard({ plan, delay, onSelectPlan, mode, tFn }: {
         plan.featured
           ? "lg:scale-105 z-10 border-2 border-primary shadow-[0_8px_32px_rgba(13,115,119,0.15)] dark:shadow-[0_8px_32px_rgba(13,115,119,0.3)]"
           : "border border-outline-variant/40 dark:border-gray-700 shadow-premium-sm hover:shadow-premium-md"
-      ) + " " + (isHovered ? "translate-y-[-4px]" : "") + " bg-white dark:bg-[#1A1A2E] dark:text-white"}>
+      ) + " " + (isHovered ? "translate-y-[-4px]" : "") + " bg-surface-container-lowest dark:bg-[#1A1A2E] dark:text-white"}>
       {/* Badge */}
       {plan.badgeKey && (
         <div className={"absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold whitespace-nowrap shadow-md " + (

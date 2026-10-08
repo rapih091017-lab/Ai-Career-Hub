@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
   // ── Anti double-click: resume order pending yang masih aktif ─────────────
   // Kalau user punya transaksi pending yang belum kedaluwarsa untuk paket yang
-  // sama, kembalikan redirect_url transaksi itu — jangan bikin order baru.
+  // sama, kembalikan redirect_url transaksi itu, jangan bikin order baru.
   const now = new Date();
   const existingPending = await db
     .select()
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + pkgDef.periodDays);
 
-  // Simpan pending payment ke DB — harga + definisi fitur di-snapshot di sini
+  // Simpan pending payment ke DB, harga + definisi fitur di-snapshot di sini
   const [payment] = await db
     .insert(payments)
     .values({

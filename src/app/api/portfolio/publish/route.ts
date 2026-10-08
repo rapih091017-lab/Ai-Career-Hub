@@ -41,7 +41,7 @@ function upgradeBody() {
   );
 }
 
-/* ─── GET /api/portfolio/publish — status publish + entitlement user ─── */
+/* ─── GET /api/portfolio/publish, status publish + entitlement user ─── */
 export const GET = apiHandler(async () => {
   const auth = await withAuth();
   if (auth instanceof NextResponse) return auth;
@@ -80,7 +80,7 @@ export const GET = apiHandler(async () => {
   });
 });
 
-/* ─── POST /api/portfolio/publish — publish / update ─── */
+/* ─── POST /api/portfolio/publish, publish / update ─── */
 export const POST = apiHandler(async (request: NextRequest) => {
   const auth = await withAuth();
   if (auth instanceof NextResponse) return auth;
@@ -181,7 +181,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
   });
 });
 
-/* ─── DELETE /api/portfolio/publish — unpublish (selalu boleh) ─── */
+/* ─── DELETE /api/portfolio/publish, unpublish (selalu boleh) ─── */
 export const DELETE = apiHandler(async () => {
   const auth = await withAuth();
   if (auth instanceof NextResponse) return auth;

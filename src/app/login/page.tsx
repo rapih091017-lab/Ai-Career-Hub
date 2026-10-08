@@ -28,8 +28,8 @@ export default function LoginPage() {
 
   return (
     <>
-      {/* Navbar — logo klik = kembali ke beranda */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm border-b border-outline-variant/10 px-margin-mobile md:px-gutter py-4 flex justify-center md:justify-start">
+      {/* Navbar, logo klik = kembali ke beranda */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest shadow-sm border-b border-outline-variant/10 px-margin-mobile md:px-gutter py-4 flex justify-center md:justify-start">
         <Link href="/" className="flex items-center gap-2 group">
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white group-hover:brightness-110 transition-all">
             <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
@@ -40,14 +40,14 @@ export default function LoginPage() {
 
       {/* Main */}
       <main className="min-h-screen flex pt-16 bg-background">
-        {/* Left Side — Gradient Brand + Ripple Background */}
+        {/* Left Side, Gradient Brand + Ripple Background */}
         <section className="hidden lg:flex flex-col items-center justify-center w-1/2 relative overflow-hidden bg-gradient-to-br from-surface-container-low via-white to-surface-container-low">
-          {/* Ripple — subtle background effect */}
+          {/* Ripple, subtle background effect */}
           <div className="absolute inset-0 pointer-events-none z-0">
             <Ripple mainCircleSize={100} mainCircleOpacity={0.08} numCircles={8} />
           </div>
 
-          {/* Gradient Brand Text — centered, unobstructed */}
+          {/* Gradient Brand Text, centered, unobstructed */}
           <div className="relative z-10 flex flex-col items-center gap-4 px-12">
             <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center">
               <span className="material-symbols-outlined text-4xl text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
@@ -61,7 +61,7 @@ export default function LoginPage() {
           </div>
         </section>
 
-        {/* Right Side — Google Login */}
+        {/* Right Side, Google Login */}
         <section className="w-full lg:w-1/2 flex flex-col justify-center items-center px-6 md:px-12 py-20">
           <div className="w-full max-w-md">
             <motion.div

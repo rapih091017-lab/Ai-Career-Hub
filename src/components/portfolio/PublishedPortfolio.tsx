@@ -26,7 +26,7 @@ interface PublishedPortfolioProps {
   showFooter?: boolean;
 }
 
-/** Render portfolio publik — persis seperti preview (WYSIWYG), tanpa chrome app. */
+/** Render portfolio publik, persis seperti preview (WYSIWYG), tanpa chrome app. */
 export default function PublishedPortfolio({
   data,
   themeId,

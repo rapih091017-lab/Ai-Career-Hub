@@ -61,7 +61,7 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
           setPublishedUrl(null);
         }
       } else {
-        // Server error — asumsikan trial masih tersedia agar publish tidak terkunci
+        // Server error, asumsikan trial masih tersedia agar publish tidak terkunci
         setPlan({ entitled: false, trialUsed: false, trialAvailable: true, upgradeUrl: "/settings/billing?plan=portfolio-web" });
       }
     } catch {
@@ -186,7 +186,7 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
     !publishedUrl
       ? entitledCanPublish || trialCanPublish
       : updateMode && canUpdate;
-  // User bebas (bukan premium/paid) yang sudah publish — butuh upgrade utk update.
+  // User bebas (bukan premium/paid) yang sudah publish, butuh upgrade utk update.
   const showUpgradeGate = !plan?.entitled && plan?.trialUsed === true;
 
   return (
@@ -201,7 +201,7 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
         onClick={onClose}
         aria-label={t("publish.close")}
       />
-      <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
+      <div className="relative w-full max-w-md bg-surface-container-lowest rounded-2xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div>

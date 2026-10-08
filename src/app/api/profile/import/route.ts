@@ -29,7 +29,7 @@ const importedProfileSchema = z.object({
       email: textItem(200),
       address: textItem(300),
       linkedin: textItem(300),
-      /** Website / portofolio (opsional) — ikut diisi bila ada di teks CV. */
+      /** Website / portofolio (opsional), ikut diisi bila ada di teks CV. */
       portfolioUrl: textItem(300),
       summary: textItem(2000),
     })

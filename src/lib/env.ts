@@ -2,7 +2,7 @@
  * Environment Variable Validation
  *
  * Validates all required env vars on startup using Zod.
- * Fail fast — if a required var is missing, throw immediately
+ * Fail fast, if a required var is missing, throw immediately
  * so the dev/deploy knows exactly what's wrong.
  */
 
@@ -10,15 +10,15 @@ import { z } from "zod";
 
 const envSchema = z.object({
   // ── Database ────────────────────────────────────────────
-  DATABASE_URL: z.string().min(1, "DATABASE_URL is required — PostgreSQL connection string"),
+  DATABASE_URL: z.string().min(1, "DATABASE_URL is required, PostgreSQL connection string"),
 
   // ── NextAuth ────────────────────────────────────────────
-  AUTH_SECRET: z.string().min(1, "AUTH_SECRET is required — generate via: openssl rand -base64 32"),
+  AUTH_SECRET: z.string().min(1, "AUTH_SECRET is required, generate via: openssl rand -base64 32"),
   AUTH_GOOGLE_ID: z.string().optional(),
   AUTH_GOOGLE_SECRET: z.string().optional(),
 
   // ── AI / DeepSeek ───────────────────────────────────────
-  DEEPSEEK_API_KEY: z.string().min(1, "DEEPSEEK_API_KEY is required — get from https://platform.deepseek.com/api_keys"),
+  DEEPSEEK_API_KEY: z.string().min(1, "DEEPSEEK_API_KEY is required, get from https://platform.deepseek.com/api_keys"),
   OPENAI_BASE_URL: z.string().url("OPENAI_BASE_URL must be a valid URL").default("https://api.deepseek.com/v1"),
 
   // ── Midtrans Payment ────────────────────────────────────

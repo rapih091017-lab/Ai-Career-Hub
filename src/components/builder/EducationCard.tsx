@@ -32,7 +32,7 @@ export function EducationCard({ edu, index, totalItems, jobTitle, skills, jobDes
           <h3 className="font-label-bold text-on-surface">Pendidikan {index + 1}</h3>
         </div>
         <div className="flex items-center gap-1">
-          {/* Visibility toggle — dedicated boolean handler */}
+          {/* Visibility toggle, dedicated boolean handler */}
           <button
             type="button"
             onClick={() => onToggleVisibility(index)}

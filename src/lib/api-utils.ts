@@ -164,7 +164,7 @@ export async function checkQuota(
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
- * Catat pemakaian fitur. resource_id di DB bertipe UUID — nilai non-UUID
+ * Catat pemakaian fitur. resource_id di DB bertipe UUID, nilai non-UUID
  * (misal nama file) akan ditolak Postgres (22P02), jadi dinormalisasi ke null.
  */
 export async function logUsage(

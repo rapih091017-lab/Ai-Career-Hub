@@ -12,7 +12,7 @@ const MINIMAL_ANALYSIS = {
     summary: { score: 70, issues: ["Terlalu generik"], suggestions: ["Tambahkan keyword spesifik"] },
     experience: { score: 65, issues: [], suggestions: [] },
     skills: { score: 60, missing_skills: ["TypeScript"], recommendations: ["Tambahkan TypeScript"] },
-    education: { score: 80, relevance: "S1 Ilmu Komputer — relevan", suggestions: [] },
+    education: { score: 80, relevance: "S1 Ilmu Komputer, relevan", suggestions: [] },
     format_ats: { score: 55, issues: ["Format tabel"], tips: ["Ganti dengan single-column"] },
   },
   keyword_analysis: {

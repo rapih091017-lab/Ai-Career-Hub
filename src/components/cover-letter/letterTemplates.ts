@@ -1,5 +1,5 @@
 /**
- * Template Surat — setiap JENIS surat punya kombinasi
+ * Template Surat, setiap JENIS surat punya kombinasi
  * gaya penulisan (style → prompt AI) + format visual (preview A4) sendiri.
  *
  * Template ini dipakai oleh SuratLamaranApp (stepper) untuk:
@@ -8,7 +8,7 @@
  */
 export interface LetterTemplate {
   id: string;
-  /** Jenis surat — dipakai untuk grouping & label */
+  /** Jenis surat, dipakai untuk grouping & label */
   type: "lamaran" | "cover" | "motivation";
   /** style yang dikirim ke API generate (harus valid di backend) */
   style: "formal" | "formal_lengkap" | "ats" | "casual" | "motivation";
@@ -99,7 +99,7 @@ export const LETTER_TEMPLATES: LetterTemplate[] = [
     style: "motivation",
     label: "Motivation Letter",
     badge: "Bukan untuk Melamar Kerja",
-    desc: "BUKAN surat lamaran kerja — untuk beasiswa, program pertukaran, magang bergengsi, atau fresh graduate. Fokus passion, alasan personal, tujuan jangka panjang.",
+    desc: "BUKAN surat lamaran kerja, untuk beasiswa, program pertukaran, magang bergengsi, atau fresh graduate. Fokus passion, alasan personal, tujuan jangka panjang.",
     icon: "emoji_events",
     defaultLang: "id",
     format: {
@@ -113,7 +113,7 @@ export const LETTER_TEMPLATES: LetterTemplate[] = [
   },
 ];
 
-/** Template kasual — opsional pelengkap di bawah template utama */
+/** Template kasual, opsional pelengkap di bawah template utama */
 export const CASUAL_TEMPLATE: LetterTemplate = {
   id: "casual",
   type: "lamaran",

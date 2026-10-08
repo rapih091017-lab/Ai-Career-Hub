@@ -115,7 +115,7 @@ function BuilderNewFormContent() {
         </p>
       </div>
 
-      {/* Ambil pilihan lewat popup — konten halaman sebagai fallback */}
+      {/* Ambil pilihan lewat popup, konten halaman sebagai fallback */}
       <div className="flex justify-center pt-8">
         <div className="bg-surface-container-lowest rounded-xl shadow-premium-md p-8 max-w-md w-full text-center border border-outline-variant/50 space-y-4">
           <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">

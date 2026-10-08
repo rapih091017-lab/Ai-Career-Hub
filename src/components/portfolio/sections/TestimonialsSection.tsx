@@ -8,7 +8,7 @@ import { usePortfolioTheme } from "../PortfolioCanvas";
 interface Props { items: TestimonialItem[]; }
 
 /* ═══════════════════════════════════════════════
- * GLASS — Carousel-style single card with
+ * GLASS, Carousel-style single card with
  *          dot indicators and auto-scroll feel
  * ═══════════════════════════════════════════════ */
 function GlassTestimonials({ items }: { items: TestimonialItem[] }) {
@@ -101,7 +101,7 @@ function GlassTestimonials({ items }: { items: TestimonialItem[] }) {
 }
 
 /* ═══════════════════════════════════════════════
- * BRUTAL — Single-column staggered layout,
+ * BRUTAL, Single-column staggered layout,
  *          alternating bold quote marks, minimal
  * ═══════════════════════════════════════════════ */
 function BrutalTestimonials({ items }: { items: TestimonialItem[] }) {
@@ -123,7 +123,7 @@ function BrutalTestimonials({ items }: { items: TestimonialItem[] }) {
           </h2>
         </motion.div>
 
-        {/* Single column — alternating left/right aligned */}
+        {/* Single column, alternating left/right aligned */}
         <div className="space-y-6">
           {filtered.map((tm, i) => (
             <motion.div
@@ -170,7 +170,7 @@ function BrutalTestimonials({ items }: { items: TestimonialItem[] }) {
 }
 
 /* ═══════════════════════════════════════════════
- * LUXE — Full-width centered quote cards
+ * LUXE, Full-width centered quote cards
  *        with large serif quotation marks
  * ═══════════════════════════════════════════════ */
 function LuxeTestimonials({ items }: { items: TestimonialItem[] }) {

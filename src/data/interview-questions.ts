@@ -2213,7 +2213,7 @@ export const POSITION_QUESTIONS: PositionQuestions[] = [
         category: "role-specific",
         question: "Apa perbedaan antara Business Analyst dan Data Analyst?",
         answer:
-          "Data Analyst fokus pada mengolah dan menyajikan data (statistik, visualisasi, insight dari data). Business Analyst lebih fokus pada memahami kebutuhan bisnis, menganalisis proses, dan menjembatani antara stakeholder dengan tim teknis — data adalah salah satu alatnya untuk mendukung rekomendasi solusi.",
+          "Data Analyst fokus pada mengolah dan menyajikan data (statistik, visualisasi, insight dari data). Business Analyst lebih fokus pada memahami kebutuhan bisnis, menganalisis proses, dan menjembatani antara stakeholder dengan tim teknis, data adalah salah satu alatnya untuk mendukung rekomendasi solusi.",
         tips: ["Jelaskan dengan contoh nyata dari pengalaman kerja Anda"],
         followUp: "Kalau Anda harus memilih salah satu, peran mana yang lebih Anda kuasai?",
       },

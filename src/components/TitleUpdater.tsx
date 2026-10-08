@@ -28,7 +28,7 @@ const pageTitles: Record<string, { id: string; en: string }> = {
 
 const pageDescriptions: Record<string, { id: string; en: string }> = {
   "/dashboard": { id: "Kelola CV dan pantau progress kariermu dalam satu dashboard.", en: "Manage your CVs and track career progress in one dashboard." },
-  "/my-resumes": { id: "Semua CV kamu dalam satu tempat — buat, edit, kelola.", en: "All your CVs in one place — create, edit, manage." },
+  "/my-resumes": { id: "Semua CV kamu dalam satu tempat, buat, edit, kelola.", en: "All your CVs in one place, create, edit, manage." },
   "/checker": { id: "Analisis CV-mu dengan AI dan dapatkan skor ATS lengkap dengan rekomendasi perbaikan.", en: "Analyze your CV with AI and get a complete ATS score with improvement suggestions." },
   "/builder/new": { id: "Buat CV ATS-friendly dengan bantuan AI, pilih template profesional dan isi data langkah demi langkah.", en: "Create an ATS-friendly CV with AI assistance, choose professional templates and fill data step by step." },
   "/portfolio": { id: "Buat portofolio website profesional dalam hitungan menit, tampilkan karya terbaikmu.", en: "Build a professional portfolio website in minutes, showcase your best work." },
@@ -91,7 +91,7 @@ export default function TitleUpdater() {
       document.querySelector('meta[name="twitter:description"]')?.setAttribute("content", desc);
     }
 
-    // Per-page OG image — all pages use same base OG image for now
+    // Per-page OG image, all pages use same base OG image for now
     const ogImage = "/og-image.png";
     document.querySelector('meta[property="og:image"]')?.setAttribute("content", ogImage);
     document.querySelector('meta[name="twitter:image"]')?.setAttribute("content", ogImage);

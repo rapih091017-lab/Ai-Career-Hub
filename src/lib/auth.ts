@@ -37,7 +37,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       if (!dbUser || dbUser.status === "active") return true;
 
-      // Google sudah memverifikasi email — user pending legacy langsung aktif
+      // Google sudah memverifikasi email, user pending legacy langsung aktif
       if (account?.provider === "google") {
         await db
           .update(schema.users)

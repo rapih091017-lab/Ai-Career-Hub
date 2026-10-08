@@ -65,7 +65,7 @@ export default function CheckoutHistoryPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <section className="bg-white rounded-2xl shadow-soft border border-outline-variant/30 overflow-hidden">
+      <section className="bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/30 overflow-hidden">
         <div className="px-6 py-5 border-b border-outline-variant/30 flex items-center gap-4">
           <div className="w-10 h-10 rounded-xl bg-secondary-container/50 flex items-center justify-center text-secondary">
             <span className="material-symbols-outlined">shopping_cart_checkout</span>

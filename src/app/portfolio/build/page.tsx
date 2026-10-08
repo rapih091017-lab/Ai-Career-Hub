@@ -229,7 +229,7 @@ export default function PortfolioBuildPage() {
       setExtraLinks(draft.extraLinks);
       setSaveStatus("saved");
     } else {
-      // No draft — tampilkan source picker popup
+      // No draft, tampilkan source picker popup
       setShowSourcePicker(true);
     }
     isFirstLoad.current = false;
@@ -372,7 +372,7 @@ export default function PortfolioBuildPage() {
       })
       .catch(() => {
         setProfileLoading(false);
-        /* profile not found — wajar, user mungkin belum isi profil */
+        /* profile not found, wajar, user mungkin belum isi profil */
       });
   }, []);
 
@@ -539,7 +539,7 @@ export default function PortfolioBuildPage() {
         <main className="pt-24 px-margin-mobile md:px-gutter flex justify-center">
           <div className="w-full max-w-[800px] flex flex-col gap-6">
             {/* Progress */}
-            <section className="bg-white rounded-2xl p-6 shadow-premium-sm border-t-4 border-primary">
+            <section className="bg-surface-container-lowest rounded-2xl p-6 shadow-premium-sm border-t-4 border-primary">
               <div className="flex justify-between items-end mb-4">
                 <div>
                   <h1 className="font-headline-lg text-on-background mb-1">{t("build.title")}</h1>
@@ -570,7 +570,7 @@ export default function PortfolioBuildPage() {
                   </p>
                 )}
 
-                {/* Generate dari CV — re-open source picker */}
+                {/* Generate dari CV, re-open source picker */}
                 <button
                   onClick={() => setShowSourcePicker(true)}
                   disabled={userCvList.length === 0}
@@ -580,7 +580,7 @@ export default function PortfolioBuildPage() {
                   Generate dari CV
                 </button>
 
-                {/* Saran AI — aktif kalau profileForFill ada */}
+                {/* Saran AI, aktif kalau profileForFill ada */}
                 <button
                   onClick={handleAiSuggest}
                   disabled={!profileForFill || aiSuggesting}
@@ -1101,7 +1101,7 @@ export default function PortfolioBuildPage() {
               </AccordionItem>
             </div>
 
-            {/* Info — panduan resmi */}
+            {/* Info, panduan resmi */}
             <a href="/portfolio/preview" className="block p-6 rounded-2xl bg-surface-container border-2 border-dashed border-primary/20 relative overflow-hidden group hover:border-primary/40 transition-colors">
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-500"></div>
               <div className="flex gap-4 relative z-10">
@@ -1223,7 +1223,7 @@ export default function PortfolioBuildPage() {
                       key={cv.id}
                       onClick={() => generateFromCv(cv.id)}
                       disabled={generatingFromCv === cv.id}
-                      className="w-full flex items-center justify-between p-3 rounded-lg bg-white border border-outline-variant/40 hover:border-primary/40 transition-all disabled:opacity-50"
+                      className="w-full flex items-center justify-between p-3 rounded-lg bg-surface-container-lowest border border-outline-variant/40 hover:border-primary/40 transition-all disabled:opacity-50"
                     >
                       <div className="text-left">
                         <span className="font-medium text-sm text-on-surface">{cv.jobTitle || t("portfolio.cv-untitled")}</span>
@@ -1354,7 +1354,7 @@ function AccordionItem({ id, icon, title, isOpen, onToggle, children }: {
   id: AccordionKey; icon: string; title: string; isOpen: boolean; onToggle: (id: AccordionKey) => void; children: React.ReactNode;
 }) {
   return (
-    <div className={`bg-white rounded-2xl shadow-soft border border-outline-variant/30 overflow-hidden transition-all`}>
+    <div className={`bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/30 overflow-hidden transition-all`}>
       <button
         className="w-full px-6 py-5 flex items-center justify-between text-left focus:bg-surface-container"
         onClick={() => onToggle(id)}

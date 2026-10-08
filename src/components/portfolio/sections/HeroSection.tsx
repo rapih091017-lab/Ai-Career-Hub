@@ -141,7 +141,7 @@ const STAGGER_CHILD_SLOW: Variants = {
 };
 
 /* ═══════════════════════════════════════════════
- * GLASS — Centered, floating glass card,
+ * GLASS, Centered, floating glass card,
  *         animated orbs, staggered entrance,
  *         floating particles
  * ═══════════════════════════════════════════════ */
@@ -269,7 +269,7 @@ function GlassHero({ data: f, name, initials }: { data: PortfolioFormData; name:
 }
 
 /* ═══════════════════════════════════════════════
- * BRUTAL — Asymmetrical split, bold borders,
+ * BRUTAL, Asymmetrical split, bold borders,
  *          shadow boxes, anaglyph motion, particles
  * ═══════════════════════════════════════════════ */
 function BrutalHero({ data: f, name, initials }: { data: PortfolioFormData; name: string; initials: string }) {
@@ -416,7 +416,7 @@ function BrutalHero({ data: f, name, initials }: { data: PortfolioFormData; name
 }
 
 /* ═══════════════════════════════════════════════
- * LUXE — Editorial split, massive serif typography,
+ * LUXE, Editorial split, massive serif typography,
  *        film grain, warm tones, parallax
  * ═══════════════════════════════════════════════ */
 function LuxeHero({ data: f, name, initials }: { data: PortfolioFormData; name: string; initials: string }) {

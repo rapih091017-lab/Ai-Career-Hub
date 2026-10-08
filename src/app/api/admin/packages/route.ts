@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { PACKAGES } from "@/lib/access";
 import { withAdmin, apiHandler, staleWhileRevalidate } from "@/lib/api-utils";
 
-/* ─── GET — List All Packages ─── */
+/* ─── GET, List All Packages ─── */
 export const GET = apiHandler(async () => {
   const admin = await withAdmin();
   if (admin instanceof NextResponse) return admin;
@@ -21,7 +21,7 @@ export const GET = apiHandler(async () => {
   });
 });
 
-/* ─── PUT — Update a Package ─── */
+/* ─── PUT, Update a Package ─── */
 export const PUT = apiHandler(async (request: NextRequest) => {
   const admin = await withAdmin();
   if (admin instanceof NextResponse) return admin;
@@ -62,8 +62,8 @@ export const PUT = apiHandler(async (request: NextRequest) => {
   return NextResponse.json(updated, { status: 200 });
 });
 
-/* ─── POST /seed — Seed Initial Packages ─── */
-// Not wrapped in apiHandler/withAdmin — parent POST handler already provides both
+/* ─── POST /seed, Seed Initial Packages ─── */
+// Not wrapped in apiHandler/withAdmin, parent POST handler already provides both
 async function handleSeed() {
   // Check if already seeded
   const existing = await db.select({ key: packages.key }).from(packages);
@@ -97,7 +97,7 @@ async function handleSeed() {
   );
 }
 
-// Route POST handler — dispatch to handleSeed
+// Route POST handler, dispatch to handleSeed
 export const POST = apiHandler(async (request: NextRequest) => {
   const admin = await withAdmin();
   if (admin instanceof NextResponse) return admin;

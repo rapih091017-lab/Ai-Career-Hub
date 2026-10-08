@@ -131,7 +131,7 @@ export default function CheckoutPage() {
         <main className="pt-24 pb-20 px-margin-mobile md:px-gutter flex justify-center">
           <div className="w-full max-w-lg flex flex-col gap-6">
             {/* Header */}
-            <section className="bg-white rounded-2xl p-6 shadow-premium-sm border border-outline-variant/30">
+            <section className="bg-surface-container-lowest rounded-2xl p-6 shadow-premium-sm border border-outline-variant/30">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-xl bg-secondary-container/50 flex items-center justify-center text-secondary shrink-0">
                   <span className="material-symbols-outlined text-2xl">shopping_cart_checkout</span>
@@ -151,7 +151,7 @@ export default function CheckoutPage() {
                 <div className="animate-spin h-8 w-8 border-4 border-primary/30 border-t-primary rounded-full" />
               </div>
             ) : error && !cvData ? (
-              <div className="bg-white rounded-2xl p-8 text-center shadow-premium-sm border border-outline-variant/30">
+              <div className="bg-surface-container-lowest rounded-2xl p-8 text-center shadow-premium-sm border border-outline-variant/30">
                 <span className="material-symbols-outlined text-3xl text-error mb-2">error</span>
                 <p className="font-label-bold text-error">{error}</p>
                 <button onClick={() => router.push("/dashboard")} className="mt-4 text-primary font-label-bold underline">
@@ -161,7 +161,7 @@ export default function CheckoutPage() {
             ) : cvData ? (
               <>
                 {/* CV Details Card */}
-                <div className="bg-white rounded-2xl p-6 shadow-premium-sm border border-outline-variant/30 space-y-4">
+                <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-premium-sm border border-outline-variant/30 space-y-4">
                   <h3 className="font-label-bold text-on-surface flex items-center gap-2">
                     <span className="material-symbols-outlined text-secondary">description</span>
                     Detail CV
@@ -187,7 +187,7 @@ export default function CheckoutPage() {
                 </div>
 
                 {/* Package Details */}
-                <div className="bg-white rounded-2xl p-6 shadow-premium-sm border-2 border-secondary/20 space-y-4">
+                <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-premium-sm border-2 border-secondary/20 space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-label-bold text-lg text-on-surface">Single CV AI Revision</h3>

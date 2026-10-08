@@ -20,7 +20,7 @@ export default function BlogPage() {
         </div>
       </div>
       <div className="max-w-4xl mx-auto px-6 py-12">
-        <div className="p-12 rounded-2xl bg-white border border-outline-variant/30 text-center">
+        <div className="p-12 rounded-2xl bg-surface-container-lowest border border-outline-variant/30 text-center">
           <span className="material-symbols-outlined text-5xl text-primary/40 mb-4">auto_stories</span>
           <h2 className="font-headline-md text-xl text-on-surface mb-2">Konten Segera Hadir</h2>
           <p className="text-body-md text-on-surface-variant max-w-md mx-auto">

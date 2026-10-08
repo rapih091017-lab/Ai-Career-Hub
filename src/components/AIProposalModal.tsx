@@ -214,7 +214,7 @@ export default function AIProposalModal({
                       "text-left p-4 rounded-xl border-2 transition-all duration-200 " +
                       (isSelected
                         ? item.color + " border-current shadow-sm"
-                        : "border-outline-variant/30 bg-white hover:border-primary/40 hover:shadow-sm hover:bg-primary/[0.02]")
+                        : "border-outline-variant/30 bg-surface-container-lowest hover:border-primary/40 hover:shadow-sm hover:bg-primary/[0.02]")
                     }
                   >
                     <div className="flex items-center justify-between mb-2">

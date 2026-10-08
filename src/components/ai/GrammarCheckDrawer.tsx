@@ -25,7 +25,7 @@ interface GrammarCheckResult {
 }
 
 /**
- * GrammarCheckDrawer — Komponen drawer untuk menampilkan hasil grammar check
+ * GrammarCheckDrawer, Komponen drawer untuk menampilkan hasil grammar check
  * Menggunakan Material Symbols icons dan useToast
  */
 interface GrammarCheckDrawerProps {
@@ -143,7 +143,7 @@ export function GrammarCheckDrawer({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm">
-      <div className="bg-white h-full w-full max-w-md shadow-2xl flex flex-col">
+      <div className="bg-surface-container-lowest h-full w-full max-w-md shadow-2xl flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <div className="flex items-center gap-3">
@@ -241,7 +241,7 @@ export function GrammarCheckDrawer({
                       className={`border rounded-lg overflow-hidden transition-all ${
                         appliedFixes.has(index)
                           ? "bg-green-50 border-green-200"
-                          : "bg-white border-gray-200 hover:border-gray-300"
+                          : "bg-surface-container-lowest border-gray-200 hover:border-gray-300"
                       }`}
                     >
                       {/* Error Header */}

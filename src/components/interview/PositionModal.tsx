@@ -77,7 +77,7 @@ export function PositionModal({
           className="w-full max-w-[700px] bg-background rounded-2xl shadow-premium-xl border border-outline-variant/50 overflow-hidden"
         >
           {/* Header */}
-          <div className="sticky top-0 bg-white border-b border-outline-variant/30 z-10">
+          <div className="sticky top-0 bg-surface-container-lowest border-b border-outline-variant/30 z-10">
             <div className="flex items-center justify-between p-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-primary-fixed flex items-center justify-center">
@@ -112,7 +112,7 @@ export function PositionModal({
                     qFilter === f.slug
                       ? "bg-primary text-on-primary border-primary"
                       : f.slug === "all"
-                        ? "bg-white text-on-surface-variant border-outline-variant/40 hover:border-primary/30"
+                        ? "bg-surface-container-lowest text-on-surface-variant border-outline-variant/40 hover:border-primary/30"
                         : f.color
                   }`}
                 >
@@ -129,7 +129,7 @@ export function PositionModal({
                   className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold border transition-all ${
                     sortMode === "category"
                       ? "bg-primary text-on-primary border-primary"
-                      : "bg-white text-on-surface-variant border-outline-variant/40 hover:border-primary/30"
+                      : "bg-surface-container-lowest text-on-surface-variant border-outline-variant/40 hover:border-primary/30"
                   }`}
                   title={sortMode === "category" ? "Urut default" : "Urut berdasarkan kategori"}
                 >
@@ -169,8 +169,8 @@ export function PositionModal({
             )}
           </div>
 
-          {/* Footer — buka dedicated page + close */}
-          <div className="sticky bottom-0 bg-white border-t border-outline-variant/30 p-3 flex items-center justify-between gap-2">
+          {/* Footer, buka dedicated page + close */}
+          <div className="sticky bottom-0 bg-surface-container-lowest border-t border-outline-variant/30 p-3 flex items-center justify-between gap-2">
             <div />
 
             <div className="flex items-center gap-2">

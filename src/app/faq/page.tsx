@@ -29,7 +29,7 @@ export default function FaqPage() {
       </div>
       <div className="max-w-3xl mx-auto px-6 py-12 space-y-6">
         {faqs.map((faq, i) => (
-          <details key={i} className="group bg-white rounded-2xl border border-outline-variant/30 overflow-hidden">
+          <details key={i} className="group bg-surface-container-lowest rounded-2xl border border-outline-variant/30 overflow-hidden">
             <summary className="px-6 py-4 font-label-bold text-on-surface cursor-pointer hover:bg-surface-container-low transition-colors list-none flex items-center justify-between">
               {faq.q}
               <span className="material-symbols-outlined text-on-surface-variant group-open:rotate-180 transition-transform">expand_more</span>

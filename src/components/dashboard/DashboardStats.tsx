@@ -25,7 +25,7 @@ export function DashboardStats({ totalCvs, recentCount, completions }: Dashboard
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.4 + i * 0.1 }}
-          className="bg-white rounded-xl p-4 shadow-premium-sm border border-outline-variant/30 flex items-center gap-3"
+          className="bg-surface-container-lowest rounded-xl p-4 shadow-premium-sm border border-outline-variant/30 flex items-center gap-3"
         >
           <div className={`w-10 h-10 rounded-xl ${card.color} flex items-center justify-center shrink-0`}>
             <span className={`material-symbols-outlined ${card.iconColor} text-xl`} style={{ fontVariationSettings: "'FILL' 1" }}>{card.icon}</span>

@@ -6,6 +6,7 @@ import AuthGuard from "@/components/AuthGuard";
 import { useToast } from "@/components/ui/toast";
 import { useTranslation } from "@/lib/i18n";
 import { AFFILIATE_REWARD_PERCENT } from "@/lib/affiliate";
+import { BANK_OPTIONS, isValidAccountHolder, isValidAccountNumber } from "@/lib/affiliate";
 
 interface ConversionRow {
   id: string;
@@ -40,39 +41,57 @@ function BankFields({
   value,
   onChange,
 }: {
-  value: { bankName: string; bankAccountNumber: string; bankAccountHolder: string };
-  onChange: (value: { bankName: string; bankAccountNumber: string; bankAccountHolder: string }) => void;
+  value: { bank: string; bankAccountNumber: string; bankAccountHolder: string };
+  onChange: (value: { bank: string; bankAccountNumber: string; bankAccountHolder: string }) => void;
 }) {
   const { t } = useTranslation();
   const inputClass =
     "w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30";
+  const accountInvalid = value.bankAccountNumber.length > 0 && !isValidAccountNumber(value.bankAccountNumber);
+  const holderInvalid = value.bankAccountHolder.length > 0 && !isValidAccountHolder(value.bankAccountHolder);
+
   return (
     <div className="mt-4 space-y-2">
       <p className="text-label-bold text-on-surface">{t("affiliate.bank-title")}</p>
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        <input
+        <select
           className={inputClass}
-          placeholder={t("affiliate.bank-name-placeholder")}
-          value={value.bankName}
-          onChange={(event) => onChange({ ...value, bankName: event.target.value })}
-          maxLength={100}
-        />
+          value={value.bank}
+          onChange={(event) => onChange({ ...value, bank: event.target.value })}
+          aria-label={t("affiliate.bank-title")}
+        >
+          <option value="">{t("affiliate.bank-select-placeholder")}</option>
+          {BANK_OPTIONS.map((bank) => (
+            <option key={bank.value} value={bank.value}>
+              {bank.label}
+            </option>
+          ))}
+        </select>
         <input
           className={inputClass}
           placeholder={t("affiliate.bank-account-placeholder")}
           value={value.bankAccountNumber}
-          onChange={(event) => onChange({ ...value, bankAccountNumber: event.target.value })}
-          maxLength={50}
+          onChange={(event) =>
+            onChange({ ...value, bankAccountNumber: event.target.value.replace(/\D/g, "").slice(0, 20) })
+          }
+          maxLength={20}
           inputMode="numeric"
         />
         <input
           className={`${inputClass} md:col-span-2`}
           placeholder={t("affiliate.bank-holder-placeholder")}
           value={value.bankAccountHolder}
-          onChange={(event) => onChange({ ...value, bankAccountHolder: event.target.value })}
-          maxLength={150}
+          onChange={(event) => onChange({ ...value, bankAccountHolder: event.target.value.slice(0, 100) })}
+          maxLength={100}
         />
       </div>
+      {accountInvalid ? (
+        <p className="text-[11px] text-error">{t("affiliate.bank-account-error")}</p>
+      ) : holderInvalid ? (
+        <p className="text-[11px] text-error">{t("affiliate.bank-holder-error")}</p>
+      ) : (
+        <p className="text-[11px] text-on-surface-variant">{t("affiliate.bank-safe-note")}</p>
+      )}
     </div>
   );
 }
@@ -86,7 +105,7 @@ export default function AffiliatePage() {
   const [origin, setOrigin] = useState("");
   const [note, setNote] = useState("");
   const [applying, setApplying] = useState(false);
-  const [bank, setBank] = useState({ bankName: "", bankAccountNumber: "", bankAccountHolder: "" });
+  const [bank, setBank] = useState({ bank: "", bankAccountNumber: "", bankAccountHolder: "" });
 
   useEffect(() => {
     setOrigin(window.location.origin);
@@ -115,7 +134,7 @@ export default function AffiliatePage() {
       const response = await fetch("/api/affiliate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ note, ...bank }),
+        body: JSON.stringify({ note, bank: bank.bank, bankAccountNumber: bank.bankAccountNumber, bankAccountHolder: bank.bankAccountHolder }),
       });
       if (!response.ok) throw new Error("apply failed");
       addToast({ type: "success", message: t("affiliate.apply-success") });
@@ -140,9 +159,9 @@ export default function AffiliatePage() {
 
   const rewardText = t("affiliate.reward-note").replace("{n}", String(AFFILIATE_REWARD_PERCENT));
   const bankComplete =
-    bank.bankName.trim().length > 0 &&
-    bank.bankAccountNumber.trim().length > 0 &&
-    bank.bankAccountHolder.trim().length > 0;
+    bank.bank.length > 0 &&
+    isValidAccountNumber(bank.bankAccountNumber) &&
+    isValidAccountHolder(bank.bankAccountHolder);
 
   const stats =
     data?.status === "approved"

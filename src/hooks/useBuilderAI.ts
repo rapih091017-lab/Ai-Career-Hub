@@ -157,7 +157,7 @@ export function useBuilderAI({
       cvData.organisations.some((o) => !!o.name),
       // 5: Skill
       cvData.skills.some((s) => !!s.name),
-      // 6: Review — always accessible
+      // 6: Review, always accessible
       true,
     ];
   }, [cvData]);

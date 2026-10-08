@@ -83,7 +83,7 @@ export default async function ContactPage() {
           </div>
 
           {/* Info Card */}
-          <div className="bg-white rounded-2xl border border-outline-variant/30 p-8 shadow-soft">
+          <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/30 p-8 shadow-soft">
             <h2 className="font-headline-md text-xl text-on-surface mb-4">Respon Cepat</h2>
             <p className="text-body-md text-on-surface-variant mb-6 leading-relaxed">
               Kami berkomitmen untuk merespon setiap pertanyaan dalam waktu 1x24 jam pada hari kerja.

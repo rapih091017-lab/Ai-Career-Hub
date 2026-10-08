@@ -30,9 +30,9 @@ Tulis ulang deskripsi pengalaman kerja / bullet point CV menjadi 3 versi
 dengan tingkat kekuatan berbeda, berdasarkan metode CARI dan XYZ formula.
 
 Versi:
-1. conservative — Diperbaiki dari aslinya, tetap humble & ATS-safe. Gunakan moderate action verbs.
-2. improved — Lebih impactful, mencantumkan hasil/kuantifikasi [est.]. Gunakan strong action verbs.
-3. bold — Paling kuat, cocok untuk senior/leadership role. Gunakan strongest action verbs + strategic impact.
+1. conservative, Diperbaiki dari aslinya, tetap humble & ATS-safe. Gunakan moderate action verbs.
+2. improved, Lebih impactful, mencantumkan hasil/kuantifikasi [est.]. Gunakan strong action verbs.
+3. bold, Paling kuat, cocok untuk senior/leadership role. Gunakan strongest action verbs + strategic impact.
 ${DELIM.SECTION}
 
 ${COT_TEMPLATE}
@@ -70,9 +70,9 @@ reports (Y), by redesigning the onboarding email sequence and implementing A/B t
 ${DELIM.SECTION}
 
 ${DELIM.SECTION}
---- ACTION VERB HIERARCHY — Tingkat Kekuatan ---
+--- ACTION VERB HIERARCHY, Tingkat Kekuatan ---
 
-### ⭐ STRONGEST (Untuk versi BOLD — senior, leadership, executive)
+### ⭐ STRONGEST (Untuk versi BOLD, senior, leadership, executive)
 
 | Kategori | Strongest Verbs |
 |----------|----------------|
@@ -84,7 +84,7 @@ ${DELIM.SECTION}
 | Growth | Accelerated, Scaled, Amplified, Fortified, Expanded |
 | Influence | Negotiated, Advised, Counseled, Mentored, Coached |
 
-### ⭐ MODERATE (Untuk versi IMPROVED — mid-level, professional)
+### ⭐ MODERATE (Untuk versi IMPROVED, mid-level, professional)
 
 | Kategori | Moderate Verbs |
 |----------|----------------|
@@ -96,7 +96,7 @@ ${DELIM.SECTION}
 | Collaboration | Collaborated, Partnered, Facilitated, Aligned, Liaised |
 | Communication | Presented, Authored, Communicated, Documented, Reported |
 
-### ⚠️ WEAK (HINDARI — tidak mencerminkan ownership)
+### ⚠️ WEAK (HINDARI, tidak mencerminkan ownership)
 
 | ❌ Hindari | ✅ Ganti Dengan |
 |-----------|----------------|
@@ -131,23 +131,23 @@ Setiap bullet point harus memiliki minimal 3 dari 5 elemen CARI:
 - Istilah teknis (React, CI/CD, API) tetap dalam bahasa aslinya
 - Gunakan PAST TENSE untuk role lama, PRESENT TENSE untuk role saat ini
 - Jangan gunakan kata ganti orang pertama (I, me, my, saya, aku)
-- CONTOH di bawah hanya ilustrasi format — bahasa output TETAP mengikuti Bahasa CV
+- CONTOH di bawah hanya ilustrasi format, bahasa output TETAP mengikuti Bahasa CV
 
 ### 4. ATS OPTIMIZATION RULES
 - Jika target role / industri diketahui dari user context, optimalkan keyword untuk itu
 - Jika INPUT menyediakan missingJdKeywords (keyword JD yang belum ada di teks):
   - Sisipkan 1-3 keyword yang PALING relevan secara natural di versi improved & bold
-  - JANGAN memaksakan semua keyword ke satu kalimat — pilih yang paling masuk akal secara konteks
+  - JANGAN memaksakan semua keyword ke satu kalimat, pilih yang paling masuk akal secara konteks
   - Keyword yang sudah ada (relevantJdKeywords) cukup dipertahankan & diperkaya, jangan diduplikasi
 - Gunakan full form di first mention, lalu boleh singkatan: "Search Engine Optimization (SEO)"
-- Jangan keyword stuffing — sisipkan keyword secara natural dalam konteks kalimat
-- Variasikan action verb antar bullet — jangan pakai verb yang sama 2x dalam satu role
+- Jangan keyword stuffing, sisipkan keyword secara natural dalam konteks kalimat
+- Variasikan action verb antar bullet, jangan pakai verb yang sama 2x dalam satu role
 
 ### 5. LARANGAN
 - JANGAN mengarang pencapaian yang tidak ada di input
 - JANGAN menambahkan skill yang tidak disebutkan user
 - JANGAN menggunakan klise: "passionate", "team player", "results-driven", "detail-oriented"
-- JANGAN menulis tugas rutin — fokus pada achievements dan dampak
+- JANGAN menulis tugas rutin, fokus pada achievements dan dampak
 - Maksimal 1-2 baris per bullet point
 
 ${DELIM.SECTION}
@@ -175,7 +175,7 @@ OUTPUT:
   "action_verb_level": "strongest",
   "keywords_added": ["authentication", "JWT", "OAuth2", "security architecture", "user onboarding"],
   "ats_keywords": ["React", "Node.js", "JWT", "OAuth2", "security", "authentication"],
-  "tip": "Untuk versi bold yang lebih kuat, tambahkan konteks skalabilitas — misal 'handling 50,000 concurrent users' atau '99.9% uptime' jika data tersedia.",
+  "tip": "Untuk versi bold yang lebih kuat, tambahkan konteks skalabilitas, misal 'handling 50,000 concurrent users' atau '99.9% uptime' jika data tersedia.",
   "format": "single-line"
 }`)}
 
@@ -209,9 +209,9 @@ ${DELIM.SECTION}
 
 --- ATURAN TAMBAHAN ---
 1. Mulai setiap bullet dengan action verb PAST TENSE (role lama) atau PRESENT TENSE (role saat ini).
-2. Versi conservative tetap harus LEBIH BAIK dari aslinya — perbaiki grammar, action verb, struktur.
+2. Versi conservative tetap harus LEBIH BAIK dari aslinya, perbaiki grammar, action verb, struktur.
 3. Jika aslinya sudah bagus, tetap buat 3 versi dengan tingkat kekuatan yang progresif.
-4. CARI analysis wajib diisi untuk setiap versi — tunjukkan progresi dari conservative ke bold.
+4. CARI analysis wajib diisi untuk setiap versi, tunjukkan progresi dari conservative ke bold.
 5. Jika input hanya 1-3 kata (sangat pendek), buat konteks yang masuk akal berdasarkan role dari user context.
 6. ATS keywords membantu user tahu keyword mana yang akan lolos ATS.
 

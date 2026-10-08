@@ -45,7 +45,7 @@ function CariMeter({ score }: { score: number }) {
           <span className={`text-[11px] font-bold ${c.text}`}>{score}/100 · {cariLabel(score, t)}</span>
         </div>
         <div
-          className="h-1.5 w-full bg-white/70 rounded-full overflow-hidden"
+          className="h-1.5 w-full bg-surface-container-lowest/70 rounded-full overflow-hidden"
           role="progressbar"
           aria-valuenow={score}
           aria-valuemin={0}
@@ -77,7 +77,7 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // clipboard unavailable — diam
+      // clipboard unavailable, diam
     }
   };
 
@@ -87,7 +87,7 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
 
   return (
     <motion.div
-      className="bg-white rounded-xl border border-surface-container-high shadow-premium-sm overflow-hidden"
+      className="bg-surface-container-lowest rounded-xl border border-surface-container-high shadow-premium-sm overflow-hidden"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, delay: index * 0.05 }}
@@ -165,7 +165,7 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
                               )}
                             </span>
                             {iss.source_excerpt && (
-                              <span className="block mt-1 text-[11px] italic text-on-surface-variant/70 bg-white rounded-md px-2 py-1 border-l-2 border-red-300">
+                              <span className="block mt-1 text-[11px] italic text-on-surface-variant/70 bg-surface-container-lowest rounded-md px-2 py-1 border-l-2 border-red-300">
                                 &ldquo;{iss.source_excerpt}&rdquo;
                               </span>
                             )}

@@ -5,7 +5,7 @@ import type { NextRequest } from "next/server";
 const AUTH_API_PREFIX = "/api/auth";
 
 /**
- * Middleware — hanya handle security headers.
+ * Middleware, hanya handle security headers.
  * Auth protection dilakukan oleh AuthGuard component di client-side.
  * (Middleware tidak bisa verify NextAuth JWT dengan reliable di Edge Runtime)
  */

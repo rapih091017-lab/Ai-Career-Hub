@@ -45,14 +45,14 @@ export default function TemplatePicker({
     onClose();
   };
 
-  // Switch mode — pick a template to switch to
+  // Switch mode, pick a template to switch to
   if (mode === "switch") {
     return (
       <div
         className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
         onClick={handleBackdropClick}
       >
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="bg-surface-container-lowest rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
           <div className="flex items-center justify-between p-6 border-b border-outline-variant/30">
             <h2 className="font-headline-md text-on-surface">Ganti Template CV</h2>
             <button
@@ -102,13 +102,13 @@ export default function TemplatePicker({
     );
   }
 
-  // Create mode — pick template + enter job title
+  // Create mode, pick template + enter job title
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+      <div className="bg-surface-container-lowest rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b border-outline-variant/30">
           <h2 className="font-headline-md text-on-surface">Buat CV Baru</h2>
           <button
@@ -187,11 +187,11 @@ function TemplateOption({ template, selected, onSelect }: {
       }`}
     >
       {/* Mini preview */}
-      <div className="h-28 bg-white overflow-hidden">
+      <div className="h-28 bg-surface-container-lowest overflow-hidden">
         <CvTemplatePreview templateId={template.id} />
       </div>
       {/* Info */}
-      <div className="p-3 bg-white border-t border-outline-variant/20">
+      <div className="p-3 bg-surface-container-lowest border-t border-outline-variant/20">
         <div className="flex items-center justify-between">
           <span className="font-label-bold text-sm text-on-surface">{template.name}</span>
           {selected && (

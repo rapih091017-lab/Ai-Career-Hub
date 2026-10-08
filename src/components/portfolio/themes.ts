@@ -2,7 +2,7 @@ import type { SectionId, ThemeDefinition } from "./types";
 
 export const THEMES: Record<string, ThemeDefinition> = {
   /* ═══════════════════════════════════════════════
-   * GLASS — Ethereal Glass (was "bento")
+   * GLASS, Ethereal Glass (was "bento")
    * VIBE: Deep OLED black, frosted glass cards,
    *       radial mesh gradients, Geist font
    * LAYOUT: Centered hero, asymmetrical bento grid
@@ -10,7 +10,7 @@ export const THEMES: Record<string, ThemeDefinition> = {
   "glass": {
     id: "glass",
     name: "Glassmorphism",
-    description: "Dark premium dengan frosted glass, purple-emerald mesh, bento grid asimetris — lebih terang dari sebelumnya",
+    description: "Dark premium dengan frosted glass, purple-emerald mesh, bento grid asimetris, lebih terang dari sebelumnya",
     font: "Geist",
     fontUrl: "https://fonts.cdnfonts.com/css/geist",
     previewGradient: "bg-gradient-to-br from-[#12121F] via-[#1A1A2E] to-[#1A1A35]",
@@ -61,11 +61,11 @@ export const THEMES: Record<string, ThemeDefinition> = {
   },
 
   /* ═══════════════════════════════════════════════
-   * BRUTAL — Soft Structuralism (BRIGHT, bold)
+   * BRUTAL, Soft Structuralism (BRIGHT, bold)
    * VIBE: White/cream bg, bold black borders,
    *       grain texture, hot pink accents
    * LAYOUT: Asymmetrical hero, Z-Axis cascade
-   * NOTE: Bright style — user prefers this!
+   * NOTE: Bright style, user prefers this!
    * ═══════════════════════════════════════════════ */
   "brutal": {
     id: "brutal",
@@ -121,7 +121,7 @@ export const THEMES: Record<string, ThemeDefinition> = {
   },
 
   /* ═══════════════════════════════════════════════
-   * LUXE — Editorial Luxury (was "clay")
+   * LUXE, Editorial Luxury (was "clay")
    * VIBE: Warm cream, serif typography, film grain,
    *       gold/terracotta accents
    * LAYOUT: Editorial split, massive typography

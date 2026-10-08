@@ -14,7 +14,7 @@ interface PageProps {
 
 export const dynamic = "force-dynamic";
 
-/** Satu query per request — dipakai bersama generateMetadata & page (React cache). */
+/** Satu query per request, dipakai bersama generateMetadata & page (React cache). */
 const getPublishedPortfolio = cache(async (slug: string) => {
   const [row] = await db
     .select({ slug: portfolioPages.slug, theme: portfolioPages.theme, data: portfolioPages.data })

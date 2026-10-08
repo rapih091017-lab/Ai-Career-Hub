@@ -8,7 +8,7 @@ import { usePortfolioTheme } from "../PortfolioCanvas";
 interface Props { data: PortfolioFormData; }
 
 /* ═══════════════════════════════════════════════
- * GLASS — Floating bento card with mesh gradient,
+ * GLASS, Floating bento card with mesh gradient,
  *          animated dot pattern, frosted backdrop
  * ═══════════════════════════════════════════════ */
 function GlassAbout({ f }: { f: PortfolioFormData }) {
@@ -95,7 +95,7 @@ function GlassAbout({ f }: { f: PortfolioFormData }) {
 }
 
 /* ═══════════════════════════════════════════════
- * BRUTAL — Pull-quote with massive drop cap,
+ * BRUTAL, Pull-quote with massive drop cap,
  *          bold border frame, asymmetrical layout
  * ═══════════════════════════════════════════════ */
 function BrutalAbout({ f }: { f: PortfolioFormData }) {
@@ -112,7 +112,7 @@ function BrutalAbout({ f }: { f: PortfolioFormData }) {
           viewport={{ once: true }}
           transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
         >
-          {/* Bold frame — no inner bezel, just raw border and shadow */}
+          {/* Bold frame, no inner bezel, just raw border and shadow */}
           <div className="relative">
             <div className="p-8 md:p-10" style={{
               background: theme.colors.surface,
@@ -127,7 +127,7 @@ function BrutalAbout({ f }: { f: PortfolioFormData }) {
               </div>
 
               <div className="flex items-start gap-6">
-                {/* Drop cap — massive first letter */}
+                {/* Drop cap, massive first letter */}
                 <div className="hidden md:block flex-shrink-0 text-center" style={{ minWidth: 100 }}>
                   <span className="font-black leading-none" style={{
                     fontSize: "clamp(5rem, 10vw, 7rem)",
@@ -161,7 +161,7 @@ function BrutalAbout({ f }: { f: PortfolioFormData }) {
 }
 
 /* ═══════════════════════════════════════════════
- * LUXE — Magazine column split with drop cap,
+ * LUXE, Magazine column split with drop cap,
  *        ornamental divider, elegant serif
  * ═══════════════════════════════════════════════ */
 function LuxeAbout({ f }: { f: PortfolioFormData }) {
@@ -181,7 +181,7 @@ function LuxeAbout({ f }: { f: PortfolioFormData }) {
         >
           {/* Magazine column split */}
           <div className="grid md:grid-cols-[1fr_2fr] gap-8 md:gap-12">
-            {/* Left column — decorative label + thin accent */}
+            {/* Left column, decorative label + thin accent */}
             <div className="relative">
               <div className="md:sticky md:top-24">
                 <span className="font-medium tracking-[0.2em] text-xs" style={{ color: theme.colors.primary }}>
@@ -198,7 +198,7 @@ function LuxeAbout({ f }: { f: PortfolioFormData }) {
               </div>
             </div>
 
-            {/* Right column — main text with drop cap */}
+            {/* Right column, main text with drop cap */}
             <div className="relative pl-6" style={{ borderLeft: `1px solid ${theme.colors.border}` }}>
               {f.aboutText && (
                 <div className="leading-relaxed" style={{ color: theme.colors.textMuted, fontSize: 15, lineHeight: 1.8 }}>

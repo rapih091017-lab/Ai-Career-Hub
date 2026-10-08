@@ -612,7 +612,7 @@ export default function PortfolioLiveBuilder() {
                     </button>
                   </div>
 
-                  {/* Profile Auto-fill — prominent card */}
+                  {/* Profile Auto-fill, prominent card */}
                   <div className="p-4 rounded-xl border-2 border-primary/20 bg-primary/5 relative">
                     <div className="absolute -top-2.5 left-3 px-2 bg-primary/5 text-[10px] font-semibold text-primary uppercase tracking-wider">{t("live.recommendation")}</div>
                     <div className="flex items-center gap-2 mb-2 mt-1">

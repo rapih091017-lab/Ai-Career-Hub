@@ -105,7 +105,7 @@ export default function CheckerPage() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        // Fingerprint anonim per-browser — supaya kuota 2x tidak dishare semua user
+        // Fingerprint anonim per-browser, supaya kuota 2x tidak dishare semua user
         ...anonIdHeaders(),
       },
       body: JSON.stringify({
@@ -166,7 +166,7 @@ export default function CheckerPage() {
         return;
       }
 
-      // PDF — render tiap halaman (helper lokal pdfjs) lalu OCR di browser
+      // PDF, render tiap halaman (helper lokal pdfjs) lalu OCR di browser
       setOcrProgress(t("checker.ocr.engine"));
       const pageBlobs = await renderPdfPagesToBlobs(file, 5);
 
@@ -583,7 +583,7 @@ export default function CheckerPage() {
                     </div>
                   </div>
                   <textarea
-                    className="w-full rounded-lg border border-amber-300 bg-white p-4 text-sm text-on-background focus:ring-2 focus:ring-primary focus:border-primary transition-[box-shadow,border-color] resize-none"
+                    className="w-full rounded-lg border border-amber-300 bg-surface-container-lowest p-4 text-sm text-on-background focus:ring-2 focus:ring-primary focus:border-primary transition-[box-shadow,border-color] resize-none"
                     rows={8}
                     placeholder={t("checker.paste.placeholder")}
                     value={pastedText}
@@ -686,7 +686,7 @@ export default function CheckerPage() {
   const atsBadge = atsBadgeColor(atsPrediction);
   const fitMeta = fitLabelMeta(fitLabel, t);
 
-  // v4 — chip "X% terkuantifikasi" pada kartu Experience (kalau AI mengirimnya)
+  // v4, chip "X% terkuantifikasi" pada kartu Experience (kalau AI mengirimnya)
   const quantPct = (breakdown?.experience as ExperienceSection | undefined)?.quantification_pct;
   const quantChip = typeof quantPct === "number"
     ? {
@@ -800,7 +800,7 @@ export default function CheckerPage() {
         </section>
 
         {/* ============================================================ */}
-        {/*  1b. IMPACT FORECAST (v4) — proyeksi skor                    */}
+        {/*  1b. IMPACT FORECAST (v4), proyeksi skor                    */}
         {/* ============================================================ */}
         {impactForecast && <ImpactForecastCard forecast={impactForecast} />}
 
@@ -979,7 +979,7 @@ export default function CheckerPage() {
         )}
 
         {/* ============================================================ */}
-        {/*  5. IMPROVEMENT CHECKLIST — langkah perbaikan interaktif      */}
+        {/*  5. IMPROVEMENT CHECKLIST, langkah perbaikan interaktif      */}
         {/* ============================================================ */}
         <ImprovementChecklist
           actionPlan={actionPlan}
@@ -1007,7 +1007,7 @@ export default function CheckerPage() {
         )}
 
         {/* ============================================================ */}
-        {/*  7. CTA BANNER — score-based routing                          */}
+        {/*  7. CTA BANNER, score-based routing                          */}
         {/* ============================================================ */}
         {(() => {
           const score = scores?.overall ?? 0;
@@ -1028,7 +1028,7 @@ export default function CheckerPage() {
             <div
               className={`relative overflow-hidden rounded-2xl p-8 md:p-10 shadow-premium-lg ${gradientBg}`}
             >
-              <div className="absolute -right-12 -top-12 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+              <div className="absolute -right-12 -top-12 w-64 h-64 bg-surface-container-lowest/10 rounded-full blur-3xl" />
               <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
                 <div className="text-center md:text-left">
                   <h2 className="text-[32px] leading-10 font-bold text-white mb-2">
@@ -1047,7 +1047,7 @@ export default function CheckerPage() {
                       } catch {}
                       router.push(targetRoute);
                     }}
-                    className="bg-white text-primary px-8 py-4 rounded-full text-sm font-semibold shadow-premium-md hover:bg-gray-100 active:scale-95 transition-[transform,background-color] flex items-center gap-2"
+                    className="bg-surface-container-lowest text-primary px-8 py-4 rounded-full text-sm font-semibold shadow-premium-md hover:bg-gray-100 active:scale-95 transition-[transform,background-color] flex items-center gap-2"
                   >
                     {ctaBtn}{" "}
                     <span className="material-symbols-outlined text-sm select-none">
