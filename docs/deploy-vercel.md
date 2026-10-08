@@ -62,3 +62,16 @@ curl -s -o NUL -w "%{http_code}\n" https://ai-career-hub-tsrys.vercel.app/api/si
 curl -s -o NUL -w "%{http_code}\n" https://ai-career-hub-tsrys.vercel.app/tracker
 curl -s -o NUL -w "%{http_code}\n" https://ai-career-hub-tsrys.vercel.app/contoh-cv
 ```
+
+## Catatan penting untuk pemakaian URL default (plan Hobby)
+
+- `NEXT_PUBLIC_BASE_URL` sudah disetel ke `https://ai-career-hub-tsrys.vercel.app`.
+  Variabel ini dipakai untuk redirect balik Midtrans setelah pembayaran dan
+  URL publik portfolio, jadi WAJIB diperbarui setiap kali domain yang dipakai
+  berubah (kalau nanti pindah ke custom domain, ganti juga di sini).
+- `AUTH_URL` tidak di-set (bagus): origin login mengikuti host yang diakses.
+  Agar login Google berfungsi lewat URL vercel.app, daftarkan redirect URI
+  `https://ai-career-hub-tsrys.vercel.app/api/auth/callback/google` di Google
+  Cloud Console (opsional selama belum dipakai).
+- Plan Hobby sebenarnya tetap bisa memasang custom domain (gratis); kalau nanti
+  ingin pindah, tinggal ikuti bagian "Menautkan domain" di atas.
