@@ -1,8 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import AppHeader from "@/components/AppHeader";
+import AdminField from "@/components/admin/AdminField";
+import AdminPageHeader from "@/components/admin/AdminPageHeader";
+import {
+  adminBtnDanger,
+  adminBtnPrimary,
+  adminCardClass,
+  adminInputClass,
+  adminSectionTitleClass,
+} from "@/components/admin/ui";
 import { ConfirmModal, type ConfirmAction } from "@/components/ui/confirm-modal";
 import { useToast } from "@/components/ui/toast";
 
@@ -13,12 +20,8 @@ interface AdminRow {
   createdAt: string | null;
 }
 
-const inputClass =
-  "w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30";
-
 /** Admin: kelola daftar admin tambahan (tanpa perlu ubah env dan deploy). */
 export default function AdminAdminsPage() {
-  const router = useRouter();
   const { addToast } = useToast();
   const [envEmails, setEnvEmails] = useState<string[]>([]);
   const [admins, setAdmins] = useState<AdminRow[]>([]);
@@ -102,60 +105,53 @@ export default function AdminAdminsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-on-background">
-      <AppHeader />
+    <div>
+      <AdminPageHeader
+        icon="shield_person"
+        title="Kelola Admin"
+        description="Tambah atau cabut akses admin langsung dari sini — tanpa mengubah environment variable dan deploy ulang."
+      />
 
-      <main className="mx-auto max-w-3xl px-margin-mobile pb-24 pt-24 md:px-gutter">
-        <button
-          onClick={() => router.push("/admin")}
-          className="mb-4 inline-flex items-center gap-1.5 text-label-bold text-on-surface-variant transition-colors hover:text-primary"
-        >
-          <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-          Kembali ke Admin
-        </button>
+      <section className={adminCardClass}>
+        <h2 className={adminSectionTitleClass}>Tambah admin baru</h2>
 
-        <h1 className="font-headline-lg text-headline-lg text-on-background">Kelola Admin</h1>
-        <p className="mt-1 text-body-md text-on-surface-variant">
-          Tambah atau cabut akses admin langsung dari sini. Tidak perlu mengubah environment variable
-          dan deploy ulang.
-        </p>
-
-        <section className="mt-8 rounded-2xl border border-outline-variant/70 bg-surface-container-lowest p-6">
-          <h2 className="text-label-bold text-on-surface">Tambah admin baru</h2>
-          <div className="mt-3 space-y-3">
+        <div className="mt-4 grid grid-cols-1 gap-5 md:grid-cols-2">
+          <AdminField label="Email Google" required hint="Dipakai untuk login memakai akun Google.">
             <input
-              className={inputClass}
+              className={adminInputClass}
               type="email"
               placeholder="email@contoh.com"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               maxLength={200}
             />
+          </AdminField>
+
+          <AdminField label="Catatan (opsional)" hint="Mis. “admin konten”, supaya mudah ditelusuri.">
             <input
-              className={inputClass}
-              placeholder="Catatan (opsional), mis. admin konten"
+              className={adminInputClass}
+              placeholder="admin konten"
               value={note}
               onChange={(event) => setNote(event.target.value)}
               maxLength={200}
             />
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={handleAdd}
-                disabled={saving || !email.trim()}
-                className="h-11 rounded-xl bg-primary px-5 text-label-bold text-on-primary transition-opacity hover:opacity-90 disabled:opacity-50"
-              >
-                {saving ? "Menyimpan..." : "Tambah Admin"}
-              </button>
-            </div>
-          </div>
-          <p className="mt-3 text-label-sm text-on-surface-variant">
-            Admin baru bisa langsung login memakai akun Google dengan email tersebut.
-          </p>
-        </section>
+          </AdminField>
+        </div>
 
-        <section className="mt-6 space-y-3">
-          <h2 className="text-label-bold text-on-surface">Admin aktif</h2>
+        <div className="mt-5 flex flex-wrap items-center justify-end gap-2">
+          <button
+            type="button"
+            onClick={handleAdd}
+            disabled={saving || !email.trim()}
+            className={adminBtnPrimary}
+          >
+            {saving ? "Menyimpan..." : "Tambah Admin"}
+          </button>
+        </div>
+      </section>
+
+      <section className="mt-6 space-y-3">
+        <h2 className={adminSectionTitleClass}>Admin aktif</h2>
 
           {envEmails.length > 0 ? (
             <div className="rounded-2xl border border-outline-variant/70 bg-surface-container-low p-4">
@@ -200,7 +196,7 @@ export default function AdminAdminsPage() {
                 <button
                   type="button"
                   onClick={() => requestRemove(row)}
-                  className="h-10 rounded-lg px-3 text-label-bold text-error transition-colors hover:bg-error-container/40"
+                  className={adminBtnDanger}
                 >
                   Cabut akses
                 </button>
@@ -209,8 +205,7 @@ export default function AdminAdminsPage() {
           )}
         </section>
 
-        <ConfirmModal confirm={confirm} onClose={() => setConfirm(null)} />
-      </main>
+      <ConfirmModal confirm={confirm} onClose={() => setConfirm(null)} />
     </div>
   );
 }

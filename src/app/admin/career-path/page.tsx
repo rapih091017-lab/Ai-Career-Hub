@@ -1,8 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import AppHeader from "@/components/AppHeader";
+import AdminField from "@/components/admin/AdminField";
+import AdminPageHeader from "@/components/admin/AdminPageHeader";
+import {
+  adminBtnDanger,
+  adminBtnPrimary,
+  adminBtnSecondary,
+  adminBtnSmall,
+  adminCheckboxClass,
+  adminInputClass,
+  adminTextareaClass,
+} from "@/components/admin/ui";
 import Modal from "@/components/Modal";
 import { ConfirmModal, type ConfirmAction } from "@/components/ui/confirm-modal";
 import { useToast } from "@/components/ui/toast";
@@ -47,13 +56,9 @@ const EMPTY_FORM: FormState = {
   isPublished: true,
 };
 
-const inputClass =
-  "w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30";
-
 /** Admin: kelola jalur karier. Editor sengaja sederhana: skill dipisah koma,
  * langkah satu per baris, jenjang diisi sebagai baris terstruktur. */
 export default function AdminCareerPathPage() {
-  const router = useRouter();
   const { addToast } = useToast();
   const [rows, setRows] = useState<CareerPathRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -224,46 +229,33 @@ export default function AdminCareerPathPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-on-background">
-      <AppHeader />
-
-      <main className="mx-auto max-w-4xl px-margin-mobile pb-24 pt-24 md:px-gutter">
-        <button
-          onClick={() => router.push("/admin")}
-          className="mb-4 inline-flex items-center gap-1.5 text-label-bold text-on-surface-variant transition-colors hover:text-primary"
-        >
-          <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-          Kembali ke Admin
-        </button>
-
-        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-          <div>
-            <h1 className="font-headline-lg text-headline-lg text-on-background">Jalur Karier</h1>
-            <p className="mt-1 text-body-md text-on-surface-variant">
-              Isi jenjang, skill, dan langkah tiap posisi. Yang dipublikasikan tampil di /career-path.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={openCreate}
-            className="h-11 rounded-xl bg-primary px-4 text-label-bold text-on-primary transition-opacity hover:opacity-90"
-          >
+    <div>
+      <AdminPageHeader
+        icon="route"
+        title="Jalur Karier"
+        description="Isi jenjang, skill, dan langkah tiap posisi. Yang dipublikasikan tampil di /career-path."
+        actions={
+          <button type="button" onClick={openCreate} className={adminBtnPrimary}>
+            <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+              add
+            </span>
             Tambah Posisi
           </button>
-        </div>
+        }
+      />
 
-        {loading ? (
-          <div className="mt-8 h-48 animate-pulse rounded-2xl bg-surface-container-low" aria-busy="true" />
-        ) : error ? (
-          <p className="mt-8 rounded-2xl border border-outline-variant/70 bg-surface-container-lowest p-8 text-center text-body-md text-on-surface-variant">
-            {error}
-          </p>
-        ) : rows.length === 0 ? (
-          <p className="mt-8 rounded-2xl border border-dashed border-outline-variant p-8 text-center text-body-md text-on-surface-variant">
-            Belum ada jalur karier. Klik "Tambah Posisi" untuk memulai.
-          </p>
-        ) : (
-          <div className="mt-6 space-y-3">
+      {loading ? (
+        <div className="h-48 animate-pulse rounded-2xl bg-surface-container-low" aria-busy="true" />
+      ) : error ? (
+        <p className="rounded-2xl border border-outline-variant/70 bg-surface-container-lowest p-8 text-center text-body-md text-on-surface-variant">
+          {error}
+        </p>
+      ) : rows.length === 0 ? (
+        <p className="rounded-2xl border border-dashed border-outline-variant p-8 text-center text-body-md text-on-surface-variant">
+          Belum ada jalur karier. Klik “Tambah Posisi” untuk memulai.
+        </p>
+      ) : (
+        <div className="space-y-3">
             {rows.map((row) => (
               <div
                 key={row.id}
@@ -290,22 +282,14 @@ export default function AdminCareerPathPage() {
                     type="button"
                     onClick={() => togglePublish(row)}
                     disabled={busyId === row.id}
-                    className="h-10 rounded-lg border border-outline-variant px-3 text-label-bold text-on-surface transition-colors hover:bg-surface-container disabled:opacity-50"
+                    className={adminBtnSmall}
                   >
                     {row.isPublished ? "Jadikan Draf" : "Publikasikan"}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => openEdit(row)}
-                    className="h-10 rounded-lg border border-outline-variant px-3 text-label-bold text-on-surface transition-colors hover:bg-surface-container"
-                  >
+                  <button type="button" onClick={() => openEdit(row)} className={adminBtnSmall}>
                     Edit
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => requestDelete(row)}
-                    className="h-10 rounded-lg px-3 text-label-bold text-error transition-colors hover:bg-error-container/40"
-                  >
+                  <button type="button" onClick={() => requestDelete(row)} className={adminBtnDanger}>
                     Hapus
                   </button>
                 </div>
@@ -320,162 +304,162 @@ export default function AdminCareerPathPage() {
           title={editRow ? `Edit Jalur Karier: ${editRow.role}` : "Tambah Jalur Karier"}
           size="max-w-3xl"
         >
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <label className="block">
-                <span className="mb-1 block text-label-bold text-on-surface">Nama posisi</span>
+          <div className="space-y-5">
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              <AdminField label="Nama posisi" required hint="Tampil sebagai judul di /career-path.">
                 <input
-                  className={inputClass}
+                  className={adminInputClass}
                   value={form.role}
                   onChange={(event) => setForm({ ...form, role: event.target.value })}
                   placeholder="mis. Data Analyst"
                   maxLength={120}
                 />
-              </label>
-              <label className="block">
-                <span className="mb-1 block text-label-bold text-on-surface">Kategori</span>
+              </AdminField>
+              <AdminField label="Kategori" required hint="Dipakai untuk mengelompokkan posisi.">
                 <input
-                  className={inputClass}
+                  className={adminInputClass}
                   value={form.category}
                   onChange={(event) => setForm({ ...form, category: event.target.value })}
                   placeholder="mis. Data & Analitik"
                   maxLength={80}
                 />
-              </label>
+              </AdminField>
             </div>
 
-            <label className="block">
-              <span className="mb-1 block text-label-bold text-on-surface">Ringkasan</span>
+            <AdminField label="Ringkasan" hint="Satu paragraf singkat tentang posisi ini.">
               <textarea
-                className={`${inputClass} min-h-[80px] resize-y`}
+                className={`${adminTextareaClass} min-h-[96px]`}
                 value={form.summary}
                 onChange={(event) => setForm({ ...form, summary: event.target.value })}
                 rows={3}
                 maxLength={1000}
               />
-            </label>
+            </AdminField>
 
             <div>
-              <div className="mb-2 flex items-center justify-between">
-                <span className="text-label-bold text-on-surface">Jenjang karier</span>
-                <button
-                  type="button"
-                  onClick={addLevel}
-                  className="rounded-lg border border-outline-variant px-3 py-1.5 text-label-sm text-on-surface transition-colors hover:bg-surface-container"
-                >
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-label-bold text-on-surface">Jenjang karier</p>
+                  <p className="text-label-sm text-on-surface-variant">
+                    Setiap jenjang diberi label sendiri supaya tetap jelas setelah field terisi.
+                  </p>
+                </div>
+                <button type="button" onClick={addLevel} className={adminBtnSecondary}>
+                  <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+                    add
+                  </span>
                   Tambah jenjang
                 </button>
               </div>
-              <div className="space-y-2">
+
+              <div className="space-y-3">
                 {form.levels.map((level, index) => (
-                  <div key={index} className="rounded-xl border border-outline-variant/60 p-3">
-                    <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
-                      <input
-                        className={inputClass}
-                        value={level.level}
-                        onChange={(event) => updateLevel(index, { level: event.target.value })}
-                        placeholder="Nama jenjang, mis. Junior"
-                        maxLength={60}
-                      />
-                      <input
-                        className={inputClass}
-                        value={level.years}
-                        onChange={(event) => updateLevel(index, { years: event.target.value })}
-                        placeholder="Pengalaman, mis. 0-2 tahun"
-                        maxLength={40}
-                      />
-                      <input
-                        className={inputClass}
-                        value={level.salaryRange}
-                        onChange={(event) => updateLevel(index, { salaryRange: event.target.value })}
-                        placeholder="Kisaran gaji, mis. Rp5-8 juta"
-                        maxLength={60}
-                      />
-                    </div>
-                    <textarea
-                      className={`${inputClass} mt-2 min-h-[60px] resize-y`}
-                      value={level.focus}
-                      onChange={(event) => updateLevel(index, { focus: event.target.value })}
-                      placeholder="Fokus pekerjaan di jenjang ini"
-                      rows={2}
-                      maxLength={400}
-                    />
-                    {form.levels.length > 1 ? (
-                      <div className="mt-2 flex justify-end">
-                        <button
-                          type="button"
-                          onClick={() => removeLevel(index)}
-                          className="rounded-lg px-3 py-1.5 text-label-sm text-error transition-colors hover:bg-error-container/40"
-                        >
+                  <div key={index} className="rounded-xl border border-outline-variant/70 bg-surface-container-low p-4">
+                    <div className="mb-3 flex items-center justify-between gap-2">
+                      <p className="text-label-bold text-on-surface">Jenjang {index + 1}</p>
+                      {form.levels.length > 1 ? (
+                        <button type="button" onClick={() => removeLevel(index)} className={adminBtnDanger}>
+                          <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+                            delete
+                          </span>
                           Hapus jenjang
                         </button>
-                      </div>
-                    ) : null}
+                      ) : null}
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                      <AdminField label="Nama jenjang">
+                        <input
+                          className={adminInputClass}
+                          value={level.level}
+                          onChange={(event) => updateLevel(index, { level: event.target.value })}
+                          placeholder="Junior"
+                          maxLength={60}
+                        />
+                      </AdminField>
+                      <AdminField label="Pengalaman">
+                        <input
+                          className={adminInputClass}
+                          value={level.years}
+                          onChange={(event) => updateLevel(index, { years: event.target.value })}
+                          placeholder="0-2 tahun"
+                          maxLength={40}
+                        />
+                      </AdminField>
+                      <AdminField label="Kisaran gaji">
+                        <input
+                          className={adminInputClass}
+                          value={level.salaryRange}
+                          onChange={(event) => updateLevel(index, { salaryRange: event.target.value })}
+                          placeholder="Rp5-8 juta"
+                          maxLength={60}
+                        />
+                      </AdminField>
+                    </div>
+
+                    <AdminField label="Fokus pekerjaan" className="mt-4" hint="Apa yang dikerjakan di jenjang ini.">
+                      <textarea
+                        className={`${adminTextareaClass} min-h-[72px]`}
+                        value={level.focus}
+                        onChange={(event) => updateLevel(index, { focus: event.target.value })}
+                        rows={2}
+                        maxLength={400}
+                      />
+                    </AdminField>
                   </div>
                 ))}
               </div>
             </div>
 
-            <label className="block">
-              <span className="mb-1 block text-label-bold text-on-surface">Skill kunci</span>
+            <AdminField label="Skill kunci" hint="Pisahkan dengan koma.">
               <input
-                className={inputClass}
+                className={adminInputClass}
                 value={form.skillsText}
                 onChange={(event) => setForm({ ...form, skillsText: event.target.value })}
-                placeholder="Pisahkan dengan koma, mis. SQL, Excel, Tableau"
+                placeholder="SQL, Excel, Tableau"
               />
-            </label>
+            </AdminField>
 
-            <label className="block">
-              <span className="mb-1 block text-label-bold text-on-surface">Langkah praktis</span>
+            <AdminField label="Langkah praktis" hint="Satu langkah per baris.">
               <textarea
-                className={`${inputClass} min-h-[100px] resize-y`}
+                className={`${adminTextareaClass} min-h-[112px]`}
                 value={form.stepsText}
                 onChange={(event) => setForm({ ...form, stepsText: event.target.value })}
-                placeholder={"Satu langkah per baris, mis.\nKuasai SQL dan dasar statistik\nBangun 3 portofolio analisis"}
+                placeholder={"Kuasai SQL dan dasar statistik\nBangun 3 portofolio analisis"}
                 rows={4}
                 maxLength={4000}
               />
-            </label>
+            </AdminField>
 
-            <label className="flex items-center gap-3">
+            <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-outline-variant/70 bg-surface-container-low px-4 py-3">
               <input
                 type="checkbox"
                 checked={form.isPublished}
                 onChange={(event) => setForm({ ...form, isPublished: event.target.checked })}
-                className="h-5 w-5 rounded border-outline-variant accent-[#0d7377]"
+                className={adminCheckboxClass}
               />
               <span className="text-label-bold text-on-surface">Publikasikan sekarang</span>
+              <span className="ml-auto text-label-sm text-on-surface-variant">Tampil di /career-path</span>
             </label>
 
             {formError ? (
-              <p className="rounded-lg bg-error-container/50 px-3 py-2 text-label-bold text-on-error-container">
+              <p className="rounded-xl bg-error-container/50 px-4 py-3 text-label-bold text-on-error-container" role="alert">
                 {formError}
               </p>
             ) : null}
 
-            <div className="flex items-center justify-end gap-2 pt-2">
-              <button
-                type="button"
-                onClick={() => setModalOpen(false)}
-                className="rounded-lg px-4 py-2.5 text-label-bold text-on-surface-variant hover:bg-surface-container"
-              >
+            <div className="flex flex-wrap items-center justify-end gap-2 border-t border-outline-variant/50 pt-4">
+              <button type="button" onClick={() => setModalOpen(false)} className={adminBtnSecondary}>
                 Batal
               </button>
-              <button
-                type="button"
-                onClick={handleSave}
-                disabled={saving}
-                className="rounded-lg bg-primary px-4 py-2.5 text-label-bold text-on-primary transition-opacity hover:opacity-90 disabled:opacity-60"
-              >
+              <button type="button" onClick={handleSave} disabled={saving} className={adminBtnPrimary}>
                 {saving ? "Menyimpan..." : "Simpan"}
               </button>
             </div>
           </div>
         </Modal>
 
-        <ConfirmModal confirm={confirm} onClose={() => setConfirm(null)} />
-      </main>
+      <ConfirmModal confirm={confirm} onClose={() => setConfirm(null)} />
     </div>
   );
 }

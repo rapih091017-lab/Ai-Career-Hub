@@ -1,8 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import AppHeader from "@/components/AppHeader";
+import AdminPageHeader from "@/components/admin/AdminPageHeader";
 
 interface InsightsData {
   funnel: { totalUsers: number; usersWithCv: number; usersWithTracker: number; usersPaid: number };
@@ -22,7 +21,6 @@ const ACTION_LABELS: Record<string, string> = {
 
 /** Admin: insight penggunaan aplikasi (funnel, aktivitas fitur, registrasi). */
 export default function AdminInsightsPage() {
-  const router = useRouter();
   const [data, setData] = useState<InsightsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -63,31 +61,21 @@ export default function AdminInsightsPage() {
     : [];
 
   return (
-    <div className="min-h-screen bg-background text-on-background">
-      <AppHeader />
+    <div>
+      <AdminPageHeader
+        icon="insights"
+        title="Insight Pengguna"
+        description="Funnel perjalanan user, aktivitas fitur 30 hari terakhir, dan tren registrasi 8 minggu."
+      />
 
-      <main className="mx-auto max-w-5xl px-margin-mobile pb-24 pt-24 md:px-gutter">
-        <button
-          onClick={() => router.push("/admin")}
-          className="mb-4 inline-flex items-center gap-1.5 text-label-bold text-on-surface-variant transition-colors hover:text-primary"
-        >
-          <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-          Kembali ke Admin
-        </button>
-
-        <h1 className="font-headline-lg text-headline-lg text-on-background">Insight Pengguna</h1>
-        <p className="mt-1 text-body-md text-on-surface-variant">
-          Funnel perjalanan user, aktivitas fitur 30 hari terakhir, dan tren registrasi 8 minggu.
+      {loading ? (
+        <div className="h-64 animate-pulse rounded-2xl bg-surface-container-low" aria-busy="true" />
+      ) : error ? (
+        <p className="rounded-2xl border border-outline-variant/70 bg-surface-container-lowest p-8 text-center text-body-md text-on-surface-variant">
+          {error}
         </p>
-
-        {loading ? (
-          <div className="mt-8 h-64 animate-pulse rounded-2xl bg-surface-container-low" aria-busy="true" />
-        ) : error ? (
-          <p className="mt-8 rounded-2xl border border-outline-variant/70 bg-surface-container-lowest p-8 text-center text-body-md text-on-surface-variant">
-            {error}
-          </p>
-        ) : data ? (
-          <div className="mt-8 space-y-8">
+      ) : data ? (
+        <div className="space-y-6">
             {/* Funnel */}
             <section className="rounded-2xl border border-outline-variant/70 bg-surface-container-lowest p-6">
               <h2 className="text-label-bold text-on-surface">Funnel User</h2>
@@ -176,9 +164,8 @@ export default function AdminInsightsPage() {
                 </div>
               )}
             </section>
-          </div>
-        ) : null}
-      </main>
+        </div>
+      ) : null}
     </div>
   );
 }

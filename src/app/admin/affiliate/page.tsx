@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-import AppHeader from "@/components/AppHeader";
+import AdminPageHeader from "@/components/admin/AdminPageHeader";
+import { adminBtnPrimary, adminBtnSmall } from "@/components/admin/ui";
 import { useToast } from "@/components/ui/toast";
 
 interface AffiliateRow {
@@ -34,7 +34,6 @@ const statusMeta = (status: string) => {
 
 /** Panel admin: review pendaftar affiliate + payout manual. */
 export default function AdminAffiliatePage() {
-  const router = useRouter();
   const { addToast } = useToast();
   const [rows, setRows] = useState<AffiliateRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -124,31 +123,20 @@ export default function AdminAffiliatePage() {
   const pendingCount = rows.filter((row) => row.status === "pending").length;
 
   return (
-    <div className="min-h-screen bg-background text-on-background">
-      <AppHeader />
-
-      <main className="mx-auto max-w-5xl px-margin-mobile pb-24 pt-24 md:px-gutter">
-        <button
-          onClick={() => router.push("/admin")}
-          className="mb-4 inline-flex items-center gap-1.5 text-label-bold text-on-surface-variant transition-colors hover:text-primary"
-        >
-          <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-          Kembali ke Admin
-        </button>
-
-        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-          <div>
-            <h1 className="font-headline-lg text-headline-lg text-on-background">Affiliate</h1>
-            <p className="mt-1 text-body-md text-on-surface-variant">
-              Review pendaftar (approve/reject) dan proses payout komisi secara manual. Tombol payout hanya mencairkan komisi yang sudah melewati masa tunggu 14 hari.
-            </p>
-          </div>
-          {pendingCount > 0 ? (
-            <span className="w-fit rounded-full bg-amber-500/10 px-4 py-1.5 text-label-bold text-amber-700">
+    <div>
+      <AdminPageHeader
+        icon="redeem"
+        title="Affiliate"
+        description="Review pendaftar dan proses payout komisi manual. Payout hanya mencairkan komisi yang sudah melewati masa tunggu 14 hari."
+        actions={
+          pendingCount > 0 ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 px-4 py-1.5 text-label-bold text-amber-700">
+              <span className="material-symbols-outlined text-[18px]" aria-hidden="true">hourglass_top</span>
               {pendingCount} menunggu review
             </span>
-          ) : null}
-        </div>
+          ) : null
+        }
+      />
 
         {loading ? (
           <div className="mt-8 h-48 animate-pulse rounded-2xl bg-surface-container-low" aria-busy="true" />
@@ -185,7 +173,7 @@ export default function AdminAffiliatePage() {
                     </p>
                     {row.applicationNote ? (
                       <p className="mt-1 line-clamp-2 text-label-sm italic text-on-surface-variant">
-                        "{row.applicationNote}"
+                        &ldquo;{row.applicationNote}&rdquo;
                       </p>
                     ) : null}
                     {row.bankName || row.bankAccountNumber ? (
@@ -224,15 +212,18 @@ export default function AdminAffiliatePage() {
                           type="button"
                           onClick={() => handleReview(row, "approve")}
                           disabled={busy}
-                          className="h-11 rounded-xl bg-primary px-4 text-label-bold text-on-primary transition-opacity hover:opacity-90 disabled:opacity-50"
+                          className={adminBtnPrimary}
                         >
+                          <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+                            check
+                          </span>
                           Approve
                         </button>
                         <button
                           type="button"
                           onClick={() => handleReview(row, "reject")}
                           disabled={busy}
-                          className="h-11 rounded-xl border border-error/40 px-4 text-label-bold text-error transition-colors hover:bg-error-container/40 disabled:opacity-50"
+                          className={`${adminBtnSmall} border-error/40 text-error hover:border-error/60 hover:bg-error-container/40`}
                         >
                           Reject
                         </button>
@@ -247,7 +238,7 @@ export default function AdminAffiliatePage() {
                             ? "Komisi masih dalam masa tunggu 14 hari (antisipasi refund)."
                             : undefined
                         }
-                        className="h-11 rounded-xl bg-primary px-4 text-label-bold text-on-primary transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+                        className={adminBtnPrimary}
                       >
                         {busy ? "Memproses..." : "Tandai Dibayar"}
                       </button>
@@ -258,7 +249,6 @@ export default function AdminAffiliatePage() {
             })}
           </div>
         )}
-      </main>
     </div>
   );
 }

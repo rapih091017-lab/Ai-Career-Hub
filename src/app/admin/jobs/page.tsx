@@ -1,8 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import AppHeader from "@/components/AppHeader";
+import AdminField from "@/components/admin/AdminField";
+import AdminPageHeader from "@/components/admin/AdminPageHeader";
+import {
+  adminBtnDanger,
+  adminBtnPrimary,
+  adminBtnSecondary,
+  adminBtnSmall,
+  adminCheckboxClass,
+  adminInputClass,
+  adminTextareaClass,
+} from "@/components/admin/ui";
 import Modal from "@/components/Modal";
 import PhotoUpload from "@/components/portfolio/PhotoUpload";
 import { ConfirmModal, type ConfirmAction } from "@/components/ui/confirm-modal";
@@ -40,12 +49,8 @@ const EMPTY_FORM: JobForm = {
   isPublished: false,
 };
 
-const inputClass =
-  "w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30";
-
 /** Admin: kelola loker yang tampil di halaman publik /karir. */
 export default function AdminJobsPage() {
-  const router = useRouter();
   const { addToast } = useToast();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
@@ -185,46 +190,33 @@ export default function AdminJobsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-on-background">
-      <AppHeader />
-
-      <main className="mx-auto max-w-5xl px-margin-mobile pb-24 pt-24 md:px-gutter">
-        <button
-          onClick={() => router.push("/admin")}
-          className="mb-4 inline-flex items-center gap-1.5 text-label-bold text-on-surface-variant transition-colors hover:text-primary"
-        >
-          <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-          Kembali ke Admin
-        </button>
-
-        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-          <div>
-            <h1 className="font-headline-lg text-headline-lg text-on-background">Kelola Loker</h1>
-            <p className="mt-1 text-body-md text-on-surface-variant">
-              Tambah judul, deskripsi, link pendaftaran, dan foto. Yang dipublikasikan tampil di halaman /karir.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={openCreate}
-            className="h-11 rounded-xl bg-primary px-4 text-label-bold text-on-primary transition-opacity hover:opacity-90"
-          >
+    <div>
+      <AdminPageHeader
+        icon="work"
+        title="Kelola Loker"
+        description="Tambah judul, deskripsi, link pendaftaran, dan foto. Yang dipublikasikan tampil di halaman /karir."
+        actions={
+          <button type="button" onClick={openCreate} className={adminBtnPrimary}>
+            <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+              add
+            </span>
             Tambah Loker
           </button>
-        </div>
+        }
+      />
 
-        {loading ? (
-          <div className="mt-8 h-48 animate-pulse rounded-2xl bg-surface-container-low" aria-busy="true" />
-        ) : error ? (
-          <p className="mt-8 rounded-2xl border border-outline-variant/70 bg-surface-container-lowest p-8 text-center text-body-md text-on-surface-variant">
-            {error}
-          </p>
-        ) : jobs.length === 0 ? (
-          <p className="mt-8 rounded-2xl border border-dashed border-outline-variant p-8 text-center text-body-md text-on-surface-variant">
-            Belum ada loker. Klik "Tambah Loker" untuk membuat yang pertama.
-          </p>
-        ) : (
-          <div className="mt-6 space-y-3">
+      {loading ? (
+        <div className="h-48 animate-pulse rounded-2xl bg-surface-container-low" aria-busy="true" />
+      ) : error ? (
+        <p className="rounded-2xl border border-outline-variant/70 bg-surface-container-lowest p-8 text-center text-body-md text-on-surface-variant">
+          {error}
+        </p>
+      ) : jobs.length === 0 ? (
+        <p className="rounded-2xl border border-dashed border-outline-variant p-8 text-center text-body-md text-on-surface-variant">
+          Belum ada loker. Klik “Tambah Loker” untuk membuat yang pertama.
+        </p>
+      ) : (
+        <div className="space-y-3">
             {jobs.map((job) => (
               <div
                 key={job.id}
@@ -261,22 +253,14 @@ export default function AdminJobsPage() {
                     type="button"
                     onClick={() => togglePublish(job)}
                     disabled={busyId === job.id}
-                    className="h-10 rounded-lg border border-outline-variant px-3 text-label-bold text-on-surface transition-colors hover:bg-surface-container disabled:opacity-50"
+                    className={adminBtnSmall}
                   >
                     {job.isPublished ? "Jadikan Draf" : "Publikasikan"}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => openEdit(job)}
-                    className="h-10 rounded-lg border border-outline-variant px-3 text-label-bold text-on-surface transition-colors hover:bg-surface-container"
-                  >
+                  <button type="button" onClick={() => openEdit(job)} className={adminBtnSmall}>
                     Edit
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => requestDelete(job)}
-                    className="h-10 rounded-lg px-3 text-label-bold text-error transition-colors hover:bg-error-container/40"
-                  >
+                  <button type="button" onClick={() => requestDelete(job)} className={adminBtnDanger}>
                     Hapus
                   </button>
                 </div>
@@ -291,61 +275,60 @@ export default function AdminJobsPage() {
           title={editJob ? "Edit Loker" : "Tambah Loker"}
           size="max-w-2xl"
         >
-          <div className="space-y-4">
-            <label className="block">
-              <span className="mb-1 block text-label-bold text-on-surface">Judul posisi</span>
+          <div className="space-y-5">
+            <AdminField label="Judul posisi" required hint="Nama posisi yang dicari pelamar, mis. “Frontend Developer”.">
               <input
-                className={inputClass}
+                className={adminInputClass}
                 value={form.title}
                 onChange={(event) => setForm({ ...form, title: event.target.value })}
                 placeholder="mis. Frontend Developer"
                 maxLength={200}
               />
-            </label>
+            </AdminField>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <label className="block">
-                <span className="mb-1 block text-label-bold text-on-surface">Perusahaan</span>
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              <AdminField label="Perusahaan" hint="Kosongkan bila dirahasiakan.">
                 <input
-                  className={inputClass}
+                  className={adminInputClass}
                   value={form.company}
                   onChange={(event) => setForm({ ...form, company: event.target.value })}
                   maxLength={200}
                 />
-              </label>
-              <label className="block">
-                <span className="mb-1 block text-label-bold text-on-surface">Lokasi</span>
+              </AdminField>
+              <AdminField label="Lokasi" hint="Bisa diisi “Remote” atau nama kota.">
                 <input
-                  className={inputClass}
+                  className={adminInputClass}
                   value={form.location}
                   onChange={(event) => setForm({ ...form, location: event.target.value })}
                   placeholder="mis. Jakarta / Remote"
                   maxLength={200}
                 />
-              </label>
+              </AdminField>
             </div>
 
-            <label className="block">
-              <span className="mb-1 block text-label-bold text-on-surface">Link pendaftaran (eksternal)</span>
+            <AdminField
+              label="Link pendaftaran (eksternal)"
+              hint="Pelamar diarahkan ke tautan ini saat mengklik Lamar."
+            >
               <input
-                className={inputClass}
+                className={adminInputClass}
                 value={form.applyUrl}
                 onChange={(event) => setForm({ ...form, applyUrl: event.target.value })}
                 placeholder="https://perusahaan.com/lamar"
+                inputMode="url"
                 maxLength={2000}
               />
-            </label>
+            </AdminField>
 
-            <label className="block">
-              <span className="mb-1 block text-label-bold text-on-surface">Deskripsi / requirement</span>
+            <AdminField label="Deskripsi / requirement" hint="Satu poin per baris lebih mudah dibaca pelamar.">
               <textarea
-                className={`${inputClass} min-h-[120px] resize-y`}
+                className={`${adminTextareaClass} min-h-[140px]`}
                 value={form.description}
                 onChange={(event) => setForm({ ...form, description: event.target.value })}
                 rows={5}
                 maxLength={10000}
               />
-            </label>
+            </AdminField>
 
             <PhotoUpload
               value={form.imageUrl}
@@ -353,44 +336,35 @@ export default function AdminJobsPage() {
               label="Foto / logo (opsional)"
             />
 
-            <label className="flex items-center gap-3">
+            <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-outline-variant/70 bg-surface-container-low px-4 py-3">
               <input
                 type="checkbox"
                 checked={form.isPublished}
                 onChange={(event) => setForm({ ...form, isPublished: event.target.checked })}
-                className="h-5 w-5 rounded border-outline-variant accent-[#0d7377]"
+                className={adminCheckboxClass}
               />
               <span className="text-label-bold text-on-surface">Publikasikan sekarang</span>
+              <span className="ml-auto text-label-sm text-on-surface-variant">Tampil di /karir</span>
             </label>
 
             {formError ? (
-              <p className="rounded-lg bg-error-container/50 px-3 py-2 text-label-bold text-on-error-container">
+              <p className="rounded-xl bg-error-container/50 px-4 py-3 text-label-bold text-on-error-container" role="alert">
                 {formError}
               </p>
             ) : null}
 
-            <div className="flex items-center justify-end gap-2 pt-2">
-              <button
-                type="button"
-                onClick={() => setModalOpen(false)}
-                className="rounded-lg px-4 py-2.5 text-label-bold text-on-surface-variant hover:bg-surface-container"
-              >
+            <div className="flex flex-wrap items-center justify-end gap-2 border-t border-outline-variant/50 pt-4">
+              <button type="button" onClick={() => setModalOpen(false)} className={adminBtnSecondary}>
                 Batal
               </button>
-              <button
-                type="button"
-                onClick={handleSave}
-                disabled={saving}
-                className="rounded-lg bg-primary px-4 py-2.5 text-label-bold text-on-primary transition-opacity hover:opacity-90 disabled:opacity-60"
-              >
+              <button type="button" onClick={handleSave} disabled={saving} className={adminBtnPrimary}>
                 {saving ? "Menyimpan..." : "Simpan"}
               </button>
             </div>
           </div>
         </Modal>
 
-        <ConfirmModal confirm={confirm} onClose={() => setConfirm(null)} />
-      </main>
+      <ConfirmModal confirm={confirm} onClose={() => setConfirm(null)} />
     </div>
   );
 }

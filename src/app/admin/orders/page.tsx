@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import AppHeader from "@/components/AppHeader";
+import AdminPageHeader from "@/components/admin/AdminPageHeader";
+import { adminBtnPrimary, adminInputWithIconClass } from "@/components/admin/ui";
 
 interface OrderRow {
   id: string;
@@ -53,7 +53,6 @@ const statusBadge = (status: string) => {
 
 /** Admin: semua checkout dengan filter status dan pencarian. */
 export default function AdminOrdersPage() {
-  const router = useRouter();
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [summary, setSummary] = useState<SummaryRow[]>([]);
   const [statusFilter, setStatusFilter] = useState("all");
@@ -94,24 +93,14 @@ export default function AdminOrdersPage() {
   const failedSummary = summary.find((row) => row.status === "failed");
 
   return (
-    <div className="min-h-screen bg-background text-on-background">
-      <AppHeader />
+    <div>
+      <AdminPageHeader
+        icon="receipt_long"
+        title="Pesanan"
+        description="Semua checkout Midtrans: siapa yang membayar, status pembayaran, dan asal referral."
+      />
 
-      <main className="mx-auto max-w-6xl px-margin-mobile pb-24 pt-24 md:px-gutter">
-        <button
-          onClick={() => router.push("/admin")}
-          className="mb-4 inline-flex items-center gap-1.5 text-label-bold text-on-surface-variant transition-colors hover:text-primary"
-        >
-          <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-          Kembali ke Admin
-        </button>
-
-        <h1 className="font-headline-lg text-headline-lg text-on-background">Pesanan</h1>
-        <p className="mt-1 text-body-md text-on-surface-variant">
-          Semua checkout Midtrans: lihat siapa yang membayar, status, dan asal referral.
-        </p>
-
-        <section className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <section className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <div className="rounded-2xl border border-emerald-500/25 bg-emerald-500/5 p-4">
             <p className="text-label-sm text-on-surface-variant">Sukses</p>
             <p className="mt-1 text-title-lg font-semibold text-emerald-700">{formatIDR(successSummary?.amount ?? 0)}</p>
@@ -152,16 +141,22 @@ export default function AdminOrdersPage() {
               setAppliedQuery(query.trim());
             }}
           >
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Cari Order ID atau email..."
-              className="h-11 flex-1 rounded-xl border border-outline-variant bg-surface-container-lowest px-3 text-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
-            />
-            <button
-              type="submit"
-              className="h-11 rounded-xl bg-primary px-4 text-label-bold text-on-primary transition-opacity hover:opacity-90"
-            >
+            <div className="relative flex-1">
+              <span
+                className="material-symbols-outlined pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[20px] text-on-surface-variant"
+                aria-hidden="true"
+              >
+                search
+              </span>
+              <input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Cari Order ID atau email..."
+                aria-label="Cari pesanan"
+                className={adminInputWithIconClass}
+              />
+            </div>
+            <button type="submit" className={adminBtnPrimary}>
               Cari
             </button>
           </form>
@@ -213,7 +208,6 @@ export default function AdminOrdersPage() {
             ))}
           </div>
         )}
-      </main>
     </div>
   );
 }
