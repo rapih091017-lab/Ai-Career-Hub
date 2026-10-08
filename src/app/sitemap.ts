@@ -1,12 +1,13 @@
 import type { MetadataRoute } from "next";
 import { CV_EXAMPLES_EN } from "@/data/cv-examples-en";
+import { SITE_URL } from "@/lib/site-url";
 import { db } from "@/db";
 import { careerPaths } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { CV_EXAMPLES } from "@/data/cv-examples";
 import { getInterviewPositions } from "@/data/interview-questions";
 
-const BASE_URL = "https://aicareerhub.com";
+const BASE_URL = SITE_URL;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const interviewPositions = getInterviewPositions("id").map((position) => ({

@@ -146,6 +146,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "footer.karir": { id: "Karir", en: "Careers" },
   "footer.blog": { id: "Blog", en: "Blog" },
   "footer.kontak": { id: "Kontak", en: "Contact" },
+  "footer.affiliate": { id: "Program Affiliate", en: "Affiliate Program" },
   "footer.faq": { id: "FAQ", en: "FAQ" },
   "footer.pusat-bantuan": { id: "Pusat Bantuan", en: "Help Center" },
   "footer.privasi": { id: "Privasi", en: "Privacy" },
@@ -1370,7 +1371,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "affiliate.empty": { id: "Belum ada konversi. Bagikan linkmu untuk mulai.", en: "No conversions yet. Share your link to get started." },
   "affiliate.status-pending": { id: "Pending", en: "Pending" },
   "affiliate.status-paid": { id: "Dibayar", en: "Paid" },
-  "affiliate.payout-note": { id: "Payout diproses manual oleh admin lewat transfer. Kamu akan dihubungi lewat email akun.", en: "Payouts are processed manually by the admin via transfer. You will be contacted through your account email." },
+  "affiliate.payout-note": { id: "Komisi baru bisa dicairkan setelah {days} hari sejak tercatat (antisipasi refund). Payout diproses manual oleh admin lewat transfer; kamu akan dihubungi lewat email akun.", en: "Commission matures {days} days after it is recorded (to cover refunds). Payouts are processed manually by the admin via transfer; you will be contacted through your account email." },
   "affiliate.error": { id: "Gagal memuat data affiliate.", en: "Failed to load affiliate data." },
 
   /* ── Karir: loker ── */

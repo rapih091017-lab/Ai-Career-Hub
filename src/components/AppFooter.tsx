@@ -66,6 +66,7 @@ export default function AppFooter({ variant = "simple", bordered = false }: AppF
                 <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/about">{t("footer.tentang")}</Link></li>
                 <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/karir">{t("footer.karir")}</Link></li>
                 <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/blog">{t("footer.blog")}</Link></li>
+                <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/affiliate">{t("footer.affiliate")}</Link></li>
                 <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/contact">{t("footer.kontak")}</Link></li>
               </ul>
             </div>

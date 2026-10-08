@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { POSITION_QUESTIONS, QUESTION_CATEGORIES } from "@/data/interview-questions";
+import { SITE_URL } from "@/lib/site-url";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -32,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: desc,
     },
     alternates: {
-      canonical: `https://aicareerhub.com/interview/${id}`,
+      canonical: `${SITE_URL}/interview/${id}`,
     },
   };
 }

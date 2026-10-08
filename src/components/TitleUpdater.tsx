@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "@/lib/i18n";
+import { SITE_URL } from "@/lib/site-url";
 
 const pageTitles: Record<string, { id: string; en: string }> = {
   "/dashboard": { id: "Dashboard", en: "Dashboard" },
@@ -97,7 +98,7 @@ export default function TitleUpdater() {
     document.querySelector('meta[name="twitter:image"]')?.setAttribute("content", ogImage);
 
     // Per-page canonical URL
-    const canonicalUrl = `https://aicareerhub.com${pathname}`;
+    const canonicalUrl = `${SITE_URL}${pathname}`;
     document.querySelector('link[rel="canonical"]')?.setAttribute("href", canonicalUrl);
     document.querySelector('meta[property="og:url"]')?.setAttribute("content", canonicalUrl);
   }, [pathname, lang]);

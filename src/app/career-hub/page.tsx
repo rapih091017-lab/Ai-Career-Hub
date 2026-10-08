@@ -2,12 +2,13 @@ import { Metadata } from "next";
 import Link from "next/link";
 import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
+import { SITE_URL } from "@/lib/site-url";
 
 export const metadata: Metadata = {
   title: "Career Hub | AI Career Hub",
   description:
     "Kunjungi blog untuk strategi mencari kerja, tips CV, taktik surat lamaran, dan wawasan karier lainnya. Semua panduan dan alat kami dikumpulkan di satu tempat.",
-  alternates: { canonical: "https://aicareerhub.com/career-hub" },
+  alternates: { canonical: `${SITE_URL}/career-hub` },
 };
 
 const CATEGORIES = [

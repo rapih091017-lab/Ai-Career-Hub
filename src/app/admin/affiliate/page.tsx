@@ -96,7 +96,7 @@ export default function AdminAffiliatePage() {
   };
 
   const handlePayout = async (row: AffiliateRow) => {
-    if (row.pendingAmount <= 0) return;
+    if (row.maturedAmount <= 0) return;
     setBusyId(row.id);
     try {
       const response = await fetch("/api/admin/affiliates/payout", {
@@ -106,7 +106,13 @@ export default function AdminAffiliatePage() {
       });
       if (!response.ok) throw new Error("payout failed");
       const data = await response.json();
-      addToast({ type: "success", message: `${data.updated} komisi ditandai dibayar.` });
+      addToast({
+        type: "success",
+        message:
+          data.updated > 0
+            ? `${data.updated} komisi ditandai dibayar.`
+            : `Belum ada komisi yang siap cair (masa tunggu ${data.minAgeDays ?? 14} hari).`,
+      });
       await load();
     } catch {
       addToast({ type: "error", message: "Gagal menandai payout. Coba lagi." });
@@ -134,7 +140,7 @@ export default function AdminAffiliatePage() {
           <div>
             <h1 className="font-headline-lg text-headline-lg text-on-background">Affiliate</h1>
             <p className="mt-1 text-body-md text-on-surface-variant">
-              Review pendaftar (approve/reject) dan proses payout komisi secara manual.
+              Review pendaftar (approve/reject) dan proses payout komisi secara manual. Tombol payout hanya mencairkan komisi yang sudah melewati masa tunggu 14 hari.
             </p>
           </div>
           {pendingCount > 0 ? (
@@ -235,7 +241,12 @@ export default function AdminAffiliatePage() {
                       <button
                         type="button"
                         onClick={() => handlePayout(row)}
-                        disabled={row.status !== "approved" || row.pendingAmount <= 0 || busy}
+                        disabled={row.status !== "approved" || row.maturedAmount <= 0 || busy}
+                        title={
+                          row.maturedAmount <= 0 && row.pendingAmount > 0
+                            ? "Komisi masih dalam masa tunggu 14 hari (antisipasi refund)."
+                            : undefined
+                        }
                         className="h-11 rounded-xl bg-primary px-4 text-label-bold text-on-primary transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
                       >
                         {busy ? "Memproses..." : "Tandai Dibayar"}

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
 import { CV_EXAMPLES_EN, getCvExampleEn } from "@/data/cv-examples-en";
+import { SITE_URL } from "@/lib/site-url";
 
 export function generateStaticParams() {
   return CV_EXAMPLES_EN.map((example) => ({ slug: example.slug }));
@@ -22,8 +23,8 @@ export async function generateMetadata({
     description: `${example.tagline} See a sample summary, key skills, achievement bullets, and ATS keywords for the ${example.title} role.`,
     alternates: {
       languages: {
-        id: `https://aicareerhub.com/contoh-cv/${example.slug}`,
-        en: `https://aicareerhub.com/cv-examples/${example.slug}`,
+        id: `${SITE_URL}/contoh-cv/${example.slug}`,
+        en: `${SITE_URL}/cv-examples/${example.slug}`,
       },
     },
     openGraph: {

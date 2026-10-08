@@ -5,6 +5,7 @@ import { SessionProvider } from "next-auth/react";
 import { Analytics } from "@vercel/analytics/react";
 import ScrollProgress from "@/components/ScrollProgress";
 import TitleUpdater from "@/components/TitleUpdater";
+import { SITE_URL } from "@/lib/site-url";
 import { LanguageProvider } from "@/lib/i18n";
 import { ToastProvider } from "@/components/ui/toast";
 import "./globals.css";
@@ -16,7 +17,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   display: "swap",
 });
 
-const siteUrl = "https://aicareerhub.com";
+const siteUrl = SITE_URL;
 
 export const metadata: Metadata = {
   title: {
@@ -54,12 +55,10 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, "max-video-preview": -1, "max-image-preview": "large", "max-snippet": -1 },
   },
+  // Situs ini satu URL dengan pengalih bahasa di sisi klien, jadi tidak ada
+  // hreflang terpisah. Sebelumnya blok `languages` menunjuk ke /en yang 404.
   alternates: {
     canonical: siteUrl,
-    languages: {
-      id: siteUrl,
-      en: siteUrl + "/en",
-    },
   },
 };
 
@@ -102,9 +101,9 @@ export default function RootLayout({
               {
                 "@type": "BreadcrumbList",
                 "itemListElement": [
-                  { "@type": "ListItem", "position": 1, "name": "Beranda", "item": "https://aicareerhub.com" },
-                  { "@type": "ListItem", "position": 2, "name": "Dashboard", "item": "https://aicareerhub.com/dashboard" },
-                  { "@type": "ListItem", "position": 3, "name": "Buat CV", "item": "https://aicareerhub.com/builder/new" },
+                  { "@type": "ListItem", "position": 1, "name": "Beranda", "item": siteUrl },
+                  { "@type": "ListItem", "position": 2, "name": "Dashboard", "item": `${siteUrl}/dashboard` },
+                  { "@type": "ListItem", "position": 3, "name": "Buat CV", "item": `${siteUrl}/builder/new` },
                 ],
               },
               {

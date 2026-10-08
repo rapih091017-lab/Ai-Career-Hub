@@ -3,6 +3,7 @@ import Link from "next/link";
 import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
 import { CV_EXAMPLES_EN } from "@/data/cv-examples-en";
+import { SITE_URL } from "@/lib/site-url";
 
 export const metadata: Metadata = {
   title: "CV Examples for 12 In-Demand Roles | AI Career Hub",
@@ -18,8 +19,8 @@ export const metadata: Metadata = {
   ],
   alternates: {
     languages: {
-      id: "https://aicareerhub.com/contoh-cv",
-      en: "https://aicareerhub.com/cv-examples",
+      id: `${SITE_URL}/contoh-cv`,
+      en: `${SITE_URL}/cv-examples`,
     },
   },
   openGraph: {

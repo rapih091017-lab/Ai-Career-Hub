@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
+import { SITE_URL } from "@/lib/site-url";
 import { db } from "@/db";
 import { careerPaths } from "@/db/schema";
 import { and, asc, eq, ne } from "drizzle-orm";
@@ -27,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `Jalur Karier ${path.role} | AI Career Hub`,
     description: `Jenjang karier ${path.role}: level junior sampai senior, kisaran gaji, skill kunci, dan langkah untuk naik tingkat.`,
-    alternates: { canonical: `https://aicareerhub.com/career-path/${path.slug}` },
+    alternates: { canonical: `${SITE_URL}/career-path/${path.slug}` },
   };
 }
 

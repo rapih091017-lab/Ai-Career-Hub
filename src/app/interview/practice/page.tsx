@@ -10,6 +10,7 @@ import { useToast } from "@/components/ui/toast";
 import { QCategoryIcon, getQCategoryFilters } from "@/components/interview/QCategoryIcon";
 import { StarPracticeBox } from "@/components/interview/StarPracticeBox";
 import { useTranslation } from "@/lib/i18n";
+import { SITE_URL } from "@/lib/site-url";
 import {
   getInterviewPositions,
   getInterviewCategories,
@@ -670,8 +671,8 @@ function FinishedScreen({
         : `Evaluasi diri: ${good} udah bisa, ${okay} kurang, ${weak} belum.`);
     }
     lines.push(en
-      ? "Free practice at https://aicareerhub.com/interview"
-      : "Latihan gratis di https://aicareerhub.com/interview");
+      ? `Free practice at ${SITE_URL}/interview`
+      : `Latihan gratis di ${SITE_URL}/interview`);
     try {
       await navigator.clipboard.writeText(lines.join("\n"));
       setCopied(true);

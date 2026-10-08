@@ -5,8 +5,13 @@ import AppHeader from "@/components/AppHeader";
 import AuthGuard from "@/components/AuthGuard";
 import { useToast } from "@/components/ui/toast";
 import { useTranslation } from "@/lib/i18n";
-import { AFFILIATE_REWARD_PERCENT } from "@/lib/affiliate";
-import { BANK_OPTIONS, isValidAccountHolder, isValidAccountNumber } from "@/lib/affiliate";
+import {
+  AFFILIATE_REWARD_PERCENT,
+  PAYOUT_MIN_AGE_DAYS,
+  BANK_OPTIONS,
+  isValidAccountHolder,
+  isValidAccountNumber,
+} from "@/lib/affiliate";
 
 interface ConversionRow {
   id: string;
@@ -158,6 +163,7 @@ export default function AffiliatePage() {
   };
 
   const rewardText = t("affiliate.reward-note").replace("{n}", String(AFFILIATE_REWARD_PERCENT));
+  const payoutText = t("affiliate.payout-note").replace("{days}", String(PAYOUT_MIN_AGE_DAYS));
   const bankComplete =
     bank.bank.length > 0 &&
     isValidAccountNumber(bank.bankAccountNumber) &&
@@ -338,7 +344,7 @@ export default function AffiliatePage() {
                 )}
               </section>
 
-              <p className="text-label-sm text-on-surface-variant">{t("affiliate.payout-note")}</p>
+              <p className="text-label-sm text-on-surface-variant">{payoutText}</p>
             </div>
           ) : null}
         </main>

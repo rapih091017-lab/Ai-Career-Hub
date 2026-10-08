@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SITE_URL } from "@/lib/site-url";
 
 export const metadata: Metadata = {
   title: "Mode Latihan Interview - Timer & Pertanyaan Acak | AI Career Hub",
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
     follow: false,
   },
   alternates: {
-    canonical: "https://aicareerhub.com/interview/practice",
+    canonical: `${SITE_URL}/interview/practice`,
   },
 };
 

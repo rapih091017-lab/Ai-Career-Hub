@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { POSITION_QUESTIONS } from "@/data/interview-questions";
+import { SITE_URL } from "@/lib/site-url";
 
 export const metadata: Metadata = {
   title: "Persiapan Interview - Database Pertanyaan & Jawaban | AI Career Hub",
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
       "Database pertanyaan interview terlengkap untuk berbagai posisi di Indonesia.",
   },
   alternates: {
-    canonical: "https://aicareerhub.com/interview",
+    canonical: `${SITE_URL}/interview`,
   },
 };
 

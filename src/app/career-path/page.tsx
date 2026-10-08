@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
+import { SITE_URL } from "@/lib/site-url";
 import { db } from "@/db";
 import { careerPaths } from "@/db/schema";
 import { asc, eq } from "drizzle-orm";
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
   title: "Jalur Karier per Posisi | AI Career Hub",
   description:
     "Peta jenjang karier untuk posisi paling banyak dibuka di Indonesia: level junior sampai senior, kisaran gaji, skill kunci, dan langkah yang perlu ditempuh.",
-  alternates: { canonical: "https://aicareerhub.com/career-path" },
+  alternates: { canonical: `${SITE_URL}/career-path` },
 };
 
 export default async function CareerPathPage() {
