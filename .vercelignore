@@ -45,3 +45,7 @@ antislop.md
 .git
 node_modules
 .next
+tsconfig.tsbuildinfo
+nul
+temp_*.json
+scratch/

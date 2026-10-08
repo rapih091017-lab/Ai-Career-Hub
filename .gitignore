@@ -68,3 +68,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .gstack/
+# Artefak lokal (jangan di-commit)
+tsconfig.tsbuildinfo
+nul
+temp_*.json
+.tmp-*.mjs
+scratch/
