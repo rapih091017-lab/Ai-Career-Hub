@@ -28,13 +28,13 @@ const SECTION_LABELS: Record<string, string> = {
 const SPACING_OPTIONS = [
   { value: "compact" as const, label: "Rapat", desc: "Lebih banyak konten per halaman" },
   { value: "normal" as const, label: "Normal", desc: "Spasi standar yang seimbang" },
-  { value: "spacious" as const, label: "Leggar", desc: "Lebih mudah dibaca, lebih sedikit konten" },
+  { value: "spacious" as const, label: "Longgar", desc: "Lebih mudah dibaca, lebih sedikit konten" },
 ];
 
 const MARGIN_OPTIONS = [
   { value: "tight" as const, label: "Mepet", desc: "10mm · memaksimalkan ruang konten" },
   { value: "normal" as const, label: "Normal", desc: "20mm · margin standar A4" },
-  { value: "wide" as const, label: "Leggar", desc: "30mm · margin luas, terlihat premium" },
+  { value: "wide" as const, label: "Longgar", desc: "30mm · margin luas, terlihat premium" },
 ];
 
 const PRESET_COLORS = [
@@ -95,7 +95,7 @@ export function DisplaySettingsModal({
             {customPrimaryColor && (
               <button
                 onClick={() => onPrimaryColorChange("")}
-                className="text-[10px] text-outline underline hover:text-on-surface"
+                className="text-[10px] text-on-surface-variant underline hover:text-on-surface"
               >
                 Reset
               </button>
@@ -184,7 +184,7 @@ export function DisplaySettingsModal({
                   onChange={(e) => onSectionVisibilityChange(key, e.target.checked)}
                   className="peer sr-only"
                 />
-                <div className="w-5 h-5 rounded-md border-2 border-outline-variant bg-white flex items-center justify-center transition-colors duration-200 peer-checked:bg-primary peer-checked:border-primary">
+                <div className="w-5 h-5 rounded-md border-2 border-outline-variant bg-surface-container-lowest flex items-center justify-center transition-colors duration-200 peer-checked:bg-primary peer-checked:border-primary">
                   {sectionVisibility[key] !== false && (
                     <span className="material-symbols-outlined text-sm text-white" aria-hidden="true">check</span>
                   )}

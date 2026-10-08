@@ -117,7 +117,7 @@ function BuilderNewFormContent() {
 
       {/* Ambil pilihan lewat popup — konten halaman sebagai fallback */}
       <div className="flex justify-center pt-8">
-        <div className="bg-white rounded-xl shadow-premium-md p-8 max-w-md w-full text-center border border-outline-variant/50 space-y-4">
+        <div className="bg-surface-container-lowest rounded-xl shadow-premium-md p-8 max-w-md w-full text-center border border-outline-variant/50 space-y-4">
           <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
             <span className="material-symbols-outlined text-primary text-[32px]">description</span>
           </div>
@@ -149,7 +149,7 @@ function BuilderNewFormContent() {
           {/* Job Title */}
           <div className="flex flex-col gap-2">
             <label className="text-sm font-semibold text-on-surface-variant">
-              {t("cv.new.target-position")} <span className="text-outline font-normal">{t("cv.new.optional")}</span>
+              {t("cv.new.target-position")} <span className="text-on-surface-variant font-normal">{t("cv.new.optional")}</span>
             </label>
             <input
               className="w-full p-3 rounded-xl border border-outline-variant bg-background text-body-md focus:outline-none focus:border-primary focus:shadow-[0_0_0_2px_rgba(13,115,119,0.1)] transition-all"
@@ -158,7 +158,7 @@ function BuilderNewFormContent() {
               onChange={(e) => setJobTitle(e.target.value)}
               autoFocus
             />
-            <p className="text-xs text-outline flex items-center gap-1 mt-1">
+            <p className="text-xs text-on-surface-variant flex items-center gap-1 mt-1">
               <span className="material-symbols-outlined text-[14px]">info</span>
               {t("cv.new.position-hint")}
             </p>
@@ -177,7 +177,7 @@ function BuilderNewFormContent() {
               </div>
               <div className="text-left">
                 <p className="font-semibold text-sm text-on-surface">{t("cv.new.fill-profile")}</p>
-                <p className="text-xs text-outline">
+                <p className="text-xs text-on-surface-variant">
                   {profileExists
                     ? t("cv.new.fill-profile-desc-exists")
                     : t("cv.new.fill-profile-desc-empty")}
@@ -200,7 +200,7 @@ function BuilderNewFormContent() {
               </div>
               <div className="text-left">
                 <p className="font-semibold text-sm text-on-surface">{t("cv.new.start-empty")}</p>
-                <p className="text-xs text-outline">{t("cv.new.start-empty-desc")}</p>
+                <p className="text-xs text-on-surface-variant">{t("cv.new.start-empty-desc")}</p>
               </div>
             </button>
             </MagneticButton>
@@ -210,7 +210,7 @@ function BuilderNewFormContent() {
 
       {/* Loading overlay saat creating */}
       {isCreating && (
-        <div className="fixed inset-0 z-[110] bg-white/80 backdrop-blur-sm flex items-center justify-center">
+        <div className="fixed inset-0 z-[110] bg-surface-container-lowest/80 backdrop-blur-sm flex items-center justify-center">
           <div className="flex flex-col items-center gap-3">
             <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
             <p className="text-sm text-on-surface-variant">

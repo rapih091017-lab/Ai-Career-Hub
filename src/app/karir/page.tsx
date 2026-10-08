@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTranslation } from "@/lib/i18n";
 
@@ -60,8 +61,43 @@ const EXTERNAL_PORTALS = [
   },
 ];
 
+interface JobPost {
+  id: string;
+  title: string;
+  company: string | null;
+  location: string | null;
+  description: string | null;
+  applyUrl: string;
+  imageUrl: string | null;
+  createdAt: string | null;
+}
+
 export default function KarirPage() {
   const { t } = useTranslation();
+  const [jobs, setJobs] = useState<JobPost[]>([]);
+  const [jobsLoaded, setJobsLoaded] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const response = await fetch("/api/jobs");
+        if (response.ok) {
+          const data = await response.json();
+          if (!cancelled) setJobs(Array.isArray(data.jobs) ? data.jobs : []);
+        }
+      } catch {
+        // Diamkan: halaman tetap tampil dengan portal eksternal.
+      } finally {
+        if (!cancelled) setJobsLoaded(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const hasJobs = jobs.length > 0;
 
   return (
     <main className="min-h-screen bg-background">
@@ -73,8 +109,8 @@ export default function KarirPage() {
             {t("karir.back-home")}
           </Link>
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/15 rounded-full text-xs font-bold tracking-wider mb-6">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            {t("karir.soon")}
+            <span className={`w-2 h-2 rounded-full ${hasJobs ? "bg-emerald-400" : "bg-emerald-400 animate-pulse"}`} />
+            {hasJobs ? t("karir.badge-open") : t("karir.soon")}
           </div>
           <h1 className="font-headline-lg text-3xl md:text-4xl font-bold mb-3">{t("karir.title")}</h1>
           <p className="text-white/80 text-lg max-w-xl">
@@ -99,36 +135,97 @@ export default function KarirPage() {
         </div>
       </div>
 
-      {/* ── Coming Soon Detail ── */}
       <div className="max-w-3xl mx-auto px-6 py-12 md:py-16">
-        <section className="mb-16">
-          <div className="bg-surface-container-low rounded-2xl p-8 border border-outline-variant/30">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>construction</span>
-              </div>
-              <div>
-                <h2 className="font-headline-md text-xl text-on-surface mb-2">{t("karir.coming-title")}</h2>
-                <p className="text-body-md text-on-surface-variant leading-relaxed mb-4">
-                  {t("karir.coming-desc")}
-                </p>
-                <ul className="space-y-3">
-                  {[
-                    { icon: "search", text: t("karir.coming-1") },
-                    { icon: "notifications", text: t("karir.coming-2") },
-                    { icon: "bolt", text: t("karir.coming-3") },
-                    { icon: "auto_awesome", text: t("karir.coming-4") },
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-center gap-3">
-                      <span className="material-symbols-outlined text-primary text-lg">{item.icon}</span>
-                      <span className="text-sm text-on-surface">{item.text}</span>
-                    </li>
-                  ))}
-                </ul>
+        {/* ── Loker pilihan (dikelola admin) ── */}
+        {hasJobs ? (
+          <section className="mb-16">
+            <div className="text-center mb-8">
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary/5 text-primary text-xs font-bold tracking-wider rounded-full mb-4">
+                <span className="material-symbols-outlined text-sm">work</span>
+                {t("karir.jobs-title")}
+              </span>
+              <p className="text-body-md text-on-surface-variant">{t("karir.jobs-desc")}</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {jobs.map((job) => (
+                <article
+                  key={job.id}
+                  className="flex flex-col gap-3 rounded-2xl border border-outline-variant/40 bg-white p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+                >
+                  <div className="flex items-start gap-4">
+                    {job.imageUrl ? (
+                      <img
+                        src={job.imageUrl}
+                        alt=""
+                        className="h-14 w-14 shrink-0 rounded-xl border border-outline-variant/50 object-cover"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+                        <span className="material-symbols-outlined text-primary">work</span>
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-label-bold text-on-surface line-clamp-2">{job.title}</h3>
+                      <p className="mt-0.5 text-xs text-on-surface-variant truncate">
+                        {[job.company, job.location].filter(Boolean).join(" · ")}
+                      </p>
+                    </div>
+                  </div>
+
+                  {job.description ? (
+                    <p className="text-xs text-on-surface-variant leading-relaxed line-clamp-3 whitespace-pre-line">
+                      {job.description}
+                    </p>
+                  ) : null}
+
+                  <a
+                    href={job.applyUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-auto inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-on-primary hover:brightness-110 active:scale-[0.98] transition-all"
+                  >
+                    <span className="material-symbols-outlined text-base">open_in_new</span>
+                    {t("karir.apply")}
+                  </a>
+                </article>
+              ))}
+            </div>
+          </section>
+        ) : jobsLoaded ? (
+          /* ── Coming soon (hanya saat belum ada loker) ── */
+          <section className="mb-16">
+            <div className="bg-surface-container-low rounded-2xl p-8 border border-outline-variant/30">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>construction</span>
+                </div>
+                <div>
+                  <h2 className="font-headline-md text-xl text-on-surface mb-2">{t("karir.coming-title")}</h2>
+                  <p className="text-body-md text-on-surface-variant leading-relaxed mb-4">
+                    {t("karir.coming-desc")}
+                  </p>
+                  <ul className="space-y-3">
+                    {[
+                      { icon: "search", text: t("karir.coming-1") },
+                      { icon: "notifications", text: t("karir.coming-2") },
+                      { icon: "bolt", text: t("karir.coming-3") },
+                      { icon: "auto_awesome", text: t("karir.coming-4") },
+                    ].map((item, i) => (
+                      <li key={i} className="flex items-center gap-3">
+                        <span className="material-symbols-outlined text-primary text-lg">{item.icon}</span>
+                        <span className="text-sm text-on-surface">{item.text}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        ) : (
+          <div className="mb-16 h-48 animate-pulse rounded-2xl bg-surface-container-low" aria-busy="true" />
+        )}
 
         {/* ── External Job Portals ── */}
         <section className="mb-16">

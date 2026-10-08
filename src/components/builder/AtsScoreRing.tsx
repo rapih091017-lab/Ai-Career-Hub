@@ -17,7 +17,7 @@ export function AtsScoreRing({ score }: { score: number }) {
             strokeLinecap="round" strokeWidth="3"
           />
         </svg>
-        <span className="absolute inset-0 flex items-center justify-center text-[7px] font-bold text-primary">{score}%</span>
+        <span className="absolute inset-0 flex items-center justify-center text-[8px] font-bold text-primary">{score}%</span>
       </div>
     </div>
   );

@@ -60,6 +60,196 @@ const hrQuestionsEn: InterviewQuestion[] = [
       "Avoid overly speculative or unrealistic answers",
     ],
   },
+  {
+    id: "hr-5",
+    category: "hr",
+    question: "Tell me about a time you resolved a conflict within a team.",
+    answer:
+      "Use the STAR frame: Situation (project and source of conflict), Task (your role in mediating), Action (concrete steps you took), Result (impact on the team and project). Show you solved the problem without blaming anyone.",
+    tips: [
+      "Focus on the solution, not the drama",
+      "End with a real outcome: decision made, deadline kept",
+      "Avoid sharing sensitive personal conflicts",
+    ],
+    followUp: "What would you do differently if the conflict happened again?",
+    star: {
+      situation: "On [project name], two teammates clashed over [topic/priority] and progress started stalling.",
+      task: "As [role], I needed to mediate so a decision could be made quickly without damaging the team.",
+      action: "I spoke with each person separately to understand the root cause, then guided a small session with neutral data and agreed decision criteria.",
+      result: "The team refocused, the deadline stayed safe, and the new discussion format became a habit in our retrospectives.",
+    },
+  },
+  {
+    id: "hr-6",
+    category: "hr",
+    question: "How do you handle a very tight deadline?",
+    answer:
+      "Use STAR: the deadline situation (Situation), your responsibility (Task), how you prioritized and communicated (Action), and the outcome for quality and timing (Result).",
+    tips: [
+      "Show how you prioritize: impact vs effort",
+      "Mention communicating trade-offs to your manager or stakeholders",
+      "Never silently sacrifice quality",
+    ],
+    followUp: "What tools do you use to keep priorities straight when everything feels urgent?",
+    star: {
+      situation: "A deadline was moved up suddenly while I was handling several parallel workstreams.",
+      task: "I had to deliver quality results without missing the new deadline.",
+      action: "I re-mapped priorities by impact, communicated trade-offs to my manager, and focused on the most critical tasks while deferring what could wait.",
+      result: "All critical deliverables shipped on time, and the deferred work landed in the next cycle without issues.",
+    },
+  },
+  {
+    id: "hr-7",
+    category: "hr",
+    question: "Tell me about your biggest failure and what you learned.",
+    answer:
+      "Answer honestly with STAR: the failure situation, your responsibility, what you did to recover, and the lesson that still shapes how you work.",
+    tips: [
+      "Pick a real failure that is safe to share, not a fatal mistake",
+      "The most important part is the lesson and your behavior change",
+      "Never blame other people or circumstances",
+    ],
+    followUp: "How do you make sure the same mistake never happens again?",
+    star: {
+      situation: "[Project/launch] I led missed its [key metric] target for that period.",
+      task: "I had to understand the cause, improve the outcome, and restore stakeholder trust.",
+      action: "I analyzed the root cause, openly acknowledged my oversight, and built a recovery plan with weekly milestones.",
+      result: "The metric recovered within [a few months], and since then I always run a validation checklist before release.",
+    },
+  },
+  {
+    id: "hr-8",
+    category: "hr",
+    question: "How do you respond to criticism or negative feedback?",
+    answer:
+      "Use STAR: the moment you received criticism, your task of responding professionally, the concrete actions you took to improve, and the visible result.",
+    tips: [
+      "Show you are not defensive",
+      "Turn criticism into a measurable improvement plan",
+      "End with results: quality improved, later feedback became positive",
+    ],
+    followUp: "What feedback was hardest for you to accept, and how did you handle it?",
+    star: {
+      situation: "My manager gave harsh criticism about the quality of [report/work] I submitted.",
+      task: "I had to stay calm, extract the point, and fix the quality in my next deliverable.",
+      action: "I asked for a focused session to get specific examples, built an improvement plan, and requested early reviews before deadlines.",
+      result: "The next revision was approved without major notes, and I set up routine check-ins so feedback never piles up.",
+    },
+  },
+  {
+    id: "hr-9",
+    category: "hr",
+    question: "Describe a time you took initiative beyond your main responsibilities.",
+    answer:
+      "Use STAR: the situation you spotted, the task you took on voluntarily, the measured actions you chose, and the impact for the team or company.",
+    tips: [
+      "Pick an initiative that helped the team or customers, not just yourself",
+      "Show you respected your core priorities",
+      "Close with an impact the team could feel or measure",
+    ],
+    followUp: "How did the team respond when you proposed the change?",
+    star: {
+      situation: "I noticed a [manual/slow] process that consumed team time every week, even though it was nobody's assigned task.",
+      task: "I wanted to improve it without hurting our main targets.",
+      action: "I built a small prototype, tested it with one teammate, then presented the results and impact for team adoption.",
+      result: "The process became faster with fewer errors, and that way of working became the team standard.",
+    },
+  },
+  {
+    id: "hr-10",
+    category: "hr",
+    question: "How do you prioritize work when everything feels urgent?",
+    answer:
+      "Explain your concrete method: judging impact against goals, delegating or deferring what can wait, and communicating the priority order to your manager so expectations are clear.",
+    tips: [
+      "Name the tools you actually use (priority list, calendar, sprint board)",
+      "Illustrate with one real situation and its outcome",
+      "Show you also ask when unsure",
+    ],
+    followUp: "Have you ever misprioritized? What happened?",
+    star: {
+      situation: "One week I held three deadlines at once: [task A], [task B], and a sudden client request.",
+      task: "I had to decide the most impactful order of work without leaving teammates in the dark.",
+      action: "I scored each task by impact and effort, communicated the new order to my manager and teammates, then blocked focus time for the top two.",
+      result: "The most critical task shipped on time, one task was delegated cleanly, and no stakeholder felt left behind.",
+    },
+  },
+  {
+    id: "hr-11",
+    category: "hr",
+    question: "Tell me about working with a difficult colleague or manager.",
+    answer:
+      "Focus on how you adapted and stayed professional: understanding their working style, adjusting communication, finding common ground, and still delivering good work.",
+    tips: [
+      "Never belittle the other person in the story",
+      "Show empathy and the communication fix you applied",
+      "End with a result: work delivered and relationship improved",
+    ],
+    followUp: "What boundaries do you keep when facing unprofessional behavior?",
+    star: {
+      situation: "I worked with a colleague who often changed requests at the last minute and was hard to reach.",
+      task: "I still had to deliver our shared work without sparking open conflict.",
+      action: "I studied their schedule and style, then agreed on a written way of working: requests via [channel], change cutoff at [H-1], and a short daily check-in.",
+      result: "Last-minute revisions dropped sharply, work shipped on schedule, and the relationship became far calmer.",
+    },
+  },
+  {
+    id: "hr-12",
+    category: "hr",
+    question: "What is your proudest achievement and why?",
+    answer:
+      "Pick one achievement with clear impact, explain your specific role in it, the challenge involved, and why it mattered to the team or company.",
+    tips: [
+      "Choose an achievement relevant to the role you are applying for",
+      "Use numbers when possible: percentages, counts, timeframes",
+      "Describe your contribution, not just the team's success",
+    ],
+    followUp: "What was the hardest part of that achievement?",
+    star: {
+      situation: "I was trusted to take on [project/problem] that had already failed twice with the team.",
+      task: "I was responsible for driving it to a measurable outcome.",
+      action: "I re-mapped the root causes of the earlier failures, built a different approach with weekly milestones, and kept stakeholders updated on progress.",
+      result: "The project finished with [measured result], and the approach was reused for similar projects.",
+    },
+  },
+  {
+    id: "hr-13",
+    category: "hr",
+    question: "How do you adapt to change or new technology?",
+    answer:
+      "Tell a real example: a change or new technology you had to master, how you learned it (courses, mentor, hands-on practice), and the result for your work.",
+    tips: [
+      "Show a habit of continuous learning",
+      "Name a specific tool, system, or process that changed",
+      "Avoid generic answers with no example",
+    ],
+    followUp: "How do you learn something new quickly?",
+    star: {
+      situation: "My team switched to [new tool/system] while a project was already running.",
+      task: "I had to stay productive while mastering the new tooling within weeks.",
+      action: "I joined the onboarding sessions, practiced 30 minutes daily on real tasks, and wrote short notes on every problem I solved.",
+      result: "Within [three weeks] I was as fast as before, and my notes helped teammates ramp up faster too.",
+    },
+  },
+  {
+    id: "hr-14",
+    category: "hr",
+    question: "Why are you looking for a new opportunity right now?",
+    answer:
+      "Answer positively and professionally: you want to grow toward [career direction], seek challenges aligned with your skills, without speaking badly about your previous employer.",
+    tips: [
+      "Focus on the future, not past complaints",
+      "Connect your reason to this role and company",
+      "Keep a positive tone even if the real reason is uncomfortable",
+    ],
+    followUp: "What do you look for in a new workplace culture?",
+    star: {
+      situation: "After [X years] in my role, growth started to plateau and my projects no longer challenged me.",
+      task: "I wanted to make sure my next step aligned with my long-term career plan, not just a change of scenery.",
+      action: "I mapped the skills I wanted to deepen ([skill]), looked for roles with that challenge, and chose companies whose vision matched.",
+      result: "The decision became clear: I applied for this role because [specific reason] aligns with my growth plan.",
+    },
+  },
 ];
 
 /* ─── Categories (English) ─── */

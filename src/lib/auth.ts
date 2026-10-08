@@ -12,6 +12,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     sessionsTable: schema.sessions,
     verificationTokensTable: schema.verificationTokens,
   }),
+  // Percayai host dari request: dev lokal di port apa pun, serta proxy
+  // Vercel/Cloudflare. Tanpa ini NextAuth v5 menolak host non-Vercel dan
+  // redirect_uri Google bisa salah, memicu "redirect_uri_mismatch".
+  trustHost: true,
   providers: [
     Google({
       clientId: process.env.AUTH_GOOGLE_ID,

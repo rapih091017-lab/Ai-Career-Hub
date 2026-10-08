@@ -20,6 +20,8 @@ export interface InterviewQuestion {
   tips?: string[];
   /** Pertanyaan lanjutan yang sering diajukan pewawancara setelah jawaban utama */
   followUp?: string;
+  /** Contoh jawaban dengan metode STAR (Situation, Task, Action, Result) */
+  star?: { situation: string; task: string; action: string; result: string };
 }
 
 /* ─── Helper: get difficulty (compute from answer length jika tidak explicit) ─── */
@@ -114,6 +116,196 @@ const hrQuestions: InterviewQuestion[] = [
       "Hubungkan growth plan dengan perusahaan - jangan terkesan hanya batu loncatan",
       "Hindari jawaban terlalu spekulatif atau muluk",
     ],
+  },
+  {
+    id: "hr-5",
+    category: "hr",
+    question: "Ceritakan pengalaman saat Anda menyelesaikan konflik dalam tim.",
+    answer:
+      "Jawab dengan kerangka STAR: Situasi (proyek dan sumber konflik), Tugas (peran Anda menengahi), Aksi (langkah konkret yang Anda ambil), Hasil (dampak pada tim dan proyek). Tunjukkan bahwa Anda menyelesaikan masalah tanpa menyalahkan siapa pun.",
+    tips: [
+      "Fokus ke solusi, bukan drama konfliknya",
+      "Tutup dengan hasil nyata: keputusan tercapai, tenggat tetap aman",
+      "Hindari menceritakan konflik pribadi yang sensitif",
+    ],
+    followUp: "Apa yang akan Anda lakukan berbeda jika konflik itu terulang?",
+    star: {
+      situation: "Pada proyek [nama proyek], dua rekan tim berselisih soal [topik/prioritas] dan progres mulai macet.",
+      task: "Sebagai [peran], saya perlu menengahi agar keputusan cepat diambil tanpa merusak hubungan tim.",
+      action: "Saya bicara terpisah dengan keduanya untuk memahami akar masalah, lalu memandu sesi kecil dengan data netral dan menyepakati kriteria keputusan bersama.",
+      result: "Tim kembali fokus, tenggat proyek tetap aman, dan cara diskusi baru itu menjadi kebiasaan di retrospektif kami.",
+    },
+  },
+  {
+    id: "hr-6",
+    category: "hr",
+    question: "Bagaimana cara Anda menangani tenggat yang sangat ketat?",
+    answer:
+      "Gunakan STAR: jelaskan situasi tenggat (Situasi), tanggung jawab Anda (Tugas), cara Anda memprioritaskan dan berkomunikasi (Aksi), serta hasil akhirnya terhadap kualitas dan waktu (Hasil).",
+    tips: [
+      "Tunjukkan cara memprioritaskan: dampak vs usaha",
+      "Sebutkan komunikasi trade-off ke atasan atau stakeholder",
+      "Jangan mengorbankan kualitas tanpa membicarakannya",
+    ],
+    followUp: "Apa alat bantu yang Anda pakai untuk menjaga prioritas saat semuanya mendesak?",
+    star: {
+      situation: "Tenggat dimajukan tiba-tiba saat saya sedang menangani beberapa pekerjaan paralel.",
+      task: "Saya harus tetap menyerahkan hasil berkualitas tanpa melewatkan tenggat baru.",
+      action: "Saya memetakan ulang prioritas berdasarkan dampak, mengomunikasikan trade-off ke atasan, dan fokus ke tugas paling kritikal sambil menunda yang bisa ditunda.",
+      result: "Semua deliverable kritikal selesai tepat waktu, dan pekerjaan tambahan dirilis di siklus berikutnya tanpa masalah.",
+    },
+  },
+  {
+    id: "hr-7",
+    category: "hr",
+    question: "Ceritakan kegagalan terbesar Anda dan apa yang Anda pelajari.",
+    answer:
+      "Jawab jujur dengan STAR: Situasi kegagalan, tanggung jawab Anda, apa yang Anda lakukan untuk mengatasi atau memulihkan keadaan, dan pembelajaran yang bertahan sampai sekarang.",
+    tips: [
+      "Pilih kegagalan nyata yang aman diceritakan, bukan kesalahan fatal",
+      "Bagian terpenting adalah pelajaran dan perubahan perilaku Anda",
+      "Jangan menyalahkan orang lain atau keadaan",
+    ],
+    followUp: "Bagaimana Anda memastikan kesalahan yang sama tidak terulang?",
+    star: {
+      situation: "[Proyek/peluncuran] yang saya pimpin tidak mencapai target [metrik utama] pada periode itu.",
+      task: "Saya harus memahami penyebabnya, memperbaiki hasil, dan memulihkan kepercayaan stakeholder.",
+      action: "Saya menganalisis akar masalah, mengakui kelalaian saya secara terbuka, lalu menyusun rencana perbaikan dengan milestone mingguan.",
+      result: "Metrik membaik dalam [beberapa bulan], dan sejak itu saya selalu memakai checklist validasi sebelum rilis.",
+    },
+  },
+  {
+    id: "hr-8",
+    category: "hr",
+    question: "Bagaimana Anda menanggapi kritik atau feedback negatif?",
+    answer:
+      "Gunakan STAR: Situasi saat Anda menerima kritik, tugas Anda untuk merespons dengan profesional, aksi konkret memperbaiki diri, dan hasil yang terlihat.",
+    tips: [
+      "Tunjukkan Anda tidak defensif",
+      "Konversikan kritik menjadi rencana perbaikan yang terukur",
+      "Sebutkan hasil: kualitas meningkat, feedback berikutnya lebih positif",
+    ],
+    followUp: "Feedback apa yang paling sulit Anda terima, dan bagaimana Anda mengatasinya?",
+    star: {
+      situation: "Atasan memberi kritik keras tentang kualitas [laporan/pekerjaan] yang saya serahkan.",
+      task: "Saya harus menahan diri, mengambil intinya, dan memperbaiki kualitas di pekerjaan berikutnya.",
+      action: "Saya meminta waktu khusus untuk meminta contoh detail, menyusun rencana perbaikan, dan meminta review lebih awal sebelum tenggat.",
+      result: "Revisi berikutnya disetujui tanpa catatan besar, dan saya menjadwalkan check-in rutin agar feedback tidak menumpuk.",
+    },
+  },
+  {
+    id: "hr-9",
+    category: "hr",
+    question: "Ceritakan saat Anda mengambil inisiatif di luar tanggung jawab utama Anda.",
+    answer:
+      "Gunakan STAR: Situasi yang Anda temukan, tugas yang Anda ambil atas kemauan sendiri, aksi terukur yang Anda lakukan, dan hasilnya bagi tim atau perusahaan.",
+    tips: [
+      "Pilih inisiatif yang berdampak ke tim atau pelanggan, bukan hanya diri sendiri",
+      "Tunjukkan Anda menghormati prioritas kerja utama",
+      "Tutup dengan dampak yang bisa diukur atau dirasakan tim",
+    ],
+    followUp: "Apa respons tim ketika Anda mengusulkan perubahan itu?",
+    star: {
+      situation: "Saya melihat proses [manual/lambat] yang menyita waktu tim setiap minggu, padahal bukan bagian dari tugas saya.",
+      task: "Saya ingin memperbaikinya tanpa mengganggu target utama tim.",
+      action: "Saya membuat prototipe kecil, mengujinya dengan satu rekan, lalu mempresentasikan hasil dan dampaknya untuk diadopsi tim.",
+      result: "Proses menjadi lebih cepat dan minim kesalahan, lalu cara kerja itu menjadi standar baru tim.",
+    },
+  },
+  {
+    id: "hr-10",
+    category: "hr",
+    question: "Bagaimana Anda memprioritaskan pekerjaan saat semuanya terasa mendesak?",
+    answer:
+      "Jelaskan metode konkret Anda: menilai dampak terhadap tujuan, mendelegasikan atau menunda yang bisa ditunda, dan mengomunikasikan urutan prioritas ke atasan agar ekspektasi jelas.",
+    tips: [
+      "Sebutkan alat yang benar-benar Anda pakai (daftar prioritas, kalender, sprint board)",
+      "Contohkan satu situasi nyata dengan hasilnya",
+      "Tunjukkan bahwa Anda juga berani bertanya saat ragu",
+    ],
+    followUp: "Pernahkah Anda salah memprioritaskan? Apa yang terjadi?",
+    star: {
+      situation: "Suatu pekan saya memegang tiga tenggat sekaligus: [tugas A], [tugas B], dan permintaan mendadak dari klien.",
+      task: "Saya harus memutuskan urutan kerja yang paling berdampak tanpa membuat rekan menunggu tanpa kabar.",
+      action: "Saya menilai tiap tugas dari dampak dan usaha, mengomunikasikan urutan baru ke atasan dan rekan, lalu memblokir waktu fokus untuk dua tugas teratas.",
+      result: "Tugas paling kritikal selesai tepat waktu, satu tugas didelegasikan dengan baik, dan tidak ada stakeholder yang merasa ditinggalkan.",
+    },
+  },
+  {
+    id: "hr-11",
+    category: "hr",
+    question: "Ceritakan pengalaman bekerja dengan rekan atau atasan yang sulit.",
+    answer:
+      "Fokus pada cara Anda beradaptasi dan menjaga profesionalisme: pahami gaya kerja mereka, sesuaikan komunikasi, cari titik temu, dan tetap selesaikan pekerjaan dengan baik.",
+    tips: [
+      "Jangan merendahkan orang tersebut saat bercerita",
+      "Tunjukkan empati dan solusi komunikasi yang Anda lakukan",
+      "Hasil akhir: pekerjaan selesai dan hubungan membaik",
+    ],
+    followUp: "Apa batas yang Anda pegang ketika menghadapi perilaku yang tidak profesional?",
+    star: {
+      situation: "Saya bekerja dengan rekan yang sering mengubah permintaan di menit terakhir dan sulit dihubungi.",
+      task: "Saya tetap harus menyelesaikan pekerjaan bersama tanpa menimbulkan konflik terbuka.",
+      action: "Saya mempelajari jam dan gaya kerjanya, lalu menyepakati cara kerja tertulis: permintaan lewat [kanal], batas perubahan [H-1], dan check-in singkat tiap pagi.",
+      result: "Revisi mendadak berkurang drastis, pekerjaan selesai sesuai jadwal, dan hubungan kerja jadi lebih tenang.",
+    },
+  },
+  {
+    id: "hr-12",
+    category: "hr",
+    question: "Apa pencapaian yang paling Anda banggakan dan mengapa?",
+    answer:
+      "Pilih satu pencapaian dengan dampak jelas, jelaskan peran spesifik Anda di dalamnya, tantangan yang dihadapi, dan mengapa itu penting bagi tim atau perusahaan.",
+    tips: [
+      "Pilih pencapaian yang relevan dengan posisi yang dilamar",
+      "Gunakan angka jika ada: persentase, jumlah, waktu",
+      "Ceritakan kontribusi Anda, bukan keberhasilan tim secara umum saja",
+    ],
+    followUp: "Apa bagian tersulit dari pencapaian itu?",
+    star: {
+      situation: "Saya dipercaya menangani [proyek/masalah] yang sebelumnya dua kali gagal ditangani tim.",
+      task: "Saya bertanggung jawab membawa proyek ini sampai menghasilkan dampak terukur.",
+      action: "Saya memetakan ulang akar kegagalan sebelumnya, menyusun pendekatan berbeda dengan milestone mingguan, dan menjaga komunikasi progres ke stakeholder.",
+      result: "Proyek selesai dengan [hasil terukur], dan pendekatan itu dipakai lagi untuk proyek serupa.",
+    },
+  },
+  {
+    id: "hr-13",
+    category: "hr",
+    question: "Bagaimana Anda beradaptasi dengan perubahan atau teknologi baru?",
+    answer:
+      "Ceritakan contoh nyata: perubahan atau teknologi baru yang harus Anda kuasai, cara Anda belajar (kursus, mentor, praktik langsung), dan hasilnya bagi pekerjaan Anda.",
+    tips: [
+      "Tunjukkan kebiasaan belajar yang berkelanjutan",
+      "Sebutkan contoh spesifik: alat, sistem, atau proses yang berubah",
+      "Hindari jawaban normatif tanpa contoh",
+    ],
+    followUp: "Bagaimana cara Anda belajar hal baru dengan cepat?",
+    star: {
+      situation: "Tim saya berpindah ke [alat/sistem baru] di tengah proyek yang sedang berjalan.",
+      task: "Saya harus tetap produktif sambil menguasai alat baru dalam hitungan minggu.",
+      action: "Saya mengikuti sesi onboarding, berlatih mandiri 30 menit setiap hari dengan tugas nyata, dan mencatat solusi setiap masalah yang saya temui.",
+      result: "Dalam [tiga minggu] saya kembali secepat sebelumnya, dan catatan saya dipakai rekan lain untuk mempercepat adaptasi mereka.",
+    },
+  },
+  {
+    id: "hr-14",
+    category: "hr",
+    question: "Mengapa Anda mencari peluang baru saat ini?",
+    answer:
+      "Jawab positif dan profesional: ingin berkembang ke [arah karier], mencari tantangan yang selaras dengan keahlian Anda, tanpa menjelekkan tempat kerja sebelumnya.",
+    tips: [
+      "Fokus ke masa depan, bukan keluhan masa lalu",
+      "Hubungkan alasan Anda dengan posisi dan perusahaan ini",
+      "Jaga nada positif meskipun alasan sebenarnya kurang nyaman",
+    ],
+    followUp: "Apa yang Anda cari dari budaya kerja tempat baru?",
+    star: {
+      situation: "Setelah [X tahun] di posisi saya, pertumbuhan peran mulai melambat dan proyek yang saya tangani tidak lagi menantang.",
+      task: "Saya ingin memastikan langkah karier berikutnya selaras dengan rencana jangka panjang saya, bukan sekadar pindah.",
+      action: "Saya memetakan skill yang ingin saya dalami ([skill]), mencari peran dengan tantangan itu, dan memilih perusahaan yang visinya sejalan.",
+      result: "Keputusan saya jadi terarah: saya melamar peran ini karena [alasan spesifik] selaras dengan rencana pertumbuhan saya.",
+    },
   },
 ];
 

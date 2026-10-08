@@ -39,18 +39,21 @@ interface PortfolioData {
 import { esc, safeUrl } from "@/lib/portfolio-safety";
 
 /** Generate standalone HTML for export */
-function generateExportHtml(data: PortfolioData, theme: ThemeDefinition): string {
+function generateExportHtml(data: PortfolioData, theme: ThemeDefinition, labels: {
+  namePlaceholder: string; yearsExp: string; projectsDone: string; clientsHappy: string;
+  positionPlaceholder: string; degreePlaceholder: string; present: string; viewDetail: string;
+}): string {
   const { formData: f, projects, experiences, educations, certifications, organizations, hobbies, testimonials, extraLinks } = data;
   const c = theme.colors;
-  const name = esc([f.heroFirstName, f.heroLastName].filter(Boolean).join(" ") || "Nama Lengkap");
+  const name = esc([f.heroFirstName, f.heroLastName].filter(Boolean).join(" ") || labels.namePlaceholder);
   const skillList = f.skillsMain.split(",").map(s => s.trim()).filter(Boolean);
 
   const statsCards = [f.aboutYearsExp, f.aboutProjectsDone, f.aboutClientsHappy]
     .filter(Boolean).length
     ? `      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:600px;margin:0 auto">
-        ${f.aboutYearsExp ? `<div style="padding:20px;background:${c.primary}12;border-radius:12px"><div style="font-size:32px;font-weight:700;color:${c.primary}">${esc(f.aboutYearsExp)}</div><div style="font-size:13px;color:${c.textMuted};margin-top:4px">Tahun Pengalaman</div></div>` : ""}
-        ${f.aboutProjectsDone ? `<div style="padding:20px;background:${c.primary}12;border-radius:12px"><div style="font-size:32px;font-weight:700;color:${c.primary}">${esc(f.aboutProjectsDone)}</div><div style="font-size:13px;color:${c.textMuted};margin-top:4px">Project Selesai</div></div>` : ""}
-        ${f.aboutClientsHappy ? `<div style="padding:20px;background:${c.primary}12;border-radius:12px"><div style="font-size:32px;font-weight:700;color:${c.primary}">${esc(f.aboutClientsHappy)}</div><div style="font-size:13px;color:${c.textMuted};margin-top:4px">Klien Puas</div></div>` : ""}
+        ${f.aboutYearsExp ? `<div style="padding:20px;background:${c.primary}12;border-radius:12px"><div style="font-size:32px;font-weight:700;color:${c.primary}">${esc(f.aboutYearsExp)}</div><div style="font-size:13px;color:${c.textMuted};margin-top:4px">${labels.yearsExp}</div></div>` : ""}
+        ${f.aboutProjectsDone ? `<div style="padding:20px;background:${c.primary}12;border-radius:12px"><div style="font-size:32px;font-weight:700;color:${c.primary}">${esc(f.aboutProjectsDone)}</div><div style="font-size:13px;color:${c.textMuted};margin-top:4px">${labels.projectsDone}</div></div>` : ""}
+        ${f.aboutClientsHappy ? `<div style="padding:20px;background:${c.primary}12;border-radius:12px"><div style="font-size:32px;font-weight:700;color:${c.primary}">${esc(f.aboutClientsHappy)}</div><div style="font-size:13px;color:${c.textMuted};margin-top:4px">${labels.clientsHappy}</div></div>` : ""}
       </div>`
     : "";
 
@@ -58,8 +61,8 @@ function generateExportHtml(data: PortfolioData, theme: ThemeDefinition): string
     .filter(e => e.company || e.position)
     .map(e => `<div class="card mb-4">
       <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;margin-bottom:4px">
-        <strong>${esc(e.position) || "Posisi"}</strong>
-        <span style="font-size:13px;color:${c.textMuted}">${esc(e.startDate)}${e.startDate ? " &mdash; " : ""}${e.isPresent ? "Sekarang" : esc(e.endDate || "")}</span>
+        <strong>${esc(e.position) || labels.positionPlaceholder}</strong>
+        <span style="font-size:13px;color:${c.textMuted}">${esc(e.startDate)}${e.startDate ? " &mdash; " : ""}${e.isPresent ? labels.present : esc(e.endDate || "")}</span>
       </div>
       <div style="color:${c.primary};font-size:14px;margin-bottom:${e.description ? "8px" : "0"}">${esc(e.company)}</div>
       ${e.description ? `<p>${esc(e.description)}</p>` : ""}
@@ -72,8 +75,8 @@ function generateExportHtml(data: PortfolioData, theme: ThemeDefinition): string
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
         <div style="width:40px;height:40px;border-radius:12px;background:${c.primary}15;display:flex;align-items:center;justify-content:center;color:${c.primary}">S</div>
         <div>
-          <strong>${esc(e.degree) || "Gelar"}</strong>
-          <div style="font-size:12px;color:${c.textMuted}">${esc(e.startDate)}${e.startDate ? " &mdash; " : ""}${e.isPresent ? "Sekarang" : esc(e.endDate || "")}</div>
+          <strong>${esc(e.degree) || labels.degreePlaceholder}</strong>
+          <div style="font-size:12px;color:${c.textMuted}">${esc(e.startDate)}${e.startDate ? " &mdash; " : ""}${e.isPresent ? labels.present : esc(e.endDate || "")}</div>
         </div>
       </div>
       <div style="color:${c.primary};font-size:14px">${esc(e.institution)}</div>
@@ -91,7 +94,7 @@ function generateExportHtml(data: PortfolioData, theme: ThemeDefinition): string
         <h3 style="margin-bottom:8px">${esc(p.name)}</h3>
         ${p.description ? `<p style="margin-bottom:16px">${esc(p.description)}</p>` : ""}
         ${techs ? `<div class="flex-wrap mb-4">${techs}</div>` : ""}
-        ${p.link && safeUrl(p.link) ? `<a href="${safeUrl(p.link)}" target="_blank" rel="noopener noreferrer" style="color:${c.primary};font-weight:600;font-size:13px">Lihat Detail &rarr;</a>` : ""}
+        ${p.link && safeUrl(p.link) ? `<a href="${safeUrl(p.link)}" target="_blank" rel="noopener noreferrer" style="color:${c.primary};font-weight:600;font-size:13px">${labels.viewDetail} &rarr;</a>` : ""}
       </div>`;
     })
     .join("\n");
@@ -300,7 +303,16 @@ export default function PortfolioPreviewPage() {
                   </button>
                   <button
                     onClick={() => {
-                      const html = generateExportHtml(data, theme);
+                      const html = generateExportHtml(data, theme, {
+                        namePlaceholder: t("portfolio.label-name"),
+                        yearsExp: t("portfolio.label-years-exp"),
+                        projectsDone: t("portfolio.label-projects-done"),
+                        clientsHappy: t("portfolio.label-clients-happy"),
+                        positionPlaceholder: t("portfolio.label-position"),
+                        degreePlaceholder: t("portfolio.label-degree"),
+                        present: t("portfolio.label-present"),
+                        viewDetail: t("portfolio.label-view-detail"),
+                      });
                       const blob = new Blob([html], { type: "text/html;charset=utf-8" });
                       const url = URL.createObjectURL(blob);
                       const a = document.createElement("a");

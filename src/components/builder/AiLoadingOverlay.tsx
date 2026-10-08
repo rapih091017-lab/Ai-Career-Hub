@@ -13,7 +13,7 @@ export function AiLoadingOverlay({ label = "AI sedang menganalisis" }: { label?:
       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/[0.04] to-transparent bg-[length:200%_100%] animate-[shimmer-slow_2s_ease-in-out_infinite]" />
       
       {/* Subtle overlay */}
-      <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px]" />
+      <div className="absolute inset-0 bg-surface-container-lowest/40 backdrop-blur-[1px]" />
 
       {/* Loading indicator at bottom */}
       <div className="absolute bottom-0 left-0 right-0">

@@ -770,7 +770,7 @@ export default function PortfolioBuildPage() {
                   {experiences.map((e, idx) => (
                     <div key={e.id} className="p-4 rounded-xl border border-outline-variant bg-surface-container-low">
                       <div className="flex justify-between items-start mb-3">
-                        <h4 className="font-label-bold text-primary">Pengalaman {idx + 1}</h4>
+                        <h4 className="font-label-bold text-primary">{t("portfolio.label-experience")} {idx + 1}</h4>
                         <button className="text-error hover:bg-error-container/30 p-1 rounded transition-colors"
                           onClick={() => setExperiences(prev => prev.filter(x => x.id !== e.id))}
                           aria-label="Hapus pengalaman">
@@ -787,7 +787,7 @@ export default function PortfolioBuildPage() {
                             value={e.position} onChange={ev => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, position: ev.target.value} : x))} />
                         </Field>
                         <div className="md:col-span-2">
-                          <label className="block text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Tanggal Mulai - Selesai</label>
+                          <label className="block text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">{t("portfolio.label-date-range")}</label>
                           <div className="flex items-center gap-2">
                             <input className="flex-1 px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" type="month" placeholder="Mulai"
                               value={e.startDate} onChange={ev => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, startDate: ev.target.value} : x))} />
@@ -847,7 +847,7 @@ export default function PortfolioBuildPage() {
                             value={e.field} onChange={ev => setEducations(prev => prev.map(x => x.id === e.id ? {...x, field: ev.target.value} : x))} />
                         </Field>
                         <div className="md:col-span-2">
-                          <label className="block text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Tahun Mulai - Selesai</label>
+                          <label className="block text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">{t("portfolio.label-year-range")}</label>
                           <div className="flex items-center gap-2">
                             <input className="flex-1 px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" type="month" placeholder="Mulai"
                               value={e.startDate} onChange={ev => setEducations(prev => prev.map(x => x.id === e.id ? {...x, startDate: ev.target.value} : x))} />
@@ -1214,7 +1214,7 @@ export default function PortfolioBuildPage() {
               {userCvList.length === 0 ? (
                 <p className="text-xs text-amber-600 flex items-center gap-1">
                   <span className="material-symbols-outlined text-sm">info</span>
-                  {cvLoading ? "Memuat daftar CV..." : <>Belum ada CV. <a href="/dashboard" className="text-primary underline">Buat CV dulu di Dashboard</a></>}
+                  {cvLoading ? t("portfolio.loading-cvs") : <>{t("portfolio.no-cv")} <a href="/dashboard" className="text-primary underline">{t("portfolio.no-cv-action")}</a></>}
                 </p>
               ) : (
                 <div className="space-y-2 max-h-40 overflow-y-auto custom-scrollbar">
@@ -1226,7 +1226,7 @@ export default function PortfolioBuildPage() {
                       className="w-full flex items-center justify-between p-3 rounded-lg bg-white border border-outline-variant/40 hover:border-primary/40 transition-all disabled:opacity-50"
                     >
                       <div className="text-left">
-                        <span className="font-medium text-sm text-on-surface">{cv.jobTitle || "CV tanpa judul"}</span>
+                        <span className="font-medium text-sm text-on-surface">{cv.jobTitle || t("portfolio.cv-untitled")}</span>
                         <p className="text-[10px] text-outline">Diperbarui: {new Date(cv.updatedAt).toLocaleDateString("id-ID")}</p>
                       </div>
                       {generatingFromCv === cv.id ? (
@@ -1270,7 +1270,7 @@ export default function PortfolioBuildPage() {
               </div>
               <div>
                 <h4 className="font-label-bold text-on-surface">Isi Manual</h4>
-                <p className="text-xs text-on-surface-variant">Mulai dari form kosong, isi sendiri</p>
+                <p className="text-xs text-on-surface-variant">{t("portfolio.start-empty")}</p>
               </div>
             </button>
           </div>

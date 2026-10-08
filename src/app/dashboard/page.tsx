@@ -135,6 +135,23 @@ export default function DashboardPage() {
       .slice(0, 5);
   }, [cvList]);
 
+  /* ── Next best action: satu langkah paling berguna mengikuti kondisi user ── */
+  const nextAction = useMemo(() => {
+    if (profileData && !profileData.hasProfile) {
+      return { icon: "person_add", label: t("dashboard.next-profile"), href: "/profile" };
+    }
+    if (profileData && profileData.score < 100) {
+      return { icon: "fact_check", label: t("dashboard.next-complete-profile"), href: "/profile" };
+    }
+    if (cvList.length === 0) {
+      return { icon: "edit_note", label: t("dashboard.next-create-cv"), href: "/builder/new" };
+    }
+    if (checkerHistory.length === 0) {
+      return { icon: "analytics", label: t("dashboard.next-check-cv"), href: "/checker" };
+    }
+    return { icon: "work", label: t("dashboard.next-track-job"), href: "/tracker" };
+  }, [profileData, cvList.length, checkerHistory.length, t]);
+
   useEffect(() => {
     fetch("/api/cv-documents")
       .then((res) => res.json())
@@ -328,6 +345,27 @@ export default function DashboardPage() {
                   </motion.div>
                 );
               })}
+            </section>
+
+            {/* Next Best Action */}
+            <section className="mb-6">
+              <Link
+                href={nextAction.href}
+                className="flex items-center gap-4 rounded-2xl border border-primary/25 bg-primary/5 p-4 transition-colors hover:bg-primary/10"
+              >
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden>
+                    {nextAction.icon}
+                  </span>
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-label-sm text-on-surface-variant">{t("dashboard.next-title")}</p>
+                  <p className="truncate text-body-md font-semibold text-on-surface">{nextAction.label}</p>
+                </div>
+                <span className="material-symbols-outlined text-primary" aria-hidden>
+                  arrow_forward
+                </span>
+              </Link>
             </section>
 
             {/* Dashboard Stats */}

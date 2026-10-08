@@ -340,6 +340,32 @@ export async function POST(request: Request) {
         });
       }
 
+      // Strategy 2: pdf-parse (engine berbeda) untuk PDF yang gagal di pdfjs,
+      // mis. struktur xref/font yang tidak lazim. Sebelumnya PDF seperti ini
+      // langsung menyerah ke OCR padahal masih bisa diekstrak.
+      try {
+        const { PDFParse } = await import("pdf-parse");
+        const parser = new PDFParse({ data: Buffer.from(rawArrayBuffer) });
+        try {
+          const parsed = await parser.getText();
+          const fallbackText = (parsed.text ?? "").trim();
+          if (fallbackText.length >= 50) {
+            return Response.json({
+              extractedText: fallbackText,
+              fileName: file.name,
+              format: "pdf",
+            });
+          }
+        } finally {
+          await parser.destroy().catch(() => {});
+        }
+      } catch (fallbackErr) {
+        console.error(
+          "[extract] pdf-parse fallback failed:",
+          fallbackErr instanceof Error ? fallbackErr.message : fallbackErr
+        );
+      }
+
       // Scanned / no text — give actionable error
       if (result1.errorType === "SCANNED") {
         return buildErrorResponse(

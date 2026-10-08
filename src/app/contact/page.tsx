@@ -1,12 +1,18 @@
 import { Metadata } from "next";
 import Link from "next/link";
+import { getSiteSettings } from "@/lib/site-settings.server";
 
 export const metadata: Metadata = {
   title: "Hubungi Kami | AI Career Hub",
   description: "Hubungi tim AI Career Hub untuk pertanyaan, dukungan, atau kerja sama.",
 };
 
-export default function ContactPage() {
+// Kontak dibaca dari pengaturan situs (dapat diubah admin) sehingga halaman
+// tidak boleh di-cache statis.
+export const dynamic = "force-dynamic";
+
+export default async function ContactPage() {
+  const settings = await getSiteSettings();
   return (
     <main className="min-h-screen bg-background">
       <div className="bg-gradient-to-br from-primary to-primary/80 text-white">
@@ -33,16 +39,34 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="font-label-bold text-on-surface">Email</p>
-                    <a href="mailto:support@aicareerhub.com" className="text-body-md text-primary hover:underline">support@aicareerhub.com</a>
+                    <a href={`mailto:${settings.contact_email}`} className="text-body-md text-primary hover:underline">{settings.contact_email}</a>
                   </div>
                 </div>
+                {settings.contact_whatsapp ? (
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-primary-fixed flex items-center justify-center shrink-0">
+                      <span className="material-symbols-outlined text-primary">chat</span>
+                    </div>
+                    <div>
+                      <p className="font-label-bold text-on-surface">WhatsApp</p>
+                      <a
+                        href={`https://wa.me/${settings.contact_whatsapp.replace(/[^0-9]/g, "").replace(/^0/, "62")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-body-md text-primary hover:underline"
+                      >
+                        {settings.contact_whatsapp}
+                      </a>
+                    </div>
+                  </div>
+                ) : null}
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-xl bg-primary-fixed flex items-center justify-center shrink-0">
                     <span className="material-symbols-outlined text-primary">alternate_email</span>
                   </div>
                   <div>
                     <p className="font-label-bold text-on-surface">Media Sosial</p>
-                    <p className="text-body-md text-on-surface-variant">@aicareerhub</p>
+                    <p className="text-body-md text-on-surface-variant">{settings.social_handle}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">

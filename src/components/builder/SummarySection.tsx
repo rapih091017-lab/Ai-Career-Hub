@@ -219,7 +219,7 @@ export function SummarySection({
               animate={{ opacity: 1 }}
               className="absolute bottom-3 left-3"
             >
-              <span className={`text-[10px] font-medium ${summary.length > 900 ? "text-amber-600" : "text-outline"}`}>
+              <span className={`text-[10px] font-medium ${summary.length > 900 ? "text-amber-600" : "text-on-surface-variant"}`}>
                 {summary.length}/1000
               </span>
             </motion.div>
@@ -290,7 +290,7 @@ export function SummarySection({
       </div>
 
       {/* Custom Fields */}
-      <div className="bg-white rounded-xl p-6 shadow-soft space-y-4">
+      <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
         <div className="flex items-center justify-between pb-2">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
@@ -310,7 +310,7 @@ export function SummarySection({
                 type="text"
                 value={field.label}
                 onChange={(e) => updateCustomField(i, "label", e.target.value)}
-                className="w-full bg-white border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary text-body-md"
+                className="w-full bg-surface-container-lowest border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary text-body-md"
                 placeholder="Label (misal: GitHub)"
               />
             </div>
@@ -319,7 +319,7 @@ export function SummarySection({
                 type="text"
                 value={field.value}
                 onChange={(e) => updateCustomField(i, "value", e.target.value)}
-                className="w-full bg-white border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary text-body-md"
+                className="w-full bg-surface-container-lowest border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary text-body-md"
                 placeholder="Nilai (misal: https://github.com/username)"
               />
             </div>
@@ -336,7 +336,7 @@ export function SummarySection({
         <button
           type="button"
           onClick={addCustomField}
-          className="w-full border-2 border-dashed border-outline/30 rounded-xl py-3 flex items-center justify-center gap-2 text-body-md text-outline hover:border-primary/50 hover:text-primary transition-colors duration-200"
+          className="w-full border-2 border-dashed border-outline/30 rounded-xl py-3 flex items-center justify-center gap-2 text-body-md text-on-surface-variant hover:border-primary/50 hover:text-primary transition-colors duration-200"
         >
           <span className="material-symbols-outlined text-lg">add</span> Tambah Field Kustom
         </button>

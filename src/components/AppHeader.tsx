@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard" },
   { label: "My Resumes", href: "/my-resumes" },
   { label: "Surat", href: "/surat-lamaran" },
+  { label: "Tracker", href: "/tracker" },
   { label: "Templates", href: "/builder/new" },
   { label: "Resources", href: "/checker" },
 ];
@@ -171,6 +172,13 @@ export default function AppHeader() {
                   >
                     <span className="material-symbols-outlined text-lg text-on-surface-variant">settings</span>
                     {t("header.settings")}
+                  </button>
+                  <button
+                    className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-high transition-colors"
+                    onClick={() => { setIsDropdownOpen(false); router.push("/affiliate"); }}
+                  >
+                    <span className="material-symbols-outlined text-lg text-on-surface-variant">redeem</span>
+                    {t("header.affiliate")}
                   </button>
                   <div className="border-t border-outline-variant/30 my-1" />
                   <button

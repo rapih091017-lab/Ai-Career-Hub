@@ -49,18 +49,18 @@ export function FormatToolbar({
 }: FormatToolbarProps) {
   const { t } = useTranslation();
   return (
-    <div className="h-auto px-3 md:px-4 py-2 border-b border-outline-variant/30 flex flex-wrap items-center gap-2 bg-white shadow-sm z-20 shrink-0">
+    <div className="h-auto px-3 md:px-4 py-2 border-b border-outline-variant/30 flex flex-wrap items-center gap-2 bg-surface-container-lowest shadow-sm z-20 shrink-0">
       {/* CV Completeness Bar */}
       <div className="flex items-center gap-1.5 shrink-0" title={`CV ${cvCompleteness}% ${t("builder.complete")}`}>
         <div className="w-12 h-1.5 bg-outline-variant/30 rounded-full overflow-hidden">
           <div
             className={`h-full rounded-full transition-[width,background-color] duration-500 ${
-              cvCompleteness >= 100 ? "bg-green-500" : cvCompleteness >= 50 ? "bg-primary" : "bg-amber-500"
+              cvCompleteness >= 100 ? "bg-emerald-500" : cvCompleteness >= 50 ? "bg-primary" : "bg-amber-500"
             }`}
             style={{ width: `${cvCompleteness}%` }}
           />
         </div>
-        <span className="text-[9px] font-bold text-outline w-6 text-right">{cvCompleteness}%</span>
+        <span className="text-[9px] font-bold text-on-surface-variant w-6 text-right">{cvCompleteness}%</span>
       </div>
 
       {/* Auto-save status */}
@@ -73,8 +73,8 @@ export function FormatToolbar({
             transition={{ type: "spring", stiffness: 400, damping: 25 }}
             className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[11px] font-semibold shrink-0 shadow-sm ${
               saveStatus === "saving" ? "text-amber-700 bg-amber-50 border border-amber-200" :
-              saveStatus === "saved" ? "text-green-700 bg-green-50 border border-green-200" :
-              "text-red-700 bg-red-50 border border-red-200 animate-[shake_0.3s_ease-in-out]"
+              saveStatus === "saved" ? "text-emerald-700 bg-emerald-500/10 border border-emerald-500/20" :
+              "text-on-error-container bg-error-container border border-error/30 animate-[shake_0.3s_ease-in-out]"
             }`}
           >
             <span className={`material-symbols-outlined text-[14px] ${saveStatus === "saving" ? "animate-spin" : ""}`}>
@@ -108,25 +108,36 @@ export function FormatToolbar({
 
       {/* Font size */}
       <div className="flex items-center gap-1 bg-surface-container-low rounded-lg px-1.5 py-1">
-        <button onClick={() => onFontSizeChange(Math.max(9, fontSize - 1))} className="p-0.5 hover:bg-white rounded text-on-surface-variant" aria-label={t("builder.font-small")}>
+        <button onClick={() => onFontSizeChange(Math.max(9, fontSize - 1))} className="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant" aria-label={t("builder.font-small")}>
           <span className="material-symbols-outlined text-sm">remove</span>
         </button>
         <span className="text-xs font-bold w-6 text-center select-none">{fontSize}pt</span>
-        <button onClick={() => onFontSizeChange(Math.min(12, fontSize + 1))} className="p-0.5 hover:bg-white rounded text-on-surface-variant" aria-label={t("builder.font-large")}>
+        <button onClick={() => onFontSizeChange(Math.min(12, fontSize + 1))} className="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant" aria-label={t("builder.font-large")}>
           <span className="material-symbols-outlined text-sm">add</span>
         </button>
       </div>
 
       {/* Text alignment */}
       <div className="flex items-center bg-surface-container-low rounded-lg p-0.5 gap-0.5">
-        {(["left", "center", "right", "justify"] as const).map((align) => (
-          <button key={align} onClick={() => onTextAlignChange(align)}
-            className={`p-1 rounded ${textAlign === align ? "bg-white shadow-sm" : "hover:bg-white/50"}`}
-            title={align === "left" ? t("builder.align-left") : align === "center" ? t("builder.align-center") : align === "right" ? t("builder.align-right") : t("builder.align-justify")}
-          >
-            <span className="material-symbols-outlined text-sm">{align === "left" ? "format_align_left" : align === "center" ? "format_align_center" : align === "right" ? "format_align_right" : "format_align_justify"}</span>
-          </button>
-        ))}
+        {(["left", "center", "right", "justify"] as const).map((align) => {
+          const label =
+            align === "left"
+              ? t("builder.align-left")
+              : align === "center"
+                ? t("builder.align-center")
+                : align === "right"
+                  ? t("builder.align-right")
+                  : t("builder.align-justify");
+          return (
+            <button key={align} onClick={() => onTextAlignChange(align)}
+              className={`p-1.5 rounded ${textAlign === align ? "bg-surface-container-lowest shadow-sm" : "hover:bg-surface-container-highest/60"}`}
+              title={label}
+              aria-label={label}
+            >
+              <span className="material-symbols-outlined text-sm">{align === "left" ? "format_align_left" : align === "center" ? "format_align_center" : align === "right" ? "format_align_right" : "format_align_justify"}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Divider toggle */}
@@ -160,10 +171,9 @@ export function FormatToolbar({
       <MagneticButton>
         <button onClick={onNavigateToCheckout}
           className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow-md overflow-hidden"
-          style={{ background: "linear-gradient(135deg, #00897B, #26A69A)" }}
+          style={{ background: "linear-gradient(135deg, #0d7377, #4fb5b5)" }}
           title={t("builder.ai-opt-tip")}
         >
-          <span className={`absolute inset-0 rounded-lg ${reducedMotion ? "opacity-30" : "animate-ping"} opacity-30`} style={{ background: "linear-gradient(135deg, #00897B, #26A69A)" }} />
           <span className="material-symbols-outlined text-sm relative z-10" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
           <span className="relative z-10 hidden sm:inline">{t("builder.ai-opt")}</span>
         </button>

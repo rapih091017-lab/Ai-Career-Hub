@@ -3,9 +3,10 @@ import { auth } from "@/lib/auth";
 import { createSnapTransaction } from "@/lib/midtrans";
 import { db } from "@/db";
 import { payments } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and, gte } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { getPackagesDb, PACKAGES as HARDCODED_PACKAGES } from "@/lib/access";
+import { REFERRAL_COOKIE, isValidAffiliateCode } from "@/lib/affiliate";
 
 export async function POST(request: NextRequest) {
   const session = await auth();
@@ -18,6 +19,12 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json();
   const { packageType, cvDocumentId } = body;
+
+  // Atribusi affiliate: cookie dari link /r/<kode> (masa hidup 25 hari)
+  // disimpan ke payment saat order dibuat, karena webhook Midtrans tidak
+  // membawa cookie. Validasi kepemilikan kode dilakukan saat konversi.
+  const rawReferral = request.cookies.get(REFERRAL_COOKIE)?.value?.trim().toLowerCase() ?? null;
+  const referralCode = rawReferral && isValidAffiliateCode(rawReferral) ? rawReferral : null;
 
   // Try packages from DB first, then fallback to hardcoded
   const dbPackages = await getPackagesDb();
@@ -38,6 +45,34 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // ── Anti double-click: resume order pending yang masih aktif ─────────────
+  // Kalau user punya transaksi pending yang belum kedaluwarsa untuk paket yang
+  // sama, kembalikan redirect_url transaksi itu — jangan bikin order baru.
+  const now = new Date();
+  const existingPending = await db
+    .select()
+    .from(payments)
+    .where(
+      and(
+        eq(payments.userId, session.user.id),
+        eq(payments.packageType, packageType),
+        eq(payments.paymentStatus, "pending"),
+        gte(payments.expiresAt, now),
+        cvDocumentId ? eq(payments.cvDocumentId, cvDocumentId) : undefined,
+      ),
+    )
+    .limit(1);
+
+  if (existingPending.length > 0 && existingPending[0].redirectUrl) {
+    const existing = existingPending[0];
+    return NextResponse.json({
+      paymentId: existing.id,
+      orderId: existing.orderId,
+      redirect_url: existing.redirectUrl,
+      existing: true,
+    });
+  }
+
   // Generate order ID unik
   const orderId = `ACH-${nanoid(12).toUpperCase()}`;
 
@@ -45,7 +80,7 @@ export async function POST(request: NextRequest) {
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + pkgDef.periodDays);
 
-  // Simpan pending payment ke DB
+  // Simpan pending payment ke DB — harga + definisi fitur di-snapshot di sini
   const [payment] = await db
     .insert(payments)
     .values({
@@ -53,7 +88,10 @@ export async function POST(request: NextRequest) {
       cvDocumentId: cvDocumentId ?? null,
       orderId,
       packageType,
+      packageName: pkgDef.name,
       amount: pkgDef.price,
+      limits: pkgDef.limits,
+      referralCode,
       paymentStatus: "pending",
       expiresAt,
     })
@@ -79,11 +117,18 @@ export async function POST(request: NextRequest) {
       expiryMinutes: 60,
     });
 
+    // Simpan redirect_url agar user bisa resume kalau terputus / double-click
+    await db
+      .update(payments)
+      .set({ redirectUrl: snapResult.redirect_url })
+      .where(eq(payments.id, payment.id));
+
     return NextResponse.json({
       paymentId: payment.id,
       orderId,
       token: snapResult.token,
       redirect_url: snapResult.redirect_url,
+      existing: false,
     });
   } catch (error) {
     console.error("Midtrans create-order error:", error);

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTranslation } from "@/lib/i18n";
 
@@ -8,8 +9,30 @@ interface AppFooterProps {
   bordered?: boolean;
 }
 
+/** Cache modul: diambil sekali per sesi browser, dipakai semua instance footer. */
+let publicSettingsCache: Record<string, string> | null = null;
+
 export default function AppFooter({ variant = "simple", bordered = false }: AppFooterProps) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
+  const [settings, setSettings] = useState<Record<string, string> | null>(publicSettingsCache);
+
+  useEffect(() => {
+    if (publicSettingsCache) return;
+    let cancelled = false;
+    fetch("/api/site-settings")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (cancelled || !data?.settings) return;
+        publicSettingsCache = data.settings;
+        setSettings(data.settings);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const contactEmail = settings?.contact_email || "support@aicareerhub.com";
   if (variant === "full") {
     return (
       <footer className="bg-inverse-surface py-20 px-margin-mobile md:px-gutter">
@@ -31,6 +54,8 @@ export default function AppFooter({ variant = "simple", bordered = false }: AppF
                 <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/checker">{t("footer.resume-checker")}</Link></li>
                 <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/portfolio">{t("footer.portfolio")}</Link></li>
                 <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/interview">{t("footer.career-path")}</Link></li>
+                <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/sinonim">{t("footer.sinonim")}</Link></li>
+                <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href={lang === "en" ? "/cv-examples" : "/contoh-cv"}>{t("footer.contoh-cv")}</Link></li>
               </ul>
             </div>
             <div>
@@ -56,7 +81,13 @@ export default function AppFooter({ variant = "simple", bordered = false }: AppF
             <p className="text-label-sm text-surface-variant/60">{t("footer.copyright")}</p>
             <div className="flex gap-6">
               <Link className="text-surface-variant/60 hover:text-primary transition-all" href="/contact"><span className="material-symbols-outlined">public</span></Link>
-              <a className="text-surface-variant/60 hover:text-primary transition-all" href="mailto:support@aicareerhub.com"><span className="material-symbols-outlined">alternate_email</span></a>
+              <a className="text-surface-variant/60 hover:text-primary transition-all" href={`mailto:${contactEmail}`}><span className="material-symbols-outlined">alternate_email</span></a>
+              {settings?.social_instagram ? (
+                <a className="text-surface-variant/60 hover:text-primary transition-all" href={settings.social_instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram"><span className="material-symbols-outlined">photo_camera</span></a>
+              ) : null}
+              {settings?.social_linkedin ? (
+                <a className="text-surface-variant/60 hover:text-primary transition-all" href={settings.social_linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><span className="material-symbols-outlined">work</span></a>
+              ) : null}
             </div>
           </div>
         </div>

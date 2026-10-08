@@ -21,6 +21,9 @@ const pageTitles: Record<string, { id: string; en: string }> = {
   "/settings/security": { id: "Keamanan", en: "Security" },
   "/settings/payment-history": { id: "Riwayat Pembayaran", en: "Payment History" },
   "/admin": { id: "Admin Panel", en: "Admin Panel" },
+  "/tracker": { id: "Job Tracker", en: "Job Tracker" },
+  "/sinonim": { id: "Sinonim CV", en: "Resume Synonyms" },
+  "/affiliate": { id: "Program Affiliate", en: "Affiliate Program" },
 };
 
 const pageDescriptions: Record<string, { id: string; en: string }> = {
@@ -39,6 +42,9 @@ const pageDescriptions: Record<string, { id: string; en: string }> = {
   "/settings/billing": { id: "Kelola tagihan, metode pembayaran, dan riwayat transaksi.", en: "Manage billing, payment methods, and transaction history." },
   "/settings/security": { id: "Kelola keamanan akun. Login dilakukan melalui Google.", en: "Manage account security. Sign-in is handled through Google." },
   "/settings/payment-history": { id: "Lihat riwayat pembayaran dan unduh invoice.", en: "View payment history and download invoices." },
+  "/tracker": { id: "Simpan lowongan dan pantau proses lamaran dari satu papan.", en: "Save jobs and follow every application from one board." },
+  "/sinonim": { id: "Ganti kata lemah di CV dengan pilihan yang lebih kuat. Klik untuk menyalin.", en: "Replace weak CV phrasing with stronger wording. Click to copy." },
+  "/affiliate": { id: "Bagikan link referralmu dan dapatkan komisi per user yang membayar.", en: "Share your referral link and earn a commission per paying user." },
 };
 
 export default function TitleUpdater() {

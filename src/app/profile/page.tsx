@@ -7,6 +7,7 @@ import AuthGuard from "@/components/AuthGuard";
 import { useTranslation } from "@/lib/i18n";
 import MagneticButton from "@/components/MagneticButton";
 import { useToast } from "@/components/ui/toast";
+import { ImportResumeModal, type ImportedProfile } from "@/components/profile/ImportResumeModal";
 
 interface PersonalInfo {
   fullName: string;
@@ -14,6 +15,7 @@ interface PersonalInfo {
   email: string;
   address: string;
   linkedin: string;
+  portfolioUrl?: string;
   summary: string;
 }
 
@@ -82,7 +84,7 @@ export default function ProfilePage() {
   const { addToast } = useToast();
 
   const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({
-    fullName: "", phone: "", email: "", address: "", linkedin: "", summary: "",
+    fullName: "", phone: "", email: "", address: "", linkedin: "", portfolioUrl: "", summary: "",
   });
 
   const [workHistory, setWorkHistory] = useState<WorkItem[]>([]);
@@ -91,6 +93,7 @@ export default function ProfilePage() {
   const [skills, setSkills] = useState<SkillItem[]>([]);
   const [certifications, setCertifications] = useState<CertificationItem[]>([]);
   const [justSaved, setJustSaved] = useState(false);
+  const [showImport, setShowImport] = useState(false);
 
   useEffect(() => {
     fetch("/api/profile")
@@ -194,6 +197,17 @@ export default function ProfilePage() {
     } finally { setIsSaving(false); }
   };
 
+  /** Isi form dari hasil import AI. Tidak disimpan otomatis: user review dulu. */
+  const handleImported = (imported: ImportedProfile) => {
+    setPersonalInfo({ ...imported.personalInfo });
+    setWorkHistory(imported.workHistory);
+    setEducation(imported.education);
+    setOrganisation(imported.organisations);
+    setSkills(imported.skills);
+    setCertifications(imported.certifications);
+    setActiveSection("section-personal");
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -220,6 +234,16 @@ export default function ProfilePage() {
               <div className="w-full h-3 bg-surface-container-highest rounded-full overflow-hidden">
                 <div className="h-full bg-primary transition-all duration-1000 ease-out" style={{ width: `${progress}%` }} />
               </div>
+              <button
+                type="button"
+                onClick={() => setShowImport(true)}
+                className="mt-4 inline-flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 px-4 py-2.5 text-label-bold text-primary transition-colors hover:bg-primary/10"
+              >
+                <span className="material-symbols-outlined text-[18px]" aria-hidden>
+                  upload_file
+                </span>
+                {t("profile.import-btn")}
+              </button>
             </section>
 
             <div className="flex flex-col gap-4">
@@ -233,6 +257,10 @@ export default function ProfilePage() {
                   <div className="flex flex-col gap-1.5 md:col-span-2">
                     <label className="text-label-bold text-on-surface-variant">{t("profile.linkedin")}</label>
                     <Input value={personalInfo.linkedin} onChange={(e) => updatePersonal("linkedin", e.target.value)} placeholder="https://linkedin.com/in/..." type="url" />
+                  </div>
+                  <div className="flex flex-col gap-1.5 md:col-span-2">
+                    <label className="text-label-bold text-on-surface-variant">{t("profile.portfolio")}</label>
+                    <Input value={personalInfo.portfolioUrl || ""} onChange={(e) => updatePersonal("portfolioUrl", e.target.value)} placeholder="https://website-atau-portofolio-kamu.com" type="url" />
                   </div>
                   <div className="flex flex-col gap-1.5 md:col-span-2">
                     <label className="text-label-bold text-on-surface-variant">{t("profile.summary")}</label>
@@ -393,6 +421,12 @@ export default function ProfilePage() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        <ImportResumeModal
+          open={showImport}
+          onClose={() => setShowImport(false)}
+          onImported={handleImported}
+        />
       </div>
     </AuthGuard>
   );

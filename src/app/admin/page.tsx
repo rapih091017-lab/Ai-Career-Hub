@@ -385,6 +385,41 @@ export default function AdminDashboardPage() {
             </div>
 
             <button
+              onClick={() => router.push("/admin/jobs")}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline-variant text-xs font-medium text-on-surface hover:bg-surface-container transition-all"
+            >
+              <span className="material-symbols-outlined text-sm">work</span>
+              Kelola Loker
+            </button>
+            <button
+              onClick={() => router.push("/admin/affiliate")}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline-variant text-xs font-medium text-on-surface hover:bg-surface-container transition-all"
+            >
+              <span className="material-symbols-outlined text-sm">redeem</span>
+              Affiliate
+            </button>
+            <button
+              onClick={() => router.push("/admin/orders")}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline-variant text-xs font-medium text-on-surface hover:bg-surface-container transition-all"
+            >
+              <span className="material-symbols-outlined text-sm">receipt_long</span>
+              Pesanan
+            </button>
+            <button
+              onClick={() => router.push("/admin/insights")}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline-variant text-xs font-medium text-on-surface hover:bg-surface-container transition-all"
+            >
+              <span className="material-symbols-outlined text-sm">insights</span>
+              Insights
+            </button>
+            <button
+              onClick={() => router.push("/admin/settings")}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline-variant text-xs font-medium text-on-surface hover:bg-surface-container transition-all"
+            >
+              <span className="material-symbols-outlined text-sm">settings</span>
+              Pengaturan
+            </button>
+            <button
               onClick={fetchStats}
               disabled={statsLoading}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline-variant text-xs font-medium text-on-surface hover:bg-surface-container transition-all disabled:opacity-50"

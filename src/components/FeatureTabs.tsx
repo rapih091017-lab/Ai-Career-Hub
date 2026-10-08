@@ -151,7 +151,7 @@ function AnalysisInteractive({ t }: { t: (key: string) => string }) {
               <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>upload_file</span>
             </div>
             <p className="text-sm font-medium text-on-surface mb-1 group-hover:text-primary transition-colors">{t("checker.upload-label")}</p>
-            <p className="text-[11px] text-on-surface-variant/70">{t("checker.upload-hint")}</p>
+            <p className="text-[11px] text-on-surface-variant">{t("checker.upload-hint")}</p>
           </Link>
         </div>
 
@@ -175,7 +175,7 @@ function AnalysisInteractive({ t }: { t: (key: string) => string }) {
             <span className="material-symbols-outlined text-lg">auto_awesome</span>
             {t("checker.analyze-btn")}
           </Link>
-          <p className="text-[10px] text-on-surface-variant/70 text-center">{t("checker.free-badge")}</p>
+          <p className="text-[10px] text-on-surface-variant text-center">{t("checker.free-badge")}</p>
         </div>
       </motion.div>
 
@@ -214,7 +214,7 @@ function BuilderShowcase({ t, router }: { t: (key: string) => string; router: Re
               className="block h-full min-h-[120px] rounded-2xl border-2 border-dashed border-outline-variant/30 bg-white/50 flex flex-col items-center justify-center gap-2 p-4 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/[0.02] hover:shadow-md transition-all duration-300 group"
             >
               <span className="material-symbols-outlined text-outline-variant text-2xl group-hover:text-primary transition-colors">add_circle</span>
-              <p className="text-[11px] text-on-surface-variant/70 leading-relaxed group-hover:text-on-surface transition-colors">
+              <p className="text-[11px] text-on-surface-variant leading-relaxed group-hover:text-on-surface transition-colors">
                 {t("features.cv-builder-title")} <br />5 template ATS
               </p>
             </Link>
@@ -277,7 +277,7 @@ function PortfolioShowcase({ t }: { t: (key: string) => string }) {
                 <div className="p-4 flex items-center justify-between">
                   <div>
                     <h4 className="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">{theme.name}</h4>
-                    <p className="text-[10px] text-on-surface-variant/70 mt-0.5">
+                    <p className="text-[10px] text-on-surface-variant mt-0.5">
                       {theme.id === "modern-slate" && t("features.portfolio-b1")}
                       {theme.id === "minimal-dark" && t("features.portfolio-b2")}
                       {theme.id === "modern-blue" && t("features.portfolio-b3")}
@@ -483,7 +483,7 @@ function CheckerScoreMockup({ t }: { t: (key: string) => string }) {
               <span className="material-symbols-outlined text-green-600 text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
             </motion.div>
             <span className="text-sm font-bold text-green-700 group-hover:text-green-600 transition-colors">{t("checker.fit-excellent")}</span>
-            <p className="text-[10px] text-on-surface-variant/70 mt-0.5">{t("checker.ats-format")} ✓</p>
+            <p className="text-[10px] text-on-surface-variant mt-0.5">{t("checker.ats-format")} ✓</p>
           </Link>
         </motion.div>
       </div>
@@ -591,7 +591,7 @@ export default function FeatureTabs() {
                 <div className={`w-16 h-16 ${activeData.bgColor}/10 rounded-3xl flex items-center justify-center`}>
                   <span className={`material-symbols-outlined text-[36px] ${activeData.color}`} style={{ fontVariationSettings: "'FILL' 1" }}>{activeData.icon}</span>
                 </div>
-                <p className="text-[10px] text-on-surface-variant/70 mt-2 text-center max-w-[100px]">
+                <p className="text-[10px] text-on-surface-variant mt-2 text-center max-w-[100px]">
                   {t("features.title-highlight")}
                 </p>
               </div>

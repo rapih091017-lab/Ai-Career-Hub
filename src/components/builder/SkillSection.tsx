@@ -41,7 +41,7 @@ export function SkillSection({
   return (
     <>
       {/* ── Skills with Category ── */}
-      <div className="bg-white rounded-xl p-6 shadow-soft space-y-4">
+      <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
         <div className="flex items-center gap-3 pb-2">
           <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
             <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>psychology</span>
@@ -60,14 +60,14 @@ export function SkillSection({
                   type="text"
                   value={skill.name}
                   onChange={(e) => onSkillChange(i, "name", e.target.value)}
-                  className="w-full bg-white border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary text-body-md"
+                  className="w-full bg-surface-container-lowest border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary text-body-md"
                   placeholder="Nama Skill"
                 />
               </div>
               <select
                 value={skill.category || "technical"}
                 onChange={(e) => onSkillChange(i, "category", e.target.value)}
-                className="bg-white border border-outline-variant/30 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary text-xs min-w-[120px]"
+                className="bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary text-xs min-w-[120px]"
               >
                 {CATEGORY_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -76,7 +76,7 @@ export function SkillSection({
               <select
                 value={skill.level}
                 onChange={(e) => onSkillChange(i, "level", e.target.value as SkillEntry["level"])}
-                className="bg-white border border-outline-variant/30 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary text-xs min-w-[100px]"
+                className="bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary text-xs min-w-[100px]"
               >
                 <option value="beginner">Beginner</option>
                 <option value="intermediate">Intermediate</option>
@@ -95,7 +95,7 @@ export function SkillSection({
           <button
             type="button"
             onClick={onSkillAdd}
-            className="w-full border-2 border-dashed border-outline/30 rounded-xl py-3 flex items-center justify-center gap-2 text-body-md text-outline hover:border-primary/50 hover:text-primary transition-colors duration-200"
+            className="w-full border-2 border-dashed border-outline/30 rounded-xl py-3 flex items-center justify-center gap-2 text-body-md text-on-surface-variant hover:border-primary/50 hover:text-primary transition-colors duration-200"
           >
             <span className="material-symbols-outlined text-lg">add</span> Tambah Skill
           </button>
@@ -110,7 +110,7 @@ export function SkillSection({
       </div>
 
       {/* ── Sertifikasi & Lisensi ── */}
-      <div className="bg-white rounded-xl p-6 shadow-soft space-y-4">
+      <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
         <div className="flex items-center gap-3 pb-2">
           <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
             <span className="material-symbols-outlined text-amber-600" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
@@ -129,7 +129,7 @@ export function SkillSection({
                   type="text"
                   value={cert.name}
                   onChange={(e) => onCertChange(i, "name", e.target.value)}
-                  className="w-full bg-white border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary text-body-md"
+                  className="w-full bg-surface-container-lowest border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary text-body-md"
                   placeholder="Nama Sertifikasi"
                 />
               </div>
@@ -138,7 +138,7 @@ export function SkillSection({
                   type="text"
                   value={cert.issuer}
                   onChange={(e) => onCertChange(i, "issuer", e.target.value)}
-                  className="w-full bg-white border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary text-body-md"
+                  className="w-full bg-surface-container-lowest border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary text-body-md"
                   placeholder="Penerbit"
                 />
               </div>
@@ -147,7 +147,7 @@ export function SkillSection({
                   type="text"
                   value={cert.year}
                   onChange={(e) => onCertChange(i, "year", e.target.value)}
-                  className="w-full bg-white border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary text-body-md"
+                  className="w-full bg-surface-container-lowest border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary text-body-md"
                   placeholder="Tahun"
                 />
               </div>
@@ -164,7 +164,7 @@ export function SkillSection({
           <button
             type="button"
             onClick={onCertAdd}
-            className="w-full border-2 border-dashed border-outline/30 rounded-xl py-3 flex items-center justify-center gap-2 text-body-md text-outline hover:border-primary/50 hover:text-primary transition-colors duration-200"
+            className="w-full border-2 border-dashed border-outline/30 rounded-xl py-3 flex items-center justify-center gap-2 text-body-md text-on-surface-variant hover:border-primary/50 hover:text-primary transition-colors duration-200"
           >
             <span className="material-symbols-outlined text-lg">add</span> Tambah Sertifikasi
           </button>
@@ -172,7 +172,7 @@ export function SkillSection({
       </div>
 
       {/* ── Self Evaluation / Evaluasi Diri ── */}
-      <div className="bg-white rounded-xl p-6 shadow-soft space-y-4">
+      <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
         <div className="flex items-center gap-3 pb-2">
           <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
             <span className="material-symbols-outlined text-emerald-600" style={{ fontVariationSettings: "'FILL' 1" }}>badge</span>
@@ -202,7 +202,7 @@ export function SkillSection({
       </div>
 
       {/* ── Lainnya ── */}
-      <div className="bg-white rounded-xl p-6 shadow-soft space-y-4">
+      <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
             <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>more_horiz</span>

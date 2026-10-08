@@ -22,7 +22,7 @@ export function EducationCard({ edu, index, totalItems, jobTitle, skills, jobDes
   const isHidden = edu.visible === false;
 
   return (
-    <div className={`bg-white rounded-xl p-6 shadow-soft space-y-4 relative transition-opacity duration-200 ${isHidden ? "opacity-50" : ""}`}>
+    <div className={`bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4 relative transition-opacity duration-200 ${isHidden ? "opacity-50" : ""}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {/* Drag handle */}
@@ -46,7 +46,7 @@ export function EducationCard({ edu, index, totalItems, jobTitle, skills, jobDes
           </button>
           {index > 0 && (
             <button type="button" onClick={() => onMoveUp(index)}
-              className="text-outline hover:text-primary transition-colors p-0.5"
+              className="text-on-surface-variant hover:text-primary transition-colors p-0.5"
               aria-label="Pindah ke atas"
             >
               <span className="material-symbols-outlined text-[16px]">arrow_upward</span>
@@ -54,7 +54,7 @@ export function EducationCard({ edu, index, totalItems, jobTitle, skills, jobDes
           )}
           {index < totalItems - 1 && (
             <button type="button" onClick={() => onMoveDown(index)}
-              className="text-outline hover:text-primary transition-colors p-0.5"
+              className="text-on-surface-variant hover:text-primary transition-colors p-0.5"
               aria-label="Pindah ke bawah"
             >
               <span className="material-symbols-outlined text-[16px]">arrow_downward</span>

@@ -24,7 +24,7 @@ export function OrgCard({ org, index, totalItems, jobTitle, skills, jobDescripti
   const isHidden = org.visible === false;
 
   return (
-    <div className={`bg-white rounded-xl p-6 shadow-soft space-y-4 relative transition-opacity duration-200 ${isHidden ? "opacity-50" : ""}`}>
+    <div className={`bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4 relative transition-opacity duration-200 ${isHidden ? "opacity-50" : ""}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {/* Drag handle */}
@@ -48,7 +48,7 @@ export function OrgCard({ org, index, totalItems, jobTitle, skills, jobDescripti
           </button>
           {index > 0 && (
             <button type="button" onClick={() => onMoveUp(index)}
-              className="text-outline hover:text-primary transition-colors p-0.5"
+              className="text-on-surface-variant hover:text-primary transition-colors p-0.5"
               aria-label="Pindah ke atas"
             >
               <span className="material-symbols-outlined text-[16px]">arrow_upward</span>
@@ -56,7 +56,7 @@ export function OrgCard({ org, index, totalItems, jobTitle, skills, jobDescripti
           )}
           {index < totalItems - 1 && (
             <button type="button" onClick={() => onMoveDown(index)}
-              className="text-outline hover:text-primary transition-colors p-0.5"
+              className="text-on-surface-variant hover:text-primary transition-colors p-0.5"
               aria-label="Pindah ke bawah"
             >
               <span className="material-symbols-outlined text-[16px]">arrow_downward</span>
@@ -92,7 +92,7 @@ export function OrgCard({ org, index, totalItems, jobTitle, skills, jobDescripti
           onChange={(e) => onSetPresent(index, e.target.checked)}
           className="peer sr-only"
         />
-        <div className="w-5 h-5 rounded-md border-2 border-outline-variant bg-white flex items-center justify-center transition-colors duration-200 peer-checked:bg-primary peer-checked:border-primary">
+        <div className="w-5 h-5 rounded-md border-2 border-outline-variant bg-surface-container-lowest flex items-center justify-center transition-colors duration-200 peer-checked:bg-primary peer-checked:border-primary">
           {org.isPresent && (
             <span className="material-symbols-outlined text-sm text-white" aria-hidden="true">check</span>
           )}

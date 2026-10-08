@@ -200,6 +200,16 @@ export async function serializePreviewHtml(
 ): Promise<string> {
   const clone = element.cloneNode(true) as HTMLElement;
 
+  // ── Bawa computed style root ke inline ──
+  // Menjamin font family/size/line-height persis seperti preview meskipun
+  // stylesheet eksternal gagal dimuat di server. Inline style menang atas
+  // stylesheet, jadi ini jaring pengaman terakhir untuk WYSIWYG.
+  const rootComputed = getComputedStyle(element);
+  clone.style.fontFamily = rootComputed.fontFamily;
+  clone.style.fontSize = rootComputed.fontSize;
+  clone.style.lineHeight = rootComputed.lineHeight;
+  clone.style.color = rootComputed.color;
+
   // Hapus UI-only artifacts
   const removeSelectors = options?.removeSelectors || [
     "[data-page-indicator]",
@@ -238,7 +248,20 @@ export async function serializePreviewHtml(
   });
   await Promise.allSettled(linkPromises);
 
-  const allCss = cssParts.filter(Boolean).join("\n\n");
+  let allCss = cssParts.filter(Boolean).join("\n\n");
+
+  // ── Absolutkan URL aset di CSS ──
+  // next/font menulis url(/_next/static/media/...) yang relatif terhadap
+  // domain app. Server Chromium me-render HTML dengan base about:blank
+  // sehingga URL relatif gagal dimuat dan font jatuh ke default (layout PDF
+  // jadi beda dari preview). Ubah ke absolut memakai origin halaman ini.
+  if (typeof window !== "undefined" && window.location.origin) {
+    const origin = window.location.origin;
+    allCss = allCss
+      .replaceAll('url("/_next/', `url("${origin}/_next/`)
+      .replaceAll("url('/_next/", `url('${origin}/_next/`)
+      .replaceAll("url(/_next/", `url(${origin}/_next/`);
+  }
 
   // ── A4 preview overrides untuk PDF server ──
   // Catatan: surat lamaran (class a4-letter) membawa padding sendiri pada
@@ -276,6 +299,9 @@ export async function serializePreviewHtml(
     }
     body { margin: 0; padding: 0; background: white; }
     * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    /* Jaga keterbacaan saat halaman terpotong: hindari baris/heading yatim */
+    p, li { orphans: 2; widows: 2; }
+    h1, h2, h3, h4 { break-after: avoid; }
   `;
 
   return `
@@ -332,12 +358,15 @@ export async function exportPdfViaServer(
       // PDF server mati/unreachable → fallback ke html2canvas (auto-download,
       // tanpa dialog print). Hasil tetap A4 rapi sesuai preview.
       if (err.error === "PDF_SERVER_UNREACHABLE" || err.error === "PDF_SERVER_ERROR") {
-        console.warn("[pdf] pdf-server unreachable, falling back to html2canvas:", err.message);
+        // Fallback utama: dialog cetak browser (PDF TEKS, paling dekat dengan
+        // preview karena mencetak DOM yang sama). Html2canvas (gambar) tidak
+        // dipakai lagi karena melanggar syarat "PDF harus teks".
+        console.warn("[pdf] server PDF tidak tersedia, membuka dialog cetak:", err.message);
         try {
-          await exportPreviewToPdf(element, fileName, contentAreaMm, marginMm);
-          return { ok: true, error: "pdf-server unavailable, used html2canvas fallback", usedFallback: true };
-        } catch (fallbackErr) {
-          return { ok: false, error: "Gagal export PDF (server & fallback)" };
+          await exportPreviewToPrintPdf(element, fileName, marginMm);
+          return { ok: true, error: "server unavailable, print dialog opened", usedFallback: true };
+        } catch {
+          return { ok: false, error: "Gagal export PDF (server & print dialog)" };
         }
       }
 
@@ -357,13 +386,13 @@ export async function exportPdfViaServer(
 
     return { ok: true };
   } catch (err) {
-    // ── Fallback: server unreachable — html2canvas (auto-download) ──
-    console.warn("[pdf] Server unreachable, falling back to html2canvas:", err);
+    // ── Fallback: server tidak terjangkau — dialog cetak (PDF teks) ──
+    console.warn("[pdf] Server tidak terjangkau, membuka dialog cetak:", err);
     try {
-      await exportPreviewToPdf(element, fileName, contentAreaMm, marginMm);
-      return { ok: true, error: "pdf-server unavailable, used html2canvas fallback", usedFallback: true };
-    } catch (fallbackErr) {
-      return { ok: false, error: "Gagal export PDF (server & fallback)" };
+      await exportPreviewToPrintPdf(element, fileName, marginMm);
+      return { ok: true, error: "server unreachable, print dialog opened", usedFallback: true };
+    } catch {
+      return { ok: false, error: "Gagal export PDF (server & print dialog)" };
     }
   }
 }

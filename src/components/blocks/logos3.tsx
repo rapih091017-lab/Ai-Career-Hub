@@ -142,7 +142,7 @@ export default function Logos3({
           <div className="relative z-[1] w-full">
             <Carousel
               opts={{ loop: true, dragFree: true }}
-              plugins={[AutoScroll({ playOnInit: true, speed: 0.5 })]}
+              plugins={[AutoScroll({ playOnInit: inView, speed: 0.5, stopOnInteraction: true, stopOnMouseEnter: true })]}
             >
               <CarouselContent className="ml-0">
                 {trustBadges.map((badge, idx) => (                    <CarouselItem
@@ -187,7 +187,7 @@ export default function Logos3({
                         </p>
 
                         {/* Description */}
-                        <p className="text-[10px] text-on-surface-variant/70 leading-relaxed">
+                        <p className="text-[10px] text-on-surface-variant leading-relaxed">
                           {t(badge.descKey)}
                         </p>
                       </div>

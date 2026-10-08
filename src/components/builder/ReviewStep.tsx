@@ -15,7 +15,7 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
   const quota = useCoverLetterQuota();
   return (
     <div className="space-y-5">
-      <div className="bg-white rounded-xl p-6 shadow-soft space-y-4">
+      <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="font-label-bold text-on-surface">Ringkasan CV</h3>
           <div className="flex items-center gap-1.5">
@@ -44,7 +44,7 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
               check_circle
             </span>
             <span className="text-on-surface font-medium">Profil:</span>
-            <span className="text-outline">{cvData.fullName || "\u2014"}</span>
+            <span className="text-on-surface-variant">{cvData.fullName || "\u2014"}</span>
           </p>
           <p className="flex items-center gap-2">
             <span
@@ -55,7 +55,7 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
               check_circle
             </span>
             <span className="text-on-surface font-medium">Pengalaman Kerja:</span>
-            <span className="text-outline">{cvData.workHistory.length} posisi</span>
+            <span className="text-on-surface-variant">{cvData.workHistory.length} posisi</span>
           </p>
           <p className="flex items-center gap-2">
             <span
@@ -66,7 +66,7 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
               check_circle
             </span>
             <span className="text-on-surface font-medium">Pendidikan:</span>
-            <span className="text-outline">{cvData.education.length} institusi</span>
+            <span className="text-on-surface-variant">{cvData.education.length} institusi</span>
           </p>
           <p className="flex items-center gap-2">
             <span
@@ -77,7 +77,7 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
               check_circle
             </span>
             <span className="text-on-surface font-medium">Organisasi:</span>
-            <span className="text-outline">{cvData.organisations.length} organisasi</span>
+            <span className="text-on-surface-variant">{cvData.organisations.length} organisasi</span>
           </p>
           <p className="flex items-center gap-2">
             <span
@@ -88,7 +88,7 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
               check_circle
             </span>
             <span className="text-on-surface font-medium">Skill:</span>
-            <span className="text-outline">{cvData.skills.length} keahlian</span>
+            <span className="text-on-surface-variant">{cvData.skills.length} keahlian</span>
           </p>
         </div>
       </div>
@@ -128,7 +128,7 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Link
               href={`/surat-lamaran/${cvId}?style=formal`}
-              className="group flex items-center gap-3 bg-white rounded-xl p-4 border border-outline-variant/50 hover:border-primary/40 hover:shadow-premium-md transition-all active:scale-[0.99]"
+              className="group flex items-center gap-3 bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 hover:border-primary/40 hover:shadow-premium-md transition-all active:scale-[0.99]"
             >
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                 <span
@@ -152,7 +152,7 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
             </Link>
             <Link
               href={`/surat-lamaran/${cvId}?style=formal_lengkap`}
-              className="group flex items-center gap-3 bg-white rounded-xl p-4 border border-outline-variant/50 hover:border-primary/40 hover:shadow-premium-md transition-all active:scale-[0.99]"
+              className="group flex items-center gap-3 bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 hover:border-primary/40 hover:shadow-premium-md transition-all active:scale-[0.99]"
             >
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                 <span
@@ -176,7 +176,7 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
             </Link>
             <Link
               href={`/surat-lamaran/${cvId}?style=ats`}
-              className="group flex items-center gap-3 bg-white rounded-xl p-4 border border-outline-variant/50 hover:border-primary/40 hover:shadow-premium-md transition-all active:scale-[0.99]"
+              className="group flex items-center gap-3 bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 hover:border-primary/40 hover:shadow-premium-md transition-all active:scale-[0.99]"
             >
               <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                 <span
@@ -200,7 +200,7 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
             </Link>
             <Link
               href={`/surat-lamaran/${cvId}?style=casual`}
-              className="group flex items-center gap-3 bg-white rounded-xl p-4 border border-outline-variant/50 hover:border-primary/40 hover:shadow-premium-md transition-all active:scale-[0.99]"
+              className="group flex items-center gap-3 bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 hover:border-primary/40 hover:shadow-premium-md transition-all active:scale-[0.99]"
             >
               <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                 <span
@@ -224,7 +224,7 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
             </Link>
             <Link
               href={`/surat-lamaran/${cvId}?style=motivation`}
-              className="group flex items-center gap-3 bg-white rounded-xl p-4 border border-outline-variant/50 hover:border-amber-400/60 hover:shadow-premium-md transition-all active:scale-[0.99] sm:col-span-2"
+              className="group flex items-center gap-3 bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 hover:border-amber-400/60 hover:shadow-premium-md transition-all active:scale-[0.99] sm:col-span-2"
             >
               <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                 <span

@@ -21,7 +21,7 @@ export function TargetPekerjaanSection({
   onJobDescriptionChange,
 }: TargetPekerjaanSectionProps) {
   return (
-    <div className="bg-white rounded-xl p-6 shadow-soft space-y-5">
+    <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-5">
       <div className="flex items-start gap-3 pb-5 border-b border-outline-variant/20">
         <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
           <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>work_history</span>
@@ -58,7 +58,7 @@ export function TargetPekerjaanSection({
           )}
         </div>
         {jobDescription && (
-          <p className="text-[10px] text-outline mt-1 text-right">{jobDescription.length}/3000 karakter</p>
+          <p className="text-[10px] text-on-surface-variant mt-1 text-right">{jobDescription.length}/3000 karakter</p>
         )}
         <p className="text-xs text-on-surface-variant mt-1.5 flex items-center gap-1">
           <span className="material-symbols-outlined text-sm" aria-hidden="true">info</span>
@@ -74,12 +74,12 @@ export function TargetPekerjaanSection({
           </div>
           <div className="flex flex-wrap gap-1.5">
             {aiKeywords.slice(0, 15).map((kw, i) => (
-              <span key={i} className="px-2.5 py-1 bg-white rounded-full text-[10px] font-medium text-primary border border-primary/20">
+              <span key={i} className="px-2.5 py-1 bg-surface-container-lowest rounded-full text-[10px] font-medium text-primary border border-primary/20">
                 {kw}
               </span>
             ))}
             {aiKeywords.length > 15 && (
-              <span className="text-[10px] text-outline self-center">+{aiKeywords.length - 15} lainnya</span>
+              <span className="text-[10px] text-on-surface-variant self-center">+{aiKeywords.length - 15} lainnya</span>
             )}
           </div>
           <p className="text-[10px] text-on-surface-variant">

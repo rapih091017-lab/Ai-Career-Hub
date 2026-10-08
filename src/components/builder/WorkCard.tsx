@@ -126,12 +126,12 @@ export function WorkCard({
   const isHidden = work.visible === false;
 
   return (
-    <div className={`bg-white rounded-xl p-6 shadow-soft relative group transition-opacity duration-200 ${isHidden ? "opacity-50" : ""}`}>
+    <div className={`bg-surface-container-lowest rounded-xl p-6 shadow-soft relative group transition-opacity duration-200 ${isHidden ? "opacity-50" : ""}`}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2 flex-1 min-w-0">
-          {/* Drag handle */}
-          <div className="shrink-0 cursor-grab active:cursor-grabbing text-outline-variant hover:text-on-surface transition-colors p-1 rounded">
-            <span className="material-symbols-outlined text-[16px]">drag_indicator</span>
+          {/* Penanda urutan (urutan diubah lewat tombol panah, bukan drag) */}
+          <div className="shrink-0 text-outline-variant/60 p-1" aria-hidden="true">
+            <span className="material-symbols-outlined text-[16px]">swap_vert</span>
           </div>
           <button
             type="button"
@@ -140,7 +140,7 @@ export function WorkCard({
             aria-label={isCollapsed ? "Perluas detail" : "Ciutkan detail"}
           >
             <span
-              className="material-symbols-outlined text-[18px] text-outline transition-transform duration-200"
+              className="material-symbols-outlined text-[18px] text-on-surface-variant transition-transform duration-200"
               style={{ transform: isCollapsed ? 'rotate(-90deg)' : 'none' }}
             >
               expand_more
@@ -148,7 +148,7 @@ export function WorkCard({
           </button>
           <div className="min-w-0">
             <h3 className="font-label-bold text-on-surface truncate">{work.position || "Pengalaman " + (index + 1)}</h3>
-            {work.company && <p className="text-xs text-outline truncate">{work.company}</p>}
+            {work.company && <p className="text-xs text-on-surface-variant truncate">{work.company}</p>}
           </div>
         </div>
         <div className="flex items-center gap-1 shrink-0 ml-2">
@@ -156,7 +156,7 @@ export function WorkCard({
           <button
             type="button"
             onClick={() => onToggleVisibility(index)}
-            className={`transition-colors p-0.5 rounded ${isHidden ? "text-outline-variant" : "text-primary hover:text-primary/80"}`}
+            className={`transition-colors p-1.5 rounded ${isHidden ? "text-on-surface-variant/60" : "text-primary hover:text-primary/80"}`}
             title={isHidden ? "Tampilkan di CV" : "Sembunyikan dari CV"}
             aria-label={isHidden ? "Tampilkan" : "Sembunyikan"}
           >
@@ -166,7 +166,7 @@ export function WorkCard({
           </button>
           {index > 0 && (
             <button type="button" onClick={() => onMoveUp(index)}
-              className="text-outline hover:text-primary transition-colors p-0.5"
+              className="text-on-surface-variant hover:text-primary transition-colors p-1.5"
               aria-label="Pindah ke atas"
             >
               <span className="material-symbols-outlined text-[16px]">arrow_upward</span>
@@ -174,7 +174,7 @@ export function WorkCard({
           )}
           {index < totalItems - 1 && (
             <button type="button" onClick={() => onMoveDown(index)}
-              className="text-outline hover:text-primary transition-colors p-0.5"
+              className="text-on-surface-variant hover:text-primary transition-colors p-1.5"
               aria-label="Pindah ke bawah"
             >
               <span className="material-symbols-outlined text-[16px]">arrow_downward</span>
@@ -183,7 +183,7 @@ export function WorkCard({
           <button
             type="button"
             onClick={() => onRemove(index)}
-            className="text-error/70 hover:text-error transition-colors"
+            className="text-error/70 hover:text-error transition-colors p-1.5"
             aria-label="Hapus pengalaman"
           >
             <span className="material-symbols-outlined text-[18px]">delete</span>
@@ -227,7 +227,7 @@ export function WorkCard({
                   }}
                   className="peer sr-only"
                 />
-                <div className="w-5 h-5 rounded-md border-2 border-outline-variant bg-white flex items-center justify-center transition-colors duration-200 peer-checked:bg-primary peer-checked:border-primary peer-focus-visible:ring-2 peer-focus-visible:ring-primary/30 group-hover:border-primary/60">
+                <div className="w-5 h-5 rounded-md border-2 border-outline-variant bg-surface-container-lowest flex items-center justify-center transition-colors duration-200 peer-checked:bg-primary peer-checked:border-primary peer-focus-visible:ring-2 peer-focus-visible:ring-primary/30 group-hover:border-primary/60">
                   {work.isCurrent && (
                     <span className="material-symbols-outlined text-sm text-white" aria-hidden="true">check</span>
                   )}
@@ -280,7 +280,7 @@ export function WorkCard({
                       animate={{ opacity: 1 }}
                       className="absolute bottom-3 left-3"
                     >
-                      <span className={`text-[10px] font-medium ${work.description.length > 2300 ? "text-amber-600" : "text-outline"}`}>
+                      <span className={`text-[10px] font-medium ${work.description.length > 2300 ? "text-amber-600" : "text-on-surface-variant"}`}>
                         {work.description.length}/2500 | {work.description.split(/\s+/).filter(Boolean).length} kata
                       </span>
                     </motion.div>

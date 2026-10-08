@@ -195,11 +195,8 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
 
   return (
     <section id="pricing" className="relative overflow-hidden bg-gradient-to-b from-white via-[#f0fafb] to-white dark:from-[#0F0F0F] dark:via-[#1A1A2E] dark:to-[#0F0F0F] py-24 md:py-32">
-      {/* Background Orbs */}
-      <motion.div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none dark:bg-primary/10"
-        animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }} />
-      <motion.div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-secondary/5 rounded-full blur-[120px] pointer-events-none dark:bg-secondary/10"
-        animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 2 }} />
+      {/* Satu orb ambient statis — kedalaman halus tanpa loop (R-01/R-19) */}
+      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none dark:bg-primary/10" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-margin-mobile md:px-gutter">
         {/* ─── HEADER ─── */}
@@ -529,7 +526,7 @@ function PricingCard({ plan, delay, onSelectPlan, mode, tFn }: {
         )}
 
         {plan.microcopyKey && (
-          <p className="text-center text-xs text-on-surface-variant/70 mt-3 italic dark:text-gray-400">{t(plan.microcopyKey)}</p>
+          <p className="text-center text-xs text-on-surface-variant mt-3 italic dark:text-gray-400">{t(plan.microcopyKey)}</p>
         )}
       </div>
     </motion.div>

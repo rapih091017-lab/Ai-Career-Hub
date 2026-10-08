@@ -164,10 +164,10 @@ export default function BuilderPage() {
           addToast({ type: "error", message: result.error || t("builder.pdf-export-failed") });
         }
       } else if (result.usedFallback) {
-        // File ter-download versi gambar (fallback). Beri tahu user jujur.
+        // Server PDF tidak tersedia; dialog cetak dibuka untuk hasil teks.
         addToast({
           type: "warning",
-          message: "Server PDF teks sedang sibuk — file yang terunduh versi gambar. Coba lagi sebentar untuk versi teks yang bisa di-select ATS.",
+          message: "Server PDF sedang sibuk, jadi dialog cetak dibuka. Pilih 'Save as PDF' untuk file teks yang bisa dibaca ATS.",
         });
       } else {
         addToast({ type: "success", message: "PDF teks berhasil diunduh!" });
@@ -231,7 +231,20 @@ export default function BuilderPage() {
         if (!isSavingRef.current) {
           handleSaveRef.current();
         }
+        return;
       }
+
+      // Ctrl+ArrowLeft/Right pindah step, TAPI saat fokus di field isian
+      // kombinasi ini milik navigasi teks (mis. lompat kata), jangan direbut.
+      const target = e.target as HTMLElement | null;
+      const typing =
+        !!target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.tagName === 'SELECT' ||
+          target.isContentEditable);
+      if (typing) return;
+
       // Ctrl+ArrowLeft → Previous step
       if (e.ctrlKey && e.key === 'ArrowLeft') {
         e.preventDefault();
@@ -260,7 +273,7 @@ export default function BuilderPage() {
         <AppHeader />
 
         {/* ── STEPPER (connector lines style) ── */}
-        <div className="w-full bg-white border-b border-outline-variant/30 py-4 md:py-5 px-3 md:px-8 overflow-x-auto shrink-0">
+        <div className="w-full bg-surface-container-lowest border-b border-outline-variant/30 py-4 md:py-5 px-3 md:px-8 overflow-x-auto shrink-0">
           <StepperSteps steps={steps} activeStep={activeStep} setActiveStep={setActiveStep} sectionCompletion={sectionCompletion} sectionMeta={sectionMeta} />
         </div>
 
@@ -289,12 +302,12 @@ export default function BuilderPage() {
                   <span>{t("builder.keywords-label")}</span>
                 </div>
                 {aiJdKeywords.slice(0, 10).map((kw, i) => (
-                  <span key={i} className="px-2 py-0.5 bg-white rounded-full text-[10px] font-medium text-primary border border-primary/20 cursor-default hover:bg-primary/10 transition-colors">
+                  <span key={i} className="px-2 py-0.5 bg-surface-container-lowest rounded-full text-[10px] font-medium text-primary border border-primary/20 cursor-default hover:bg-primary/10 transition-colors">
                     {kw}
                   </span>
                 ))}
                 {aiJdKeywords.length > 10 && (
-                  <span className="text-[10px] text-outline">+{aiJdKeywords.length - 10} {t("builder.keywords-more").replace("{n}", String(aiJdKeywords.length - 10))}</span>
+                  <span className="text-[10px] text-on-surface-variant">+{aiJdKeywords.length - 10} {t("builder.keywords-more").replace("{n}", String(aiJdKeywords.length - 10))}</span>
                 )}
               </div>
             )}
@@ -309,7 +322,7 @@ export default function BuilderPage() {
               className="px-4 md:px-6 pb-32 space-y-6"
             >
               {activeStep === 0 && (
-                <div className="bg-white rounded-xl p-6 shadow-soft space-y-5">
+                <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-5">
                   <Field label={t("builder.field-fullname")} value={cvData.fullName} onChange={(v) => updateField("fullName", v)} />
                   <Field label={t("builder.field-phone")} type="tel" value={cvData.phone} onChange={(v) => updateField("phone", v)} />
                   <Field label={t("builder.field-email")} type="email" value={cvData.email} onChange={(v) => updateField("email", v)} />
@@ -412,7 +425,7 @@ export default function BuilderPage() {
                     />
                   ))}
                   <button type="button" onClick={addWork}
-                    className="w-full border-2 border-dashed border-outline/30 rounded-xl py-4 flex items-center justify-center gap-2 text-body-md text-outline hover:border-primary/50 hover:text-primary transition-colors duration-200"
+                    className="w-full border-2 border-dashed border-outline/30 rounded-xl py-4 flex items-center justify-center gap-2 text-body-md text-on-surface-variant hover:border-primary/50 hover:text-primary transition-colors duration-200"
                   >
                     <span className="material-symbols-outlined text-lg">add</span> {t("builder.add-experience")}
                   </button>
@@ -446,7 +459,7 @@ export default function BuilderPage() {
                     />
                   ))}
                   <button type="button" onClick={addEducation}
-                    className="w-full border-2 border-dashed border-outline/30 rounded-xl py-4 flex items-center justify-center gap-2 text-body-md text-outline hover:border-primary/50 hover:text-primary transition-colors duration-200"
+                    className="w-full border-2 border-dashed border-outline/30 rounded-xl py-4 flex items-center justify-center gap-2 text-body-md text-on-surface-variant hover:border-primary/50 hover:text-primary transition-colors duration-200"
                   >
                     <span className="material-symbols-outlined text-lg">add</span> {t("builder.add-education")}
                   </button>
@@ -478,7 +491,7 @@ export default function BuilderPage() {
                     />
                   ))}
                   <button type="button" onClick={addOrganization}
-                    className="w-full border-2 border-dashed border-outline/30 rounded-xl py-4 flex items-center justify-center gap-2 text-body-md text-outline hover:border-primary/50 hover:text-primary transition-colors duration-200"
+                    className="w-full border-2 border-dashed border-outline/30 rounded-xl py-4 flex items-center justify-center gap-2 text-body-md text-on-surface-variant hover:border-primary/50 hover:text-primary transition-colors duration-200"
                   >
                     <span className="material-symbols-outlined text-lg">add</span> {t("builder.add-org")}
                   </button>
@@ -539,7 +552,7 @@ export default function BuilderPage() {
               <div className="w-full max-w-[210mm] px-[15mm] py-4 md:py-6">
                 {/* Page count badge */}
                 {allPageCount > 1 && (
-                  <div className="mb-3 flex items-center gap-2 text-[11px] font-medium text-outline bg-white/80 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-outline-variant/20 shadow-sm w-fit">
+                  <div className="mb-3 flex items-center gap-2 text-[11px] font-medium text-on-surface-variant bg-surface-container-lowest/80 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-outline-variant/20 shadow-sm w-fit">
                     <span className="material-symbols-outlined text-sm">description</span>
                     {t("builder.page-badge").replace("{pages}", String(allPageCount)).replace("{margin}", marginMode === "tight" ? "10" : marginMode === "normal" ? "20" : "30")}
                   </div>
@@ -695,7 +708,5 @@ export default function BuilderPage() {
     </AuthGuard>
   );
 }
-
-
 
 

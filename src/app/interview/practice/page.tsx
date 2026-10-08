@@ -8,6 +8,7 @@ import AppFooter from "@/components/AppFooter";
 import AuthGuard from "@/components/AuthGuard";
 import { useToast } from "@/components/ui/toast";
 import { QCategoryIcon, getQCategoryFilters } from "@/components/interview/QCategoryIcon";
+import { StarPracticeBox } from "@/components/interview/StarPracticeBox";
 import { useTranslation } from "@/lib/i18n";
 import {
   getInterviewPositions,
@@ -461,6 +462,13 @@ function RunningScreen({
               {currentQuestion.question.question}
             </p>
           </div>
+
+          {/* Latihan STAR: tulis jawaban sambil timer berjalan, nilai dengan AI */}
+          <StarPracticeBox
+            questionId={currentQuestion.question.id}
+            questionText={currentQuestion.question.question}
+            category={currentQuestion.question.category}
+          />
 
           {/* Answer section */}
           <AnimatePresence>

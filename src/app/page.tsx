@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useMemo, useState } from "react";
-import { motion, AnimatePresence, useScroll, useTransform, useInView } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence, useScroll, useTransform } from "motion/react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import AppFooter from "@/components/AppFooter";
-import TestimonialsColumn from "@/components/TestimonialsColumn";
 import Logos3 from "@/components/blocks/logos3";
 import PricingSection from "@/components/PricingSection";
 import ScrollProgress from "@/components/ScrollProgress";
@@ -22,19 +21,11 @@ import {
   staggerItemUp,
   staggerItemScale,
   slideUp,
-  slideLeft,
-  slideRight,
   sectionReveal,
-  floatSlow,
 } from "@/lib/animationVariants";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/lib/i18n";
-
-const testimonialKeys = [0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => ({
-  textKey: "testimonial." + i + ".text",
-  nameKey: "testimonial." + i + ".name",
-  roleKey: "testimonial." + i + ".role",
-}));
+import { INTERVIEW_POSITION_COUNT, INTERVIEW_QUESTION_COUNT } from "@/lib/interview-stats";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -51,21 +42,19 @@ export default function Home() {
   const templateY = useTransform(scrollYProgress, [0, 1], [0, -50]);
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0.3]);
 
-  // Build bilingual testimonials
-  const testimonials = useMemo(() =>
-    testimonialKeys.map((k) => ({
-      text: t(k.textKey),
-      name: t(k.nameKey),
-      role: t(k.roleKey),
-    })),
-  [t]);
-
-  const firstColumn = testimonials.slice(0, 3);
-  const secondColumn = testimonials.slice(3, 6);
-  const thirdColumn = testimonials.slice(6, 9);
-
   // Mobile hamburger menu
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Real platform stats (from /api/public/stats) — no fabricated numbers
+  const [stats, setStats] = useState<{ totalCvs: number; totalUsers: number; totalAnalyses: number; avgAtsScore: number } | null>(null);
+  useEffect(() => {
+    let active = true;
+    fetch("/api/public/stats")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (active && d) setStats(d); })
+      .catch(() => { /* keep null — stats row hides */ });
+    return () => { active = false; };
+  }, []);
 
   // Hydration-safe mount flag — prevents session-based SSR mismatch
   const [mounted, setMounted] = useState(false);
@@ -175,44 +164,13 @@ export default function Home() {
 
       {/* ── Hero ── */}
       <header id="hero" ref={heroRef} className="relative min-h-[90vh] md:min-h-[95vh] flex items-center overflow-hidden bg-gradient-to-b from-white via-primary/[0.02] to-white pt-24 md:pt-32 pb-16 md:pb-24">
-        {/* Animated grid pattern */}
-        <motion.div className="absolute inset-0 pointer-events-none opacity-[0.04]"
-          animate={{ backgroundPosition: ["0px 0px", "0px 60px"] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          style={{
-            y: contentY,
-            backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")",
-            backgroundSize: "60px 60px",
-          }}
-        />
-        <motion.div className="absolute top-1/4 left-0 w-[600px] h-[600px] bg-primary/[0.04] rounded-full blur-[150px] pointer-events-none -translate-x-1/2"
-          animate={{ scale: [1, 1.2, 1], rotate: [0, 10, 0] }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div className="absolute bottom-1/4 right-0 w-[500px] h-[500px] bg-secondary/[0.04] rounded-full blur-[120px] pointer-events-none translate-x-1/3"
-          animate={{ scale: [1, 1.15, 1], rotate: [0, -10, 0] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-        />
-
-        {/* Floating glow orbs */}
-        <motion.div className="absolute top-[20%] left-[15%] w-3 h-3 bg-primary/30 rounded-full blur-sm pointer-events-none"
-          animate={{ y: [0, -20, 0], opacity: [0.3, 0.8, 0.3] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div className="absolute top-[40%] right-[20%] w-2 h-2 bg-secondary/40 rounded-full blur-sm pointer-events-none"
-          animate={{ y: [0, -15, 0], opacity: [0.4, 0.9, 0.4] }}
-          transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-        />
-        <motion.div className="absolute bottom-[30%] left-[30%] w-4 h-4 bg-amber-400/20 rounded-full blur-md pointer-events-none"
-          animate={{ y: [0, -25, 0], opacity: [0.2, 0.6, 0.2] }}
-          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-        />
+        {/* One soft ambient orb — subtle depth, static (R-01: purpose = soften the plain white canvas) */}
+        <div className="absolute top-1/4 -left-40 w-[600px] h-[600px] bg-primary/[0.04] rounded-full blur-[150px] pointer-events-none" />
 
         {/* Enlarged Mockup — desktop only */}
-        <motion.div className="absolute right-[3%] top-1/4 hidden lg:block pointer-events-none" style={{ y: mockupY }}>
-          <motion.div className="w-[380px] bg-white rounded-2xl shadow-2xl border border-outline-variant/20 overflow-hidden rotate-[3deg]"
-            animate={{ y: [0, -8, 0] }}
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}>
+        <motion.div className="absolute right-[3%] top-1/4 hidden lg:block pointer-events-none" style={{ y: mockupY }}
+          initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.3 }}>
+          <div className="w-[380px] bg-white rounded-2xl shadow-2xl border border-outline-variant/20 overflow-hidden rotate-[3deg]">
             <div className="h-3 bg-primary/10 flex items-center px-4 gap-1.5">
               <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
               <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
@@ -240,14 +198,13 @@ export default function Home() {
                 <div className="h-8 w-20 rounded-lg bg-outline/10" />
               </div>
             </div>
-          </motion.div>
+          </div>
         </motion.div>
 
         {/* Template Preview Card — desktop only */}
-        <motion.div className="absolute right-[5%] top-[12%] hidden lg:block pointer-events-none z-[5]" style={{ y: templateY }}>
-          <motion.div className="w-[200px] bg-white rounded-xl shadow-lg border border-outline-variant/20 overflow-hidden rotate-[6deg]"
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}>
+        <motion.div className="absolute right-[5%] top-[12%] hidden lg:block pointer-events-none z-[5]" style={{ y: templateY }}
+          initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.5 }}>
+          <div className="w-[200px] bg-white rounded-xl shadow-lg border border-outline-variant/20 overflow-hidden rotate-[6deg]">
             <div className="p-3">
               {/* Template header */}
               <div className="flex items-center gap-2 mb-2">
@@ -270,12 +227,12 @@ export default function Home() {
                 <div className="h-1.5 w-8 rounded bg-outline/5" />
               </div>
             </div>
-          </motion.div>
+          </div>
         </motion.div>
 
         {/* Enlarged ATS Score Card */}
         <motion.div className="absolute right-[8%] top-[58%] hidden lg:block z-10" style={{ y: cardY }}
-          animate={{ y: [0, 12, 0] }} transition={{ duration: 5, delay: 1.5, repeat: Infinity, ease: "easeInOut" }}>
+          initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.7 }}>
           <Link href="/checker" className="block w-[260px] bg-white rounded-xl shadow-lg border border-outline-variant/20 overflow-hidden -rotate-[2deg] hover:-rotate-1 hover:shadow-xl hover:scale-105 transition-[transform,box-shadow] duration-300 cursor-pointer">
             <div className="p-4">
               <div className="flex items-center justify-between mb-3">
@@ -303,13 +260,11 @@ export default function Home() {
         {/* AI Suggestion Floating Chip */}
         <motion.div className="absolute right-[38%] top-[22%] hidden lg:flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full shadow-premium-sm border border-primary/15 z-20 pointer-events-none"
           initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1, y: [0, -6, 0] }}
-          transition={{ opacity: { delay: 1.2, duration: 0.5 }, scale: { delay: 1.2, duration: 0.5 }, y: { duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1.8 } }}>
-          <motion.span className="material-symbols-outlined text-[14px] text-primary"
-            animate={{ rotate: [0, 15, -15, 0] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 2 }}>
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 1.2, duration: 0.5 }}>
+          <span className="material-symbols-outlined text-[14px] text-primary">
             auto_awesome
-          </motion.span>
+          </span>
           <span className="text-[10px] font-bold text-primary">{t("hero.ai-chip")}</span>
         </motion.div>
 
@@ -318,10 +273,7 @@ export default function Home() {
           <motion.div className="max-w-3xl mx-auto lg:mx-0 lg:ml-[5%] relative z-10" style={{ y: contentY, opacity }}>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
               className="inline-flex items-center gap-2 px-4 py-1.5 bg-secondary-container text-on-secondary-container rounded-full mb-8">
-              <motion.span className="w-2 h-2 rounded-full bg-primary"
-                animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              ></motion.span>
+              <span className="w-2 h-2 rounded-full bg-primary"></span>
               <span className="text-label-bold text-[13px]">{t("hero.badge")}</span>
             </motion.div>
             <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }}
@@ -345,30 +297,24 @@ export default function Home() {
               </MagneticButton>
               <MagneticButton>
                 <a href="#how-it-works" className="w-full sm:w-auto flex items-center justify-center gap-2 text-on-surface font-label-bold px-6 sm:px-8 py-3.5 sm:py-4 hover:bg-surface-container rounded-xl sm:rounded-2xl transition-colors cursor-pointer">
-                  <motion.span className="material-symbols-outlined"
-                    animate={{ scale: [1, 1.15, 1] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}>
+                  <span className="material-symbols-outlined">
                     play_circle
-                  </motion.span>
+                  </span>
                   {t("hero.cta-how")}
                 </a>
               </MagneticButton>
             </motion.div>
 
-            {/* Social proof — subtle after CTA */}
-            <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.35 }}
-              className="flex items-center gap-3 mb-8 md:mb-10">
-              <motion.div className="flex -space-x-2"
-                animate={{ x: [0, 3, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}>
-                {[1,2,3,4].map((i) => (
-                  <div key={i} className="w-7 h-7 md:w-8 md:h-8 rounded-full border-2 border-white bg-primary/20 flex items-center justify-center text-[9px] md:text-[10px] font-bold text-primary">
-                    {String.fromCharCode(64 + i)}
-                  </div>
-                ))}
+            {/* Social proof — only with real numbers from DB (R-17) */}
+            {stats && stats.totalUsers > 0 && (
+              <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.35 }}
+                className="flex items-center gap-2 mb-8 md:mb-10">
+                <span className="material-symbols-outlined text-[15px] text-primary">verified</span>
+                <span className="text-xs md:text-sm text-on-surface-variant font-medium">
+                  <strong className="text-on-surface">{stats.totalUsers.toLocaleString("id-ID")}+</strong> {t("hero.social-proof-count")}
+                </span>
               </motion.div>
-              <span className="text-xs md:text-sm text-on-surface-variant font-medium">{t("hero.social-proof")}</span>
-            </motion.div>
+            )}
 
             {/* Interactive Hero Demo — Mini ATS Preview (after CTA, secondary) */}
             <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }}
@@ -385,7 +331,7 @@ export default function Home() {
                     className="w-full px-3.5 py-2.5 bg-white/60 border border-outline-variant/30 rounded-xl text-sm text-on-surface/80 placeholder:text-outline-variant/60 cursor-not-allowed select-none"
                     readOnly disabled
                   />
-                  <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-outline-variant font-medium bg-white/80 px-1.5 rounded">{t("hero.demo-preview")}</span>
+                  <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-on-surface-variant font-medium bg-white/80 px-1.5 rounded">{t("hero.demo-preview")}</span>
                 </div>
                 <Link href="/checker" className="px-4 py-2.5 bg-primary text-on-primary rounded-xl text-xs font-bold hover:brightness-110 transition-all whitespace-nowrap shadow-sm cursor-pointer inline-flex items-center">
                   {t("hero.demo-analyze")}
@@ -399,7 +345,7 @@ export default function Home() {
                 </div>
                 <span className="text-xs font-bold text-primary shrink-0">{t("hero.demo-score")}</span>
               </div>
-              <p className="text-[10px] text-on-surface-variant/60 mt-1.5">{t("hero.demo-hint")}</p>
+              <p className="text-[10px] text-on-surface-variant mt-1.5">{t("hero.demo-hint")}</p>
             </motion.div>
           </motion.div>
         </div>
@@ -407,18 +353,6 @@ export default function Home() {
 
       {/* ── Social Proof Stats — replaces old duplicate template showcase ── */}
       <section id="stats" className="relative py-16 md:py-20 bg-white overflow-hidden">
-        <motion.div className="absolute top-10 left-[10%] w-2 h-2 bg-primary/20 rounded-full pointer-events-none"
-          animate={{ y: [0, -15, 0], opacity: [0.2, 0.6, 0.2] }}
-          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-        />
-        <motion.div className="absolute top-20 right-[15%] w-3 h-3 bg-secondary/15 rounded-full pointer-events-none"
-          animate={{ y: [0, -20, 0], opacity: [0.15, 0.5, 0.15] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
-        />
-        <motion.div className="absolute bottom-20 left-[20%] w-1.5 h-1.5 bg-amber-400/20 rounded-full pointer-events-none"
-          animate={{ y: [0, -12, 0], opacity: [0.2, 0.5, 0.2] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 2.5 }}
-        />
         <div className="max-w-7xl mx-auto px-margin-mobile md:px-gutter text-center">
           <motion.div variants={slideUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}>
             <h2 className="font-headline-lg text-on-background mb-2">{t("template.title")}</h2>
@@ -428,40 +362,56 @@ export default function Home() {
           <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-5xl mx-auto mb-12"
           >
-            {/* Stat 1: Total CV */}
+            {/* Stat 1: Total CV (real dari DB) */}
             <motion.div variants={staggerItemScale} className="bg-white rounded-2xl p-6 shadow-premium-md border border-outline-variant/30 hover:shadow-premium-lg hover:-translate-y-1 transition-all duration-300">
               <div className="w-12 h-12 rounded-xl bg-primary-fixed flex items-center justify-center mx-auto mb-4">
                 <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>description</span>
               </div>
-              <CountUp end={500} suffix="+" className="text-3xl font-extrabold text-on-surface" />
+              {stats ? (
+                <CountUp end={stats.totalCvs} suffix="+" className="text-3xl font-extrabold text-on-surface" />
+              ) : (
+                <div className="h-9 w-20 bg-surface-container-high rounded-lg animate-pulse mx-auto" />
+              )}
               <p className="text-sm text-on-surface-variant mt-1">{t("cta.stats-cv")}</p>
             </motion.div>
 
-            {/* Stat 2: ATS Score */}
+            {/* Stat 2: Total Analisis (real dari DB) */}
             <motion.div variants={staggerItemScale} className="bg-white rounded-2xl p-6 shadow-premium-md border border-outline-variant/30 hover:shadow-premium-lg hover:-translate-y-1 transition-all duration-300">
               <div className="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center mx-auto mb-4">
                 <span className="material-symbols-outlined text-green-600 text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>checklist</span>
               </div>
-              <CountUp end={85} suffix="%" className="text-3xl font-extrabold text-on-surface" />
-              <p className="text-sm text-on-surface-variant mt-1">{t("cta.stats-screening")}</p>
+              {stats ? (
+                <CountUp end={stats.totalAnalyses} suffix="+" className="text-3xl font-extrabold text-on-surface" />
+              ) : (
+                <div className="h-9 w-20 bg-surface-container-high rounded-lg animate-pulse mx-auto" />
+              )}
+              <p className="text-sm text-on-surface-variant mt-1">{t("cta.stats-analyzed")}</p>
             </motion.div>
 
-            {/* Stat 3: Interview Rate */}
+            {/* Stat 3: Skor ATS Rata-rata (real dari DB) */}
             <motion.div variants={staggerItemScale} className="bg-white rounded-2xl p-6 shadow-premium-md border border-outline-variant/30 hover:shadow-premium-lg hover:-translate-y-1 transition-all duration-300">
               <div className="w-12 h-12 rounded-xl bg-secondary-container/50 flex items-center justify-center mx-auto mb-4">
                 <span className="material-symbols-outlined text-secondary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>trending_up</span>
               </div>
-              <CountUp end={3} suffix="x" className="text-3xl font-extrabold text-on-surface" />
-              <p className="text-sm text-on-surface-variant mt-1">{t("cta.stats-interview")}</p>
+              {stats ? (
+                <CountUp end={stats.avgAtsScore} suffix="%" className="text-3xl font-extrabold text-on-surface" />
+              ) : (
+                <div className="h-9 w-20 bg-surface-container-high rounded-lg animate-pulse mx-auto" />
+              )}
+              <p className="text-sm text-on-surface-variant mt-1">{t("cta.stats-avg-ats")}</p>
             </motion.div>
 
-            {/* Stat 4: Active Users */}
+            {/* Stat 4: Pengguna Terdaftar (real dari DB) */}
             <motion.div variants={staggerItemScale} className="bg-white rounded-2xl p-6 shadow-premium-md border border-outline-variant/30 hover:shadow-premium-lg hover:-translate-y-1 transition-all duration-300">
               <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center mx-auto mb-4">
                 <span className="material-symbols-outlined text-amber-600 text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>group</span>
               </div>
-              <CountUp end={1200} suffix="+" className="text-3xl font-extrabold text-on-surface" />
-              <p className="text-sm text-on-surface-variant mt-1">Profesional Aktif</p>
+              {stats ? (
+                <CountUp end={stats.totalUsers} suffix="+" className="text-3xl font-extrabold text-on-surface" />
+              ) : (
+                <div className="h-9 w-20 bg-surface-container-high rounded-lg animate-pulse mx-auto" />
+              )}
+              <p className="text-sm text-on-surface-variant mt-1">{t("cta.stats-users")}</p>
             </motion.div>
           </motion.div>
 
@@ -469,15 +419,17 @@ export default function Home() {
           <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto mb-8"
           >
-            <motion.div variants={staggerItemUp}>
-              <Link href="/builder/new" className="block bg-gradient-to-br from-primary/5 to-primary/[0.02] rounded-2xl p-5 shadow-premium-md hover:shadow-premium-lg hover:-translate-y-0.5 transition-all duration-300 group text-left">
+            {/* Kartu utama — treatment berbeda (R-14): border primary + badge arah */}
+            <motion.div variants={staggerItemUp} className="sm:col-span-2 lg:col-span-1">
+              <Link href="/builder/new" className="block relative h-full bg-gradient-to-br from-primary/10 to-primary/[0.02] rounded-2xl p-5 border-2 border-primary/25 shadow-premium-md hover:shadow-premium-lg hover:-translate-y-0.5 transition-all duration-300 group text-left">
+                <span className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">{t("tool.start-here")}</span>
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>edit_note</span>
                   </div>
-                  <h3 className="font-label-bold text-on-surface group-hover:text-primary transition-colors">Buat CV Baru</h3>
+                  <h3 className="font-label-bold text-on-surface group-hover:text-primary transition-colors">{t("tool.build-cv")}</h3>
                 </div>
-                <p className="text-xs text-on-surface-variant leading-relaxed">Gunakan template ATS-friendly dengan panduan AI step-by-step.</p>
+                <p className="text-xs text-on-surface-variant leading-relaxed">{t("tool.build-cv-desc")}</p>
               </Link>
             </motion.div>
             <motion.div variants={staggerItemUp}>
@@ -486,9 +438,9 @@ export default function Home() {
                   <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>fact_check</span>
                   </div>
-                  <h3 className="font-label-bold text-on-surface group-hover:text-secondary transition-colors">Analisis CV</h3>
+                  <h3 className="font-label-bold text-on-surface group-hover:text-secondary transition-colors">{t("tool.analyze-cv")}</h3>
                 </div>
-                <p className="text-xs text-on-surface-variant leading-relaxed">Cek skor ATS dan dapatkan rekomendasi perbaikan instan.</p>
+                <p className="text-xs text-on-surface-variant leading-relaxed">{t("tool.analyze-cv-desc")}</p>
               </Link>
             </motion.div>
             <motion.div variants={staggerItemUp}>
@@ -497,28 +449,33 @@ export default function Home() {
                   <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <span className="material-symbols-outlined text-amber-600" style={{ fontVariationSettings: "'FILL' 1" }}>grid_view</span>
                   </div>
-                  <h3 className="font-label-bold text-on-surface group-hover:text-amber-600 transition-colors">Portofolio Website</h3>
+                  <h3 className="font-label-bold text-on-surface group-hover:text-amber-600 transition-colors">{t("tool.portfolio")}</h3>
                 </div>
-                <p className="text-xs text-on-surface-variant leading-relaxed">Bangun website portofolio profesional dalam hitungan menit.</p>
+                <p className="text-xs text-on-surface-variant leading-relaxed">{t("tool.portfolio-desc")}</p>
               </Link>
             </motion.div>
             <motion.div variants={staggerItemUp}>
               <Link href="/interview" className="block bg-gradient-to-br from-violet-500/5 to-violet-500/[0.02] rounded-2xl p-5 shadow-premium-md hover:shadow-premium-lg hover:-translate-y-0.5 transition-all duration-300 group text-left relative">
-                {/* Gratis badge */}
+                {/* Gratis badge — fungsional (fitur memang gratis) */}
                 <span className="absolute -top-2 -right-2 px-2 py-0.5 rounded-full bg-emerald-500 text-white text-[8px] font-bold uppercase tracking-wider shadow-premium-sm">
-                  Gratis
+                  {t("tool.free-badge")}
                 </span>
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <span className="material-symbols-outlined text-violet-600" style={{ fontVariationSettings: "'FILL' 1" }}>record_voice_over</span>
                   </div>
-                  <h3 className="font-label-bold text-on-surface group-hover:text-violet-600 transition-colors">Persiapan Interview</h3>
+                  <h3 className="font-label-bold text-on-surface group-hover:text-violet-600 transition-colors">{t("tool.interview")}</h3>
                 </div>
-                <p className="text-xs text-on-surface-variant leading-relaxed">300+ pertanyaan umum untuk 33+ posisi, lengkap dengan tips jawaban.</p>
+                <p className="text-xs text-on-surface-variant leading-relaxed">{t("tool.interview-desc")}</p>
+                <p className="mt-1.5 text-[11px] font-bold text-violet-600">
+                  {t("tool.interview-count-questions").replace("{n}", INTERVIEW_QUESTION_COUNT.toLocaleString("id-ID"))}
+                  {" · "}
+                  {t("tool.interview-count-positions").replace("{n}", INTERVIEW_POSITION_COUNT.toLocaleString("id-ID"))}
+                </p>
                 {/* CTA ke practice mode */}
                 <span className="mt-2 inline-flex items-center gap-1 text-[9px] font-semibold text-violet-500">
                   <span className="material-symbols-outlined text-[11px]">play_circle</span>
-                  Juga tersedia: Mode Latihan dengan timer
+                  {t("tool.practice-cta")}
                 </span>
               </Link>
             </motion.div>
@@ -530,28 +487,16 @@ export default function Home() {
             <AnimatedButton
               href="/builder/new"
               variant="primary"
-              shimmer
-              pulseIcon
-              bounceArrow
               icon={<span className="material-symbols-outlined text-lg">add</span>}
-              iconRight={
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              }
             >
               {t("hero.cta-start")}
             </AnimatedButton>
             <AnimatedButton
               href="/interview/practice"
               variant="emerald"
-              shimmer
-              pulseIcon
-              bounceArrow
               icon={<span className="material-symbols-outlined text-lg">play_circle</span>}
-              iconRight={
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              }
             >
-              Mode Latihan Interview
+              {t("tool.practice-btn")}
             </AnimatedButton>
           </motion.div>
         </div>
@@ -660,7 +605,7 @@ export default function Home() {
                           <p className="text-[11px] text-red-300 font-medium">{t("before-after.score-before")}<span className="text-red-500 font-bold">45%</span></p>
                         </div>
                       </div>
-                      <span className="px-3 py-1 bg-red-50 text-red-500 rounded-full text-[10px] font-bold">Tidak Lolos</span>
+                      <span className="px-3 py-1 bg-red-50 text-red-500 rounded-full text-[10px] font-bold">{t("before-after.fail-label")}</span>
                     </div>
                     {/* Mock CV Content — messy */}
                     <div className="space-y-3 opacity-60">
@@ -685,7 +630,7 @@ export default function Home() {
                     {/* Score bar */}
                     <div className="mt-5">
                       <div className="flex items-center justify-between text-xs mb-1.5">
-                        <span className="text-red-400 font-medium">ATS Score</span>
+                        <span className="text-red-400 font-medium">{t("before-after.ats-label")}</span>
                         <span className="text-red-500 font-bold">45%</span>
                       </div>
                       <div className="h-2.5 w-full bg-red-100 rounded-full overflow-hidden">
@@ -715,7 +660,7 @@ export default function Home() {
                           <p className="text-[11px] text-primary/50 font-medium">{t("before-after.score-after")}<span className="text-primary font-bold">92%</span></p>
                         </div>
                       </div>
-                      <span className="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-bold">Lolos ATS</span>
+                      <span className="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-bold">{t("before-after.pass-label")}</span>
                     </div>
                     {/* Mock CV Content — clean */}
                     <div className="space-y-3">
@@ -741,7 +686,7 @@ export default function Home() {
                     {/* Score bar */}
                     <div className="mt-5">
                       <div className="flex items-center justify-between text-xs mb-1.5">
-                        <span className="text-primary/60 font-medium">ATS Score</span>
+                        <span className="text-primary/60 font-medium">{t("before-after.ats-label")}</span>
                         <span className="text-primary font-bold">92%</span>
                       </div>
                       <div className="h-2.5 w-full bg-primary/10 rounded-full overflow-hidden">
@@ -808,20 +753,6 @@ export default function Home() {
         }}
       />
 
-      {/* ── Testimonials ── */}
-      <motion.section id="testimonials" className="py-20 md:py-28 bg-surface-container-low overflow-hidden"
-        initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.6 }}>
-        <div className="max-w-7xl mx-auto px-margin-mobile md:px-gutter mb-16 text-center">
-          <h2 className="font-headline-lg text-on-background mb-4">{t("testimonials.title")}</h2>
-          <p className="font-body-md text-on-surface-variant max-w-xl mx-auto">{t("testimonials.subtitle")}</p>
-        </div>
-        <div className="max-w-7xl mx-auto flex justify-center gap-6 mt-10 [mask-image:linear-gradient(to_bottom,transparent,black_25%,black_75%,transparent)] max-h-[900px] overflow-hidden">
-          <TestimonialsColumn key={"col1-" + lang} testimonials={firstColumn} duration={15} />
-          <TestimonialsColumn key={"col2-" + lang} testimonials={secondColumn} className="hidden md:block" duration={19} />
-          <TestimonialsColumn key={"col3-" + lang} testimonials={thirdColumn} className="hidden lg:block" duration={17} />
-        </div>
-      </motion.section>
-
       {/* ── CTA ── */}
       <motion.section id="cta-footer" className="relative py-20 md:py-28 bg-white overflow-hidden"
         variants={sectionReveal} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
@@ -857,11 +788,9 @@ export default function Home() {
                     style={{ transformStyle: "preserve-3d" }}>
                     <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/cta:translate-x-full transition-transform duration-700" />
                     {t("cta.button")}
-                    <motion.svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-                      animate={{ x: [0, 4, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                       <path d="M5 12h14M12 5l7 7-7 7"/>
-                    </motion.svg>
+                    </svg>
                   </Link>
                 </MagneticButton>
                 <MagneticButton>

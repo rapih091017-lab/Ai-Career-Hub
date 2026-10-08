@@ -210,7 +210,15 @@ export async function getUserAccess(userId: string): Promise<UserAccess> {
     if (!pkg) continue;
     activePackageIds.add(pkg.id);
 
-    for (const [feat, limit] of Object.entries(pkg.limits) as [Feature, number | "unlimited" | false][]) {
+    // Snapshot limits diambil saat order dibuat — definisi fitur terkunci apa
+    // adanya saat user bayar. Fallback ke katalog saat ini untuk order lama
+    // (sebelum fitur snapshot ada).
+    const effectiveLimits =
+      payment.limits && Object.keys(payment.limits).length > 0
+        ? payment.limits
+        : pkg.limits;
+
+    for (const [feat, limit] of Object.entries(effectiveLimits) as [Feature, number | "unlimited" | false][]) {
       for (const acc of [merged, purchased]) {
         if (limit === "unlimited") {
           acc[feat] = "unlimited";

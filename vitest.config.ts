@@ -2,6 +2,14 @@ import { defineConfig } from "vitest/config";
 import path from "path";
 
 export default defineConfig({
+  // Next default tsconfig uses jsx: "preserve" which vite:import-analysis
+  // cannot parse — force the automatic runtime so .tsx test files work.
+  esbuild: {
+    jsx: "automatic",
+  },
+  oxc: {
+    jsx: { runtime: "automatic" },
+  },
   test: {
     environment: "jsdom",
     globals: true,

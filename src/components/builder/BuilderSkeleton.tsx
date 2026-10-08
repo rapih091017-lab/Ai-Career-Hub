@@ -73,7 +73,7 @@ export function BuilderErrorState({ message }: BuilderErrorStateProps) {
       <div className="flex items-center justify-center h-[calc(100vh-64px)]">
         <div className="text-center space-y-4">
           <p className="text-lg font-semibold text-error">Error</p>
-          <p className="text-sm text-outline">{message}</p>
+          <p className="text-sm text-on-surface-variant">{message}</p>
           <MagneticButton>
             <button
               onClick={() => router.push("/dashboard")}

@@ -15,75 +15,8 @@ import { KeywordChip, BulletReviewCard } from "@/components/checker/ResultCompon
 import { ImprovementChecklist } from "@/components/checker/ImprovementChecklist";
 import { scoreColor, gradeColor, atsBadgeColor, fitLabelMeta, ROLE_CATEGORY_OPTIONS, type AnalysisResult, type ExperienceSection, type SkillsSection } from "@/components/checker/types";
 import { anonIdHeaders } from "@/lib/anon-id";
-
-/**
- * OCR di browser — semua aset (worker, core wasm, data bahasa) di-host
- * lokal di domain sendiri (/tesseract, /tessdata). Tidak ada fetch ke CDN
- * eksternal (jsdelivr/unpkg sering diblokir/lambat di Indonesia) dan tidak
- * bergantung pada Tesseract serverless (cold start + batas waktu fungsi).
- */
-interface OcrMsgs {
-  preparing: string;
-  core: string;
-  lang: string;
-  init: string;
-  reading: (p: number) => string;
-  page: (i: number, total: number) => string;
-}
-
-/** Teks status OCR default (bahasa) — call site bisa mengirim terjemahan sendiri. */
-const DEFAULT_OCR_MSGS: OcrMsgs = {
-  preparing: "Menyiapkan mesin OCR...",
-  core: "Memuat mesin OCR...",
-  lang: "Memuat kamus bahasa (sekali saja)...",
-  init: "Menginisialisasi OCR...",
-  reading: (p) => `Membaca teks... ${p}%`,
-  page: (i, total) => `Membaca halaman ${i}/${total}...`,
-};
-
-async function runClientOcr(
-  inputs: Array<Blob | File>,
-  onStatus: (status: string) => void,
-  msgs: OcrMsgs = DEFAULT_OCR_MSGS
-): Promise<string> {
-  const { createWorker } = await import("tesseract.js");
-  onStatus(msgs.preparing);
-  const worker = await createWorker("eng+ind", 1 /* OEM.LSTM_ONLY */, {
-    workerPath: "/tesseract/worker.min.js",
-    corePath: "/tesseract/",
-    langPath: "/tessdata/",
-    logger: (m: any) => {
-      if (!m || !m.status) return;
-      const status = String(m.status);
-      if (status === "recognizing text" && typeof m.progress === "number") {
-        onStatus(msgs.reading(Math.round(m.progress * 100)));
-      } else if (status === "loading tesseract core") {
-        onStatus(msgs.core);
-      } else if (status === "loading language traineddata") {
-        onStatus(msgs.lang);
-      } else if (status === "initializing tesseract") {
-        onStatus(msgs.init);
-      }
-    },
-  });
-
-  try {
-    const parts: string[] = [];
-    for (let i = 0; i < inputs.length; i++) {
-      if (inputs.length > 1) onStatus(msgs.page(i + 1, inputs.length));
-      const { data } = await worker.recognize(inputs[i]);
-      parts.push((data.text || "").trim());
-    }
-    return parts.join("\n\n").trim();
-  } finally {
-    try {
-      await worker.terminate();
-    } catch {}
-  }
-}
-
-
-
+import { extractPdfTextClient, renderPdfPagesToBlobs } from "@/lib/pdf-extract-client";
+import { runClientOcr, type OcrMsgs } from "@/lib/ocr-client";
 
 /* ------------------------------------------------------------------ */
 /*  Page Component                                                     */
@@ -106,6 +39,7 @@ export default function CheckerPage() {
   const [showOcrButton, setShowOcrButton] = useState(false);
   const [ocrLoading, setOcrLoading] = useState(false);
   const [ocrProgress, setOcrProgress] = useState("");
+  const [processNote, setProcessNote] = useState("");
   const shareTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const donutRef = useRef<HTMLDivElement>(null);
@@ -161,6 +95,7 @@ export default function CheckerPage() {
     setShowOcrButton(false);
     setOcrLoading(false);
     setOcrProgress("");
+    setProcessNote("");
     extractedTextRef.current = null;
   }, []);
 
@@ -231,35 +166,9 @@ export default function CheckerPage() {
         return;
       }
 
-      // PDF — render tiap halaman di browser (pdfjs lokal) lalu OCR di browser
+      // PDF — render tiap halaman (helper lokal pdfjs) lalu OCR di browser
       setOcrProgress(t("checker.ocr.engine"));
-      const pdfjs: any = await import("pdfjs-dist/build/pdf.mjs");
-      pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
-
-      const arrayBuffer = await file.arrayBuffer();
-      const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
-      const totalPages = Math.min(pdf.numPages, 5); // Max 5 halaman untuk performa
-
-      const pageBlobs: Blob[] = [];
-      for (let i = 1; i <= totalPages; i++) {
-        setOcrProgress(t("checker.ocr.render").replace("{i}", String(i)).replace("{total}", String(totalPages)));
-        const page = await pdf.getPage(i);
-        const viewport = page.getViewport({ scale: 1.5 });
-
-        const canvas = document.createElement("canvas");
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        const ctx = canvas.getContext("2d")!;
-
-        await page.render({ canvasContext: ctx, viewport }).promise;
-
-        const blob = await new Promise<Blob | null>((resolve) =>
-          canvas.toBlob((b) => resolve(b), "image/png")
-        );
-        canvas.width = 0;
-        canvas.height = 0;
-        if (blob) pageBlobs.push(blob);
-      }
+      const pageBlobs = await renderPdfPagesToBlobs(file, 5);
 
       if (pageBlobs.length === 0) {
         throw new Error(t("checker.ocr.render-failed"));
@@ -292,6 +201,71 @@ export default function CheckerPage() {
       setShowPasteFallback(true);
     }
   }, [file, doAnalyze, ocrMsgs, t]);
+
+  /**
+   * Ekstraksi PDF berlapis supaya tidak ada file yang mentok:
+   * 1) pdfjs di perangkat, 2) OCR otomatis untuk PDF scan, 3) server.
+   * Return null jika semua gagal (state error + fallback paste sudah diatur).
+   */
+  const extractPdfSmart = useCallback(async (): Promise<string | null> => {
+    if (!file) return null;
+
+    // 1) Teks dibaca di perangkat: file besar tidak pernah kena batas body
+    //    serverless karena tidak perlu diunggah dulu.
+    setProcessNote(t("checker.extract.reading-file"));
+    let clientText = "";
+    try {
+      clientText = await extractPdfTextClient(file);
+    } catch (err) {
+      console.error("[checker] ekstraksi klien gagal:", err);
+    }
+    if (clientText.length >= 50) {
+      setProcessNote("");
+      return clientText;
+    }
+
+    // 2) Tidak ada lapisan teks (scan/gambar) → OCR otomatis tanpa klik.
+    try {
+      setProcessNote(t("checker.extract.auto-ocr"));
+      const pageBlobs = await renderPdfPagesToBlobs(file, 5);
+      if (pageBlobs.length > 0) {
+        const ocrText = await runClientOcr(pageBlobs, (status) => setProcessNote(status), ocrMsgs);
+        if (ocrText.length >= 20) {
+          setProcessNote("");
+          return ocrText;
+        }
+      }
+    } catch (err) {
+      console.error("[checker] OCR otomatis gagal:", err);
+    }
+
+    // 3) Fallback server (pdfjs + pdf-parse) untuk kasus yang tetap langka.
+    try {
+      setProcessNote(t("checker.extract.server-fallback"));
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/checker/extract", { method: "POST", body: formData });
+      const raw = await res.text();
+      let data: any = null;
+      try {
+        data = JSON.parse(raw);
+      } catch {}
+
+      if (res.ok && data?.extractedText) {
+        setProcessNote("");
+        return data.extractedText as string;
+      }
+
+      setShowPasteFallback(true);
+      setShowOcrButton(true);
+      setError(data?.message || t("checker.error-failed"));
+    } catch {
+      setShowPasteFallback(true);
+      setError(t("checker.error-failed"));
+    }
+    setProcessNote("");
+    return null;
+  }, [file, ocrMsgs, t]);
 
   const handlePasteAnalyze = useCallback(async () => {
     if (!pastedText.trim()) {
@@ -367,43 +341,52 @@ export default function CheckerPage() {
       const cachedText = extractedTextRef.current;
       let extractedText: string;
       if (!cachedText) {
-        const formData = new FormData();
-        formData.append("file", file);
-        const extractRes = await fetch("/api/checker/extract", {
-          method: "POST",
-          body: formData,
-        });
+        const isPdfFile = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
 
-        const extractText = await extractRes.text();
-        let extractData: any;
-        try {
-          extractData = JSON.parse(extractText);
-        } catch {
-          setError("[extract] Server error: " + extractText.slice(0, 200));
-          setLoading(false);
-          return;
-        }
-
-        if (!extractRes.ok) {
-          // Jika API mengirim suggestOcr, tampilkan tombol OCR
-          if (extractData.suggestOcr) {
-            setShowOcrButton(true);
-          }
-          // Jika API mengirim suggestPaste, tampilkan fallback paste
-          if (extractData.suggestPaste) {
-            setShowPasteFallback(true);
-          }
-          if (extractData.suggestOcr || extractData.suggestPaste) {
-            setError(extractData.message || t("checker.error-failed"));
+        if (isPdfFile) {
+          // PDF: dibaca di perangkat dulu, OCR otomatis bila scan, server
+          // hanya sebagai fallback terakhir. Tidak ada langkah yang butuh
+          // klik tambahan dari user.
+          const smartText = await extractPdfSmart();
+          if (!smartText) {
             setLoading(false);
             return;
           }
-          setError(extractData.message || t("checker.error-failed"));
-          setLoading(false);
-          return;
+          extractedText = smartText;
+          extractedTextRef.current = extractedText; // cache untuk retry
+        } else {
+          // DOCX: ekstraksi di server (mammoth).
+          const formData = new FormData();
+          formData.append("file", file);
+          const extractRes = await fetch("/api/checker/extract", {
+            method: "POST",
+            body: formData,
+          });
+
+          const extractText = await extractRes.text();
+          let extractData: any = null;
+          try {
+            extractData = JSON.parse(extractText);
+          } catch {}
+
+          if (!extractRes.ok) {
+            if (extractData?.suggestOcr) setShowOcrButton(true);
+            if (extractData?.suggestPaste) setShowPasteFallback(true);
+            setError(extractData?.message || t("checker.error-failed"));
+            setLoading(false);
+            return;
+          }
+
+          if (!extractData?.extractedText) {
+            setShowPasteFallback(true);
+            setError(t("checker.error-failed"));
+            setLoading(false);
+            return;
+          }
+
+          extractedText = extractData.extractedText as string;
+          extractedTextRef.current = extractedText; // cache untuk retry
         }
-        extractedText = extractData.extractedText as string;
-        extractedTextRef.current = extractedText; // cache untuk retry
       } else {
         extractedText = cachedText;
       }
@@ -466,7 +449,7 @@ export default function CheckerPage() {
             </div>
             <p className="text-center text-sm text-on-surface-variant">
               <span className="material-symbols-outlined text-lg align-middle mr-1 animate-spin select-none">sync</span>
-              {t("checker.analyzing-full")}
+              {processNote || t("checker.analyzing-full")}
             </p>
           </main>
           <AppFooter />
