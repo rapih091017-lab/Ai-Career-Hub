@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { isValidSlug, safeUrl } from "@/lib/portfolio-safety";
-import { SECTION_IDS, type SectionId } from "@/components/portfolio/types";
+import { SECTION_IDS, THEME_IDS, type SectionId } from "@/components/portfolio/types";
+
+export { THEME_IDS };
 
 /** Batas jumlah item per array. Dipakai form dan Zod sekaligus. */
 export const LIMITS = {
@@ -46,16 +48,34 @@ const monthField = z
   .trim()
   .regex(/^$|^\d{4}-(0[1-9]|1[0-2])$/, "Tanggal harus format YYYY-MM");
 
+/** Nama field tanggal selesai, supaya pesan error menyebut field yang benar:
+ *  pengalaman kerja tidak sama dengan riwayat pendidikan. */
+type EndDateLabel = "tanggal selesai" | "tanggal lulus";
+
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
 /**
- * Aturan rentang tanggal (YYYY-MM, string kosong = belum diisi):
- * - tanggal selesai tanpa tanggal mulai → tidak sah
- * - `isPresent` (masih berjalan) bersama tanggal selesai → tidak sah
- * - selain itu, tanggal selesai tidak boleh lebih awal dari tanggal mulai
+ * Tiga aturan rentang tanggal (YYYY-MM, string kosong = belum diisi). Mengembalikan
+ * alasan kegagalan yang tepat, atau null kalau rentangnya sah. Tiap aturan punya
+ * pesannya sendiri karena tiga masalahnya berbeda: satu soal field yang belum diisi,
+ * satu soal dua field yang saling bertentangan, satu soal urutan yang terbalik.
  */
-const dateRange = (startDate: string, endDate: string, isPresent: boolean): boolean => {
-  if (endDate !== "" && startDate === "") return false;
-  if (isPresent && endDate !== "") return false;
-  return startDate === "" || endDate === "" || endDate >= startDate;
+const dateRangeError = (
+  startDate: string,
+  endDate: string,
+  isPresent: boolean,
+  endDateLabel: EndDateLabel,
+): string | null => {
+  if (endDate !== "" && startDate === "") {
+    return `Isi tanggal mulai dulu sebelum mengisi ${endDateLabel}`;
+  }
+  if (isPresent && endDate !== "") {
+    return `${capitalize(endDateLabel)} tidak bisa diisi kalau ditandai masih berjalan`;
+  }
+  if (startDate !== "" && endDate !== "" && endDate < startDate) {
+    return `${capitalize(endDateLabel)} tidak boleh lebih awal dari tanggal mulai`;
+  }
+  return null;
 };
 
 const id = z.string().min(1).max(64);
@@ -85,10 +105,10 @@ export const experienceItemSchema = z
     imageUrl: urlField(MAX.url).default(""),
     companyLogo: urlField(MAX.url).default(""),
   })
-  .refine(
-    (v) => dateRange(v.startDate, v.endDate, v.isPresent),
-    { message: "Tanggal selesai tidak boleh lebih awal dari tanggal mulai" },
-  );
+  .superRefine((v, ctx) => {
+    const reason = dateRangeError(v.startDate, v.endDate, v.isPresent, "tanggal selesai");
+    if (reason) ctx.addIssue({ code: "custom", message: reason });
+  });
 
 export const educationItemSchema = z
   .object({
@@ -100,10 +120,10 @@ export const educationItemSchema = z
     endDate: monthField,
     isPresent: z.boolean().default(false),
   })
-  .refine(
-    (v) => dateRange(v.startDate, v.endDate, v.isPresent),
-    { message: "Tanggal lulus tidak boleh lebih awal dari tanggal mulai" },
-  );
+  .superRefine((v, ctx) => {
+    const reason = dateRangeError(v.startDate, v.endDate, v.isPresent, "tanggal lulus");
+    if (reason) ctx.addIssue({ code: "custom", message: reason });
+  });
 
 export const certificationItemSchema = z.object({
   id,
@@ -179,24 +199,25 @@ export const portfolioDataSchema = z.object({
   extraLinks: z.array(extraLinkSchema).max(LIMITS.extraLinks).default([]),
   sectionOrder: z.array(z.enum(SECTION_IDS)).optional(),
   sectionVisibility: z.partialRecord(z.enum(SECTION_IDS), z.boolean()).optional(),
-  sectionColors: z.record(z.string(), z.record(z.string(), z.string())).optional(),
+  sectionColors: z
+    .partialRecord(z.enum(SECTION_IDS), z.record(z.string(), z.string()))
+    .optional(),
 });
 
 export type ValidatedPortfolioData = z.infer<typeof portfolioDataSchema>;
-
-export const THEME_IDS = ["glass", "brutal", "luxe"] as const;
 
 export const publishPayloadSchema = z
   .object({
     slug: z
       .string()
-      .min(3)
       .transform((v) => v.trim().toLowerCase())
       .refine(isValidSlug, "Slug tidak valid atau kata terlarang"),
     themeId: z.enum(THEME_IDS),
     data: portfolioDataSchema,
     fontSize: z.enum(["small", "medium", "large"]).default("medium"),
-    alignment: z.record(z.string(), z.enum(["left", "center", "right"])).default({}),
+    alignment: z
+      .partialRecord(z.enum(SECTION_IDS), z.enum(["left", "center", "right"]))
+      .default({}),
   })
   .refine((v) => v.data.formData.heroFirstName.trim() !== "", {
     message: "Isi nama dulu sebelum menerbitkan",

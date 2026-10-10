@@ -29,6 +29,8 @@ const URL_UNSAFE_CHARS = /[\x00-\x1f\x7f\\]/;
 export function safeUrl(v: string): string {
   const t = v.trim();
   if (URL_UNSAFE_CHARS.test(t)) return "";
+  // Output `esc()` adalah konteks atribut HTML (href/src); jangan pernah
+  // diberi ke fetch() atau CSS url() — `&amp;` di sana bukan pemisah query.
   if (/^\/(?!\/)/.test(t)) return esc(t);
   if (/^(https?:\/\/|mailto:|tel:)/i.test(t)) return esc(t);
   if (/^[\w.-]+\.[a-z]{2,}(\/\S*)?$/i.test(t)) return esc("https://" + t);

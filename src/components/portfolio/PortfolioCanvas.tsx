@@ -19,7 +19,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import type { SectionId, ThemeDefinition, ThemeColors } from "./types";
+import type { SectionId, SectionVisibility, ThemeDefinition, ThemeColors } from "./types";
 import { THEMES, DEFAULT_THEME_ID } from "./themes";
 
 /* ─── Context ─── */
@@ -169,11 +169,11 @@ export const SECTION_META: Record<SectionId, { label: string; icon: string }> = 
 
 type FontSize = "small" | "medium" | "large";
 
-interface PortfolioCanvasProps {
+export interface PortfolioCanvasProps {
   themeId: string;
   sectionOrder: SectionId[];
   onSectionOrderChange: (order: SectionId[]) => void;
-  sectionVisibility: Record<SectionId, boolean>;
+  sectionVisibility: SectionVisibility;
   onToggleSection: (id: SectionId) => void;
   selectedSection: SectionId | null;
   onSelectSection: (id: SectionId | null) => void;

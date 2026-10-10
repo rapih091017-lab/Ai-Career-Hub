@@ -3,7 +3,7 @@
 import React from "react";
 import { THEMES, DEFAULT_THEME_ID, DEFAULT_SECTION_ORDER } from "./themes";
 import { ThemeContext } from "./PortfolioCanvas";
-import type { SectionId, ThemeDefinition, PortfolioData } from "./types";
+import type { SectionId, SectionVisibility, ThemeDefinition, PortfolioData } from "./types";
 
 import HeroSection from "./sections/HeroSection";
 import AboutSection from "./sections/AboutSection";
@@ -18,11 +18,11 @@ import HobbiesSection from "./sections/HobbiesSection";
 import TestimonialsSection from "./sections/TestimonialsSection";
 import ContactSection from "./sections/ContactSection";
 
-interface PublishedPortfolioProps {
+export interface PublishedPortfolioProps {
   data: PortfolioData;
   themeId: string;
   sectionOrder?: SectionId[];
-  sectionVisibility?: Record<SectionId, boolean>;
+  sectionVisibility?: SectionVisibility;
   showFooter?: boolean;
 }
 

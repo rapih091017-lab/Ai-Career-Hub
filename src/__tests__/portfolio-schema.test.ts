@@ -1,6 +1,9 @@
 import { describe, it, expect } from "vitest";
 import type { PortfolioData } from "@/components/portfolio-templates/types";
 import { SECTION_IDS } from "@/components/portfolio/types";
+import type { PortfolioCanvasProps } from "@/components/portfolio/PortfolioCanvas";
+import type { PublishedPortfolioProps } from "@/components/portfolio/PublishedPortfolio";
+import type { PublishDialogProps } from "@/components/portfolio/PublishDialog";
 import {
   portfolioDataSchema,
   publishPayloadSchema,
@@ -40,6 +43,20 @@ const emptyData = {
   testimonials: [],
   extraLinks: [],
 };
+
+/** Menolak payload sekaligus memaksa pesan + lokasi issue pertama,
+ *  supaya tiap aturan tanggal punya pesan yang benar-benar diuji. */
+function expectRejectedWith(
+  payload: unknown,
+  message: string,
+  path: (string | number)[],
+) {
+  const result = portfolioDataSchema.safeParse(payload);
+  expect(result.success).toBe(false);
+  if (result.success) return;
+  expect(result.error.issues[0].message).toBe(message);
+  expect(result.error.issues[0].path).toEqual(path);
+}
 
 describe("portfolioDataSchema", () => {
   it("menerima data portfolio yang valid", () => {
@@ -93,6 +110,67 @@ describe("portfolioDataSchema", () => {
       ],
     };
     expect(portfolioDataSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it("memberi pesan sendiri saat tanggal selesai didahului tanggal mulai yang kosong", () => {
+    expectRejectedWith(
+      {
+        ...emptyData,
+        educations: [
+          {
+            id: "ed1",
+            institution: "Universitas X",
+            degree: "S1",
+            field: "Informatika",
+            startDate: "",
+            endDate: "2024-01",
+          },
+        ],
+      },
+      "Isi tanggal mulai dulu sebelum mengisi tanggal lulus",
+      ["educations", 0],
+    );
+  });
+
+  it("memberi pesan sendiri saat isPresentdisambiguation dengan tanggal selesai", () => {
+    expectRejectedWith(
+      {
+        ...emptyData,
+        experiences: [
+          {
+            id: "e1",
+            company: "Acme",
+            position: "Dev",
+            startDate: "2024-01",
+            endDate: "2025-06",
+            description: "",
+            isPresent: true,
+          },
+        ],
+      },
+      "Tanggal selesai tidak bisa diisi kalau ditandai masih berjalan",
+      ["experiences", 0],
+    );
+  });
+
+  it("memberi pesan sendiri saat urutan tanggal terbalik", () => {
+    expectRejectedWith(
+      {
+        ...emptyData,
+        experiences: [
+          {
+            id: "e1",
+            company: "Acme",
+            position: "Dev",
+            startDate: "2024-01",
+            endDate: "2023-01",
+            description: "",
+          },
+        ],
+      },
+      "Tanggal selesai tidak boleh lebih awal dari tanggal mulai",
+      ["experiences", 0],
+    );
   });
 
   it("menolak skema terlarang pada URL aset dan tautan project", () => {
@@ -178,42 +256,8 @@ describe("portfolioDataSchema", () => {
     expect(portfolioDataSchema.safeParse(bad).success).toBe(false);
   });
 
-  it("menolak isPresent yangdisambiguation dengan tanggal selesai", () => {
-    const bad = {
-      ...emptyData,
-      experiences: [
-        {
-          id: "e1",
-          company: "Acme",
-          position: "Dev",
-          startDate: "2024-01",
-          endDate: "2023-01",
-          description: "",
-          isPresent: true,
-        },
-      ],
-    };
-    expect(portfolioDataSchema.safeParse(bad).success).toBe(false);
-  });
-
-  it("menolak tanggal selesai tanpa tanggal mulai", () => {
-    const bad = {
-      ...emptyData,
-      educations: [
-        {
-          id: "ed1",
-          institution: "Universitas X",
-          degree: "S1",
-          field: "Informatika",
-          startDate: "",
-          endDate: "2024-01",
-        },
-      ],
-    };
-    expect(portfolioDataSchema.safeParse(bad).success).toBe(false);
-  });
-
   it("menerima rentang tanggal yang konsisten", () => {
+
     const ok = {
       ...emptyData,
       experiences: [
@@ -283,6 +327,14 @@ describe("portfolioDataSchema", () => {
     const bad = {
       ...emptyData,
       sectionVisibility: { hero: true, footer: false },
+    };
+    expect(portfolioDataSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it("menolak section id yang tidak dikenal pada sectionColors", () => {
+    const bad = {
+      ...emptyData,
+      sectionColors: { hero: { primary: "#fff" }, footer: { primary: "#000" } },
     };
     expect(portfolioDataSchema.safeParse(bad).success).toBe(false);
   });
@@ -413,7 +465,19 @@ describe("publishPayloadSchema", () => {
     ).toBe(false);
   });
 
+  it("menolak alignment untuk section yang tidak dikenal", () => {
+    expect(
+      publishPayloadSchema.safeParse({
+        slug: "teguh-surya",
+        themeId: "glass",
+        data: emptyData,
+        alignment: { footer: "center" },
+      }).success,
+    ).toBe(false);
+  });
+
   it("menerima payload valid lengkap dengan opsi tampilan", () => {
+
     expect(
       publishPayloadSchema.safeParse({
         slug: "teguh-surya",
@@ -423,6 +487,35 @@ describe("publishPayloadSchema", () => {
         alignment: { hero: "center", contact: "center" },
       }).success,
     ).toBe(true);
+  });
+});
+
+describe("tipe output schema ke konsumen", () => {
+  it("sectionVisibility hasil parse langsung muat di tiga tipe konsumen", () => {
+    const parsed = portfolioDataSchema.parse({
+      ...emptyData,
+      sectionVisibility: { hero: true, about: false },
+    });
+    const visibility = parsed.sectionVisibility;
+    expect(visibility).toBeDefined();
+    if (!visibility) throw new Error("sectionVisibility harus ada pada payload ini");
+
+    // Assertion compile-time: ketiga baris ini GAGAL di `npx tsc --noEmit`
+    // kalau tipe konsumen kembali diperketat ke Record<SectionId, boolean>
+    // (peta parsial hasil parse tidak muat ke record lengkap).
+    const canvas: Pick<PortfolioCanvasProps, "sectionVisibility"> = {
+      sectionVisibility: visibility,
+    };
+    const published: Pick<PublishedPortfolioProps, "sectionVisibility"> = {
+      sectionVisibility: visibility,
+    };
+    const dialog: Pick<NonNullable<PublishDialogProps["extras"]>, "sectionVisibility"> = {
+      sectionVisibility: visibility,
+    };
+
+    expect(canvas.sectionVisibility).toEqual({ hero: true, about: false });
+    expect(published.sectionVisibility).toEqual({ hero: true, about: false });
+    expect(dialog.sectionVisibility).toEqual({ hero: true, about: false });
   });
 });
 

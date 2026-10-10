@@ -17,7 +17,15 @@ export const SECTION_IDS = [
 
 export type SectionId = (typeof SECTION_IDS)[number];
 
-export type ThemeId = "glass" | "brutal" | "luxe";
+/** Peta visibilitas section. Sengaja parsial: section yang tidak disebut
+ *  dianggap tampil, jadi peta kosong berarti "semua section tampil". */
+export type SectionVisibility = Partial<Record<SectionId, boolean>>;
+
+/** Tema yang tersedia. Sumber kebenaran untuk union ThemeId sekaligus untuk
+ *  validasi Zod (publishPayloadSchema.themeId). */
+export const THEME_IDS = ["glass", "brutal", "luxe"] as const;
+
+export type ThemeId = (typeof THEME_IDS)[number];
 
 export interface ThemeColors {
   bg: string;

@@ -6,7 +6,7 @@ import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/components/ui/toast";
 import type { PortfolioData } from "@/components/portfolio/types";
 
-interface PublishDialogProps {
+export interface PublishDialogProps {
   open: boolean;
   onClose: () => void;
   data: PortfolioData | null;

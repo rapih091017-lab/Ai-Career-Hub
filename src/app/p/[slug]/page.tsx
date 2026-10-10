@@ -6,7 +6,7 @@ import { portfolioPages } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { THEMES, DEFAULT_THEME_ID } from "@/components/portfolio/themes";
 import PublishedPortfolio from "@/components/portfolio/PublishedPortfolio";
-import type { PortfolioData, SectionId } from "@/components/portfolio/types";
+import type { PortfolioData, SectionId, SectionVisibility } from "@/components/portfolio/types";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -51,7 +51,7 @@ export default async function PublishedPortfolioPage({ params }: PageProps) {
 
   const d = row.data as unknown as PortfolioData & {
     sectionOrder?: SectionId[];
-    sectionVisibility?: Record<SectionId, boolean>;
+    sectionVisibility?: SectionVisibility;
   };
   const theme = THEMES[row.theme] || THEMES[DEFAULT_THEME_ID];
 
