@@ -3472,7 +3472,6 @@ git commit -m "feat(portfolio): export HTML dari renderer yang sama, gambar inli
 **Files:**
 - Modify: `src/app/p/[slug]/page.tsx` (`generateMetadata`)
 - Create: `src/app/api/portfolio/og/[slug]/route.tsx`
-- Create: `src/app/api/portfolio/public-asset/[id]/route.ts`
 - Modify: `src/app/sitemap.ts`
 - Create: `src/app/robots.ts`
 - Modify: `src/components/TitleUpdater.tsx`
