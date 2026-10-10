@@ -74,7 +74,7 @@ function FloatingParticles({ count = 6, colors }: { count?: number; colors: { pr
   if (reduced) return null;
 
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+    <div className="pf-atmosphere absolute inset-0 pointer-events-none overflow-hidden">
       {particles.map((p, i) => (
         <motion.div
           key={i}
@@ -150,7 +150,7 @@ function GlassHero({ data: f, name, initials }: { data: PortfolioFormData; name:
   return (
     <section className="relative overflow-hidden" style={{ padding: "140px 0 80px" }}>
       {/* Animated gradient orbs */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      <div className="pf-atmosphere absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
           className="absolute w-[600px] h-[600px] rounded-full blur-[120px]"
           style={{ background: theme.colors.primary, top: "-30%", right: "-10%", opacity: 0.08 }}
@@ -278,7 +278,7 @@ function BrutalHero({ data: f, name, initials }: { data: PortfolioFormData; name
     <section className="relative overflow-hidden" style={{ padding: "120px 0 80px" }}>
       {/* Grain overlay with subtle animation */}
       <motion.div
-        className="fixed inset-0 pointer-events-none"
+        className="pf-atmosphere fixed inset-0 pointer-events-none"
         style={{ zIndex: 50, opacity: 0.03, backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")" }}
         animate={{ opacity: [0.025, 0.04, 0.025] }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
@@ -425,7 +425,7 @@ function LuxeHero({ data: f, name, initials }: { data: PortfolioFormData; name: 
     <section className="relative overflow-hidden" style={{ padding: "120px 0 80px" }}>
       {/* Animated grain overlay */}
       <motion.div
-        className="fixed inset-0 pointer-events-none"
+        className="pf-atmosphere fixed inset-0 pointer-events-none"
         style={{ zIndex: 50, opacity: 0.025, backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")" }}
         animate={{ opacity: [0.02, 0.035, 0.02] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
@@ -433,7 +433,7 @@ function LuxeHero({ data: f, name, initials }: { data: PortfolioFormData; name: 
 
       {/* Warm ambient glow */}
       <motion.div
-        className="absolute inset-0 pointer-events-none"
+        className="pf-atmosphere absolute inset-0 pointer-events-none"
         style={{
           background: `radial-gradient(ellipse at 30% 50%, ${theme.colors.primary}06, transparent 60%)`,
         }}

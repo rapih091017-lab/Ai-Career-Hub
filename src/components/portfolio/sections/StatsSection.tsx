@@ -17,7 +17,7 @@ function GlassStats({ stats }: { stats: { value: string; label: string; icon: st
       <div className="max-w-4xl mx-auto px-6">
         <div className="flex flex-col md:flex-row md:items-start md:justify-center gap-4 md:gap-6 relative">
           {/* Connecting lines between bubbles */}
-          <svg className="hidden md:block absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
+          <svg className="pf-atmosphere hidden md:block absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
             <defs>
               <linearGradient id="stats-line" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor={theme.colors.primary} stopOpacity="0" />

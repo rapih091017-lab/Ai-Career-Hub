@@ -16,8 +16,11 @@ import type {
   ThemeId,
 } from "@/components/portfolio/types";
 
+import "@/app/portfolio/print.css";
+
 interface PageProps {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ print?: string }>;
 }
 
 export const dynamic = "force-dynamic";
@@ -51,8 +54,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function PublishedPortfolioPage({ params }: PageProps) {
-  const { slug } = await params;
+export default async function PublishedPortfolioPage({ params, searchParams }: PageProps) {
+  const [{ slug }, query] = await Promise.all([params, searchParams]);
   const row = await getPublishedPortfolio(slug);
 
   if (!row) notFound();
@@ -64,20 +67,24 @@ export default async function PublishedPortfolioPage({ params }: PageProps) {
     fontSize?: FontSize;
   };
   const theme = THEMES[row.theme] || THEMES[DEFAULT_THEME_ID];
+  const printMode = query?.print === "1";
 
   return (
     <>
       <link rel="stylesheet" href={theme.fontUrl} />
-      <PortfolioDocument
-        data={d}
-        themeId={row.theme as ThemeId}
-        mode="static"
-        sectionOrder={d.sectionOrder}
-        sectionVisibility={d.sectionVisibility}
-        fontSize={d.fontSize ?? "medium"}
-        sectionColors={d.sectionColors ?? null}
-      />
+      <div data-pf-print={printMode ? "true" : undefined}>
+        <PortfolioDocument
+          data={d}
+          themeId={row.theme as ThemeId}
+          mode="static"
+          sectionOrder={d.sectionOrder}
+          sectionVisibility={d.sectionVisibility}
+          fontSize={d.fontSize ?? "medium"}
+          sectionColors={d.sectionColors ?? null}
+        />
+      </div>
       <footer
+        data-pf-print-hidden={printMode ? "true" : undefined}
         className="text-center py-8"
         style={{
           color: theme.colors.textMuted,

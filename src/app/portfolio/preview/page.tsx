@@ -10,7 +10,10 @@ import { THEMES, DEFAULT_THEME_ID } from "@/components/portfolio/themes";
 import type { ThemeDefinition, PortfolioFormData, ProjectItem, ExperienceItem, EducationItem, CertificationItem, OrganizationItem, HobbyItem, TestimonialItem, ExtraLink, SectionId, SectionVisibility, FontSize, ThemeId } from "@/components/portfolio/types";
 import PortfolioDocument from "@/components/portfolio/render/PortfolioDocument";
 
+import "../print.css";
+
 import PublishDialog from "@/components/portfolio/PublishDialog";
+import { STATIC_REVEAL_FALLBACK_CSS } from "@/components/portfolio/render/PortfolioDocument";
 
 interface PortfolioData {
   formData: PortfolioFormData;
@@ -191,6 +194,8 @@ export default function PortfolioPreviewPage() {
   const [notFound, setNotFound] = useState(false);
   const [themeId, setThemeId] = useState<string>(DEFAULT_THEME_ID);
   const [showPublish, setShowPublish] = useState(false);
+  const [printMode, setPrintMode] = useState(false);
+  const [publishedSlug, setPublishedSlug] = useState<string | null>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -198,6 +203,26 @@ export default function PortfolioPreviewPage() {
     if (t && THEMES[t]) {
       setThemeId(t);
     }
+    if (params.get("print") === "1") {
+      setPrintMode(true);
+    }
+  }, []);
+
+  // Status publish dipakai tombol Simpan PDF: kalau sudah live, cetak dari
+  // URL publik (?print=1), kalau belum, cetak dari preview ini.
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/portfolio/publish")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((body) => {
+        if (alive && body?.published && typeof body.slug === "string") {
+          setPublishedSlug(body.slug);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -249,6 +274,34 @@ export default function PortfolioPreviewPage() {
   const theme = THEMES[themeId] || THEMES[DEFAULT_THEME_ID];
   const name = [data.formData.heroFirstName, data.formData.heroLastName].filter(Boolean).join(" ") || "Nama Lengkap";
 
+  if (printMode) {
+    // Tampilan cetak: dokumen polos tanpa chrome builder. Pengguna menyelesaikan
+    // lewat dialog cetak browser (Ctrl+P → Simpan sebagai PDF).
+    return (
+      <div data-pf-print="true" className="min-h-screen" style={{ backgroundColor: theme.colors.bg }}>
+        <style media="print">{STATIC_REVEAL_FALLBACK_CSS}</style>
+        <PortfolioDocument
+          data={data}
+          themeId={themeId as ThemeId}
+          mode="static"
+          sectionOrder={data.sectionOrder}
+          sectionVisibility={data.sectionVisibility}
+          fontSize={data.fontSize}
+          sectionColors={null}
+        />
+        <button
+          type="button"
+          onClick={() => window.print()}
+          className="pf-chrome fixed bottom-6 right-6 z-50 inline-flex min-h-11 items-center gap-2 rounded-xl px-4 text-sm font-semibold"
+          style={{ backgroundColor: theme.colors.primary, color: "#fff", boxShadow: "0 4px 16px rgba(0,0,0,0.25)" }}
+        >
+          <span className="material-symbols-outlined text-lg" aria-hidden="true">print</span>
+          Cetak / Simpan PDF
+        </button>
+      </div>
+    );
+  }
+
   return (
     <AuthGuard>
       <div
@@ -286,6 +339,21 @@ export default function PortfolioPreviewPage() {
                     style={{ border: `1px solid ${theme.colors.border}`, color: theme.colors.text }}>
                     {t("preview.edit")}
                   </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const target = publishedSlug
+                        ? `/p/${publishedSlug}?print=1`
+                        : "/portfolio/preview?print=1";
+                      window.open(target, "_blank", "noopener");
+                    }}
+                    className="inline-flex min-h-11 items-center gap-1.5 px-3 rounded-xl text-xs font-semibold transition-all"
+                    style={{ border: `1px solid ${theme.colors.border}`, color: theme.colors.text }}
+                    title={t("preview.save-pdf")}
+                  >
+                    <span className="material-symbols-outlined text-base" aria-hidden="true">picture_as_pdf</span>
+                    Simpan PDF
+                  </button>
                   <button
                     onClick={() => setShowPublish(true)}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"

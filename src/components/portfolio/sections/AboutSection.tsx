@@ -17,7 +17,7 @@ function GlassAbout({ f }: { f: PortfolioFormData }) {
   return (
     <section className="relative overflow-hidden" style={{ padding: "96px 0" }}>
       {/* Decorative mesh dots */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      <div className="pf-atmosphere absolute inset-0 pointer-events-none overflow-hidden">
         <svg className="w-full h-full opacity-[0.03]" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="glass-dots" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">

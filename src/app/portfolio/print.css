@@ -1,0 +1,60 @@
+/*
+ * Gaya cetak portfolio (?print=1). Dimuat statis oleh /p/[slug] dan
+ * /portfolio/preview. Semua aturan di-scope ke [data-pf-print] supaya
+ * tidak memengaruhi halaman aplikasi lain; @page tidak bisa di-scope
+ * (aturan CSS) tapi hanya aktif dalam konteks cetak.
+ *
+ * Prinsip: atmosphere (grain, orb, partikel) adalah dekorasi layar dan
+ * tidak pernah menjadi bagian dari dokumen cetak.
+ */
+
+@page {
+  size: A4;
+  margin: 12mm;
+}
+
+@media print {
+  [data-pf-print] {
+    background: #ffffff !important;
+  }
+
+  /* Dekorasi layar + chrome builder tidak ikut tercetak. */
+  [data-pf-print] .pf-atmosphere,
+  [data-pf-print] .pf-chrome,
+  [data-pf-print] [data-pf-print-hidden="true"] {
+    display: none !important;
+  }
+
+  /* Paksa warna asli tercetak (Chrome/Safari butuh prefiks -webkit-). */
+  [data-pf-print],
+  [data-pf-print] * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Kartu: shadow/blur tidak tercetak dengan baik, dan kartu tidak boleh
+     terbelah antar halaman. Kartu-kartu section memakai borderRadius inline
+     (tidak ada kelas bersama), jadi ditarget lewat style attr. */
+  [data-pf-print] section [style*="border-radius"] {
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Judul tidak boleh yatim di akhir halaman. */
+  [data-pf-print] h1,
+  [data-pf-print] h2,
+  [data-pf-print] h3,
+  [data-pf-print] h4 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  /* Tautan tetap terbaca di kertas: URL dicantumkan. */
+  [data-pf-print] a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.75em;
+    word-break: break-all;
+  }
+}
