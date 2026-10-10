@@ -232,9 +232,11 @@ export const portfolioPages = pgTable("portfolio_pages", {
   theme: varchar("theme", { length: 50 }).notNull().default("glass"),
   status: varchar("status", { length: 16 }).notNull().default("draft"),
   data: jsonb("data").$type<Record<string, unknown>>().notNull(),
-  publishedAt: timestamp("published_at", { mode: "date" }).defaultNow(),
+  publishedAt: timestamp("published_at", { mode: "date" }),
   updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow(),
-});
+}, (table) => [
+  index("portfolio_pages_status_idx").on(table.status),
+]);
 
 /** Penanda pemakaian trial publish portfolio (1x gratis per akun, permanen).
  * Dipakai supaya unpublish → publish ulang tidak bisa mem-bypass trial.

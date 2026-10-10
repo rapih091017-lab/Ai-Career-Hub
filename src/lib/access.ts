@@ -21,6 +21,7 @@ export interface PackageDef {
   price: number;
   periodDays: number;
   monthly?: boolean;
+  maxActivePortfolios: number;
   limits: Record<Feature, number | "unlimited" | false>;
 }
 
@@ -31,47 +32,47 @@ export interface PackageDef {
 export const PACKAGES: Record<string, PackageDef> = {
   // ── SATUAN ──
   cv_starter: {
-    id: "cv_starter", name: "CV Starter", price: 7000, periodDays: 7,
+    id: "cv_starter", name: "CV Starter", price: 7000, periodDays: 7, maxActivePortfolios: 0,
     limits: { ai_cv_generate: false, cv_analyzer: false, ai_revision: false, ai_suggestion: false, cover_letter: false, portfolio_web: false, pdf_export: 1, bulk_analyzer: false, white_label: false },
   },
   cv_ai_generate: {
-    id: "cv_ai_generate", name: "CV + AI Generate", price: 12000, periodDays: 30,
+    id: "cv_ai_generate", name: "CV + AI Generate", price: 12000, periodDays: 30, maxActivePortfolios: 0,
     limits: { ai_cv_generate: "unlimited", cv_analyzer: false, ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: "unlimited", portfolio_web: false, pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
   },
   cv_analyzer: {
-    id: "cv_analyzer", name: "CV Analyzer", price: 9000, periodDays: 30,
+    id: "cv_analyzer", name: "CV Analyzer", price: 9000, periodDays: 30, maxActivePortfolios: 0,
     limits: { ai_cv_generate: false, cv_analyzer: 1, ai_revision: false, ai_suggestion: false, cover_letter: false, portfolio_web: false, pdf_export: false, bulk_analyzer: false, white_label: false },
   },
   portfolio_web: {
-    id: "portfolio_web", name: "Portfolio Web", price: 35000, periodDays: 30,
+    id: "portfolio_web", name: "Portfolio Web", price: 35000, periodDays: 30, maxActivePortfolios: 5,
     limits: { ai_cv_generate: false, cv_analyzer: false, ai_revision: false, ai_suggestion: false, cover_letter: false, portfolio_web: 1, pdf_export: false, bulk_analyzer: false, white_label: false },
   },
   bundle_hemat: {
-    id: "bundle_hemat", name: "Bundle Hemat", price: 49000, periodDays: 60,
+    id: "bundle_hemat", name: "Bundle Hemat", price: 49000, periodDays: 60, maxActivePortfolios: 5,
     limits: { ai_cv_generate: "unlimited", cv_analyzer: 1, ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: "unlimited", portfolio_web: 1, pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
   },
 
   // ── SINGLE CV (legacy) ──
   single_cv: {
-    id: "single_cv", name: "Single CV AI Revision", price: 25000, periodDays: 365,
+    id: "single_cv", name: "Single CV AI Revision", price: 25000, periodDays: 365, maxActivePortfolios: 0,
     limits: { ai_cv_generate: false, cv_analyzer: false, ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: "unlimited", portfolio_web: false, pdf_export: false, bulk_analyzer: false, white_label: false },
   },
 
   // ── LANGGANAN BULANAN ──
   premium_pass_30d: {
-    id: "premium_pass_30d", name: "Premium Pass 30 Hari", price: 119000, periodDays: 30, monthly: true,
+    id: "premium_pass_30d", name: "Premium Pass 30 Hari", price: 119000, periodDays: 30, monthly: true, maxActivePortfolios: 5,
     limits: { ai_cv_generate: "unlimited", cv_analyzer: "unlimited", ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: "unlimited", portfolio_web: "unlimited", pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
   },
   starter_monthly: {
-    id: "starter_monthly", name: "Starter", price: 15000, periodDays: 30, monthly: true,
+    id: "starter_monthly", name: "Starter", price: 15000, periodDays: 30, monthly: true, maxActivePortfolios: 0,
     limits: { ai_cv_generate: 5, cv_analyzer: false, ai_revision: false, ai_suggestion: false, cover_letter: false, portfolio_web: false, pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
   },
   pro_monthly: {
-    id: "pro_monthly", name: "Pro", price: 29000, periodDays: 30, monthly: true,
+    id: "pro_monthly", name: "Pro", price: 29000, periodDays: 30, monthly: true, maxActivePortfolios: 0,
     limits: { ai_cv_generate: "unlimited", cv_analyzer: "unlimited", ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: "unlimited", portfolio_web: 1, pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
   },
   business_monthly: {
-    id: "business_monthly", name: "Business", price: 79000, periodDays: 30, monthly: true,
+    id: "business_monthly", name: "Business", price: 79000, periodDays: 30, monthly: true, maxActivePortfolios: 5,
     limits: { ai_cv_generate: 20, cv_analyzer: "unlimited", ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: "unlimited", portfolio_web: 3, pdf_export: "unlimited", bulk_analyzer: "unlimited", white_label: "unlimited" },
   },
 };
@@ -100,6 +101,7 @@ function dbRowToPackageDef(row: DbPackageRow): PackageDef {
     price: row.price,
     periodDays: row.periodDays,
     monthly: row.monthly || undefined,
+    maxActivePortfolios: hardcoded?.maxActivePortfolios ?? 0,
     limits: row.limits || hardcoded?.limits || FREE_LIMITS,
   };
 }
@@ -177,6 +179,15 @@ export interface UserAccess {
   purchasedFeatures: Record<Feature, number | "unlimited" | false>;
   /** Active packages list */
   activePackages: string[];
+  /** Max active portfolios count */
+  maxActivePortfolios: number;
+  packageDef?: {
+    maxActivePortfolios: number;
+  };
+}
+
+export function maxActivePortfoliosFor(access: UserAccess): number {
+  return access.maxActivePortfolios ?? access.packageDef?.maxActivePortfolios ?? 1;
 }
 
 /**
@@ -204,11 +215,15 @@ export async function getUserAccess(userId: string): Promise<UserAccess> {
     Object.keys(FREE_LIMITS).map((k) => [k, false]),
   ) as Record<Feature, number | "unlimited" | false>;
   const allPackages = await getPackagesDb();
+  let maxActivePortfolios = 1;
 
   for (const payment of activePayments) {
     const pkg = allPackages[payment.packageType] || PACKAGES[payment.packageType];
     if (!pkg) continue;
     activePackageIds.add(pkg.id);
+    if (pkg.maxActivePortfolios > 0) {
+      maxActivePortfolios = Math.max(maxActivePortfolios, pkg.maxActivePortfolios);
+    }
 
     // Snapshot limits diambil saat order dibuat, definisi fitur terkunci apa
     // adanya saat user bayar. Fallback ke katalog saat ini untuk order lama
@@ -246,5 +261,13 @@ export async function getUserAccess(userId: string): Promise<UserAccess> {
     }
   }
 
-  return { tierName, limits: merged, purchasedFeatures: purchased, isPremium, activePackages };
+  return {
+    tierName,
+    limits: merged,
+    purchasedFeatures: purchased,
+    isPremium,
+    activePackages,
+    maxActivePortfolios,
+    packageDef: { maxActivePortfolios },
+  };
 }

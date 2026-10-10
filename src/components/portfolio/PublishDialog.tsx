@@ -16,9 +16,10 @@ export interface PublishDialogProps {
 }
 
 interface PortfolioPlan {
+  maxActive: number;
+  used: number;
+  remaining: number;
   entitled: boolean;
-  trialUsed: boolean;
-  trialAvailable: boolean;
   upgradeUrl: string;
 }
 
@@ -39,10 +40,13 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
 
   const [slug, setSlug] = useState("");
   const [publishedUrl, setPublishedUrl] = useState<string | null>(null);
+  const [status, setStatus] = useState<"published" | "draft" | "archived" | null>(null);
   const [plan, setPlan] = useState<PortfolioPlan | null>(null);
   const [updateMode, setUpdateMode] = useState(false);
   const [publishing, setPublishing] = useState(false);
-  const [unpublishing, setUnpublishing] = useState(false);
+  const [archiving, setArchiving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
@@ -54,18 +58,31 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
       if (res.ok) {
         const body = await res.json();
         setPlan(body.plan ?? null);
+        setStatus(body.status ?? null);
         if (body.published) {
           setPublishedUrl(body.url);
           setSlug(body.slug);
         } else {
           setPublishedUrl(null);
+          if (body.slug) setSlug(body.slug);
         }
       } else {
-        // Server error, asumsikan trial masih tersedia agar publish tidak terkunci
-        setPlan({ entitled: false, trialUsed: false, trialAvailable: true, upgradeUrl: "/settings/billing?plan=portfolio-web" });
+        setPlan({
+          maxActive: 1,
+          used: 0,
+          remaining: 1,
+          entitled: true,
+          upgradeUrl: "/settings/billing?plan=portfolio-web",
+        });
       }
     } catch {
-      setPlan({ entitled: false, trialUsed: false, trialAvailable: true, upgradeUrl: "/settings/billing?plan=portfolio-web" });
+      setPlan({
+        maxActive: 1,
+        used: 0,
+        remaining: 1,
+        entitled: true,
+        upgradeUrl: "/settings/billing?plan=portfolio-web",
+      });
     } finally {
       setChecked(true);
     }
@@ -79,7 +96,9 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
       setCopied(false);
       setChecked(false);
       setPlan(null);
+      setStatus(null);
       setUpdateMode(false);
+      setShowDeleteConfirm(false);
       setPublishedUrl(null);
       const name = [data?.formData?.heroFirstName, data?.formData?.heroLastName].filter(Boolean).join(" ") || "";
       setSlug(slugifyName(name) || "portofolio-saya");
@@ -108,14 +127,19 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
     }
     setPublishing(true);
     try {
+      const dataRecord = data ? (data as unknown as Record<string, unknown>) : null;
       const payload: Record<string, unknown> = {
         slug: s,
-        theme: themeId,
+        themeId,
         data: {
           ...data,
+          fontSize: dataRecord?.fontSize,
+          alignment: dataRecord?.alignment,
           sectionOrder: extras?.sectionOrder,
           sectionVisibility: extras?.sectionVisibility,
         },
+        fontSize: dataRecord?.fontSize,
+        alignment: dataRecord?.alignment,
       };
       const res = await fetch("/api/portfolio/publish", {
         method: "POST",
@@ -125,17 +149,21 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
       const body = await res.json();
       if (!res.ok) {
         setError(body.message || "Gagal publish");
-        // Kena gating paket → paksa tampilan upgrade
-        if (body.error === "PORTFOLIO_PACKAGE_REQUIRED" && body.upgradeUrl) {
-          setPlan({ entitled: false, trialUsed: true, trialAvailable: false, upgradeUrl: body.upgradeUrl });
-          setUpdateMode(false);
+        if ((body.error === "QUOTA_EXCEEDED" || body.error === "PORTFOLIO_PACKAGE_REQUIRED") && body.upgradeUrl) {
+          setPlan((prev) =>
+            prev
+              ? { ...prev, remaining: 0, upgradeUrl: body.upgradeUrl }
+              : { maxActive: 1, used: 1, remaining: 0, entitled: false, upgradeUrl: body.upgradeUrl }
+          );
         }
         return;
       }
       setPublishedUrl(body.url);
       setSlug(body.slug);
+      setStatus("published");
       setUpdateMode(false);
       addToast({ type: "success", message: t("publish.success") });
+      refresh();
     } catch {
       setError(t("publish.error-network"));
     } finally {
@@ -143,19 +171,40 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
     }
   };
 
-  const handleUnpublish = async () => {
-    setUnpublishing(true);
+  const handleArchive = async () => {
+    setArchiving(true);
     setError(null);
     try {
-      const res = await fetch("/api/portfolio/publish", { method: "DELETE" });
-      if (!res.ok) throw new Error("unpublish failed");
+      const res = await fetch("/api/portfolio/publish", { method: "PATCH" });
+      if (!res.ok) throw new Error("archive failed");
       setPublishedUrl(null);
+      setStatus("archived");
       setUpdateMode(false);
-      addToast({ type: "info", message: t("publish.unpublished") });
+      addToast({ type: "info", message: "Portfolio ditutup (diarsipkan). Slug Anda tetap tersimpan." });
+      refresh();
     } catch {
       setError(t("publish.error-network"));
     } finally {
-      setUnpublishing(false);
+      setArchiving(false);
+    }
+  };
+
+  const handleDeletePermanent = async () => {
+    setDeleting(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/portfolio/publish", { method: "DELETE" });
+      if (!res.ok) throw new Error("delete failed");
+      setPublishedUrl(null);
+      setStatus(null);
+      setUpdateMode(false);
+      setShowDeleteConfirm(false);
+      addToast({ type: "info", message: "Portfolio dihapus permanen dan slug dilepas." });
+      refresh();
+    } catch {
+      setError(t("publish.error-network"));
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -177,17 +226,9 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
 
   if (!open) return null;
 
-  const canUpdate = plan?.entitled === true;
-  const trialCanPublish = !publishedUrl && plan?.trialAvailable === true;
-  const entitledCanPublish = plan?.entitled === true;
-  // Form muncul saat: (a) publish pertama tersedia, atau (b) user berbayar
-  // sedang memperbarui konten/ganti link.
-  const showForm =
-    !publishedUrl
-      ? entitledCanPublish || trialCanPublish
-      : updateMode && canUpdate;
-  // User bebas (bukan premium/paid) yang sudah publish, butuh upgrade utk update.
-  const showUpgradeGate = !plan?.entitled && plan?.trialUsed === true;
+  const quotaKnown = checked && plan !== null;
+  const isPublished = status === "published" && !!publishedUrl;
+  const isQuotaExceeded = quotaKnown && plan.remaining <= 0 && !isPublished;
 
   return (
     <div
@@ -220,8 +261,8 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
           </button>
         </div>
 
-        {/* ── SUDAH LIVE: kelola link / update konten ── */}
-        {publishedUrl && (
+        {/* ── SUDAH LIVE ── */}
+        {isPublished && !showDeleteConfirm && (
           <div className="space-y-4">
             <div className="p-4 rounded-xl bg-green-50 border border-green-200">
               <p className="text-sm font-semibold text-green-700 flex items-center gap-1.5 mb-1">
@@ -253,72 +294,51 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
               </button>
             </div>
 
-            {/* User berbayar bisa update konten / ganti link */}
-            {canUpdate && (
-              <button
-                onClick={() => { setUpdateMode((prev) => !prev); setError(null); if (!updateMode) setTimeout(() => slugInputRef.current?.focus(), 50); }}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary-fixed text-primary font-label-bold hover:brightness-95 active:scale-95 transition-all"
-              >
-                <span className="material-symbols-outlined text-lg">{updateMode ? "close" : "edit"}</span>
-                {updateMode ? t("publish.cancel-update") : t("publish.update-content")}
-              </button>
-            )}
-
-            {/* User free yang trial-nya sudah terpakai → upgrade */}
-            {showUpgradeGate && !updateMode && (
-              <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 space-y-3">
-                <div className="flex items-start gap-2">
-                  <span className="material-symbols-outlined text-amber-600 text-lg shrink-0">lock</span>
-                  <div>
-                    <p className="text-sm font-bold text-amber-800">{t("publish.upgrade-title")}</p>
-                    <p className="text-xs text-amber-700 mt-0.5 leading-relaxed">{t("publish.upgrade-desc")}</p>
-                  </div>
-                </div>
-                <button
-                  onClick={goUpgrade}
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-on-primary font-label-bold hover:opacity-90 active:scale-95 transition-all"
-                >
-                  <span className="material-symbols-outlined text-lg">workspace_premium</span>
-                  {t("publish.upgrade-btn")}
-                  <span className="text-xs opacity-80">{t("publish.upgrade-price")}</span>
-                </button>
-              </div>
-            )}
-
             <button
-              onClick={handleUnpublish}
-              disabled={unpublishing}
-              className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-error/30 text-error font-label-bold hover:bg-error-container/20 active:scale-95 transition-all disabled:opacity-50"
+              onClick={() => { setUpdateMode((prev) => !prev); setError(null); if (!updateMode) setTimeout(() => slugInputRef.current?.focus(), 50); }}
+              className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary-fixed text-primary font-label-bold hover:brightness-95 active:scale-95 transition-all"
             >
-              {unpublishing ? (
-                <span className="material-symbols-outlined text-lg animate-spin">sync</span>
-              ) : (
-                <span className="material-symbols-outlined text-lg">visibility_off</span>
-              )}
-              {t("publish.unpublish")}
+              <span className="material-symbols-outlined text-lg">{updateMode ? "close" : "edit"}</span>
+              {updateMode ? t("publish.cancel-update") : t("publish.update-content")}
             </button>
+
+            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-outline-variant">
+              <button
+                onClick={handleArchive}
+                disabled={archiving}
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-outline-variant text-on-surface-variant font-label-bold text-xs hover:bg-surface-container-low active:scale-95 transition-all disabled:opacity-50"
+              >
+                {archiving ? (
+                  <span className="material-symbols-outlined text-sm animate-spin">sync</span>
+                ) : (
+                  <span className="material-symbols-outlined text-sm">archive</span>
+                )}
+                Tutup (Arsip)
+              </button>
+
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-error/30 text-error font-label-bold text-xs hover:bg-error-container/20 active:scale-95 transition-all"
+              >
+                <span className="material-symbols-outlined text-sm">delete_forever</span>
+                Hapus Permanen
+              </button>
+            </div>
           </div>
         )}
 
-        {/* ── Upgrade gate (free, trial habis, belum live) ── */}
-        {!publishedUrl && showUpgradeGate && (
+        {/* ── KONFIRMASI HAPUS PERMANEN ── */}
+        {showDeleteConfirm && (
           <div className="space-y-4">
-            <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 space-y-3">
-              <div className="flex items-start gap-2">
-                <span className="material-symbols-outlined text-amber-600 text-2xl shrink-0">lock</span>
-                <div>
-                  <p className="font-label-bold text-amber-800">{t("publish.upgrade-title")}</p>
-                  <p className="text-xs text-amber-700 mt-0.5 leading-relaxed">{t("publish.upgrade-desc-empty")}</p>
-                </div>
+            <div className="rounded-xl border border-error/30 bg-error-container/10 p-4 space-y-2">
+              <div className="flex items-center gap-2 text-error font-label-bold text-sm">
+                <span className="material-symbols-outlined text-lg">warning</span>
+                Konfirmasi Hapus Permanen
               </div>
-              <button
-                onClick={goUpgrade}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary text-on-primary font-label-bold hover:opacity-90 active:scale-95 transition-all"
-              >
-                <span className="material-symbols-outlined text-lg">workspace_premium</span>
-                {t("publish.upgrade-btn")}
-                <span className="text-xs opacity-80">{t("publish.upgrade-price")}</span>
-              </button>
+              <p className="text-xs text-on-surface-variant leading-relaxed">
+                Tindakan ini akan menghapus portfolio ini secara permanen dan melepas slug{" "}
+                <span className="font-mono text-on-surface font-semibold">{slug}</span>. Slug akan tersedia untuk pengguna lain.
+              </p>
             </div>
 
             {error && (
@@ -327,18 +347,72 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
                 {error}
               </p>
             )}
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={deleting}
+                className="flex-1 py-2.5 rounded-xl border border-outline-variant text-on-surface font-label-bold hover:bg-surface-container transition-all text-sm"
+              >
+                Batal
+              </button>
+
+              <button
+                onClick={handleDeletePermanent}
+                disabled={deleting}
+                className="flex-1 py-2.5 rounded-xl bg-error text-on-error font-label-bold hover:opacity-90 active:scale-95 transition-all text-sm inline-flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {deleting ? (
+                  <span className="material-symbols-outlined text-sm animate-spin">sync</span>
+                ) : (
+                  "Ya, Hapus Permanen"
+                )}
+              </button>
+            </div>
           </div>
         )}
 
-        {/* ── Form slug (publish pertama / update oleh user berbayar) ── */}
-        {showForm && (
+        {/* ── UNARCHIVED / BELUM PUBLISH & QUOTA EXCEEDED ── */}
+        {!isPublished && isQuotaExceeded && !showDeleteConfirm && (
           <div className="space-y-4">
-            {publishedUrl && updateMode && (
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 space-y-3">
+              <div className="flex items-start gap-2">
+                <span className="material-symbols-outlined text-amber-600 text-2xl shrink-0">lock</span>
+                <div>
+                  <p className="font-label-bold text-amber-800">Batas Portfolio Tercapai</p>
+                  <p className="text-xs text-amber-700 mt-0.5 leading-relaxed">
+                    Kamu sudah punya {plan?.used} portfolio aktif dari batas {plan?.maxActive} di paket gratis. Tutup salah satu atau aktifkan paket Portfolio Web untuk menambah slot.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={goUpgrade}
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary text-on-primary font-label-bold hover:opacity-90 active:scale-95 transition-all"
+              >
+                <span className="material-symbols-outlined text-lg">workspace_premium</span>
+                Aktifkan Paket Portfolio Web
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ── FORM SLUG (BELUM LIVE ATAU SEDANG UPDATE) ── */}
+        {(!isPublished || updateMode) && !isQuotaExceeded && !showDeleteConfirm && (
+          <div className="space-y-4">
+            {isPublished && updateMode && (
               <p className="text-xs font-semibold text-primary bg-primary/5 border border-primary/20 rounded-lg px-3 py-2 flex items-center gap-1.5">
                 <span className="material-symbols-outlined text-sm">edit</span>
-                {t("publish.updating-note")}
+                Memperbarui konten portfolio live
               </p>
             )}
+
+            {status === "archived" && (
+              <p className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-sm">archive</span>
+                Portfolio ini saat ini diarsipkan. Terbitkan kembali untuk mengaktifkan URL.
+              </p>
+            )}
+
             <div>
               <label className="text-label-sm text-on-surface-variant block mb-1.5">{t("publish.slug-label")}</label>
               <div className="flex items-center gap-2 bg-surface-container-low rounded-xl px-4 py-2.5 border border-outline-variant focus-within:border-primary transition-colors">
@@ -364,7 +438,7 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
 
             <button
               onClick={handlePublish}
-              disabled={publishing || !checked}
+              disabled={publishing || !quotaKnown}
               className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary text-on-primary font-label-bold hover:opacity-90 active:scale-95 transition-all disabled:opacity-50"
             >
               {publishing ? (
@@ -372,29 +446,18 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
                   <span className="material-symbols-outlined text-lg animate-spin">sync</span>
                   {t("publish.publishing")}
                 </>
+              ) : !quotaKnown ? (
+                <>
+                  <span className="material-symbols-outlined text-lg animate-spin">sync</span>
+                  Memeriksa ketersediaan...
+                </>
               ) : (
                 <>
                   <span className="material-symbols-outlined text-lg">rocket_launch</span>
-                  {publishedUrl && updateMode ? t("publish.btn-update") : t("publish.btn")}
+                  {isPublished && updateMode ? "Perbarui Portfolio" : "Terbitkan Portfolio"}
                 </>
               )}
             </button>
-
-            <p className="text-[11px] text-on-surface-variant text-center leading-relaxed">
-              {publishedUrl && updateMode
-                ? t("publish.update-note")
-                : trialCanPublish
-                  ? t("publish.trial-note")
-                  : t("publish.paid-note")}
-            </p>
-          </div>
-        )}
-
-        {/* ── Loading status saat dialog baru dibuka ── */}
-        {!publishedUrl && !showUpgradeGate && !showForm && (
-          <div className="py-6 flex flex-col items-center gap-3 text-on-surface-variant">
-            <span className="material-symbols-outlined text-2xl animate-spin">sync</span>
-            <p className="text-sm">Memeriksa status publish...</p>
           </div>
         )}
       </div>
