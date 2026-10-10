@@ -52,9 +52,9 @@ export const projectItemSchema = z.object({
   description: text(MAX.line),
   techStack: text(MAX.line),
   link: urlField(MAX.url),
-  imageUrl: z.string().max(MAX.url).default(""),
-  liveUrl: z.string().max(MAX.url).default(""),
-  repoUrl: z.string().max(MAX.url).default(""),
+  imageUrl: urlField(MAX.url).default(""),
+  liveUrl: urlField(MAX.url).default(""),
+  repoUrl: urlField(MAX.url).default(""),
   role: z.string().max(MAX.short).default(""),
   featured: z.boolean().default(false),
 });
@@ -69,6 +69,7 @@ export const experienceItemSchema = z
     description: text(MAX.paragraph),
     isPresent: z.boolean().default(false),
     imageUrl: z.string().max(MAX.url).default(""),
+    companyLogo: urlField(MAX.url).default(""),
   })
   .refine(
     (v) => v.startDate === "" || v.endDate === "" || v.isPresent || v.endDate >= v.startDate,
@@ -95,7 +96,7 @@ export const certificationItemSchema = z.object({
   name: text(MAX.name),
   issuer: text(MAX.name),
   year: text(MAX.short),
-  url: z.string().max(MAX.url).default(""),
+  url: urlField(MAX.url).default(""),
 });
 
 export const organizationItemSchema = z.object({
@@ -126,7 +127,7 @@ export const extraLinkSchema = z.object({
 });
 
 export const portfolioFormDataSchema = z.object({
-  heroPhotoUrl: z.string().max(MAX.url).default(""),
+  heroPhotoUrl: urlField(MAX.url).default(""),
   heroHeadline: text(MAX.name),
   heroSubHeadline: text(MAX.line),
   heroFirstName: text(MAX.name),

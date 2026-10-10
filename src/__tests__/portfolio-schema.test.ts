@@ -92,6 +92,89 @@ describe("portfolioDataSchema", () => {
     expect(portfolioDataSchema.safeParse(bad).success).toBe(false);
   });
 
+  it("menolak skema terlarang pada URL aset dan tautan project", () => {
+    const asset = "javascript:alert(1)";
+    expect(
+      portfolioDataSchema.safeParse({
+        ...emptyData,
+        formData: { ...validFormData, heroPhotoUrl: asset },
+      }).success,
+    ).toBe(false);
+
+    for (const key of ["imageUrl", "liveUrl", "repoUrl"]) {
+      const project = {
+        id: "p1",
+        name: "N",
+        description: "D",
+        techStack: "React",
+        link: "",
+        imageUrl: "",
+        liveUrl: "",
+        repoUrl: "",
+        [key]: asset,
+      };
+      expect(portfolioDataSchema.safeParse({ ...emptyData, projects: [project] }).success).toBe(false);
+    }
+  });
+
+  it("menolak skema terlarang pada certifications[].url", () => {
+    const bad = {
+      ...emptyData,
+      certifications: [{ id: "c1", name: "AWS", issuer: "Amazon", year: "2025", url: "javascript:alert(1)" }],
+    };
+    expect(portfolioDataSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it("menerima path aset lokal pada heroPhotoUrl dan projects[].imageUrl", () => {
+    const assetPath = "/api/portfolio/assets/6f1c2d3e-4a5b-4c7d-8e9f-0a1b2c3d4e5f";
+    const r = portfolioDataSchema.parse({
+      ...emptyData,
+      formData: { ...validFormData, heroPhotoUrl: assetPath },
+      projects: [
+        { id: "p1", name: "N", description: "D", techStack: "React", link: "", imageUrl: assetPath },
+      ],
+    });
+    expect(r.formData.heroPhotoUrl).toBe(assetPath);
+    expect(r.projects[0].imageUrl).toBe(assetPath);
+  });
+
+  it("mempertahankan companyLogo pada experiences", () => {
+    const logo = "/api/portfolio/assets/9a8b7c6d-5e4f-4a3b-9c2d-1e2f3a4b5c6d";
+    const r = portfolioDataSchema.parse({
+      ...emptyData,
+      experiences: [
+        {
+          id: "e1",
+          company: "Acme",
+          position: "Dev",
+          startDate: "2024-01",
+          endDate: "",
+          description: "",
+          companyLogo: logo,
+        },
+      ],
+    });
+    expect(r.experiences[0].companyLogo).toBe(logo);
+  });
+
+  it("menolak skema terlarang pada experiences[].companyLogo", () => {
+    const bad = {
+      ...emptyData,
+      experiences: [
+        {
+          id: "e1",
+          company: "Acme",
+          position: "Dev",
+          startDate: "2024-01",
+          endDate: "",
+          description: "",
+          companyLogo: "javascript:alert(1)",
+        },
+      ],
+    };
+    expect(portfolioDataSchema.safeParse(bad).success).toBe(false);
+  });
+
   it("menerapkan default pada field opsional", () => {
     const r = portfolioDataSchema.parse({
       ...emptyData,
