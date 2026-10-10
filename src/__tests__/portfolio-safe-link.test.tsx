@@ -37,7 +37,7 @@ describe("SafeLink", () => {
   it("memperingatkan editor saat tautan ditolak", () => {
     render(<SafeLink href="data:text/html,x" mode="editor">Fail</SafeLink>);
     expect(screen.queryByRole("link")).toBeNull();
-    expect(screen.getByText(/tautan ditolak/i)).toBeInTheDocument();
+    expect(screen.getByText(/ditolak: skema tidak diizinkan/i)).toBeInTheDocument();
   });
 
   it("membuka tautan eksternal di tab baru dengan rel aman", () => {
@@ -159,7 +159,7 @@ describe("SafeLink", () => {
     const { container } = render(
       <SafeLink href="vbscript:msgbox(1)" mode="editor">VBS</SafeLink>,
     );
-    const badge = screen.getByText(/tautan ditolak/i);
+    const badge = screen.getByText(/ditolak: skema tidak diizinkan/i);
     expect(badge.className).toContain("bg-error-container");
     expect(badge.className).toContain("text-on-error-container");
     expect(container.innerHTML).not.toMatch(/rounded|red-\d|#[0-9a-f]{3,6}/i);
@@ -167,8 +167,8 @@ describe("SafeLink", () => {
 
   it("memakai tanda baca yang benar pada badge penolakan", () => {
     render(<SafeLink href="vbscript:x" mode="editor">VBS</SafeLink>);
-    const badge = screen.getByText(/tautan ditolak/i);
-    expect(badge.textContent).toContain("\u2014");
+    const badge = screen.getByText(/ditolak: skema tidak diizinkan/i);
+    expect(badge.textContent).toContain(":");
     expect(badge.textContent).not.toMatch(/\s-\s/);
   });
 
@@ -187,6 +187,21 @@ describe("SafeLink", () => {
     expect(span.className).toContain("text-primary");
     expect(span.className).toContain("underline");
     expect(span.className).not.toMatch(/cursor-pointer|hover:/);
+  });
+
+  it("melepas affordance interaktif yang berprefiks variant", () => {
+    render(
+      <SafeLink
+        href="javascript:alert(1)"
+        mode="static"
+        className="md:hover:underline dark:hover:underline group-hover:underline focus:underline font-semibold"
+      >
+        mati
+      </SafeLink>,
+    );
+    const span = screen.getByText("mati");
+    expect(span.className).toContain("font-semibold");
+    expect(span.className).not.toMatch(/hover:|focus:/);
   });
 
   it("tetap menempelkan class interaktif pada tautan yang diterima", () => {
@@ -252,9 +267,20 @@ describe("SafeImg", () => {
     );
   });
 
-  it("memakai nama aksesibel yang tidak kosong saat alt kosong", () => {
+  it("memakai nama aksesibel yang tepat tanpa pemisah tambahan saat alt kosong", () => {
     render(<SafeImg src="javascript:alert(1)" mode="static" alt="" width={10} height={10} />);
-    expect(screen.getByRole("img").getAttribute("aria-label")).toBeTruthy();
+    expect(screen.getByRole("img")).toHaveAccessibleName(
+      "gambar tidak dapat ditampilkan",
+    );
+  });
+
+  it("menyertakan alasan penolakan pada nama aksesibel di mode editor", () => {
+    render(
+      <SafeImg src="vbscript:x" mode="editor" alt="Foto Skripsi" width={100} height={100} />,
+    );
+    expect(screen.getByRole("img")).toHaveAccessibleName(
+      /foto skripsi[\s\S]*gambar tidak dapat ditampilkan[\s\S]*skema tidak diizinkan/i,
+    );
   });
 
   it("menerima data URI gambar raster untuk export mandiri", () => {
@@ -264,7 +290,7 @@ describe("SafeImg", () => {
   });
 
   it("menerima data URI base64 dengan padding dan karakter base64 penuh", () => {
-    const src = `data:image/png;base64,${"A+/9".repeat(8)}=`;
+    const src = `data:image/png;base64,iVBORw0KGgoAAA${"+/9".repeat(8)}=`;
     render(<SafeImg src={src} mode="static" alt="Alfabet" />);
     expect(screen.getByAltText("Alfabet")).toHaveAttribute("src", src);
   });
@@ -283,8 +309,27 @@ describe("SafeImg", () => {
     expect(screen.getByText(/gambar tidak dapat ditampilkan/i)).toBeInTheDocument();
   });
 
-  it("menerima raster base64 dengan payload yang sama bentuknya, jadi aturan SVG yang diuji", () => {
+  it("menolak svg yang dilabeli png: magic number tidak cocok dengan tipe yang diklaim", () => {
     const src = "data:image/png;base64,PHN2ZyBvbmxvYWQ9J2FsZXJ0KDEpJz48L3N2Zz4=";
+    render(<SafeImg src={src} mode="static" alt="Mislabel" />);
+    expect(screen.queryByAltText("Mislabel")).toBeNull();
+    expect(screen.getByText(/gambar tidak dapat ditampilkan/i)).toBeInTheDocument();
+  });
+
+  it("menolak raster asli yang dilabeli format lain", () => {
+    const src = "data:image/png;base64,R0lGODlhAQABAIAAAA==";
+    render(<SafeImg src={src} mode="static" alt="Tukar label" />);
+    expect(screen.queryByAltText("Tukar label")).toBeNull();
+    expect(screen.getByText(/gambar tidak dapat ditampilkan/i)).toBeInTheDocument();
+  });
+
+  it.each([
+    ["png", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg=="],
+    ["jpeg", "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAA="],
+    ["jpg", "data:image/jpg;base64,/9j/4AAQSkZJRgABAQAAAQABAAA="],
+    ["gif", "data:image/gif;base64,R0lGODlhAQABAIAAAA=="],
+    ["webp", "data:image/webp;base64,UklGRiQAAABXRUJQVlA4IA=="],
+  ])("menerima data URI %s yang magic number-nya cocok", (_label, src) => {
     render(<SafeImg src={src} mode="static" alt="Raster" />);
     expect(screen.getByAltText("Raster")).toHaveAttribute("src", src);
   });
@@ -322,7 +367,8 @@ describe("SafeImg", () => {
 
   it("menerima data URI tepat di batas ukuran", () => {
     const prefix = "data:image/png;base64,";
-    const body = "A".repeat(MAX_DATA_IMAGE_LENGTH - prefix.length);
+    const signature = "iVBORw0KGgo";
+    const body = signature + "A".repeat(MAX_DATA_IMAGE_LENGTH - prefix.length - signature.length);
     const src = prefix + body;
     expect(src).toHaveLength(MAX_DATA_IMAGE_LENGTH);
     render(<SafeImg src={src} mode="static" alt="Tepat batas" />);
