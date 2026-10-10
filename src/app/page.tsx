@@ -26,6 +26,8 @@ import {
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/lib/i18n";
 import { INTERVIEW_POSITION_COUNT, INTERVIEW_QUESTION_COUNT } from "@/lib/interview-stats";
+import NavDropdown from "@/components/NavDropdown";
+import NavMobileDropdown from "@/components/NavMobileDropdown";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -81,12 +83,23 @@ export default function Home() {
             </div>
             <span className="font-headline-md text-[18px] font-bold text-primary tracking-tight cursor-pointer">AI Career Hub</span>
           </Link>
-          <div className="hidden md:flex items-center gap-8">
-            <a className="text-on-surface-variant hover:text-primary font-label-bold transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2" href="#features">{t("nav.features")}</a>
-            <a className="text-on-surface-variant hover:text-primary font-label-bold transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2" href="#pricing">{t("nav.pricing")}</a>
-            <a className="text-on-surface-variant hover:text-primary font-label-bold transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2" href="#how-it-works">{t("nav.how-it-works")}</a>
-            <a className="text-on-surface-variant hover:text-primary font-label-bold transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2" href="/dashboard">{t("nav.dashboard")}</a>
-            <a className="text-on-surface-variant hover:text-primary font-label-bold transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2" href="/karir">{t("nav.karir")}</a>
+          <div className="hidden md:flex items-center gap-2">
+            <NavDropdown label={t("nav.features")} items={[
+              { title: t("nav.dropdown.builder.title"), description: t("nav.dropdown.builder.desc"), icon: "edit_note", href: "/builder/new" },
+              { title: t("nav.dropdown.checker.title"), description: t("nav.dropdown.checker.desc"), icon: "fact_check", href: "/checker" },
+              { title: t("nav.dropdown.portfolio.title"), description: t("nav.dropdown.portfolio.desc"), icon: "grid_view", href: "/portfolio" },
+              { title: t("nav.dropdown.cover-letter.title"), description: t("nav.dropdown.cover-letter.desc"), icon: "mail", href: "/surat-lamaran" },
+            ]} />
+            <a className="flex min-h-11 items-center rounded-lg px-3 text-label-bold text-on-surface-variant hover:bg-surface-container hover:text-primary focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2" href="#pricing">{t("nav.pricing")}</a>
+            <NavDropdown label={t("nav.resources")} items={[
+              { title: t("nav.dropdown.hub.title"), description: t("nav.dropdown.hub.desc"), icon: "auto_stories", href: "/career-hub" },
+              { title: t("nav.dropdown.career-path.title"), description: t("nav.dropdown.career-path.desc"), icon: "route", href: "/career-path" },
+              { title: t("nav.dropdown.jobs.title"), description: t("nav.dropdown.jobs.desc"), icon: "work", href: "/karir" },
+              { title: t("nav.dropdown.cv-examples.title"), description: t("nav.dropdown.cv-examples.desc"), icon: "description", href: lang === "en" ? "/cv-examples" : "/contoh-cv" },
+              { title: t("nav.dropdown.interview.title"), description: t("nav.dropdown.interview.desc"), icon: "record_voice_over", href: "/interview/practice" },
+              { title: t("nav.dropdown.job-tracker.title"), description: t("nav.dropdown.job-tracker.desc"), icon: "view_kanban", href: "/tracker" },
+            ]} />
+            <Link className="flex min-h-11 items-center rounded-lg px-3 text-label-bold text-on-surface-variant hover:bg-surface-container hover:text-primary focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2" href="/dashboard">{t("nav.dashboard")}</Link>
           </div>
           <div className="flex items-center gap-3">
             <button onClick={toggleLang}
@@ -140,11 +153,22 @@ export default function Home() {
               className="md:hidden overflow-hidden bg-surface-container-lowest/95 backdrop-blur-lg border-t border-outline-variant/10"
             >
               <div className="px-margin-mobile py-4 flex flex-col gap-2">
-                <a onClick={() => setMobileMenuOpen(false)} className="w-full px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all text-left" href="#features">{t("nav.features")}</a>
-                <a onClick={() => setMobileMenuOpen(false)} className="w-full px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all text-left" href="#pricing">{t("nav.pricing")}</a>
-                <a onClick={() => setMobileMenuOpen(false)} className="w-full px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all text-left" href="#how-it-works">{t("nav.how-it-works")}</a>
-                <a onClick={() => setMobileMenuOpen(false)} className="w-full px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all text-left" href="/dashboard">{t("nav.dashboard")}</a>
-                <a onClick={() => setMobileMenuOpen(false)} className="w-full px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all text-left" href="/karir">{t("nav.karir")}</a>
+                <NavMobileDropdown label={t("nav.features")} onItemClick={() => setMobileMenuOpen(false)} items={[
+                  { title: t("nav.dropdown.builder.title"), description: t("nav.dropdown.builder.desc"), icon: "edit_note", href: "/builder/new" },
+                  { title: t("nav.dropdown.checker.title"), description: t("nav.dropdown.checker.desc"), icon: "fact_check", href: "/checker" },
+                  { title: t("nav.dropdown.portfolio.title"), description: t("nav.dropdown.portfolio.desc"), icon: "grid_view", href: "/portfolio" },
+                  { title: t("nav.dropdown.cover-letter.title"), description: t("nav.dropdown.cover-letter.desc"), icon: "mail", href: "/surat-lamaran" },
+                ]} />
+              <a onClick={() => setMobileMenuOpen(false)} className="w-full min-h-12 px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all text-left" href="#pricing">{t("nav.pricing")}</a>
+                <NavMobileDropdown label={t("nav.resources")} onItemClick={() => setMobileMenuOpen(false)} items={[
+                  { title: t("nav.dropdown.hub.title"), description: t("nav.dropdown.hub.desc"), icon: "auto_stories", href: "/career-hub" },
+                  { title: t("nav.dropdown.career-path.title"), description: t("nav.dropdown.career-path.desc"), icon: "route", href: "/career-path" },
+                  { title: t("nav.dropdown.jobs.title"), description: t("nav.dropdown.jobs.desc"), icon: "work", href: "/karir" },
+                  { title: t("nav.dropdown.cv-examples.title"), description: t("nav.dropdown.cv-examples.desc"), icon: "description", href: lang === "en" ? "/cv-examples" : "/contoh-cv" },
+                  { title: t("nav.dropdown.interview.title"), description: t("nav.dropdown.interview.desc"), icon: "record_voice_over", href: "/interview/practice" },
+                  { title: t("nav.dropdown.job-tracker.title"), description: t("nav.dropdown.job-tracker.desc"), icon: "view_kanban", href: "/tracker" },
+                ]} />
+                <Link onClick={() => setMobileMenuOpen(false)} className="block w-full min-h-12 px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all" href="/dashboard">{t("nav.dashboard")}</Link>
                 <hr className="border-outline-variant/20 my-2" />
                 {!mounted ? null : session ? (
                   <Link onClick={() => setMobileMenuOpen(false)} href="/profile" className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all">
@@ -664,13 +688,13 @@ export default function Home() {
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
               {t("before-after.badge")}
             </span>
-            <h2 className="font-headline-lg text-on-background mb-4">{t("before-after.title")}</h2>
+             <h2 className="font-headline-lg text-on-background mb-4">{t("before-after.title")}</h2>
             <p className="font-body-md text-on-surface-variant max-w-2xl mx-auto">{t("before-after.subtitle")}</p>
           </motion.div>
 
           <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}
             className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-stretch">
-            {/* BEFORE */}
+             {/* BEFORE: illustrative simulation, not a customer result */}
             <motion.div variants={staggerItemUp} className="[perspective:800px]">
               <TiltCard tiltOptions={{ maxAngle: 3, scale: 1.005, glare: false }}>
                 <div className="group relative rounded-2xl border-2 border-red-200 bg-surface-container-lowest overflow-hidden shadow-premium-sm hover:shadow-premium-md transition-all duration-300">
@@ -683,7 +707,7 @@ export default function Home() {
                         </div>
                         <div>
                           <span className="text-sm font-bold text-red-500">{t("before-after.before-label")}</span>
-                          <p className="text-[11px] text-red-300 font-medium">{t("before-after.score-before")}<span className="text-red-500 font-bold">45%</span></p>
+                          <p className="text-[11px] text-red-300 font-medium">{t("before-after.example")}</p>
                         </div>
                       </div>
                       <span className="px-3 py-1 bg-red-50 text-red-500 rounded-full text-[10px] font-bold">{t("before-after.fail-label")}</span>
@@ -725,7 +749,7 @@ export default function Home() {
               </TiltCard>
             </motion.div>
 
-            {/* AFTER */}
+             {/* AFTER: illustrative simulation, not a customer result */}
             <motion.div variants={staggerItemUp} className="[perspective:800px]">
               <TiltCard tiltOptions={{ maxAngle: 3, scale: 1.005, glare: false }}>
                 <div className="group relative rounded-2xl border-2 border-green-200 bg-surface-container-lowest overflow-hidden shadow-premium-sm hover:shadow-premium-md transition-all duration-300 hover:-translate-y-0.5">
@@ -738,7 +762,7 @@ export default function Home() {
                         </div>
                         <div>
                           <span className="text-sm font-bold text-primary">{t("before-after.after-label")}</span>
-                          <p className="text-[11px] text-primary/50 font-medium">{t("before-after.score-after")}<span className="text-primary font-bold">92%</span></p>
+                           <p className="text-[11px] text-primary/50 font-medium">{t("before-after.example")}</p>
                         </div>
                       </div>
                       <span className="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-bold">{t("before-after.pass-label")}</span>
@@ -815,6 +839,32 @@ export default function Home() {
             </div>
           </motion.div>
         </div>
+      </section>
+
+      {/* ── Job-seeker journey ── */}
+      <section id="journey" className="relative overflow-hidden bg-surface-container-low px-margin-mobile py-20 md:px-gutter md:py-28">
+        <div className="mx-auto max-w-7xl">
+          <motion.div className="mb-12 max-w-2xl" variants={slideUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}>
+            <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary/5 px-4 py-1.5 text-xs font-bold tracking-wider text-primary"><span className="material-symbols-outlined text-[14px]">route</span>{t("journey.badge")}</span>
+            <h2 className="font-headline-lg text-on-background">{t("journey.title")}</h2>
+            <p className="mt-3 text-body-lg text-on-surface-variant">{t("journey.subtitle")}</p>
+          </motion.div>
+          <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              { icon: "edit_note", title: t("journey.step1.title"), text: t("journey.step1.desc"), href: "/builder/new" },
+              { icon: "fact_check", title: t("journey.step2.title"), text: t("journey.step2.desc"), href: "/checker" },
+              { icon: "mail", title: t("journey.step3.title"), text: t("journey.step3.desc"), href: "/surat-lamaran" },
+              { icon: "event_available", title: t("journey.step4.title"), text: t("journey.step4.desc"), href: "/tracker" },
+            ].map((step, index) => <motion.div key={step.title} variants={staggerItemUp}><Link href={step.href} className="group block h-full rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-premium-md transition-all hover:-translate-y-1 hover:shadow-premium-lg"><div className="mb-5 flex items-center justify-between"><span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary"><span className="material-symbols-outlined">{step.icon}</span></span><span className="text-label-sm text-on-surface-variant">0{index + 1}</span></div><h3 className="font-label-bold text-on-surface group-hover:text-primary">{step.title}</h3><p className="mt-2 text-body-md leading-relaxed text-on-surface-variant">{step.text}</p></Link></motion.div>)}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── Objection answers ── */}
+      <section className="relative bg-surface-container-lowest px-margin-mobile py-20 md:px-gutter md:py-28">
+        <div className="mx-auto max-w-5xl"><motion.div className="mb-12 max-w-2xl" variants={slideUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}><h2 className="font-headline-lg text-on-background">{t("objections.title")}</h2><p className="mt-3 text-body-lg text-on-surface-variant">{t("objections.subtitle")}</p></motion.div><div className="grid gap-4 md:grid-cols-2">{[
+          ["objections.q1", "objections.a1"], ["objections.q2", "objections.a2"], ["objections.q3", "objections.a3"], ["objections.q4", "objections.a4"],
+        ].map(([question, answer], index) => <motion.div key={question} variants={staggerItemUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} transition={{ delay: index * 0.04 }} className="rounded-2xl border border-outline-variant/50 bg-surface-container-low p-6"><h3 className="font-label-bold text-on-surface">{t(question)}</h3><p className="mt-2 text-body-md leading-relaxed text-on-surface-variant">{t(answer)}</p></motion.div>)}</div></div>
       </section>
 
       {/* ── Pricing ── */}

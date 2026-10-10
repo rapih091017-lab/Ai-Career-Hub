@@ -33,6 +33,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
       { href: "/admin/packages", label: "Paket", icon: "inventory_2", hint: "Harga, nama, dan status paket" },
       { href: "/admin/jobs", label: "Loker", icon: "work", hint: "Lowongan yang tampil di /karir" },
       { href: "/admin/career-path", label: "Jalur Karier", icon: "route", hint: "Jenjang, skill, dan langkah karier" },
+      { href: "/admin/career-hub", label: "Career Hub", icon: "article", hint: "Artikel panduan untuk pencari kerja" },
     ],
   },
   {

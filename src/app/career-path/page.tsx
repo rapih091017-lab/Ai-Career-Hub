@@ -17,11 +17,16 @@ export const metadata: Metadata = {
 };
 
 export default async function CareerPathPage() {
-  const paths = await db
-    .select()
-    .from(careerPaths)
-    .where(eq(careerPaths.isPublished, true))
-    .orderBy(asc(careerPaths.sortOrder), asc(careerPaths.role));
+  let paths: (typeof careerPaths.$inferSelect)[] = [];
+  try {
+    paths = await db
+      .select()
+      .from(careerPaths)
+      .where(eq(careerPaths.isPublished, true))
+      .orderBy(asc(careerPaths.sortOrder), asc(careerPaths.role));
+  } catch (error) {
+    console.error("[career-path] gagal memuat daftar jalur karier:", error instanceof Error ? error.message : error);
+  }
 
   const categories = Array.from(new Set(paths.map((path) => path.category)));
 
