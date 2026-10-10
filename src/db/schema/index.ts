@@ -230,6 +230,7 @@ export const portfolioPages = pgTable("portfolio_pages", {
   userId: uuid("user_id").notNull().unique().references(() => users.id, { onDelete: "cascade" }),
   slug: varchar("slug", { length: 60 }).notNull().unique(),
   theme: varchar("theme", { length: 50 }).notNull().default("glass"),
+  status: varchar("status", { length: 16 }).notNull().default("draft"),
   data: jsonb("data").$type<Record<string, unknown>>().notNull(),
   publishedAt: timestamp("published_at", { mode: "date" }).defaultNow(),
   updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow(),

@@ -28,7 +28,8 @@ export const GET = async (
     const needle = `/api/portfolio/assets/${id}`;
     const pages = await db
       .select({ data: portfolioPages.data })
-      .from(portfolioPages);
+      .from(portfolioPages)
+      .where(eq(portfolioPages.status, "published"));
     const referenced = pages.some((p) =>
       JSON.stringify(p.data ?? "").includes(needle),
     );
