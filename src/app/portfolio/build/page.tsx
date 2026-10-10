@@ -9,6 +9,7 @@ import { AIPolishButton } from "@/components/ai/AIPolishDialog";
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/components/ui/toast";
 import { ConfirmModal, type ConfirmAction } from "@/components/ui/confirm-modal";
+import PortfolioPhotoUpload from "@/components/portfolio/render/PortfolioPhotoUpload";
 
 type AccordionKey = "hero" | "about" | "projects" | "skills" | "experience" | "education" | "certifications" | "organizations" | "hobbies" | "testimonials" | "contact";
 
@@ -609,10 +610,11 @@ export default function PortfolioBuildPage() {
                     <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Frontend Web Developer"
                       value={formData.heroHeadline} onChange={update("heroHeadline")} />
                   </Field>
-                          <Field label={t("build.hero-photo-url")}>
-                    <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="https://example.com/foto.jpg"
-                      value={formData.heroPhotoUrl} onChange={update("heroPhotoUrl")} />
-                  </Field>
+                  <PortfolioPhotoUpload
+                    value={formData.heroPhotoUrl}
+                    onChange={(url) => setFormData((prev) => ({ ...prev, heroPhotoUrl: url }))}
+                    label={t("build.hero-photo-url")}
+                  />
           <Field label={t("build.hero-bg-url")}>
                     <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="https://example.com/hero-bg.jpg"
                       value={formData.heroBgUrl} onChange={update("heroBgUrl")} />

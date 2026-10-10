@@ -6,7 +6,7 @@ import AuthGuard from "@/components/AuthGuard";
 import AppHeader from "@/components/AppHeader";
 import PortfolioCanvas, { SECTION_META } from "@/components/portfolio/PortfolioCanvas";
 import DateField from "@/components/portfolio/DateField";
-import PhotoUpload from "@/components/portfolio/PhotoUpload";
+import PortfolioPhotoUpload from "@/components/portfolio/render/PortfolioPhotoUpload";
 import { AIPolishButton } from "@/components/ai/AIPolishDialog";
 import PublishDialog from "@/components/portfolio/PublishDialog";
 import { THEMES, DEFAULT_THEME_ID, DEFAULT_SECTION_ORDER } from "@/components/portfolio/themes";
@@ -783,7 +783,7 @@ function renderFormFields(
                 <AIPolishButton content={formData.heroBio} onApply={(v) => setFormData(prev => ({ ...prev, heroBio: v }))} field="bio hero" size="sm" />
               </div>
             </div></div>
-          <PhotoUpload value={formData.heroPhotoUrl} onChange={(url) => setFormData(prev => ({ ...prev, heroPhotoUrl: url }))} label={L("live.form.photo")} />
+          <PortfolioPhotoUpload value={formData.heroPhotoUrl} onChange={(url) => setFormData(prev => ({ ...prev, heroPhotoUrl: url }))} label={L("live.form.photo")} />
         </div>
       );
 
