@@ -1,23 +1,8 @@
 "use client";
 
-import { safeUrl } from "@/lib/portfolio-safety";
+import { safeUrlUnescaped } from "@/lib/portfolio-safety";
 
 export type SafeRenderMode = "editor" | "static";
-
-/**
- * safeUrl mengembalikan nilai yang sudah di-esc untuk konteks atribut HTML
- * (jalur export). React menulis atribut lewat setAttribute — tidak ada parser
- * HTML di sana — jadi entity harus dibalik dulu, kalau tidak `&` jadi
- * `&amp;amp;` dan query string rusak.
- */
-function fromSafeUrl(escaped: string): string {
-  return escaped
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&amp;/g, "&");
-}
 
 type SafeLinkProps = {
   href: string;
@@ -33,7 +18,7 @@ type SafeLinkProps = {
  * Mode editor: skema terlarang diberi tanda merah supaya terlihat saat menyunting.
  */
 export function SafeLink({ href, mode, className, target, children }: SafeLinkProps) {
-  const safe = safeUrl(href ?? "");
+  const safe = safeUrlUnescaped(href ?? "");
 
   if (!safe) {
     if (mode !== "editor") return <span className={className}>{children}</span>;
@@ -51,7 +36,7 @@ export function SafeLink({ href, mode, className, target, children }: SafeLinkPr
 
   return (
     <a
-      href={fromSafeUrl(safe)}
+      href={safe}
       className={className}
       {...(target ? { target } : {})}
       {...(target || external ? { rel: "noopener noreferrer" } : {})}
@@ -78,13 +63,13 @@ type SafeImgProps = {
 };
 
 /**
- * src yang lolos safeUrl. Data URI gambar raster tetap boleh supaya aset yang
+ * src yang lolos validasi. Data URI gambar raster tetap boleh supaya aset yang
  * sudah di-inline saat export bisa dirender.
  */
 export function SafeImg({ src, mode, alt, width, height, className }: SafeImgProps) {
   const value = src ?? "";
   const inline = ALLOWED_DATA_IMAGE.test(value);
-  const ok = inline || safeUrl(value) !== "";
+  const ok = inline || safeUrlUnescaped(value) !== "";
 
   if (!ok) {
     return (
@@ -101,7 +86,7 @@ export function SafeImg({ src, mode, alt, width, height, className }: SafeImgPro
 
   return (
     <img
-      src={inline ? value : fromSafeUrl(safeUrl(value))}
+      src={inline ? value : safeUrlUnescaped(value)}
       alt={alt}
       width={width}
       height={height}

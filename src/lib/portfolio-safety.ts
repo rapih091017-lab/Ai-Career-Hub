@@ -17,6 +17,19 @@ export function esc(v: unknown): string {
 const URL_UNSAFE_CHARS = /[\x00-\x1f\x7f\\]/;
 
 /**
+ * Resolusi URL mentah: trim, tolak karakter tidak aman, lalu kembalikan URL
+ * yang sudah tervalidasi TANPA esc(). `""` berarti ditolak.
+ */
+function resolveUrl(v: string): string {
+  const t = v.trim();
+  if (URL_UNSAFE_CHARS.test(t)) return "";
+  if (/^\/(?!\/)/.test(t)) return t;
+  if (/^(https?:\/\/|mailto:|tel:)/i.test(t)) return t;
+  if (/^[\w.-]+\.[a-z]{2,}(\/\S*)?$/i.test(t)) return "https://" + t;
+  return "";
+}
+
+/**
  * Validasi & sanitasi URL. Menerima http/https/mailto/tel, path relatif yang
  * diawali `/`, dan domain telanjang (diberi prefiks https://).
  * Skema lain — javascript:, data:, vbscript:, file: — ditolak dengan "".
@@ -25,16 +38,30 @@ const URL_UNSAFE_CHARS = /[\x00-\x1f\x7f\\]/;
  * Backslash dan karakter kontrol ASCII ditolak sebelum cek path relatif: browser
  * menormalkan `\` jadi `/` dan meng-strip tab/newline dari URL, sehingga
  * `/\evil.com` dan `/<TAB>/evil.com` berakhir jadi `//evil.com` (origin lain).
+ *
+ * KONTEKS: output-nya sudah di-esc untuk disisipkan sebagai nilai atribut di
+ * string HTML (jalur export/preview mandiri). Untuk JSX/React jangan pakai ini —
+ * React menulis atribut lewat setAttribute tanpa parser HTML, jadi `&` akan
+ * ter-escape dua kali (`&amp;amp;`). Gunakan `safeUrlUnescaped` di sana.
+ *
+ * Hasil fungsi ini juga jangan pernah diberi ke fetch() atau CSS url() — di sana
+ * `&amp;` bukan pemisah query. Untuk kedua kasus itu pakailah `safeUrlUnescaped`.
  */
 export function safeUrl(v: string): string {
-  const t = v.trim();
-  if (URL_UNSAFE_CHARS.test(t)) return "";
-  // Output `esc()` adalah konteks atribut HTML (href/src); jangan pernah
-  // diberi ke fetch() atau CSS url() — `&amp;` di sana bukan pemisah query.
-  if (/^\/(?!\/)/.test(t)) return esc(t);
-  if (/^(https?:\/\/|mailto:|tel:)/i.test(t)) return esc(t);
-  if (/^[\w.-]+\.[a-z]{2,}(\/\S*)?$/i.test(t)) return esc("https://" + t);
-  return "";
+  return esc(resolveUrl(v));
+}
+
+/**
+ * Validasi URL yang sama persis dengan `safeUrl`, tapi TIDAK meng-escape hasil.
+ *
+ * KONTEKS: komponen React (`SafeLink`, `SafeImg`) yang meneruskan nilai ke
+ * atribut href/src. React sudah meng-escape nilai atribut sendiri, jadi
+ * meng-escape di sini justru merusak URL — `&` jadi `&amp;amp;`.
+ * `safeUrl` tetap ada karena jalur export membangun string HTML secara manual,
+ * di situ tidak ada React yang menolong meng-escape.
+ */
+export function safeUrlUnescaped(v: string): string {
+  return resolveUrl(v);
 }
 
 /** Slug publik portfolio: huruf kecil, angka, tanda hubung, 3–50 karakter. */

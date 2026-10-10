@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { esc, safeUrl, isValidSlug } from "@/lib/portfolio-safety";
+import { esc, safeUrl, safeUrlUnescaped, isValidSlug } from "@/lib/portfolio-safety";
 
 describe("esc", () => {
   it("meng-escape karakter HTML berbahaya", () => {
@@ -72,6 +72,51 @@ describe("safeUrl", () => {
   it("tetap menerima path aset lokal yang sah", () => {
     const asset = "/api/portfolio/assets/6f1c2d3e-4a5b-6c7d-8e9f-0a1b2c3d4e5f";
     expect(safeUrl(asset)).toBe(asset);
+  });
+});
+
+describe("safeUrlUnescaped", () => {
+  it("mengembalikan URL apa adanya untuk input sah ber-&", () => {
+    const url = "https://example.com/p?utm_source=portofolio&utm_medium=link";
+    expect(safeUrlUnescaped(url)).toBe(url);
+  });
+
+  it("tidak meng-escape tanda &, berbeda dari safeUrl", () => {
+    const url = "/api/portfolio/assets/abc?w=200&h=200";
+    expect(safeUrlUnescaped(url)).toBe(url);
+    expect(safeUrl(url)).toBe("/api/portfolio/assets/abc?w=200&amp;h=200");
+  });
+
+  it("tidak meng-escape karakter HTML di URL yang lolos validasi", () => {
+    const url = `https://a.com/?q="><script>`;
+    expect(safeUrlUnescaped(url)).toBe(url);
+    expect(safeUrl(url)).toBe(`https://a.com/?q=&quot;&gt;&lt;script&gt;`);
+  });
+
+  it("tetap memberi prefiks https pada domain telanjang", () => {
+    expect(safeUrlUnescaped("linkedin.com/in/teguh")).toBe("https://linkedin.com/in/teguh");
+  });
+
+  it("menolak skema terlarang sama seperti safeUrl", () => {
+    for (const payload of ["javascript:alert(1)", "data:text/html,<script>1</script>", "vbscript:msgbox(1)"]) {
+      expect(safeUrlUnescaped(payload)).toBe("");
+      expect(safeUrlUnescaped(payload)).toBe(safeUrl(payload));
+    }
+  });
+
+  it("menolak protocol-relative, backslash, dan karakter kontrol seperti safeUrl", () => {
+    const payloads = [
+      "//evil.com",
+      "//evil.com/path",
+      "/\\evil.com",
+      "/\t/evil.com",
+      "/\n/evil.com",
+      "/\r\n/evil.com",
+    ];
+    for (const payload of payloads) {
+      expect(safeUrlUnescaped(payload)).toBe("");
+      expect(safeUrlUnescaped(payload)).toBe(safeUrl(payload));
+    }
   });
 });
 

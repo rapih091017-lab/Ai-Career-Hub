@@ -76,6 +76,15 @@ describe("SafeLink", () => {
     );
   });
 
+  it("menyerialkan atribut href dengan satu tingkat escape", () => {
+    const { container } = render(
+      <SafeLink href="https://example.com/p?a=1&b=2" mode="static">Sekali</SafeLink>,
+    );
+    const html = container.innerHTML;
+    expect(html).toContain("&amp;");
+    expect(html).not.toContain("&amp;amp;");
+  });
+
   it("memangkas spasi di sekitar URL", () => {
     render(
       <SafeLink href="   https://example.com/spasi   " mode="static">Spasi</SafeLink>,
