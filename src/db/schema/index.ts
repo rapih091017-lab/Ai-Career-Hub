@@ -1,4 +1,5 @@
-﻿import { pgTable, text, timestamp, uuid, jsonb, boolean, integer, varchar, index, numeric, uniqueIndex } from "drizzle-orm/pg-core";
+﻿import { pgTable, text, timestamp, uuid, jsonb, boolean, integer, varchar, index, numeric, uniqueIndex, check } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -426,3 +427,22 @@ export const careerPaths = pgTable("career_paths", {
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
   updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow(),
 });
+
+export const careerHubPosts = pgTable("career_hub_posts", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  slug: varchar("slug", { length: 180 }).notNull().unique(),
+  title: varchar("title", { length: 180 }).notNull(),
+  excerpt: varchar("excerpt", { length: 500 }).notNull(),
+  content: text("content").notNull(),
+  coverImageUrl: text("cover_image_url"),
+  category: varchar("category", { length: 60 }).notNull(),
+  tags: jsonb("tags").$type<string[]>().notNull().default([]),
+  status: varchar("status", { length: 12 }).notNull().default("draft"),
+  publishedAt: timestamp("published_at", { mode: "date" }),
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
+}, (table) => [
+  index("career_hub_posts_status_published_idx").on(table.status, table.publishedAt),
+  index("career_hub_posts_category_status_published_idx").on(table.category, table.status, table.publishedAt),
+  check("career_hub_posts_status_check", sql`${table.status} in ('draft', 'published')`),
+]);

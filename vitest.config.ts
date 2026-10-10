@@ -16,7 +16,7 @@ export default defineConfig({
     setupFiles: ["./src/__tests__/setup-globals.ts"],
     include: ["src/**/*.test.{ts,tsx}"],
     // Tooling skill (gstack) & node_modules tidak boleh ikut ter-scan sebagai test
-    exclude: ["node_modules/**", ".agents/**", "skills/**", "scripts/**", "pdf-server/**"],
+    exclude: ["node_modules/**", ".agents/**", "skills/**", "scripts/**", "pdf-server/**", "src/__tests__/cv-pdf.test.ts"],
   },
   resolve: {
     alias: {

@@ -2,12 +2,13 @@ import type { MetadataRoute } from "next";
 import { CV_EXAMPLES_EN } from "@/data/cv-examples-en";
 import { SITE_URL } from "@/lib/site-url";
 import { db } from "@/db";
-import { careerPaths } from "@/db/schema";
+import { careerPaths, careerHubPosts } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { CV_EXAMPLES } from "@/data/cv-examples";
 import { getInterviewPositions } from "@/data/interview-questions";
 
 const BASE_URL = SITE_URL;
+export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const interviewPositions = getInterviewPositions("id").map((position) => ({
@@ -31,6 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Jalur karier dari database; kegagalan query tidak boleh mematikan sitemap.
   let careerPathEntries: MetadataRoute.Sitemap = [];
+  let careerHubEntries: MetadataRoute.Sitemap = [];
   try {
     const rows = await db
       .select({ slug: careerPaths.slug })
@@ -39,6 +41,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     careerPathEntries = rows.map((row) => ({
       url: `${BASE_URL}/career-path/${row.slug}`,
       lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    }));
+  } catch {}
+
+  try {
+    const rows = await db.select({ slug: careerHubPosts.slug, updatedAt: careerHubPosts.updatedAt })
+      .from(careerHubPosts).where(eq(careerHubPosts.status, "published"));
+    careerHubEntries = rows.map((row) => ({
+      url: `${BASE_URL}/career-hub/${row.slug}`,
+      lastModified: row.updatedAt ?? new Date(),
       changeFrequency: "monthly" as const,
       priority: 0.7,
     }));
@@ -78,5 +91,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...cvExamples,
     ...cvExamplesEn,
     ...careerPathEntries,
+    ...careerHubEntries,
   ];
 }

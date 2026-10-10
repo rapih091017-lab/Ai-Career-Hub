@@ -13,12 +13,17 @@ export const revalidate = 300;
 type Props = { params: Promise<{ slug: string }> };
 
 async function getPath(slug: string) {
-  const [row] = await db
-    .select()
-    .from(careerPaths)
-    .where(and(eq(careerPaths.slug, slug), eq(careerPaths.isPublished, true)))
-    .limit(1);
-  return row ?? null;
+  try {
+    const [row] = await db
+      .select()
+      .from(careerPaths)
+      .where(and(eq(careerPaths.slug, slug), eq(careerPaths.isPublished, true)))
+      .limit(1);
+    return row ?? null;
+  } catch (error) {
+    console.error("[career-path] gagal memuat detail jalur karier:", error instanceof Error ? error.message : error);
+    return null;
+  }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -37,12 +42,17 @@ export default async function CareerPathDetailPage({ params }: Props) {
   const path = await getPath(slug);
   if (!path) notFound();
 
-  const others = await db
-    .select({ slug: careerPaths.slug, role: careerPaths.role, category: careerPaths.category })
-    .from(careerPaths)
-    .where(and(eq(careerPaths.isPublished, true), ne(careerPaths.slug, path.slug)))
-    .orderBy(asc(careerPaths.sortOrder))
-    .limit(4);
+  let others: { slug: string; role: string; category: string }[] = [];
+  try {
+    others = await db
+      .select({ slug: careerPaths.slug, role: careerPaths.role, category: careerPaths.category })
+      .from(careerPaths)
+      .where(and(eq(careerPaths.isPublished, true), ne(careerPaths.slug, path.slug)))
+      .orderBy(asc(careerPaths.sortOrder))
+      .limit(4);
+  } catch (error) {
+    console.error("[career-path] gagal memuat rekomendasi:", error instanceof Error ? error.message : error);
+  }
 
   const levels = path.levels ?? [];
   const skills = path.skills ?? [];
