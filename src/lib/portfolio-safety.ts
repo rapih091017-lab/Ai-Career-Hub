@@ -17,17 +17,31 @@ export function esc(v: unknown): string {
 const URL_UNSAFE_CHARS = /[\x00-\x1f\x7f\\]/;
 
 /**
+ * CR/LF yang ditulis sebagai percent-encoding, mis. `%0D%0A`. Penjaga karakter
+ * kontrol di atas tidak melihatnya: yang kelihatan hanya `%`, `0`, `D`. Pada
+ * `mailto:` itu berarti header baru (`Bcc:`) diselundupkan ke pesan.
+ */
+const ENCODED_CRLF = /%(?:0d|0a)/i;
+
+/**
  * Resolusi URL mentah: trim, tolak karakter tidak aman, lalu kembalikan URL
  * yang sudah tervalidasi TANPA esc(). `""` berarti ditolak.
+ *
+ * Parameter `unknown` dengan hasil `""` untuk non-string: data yang datang dari
+ * JSON/DB bisa punya field kosong tanpa tipe, dan modul ini tidak boleh
+ * melempar exception hanya karena itu. `esc()` sudah punya jaminan yang sama.
  */
-function resolveUrl(v: string): string {
+function resolveUrl(v: unknown): string {
+  if (typeof v !== "string") return "";
   const t = v.trim();
   if (URL_UNSAFE_CHARS.test(t)) return "";
+  if (/^mailto:/i.test(t) && ENCODED_CRLF.test(t)) return "";
   if (/^\/(?!\/)/.test(t)) return t;
   if (/^(https?:\/\/|mailto:|tel:)/i.test(t)) return t;
   if (/^[\w.-]+\.[a-z]{2,}(\/\S*)?$/i.test(t)) return "https://" + t;
   return "";
 }
+
 
 /**
  * Validasi & sanitasi URL. Menerima http/https/mailto/tel, path relatif yang
@@ -46,8 +60,12 @@ function resolveUrl(v: string): string {
  *
  * Hasil fungsi ini juga jangan pernah diberi ke fetch() atau CSS url() — di sana
  * `&amp;` bukan pemisah query. Untuk kedua kasus itu pakailah `safeUrlUnescaped`.
+ *
+ * Parameter `unknown`: input non-string menghasilkan `""`, bukan exception.
+ * `schema.ts` memanggilnya setelah `z.string()`, jadi perilakunya di sana tidak
+ * berubah — jaminan ini hanya menutup jalur data yang belum tervalidasi.
  */
-export function safeUrl(v: string): string {
+export function safeUrl(v: unknown): string {
   return esc(resolveUrl(v));
 }
 
@@ -60,9 +78,10 @@ export function safeUrl(v: string): string {
  * `safeUrl` tetap ada karena jalur export membangun string HTML secara manual,
  * di situ tidak ada React yang menolong meng-escape.
  */
-export function safeUrlUnescaped(v: string): string {
+export function safeUrlUnescaped(v: unknown): string {
   return resolveUrl(v);
 }
+
 
 /** Slug publik portfolio: huruf kecil, angka, tanda hubung, 3–50 karakter. */
 export const SLUG_REGEX = /^[a-z0-9][a-z0-9-]{2,49}$/;

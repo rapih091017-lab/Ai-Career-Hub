@@ -1,7 +1,11 @@
 import "@testing-library/jest-dom/vitest";
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { SafeLink, SafeImg } from "@/components/portfolio/render/SafeLink";
+import {
+  SafeLink,
+  SafeImg,
+  MAX_DATA_IMAGE_LENGTH,
+} from "@/components/portfolio/render/SafeLink";
 
 describe("SafeLink", () => {
   it("merender tautan https tanpa perubahan", () => {
@@ -60,6 +64,15 @@ describe("SafeLink", () => {
       "href",
       "tel:+628123456789",
     );
+  });
+
+  it("menolak mailto dengan injeksi header CRLF yang ter-percent-encode", () => {
+    render(
+      <SafeLink href="mailto:a@b?subject=x%0D%0ABcc:korban@example.com" mode="static">
+        Injeksi</SafeLink>,
+    );
+    expect(screen.queryByRole("link")).toBeNull();
+    expect(screen.getByText("Injeksi")).toBeInTheDocument();
   });
 
   it("tidak meng-escape ganda tanda & pada query string", () => {
@@ -125,14 +138,13 @@ describe("SafeLink", () => {
     expect(screen.getByText("Injeksi")).toBeInTheDocument();
   });
 
-  it("menolak bypass relative-url dengan backslash, tab, dan protocol-relative", () => {
-    for (const payload of ["/\\evil.com", "/\t/evil.com", "//evil.com"]) {
-      const { unmount } = render(
-        <SafeLink href={payload} mode="static">Bypass</SafeLink>,
-      );
-      expect(screen.queryByRole("link")).toBeNull();
-      unmount();
-    }
+  it.each([
+    ["backslash", "/\\evil.com"],
+    ["tab", "/\t/evil.com"],
+    ["protocol-relative", "//evil.com"],
+  ])("menolak bypass relative-url dengan %s", (_label, payload) => {
+    render(<SafeLink href={payload} mode="static">Bypass</SafeLink>);
+    expect(screen.queryByRole("link")).toBeNull();
   });
 
   it("tidak crash saat href undefined walau tipenya string", () => {
@@ -151,6 +163,55 @@ describe("SafeLink", () => {
     expect(badge.className).toContain("bg-error-container");
     expect(badge.className).toContain("text-on-error-container");
     expect(container.innerHTML).not.toMatch(/rounded|red-\d|#[0-9a-f]{3,6}/i);
+  });
+
+  it("memakai tanda baca yang benar pada badge penolakan", () => {
+    render(<SafeLink href="vbscript:x" mode="editor">VBS</SafeLink>);
+    const badge = screen.getByText(/tautan ditolak/i);
+    expect(badge.textContent).toContain("\u2014");
+    expect(badge.textContent).not.toMatch(/\s-\s/);
+  });
+
+  it("melepas affordance interaktif pada tautan yang ditolak", () => {
+    render(
+      <SafeLink
+        href="javascript:alert(1)"
+        mode="static"
+        className="text-primary hover:underline cursor-pointer underline"
+      >
+        mati
+      </SafeLink>,
+    );
+    const span = screen.getByText("mati");
+    expect(span.tagName).toBe("SPAN");
+    expect(span.className).toContain("text-primary");
+    expect(span.className).toContain("underline");
+    expect(span.className).not.toMatch(/cursor-pointer|hover:/);
+  });
+
+  it("tetap menempelkan class interaktif pada tautan yang diterima", () => {
+    render(
+      <SafeLink
+        href="https://example.com"
+        mode="static"
+        className="hover:underline cursor-pointer"
+      >
+        hidup
+      </SafeLink>,
+    );
+    const a = screen.getByRole("link");
+    expect(a.className).toContain("hover:underline");
+    expect(a.className).toContain("cursor-pointer");
+  });
+
+  it("mempertahankan class non-interaktif pada tautan ditolak di mode editor", () => {
+    render(
+      <SafeLink href="javascript:alert(1)" mode="editor" className="font-semibold">
+        tolak
+      </SafeLink>,
+    );
+    const inner = screen.getByText("tolak");
+    expect(inner.className).toContain("font-semibold");
   });
 });
 
@@ -173,16 +234,45 @@ describe("SafeImg", () => {
     expect(screen.getByText(/gambar tidak dapat ditampilkan/i)).toBeInTheDocument();
   });
 
+  it("menyampaikan kegagalan ke teknologi bantu, bukan hanya ke mata", () => {
+    render(
+      <SafeImg src="javascript:alert(1)" mode="static" alt="Foto Wisuda" width={100} height={100} />,
+    );
+    // role="img" membuat seluruh anak presentasional, jadi teks yang terlihat
+    // tidak akan diumumkan. Nama aksesibel harus memuat alt DAN kegagalannya.
+    expect(screen.getByRole("img")).toHaveAccessibleName(
+      /foto wisuda[\s\S]*gambar tidak dapat ditampilkan/i,
+    );
+  });
+
+  it("tetap menyampaikan kegagalan saat alt kosong", () => {
+    render(<SafeImg src="javascript:alert(1)" mode="static" alt="" width={100} height={100} />);
+    expect(screen.getByRole("img")).toHaveAccessibleName(
+      /gambar tidak dapat ditampilkan/i,
+    );
+  });
+
+  it("memakai nama aksesibel yang tidak kosong saat alt kosong", () => {
+    render(<SafeImg src="javascript:alert(1)" mode="static" alt="" width={10} height={10} />);
+    expect(screen.getByRole("img").getAttribute("aria-label")).toBeTruthy();
+  });
+
   it("menerima data URI gambar raster untuk export mandiri", () => {
     const src = "data:image/png;base64,iVBORw0KGgo=";
     render(<SafeImg src={src} mode="static" alt="Inlined" />);
     expect(screen.getByAltText("Inlined")).toHaveAttribute("src", src);
   });
 
-  it("menolak data URI svg karena bisa membawa skrip", () => {
+  it("menerima data URI base64 dengan padding dan karakter base64 penuh", () => {
+    const src = `data:image/png;base64,${"A+/9".repeat(8)}=`;
+    render(<SafeImg src={src} mode="static" alt="Alfabet" />);
+    expect(screen.getByAltText("Alfabet")).toHaveAttribute("src", src);
+  });
+
+  it("menolak data URI svg karena bisa membawa skrip, meski base64 valid", () => {
     render(
       <SafeImg
-        src="data:image/svg+xml,<svg onload='alert(1)'/>"
+        src="data:image/svg+xml;base64,PHN2ZyBvbmxvYWQ9J2FsZXJ0KDEpJz48L3N2Zz4="
         mode="static"
         alt="Svg"
         width={50}
@@ -191,6 +281,52 @@ describe("SafeImg", () => {
     );
     expect(screen.queryByAltText("Svg")).toBeNull();
     expect(screen.getByText(/gambar tidak dapat ditampilkan/i)).toBeInTheDocument();
+  });
+
+  it("menerima raster base64 dengan payload yang sama bentuknya, jadi aturan SVG yang diuji", () => {
+    const src = "data:image/png;base64,PHN2ZyBvbmxvYWQ9J2FsZXJ0KDEpJz48L3N2Zz4=";
+    render(<SafeImg src={src} mode="static" alt="Raster" />);
+    expect(screen.getByAltText("Raster")).toHaveAttribute("src", src);
+  });
+
+  it.each([
+    ["kutip", "data:image/png;base64,iVBOR\""],
+    ["kutip tunggal", "data:image/png;base64,iVBOR'"],
+    ["sudut", "data:image/png;base64,<svg>"],
+    ["ampersand", "data:image/png;base64,iVBOR&x=1"],
+    ["backslash", "data:image/png;base64,iVBOR\\x"],
+    ["newline", "data:image/png;base64,iVBOR\nw0KGgo="],
+    ["karakter di luar base64", "data:image/png;base64,iVBOR#w0KGgo="],
+    ["padding di tengah", "data:image/png;base64,iV=BOR"],
+    ["padding berlebih", "data:image/png;base64,iVBOR==="],
+    ["body kosong", "data:image/png;base64,"],
+    ["tanpa base64", "data:image/png,iVBORw0KGgo="],
+  ])("menolak data URI dengan %s", (_label, src) => {
+    render(<SafeImg src={src} mode="static" alt="Uji" />);
+    expect(screen.queryByAltText("Uji")).toBeNull();
+    expect(screen.getByText(/gambar tidak dapat ditampilkan/i)).toBeInTheDocument();
+  });
+
+  it("tetap menerima huruf besar pada tipe MIME", () => {
+    const src = "data:image/PNG;base64,iVBORw0KGgo=";
+    render(<SafeImg src={src} mode="static" alt="Upper" />);
+    expect(screen.getByAltText("Upper")).toHaveAttribute("src", src);
+  });
+
+  it("menolak data URI yang melebihi batas ukuran", () => {
+    const src = `data:image/png;base64,${"A".repeat(MAX_DATA_IMAGE_LENGTH)}`;
+    render(<SafeImg src={src} mode="static" alt="Raksasa" />);
+    expect(screen.queryByAltText("Raksasa")).toBeNull();
+    expect(screen.getByText(/gambar tidak dapat ditampilkan/i)).toBeInTheDocument();
+  });
+
+  it("menerima data URI tepat di batas ukuran", () => {
+    const prefix = "data:image/png;base64,";
+    const body = "A".repeat(MAX_DATA_IMAGE_LENGTH - prefix.length);
+    const src = prefix + body;
+    expect(src).toHaveLength(MAX_DATA_IMAGE_LENGTH);
+    render(<SafeImg src={src} mode="static" alt="Tepat batas" />);
+    expect(screen.getByAltText("Tepat batas")).toHaveAttribute("src", src);
   });
 
   it("menolak data URI non-gambar", () => {
@@ -210,10 +346,17 @@ describe("SafeImg", () => {
     );
   });
 
-  it("menampilkan placeholder di mode editor juga", () => {
+  it("menampilkan placeholder di mode editor dan menjelaskan alasannya", () => {
     render(<SafeImg src="vbscript:x" mode="editor" alt="Edit" />);
     expect(screen.queryByAltText("Edit")).toBeNull();
     expect(screen.getByText(/gambar tidak dapat ditampilkan/i)).toBeInTheDocument();
+    expect(screen.getByText(/skema tidak diizinkan/i)).toBeInTheDocument();
+  });
+
+  it("tidak menampilkan penjelasan penolakan di mode static", () => {
+    render(<SafeImg src="vbscript:x" mode="static" alt="Statis" />);
+    expect(screen.getByText(/gambar tidak dapat ditampilkan/i)).toBeInTheDocument();
+    expect(screen.queryByText(/skema tidak diizinkan/i)).toBeNull();
   });
 
   it("tidak crash saat src undefined walau tipenya string", () => {
