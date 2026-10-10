@@ -237,6 +237,21 @@ export const portfolioTrialUses = pgTable("portfolio_trial_uses", {
   usedAt: timestamp("used_at", { mode: "date" }).defaultNow(),
 });
 
+/** Draft portfolio milik user. Banyak draft per user. Data disimpan utuh
+ *  sebagai JSONB dan divalidasi Zod di server sebelum ditulis. */
+export const portfolioDrafts = pgTable("portfolio_drafts", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 120 }).notNull().default("Portfolio saya"),
+  data: jsonb("data").$type<Record<string, unknown>>().notNull().default({}),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow(),
+}, (table) => [
+  index("portfolio_drafts_user_idx").on(table.userId),
+]);
+
 export const slugHistory = pgTable("slug_history", {
   id: uuid("id").defaultRandom().primaryKey(),
   oldSlug: varchar("old_slug", { length: 50 }).notNull().unique(),
