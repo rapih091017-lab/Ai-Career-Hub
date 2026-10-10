@@ -54,9 +54,9 @@ const DICT: Record<string, { id: string; en: string }> = {
 
   /* ── Hero ── */
   "hero.badge": { id: "Tersedia untuk Mahasiswa & Profesional", en: "Available for Students & Professionals" },
-  "hero.title-line1": { id: "Siapkan lamaran kerja", en: "Prepare your next application" },
-  "hero.title-line2": { id: "tanpa mulai dari nol", en: "without starting from zero" },
-  "hero.subtitle": { id: "Buat CV, cek kecocokan ATS, tulis surat lamaran, dan latihan interview. Mulai gratis, bayar hanya saat butuh.", en: "Build a CV, check ATS fit, write your cover letter, and practice interviews. Start free, pay only when you need more." },
+  "hero.title-line1": { id: "CV yang lolos layar ATS,", en: "A CV that passes ATS screens," },
+  "hero.title-line2": { id: "siap sebelum hari-H", en: "ready before interview day" },
+  "hero.subtitle": { id: "Bangun CV, cek kecocokan, tulis surat lamaran, dan latihan interview di satu tempat. Mulai gratis, bayar hanya saat butuh.", en: "Build a CV, check the fit, write your cover letter, and practice interviews in one place. Start free, pay only when you need more." },
   "hero.cta-start": { id: "Buat CV Gratis", en: "Build a Free CV" },
   "hero.cta-how": { id: "Cara Kerja", en: "How It Works" },
   "hero.ats-badge": { id: "Lolos ATS", en: "ATS Ready" },
@@ -68,6 +68,29 @@ const DICT: Record<string, { id: string; en: string }> = {
   "hero.demo-score": { id: "Skor 85%", en: "Score 85%" },
   "hero.demo-hint": { id: "Gratis · hasil instan untuk CV-mu", en: "Free · instant results for your CV" },
   "hero.demo-preview": { id: "Pratinjau", en: "Preview" },
+  "hero.demo.title": { id: "Coba dulu, langsung di sini", en: "Try it right here, right now" },
+  "hero.demo.input-label": { id: "Tempel potongan CV atau deskripsi lowongan", en: "Paste a snippet of your CV or a job description" },
+  "hero.demo.placeholder": { id: "Tempel potongan CV atau deskripsi lowonganmu di sini, lalu lihat perkiraannya...", en: "Paste a snippet of your CV or a job description, then see the quick estimate..." },
+  "hero.demo.run": { id: "Cek Perkiraan", en: "Quick Check" },
+  "hero.demo.free": { id: "Tanpa login", en: "No login" },
+  "hero.demo.estimate-label": { id: "Perkiraan cepat", en: "Quick estimate" },
+  "hero.demo.tip-short": { id: "Isi masih pendek. Tambahkan pengalaman dan skill secara spesifik.", en: "Content is short. Add specific experience and skills." },
+  "hero.demo.tip-sections": { id: "Bagian penting belum terlihat (pengalaman, pendidikan, skill).", en: "Key sections are missing (experience, education, skills)." },
+  "hero.demo.tip-verbs": { id: "Pakai kata kerja aktif: mengelola, meningkatkan, membangun.", en: "Use active verbs: managed, improved, built." },
+  "hero.demo.tip-numbers": { id: "Tambahkan angka hasil kerja, mis. tingkatkan X sebesar Y%.", en: "Add result numbers, e.g. improved X by Y%." },
+  "hero.demo.tip-contact": { id: "Sertakan kontak yang bisa dihubungi.", en: "Include reachable contact details." },
+  "hero.demo.good": { id: "Fondasinya sudah ada. Analisis lengkap akan menemukan sisa gap-nya.", en: "Good base. The full analysis will find the remaining gaps." },
+  "hero.demo.full-cta": { id: "Analisis lengkap, gratis", en: "Run the full analysis, free" },
+  "hero.demo.disclaimer": { id: "Perkiraan cepat di browser, bukan skor ATS penuh.", en: "A quick browser estimate, not a full ATS score." },
+
+  /* ── Emotional moment ── */
+  "moment.title": { id: "Bulan depan, CV yang sama sudah ada di meja HRD.", en: "Next month, this same CV is on a recruiter's desk." },
+  "moment.subtitle": { id: "Hari ini, dia masih tergantung di laptopmu. Yang membedakan cuma satu: dipersiapkan atau tidak.", en: "Today, it is still stuck on your laptop. One thing makes the difference: prepared or not." },
+  "moment.cta": { id: "Persiapkan Sekarang, Gratis", en: "Prepare It Now, Free" },
+
+  /* ── Pricing framing ── */
+  "pricing.value-satuan": { id: "Butuh sekali saja? Bayar per pemakaian, dari harga segelas kopi.", en: "Only need it once? Pay per use, starting at coffee prices." },
+  "pricing.value-langganan": { id: "Rutin melamar? Mulai dari paket Gratis, upgrade saat butuh lebih banyak.", en: "Applying regularly? Start on the Free plan, upgrade when you need more." },
 
   /* ── Template Showcase ── */
   "template.title": { id: "Mulai dengan Template CV", en: "Start with CV Templates" },
@@ -1130,6 +1153,12 @@ const DICT: Record<string, { id: string; en: string }> = {
   "progress.pricing": { id: "Harga", en: "Pricing" },
   "progress.testimonials": { id: "Testimoni", en: "Testimonials" },
   "progress.cta": { id: "Mulai", en: "Start" },
+
+  /* ── Testimonial marquee ── */
+  "testimonials.heading.many": { id: "Yang sudah merasakannya", en: "Those who already felt the difference" },
+  "testimonials.heading.few": { id: "Kata pengguna kami", en: "What our users say" },
+  "testimonials.heading.sub": { id: "Kutipan dari pengguna yang mengizinkan pengalamannya ditampilkan.", en: "Quotes from users who allowed their experience to be shown." },
+  "testimonials.item.aria": { id: "Testimoni pengguna", en: "User testimonials" },
 
   /* ── Logos / Social Proof Stats ── */
   "logos.heading": { id: "Mulai perjalanan kariermu bersama", en: "Start your career journey with" },

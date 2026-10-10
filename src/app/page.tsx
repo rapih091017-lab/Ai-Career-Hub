@@ -28,6 +28,8 @@ import { useTranslation } from "@/lib/i18n";
 import { INTERVIEW_POSITION_COUNT, INTERVIEW_QUESTION_COUNT } from "@/lib/interview-stats";
 import NavDropdown from "@/components/NavDropdown";
 import NavMobileDropdown from "@/components/NavMobileDropdown";
+import HeroCvDemo from "@/components/HeroCvDemo";
+import TestimonialMarquee from "@/components/TestimonialMarquee";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -378,36 +380,9 @@ export default function Home() {
               </motion.div>
             )}
 
-            {/* Interactive Hero Demo, Mini ATS Preview (after CTA, secondary) */}
-            <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }}
-              className="p-4 bg-surface-container-lowest/80 backdrop-blur-sm rounded-2xl border border-outline-variant/20 shadow-premium-sm max-w-md">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="material-symbols-outlined text-primary text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>search_insights</span>
-                <span className="text-xs font-medium text-on-surface-variant">{t("hero.demo-title")}</span>
-              </div>
-              <div className="flex gap-2">
-                <div className="flex-1 relative">
-                  <input
-                    type="text"
-                    placeholder={t("hero.demo-input")}
-                    className="w-full px-3.5 py-2.5 bg-surface-container-lowest/60 border border-outline-variant/30 rounded-xl text-sm text-on-surface/80 placeholder:text-outline-variant/60 cursor-not-allowed select-none"
-                    readOnly disabled
-                  />
-                  <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-on-surface-variant font-medium bg-surface-container-lowest/80 px-1.5 rounded">{t("hero.demo-preview")}</span>
-                </div>
-                <Link href="/checker" className="px-4 py-2.5 bg-primary text-on-primary rounded-xl text-xs font-bold hover:brightness-110 transition-all whitespace-nowrap shadow-sm cursor-pointer inline-flex items-center">
-                  {t("hero.demo-analyze")}
-                </Link>
-              </div>
-              <div className="mt-3 flex items-center gap-3">
-                <div className="flex-1 h-2 bg-primary/10 rounded-full overflow-hidden">
-                  <motion.div className="h-full bg-gradient-to-r from-green-400 to-primary rounded-full"
-                    initial={{ width: "0%" }} animate={{ width: "85%" }}
-                    transition={{ duration: 1.5, delay: 0.8, ease: "easeOut" }} />
-                </div>
-                <span className="text-xs font-bold text-primary shrink-0">{t("hero.demo-score")}</span>
-              </div>
-              <p className="text-[10px] text-on-surface-variant mt-1.5">{t("hero.demo-hint")}</p>
+            {/* Interactive Hero Demo, real quick-check without login (hook pembeli pelit) */}
+            <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }}>
+              <HeroCvDemo />
             </motion.div>
           </motion.div>
         </div>
@@ -565,6 +540,9 @@ export default function Home() {
       </section>
 
       <Logos3 />
+
+      {/* ── Real user testimonials, hanya tampil bila ada data terbit (R-18) ── */}
+      <TestimonialMarquee />
 
       {/* ── Fitur terbaru (antislop purpose: membuktikan produk aktif berkembang
           dan memberi jalur masuk ke fitur yang belum tampil di tab fitur utama) ── */}
@@ -865,6 +843,22 @@ export default function Home() {
         <div className="mx-auto max-w-5xl"><motion.div className="mb-12 max-w-2xl" variants={slideUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}><h2 className="font-headline-lg text-on-background">{t("objections.title")}</h2><p className="mt-3 text-body-lg text-on-surface-variant">{t("objections.subtitle")}</p></motion.div><div className="grid gap-4 md:grid-cols-2">{[
           ["objections.q1", "objections.a1"], ["objections.q2", "objections.a2"], ["objections.q3", "objections.a3"], ["objections.q4", "objections.a4"],
         ].map(([question, answer], index) => <motion.div key={question} variants={staggerItemUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} transition={{ delay: index * 0.04 }} className="rounded-2xl border border-outline-variant/50 bg-surface-container-low p-6"><h3 className="font-label-bold text-on-surface">{t(question)}</h3><p className="mt-2 text-body-md leading-relaxed text-on-surface-variant">{t(answer)}</p></motion.div>)}</div></div>
+      </section>
+
+      {/* ── Momen keputusan sebelum pricing ── */}
+      <section className="relative bg-surface-container-lowest px-margin-mobile pb-4 pt-20 md:px-gutter md:pt-28">
+        <motion.div className="mx-auto max-w-2xl text-center" variants={slideUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.4 }}>
+          <h2 className="font-headline-lg text-on-background">{t("moment.title")}</h2>
+          <p className="mt-4 text-body-lg text-on-surface-variant">{t("moment.subtitle")}</p>
+          <div className="mt-8">
+            <MagneticButton>
+              <Link href={session ? "/builder/new" : "/login"} className="inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-3.5 font-label-bold text-on-primary shadow-lg transition-all hover:brightness-110 active:scale-[0.98]">
+                {t("moment.cta")}
+                <span className="material-symbols-outlined text-[18px]" aria-hidden>arrow_forward</span>
+              </Link>
+            </MagneticButton>
+          </div>
+        </motion.div>
       </section>
 
       {/* ── Pricing ── */}

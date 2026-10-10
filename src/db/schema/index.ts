@@ -446,3 +446,19 @@ export const careerHubPosts = pgTable("career_hub_posts", {
   index("career_hub_posts_category_status_published_idx").on(table.category, table.status, table.publishedAt),
   check("career_hub_posts_status_check", sql`${table.status} in ('draft', 'published')`),
 ]);
+
+/* ─── Testimonials ───────────────────────────────────────────────
+ * Bukti sosial dari pengguna nyata, dikelola dari /admin/testimonials.
+ * Landing menampilkan marquee hanya bila ada testimoni terbit. */
+
+export const testimonials = pgTable("testimonials", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  role: varchar("role", { length: 100 }).notNull(),
+  text: varchar("text", { length: 600 }).notNull(),
+  avatarUrl: text("avatar_url"),
+  isPublished: boolean("is_published").notNull().default(false),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
+});

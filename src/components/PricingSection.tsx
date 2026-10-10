@@ -233,6 +233,13 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
           </motion.div>
         </div>
 
+        {/* ─── VALUE FRAMING per mode ─── */}
+        <div className="mx-auto mb-8 max-w-xl text-center">
+          <p className="text-body-md text-on-surface-variant dark:text-gray-400">
+            {mode === "satuan" ? t("pricing.value-satuan") : t("pricing.value-langganan")}
+          </p>
+        </div>
+
         {/* ─── PRICING CARDS ─── */}
         <AnimatePresence mode="wait">
           <motion.div key={mode}
