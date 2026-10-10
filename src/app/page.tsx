@@ -102,11 +102,10 @@ export default function Home() {
               { title: t("nav.dropdown.interview.title"), description: t("nav.dropdown.interview.desc"), icon: "record_voice_over", href: "/interview/practice" },
               { title: t("nav.dropdown.job-tracker.title"), description: t("nav.dropdown.job-tracker.desc"), icon: "view_kanban", href: "/tracker" },
             ]} />
-            <Link className="flex min-h-11 items-center rounded-lg px-3 text-label-bold text-on-surface-variant hover:bg-surface-container hover:text-primary focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2" href="/dashboard">{t("nav.dashboard")}</Link>
           </div>
           <div className="flex items-center gap-3">
             <button onClick={toggleLang}
-              className="w-9 h-9 rounded-lg border border-outline-variant/40 text-[11px] font-bold uppercase tracking-wider hover:bg-surface-container transition-colors"
+              className="w-11 h-11 rounded-lg border border-outline-variant/40 text-xs font-bold uppercase tracking-wider hover:bg-surface-container transition-colors"
               title="Switch language">{lang === "id" ? "EN" : "ID"}</button>
 
             {/* Mobile Hamburger, md:hidden */}
@@ -171,7 +170,7 @@ export default function Home() {
                   { title: t("nav.dropdown.interview.title"), description: t("nav.dropdown.interview.desc"), icon: "record_voice_over", href: "/interview/practice" },
                   { title: t("nav.dropdown.job-tracker.title"), description: t("nav.dropdown.job-tracker.desc"), icon: "view_kanban", href: "/tracker" },
                 ]} />
-                <Link onClick={() => setMobileMenuOpen(false)} className="block w-full min-h-12 px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all" href="/dashboard">{t("nav.dashboard")}</Link>
+                <a onClick={() => setMobileMenuOpen(false)} className="w-full min-h-12 px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all text-left" href="/karir">{t("nav.karir")}</a>
                 <hr className="border-outline-variant/20 my-2" />
                 {!mounted ? null : session ? (
                   <Link onClick={() => setMobileMenuOpen(false)} href="/profile" className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all">
@@ -302,14 +301,14 @@ export default function Home() {
             <div className="p-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="h-2.5 w-20 bg-secondary/30 rounded" />
-                <div className="flex items-center gap-1 text-[10px] text-green-700 font-bold">
+                <div className="flex items-center gap-1 text-xs text-green-700 font-bold">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8L12 2z"/></svg>
                   <span>{t("hero.ats-badge")}</span>
                 </div>
               </div>
               <div className="flex flex-wrap gap-1.5 mb-3">
-                <span className="h-5 px-2.5 bg-blue-100 text-blue-700 text-[9px] font-bold rounded flex items-center">{t("hero.keyword-match")}</span>
-                <span className="h-5 px-2.5 bg-purple-100 text-purple-700 text-[9px] font-bold rounded flex items-center">93%</span>
+                <span className="h-5 px-2.5 bg-blue-100 text-blue-700 text-xs font-bold rounded flex items-center">{t("hero.keyword-match")}</span>
+                <span className="h-5 px-2.5 bg-purple-100 text-purple-700 text-xs font-bold rounded flex items-center">93%</span>
               </div>
               <div className="h-2 w-full bg-outline/10 rounded-full overflow-hidden">
                 <motion.div className="h-full bg-gradient-to-r from-green-400 to-green-500 rounded-full"
@@ -333,7 +332,7 @@ export default function Home() {
               <span className="text-label-bold text-[13px]">{t("hero.badge")}</span>
             </motion.div>
             <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }}
-              className="font-display text-[clamp(2.2rem,7vw,4.5rem)] text-on-background mb-6 leading-[0.95] tracking-[-0.02em]">
+              className="font-display text-[clamp(2.2rem,7vw,4.5rem)] text-on-background mb-6 leading-[1.05] tracking-[-0.02em] text-balance">
               {t("hero.title-line1")}<br className="hidden md:block"/>
               <span className="text-primary"> {t("hero.title-line2")}</span>
             </motion.h1>
@@ -346,7 +345,7 @@ export default function Home() {
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.25 }}
               className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-8">
               <MagneticButton>
-                <Link href={session ? "/dashboard" : "/login"}
+                  <Link href="/builder/new"
                   className="w-full sm:w-auto bg-primary text-on-primary px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-headline-md text-[15px] sm:text-[17px] shadow-xl hover:shadow-2xl active:scale-95 cursor-pointer text-center block">
                   {t("hero.cta-start")}
                 </Link>
@@ -388,72 +387,54 @@ export default function Home() {
             <p className="font-body-md text-on-surface-variant max-w-2xl mx-auto mb-12">{t("template.subtitle")}</p>
           </motion.div>
 
+          {/* Stat band: 4 angka nyata dari DB, tanpa kartu bertumpuk (mengurangi beban visual) */}
           <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-5xl mx-auto mb-12"
+            className="grid grid-cols-2 lg:grid-cols-4 gap-y-10 gap-x-6 max-w-4xl mx-auto mb-16"
           >
-            {/* Stat 1: Total CV (real dari DB) */}
-            <motion.div variants={staggerItemScale} className="bg-surface-container-lowest rounded-2xl p-6 shadow-premium-md border border-outline-variant/30 hover:shadow-premium-lg hover:-translate-y-1 transition-all duration-300">
-              <div className="w-12 h-12 rounded-xl bg-primary-fixed flex items-center justify-center mx-auto mb-4">
-                <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>description</span>
-              </div>
+            <motion.div variants={staggerItemScale} className="text-center">
               {stats ? (
-                <CountUp end={stats.totalCvs} suffix="+" className="text-3xl font-extrabold text-on-surface" />
+                <CountUp end={stats.totalCvs} suffix="+" className="text-4xl font-extrabold text-primary tabular-nums" />
               ) : (
-                <div className="h-9 w-20 bg-surface-container-high rounded-lg animate-pulse mx-auto" />
+                <div className="h-10 w-24 bg-surface-container-high rounded-lg animate-pulse mx-auto" />
               )}
-              <p className="text-sm text-on-surface-variant mt-1">{t("cta.stats-cv")}</p>
+              <p className="text-sm text-on-surface-variant mt-2">{t("cta.stats-cv")}</p>
             </motion.div>
-
-            {/* Stat 2: Total Analisis (real dari DB) */}
-            <motion.div variants={staggerItemScale} className="bg-surface-container-lowest rounded-2xl p-6 shadow-premium-md border border-outline-variant/30 hover:shadow-premium-lg hover:-translate-y-1 transition-all duration-300">
-              <div className="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center mx-auto mb-4">
-                <span className="material-symbols-outlined text-green-600 text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>checklist</span>
-              </div>
+            <motion.div variants={staggerItemScale} className="text-center">
               {stats ? (
-                <CountUp end={stats.totalAnalyses} suffix="+" className="text-3xl font-extrabold text-on-surface" />
+                <CountUp end={stats.totalAnalyses} suffix="+" className="text-4xl font-extrabold text-primary tabular-nums" />
               ) : (
-                <div className="h-9 w-20 bg-surface-container-high rounded-lg animate-pulse mx-auto" />
+                <div className="h-10 w-24 bg-surface-container-high rounded-lg animate-pulse mx-auto" />
               )}
-              <p className="text-sm text-on-surface-variant mt-1">{t("cta.stats-analyzed")}</p>
+              <p className="text-sm text-on-surface-variant mt-2">{t("cta.stats-analyzed")}</p>
             </motion.div>
-
-            {/* Stat 3: Skor ATS Rata-rata (real dari DB) */}
-            <motion.div variants={staggerItemScale} className="bg-surface-container-lowest rounded-2xl p-6 shadow-premium-md border border-outline-variant/30 hover:shadow-premium-lg hover:-translate-y-1 transition-all duration-300">
-              <div className="w-12 h-12 rounded-xl bg-secondary-container/50 flex items-center justify-center mx-auto mb-4">
-                <span className="material-symbols-outlined text-secondary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>trending_up</span>
-              </div>
+            <motion.div variants={staggerItemScale} className="text-center">
               {stats ? (
-                <CountUp end={stats.avgAtsScore} suffix="%" className="text-3xl font-extrabold text-on-surface" />
+                <CountUp end={stats.avgAtsScore} suffix="%" className="text-4xl font-extrabold text-primary tabular-nums" />
               ) : (
-                <div className="h-9 w-20 bg-surface-container-high rounded-lg animate-pulse mx-auto" />
+                <div className="h-10 w-24 bg-surface-container-high rounded-lg animate-pulse mx-auto" />
               )}
-              <p className="text-sm text-on-surface-variant mt-1">{t("cta.stats-avg-ats")}</p>
+              <p className="text-sm text-on-surface-variant mt-2">{t("cta.stats-avg-ats")}</p>
             </motion.div>
-
-            {/* Stat 4: Pengguna Terdaftar (real dari DB) */}
-            <motion.div variants={staggerItemScale} className="bg-surface-container-lowest rounded-2xl p-6 shadow-premium-md border border-outline-variant/30 hover:shadow-premium-lg hover:-translate-y-1 transition-all duration-300">
-              <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center mx-auto mb-4">
-                <span className="material-symbols-outlined text-amber-600 text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>group</span>
-              </div>
+            <motion.div variants={staggerItemScale} className="text-center">
               {stats ? (
-                <CountUp end={stats.totalUsers} suffix="+" className="text-3xl font-extrabold text-on-surface" />
+                <CountUp end={stats.totalUsers} suffix="+" className="text-4xl font-extrabold text-primary tabular-nums" />
               ) : (
-                <div className="h-9 w-20 bg-surface-container-high rounded-lg animate-pulse mx-auto" />
+                <div className="h-10 w-24 bg-surface-container-high rounded-lg animate-pulse mx-auto" />
               )}
-              <p className="text-sm text-on-surface-variant mt-1">{t("cta.stats-users")}</p>
+              <p className="text-sm text-on-surface-variant mt-2">{t("cta.stats-users")}</p>
             </motion.div>
           </motion.div>
 
-          {/* Quick Tool Access, 4 cards */}
+          {/* Quick Tool Access, 4 cards, satu aksen (teal) + emerald semantik untuk GRATIS */}
           <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto mb-8"
           >
             {/* Kartu utama, treatment berbeda (R-14): border primary + badge arah */}
             <motion.div variants={staggerItemUp} className="sm:col-span-2 lg:col-span-1">
-              <Link href="/builder/new" className="block relative h-full bg-gradient-to-br from-primary/10 to-primary/[0.02] rounded-2xl p-5 border-2 border-primary/25 shadow-premium-md hover:shadow-premium-lg hover:-translate-y-0.5 transition-all duration-300 group text-left">
-                <span className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">{t("tool.start-here")}</span>
+              <Link href="/builder/new" className="block relative h-full bg-surface-container-lowest rounded-2xl p-5 border-2 border-primary/40 shadow-premium-md hover:shadow-premium-lg hover:-translate-y-0.5 transition-all duration-300 group text-left">
+                <span className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-bold">{t("tool.start-here")}</span>
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>edit_note</span>
                   </div>
                   <h3 className="font-label-bold text-on-surface group-hover:text-primary transition-colors">{t("tool.build-cv")}</h3>
@@ -462,48 +443,48 @@ export default function Home() {
               </Link>
             </motion.div>
             <motion.div variants={staggerItemUp}>
-              <Link href="/checker" className="block bg-gradient-to-br from-secondary/5 to-secondary/[0.02] rounded-2xl p-5 shadow-premium-md hover:shadow-premium-lg hover:-translate-y-0.5 transition-all duration-300 group text-left">
+              <Link href="/checker" className="block bg-surface-container-lowest rounded-2xl p-5 border border-outline-variant/30 shadow-premium-md hover:shadow-premium-lg hover:-translate-y-0.5 transition-all duration-300 group text-left">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>fact_check</span>
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>fact_check</span>
                   </div>
-                  <h3 className="font-label-bold text-on-surface group-hover:text-secondary transition-colors">{t("tool.analyze-cv")}</h3>
+                  <h3 className="font-label-bold text-on-surface group-hover:text-primary transition-colors">{t("tool.analyze-cv")}</h3>
                 </div>
                 <p className="text-xs text-on-surface-variant leading-relaxed">{t("tool.analyze-cv-desc")}</p>
               </Link>
             </motion.div>
             <motion.div variants={staggerItemUp}>
-              <Link href="/portfolio" className="block bg-gradient-to-br from-amber-500/5 to-amber-500/[0.02] rounded-2xl p-5 shadow-premium-md hover:shadow-premium-lg hover:-translate-y-0.5 transition-all duration-300 group text-left">
+              <Link href="/portfolio" className="block bg-surface-container-lowest rounded-2xl p-5 border border-outline-variant/30 shadow-premium-md hover:shadow-premium-lg hover:-translate-y-0.5 transition-all duration-300 group text-left">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <span className="material-symbols-outlined text-amber-600" style={{ fontVariationSettings: "'FILL' 1" }}>grid_view</span>
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>grid_view</span>
                   </div>
-                  <h3 className="font-label-bold text-on-surface group-hover:text-amber-600 transition-colors">{t("tool.portfolio")}</h3>
+                  <h3 className="font-label-bold text-on-surface group-hover:text-primary transition-colors">{t("tool.portfolio")}</h3>
                 </div>
                 <p className="text-xs text-on-surface-variant leading-relaxed">{t("tool.portfolio-desc")}</p>
               </Link>
             </motion.div>
             <motion.div variants={staggerItemUp}>
-              <Link href="/interview" className="block bg-gradient-to-br from-violet-500/5 to-violet-500/[0.02] rounded-2xl p-5 shadow-premium-md hover:shadow-premium-lg hover:-translate-y-0.5 transition-all duration-300 group text-left relative">
+              <Link href="/interview" className="block bg-surface-container-lowest rounded-2xl p-5 border border-outline-variant/30 shadow-premium-md hover:shadow-premium-lg hover:-translate-y-0.5 transition-all duration-300 group text-left relative">
                 {/* Gratis badge, fungsional (fitur memang gratis) */}
-                <span className="absolute -top-2 -right-2 px-2 py-0.5 rounded-full bg-emerald-500 text-white text-[8px] font-bold uppercase tracking-wider shadow-premium-sm">
+                <span className="absolute -top-2 -right-2 px-2 py-0.5 rounded-full bg-emerald-500 text-white text-xs font-bold uppercase tracking-wider shadow-premium-sm">
                   {t("tool.free-badge")}
                 </span>
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <span className="material-symbols-outlined text-violet-600" style={{ fontVariationSettings: "'FILL' 1" }}>record_voice_over</span>
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>record_voice_over</span>
                   </div>
-                  <h3 className="font-label-bold text-on-surface group-hover:text-violet-600 transition-colors">{t("tool.interview")}</h3>
+                  <h3 className="font-label-bold text-on-surface group-hover:text-primary transition-colors">{t("tool.interview")}</h3>
                 </div>
                 <p className="text-xs text-on-surface-variant leading-relaxed">{t("tool.interview-desc")}</p>
-                <p className="mt-1.5 text-[11px] font-bold text-violet-600">
+                <p className="mt-1.5 text-xs font-bold text-primary tabular-nums">
                   {t("tool.interview-count-questions").replace("{n}", INTERVIEW_QUESTION_COUNT.toLocaleString("id-ID"))}
                   {" · "}
                   {t("tool.interview-count-positions").replace("{n}", INTERVIEW_POSITION_COUNT.toLocaleString("id-ID"))}
                 </p>
                 {/* CTA ke practice mode */}
-                <span className="mt-2 inline-flex items-center gap-1 text-[9px] font-semibold text-violet-500">
-                  <span className="material-symbols-outlined text-[11px]">play_circle</span>
+                <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary">
+                  <span className="material-symbols-outlined text-xs">play_circle</span>
                   {t("tool.practice-cta")}
                 </span>
               </Link>
@@ -544,7 +525,7 @@ export default function Home() {
       <section className="relative py-16 md:py-24 px-margin-mobile md:px-gutter bg-surface-container-low/50 overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <motion.div variants={slideUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }} className="text-center mb-10 md:mb-14">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-bold tracking-wider uppercase mb-4">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-wider uppercase mb-4">
               <span className="material-symbols-outlined text-[14px]">new_releases</span>
               {t("new.badge")}
             </span>
@@ -569,7 +550,7 @@ export default function Home() {
                   <h3 className="font-label-bold text-on-surface transition-colors group-hover:text-primary">{t(item.titleKey)}</h3>
                   <p className="mt-1.5 flex-1 text-body-md text-on-surface-variant">{t(item.descKey)}</p>
                   {item.stat ? (
-                    <span className="mt-3 inline-flex w-fit items-center rounded-full bg-emerald-500/10 px-2.5 py-1 text-[11px] font-bold text-emerald-700">{item.stat}</span>
+                    <span className="mt-3 inline-flex w-fit items-center rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-bold text-emerald-700">{item.stat}</span>
                   ) : null}
                   <span className="mt-3 inline-flex items-center gap-1 text-label-bold text-primary">
                     {t("new.cta-open")}
@@ -680,10 +661,10 @@ export default function Home() {
                         </div>
                         <div>
                           <span className="text-sm font-bold text-red-500">{t("before-after.before-label")}</span>
-                          <p className="text-[11px] text-red-300 font-medium">{t("before-after.example")}</p>
+                          <p className="text-xs text-red-600 font-medium">{t("before-after.example")}</p>
                         </div>
                       </div>
-                      <span className="px-3 py-1 bg-red-50 text-red-500 rounded-full text-[10px] font-bold">{t("before-after.fail-label")}</span>
+                      <span className="px-3 py-1 bg-red-50 text-red-500 rounded-full text-xs font-bold">{t("before-after.fail-label")}</span>
                     </div>
                     {/* Mock CV Content, messy */}
                     <div className="space-y-3 opacity-60">
@@ -700,7 +681,7 @@ export default function Home() {
                         <div className="h-4 w-1/4 bg-gray-200 rounded mb-2" />
                         <div className="flex flex-wrap gap-1.5">
                           {["HTML", "CSS", "JS"].map((s) => (
-                            <span key={s} className="px-2.5 py-1 bg-gray-100 text-gray-400 rounded text-[10px] font-medium">{s}</span>
+                            <span key={s} className="px-2.5 py-1 bg-gray-100 text-gray-400 rounded text-xs font-medium">{s}</span>
                           ))}
                         </div>
                       </div>
@@ -735,10 +716,10 @@ export default function Home() {
                         </div>
                         <div>
                           <span className="text-sm font-bold text-primary">{t("before-after.after-label")}</span>
-                           <p className="text-[11px] text-primary/50 font-medium">{t("before-after.example")}</p>
+                           <p className="text-xs text-primary/70 font-medium">{t("before-after.example")}</p>
                         </div>
                       </div>
-                      <span className="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-bold">{t("before-after.pass-label")}</span>
+                      <span className="px-3 py-1 bg-green-50 text-green-600 rounded-full text-xs font-bold">{t("before-after.pass-label")}</span>
                     </div>
                     {/* Mock CV Content, clean */}
                     <div className="space-y-3">
@@ -756,7 +737,7 @@ export default function Home() {
                         <div className="h-4 w-1/4 bg-primary/10 rounded mb-2" />
                         <div className="flex flex-wrap gap-1.5">
                           {["React", "TypeScript", "Node.js", "PostgreSQL", "AWS", "Docker"].map((s) => (
-                            <span key={s} className="px-2.5 py-1 bg-primary/5 text-primary rounded text-[10px] font-medium">{s}</span>
+                            <span key={s} className="px-2.5 py-1 bg-primary/5 text-primary rounded text-xs font-medium">{s}</span>
                           ))}
                         </div>
                       </div>
@@ -783,7 +764,7 @@ export default function Home() {
           <motion.div className="mt-12 text-center" variants={slideUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}>
             <div className="inline-flex flex-col sm:flex-row items-center gap-4 sm:gap-8 bg-surface-container-low rounded-2xl px-8 py-5">
               <div className="flex items-center gap-3">
-                <span className="text-2xl">📈</span>
+                <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>trending_up</span>
                 <span className="font-label-bold text-on-surface">{t("before-after.difference")}</span>
               </div>
               <div className="hidden sm:block w-px h-8 bg-outline-variant" />
@@ -903,7 +884,7 @@ export default function Home() {
               </div>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 perspective-[600px]">
                 <MagneticButton>
-                  <Link href={session ? "/dashboard" : "/login"}
+                <Link href="/builder/new"
                     className="group/cta px-10 py-4 rounded-2xl bg-surface-container-lowest text-primary font-bold text-base transition-all duration-300 inline-flex items-center gap-2 cursor-pointer relative overflow-hidden"
                     style={{ transformStyle: "preserve-3d" }}>
                     <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/cta:translate-x-full transition-transform duration-700" />
@@ -920,7 +901,7 @@ export default function Home() {
                   </Link>
                 </MagneticButton>
               </div>
-              <p className="text-xs text-white/50 mt-6">{t("cta.footer")}</p>
+              <p className="text-xs text-white/80 mt-6">{t("cta.footer")}</p>
             </div>
           </div>
         </div>
@@ -929,6 +910,8 @@ export default function Home() {
       <StickyMobileCTA />
 
       <AppFooter variant="full" />
+      {/* Spacer kompensasi sticky mobile CTA agar tidak menimpa footer */}
+      <div className="h-20 md:hidden" aria-hidden="true" />
     </>
   );
 }

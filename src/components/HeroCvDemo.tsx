@@ -73,7 +73,9 @@ export default function HeroCvDemo() {
           <span className="material-symbols-outlined text-[16px]" aria-hidden>bolt</span>
           {t("hero.demo.run")}
         </button>
-        <span className="text-[10px] leading-tight text-on-surface-variant">{t("hero.demo.free")}</span>
+        <span className="text-xs leading-tight text-on-surface-variant">
+          {text.trim().length < 20 ? t("hero.demo.min") : t("hero.demo.free")}
+        </span>
       </div>
 
       <AnimatePresence>
@@ -113,7 +115,7 @@ export default function HeroCvDemo() {
                     initial={reduce ? false : { opacity: 0, x: -8 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: reduce ? 0 : 0.5 + index * 0.18 }}
-                    className="flex items-start gap-2 text-[11px] leading-snug text-on-surface-variant"
+                    className="flex items-start gap-2 text-xs leading-snug text-on-surface-variant"
                   >
                     <span className="material-symbols-outlined mt-0.5 text-[14px] text-primary" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden>
                       tips_and_updates
@@ -122,7 +124,7 @@ export default function HeroCvDemo() {
                   </motion.li>
                 ))}
                 {result.tips.length === 0 ? (
-                  <motion.li initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: reduce ? 0 : 0.5 }} className="text-[11px] text-on-surface-variant">
+                  <motion.li initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: reduce ? 0 : 0.5 }} className="text-xs text-on-surface-variant">
                     {t("hero.demo.good")}
                   </motion.li>
                 ) : null}
@@ -137,7 +139,7 @@ export default function HeroCvDemo() {
                   <span className="material-symbols-outlined text-[16px]" aria-hidden>arrow_forward</span>
                 </Link>
               </motion.div>
-              <p className="mt-2 text-[10px] text-outline">{t("hero.demo.disclaimer")}</p>
+              <p className="mt-2 text-xs text-on-surface-variant">{t("hero.demo.disclaimer")}</p>
             </div>
           </motion.div>
         ) : null}

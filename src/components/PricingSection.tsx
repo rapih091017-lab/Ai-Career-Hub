@@ -223,7 +223,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
                 )}
                 <span className="relative z-10">{m === "satuan" ? t("pricing.toggle-satuan") : t("pricing.toggle-langganan")}</span>
                 {mode === "satuan" && m === "langganan" && (
-                  <span className="relative z-10 ml-2 inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-[10px] font-bold">
+                  <span className="relative z-10 ml-2 inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-bold">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
                     {t("pricing.badge-hemat")}
                   </span>
@@ -255,6 +255,82 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
             ))}
           </motion.div>
         </AnimatePresence>
+
+        {/* ─── FOOTNOTE (langganan mode) ─── */}
+        {mode === "langganan" && (
+          <motion.div className="mt-8 text-center space-y-3"
+            initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.3 }}>
+            <p className="text-sm text-on-surface-variant inline-flex items-center gap-1.5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              {t("pricing.footnote-payment")}
+            </p>
+            <p className="text-sm text-on-surface-variant inline-flex items-center gap-1.5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              {t("pricing.footnote-cancel")}
+            </p>
+            {/* Risk Reversal Badges */}
+            <div className="flex items-center justify-center gap-4 pt-2">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded-xl">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-600 shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <div className="text-left">
+                  <p className="text-xs font-bold text-green-700">{t("pricing.garansi")}</p>
+                  <p className="text-xs text-green-600">{t("pricing.garansi-desc")}</p>
+                </div>
+              </div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-xl">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600 shrink-0"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                <div className="text-left">
+                  <p className="text-xs font-bold text-blue-700">{t("pricing.no-contract")}</p>
+                  <p className="text-xs text-blue-600">{t("pricing.no-contract-desc")}</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* ─── COMPARISON TABLE ─── */}
+        <motion.div className="mt-16"
+          initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }}>
+          <button onClick={() => setShowComparison(!showComparison)}
+            className="flex items-center justify-center gap-2 w-full py-4 text-primary font-label-bold hover:bg-primary/5 rounded-xl transition-colors">
+            <span>{t("pricing.comparison-toggle")}</span>
+            <motion.span animate={{ rotate: showComparison ? 180 : 0 }} transition={{ duration: 0.2 }}
+              className="material-symbols-outlined text-lg">expand_more</motion.span>
+          </button>
+          <AnimatePresence>
+            {showComparison && (
+              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: "easeInOut" }} className="overflow-hidden">
+                <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/30 overflow-hidden shadow-premium-sm mt-2">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                      <thead>
+                        <tr className="bg-surface-container-low border-b border-outline-variant/30">
+                          <th className="p-4 text-label-sm font-bold text-on-surface-variant">{t("pricing.comparison-header")}</th>
+                          <th className="p-4 text-label-sm font-bold text-on-surface-variant">Free</th>
+                          <th className="p-4 text-label-sm font-bold text-on-surface-variant">Starter</th>
+                          <th className="p-4 text-label-sm font-bold text-primary bg-primary/5">Pro</th>
+                          <th className="p-4 text-label-sm font-bold text-on-surface-variant">Business</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {COMPARISON_ROW_KEYS.map((row, i) => (
+                          <tr key={row.labelKey} className={`border-b border-outline-variant/10 ${i % 2 === 0 ? "bg-surface-container-lowest" : "bg-surface-container-low/50"}`}>
+                            <td className="p-4 text-sm font-medium text-on-surface">{t(row.labelKey)}</td>
+                            <td className="p-4 text-sm text-on-surface-variant">{row.free}</td>
+                            <td className="p-4 text-sm text-on-surface-variant">{row.starter}</td>
+                            <td className="p-4 text-sm font-semibold text-primary bg-primary/5">{row.pro}</td>
+                            <td className="p-4 text-sm text-on-surface-variant">{row.business}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
 
         {/* ─── BUNDLE BOX (satuan mode only) ─── */}
         {mode === "satuan" && (
@@ -319,83 +395,8 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
           </motion.div>
         )}
 
-        {/* ─── FOOTNOTE (langganan mode) ─── */}
-        {mode === "langganan" && (
-          <motion.div className="mt-8 text-center space-y-3"
-            initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.3 }}>
-            <p className="text-sm text-on-surface-variant inline-flex items-center gap-1.5">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-              {t("pricing.footnote-payment")}
-            </p>
-            <p className="text-sm text-on-surface-variant inline-flex items-center gap-1.5">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              {t("pricing.footnote-cancel")}
-            </p>
-            {/* Risk Reversal Badges */}
-            <div className="flex items-center justify-center gap-4 pt-2">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded-xl">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-600 shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                <div className="text-left">
-                  <p className="text-xs font-bold text-green-700">{t("pricing.garansi")}</p>
-                  <p className="text-[10px] text-green-600">{t("pricing.garansi-desc")}</p>
-                </div>
-              </div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-xl">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600 shrink-0"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                <div className="text-left">
-                  <p className="text-xs font-bold text-blue-700">{t("pricing.no-contract")}</p>
-                  <p className="text-[10px] text-blue-600">{t("pricing.no-contract-desc")}</p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {/* ─── COMPARISON TABLE ─── */}
-        <motion.div className="mt-16"
-          initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }}>
-          <button onClick={() => setShowComparison(!showComparison)}
-            className="flex items-center justify-center gap-2 w-full py-4 text-primary font-label-bold hover:bg-primary/5 rounded-xl transition-colors">
-            <span>{t("pricing.comparison-toggle")}</span>
-            <motion.span animate={{ rotate: showComparison ? 180 : 0 }} transition={{ duration: 0.2 }}
-              className="material-symbols-outlined text-lg">expand_more</motion.span>
-          </button>
-          <AnimatePresence>
-            {showComparison && (
-              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: "easeInOut" }} className="overflow-hidden">
-                <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/30 overflow-hidden shadow-premium-sm mt-2">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                      <thead>
-                        <tr className="bg-surface-container-low border-b border-outline-variant/30">
-                          <th className="p-4 text-label-sm font-bold text-on-surface-variant">{t("pricing.comparison-header")}</th>
-                          <th className="p-4 text-label-sm font-bold text-on-surface-variant">Free</th>
-                          <th className="p-4 text-label-sm font-bold text-on-surface-variant">Starter</th>
-                          <th className="p-4 text-label-sm font-bold text-primary bg-primary/5">Pro</th>
-                          <th className="p-4 text-label-sm font-bold text-on-surface-variant">Business</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {COMPARISON_ROW_KEYS.map((row, i) => (
-                          <tr key={row.labelKey} className={`border-b border-outline-variant/10 ${i % 2 === 0 ? "bg-surface-container-lowest" : "bg-surface-container-low/50"}`}>
-                            <td className="p-4 text-sm font-medium text-on-surface">{t(row.labelKey)}</td>
-                            <td className="p-4 text-sm text-on-surface-variant">{row.free}</td>
-                            <td className="p-4 text-sm text-on-surface-variant">{row.starter}</td>
-                            <td className="p-4 text-sm font-semibold text-primary bg-primary/5">{row.pro}</td>
-                            <td className="p-4 text-sm text-on-surface-variant">{row.business}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
-
-        {/* ─── FAQ ─── */}
+        {/* ─── 
+{/* ─── FAQ ─── */}
         <motion.div className="mt-16"
           initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.1 }}>
           <h3 className="font-headline-md text-center text-on-surface dark:text-white mb-8">{t("pricing.faq-title")}</h3>
@@ -465,7 +466,7 @@ function PricingCard({ plan, delay, onSelectPlan, mode, tFn }: {
         </div>
       )}
       {!plan.badgeKey && plan.id === "free" && mode === "langganan" && (
-        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-[11px] font-bold whitespace-nowrap shadow-md bg-emerald-500 text-white">
+        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold whitespace-nowrap shadow-md bg-emerald-500 text-white">
           Gratis
         </div>
       )}
@@ -481,7 +482,7 @@ function PricingCard({ plan, delay, onSelectPlan, mode, tFn }: {
                     {plan.id === "pro" && (
                       <div className="mt-3 inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 border border-amber-200 rounded-full">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500 shrink-0"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                        <span className="text-[11px] font-bold text-amber-700">{t("pricing.best-value")}</span>
+                        <span className="text-xs font-bold text-amber-700">{t("pricing.best-value")}</span>
                       </div>
                     )}
                   </div>
@@ -489,7 +490,7 @@ function PricingCard({ plan, delay, onSelectPlan, mode, tFn }: {
         {/* Price */}
         <div className="mb-6">
           <div className="flex items-baseline gap-1">
-            <span className={"font-bold tracking-tight " + (plan.featured ? "text-[36px]" : "text-[30px]") + " text-on-surface dark:text-white"}>
+            <span className={"font-bold tracking-tight tabular-nums " + (plan.featured ? "text-[36px]" : "text-[30px]") + " text-on-surface dark:text-white"}>
               {plan.price === 0 ? t("pricing.plan.free.name") : "Rp" + plan.price.toLocaleString("id-ID")}
             </span>
             <span className="text-sm text-on-surface-variant dark:text-gray-400">{t(plan.unitKey)}</span>
