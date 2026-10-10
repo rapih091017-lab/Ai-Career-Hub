@@ -95,7 +95,8 @@ export function usePortfolioDraft(draftId: string | null): UsePortfolioDraftResu
     (async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/portfolio/draft?draftId=${draftId}`, {
+        const params = new URLSearchParams({ draftId });
+        const res = await fetch(`/api/portfolio/draft?${params.toString()}`, {
           cache: "no-store",
         });
         if (!res.ok) throw new Error("gagal memuat");
@@ -144,6 +145,7 @@ export function usePortfolioDraft(draftId: string | null): UsePortfolioDraftResu
       setLastSavedAt(json.updatedAt);
       writeCache(draftId, { name, data: body, updatedAt: json.updatedAt });
     } catch {
+      pending.current = body;
       setStatus("error");
       setOffline(true);
       setError("Perubahan belum masuk server. Ketuk coba lagi.");
@@ -182,6 +184,12 @@ export function usePortfolioDraft(draftId: string | null): UsePortfolioDraftResu
       timer.current = setTimeout(() => void flush(), DEBOUNCE_MS);
     }
   }, [flush]);
+
+  useEffect(() => {
+    return () => {
+      if (timer.current) clearTimeout(timer.current);
+    };
+  }, []);
 
   const retry = useCallback(() => {
     if (!pending.current) return;
