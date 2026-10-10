@@ -1,5 +1,13 @@
-﻿import { pgTable, text, timestamp, uuid, jsonb, boolean, integer, varchar, index, numeric, uniqueIndex, check } from "drizzle-orm/pg-core";
+﻿import { pgTable, text, timestamp, uuid, jsonb, boolean, integer, varchar, index, numeric, uniqueIndex, check, customType } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
+
+/** customType untuk kolom biner PostgreSQL. Drizzle pg-core (0.45.2) belum
+ *  punya bytea bawaan; dipetakan ke Buffer node-postgres. */
+const bytea = customType<{ data: Buffer; driverData: Buffer }>({
+  dataType() {
+    return "bytea";
+  },
+});
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -250,6 +258,25 @@ export const portfolioDrafts = pgTable("portfolio_drafts", {
   updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow(),
 }, (table) => [
   index("portfolio_drafts_user_idx").on(table.userId),
+]);
+
+/** Aset gambar portfolio. Disimpan sebagai bytea agar draft JSON tetap kecil
+ *  dan file HTML export bisa meng-inline gambar tanpa kehilangan. */
+export const portfolioAssets = pgTable("portfolio_assets", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  mime: varchar("mime", { length: 32 }).notNull(),
+  bytes: integer("bytes").notNull(),
+  width: integer("width"),
+  height: integer("height"),
+  sha256: varchar("sha256", { length: 64 }).notNull(),
+  data: bytea("data").notNull(),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
+}, (table) => [
+  uniqueIndex("portfolio_assets_user_sha_idx").on(table.userId, table.sha256),
+  index("portfolio_assets_user_idx").on(table.userId),
 ]);
 
 export const slugHistory = pgTable("slug_history", {
