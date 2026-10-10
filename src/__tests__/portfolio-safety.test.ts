@@ -57,6 +57,22 @@ describe("safeUrl", () => {
     expect(safeUrl("//evil.com")).toBe("");
     expect(safeUrl("//evil.com/path")).toBe("");
   });
+
+  it("menolak backslash yang di-normalisasi browser jadi slash", () => {
+    expect(safeUrl("/\\evil.com")).toBe("");
+    expect(safeUrl("/\\evil.com/path")).toBe("");
+  });
+
+  it("menolak karakter kontrol yang di-strip browser jadi slash", () => {
+    expect(safeUrl("/\t/evil.com")).toBe("");
+    expect(safeUrl("/\n/evil.com")).toBe("");
+    expect(safeUrl("/\r\n/evil.com")).toBe("");
+  });
+
+  it("tetap menerima path aset lokal yang sah", () => {
+    const asset = "/api/portfolio/assets/6f1c2d3e-4a5b-6c7d-8e9f-0a1b2c3d4e5f";
+    expect(safeUrl(asset)).toBe(asset);
+  });
 });
 
 describe("isValidSlug", () => {

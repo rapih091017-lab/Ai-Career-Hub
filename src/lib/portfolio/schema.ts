@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { isValidSlug, safeUrl } from "@/lib/portfolio-safety";
+import { SECTION_IDS, type SectionId } from "@/components/portfolio/types";
 
 /** Batas jumlah item per array. Dipakai form dan Zod sekaligus. */
 export const LIMITS = {
@@ -13,7 +14,9 @@ export const LIMITS = {
   extraLinks: 12,
 } as const;
 
-/** Panjang maksimum string. Cerminan maxLength di form. */
+/** Panjang maksimum string. Cerminan maxLength di form.
+ *  Panjang slug tidak ada di sini: SLUG_REGEX (lewat isValidSlug) satu-satunya
+ *  penentu panjang slug. */
 const MAX = {
   short: 200,
   line: 500,
@@ -23,7 +26,6 @@ const MAX = {
   email: 254,
   phone: 32,
   url: 2048,
-  slug: 60,
 } as const;
 
 const text = (max: number) => z.string().max(max);
@@ -38,11 +40,23 @@ const urlField = (max: number) =>
       message: "Tautan memakai skema yang tidak diizinkan",
     });
 
-/** Tanggal portfolio: YYYY-MM, atau string kosong. */
+/** Tanggal portfolio: YYYY-MM, atau string kosong (spasi tepi di-trim dulu). */
 const monthField = z
   .string()
-  .regex(/^$|^\d{4}-(0[1-9]|1[0-2])$/, "Tanggal harus format YYYY-MM")
-  .transform((v) => v.trim());
+  .trim()
+  .regex(/^$|^\d{4}-(0[1-9]|1[0-2])$/, "Tanggal harus format YYYY-MM");
+
+/**
+ * Aturan rentang tanggal (YYYY-MM, string kosong = belum diisi):
+ * - tanggal selesai tanpa tanggal mulai → tidak sah
+ * - `isPresent` (masih berjalan) bersama tanggal selesai → tidak sah
+ * - selain itu, tanggal selesai tidak boleh lebih awal dari tanggal mulai
+ */
+const dateRange = (startDate: string, endDate: string, isPresent: boolean): boolean => {
+  if (endDate !== "" && startDate === "") return false;
+  if (isPresent && endDate !== "") return false;
+  return startDate === "" || endDate === "" || endDate >= startDate;
+};
 
 const id = z.string().min(1).max(64);
 
@@ -68,11 +82,11 @@ export const experienceItemSchema = z
     endDate: monthField,
     description: text(MAX.paragraph),
     isPresent: z.boolean().default(false),
-    imageUrl: z.string().max(MAX.url).default(""),
+    imageUrl: urlField(MAX.url).default(""),
     companyLogo: urlField(MAX.url).default(""),
   })
   .refine(
-    (v) => v.startDate === "" || v.endDate === "" || v.isPresent || v.endDate >= v.startDate,
+    (v) => dateRange(v.startDate, v.endDate, v.isPresent),
     { message: "Tanggal selesai tidak boleh lebih awal dari tanggal mulai" },
   );
 
@@ -87,7 +101,7 @@ export const educationItemSchema = z
     isPresent: z.boolean().default(false),
   })
   .refine(
-    (v) => v.startDate === "" || v.endDate === "" || v.isPresent || v.endDate >= v.startDate,
+    (v) => dateRange(v.startDate, v.endDate, v.isPresent),
     { message: "Tanggal lulus tidak boleh lebih awal dari tanggal mulai" },
   );
 
@@ -130,8 +144,12 @@ export const portfolioFormDataSchema = z.object({
   heroPhotoUrl: urlField(MAX.url).default(""),
   heroHeadline: text(MAX.name),
   heroSubHeadline: text(MAX.line),
+  // Dua field di bawah masih dipakai form live builder; dihapus di task terpisah.
+  // String biasa (bukan urlField) supaya isinya tidak ditolak/diubah schema.
+  heroBgUrl: text(MAX.url).default(""),
   heroFirstName: text(MAX.name),
   heroLastName: text(MAX.name),
+  heroCreativeTitle: text(MAX.line).default(""),
   heroBio: text(MAX.line),
   aboutText: text(MAX.long),
   aboutYearsExp: z.string().max(MAX.short).default(""),
@@ -159,8 +177,8 @@ export const portfolioDataSchema = z.object({
   hobbies: z.array(hobbyItemSchema).max(LIMITS.hobbies).default([]),
   testimonials: z.array(testimonialItemSchema).max(LIMITS.testimonials).default([]),
   extraLinks: z.array(extraLinkSchema).max(LIMITS.extraLinks).default([]),
-  sectionOrder: z.array(z.string()).optional(),
-  sectionVisibility: z.record(z.string(), z.boolean()).optional(),
+  sectionOrder: z.array(z.enum(SECTION_IDS)).optional(),
+  sectionVisibility: z.partialRecord(z.enum(SECTION_IDS), z.boolean()).optional(),
   sectionColors: z.record(z.string(), z.record(z.string(), z.string())).optional(),
 });
 
@@ -173,7 +191,6 @@ export const publishPayloadSchema = z
     slug: z
       .string()
       .min(3)
-      .max(MAX.slug)
       .transform((v) => v.trim().toLowerCase())
       .refine(isValidSlug, "Slug tidak valid atau kata terlarang"),
     themeId: z.enum(THEME_IDS),
@@ -204,13 +221,14 @@ export const draftPayloadSchema = z.object({
 export type DraftPayload = z.infer<typeof draftPayloadSchema>;
 
 /**
- * Daftar section yang tidak punya data. Publish ditolak kalau semua kosong,
- * supaya portfolio yang secara visual kosong tidak bisa terbit.
+ * Daftar section yang tidak punya data, dalam urutan SECTION_IDS.
+ * Fungsi ini hanya melaporkan; pemanggil yang memutuskan threshold publish
+ * (misal: menolak publish kalau semua section kosong).
  */
-export function emptySectionIds(data: ValidatedPortfolioData): string[] {
+export function emptySectionIds(data: ValidatedPortfolioData): SectionId[] {
   const f = data.formData;
   const has = (s: string) => s.trim() !== "";
-  const checks: Record<string, boolean> = {
+  const checks: Record<SectionId, boolean> = {
     hero: has(f.heroFirstName),
     about: has(f.aboutText),
     stats: has(f.aboutYearsExp) || has(f.aboutProjectsDone) || has(f.aboutClientsHappy),
@@ -224,7 +242,7 @@ export function emptySectionIds(data: ValidatedPortfolioData): string[] {
     testimonials: data.testimonials.some((t) => has(t.name)),
     contact: has(f.contactEmail) || has(f.contactLinkedin) || has(f.contactGithub),
   };
-  return Object.entries(checks)
+  return (Object.entries(checks) as [SectionId, boolean][])
     .filter(([, filled]) => !filled)
-    .map(([id]) => id);
+    .map(([sectionId]) => sectionId);
 }

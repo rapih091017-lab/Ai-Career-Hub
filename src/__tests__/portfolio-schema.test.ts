@@ -1,8 +1,11 @@
 import { describe, it, expect } from "vitest";
+import type { PortfolioData } from "@/components/portfolio-templates/types";
+import { SECTION_IDS } from "@/components/portfolio/types";
 import {
   portfolioDataSchema,
   publishPayloadSchema,
   draftPayloadSchema,
+  emptySectionIds,
   LIMITS,
 } from "@/lib/portfolio/schema";
 
@@ -175,6 +178,145 @@ describe("portfolioDataSchema", () => {
     expect(portfolioDataSchema.safeParse(bad).success).toBe(false);
   });
 
+  it("menolak isPresent yangdisambiguation dengan tanggal selesai", () => {
+    const bad = {
+      ...emptyData,
+      experiences: [
+        {
+          id: "e1",
+          company: "Acme",
+          position: "Dev",
+          startDate: "2024-01",
+          endDate: "2023-01",
+          description: "",
+          isPresent: true,
+        },
+      ],
+    };
+    expect(portfolioDataSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it("menolak tanggal selesai tanpa tanggal mulai", () => {
+    const bad = {
+      ...emptyData,
+      educations: [
+        {
+          id: "ed1",
+          institution: "Universitas X",
+          degree: "S1",
+          field: "Informatika",
+          startDate: "",
+          endDate: "2024-01",
+        },
+      ],
+    };
+    expect(portfolioDataSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it("menerima rentang tanggal yang konsisten", () => {
+    const ok = {
+      ...emptyData,
+      experiences: [
+        { id: "e1", company: "Acme", position: "Dev", startDate: "2023-01", endDate: "2024-01", description: "" },
+      ],
+      educations: [
+        {
+          id: "ed1",
+          institution: "Universitas X",
+          degree: "S1",
+          field: "Informatika",
+          startDate: "2019-08",
+          endDate: "",
+          isPresent: true,
+        },
+      ],
+    };
+    expect(portfolioDataSchema.safeParse(ok).success).toBe(true);
+  });
+
+  it("menolak skema terlarang pada experiences[].imageUrl", () => {
+    const bad = {
+      ...emptyData,
+      experiences: [
+        {
+          id: "e1",
+          company: "Acme",
+          position: "Dev",
+          startDate: "2024-01",
+          endDate: "",
+          description: "",
+          imageUrl: "javascript:alert(1)",
+        },
+      ],
+    };
+    expect(portfolioDataSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it("menerima path aset lokal pada experiences[].imageUrl", () => {
+    const assetPath = "/api/portfolio/assets/6f1c2d3e-4a5b-6c7d-8e9f-0a1b2c3d4e5f";
+    const r = portfolioDataSchema.parse({
+      ...emptyData,
+      experiences: [
+        {
+          id: "e1",
+          company: "Acme",
+          position: "Dev",
+          startDate: "2024-01",
+          endDate: "",
+          description: "",
+          imageUrl: assetPath,
+        },
+      ],
+    });
+    expect(r.experiences[0].imageUrl).toBe(assetPath);
+  });
+
+  it("menolak section id yang tidak dikenal pada sectionOrder", () => {
+    const bad = {
+      ...emptyData,
+      sectionOrder: ["hero", "footer"],
+    };
+    expect(portfolioDataSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it("menolak section id yang tidak dikenal pada sectionVisibility", () => {
+    const bad = {
+      ...emptyData,
+      sectionVisibility: { hero: true, footer: false },
+    };
+    expect(portfolioDataSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it("mempertahankan sectionOrder dan sectionVisibility yang sah", () => {
+    const sectionOrder = ["hero", "about", "contact"] as const;
+    const r = portfolioDataSchema.parse({
+      ...emptyData,
+      sectionOrder: [...sectionOrder],
+      sectionVisibility: { hero: true, about: false },
+    });
+    expect(r.sectionOrder).toEqual([...sectionOrder]);
+    expect(r.sectionVisibility).toEqual({ hero: true, about: false });
+  });
+
+  it("mempertahankan heroBgUrl dan heroCreativeTitle saat parse", () => {
+    const r = portfolioDataSchema.parse({
+      ...emptyData,
+      formData: {
+        ...validFormData,
+        heroBgUrl: "/uploads/hero-bg.jpg",
+        heroCreativeTitle: "Frontend Engineer",
+      },
+    });
+    expect(r.formData.heroBgUrl).toBe("/uploads/hero-bg.jpg");
+    expect(r.formData.heroCreativeTitle).toBe("Frontend Engineer");
+  });
+
+  it("hasil parse tetap memenuhi tipe PortfolioData", () => {
+    const parsed: PortfolioData = portfolioDataSchema.parse(emptyData);
+    expect(parsed.formData.heroBgUrl).toBe("");
+    expect(parsed.formData.heroCreativeTitle).toBe("");
+  });
+
   it("menerapkan default pada field opsional", () => {
     const r = portfolioDataSchema.parse({
       ...emptyData,
@@ -186,6 +328,65 @@ describe("portfolioDataSchema", () => {
     expect(r.projects[0].imageUrl).toBe("");
     expect(r.projects[0].featured).toBe(false);
     expect(r.experiences[0].isPresent).toBe(false);
+  });
+});
+
+describe("emptySectionIds", () => {
+  it("mengembalikan dua belas id saat seluruh data kosong", () => {
+    const parsed = portfolioDataSchema.parse({
+      ...emptyData,
+      formData: {
+        heroPhotoUrl: "",
+        heroHeadline: "",
+        heroSubHeadline: "",
+        heroBgUrl: "",
+        heroFirstName: "",
+        heroLastName: "",
+        heroCreativeTitle: "",
+        heroBio: "",
+        aboutText: "",
+        aboutYearsExp: "",
+        aboutProjectsDone: "",
+        aboutClientsHappy: "",
+        skillsMain: "",
+        skillsTools: "",
+        skillsLanguages: "",
+        contactEmail: "",
+        contactPhone: "",
+        contactLinkedin: "",
+        contactGithub: "",
+      },
+    });
+    expect(emptySectionIds(parsed)).toEqual([...SECTION_IDS]);
+  });
+
+  it("tidak menandai hero yang sudah terisi", () => {
+    const parsed = portfolioDataSchema.parse({
+      ...emptyData,
+      formData: {
+        ...validFormData,
+        aboutText: "",
+        aboutYearsExp: "",
+        aboutProjectsDone: "",
+        aboutClientsHappy: "",
+        skillsMain: "",
+        contactEmail: "",
+        contactLinkedin: "",
+        contactGithub: "",
+      },
+    });
+    const empty = emptySectionIds(parsed);
+    expect(empty).not.toContain("hero");
+    expect(empty).toContain("about");
+    expect(empty).toHaveLength(SECTION_IDS.length - 1);
+  });
+
+  it("tetap menandai hero kosong saat hanya headline yang terisi", () => {
+    const parsed = portfolioDataSchema.parse({
+      ...emptyData,
+      formData: { ...validFormData, heroFirstName: "" },
+    });
+    expect(emptySectionIds(parsed)).toContain("hero");
   });
 });
 

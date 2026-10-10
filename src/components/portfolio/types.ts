@@ -1,16 +1,21 @@
-export type SectionId =
-  | "hero"
-  | "about"
-  | "stats"
-  | "experience"
-  | "education"
-  | "projects"
-  | "skills"
-  | "certifications"
-  | "organizations"
-  | "hobbies"
-  | "testimonials"
-  | "contact";
+/** Dua belas section portfolio. Sumber kebenaran untuk union SectionId
+ *  sekaligus untuk validasi Zod (sectionOrder / sectionVisibility). */
+export const SECTION_IDS = [
+  "hero",
+  "about",
+  "stats",
+  "experience",
+  "education",
+  "projects",
+  "skills",
+  "certifications",
+  "organizations",
+  "hobbies",
+  "testimonials",
+  "contact",
+] as const;
+
+export type SectionId = (typeof SECTION_IDS)[number];
 
 export type ThemeId = "glass" | "brutal" | "luxe";
 
