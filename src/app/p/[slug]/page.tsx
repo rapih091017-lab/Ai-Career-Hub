@@ -5,8 +5,16 @@ import { db } from "@/db";
 import { portfolioPages } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { THEMES, DEFAULT_THEME_ID } from "@/components/portfolio/themes";
-import PublishedPortfolio from "@/components/portfolio/PublishedPortfolio";
-import type { PortfolioData, SectionId, SectionVisibility } from "@/components/portfolio/types";
+import PortfolioDocument, {
+  type PortfolioSectionColors,
+} from "@/components/portfolio/render/PortfolioDocument";
+import type {
+  FontSize,
+  PortfolioData,
+  SectionId,
+  SectionVisibility,
+  ThemeId,
+} from "@/components/portfolio/types";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -52,18 +60,35 @@ export default async function PublishedPortfolioPage({ params }: PageProps) {
   const d = row.data as unknown as PortfolioData & {
     sectionOrder?: SectionId[];
     sectionVisibility?: SectionVisibility;
+    sectionColors?: PortfolioSectionColors;
+    fontSize?: FontSize;
   };
   const theme = THEMES[row.theme] || THEMES[DEFAULT_THEME_ID];
 
   return (
     <>
       <link rel="stylesheet" href={theme.fontUrl} />
-      <PublishedPortfolio
+      <PortfolioDocument
         data={d}
-        themeId={row.theme}
+        themeId={row.theme as ThemeId}
+        mode="static"
         sectionOrder={d.sectionOrder}
         sectionVisibility={d.sectionVisibility}
+        fontSize={d.fontSize ?? "medium"}
+        sectionColors={d.sectionColors ?? null}
       />
+      <footer
+        className="text-center py-8"
+        style={{
+          color: theme.colors.textMuted,
+          borderTop: `1px solid ${theme.colors.border}`,
+          fontSize: 13,
+        }}
+      >
+        &copy; {new Date().getFullYear()}{" "}
+        {[d.formData?.heroFirstName, d.formData?.heroLastName].filter(Boolean).join(" ") || "Nama Lengkap"}
+        . Dibuat dengan AI Career Hub
+      </footer>
     </>
   );
 }

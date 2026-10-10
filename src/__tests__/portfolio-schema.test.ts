@@ -603,30 +603,29 @@ describe("canvas dan halaman publik membaca peta parsial sama", () => {
   it("canvas still renders a section missing from a partial visibility map", () => {
     // Persis skenario yang ditemukan: output schema (peta parsial) mengalir
     // ke editor. about tidak disebut di peta, jadi harus tetap tampil.
+    stubBrowserApis();
     const parsed = portfolioDataSchema.parse({
       ...emptyData,
+      formData: { ...validFormData, aboutText: "SEKSI_ABOUT" },
       sectionVisibility: { hero: false },
     });
     const sectionVisibility = parsed.sectionVisibility;
     if (!sectionVisibility) throw new Error("sectionVisibility harus ada pada payload ini");
 
-    render(
+    const { container } = render(
       createElement(PortfolioCanvas, {
         themeId: "glass",
+        data: parsed as PortfolioData,
         sectionOrder: ["hero", "about"],
         onSectionOrderChange: () => {},
         sectionVisibility,
         onToggleSection: () => {},
         selectedSection: null,
         onSelectSection: () => {},
-        children: [
-          createElement("div", { key: "hero", "data-section-id": "hero" }, "SEKSI_HERO"),
-          createElement("div", { key: "about", "data-section-id": "about" }, "SEKSI_ABOUT"),
-        ],
       }),
     );
 
-    expect(screen.queryByText("SEKSI_HERO")).toBeNull();
+    expect(container.querySelector('[data-section-id="hero"]')).toBeNull();
     expect(screen.getByText("SEKSI_ABOUT")).toBeTruthy();
   });
 

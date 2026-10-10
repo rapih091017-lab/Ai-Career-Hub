@@ -18,20 +18,6 @@ import type {
   TestimonialItem, ExtraLink, FontSize, TextAlignment,
 } from "@/components/portfolio/types";
 
-/* ─── SECTION IMPORTS ─── */
-import HeroSection from "@/components/portfolio/sections/HeroSection";
-import AboutSection from "@/components/portfolio/sections/AboutSection";
-import StatsSection from "@/components/portfolio/sections/StatsSection";
-import SkillsSection from "@/components/portfolio/sections/SkillsSection";
-import ProjectsSection from "@/components/portfolio/sections/ProjectsSection";
-import ExperienceSection from "@/components/portfolio/sections/ExperienceSection";
-import EducationSection from "@/components/portfolio/sections/EducationSection";
-import CertificationsSection from "@/components/portfolio/sections/CertificationsSection";
-import OrganizationsSection from "@/components/portfolio/sections/OrganizationsSection";
-import HobbiesSection from "@/components/portfolio/sections/HobbiesSection";
-import TestimonialsSection from "@/components/portfolio/sections/TestimonialsSection";
-import ContactSection from "@/components/portfolio/sections/ContactSection";
-
 /* ─── HELPERS ─── */
 const genId = () => Math.random().toString(36).slice(2, 9);
 
@@ -298,21 +284,9 @@ export default function PortfolioLiveBuilder() {
   const theme = THEMES[themeId] || THEMES[DEFAULT_THEME_ID];
   const themeOptions = Object.values(THEMES);
 
-  const renderSection = (id: SectionId) => {
-    switch (id) {
-      case "hero": return <HeroSection data={formData} />;
-      case "about": return <AboutSection data={formData} />;
-      case "stats": return <StatsSection data={formData} />;
-      case "experience": return <ExperienceSection items={experiences} />;
-      case "education": return <EducationSection items={educations} />;
-      case "projects": return <ProjectsSection items={projects} />;
-      case "skills": return <SkillsSection data={formData} />;
-      case "certifications": return <CertificationsSection items={certifications} />;
-      case "organizations": return <OrganizationsSection items={organizations} />;
-      case "hobbies": return <HobbiesSection items={hobbies} />;
-      case "testimonials": return <TestimonialsSection items={testimonials} />;
-      case "contact": return <ContactSection data={formData} extraLinks={extraLinks} />;
-    }
+  const canvasData = {
+    formData, projects, experiences, educations, certifications,
+    organizations, hobbies, testimonials, extraLinks,
   };
 
   const editSection = (sid: SectionId) => {
@@ -741,6 +715,7 @@ export default function PortfolioLiveBuilder() {
           <main className={`flex-1 overflow-y-auto relative ${fullscreenForm ? "hidden" : ""}`}>
             <PortfolioCanvas
               themeId={themeId}
+              data={canvasData}
               sectionOrder={sectionOrder}
               onSectionOrderChange={setSectionOrder}
               sectionVisibility={sectionVisibility}
@@ -748,13 +723,10 @@ export default function PortfolioLiveBuilder() {
               selectedSection={selectedSection}
               onSelectSection={setSelectedSection}
               fontSize={fontSize}
-            >
-              {sectionOrder.map(sid => (
-                <div key={sid} data-section-id={sid} style={{ textAlign: alignment[sid] || "left" }}>
-                  {renderSection(sid)}
-                </div>
-              ))}
-            </PortfolioCanvas>
+              sectionStyle={Object.fromEntries(
+                (Object.keys(alignment) as SectionId[]).map(sid => [sid, { textAlign: alignment[sid] }])
+              )}
+            />
           </main>
         </div>
       </div>
@@ -763,7 +735,7 @@ export default function PortfolioLiveBuilder() {
       <PublishDialog
         open={showPublish}
         onClose={() => setShowPublish(false)}
-        data={{ formData, projects, experiences, educations, certifications, organizations, hobbies, testimonials, extraLinks }}
+        data={canvasData}
         themeId={themeId}
         extras={{ sectionOrder, sectionVisibility }}
       />

@@ -19,17 +19,19 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import type { FontSize, SectionConfig, SectionId, SectionVisibility, ThemeDefinition } from "./types";
+import type { CSSProperties } from "react";
+import type { FontSize, PortfolioData, SectionConfig, SectionId, SectionVisibility, ThemeDefinition } from "./types";
 import { isSectionVisible, resolveVisibility } from "./sectionVisibility";
 import { SECTION_IDS } from "./types";
 import { THEMES, DEFAULT_THEME_ID } from "./themes";
+import type { ThemeId } from "./types";
+import PortfolioDocument from "./render/PortfolioDocument";
+
 /* ─── Context ─── */
 
 const ThemeContext = createContext<ThemeDefinition>(THEMES[DEFAULT_THEME_ID]);
 export { ThemeContext };
 export const usePortfolioTheme = () => useContext(ThemeContext);
-
-/** Provides section-scoped theme override for per-section colors */
 
 interface OrderContextType {
   sectionOrder: SectionId[];
@@ -41,39 +43,12 @@ interface OrderContextType {
 const OrderContext = createContext<OrderContextType | null>(null);
 export const useSectionOrder = () => useContext(OrderContext)!;
 
-/* ─── Section-scoped Theme Provider ─── */
-
-function SectionThemeProvider({ sectionId, children }: { sectionId: SectionId; children: React.ReactNode }) {
-  const theme = usePortfolioTheme();
-  const sectionColor = theme.sectionColors?.[sectionId];
-
-  if (!sectionColor) return <>{children}</>;
-
-  // Merge section colors into full theme
-  const mergedTheme: ThemeDefinition = {
-    ...theme,
-    colors: {
-      ...theme.colors,
-      primary: sectionColor.primary || theme.colors.primary,
-      accent: sectionColor.accent || theme.colors.accent,
-      primaryGlow: sectionColor.primaryGlow || theme.colors.primaryGlow,
-    },
-  };
-
-  return (
-    <ThemeContext.Provider value={mergedTheme}>
-      {children}
-    </ThemeContext.Provider>
-  );
-}
-
 /* ─── Sortable Section Wrapper ─── */
 
-function SortableSection({ id, children, isSelected, onSelect }: {
+function SortableSection({ id, children, isSelected }: {
   id: SectionId;
   children: React.ReactNode;
   isSelected: boolean;
-  onSelect: () => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const theme = usePortfolioTheme();
@@ -101,21 +76,17 @@ function SortableSection({ id, children, isSelected, onSelect }: {
         </svg>
       </button>
 
-      {/* Click to select for editing */}
+      {/* Selection ring; klik section ditangani onSectionClick dari PortfolioDocument */}
       <div
-        onClick={onSelect}
         className={`transition-all duration-200 rounded-xl ${
           isSelected ? "ring-2 ring-offset-2" : ""
         }`}
         style={{
           "--tw-ring-color": theme.colors.primary,
           "--tw-ring-offset-color": theme.colors.bg,
-          cursor: "pointer",
         } as React.CSSProperties}
       >
-        <SectionThemeProvider sectionId={id}>
-          {children}
-        </SectionThemeProvider>
+        {children}
       </div>
     </div>
   );
@@ -170,6 +141,7 @@ export const SECTION_META: Record<SectionId, { label: string; icon: string }> = 
 
 export interface PortfolioCanvasProps {
   themeId: string;
+  data: PortfolioData;
   sectionOrder: SectionId[];
   onSectionOrderChange: (order: SectionId[]) => void;
   sectionVisibility: SectionVisibility;
@@ -177,17 +149,12 @@ export interface PortfolioCanvasProps {
   selectedSection: SectionId | null;
   onSelectSection: (id: SectionId | null) => void;
   fontSize?: FontSize;
-  children: React.ReactNode;
+  sectionStyle?: Partial<Record<SectionId, CSSProperties>>;
 }
-
-const FONT_SIZE_MAP: Record<string, { base: string; small: string; h2: string; h3: string }> = {
-  small: { base: "14px", small: "12px", h2: "1.25rem", h3: "1.05rem" },
-  medium: { base: "16px", small: "13px", h2: "1.5rem", h3: "1.15rem" },
-  large: { base: "18px", small: "14px", h2: "1.75rem", h3: "1.3rem" },
-};
 
 export default function PortfolioCanvas({
   themeId,
+  data,
   sectionOrder,
   onSectionOrderChange,
   sectionVisibility,
@@ -195,7 +162,7 @@ export default function PortfolioCanvas({
   selectedSection,
   onSelectSection,
   fontSize = "medium",
-  children,
+  sectionStyle,
 }: PortfolioCanvasProps) {
   const theme = THEMES[themeId] || THEMES[DEFAULT_THEME_ID];
   const [activeId, setActiveId] = React.useState<SectionId | null>(null);
@@ -206,7 +173,6 @@ export default function PortfolioCanvas({
   );
 
   const visibleSections = resolveVisibility(sectionOrder, sectionVisibility);
-  const fm = FONT_SIZE_MAP[fontSize];
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -253,12 +219,7 @@ export default function PortfolioCanvas({
             backgroundColor: theme.colors.bg,
             color: theme.colors.text,
             fontFamily: theme.font.includes(" ") ? `'${theme.font}', sans-serif` : `${theme.font}, sans-serif`,
-            "--p-font-size-base": fm.base,
-            "--p-font-size-sm": fm.small,
-            "--p-font-size-h2": fm.h2,
-            "--p-font-size-h3": fm.h3,
-            fontSize: fm.base,
-          } as React.CSSProperties}
+          }}
         >
           <DndContext
             sensors={sensors}
@@ -268,23 +229,21 @@ export default function PortfolioCanvas({
             onDragCancel={() => setActiveId(null)}
           >
             <SortableContext items={visibleSections} strategy={verticalListSortingStrategy}>
-              <div className="relative">
-                {React.Children.map(children, (child) => {
-                  if (!React.isValidElement(child)) return null;
-                  // @ts-expect-error - data-section-id is a custom prop
-                  const sectionId = child.props["data-section-id"] as SectionId;
-                  if (!sectionId || !isSectionVisible(sectionVisibility, sectionId)) return null;
-                  return (
-                    <SortableSection
-                      id={sectionId}
-                      isSelected={selectedSection === sectionId}
-                      onSelect={() => onSelectSection(selectedSection === sectionId ? null : sectionId)}
-                    >
-                      {child}
-                    </SortableSection>
-                  );
-                })}
-              </div>
+              <PortfolioDocument
+                data={data}
+                themeId={themeId as ThemeId}
+                mode="editor"
+                sectionOrder={sectionOrder}
+                sectionVisibility={sectionVisibility}
+                fontSize={fontSize}
+                sectionStyle={sectionStyle}
+                onSectionClick={(id) => onSelectSection(selectedSection === id ? null : id)}
+                sectionWrapper={(id, node) => (
+                  <SortableSection id={id} isSelected={selectedSection === id}>
+                    {node}
+                  </SortableSection>
+                )}
+              />
             </SortableContext>
 
             <DragOverlay>

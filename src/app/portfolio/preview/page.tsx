@@ -7,22 +7,10 @@ import AuthGuard from "@/components/AuthGuard";
 import { useTranslation } from "@/lib/i18n";
 
 import { THEMES, DEFAULT_THEME_ID } from "@/components/portfolio/themes";
-import { ThemeContext } from "@/components/portfolio/PortfolioCanvas";
-import type { ThemeDefinition, PortfolioFormData, ProjectItem, ExperienceItem, EducationItem, CertificationItem, OrganizationItem, HobbyItem, TestimonialItem, ExtraLink } from "@/components/portfolio/types";
+import type { ThemeDefinition, PortfolioFormData, ProjectItem, ExperienceItem, EducationItem, CertificationItem, OrganizationItem, HobbyItem, TestimonialItem, ExtraLink, SectionId, SectionVisibility, FontSize, ThemeId } from "@/components/portfolio/types";
+import PortfolioDocument from "@/components/portfolio/render/PortfolioDocument";
 
 import PublishDialog from "@/components/portfolio/PublishDialog";
-import HeroSection from "@/components/portfolio/sections/HeroSection";
-import AboutSection from "@/components/portfolio/sections/AboutSection";
-import StatsSection from "@/components/portfolio/sections/StatsSection";
-import SkillsSection from "@/components/portfolio/sections/SkillsSection";
-import ProjectsSection from "@/components/portfolio/sections/ProjectsSection";
-import ExperienceSection from "@/components/portfolio/sections/ExperienceSection";
-import EducationSection from "@/components/portfolio/sections/EducationSection";
-import CertificationsSection from "@/components/portfolio/sections/CertificationsSection";
-import OrganizationsSection from "@/components/portfolio/sections/OrganizationsSection";
-import HobbiesSection from "@/components/portfolio/sections/HobbiesSection";
-import TestimonialsSection from "@/components/portfolio/sections/TestimonialsSection";
-import ContactSection from "@/components/portfolio/sections/ContactSection";
 
 interface PortfolioData {
   formData: PortfolioFormData;
@@ -34,6 +22,9 @@ interface PortfolioData {
   hobbies: HobbyItem[];
   testimonials: TestimonialItem[];
   extraLinks: ExtraLink[];
+  sectionOrder?: SectionId[];
+  sectionVisibility?: SectionVisibility;
+  fontSize?: FontSize;
 }
 
 import { esc, safeUrl } from "@/lib/portfolio-safety";
@@ -211,7 +202,11 @@ export default function PortfolioPreviewPage() {
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem("portfolio_draft");
+      // Draft lengkap builder (urutan, visibilitas, ukuran font) ada di
+      // portfolio_live_data; portfolio_draft hanya data isi.
+      const raw =
+        localStorage.getItem("portfolio_live_data") ??
+        localStorage.getItem("portfolio_draft");
       if (raw) {
         const parsed: PortfolioData = JSON.parse(raw);
         setData(parsed);
@@ -252,13 +247,11 @@ export default function PortfolioPreviewPage() {
   }
 
   const theme = THEMES[themeId] || THEMES[DEFAULT_THEME_ID];
-  const { formData: f, projects, experiences, educations, certifications, organizations, hobbies, testimonials, extraLinks } = data;
-  const name = [f.heroFirstName, f.heroLastName].filter(Boolean).join(" ") || "Nama Lengkap";
+  const name = [data.formData.heroFirstName, data.formData.heroLastName].filter(Boolean).join(" ") || "Nama Lengkap";
 
   return (
     <AuthGuard>
-      <ThemeContext.Provider value={theme}>
-        <div
+      <div
           className="min-h-screen"
           style={{
             backgroundColor: theme.colors.bg,
@@ -329,19 +322,15 @@ export default function PortfolioPreviewPage() {
                 </div>
               </div>
 
-              {/* Section Components */}
-              <HeroSection data={f} />
-              <AboutSection data={f} />
-              <StatsSection data={f} />
-              <ExperienceSection items={experiences} />
-              <EducationSection items={educations} />
-              <ProjectsSection items={projects} />
-              <SkillsSection data={f} />
-              <CertificationsSection items={certifications || []} />
-              <OrganizationsSection items={organizations || []} />
-              <HobbiesSection items={hobbies || []} />
-              <TestimonialsSection items={testimonials} />
-              <ContactSection data={f} extraLinks={extraLinks} />
+              {/* Document */}
+              <PortfolioDocument
+                data={data}
+                themeId={themeId as ThemeId}
+                mode="editor"
+                sectionOrder={data.sectionOrder}
+                sectionVisibility={data.sectionVisibility}
+                fontSize={data.fontSize}
+              />
 
               {/* Info */}
               <div className="px-6 mt-4">
@@ -355,7 +344,6 @@ export default function PortfolioPreviewPage() {
             &copy; {new Date().getFullYear()}. Dibuat dengan AI Career Hub
           </footer>
         </div>
-      </ThemeContext.Provider>
 
       {/* Publish dialog */}
       <PublishDialog open={showPublish} onClose={() => setShowPublish(false)} data={data} themeId={themeId} />

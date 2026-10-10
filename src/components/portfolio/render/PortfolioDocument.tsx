@@ -1,6 +1,6 @@
 "use client";
 
-import { Component, type CSSProperties, type ReactElement, type ReactNode } from "react";
+import { Component, Fragment, type CSSProperties, type ReactElement, type ReactNode } from "react";
 import { MotionConfig } from "motion/react";
 
 import { ThemeContext } from "../PortfolioCanvas";
@@ -61,6 +61,14 @@ export type PortfolioDocumentProps = {
   sectionColors?: PortfolioSectionColors | null;
   fontSize?: FontSize;
   onSectionClick?: (id: SectionId) => void;
+  /**
+   * Khusus editor: pembungkus tambahan di luar section (mis. wrapper
+   * sortable dnd-kit di canvas builder). Halaman publik tidak memakainya,
+   * jadi pohon render tetap satu untuk semua konsumen.
+   */
+  sectionWrapper?: (id: SectionId, node: ReactNode) => ReactNode;
+  /** Gaya per section dari editor (mis. perataan teks builder). */
+  sectionStyle?: Partial<Record<SectionId, CSSProperties>>;
 };
 
 /**
@@ -333,6 +341,8 @@ export function PortfolioDocument({
   sectionColors,
   fontSize,
   onSectionClick,
+  sectionWrapper,
+  sectionStyle,
 }: PortfolioDocumentProps) {
   const safeData = normalizeData(data);
   const theme = resolveTheme(themeId);
@@ -376,11 +386,12 @@ export function PortfolioDocument({
             const renderSection = RENDERERS[id];
             if (!renderSection) return null;
 
-            return (
+            const section = (
               <div
                 key={id}
                 id={id}
                 data-section-id={id}
+                style={sectionStyle?.[id]}
                 onClick={interactive ? () => interactive(id) : undefined}
               >
                 <ThemeContext.Provider value={themeForSection(theme, id, sectionColors)}>
@@ -389,6 +400,12 @@ export function PortfolioDocument({
                   </SectionBoundary>
                 </ThemeContext.Provider>
               </div>
+            );
+
+            return sectionWrapper ? (
+              <Fragment key={id}>{sectionWrapper(id, section)}</Fragment>
+            ) : (
+              section
             );
           })}
         </div>
