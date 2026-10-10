@@ -188,7 +188,7 @@ export default function Logos3({
                         </p>
 
                         {/* Description */}
-                        <p className="text-[10px] text-on-surface-variant leading-relaxed">
+                        <p className="text-xs text-on-surface-variant leading-relaxed">
                           {t(badge.descKey)}
                         </p>
                       </div>

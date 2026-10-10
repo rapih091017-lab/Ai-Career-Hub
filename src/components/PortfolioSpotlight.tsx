@@ -79,7 +79,7 @@ export default function PortfolioSpotlight() {
             <p className="mb-4 text-label-sm text-outline">{t("portfolio.spot.preview-label")}</p>
             {/* Mini hero portfolio */}
             <div className="rounded-xl border border-outline-variant/40 bg-gradient-to-br from-[#0f172a] to-[#1e293b] p-6 text-white md:p-8">
-              <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-white/50">
+              <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-white/50">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#0ea5e9]" aria-hidden />
                 Rizki Firmansyah
               </div>
@@ -87,7 +87,7 @@ export default function PortfolioSpotlight() {
               <p className="mt-2 text-xs text-white/60">{t("portfolio.spot.sample-sub")}</p>
               <div className="mt-5 flex flex-wrap gap-2">
                 {["Projects", "Skills", "Contact"].map((chip) => (
-                  <span key={chip} className="rounded-md bg-white/10 px-2.5 py-1 text-[10px] font-medium">{chip}</span>
+                  <span key={chip} className="rounded-md bg-white/10 px-2.5 py-1 text-xs font-medium">{chip}</span>
                 ))}
               </div>
             </div>
@@ -97,11 +97,11 @@ export default function PortfolioSpotlight() {
                 <div key={theme.name} className="rounded-lg border border-outline-variant/40 p-3 text-center">
                   <span className="mx-auto mb-2 block h-6 w-6 rounded-full" style={{ backgroundColor: theme.dot }} aria-hidden />
                   <span className="block h-1.5 w-8 mx-auto rounded-full mb-1.5" style={{ backgroundColor: theme.accent, opacity: 0.7 }} aria-hidden />
-                  <p className="text-[10px] font-medium text-on-surface-variant">{theme.name}</p>
+                  <p className="text-xs font-medium text-on-surface-variant">{theme.name}</p>
                 </div>
               ))}
             </div>
-            <p className="mt-4 text-[10px] text-outline">{t("portfolio.spot.sample-note")}</p>
+            <p className="mt-4 text-xs text-outline">{t("portfolio.spot.sample-note")}</p>
           </div>
         </motion.div>
       </div>

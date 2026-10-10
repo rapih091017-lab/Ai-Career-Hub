@@ -151,18 +151,20 @@ function AnalysisInteractive({ t }: { t: (key: string) => string }) {
               <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>upload_file</span>
             </div>
             <p className="text-sm font-medium text-on-surface mb-1 group-hover:text-primary transition-colors">{t("checker.upload-label")}</p>
-            <p className="text-[11px] text-on-surface-variant">{t("checker.upload-hint")}</p>
+            <p className="text-xs text-on-surface-variant">{t("checker.upload-hint")}</p>
           </Link>
         </div>
 
-        {/* Paste JD */}
+        {/* Paste JD, ilustrasi statis (bukan input palsu) */}
         <div className="flex-1">
-          <div className="relative">
-            <textarea
-              readOnly
-              placeholder={t("checker.jd-placeholder")}
-              className="w-full h-[120px] px-4 py-3 bg-surface-container-lowest border border-outline-variant/30 rounded-xl text-sm text-on-surface placeholder:text-outline-variant resize-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
-            />
+          <div
+            aria-hidden="true"
+            className="relative h-[120px] px-4 py-3 bg-surface-container-lowest border border-dashed border-outline-variant/40 rounded-xl text-sm text-outline-variant select-none"
+          >
+            {t("checker.jd-placeholder")}
+            <span className="absolute bottom-3 right-3 text-xs font-medium text-on-surface-variant bg-surface-container-low px-2 py-0.5 rounded">
+              {t("checker.mock-sample")}
+            </span>
           </div>
         </div>
 
@@ -175,7 +177,7 @@ function AnalysisInteractive({ t }: { t: (key: string) => string }) {
             <span className="material-symbols-outlined text-lg">auto_awesome</span>
             {t("checker.analyze-btn")}
           </Link>
-          <p className="text-[10px] text-on-surface-variant text-center">{t("checker.free-badge")}</p>
+          <p className="text-xs text-on-surface-variant text-center">{t("checker.free-badge")}</p>
         </div>
       </motion.div>
 
@@ -214,7 +216,7 @@ function BuilderShowcase({ t, router }: { t: (key: string) => string; router: Re
               className="block h-full min-h-[120px] rounded-2xl border-2 border-dashed border-outline-variant/30 bg-surface-container-lowest/50 flex flex-col items-center justify-center gap-2 p-4 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/[0.02] hover:shadow-md transition-all duration-300 group"
             >
               <span className="material-symbols-outlined text-outline-variant text-2xl group-hover:text-primary transition-colors">add_circle</span>
-              <p className="text-[11px] text-on-surface-variant leading-relaxed group-hover:text-on-surface transition-colors">
+              <p className="text-xs text-on-surface-variant leading-relaxed group-hover:text-on-surface transition-colors">
                 {t("features.cv-builder-title")} <br />5 template ATS
               </p>
             </Link>
@@ -234,7 +236,7 @@ function BuilderShowcase({ t, router }: { t: (key: string) => string; router: Re
             {t("features.cv-builder-b3")}
           </span>
         </div>
-        <span className="text-[10px] text-primary font-bold bg-primary/5 px-2.5 py-1 rounded-full">
+        <span className="text-xs text-primary font-bold bg-primary/5 px-2.5 py-1 rounded-full">
           {t("features.title-highlight")}
         </span>
       </motion.div>
@@ -277,7 +279,7 @@ function PortfolioShowcase({ t }: { t: (key: string) => string }) {
                 <div className="p-4 flex items-center justify-between">
                   <div>
                     <h4 className="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">{theme.name}</h4>
-                    <p className="text-[10px] text-on-surface-variant mt-0.5">
+                    <p className="text-xs text-on-surface-variant mt-0.5">
                       {theme.id === "modern-slate" && t("features.portfolio-b1")}
                       {theme.id === "minimal-dark" && t("features.portfolio-b2")}
                       {theme.id === "modern-blue" && t("features.portfolio-b3")}
@@ -334,7 +336,7 @@ function LetterShowcase({ t }: { t: (key: string) => string }) {
               <div className="h-2 w-3/6 bg-outline/10 rounded" />
             </div>
             <div className="px-4 pb-3 flex justify-end">
-              <span className="text-[9px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Resmi · BUMN/Korporasi</span>
+              <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Resmi · BUMN/Korporasi</span>
             </div>
           </Link>
         </motion.div>
@@ -358,7 +360,7 @@ function LetterShowcase({ t }: { t: (key: string) => string }) {
               <div className="h-2 w-2/3 bg-outline/10 rounded" />
             </div>
             <div className="px-4 pb-3 flex justify-end">
-              <span className="text-[9px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">EN · ATS Optimized</span>
+              <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">EN · ATS Optimized</span>
             </div>
           </Link>
         </motion.div>
@@ -382,7 +384,7 @@ function LetterShowcase({ t }: { t: (key: string) => string }) {
               <div className="h-2 w-4/6 bg-outline/10 rounded" />
             </div>
             <div className="px-4 pb-3 flex justify-end">
-              <span className="text-[9px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">Beasiswa · Program · Passion</span>
+              <span className="text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">Beasiswa · Program · Passion</span>
             </div>
           </Link>
         </motion.div>
@@ -400,7 +402,7 @@ function LetterShowcase({ t }: { t: (key: string) => string }) {
             {t("features.letters-pdf")}
           </span>
         </div>
-        <span className="text-[10px] text-secondary font-bold bg-secondary/10 px-2.5 py-1 rounded-full">
+        <span className="text-xs text-secondary font-bold bg-secondary/10 px-2.5 py-1 rounded-full">
           {t("features.letters-free")}
         </span>
       </motion.div>
@@ -439,8 +441,8 @@ function CheckerScoreMockup({ t }: { t: (key: string) => string }) {
             href="/checker"
             className="block bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/20 hover:-translate-y-1 hover:shadow-lg hover:border-amber-300/40 transition-all duration-300 cursor-pointer group"
           >
-            <div className="text-xs text-on-surface-variant font-medium mb-2 group-hover:text-amber-700 transition-colors">{t("checker.keyword-gap")}</div>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="text-xs text-on-surface-variant font-medium mb-2 group-hover:text-primary transition-colors">{t("checker.keyword-gap")}</div>
+            <div className="flex flex-wrap gap-1.5" aria-hidden="true">
               {[
                 { label: "React", color: "green" },
                 { label: "TypeScript", color: "green" },
@@ -451,7 +453,7 @@ function CheckerScoreMockup({ t }: { t: (key: string) => string }) {
               ].map((kw, i) => (
                 <motion.span
                   key={kw.label}
-                  className={`px-2 py-0.5 text-[10px] font-bold rounded cursor-default ${
+                  className={`px-2 py-0.5 text-xs font-bold rounded ${
                     kw.color === "green" ? "bg-green-100 text-green-700" :
                     kw.color === "red" ? "bg-red-100 text-red-700" :
                     "bg-amber-100 text-amber-700"
@@ -459,12 +461,12 @@ function CheckerScoreMockup({ t }: { t: (key: string) => string }) {
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ type: "spring", stiffness: 300, damping: 15, delay: 0.5 + i * 0.1 }}
-                  whileHover={{ scale: 1.2, y: -2 }}
                 >
                   {kw.label}
                 </motion.span>
               ))}
             </div>
+            <p className="mt-2 text-xs text-on-surface-variant">{t("checker.mock-sample")}</p>
           </Link>
         </motion.div>
 
@@ -483,7 +485,7 @@ function CheckerScoreMockup({ t }: { t: (key: string) => string }) {
               <span className="material-symbols-outlined text-green-600 text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
             </motion.div>
             <span className="text-sm font-bold text-green-700 group-hover:text-green-600 transition-colors">{t("checker.fit-excellent")}</span>
-            <p className="text-[10px] text-on-surface-variant mt-0.5">{t("checker.ats-format")} ✓</p>
+            <p className="text-xs text-on-surface-variant mt-0.5">{t("checker.ats-format")} ✓</p>
           </Link>
         </motion.div>
       </div>
@@ -517,8 +519,8 @@ export default function FeatureTabs() {
                   transition={{ type: "spring" as const, stiffness: 400, damping: 30 }}
                 />
               )}
-              <span className="relative z-10 material-symbols-outlined text-[18px]">{tab.icon}</span>
-              <span className="relative z-10 hidden sm:inline">{t(tab.titleKey)}</span>
+              <span className="relative z-10 material-symbols-outlined text-[18px]" aria-hidden>{tab.icon}</span>
+              <span className="relative z-10 inline">{t(tab.titleKey)}</span>
             </button>
           ))}
         </div>
@@ -591,7 +593,7 @@ export default function FeatureTabs() {
                 <div className={`w-16 h-16 ${activeData.bgColor}/10 rounded-3xl flex items-center justify-center`}>
                   <span className={`material-symbols-outlined text-[36px] ${activeData.color}`} style={{ fontVariationSettings: "'FILL' 1" }}>{activeData.icon}</span>
                 </div>
-                <p className="text-[10px] text-on-surface-variant mt-2 text-center max-w-[100px]">
+                <p className="text-xs text-on-surface-variant mt-2 text-center max-w-[100px]">
                   {t("features.title-highlight")}
                 </p>
               </div>
