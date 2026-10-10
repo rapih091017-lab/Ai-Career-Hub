@@ -43,6 +43,20 @@ describe("safeUrl", () => {
   it("meng-escape nilai yang lolos validasi", () => {
     expect(safeUrl(`https://a.com/?q="><script>`)).toBe(`https://a.com/?q=&quot;&gt;&lt;script&gt;`);
   });
+
+  it("menerima path relatif yang diawali slash", () => {
+    expect(safeUrl("/api/portfolio/assets/abc")).toBe("/api/portfolio/assets/abc");
+    expect(safeUrl("/")).toBe("/");
+  });
+
+  it("menolak path relatif tanpa slash di depan", () => {
+    expect(safeUrl("api/portfolio/assets/abc")).toBe("");
+  });
+
+  it("menolak URL protocol-relative yang mencuri origin", () => {
+    expect(safeUrl("//evil.com")).toBe("");
+    expect(safeUrl("//evil.com/path")).toBe("");
+  });
 });
 
 describe("isValidSlug", () => {

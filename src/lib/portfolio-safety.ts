@@ -13,9 +13,16 @@ export function esc(v: unknown): string {
     .replace(/'/g, "&#39;");
 }
 
-/** Validasi & sanitasi URL, hanya http/https/mailto/tel yang diizinkan, javascript: ditolak. */
+/**
+ * Validasi & sanitasi URL. Menerima http/https/mailto/tel, path relatif yang
+ * diawali `/`, dan domain telanjang (diberi prefiks https://).
+ * Skema lain — javascript:, data:, vbscript:, file: — ditolak dengan "".
+ * `//host` (protocol-relative) juga ditolak: di href itu resolve ke origin lain.
+ */
 export function safeUrl(v: string): string {
   const t = v.trim();
+  if (!t) return "";
+  if (/^\/(?!\/)/.test(t)) return esc(t);
   if (/^(https?:\/\/|mailto:|tel:)/i.test(t)) return esc(t);
   if (/^[\w.-]+\.[a-z]{2,}(\/\S*)?$/i.test(t)) return esc("https://" + t);
   return "";
