@@ -279,7 +279,9 @@ export default function PortfolioPreviewPage() {
     // lewat dialog cetak browser (Ctrl+P → Simpan sebagai PDF).
     return (
       <div data-pf-print="true" className="min-h-screen" style={{ backgroundColor: theme.colors.bg }}>
-        <style media="print">{STATIC_REVEAL_FALLBACK_CSS}</style>
+        {/* @page tidak bisa di-scope selector; dirender di sini (bukan
+            print.css yang di-share lintas rute) agar tak bocor ke app lain. */}
+        <style media="print">{`@page { size: A4; margin: 12mm; } ${STATIC_REVEAL_FALLBACK_CSS}`}</style>
         <PortfolioDocument
           data={data}
           themeId={themeId as ThemeId}
@@ -296,7 +298,7 @@ export default function PortfolioPreviewPage() {
           style={{ backgroundColor: theme.colors.primary, color: "#fff", boxShadow: "0 4px 16px rgba(0,0,0,0.25)" }}
         >
           <span className="material-symbols-outlined text-lg" aria-hidden="true">print</span>
-          Cetak / Simpan PDF
+          {t("preview.print-save-pdf")}
         </button>
       </div>
     );
@@ -352,7 +354,7 @@ export default function PortfolioPreviewPage() {
                     title={t("preview.save-pdf")}
                   >
                     <span className="material-symbols-outlined text-base" aria-hidden="true">picture_as_pdf</span>
-                    Simpan PDF
+                    {t("preview.save-pdf")}
                   </button>
                   <button
                     onClick={() => setShowPublish(true)}

@@ -784,6 +784,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "preview.edit": { id: "Edit", en: "Edit" },
   "preview.export-html": { id: "Export HTML", en: "Export HTML" },
   "preview.save-pdf": { id: "Simpan PDF", en: "Save PDF" },
+  "preview.print-save-pdf": { id: "Cetak / Simpan PDF", en: "Print / Save PDF" },
   "preview.no-draft-title": { id: "Belum ada draft portfolio", en: "No portfolio draft yet" },
   "preview.no-draft-desc": { id: "Kamu belum menyimpan draft portfolio. Silakan isi konten portfolio di Live Builder.", en: "You haven't saved a portfolio draft. Fill in portfolio content in the Live Builder." },
   "preview.open-builder": { id: "Buka Live Builder", en: "Open Live Builder" },

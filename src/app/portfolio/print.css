@@ -1,17 +1,17 @@
 /*
  * Gaya cetak portfolio (?print=1). Dimuat statis oleh /p/[slug] dan
  * /portfolio/preview. Semua aturan di-scope ke [data-pf-print] supaya
- * tidak memengaruhi halaman aplikasi lain; @page tidak bisa di-scope
- * (aturan CSS) tapi hanya aktif dalam konteks cetak.
+ * tidak memengaruhi halaman aplikasi lain.
+ *
+ * @page TIDAK ada di file ini: aturan @page tidak bisa di-scope dengan
+ * selector, dan file ini ikut bundle statis yang dishare lintas rute —
+ * A4/12mm akan bocor ke cetak halaman app lain setelah navigasi klien.
+ * @page dirender inline (hanya @media print) di dua titik masuk cetak:
+ * /p/[slug]?print=1 dan /portfolio/preview?print=1.
  *
  * Prinsip: atmosphere (grain, orb, partikel) adalah dekorasi layar dan
  * tidak pernah menjadi bagian dari dokumen cetak.
  */
-
-@page {
-  size: A4;
-  margin: 12mm;
-}
 
 @media print {
   [data-pf-print] {
@@ -35,7 +35,10 @@
   /* Kartu: shadow/blur tidak tercetak dengan baik, dan kartu tidak boleh
      terbelah antar halaman. Kartu-kartu section memakai borderRadius inline
      (tidak ada kelas bersama), jadi ditarget lewat style attr. */
-  [data-pf-print] section [style*="border-radius"] {
+  /* Glass cards: backdropFilter kadang tanpa borderRadius inline
+     (mis. GlassContact), jadi blur dinetralkan lewat dua jalur. */
+  [data-pf-print] section [style*="border-radius"],
+  [data-pf-print] [style*="backdrop-filter"] {
     box-shadow: none !important;
     backdrop-filter: none !important;
     break-inside: avoid;

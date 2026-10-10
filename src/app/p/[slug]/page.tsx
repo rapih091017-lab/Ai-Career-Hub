@@ -7,6 +7,7 @@ import { eq } from "drizzle-orm";
 import { THEMES, DEFAULT_THEME_ID } from "@/components/portfolio/themes";
 import PortfolioDocument, {
   type PortfolioSectionColors,
+  STATIC_REVEAL_FALLBACK_CSS,
 } from "@/components/portfolio/render/PortfolioDocument";
 import type {
   FontSize,
@@ -72,6 +73,11 @@ export default async function PublishedPortfolioPage({ params, searchParams }: P
   return (
     <>
       <link rel="stylesheet" href={theme.fontUrl} />
+      {printMode && (
+        // @media print: @page + paksa section motion (inline opacity:0 dari
+        // whileInView) terlihat saat cetak sebelum ter-scroll.
+        <style media="print">{`@page { size: A4; margin: 12mm; } ${STATIC_REVEAL_FALLBACK_CSS}`}</style>
+      )}
       <div data-pf-print={printMode ? "true" : undefined}>
         <PortfolioDocument
           data={d}
