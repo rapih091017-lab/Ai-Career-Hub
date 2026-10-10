@@ -27,7 +27,7 @@ function TestimonialsColumn({ className, items, duration }: { className?: string
       <motion.ul
         animate={reduce ? undefined : { translateY: "-50%" }}
         transition={reduce ? { duration: 0 } : { duration, repeat: Infinity, ease: "linear" }}
-        className="m-0 flex list-none flex-col gap-6 p-0"
+        className="m-0 flex list-none flex-col gap-6 p-0 py-3"
       >
         {[0, 1].map((copy) => (
           <React.Fragment key={copy}>
@@ -35,7 +35,7 @@ function TestimonialsColumn({ className, items, duration }: { className?: string
               <li
                 key={`${copy}-${item.id}`}
                 aria-hidden={copy === 1 || undefined}
-                className="w-full max-w-xs cursor-default select-none rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-7 shadow-premium-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-premium-lg"
+                className="w-full max-w-xs cursor-default select-none rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-7 shadow-premium-sm transition-all duration-300 hover:border-primary/30 hover:shadow-premium-md"
               >
                 <blockquote className="m-0 p-0">
                   <p className="m-0 text-body-md leading-relaxed text-on-surface-variant">{item.text}</p>
@@ -88,10 +88,10 @@ export default function TestimonialMarquee() {
     <section aria-labelledby="testimonials-heading" className="relative overflow-hidden bg-surface-container-lowest py-20 md:py-28">
       <div className="relative z-10 mx-auto max-w-7xl px-margin-mobile md:px-gutter">
         <div className="mx-auto mb-14 flex max-w-xl flex-col items-center">
-          <h2 id="testimonials-heading" className="text-center font-headline-lg text-on-background">
+          <h2 id="testimonials-heading" className="text-center font-display text-[26px] font-extrabold leading-tight tracking-tight text-on-background md:text-[34px]">
             {items.length > 3 ? t("testimonials.heading.many") : t("testimonials.heading.few")}
           </h2>
-          <p className="mt-3 text-center text-body-md text-on-surface-variant">
+          <p className="mt-4 text-center text-[15px] font-medium text-on-surface-variant">
             {t("testimonials.heading.sub")}
           </p>
         </div>

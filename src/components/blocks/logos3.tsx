@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useInView } from "motion/react";
+import { motion, useInView, useReducedMotion } from "motion/react";
 import AutoScroll from "embla-carousel-auto-scroll";
 import {
   Carousel,
@@ -112,6 +112,7 @@ export default function Logos3({
   heading,
 }: Logos3Props) {
   const { t } = useTranslation();
+  const reduce = useReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
   const inView = useInView(sectionRef, { once: true, margin: "-80px" });
 
@@ -126,10 +127,10 @@ export default function Logos3({
       <div className="max-w-7xl mx-auto px-margin-mobile md:px-gutter flex flex-col items-center text-center">
         {/* Heading */}
         <motion.p
-          className="text-center font-label-bold text-on-surface-variant mb-10"
-          initial={{ opacity: 0, y: 12 }}
+          className="mb-10 text-center font-display text-xl font-extrabold tracking-tight text-on-background md:text-2xl"
+          initial={reduce ? false : { opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, ease: "easeOut" }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
           {resolvedHeading}
         </motion.p>

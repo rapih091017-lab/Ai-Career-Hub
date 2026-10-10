@@ -1160,6 +1160,20 @@ const DICT: Record<string, { id: string; en: string }> = {
   "testimonials.heading.sub": { id: "Kutipan dari pengguna yang mengizinkan pengalamannya ditampilkan.", en: "Quotes from users who allowed their experience to be shown." },
   "testimonials.item.aria": { id: "Testimoni pengguna", en: "User testimonials" },
 
+  /* ── Portfolio spotlight ── */
+  "portfolio.spot.badge": { id: "Portfolio Web Generator", en: "Web Portfolio Generator" },
+  "portfolio.spot.title": { id: "Punya karya? Waktunya dipamerkan, bukan disimpan di folder.", en: "Got work to show? Put it on display, not in a folder." },
+  "portfolio.spot.desc": { id: "Isi datamu sekali, AI menyusun jadi halaman portfolio yang bisa dibagikan ke recruiter lewat satu link.", en: "Fill in your data once. AI arranges it into a shareable portfolio page, one link for recruiters." },
+  "portfolio.spot.b1": { id: "3 tema profesional, tinggal pilih", en: "3 professional themes to pick from" },
+  "portfolio.spot.b2": { id: "Link publik langsung siap dibagikan", en: "Public link, ready to share" },
+  "portfolio.spot.b3": { id: "AI membantu menulis deskripsi proyek dari data CV", en: "AI helps draft project descriptions from your CV data" },
+  "portfolio.spot.b4": { id: "Tampil rapi di HP recruiter", en: "Looks clean on a recruiter's phone" },
+  "portfolio.spot.cta": { id: "Buat Portfolio", en: "Build a Portfolio" },
+  "portfolio.spot.preview-label": { id: "Contoh tampilan", en: "Sample layout" },
+  "portfolio.spot.sample-title": { id: "Merancang pengalaman digital yang terukur.", en: "Designing measurable digital experiences." },
+  "portfolio.spot.sample-sub": { id: "Digital Marketer · Jakarta", en: "Digital Marketer · Jakarta" },
+  "portfolio.spot.sample-note": { id: "Contoh ilustrasi tata letak. Isi akhirmu sepenuhnya dari datamu.", en: "Illustrative layout sample. Your final content comes from your own data." },
+
   /* ── Logos / Social Proof Stats ── */
   "logos.heading": { id: "Mulai perjalanan kariermu bersama", en: "Start your career journey with" },
   "logos.badge-ats-title": { id: "CV ATS-Friendly", en: "ATS-Friendly CV" },
