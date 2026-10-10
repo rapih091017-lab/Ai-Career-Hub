@@ -3,6 +3,7 @@
 import React from "react";
 import { THEMES, DEFAULT_THEME_ID, DEFAULT_SECTION_ORDER } from "./themes";
 import { ThemeContext } from "./PortfolioCanvas";
+import { resolveVisibility } from "./sectionVisibility";
 import type { SectionId, SectionVisibility, ThemeDefinition, PortfolioData } from "./types";
 
 import HeroSection from "./sections/HeroSection";
@@ -38,7 +39,7 @@ export default function PublishedPortfolio({
   const { formData: f, projects, experiences, educations, certifications, organizations, hobbies, testimonials, extraLinks } = data;
 
   const order = sectionOrder && sectionOrder.length > 0 ? sectionOrder : DEFAULT_SECTION_ORDER;
-  const isVisible = (id: SectionId) => !sectionVisibility || sectionVisibility[id] !== false;
+  const visibleOrder = resolveVisibility(order, sectionVisibility);
 
   const name = [f.heroFirstName, f.heroLastName].filter(Boolean).join(" ") || "Nama Lengkap";
 
@@ -69,7 +70,7 @@ export default function PublishedPortfolio({
           fontFamily: theme.font.includes(" ") ? `'${theme.font}', sans-serif` : `${theme.font}, sans-serif`,
         }}
       >
-        {order.filter(isVisible).map((id) => (
+        {visibleOrder.map((id) => (
           <React.Fragment key={id}>{renderSection(id)}</React.Fragment>
         ))}
         {showFooter && (

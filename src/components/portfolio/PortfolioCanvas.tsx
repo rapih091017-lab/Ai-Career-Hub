@@ -19,9 +19,10 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import type { SectionId, SectionVisibility, ThemeDefinition, ThemeColors } from "./types";
+import type { FontSize, SectionConfig, SectionId, SectionVisibility, ThemeDefinition } from "./types";
+import { isSectionVisible, resolveVisibility } from "./sectionVisibility";
+import { SECTION_IDS } from "./types";
 import { THEMES, DEFAULT_THEME_ID } from "./themes";
-
 /* ─── Context ─── */
 
 const ThemeContext = createContext<ThemeDefinition>(THEMES[DEFAULT_THEME_ID]);
@@ -33,7 +34,7 @@ export const usePortfolioTheme = () => useContext(ThemeContext);
 interface OrderContextType {
   sectionOrder: SectionId[];
   setSectionOrder: (order: SectionId[]) => void;
-  sectionConfigs: Record<SectionId, { id: SectionId; label: string; icon: string; visible: boolean }>;
+  sectionConfigs: Record<SectionId, SectionConfig>;
   toggleSection: (id: SectionId) => void;
 }
 
@@ -167,8 +168,6 @@ export const SECTION_META: Record<SectionId, { label: string; icon: string }> = 
 
 /* ─── MAIN COMPONENT ─── */
 
-type FontSize = "small" | "medium" | "large";
-
 export interface PortfolioCanvasProps {
   themeId: string;
   sectionOrder: SectionId[];
@@ -206,7 +205,7 @@ export default function PortfolioCanvas({
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
-  const visibleSections = sectionOrder.filter(id => sectionVisibility[id]);
+  const visibleSections = resolveVisibility(sectionOrder, sectionVisibility);
   const fm = FONT_SIZE_MAP[fontSize];
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -220,11 +219,10 @@ export default function PortfolioCanvas({
       newOrder.splice(oldIndex, 1);
       newOrder.splice(newIndex, 0, active.id as SectionId);
 
-      const hidden = sectionOrder.filter(id => !sectionVisibility[id]);
       const result: SectionId[] = [];
       let vi = 0;
       for (const sid of sectionOrder) {
-        if (sectionVisibility[sid]) {
+        if (isSectionVisible(sectionVisibility, sid)) {
           result.push(newOrder[vi++]);
         } else {
           result.push(sid);
@@ -235,11 +233,11 @@ export default function PortfolioCanvas({
   };
 
   const sectionConfigs = Object.fromEntries(
-    Object.entries(SECTION_META).map(([id, meta]) => [
+    SECTION_IDS.map((id) => [
       id,
-      { id: id as SectionId, ...meta, visible: sectionVisibility[id as SectionId] },
+      { id, ...SECTION_META[id], visible: isSectionVisible(sectionVisibility, id) },
     ])
-  ) as Record<SectionId, { id: SectionId; label: string; icon: string; visible: boolean }>;
+  ) as Record<SectionId, SectionConfig>;
 
   return (
     <ThemeContext.Provider value={theme}>
@@ -275,7 +273,7 @@ export default function PortfolioCanvas({
                   if (!React.isValidElement(child)) return null;
                   // @ts-expect-error - data-section-id is a custom prop
                   const sectionId = child.props["data-section-id"] as SectionId;
-                  if (!sectionId || !sectionVisibility[sectionId]) return null;
+                  if (!sectionId || !isSectionVisible(sectionVisibility, sectionId)) return null;
                   return (
                     <SortableSection
                       id={sectionId}

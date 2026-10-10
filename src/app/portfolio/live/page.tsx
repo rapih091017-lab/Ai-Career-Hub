@@ -10,8 +10,9 @@ import PhotoUpload from "@/components/portfolio/PhotoUpload";
 import { AIPolishButton } from "@/components/ai/AIPolishDialog";
 import PublishDialog from "@/components/portfolio/PublishDialog";
 import { THEMES, DEFAULT_THEME_ID, DEFAULT_SECTION_ORDER } from "@/components/portfolio/themes";
+import { FONT_SIZES } from "@/components/portfolio/types";
 import type {
-  SectionId, ThemeId, PortfolioFormData,
+  SectionId, SectionVisibility, ThemeId, PortfolioFormData,
   ProjectItem, ExperienceItem, EducationItem,
   CertificationItem, OrganizationItem, HobbyItem,
   TestimonialItem, ExtraLink, FontSize, TextAlignment,
@@ -53,7 +54,10 @@ type TabId = "sections" | "edit" | "design" | "ai";
 
 const STORAGE_KEY = "portfolio_live_data";
 
-interface LiveData {
+/** Bentuk draft yang disimpan ke localStorage. Dua field tampilan sengaja
+ *  dibiarkan parsial supaya bisa langsung diberi draftPayloadSchema nanti ini:
+ *  peta parsial hasil parse schema tidak muat ke Record lengkap. */
+export interface LiveData {
   formData: PortfolioFormData;
   projects: ProjectItem[];
   experiences: ExperienceItem[];
@@ -65,9 +69,9 @@ interface LiveData {
   extraLinks: ExtraLink[];
   sectionOrder: SectionId[];
   themeId: ThemeId;
-  sectionVisibility: Record<SectionId, boolean>;
+  sectionVisibility: SectionVisibility;
   fontSize: FontSize;
-  alignment: Record<SectionId, TextAlignment>;
+  alignment: Partial<Record<SectionId, TextAlignment>>;
 }
 
 function loadDraft(): LiveData | null {
@@ -129,9 +133,10 @@ export default function PortfolioLiveBuilder() {
       setExtraLinks(draft.extraLinks);
       setSectionOrder(draft.sectionOrder);
       setThemeId(draft.themeId);
-      if (draft.sectionVisibility) setSectionVisibility(draft.sectionVisibility);
+      // Draft boleh parsial (hasil parse schema), state builder selalu lengkap.
+      if (draft.sectionVisibility) setSectionVisibility(prev => ({ ...prev, ...draft.sectionVisibility }));
       if (draft.fontSize) setFontSize(draft.fontSize);
-      if (draft.alignment) setAlignment(draft.alignment);
+      if (draft.alignment) setAlignment(prev => ({ ...prev, ...draft.alignment }));
     }
     setMounted(true);
   }, []);
@@ -511,7 +516,7 @@ export default function PortfolioLiveBuilder() {
                       {t("live.font-size")}
                     </label>
                     <div className="flex gap-2">
-                      {(["small", "medium", "large"] as FontSize[]).map(size => (
+                      {FONT_SIZES.map(size => (
                         <button
                           key={size}
                           onClick={() => setFontSize(size)}

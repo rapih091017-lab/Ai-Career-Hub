@@ -1,10 +1,12 @@
 import { z } from "zod";
 import { isValidSlug, safeUrl } from "@/lib/portfolio-safety";
-import { SECTION_IDS, THEME_IDS, type SectionId } from "@/components/portfolio/types";
+import { FONT_SIZES, SECTION_IDS, THEME_IDS, type SectionId } from "@/components/portfolio/types";
 
 export { THEME_IDS };
 
-/** Batas jumlah item per array. Dipakai form dan Zod sekaligus. */
+/** Batas jumlah item per array. Yang menegakkan batas ini adalah schema;
+ *  task builder berikutnya yang bertanggung jawab mencerminkannya jadi batas
+ *  input di form. */
 export const LIMITS = {
   projects: 60,
   experiences: 40,
@@ -16,7 +18,10 @@ export const LIMITS = {
   extraLinks: 12,
 } as const;
 
-/** Panjang maksimum string. Cerminan maxLength di form.
+/** Panjang maksimum string. Schema satu-satunya otoritas panjang: form builder
+ *  perlu mencerminkan angka-angka ini sebagai maxLength, tapi saat ini input form
+ *  belum semuanya memakai maxLength, jadi jangan jadikan angka ini bukti
+ *  validasi di sisi form.
  *  Panjang slug tidak ada di sini: SLUG_REGEX (lewat isValidSlug) satu-satunya
  *  penentu panjang slug. */
 const MAX = {
@@ -51,6 +56,17 @@ const monthField = z
 /** Nama field tanggal selesai, supaya pesan error menyebut field yang benar:
  *  pengalaman kerja tidak sama dengan riwayat pendidikan. */
 type EndDateLabel = "tanggal selesai" | "tanggal lulus";
+
+/**
+ * Nilai sectionColors akan masuk ke inline style dan custom property, jadi
+ * bentuknya dibatasi ke notasi warna CSS yang stand alone: hex, rgb(), hsl().
+ * var(), url(), dan expression() sengaja ditolak: semuanya tak berguna sebagai
+ * warna dan bisa jadi jalur injeksi begitu override per-section disambungkan.
+ */
+const COLOR_PATTERN =
+  /^(?:#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})|rgba?\(\s*\d+(?:\.\d+)?%?\s*,\s*\d+(?:\.\d+)?%?\s*,\s*\d+(?:\.\d+)?%?\s*(?:,\s*\d+(?:\.\d+)?%?\s*)?\)|hsla?\(\s*-?\d+(?:\.\d+)?(?:deg|grad|rad|turn)?\s*,\s*\d+(?:\.\d+)?%\s*,\s*\d+(?:\.\d+)?%\s*(?:,\s*\d+(?:\.\d+)?%?\s*)?\))$/i;
+
+const colorValue = z.string().regex(COLOR_PATTERN, "Warna harus hex (#rgb atau #rrggbb), rgb(), atau hsl()");
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
@@ -180,9 +196,14 @@ export const portfolioFormDataSchema = z.object({
   skillsLanguages: text(MAX.paragraph),
   contactEmail: z
     .string()
+    .trim()
     .max(MAX.email)
     .regex(/^$|^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Format email tidak valid"),
-  contactPhone: z.string().max(MAX.phone).regex(/^$|^[+()\d\s-]{7,32}$/),
+  contactPhone: z
+    .string()
+    .trim()
+    .max(MAX.phone)
+    .regex(/^$|^[+()\d\s-]{7,32}$/, "Nomor telepon tidak valid"),
   contactLinkedin: urlField(MAX.url),
   contactGithub: urlField(MAX.url),
 });
@@ -200,7 +221,7 @@ export const portfolioDataSchema = z.object({
   sectionOrder: z.array(z.enum(SECTION_IDS)).optional(),
   sectionVisibility: z.partialRecord(z.enum(SECTION_IDS), z.boolean()).optional(),
   sectionColors: z
-    .partialRecord(z.enum(SECTION_IDS), z.record(z.string(), z.string()))
+    .partialRecord(z.enum(SECTION_IDS), z.record(z.string(), colorValue))
     .optional(),
 });
 
@@ -214,13 +235,19 @@ export const publishPayloadSchema = z
       .refine(isValidSlug, "Slug tidak valid atau kata terlarang"),
     themeId: z.enum(THEME_IDS),
     data: portfolioDataSchema,
-    fontSize: z.enum(["small", "medium", "large"]).default("medium"),
+    fontSize: z.enum(FONT_SIZES).default("medium"),
     alignment: z
       .partialRecord(z.enum(SECTION_IDS), z.enum(["left", "center", "right"]))
       .default({}),
   })
-  .refine((v) => v.data.formData.heroFirstName.trim() !== "", {
-    message: "Isi nama dulu sebelum menerbitkan",
+  .superRefine((v, ctx) => {
+    if (v.data.formData.heroFirstName.trim() === "") {
+      ctx.addIssue({
+        code: "custom",
+        message: "Isi nama dulu sebelum menerbitkan",
+        path: ["data", "formData", "heroFirstName"],
+      });
+    }
   });
 
 export type PublishPayload = z.infer<typeof publishPayloadSchema>;

@@ -1,9 +1,15 @@
 import { describe, it, expect } from "vitest";
+import { createElement } from "react";
+import { render, screen } from "@testing-library/react";
 import type { PortfolioData } from "@/components/portfolio-templates/types";
 import { SECTION_IDS } from "@/components/portfolio/types";
+import PortfolioCanvas from "@/components/portfolio/PortfolioCanvas";
+import PublishedPortfolio from "@/components/portfolio/PublishedPortfolio";
+import { isSectionVisible, resolveVisibility } from "@/components/portfolio/sectionVisibility";
 import type { PortfolioCanvasProps } from "@/components/portfolio/PortfolioCanvas";
 import type { PublishedPortfolioProps } from "@/components/portfolio/PublishedPortfolio";
 import type { PublishDialogProps } from "@/components/portfolio/PublishDialog";
+import type { LiveData } from "@/app/portfolio/live/page";
 import {
   portfolioDataSchema,
   publishPayloadSchema,
@@ -491,7 +497,7 @@ describe("publishPayloadSchema", () => {
 });
 
 describe("tipe output schema ke konsumen", () => {
-  it("sectionVisibility hasil parse langsung muat di tiga tipe konsumen", () => {
+  it("sectionVisibility hasil parse langsung muat di empat tipe konsumen", () => {
     const parsed = portfolioDataSchema.parse({
       ...emptyData,
       sectionVisibility: { hero: true, about: false },
@@ -500,7 +506,7 @@ describe("tipe output schema ke konsumen", () => {
     expect(visibility).toBeDefined();
     if (!visibility) throw new Error("sectionVisibility harus ada pada payload ini");
 
-    // Assertion compile-time: ketiga baris ini GAGAL di `npx tsc --noEmit`
+    // Assertion compile-time: keempat baris ini GAGAL di `npx tsc --noEmit`
     // kalau tipe konsumen kembali diperketat ke Record<SectionId, boolean>
     // (peta parsial hasil parse tidak muat ke record lengkap).
     const canvas: Pick<PortfolioCanvasProps, "sectionVisibility"> = {
@@ -512,10 +518,28 @@ describe("tipe output schema ke konsumen", () => {
     const dialog: Pick<NonNullable<PublishDialogProps["extras"]>, "sectionVisibility"> = {
       sectionVisibility: visibility,
     };
+    const live: Pick<LiveData, "sectionVisibility"> = {
+      sectionVisibility: visibility,
+    };
 
     expect(canvas.sectionVisibility).toEqual({ hero: true, about: false });
     expect(published.sectionVisibility).toEqual({ hero: true, about: false });
     expect(dialog.sectionVisibility).toEqual({ hero: true, about: false });
+    expect(live.sectionVisibility).toEqual({ hero: true, about: false });
+  });
+
+  it("LiveData juga menerima alignment parsial hasil parse", () => {
+    const parsed = publishPayloadSchema.parse({
+      slug: "teguh-surya",
+      themeId: "glass",
+      data: emptyData,
+      alignment: { hero: "center" },
+    });
+
+    // Assertion compile-time: gagal kalau LiveData.alignment kembali
+    // diperketat ke Record<SectionId, TextAlignment>.
+    const live: Pick<LiveData, "alignment"> = { alignment: parsed.alignment };
+    expect(live.alignment).toEqual({ hero: "center" });
   });
 });
 
@@ -528,3 +552,207 @@ describe("draftPayloadSchema", () => {
     expect(draftPayloadSchema.parse({ name: "a".repeat(200), data: emptyData }).name.length).toBe(120);
   });
 });
+
+/* ─── Visibilitas parsial: satu aturan, dua konsumen ─── */
+
+/** Seksi portfolio memakai IntersectionObserver dan matchMedia yang tidak ada
+ *  di jsdom; stub ini cuma supaya bisa dirender di test. */
+function stubBrowserApis() {
+  // @ts-expect-error stub minimal IntersectionObserver
+  globalThis.IntersectionObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+    takeRecords() { return []; }
+  };
+  window.matchMedia = ((query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener() {},
+    removeListener() {},
+    addEventListener() {},
+    removeEventListener() {},
+    dispatchEvent() { return false; },
+  })) as never;
+}
+
+describe("resolveVisibility", () => {
+  const order = ["hero", "about", "contact"] as const;
+
+  it("treats a section missing from the map as visible", () => {
+    expect(resolveVisibility(order, { hero: false })).toEqual(["about", "contact"]);
+  });
+
+  it("treats an absent map as everything visible", () => {
+    expect(resolveVisibility(order, undefined)).toEqual([...order]);
+  });
+
+  it("treats an empty map as everything visible", () => {
+    expect(resolveVisibility(order, {})).toEqual([...order]);
+  });
+
+  it("only drops sections explicitly marked false", () => {
+    expect(resolveVisibility(order, { contact: false, about: false })).toEqual(["hero"]);
+    expect(isSectionVisible({ about: false }, "about")).toBe(false);
+    expect(isSectionVisible({}, "about")).toBe(true);
+  });
+});
+
+describe("canvas dan halaman publik membaca peta parsial sama", () => {
+  it("canvas still renders a section missing from a partial visibility map", () => {
+    // Persis skenario yang ditemukan: output schema (peta parsial) mengalir
+    // ke editor. about tidak disebut di peta, jadi harus tetap tampil.
+    const parsed = portfolioDataSchema.parse({
+      ...emptyData,
+      sectionVisibility: { hero: false },
+    });
+    const sectionVisibility = parsed.sectionVisibility;
+    if (!sectionVisibility) throw new Error("sectionVisibility harus ada pada payload ini");
+
+    render(
+      createElement(PortfolioCanvas, {
+        themeId: "glass",
+        sectionOrder: ["hero", "about"],
+        onSectionOrderChange: () => {},
+        sectionVisibility,
+        onToggleSection: () => {},
+        selectedSection: null,
+        onSelectSection: () => {},
+        children: [
+          createElement("div", { key: "hero", "data-section-id": "hero" }, "SEKSI_HERO"),
+          createElement("div", { key: "about", "data-section-id": "about" }, "SEKSI_ABOUT"),
+        ],
+      }),
+    );
+
+    expect(screen.queryByText("SEKSI_HERO")).toBeNull();
+    expect(screen.getByText("SEKSI_ABOUT")).toBeTruthy();
+  });
+
+  it("published page renders the same section from the same partial map", () => {
+    stubBrowserApis();
+    const parsed = portfolioDataSchema.parse({
+      ...emptyData,
+      formData: { ...validFormData, aboutText: "TENTANG_SAYA_UNIK" },
+      sectionVisibility: { hero: false },
+    });
+    const sectionVisibility = parsed.sectionVisibility;
+    if (!sectionVisibility) throw new Error("sectionVisibility harus ada pada payload ini");
+
+    render(
+      createElement(PublishedPortfolio, {
+        data: parsed as PortfolioData,
+        themeId: "glass",
+        sectionOrder: ["hero", "about"],
+        sectionVisibility,
+      }),
+    );
+
+    expect(screen.getByText(/TENTANG_SAYA_UNIK/)).toBeTruthy();
+  });
+});
+
+/* ─── Format nilai sectionColors ─── */
+
+describe("sectionColors", () => {
+  const withColor = (value: string) =>
+    portfolioDataSchema.safeParse({
+      ...emptyData,
+      sectionColors: { hero: { primary: value } },
+    });
+
+  const ACCEPTED = [
+    "#fff",
+    "#FFFF",
+    "#a1b2c3",
+    "#a1b2c3d4",
+    "#FFF",
+    "rgb(255, 0, 128)",
+    "rgba(255, 0, 128, 0.5)",
+    "rgb(100%, 0%, 50%)",
+    "hsl(210, 50%, 40%)",
+    "hsla(210, 50%, 40%, 0.5)",
+  ];
+
+  it.each(ACCEPTED)("menerima %s", (value) => {
+    expect(withColor(value).success).toBe(true);
+  });
+
+  const REJECTED = [
+    "var(--p-primary)",
+    "url(javascript:alert(1))",
+    "expression(alert(1))",
+    "biru",
+    "#ff",
+    "#fffffffff",
+    "rgb(1, 2)",
+    "hsl(210, 50%)",
+    "rgb(1,2,3); background: url(x)",
+  ];
+
+  it.each(REJECTED)("menolak %s", (value) => {
+    expect(withColor(value).success).toBe(false);
+  });
+
+  it("menolak dengan pesan yang menyebut format yang diterima", () => {
+    const result = withColor("var(--p-primary)");
+    expect(result.success).toBe(false);
+    if (result.success) return;
+    expect(result.error.issues[0].message).toBe(
+      "Warna harus hex (#rgb atau #rrggbb), rgb(), atau hsl()",
+    );
+    expect(result.error.issues[0].path).toEqual(["sectionColors", "hero", "primary"]);
+  });
+});
+
+/* ─── Contact field: trim seperti field teks lain ─── */
+
+describe("field kontak", () => {
+  it("mem-trim spasi tepi pada contactEmail", () => {
+    const r = portfolioDataSchema.parse({
+      ...emptyData,
+      formData: { ...validFormData, contactEmail: "  teguh@example.com  " },
+    });
+    expect(r.formData.contactEmail).toBe("teguh@example.com");
+  });
+
+  it("mem-trim spasi tepi pada contactPhone", () => {
+    const r = portfolioDataSchema.parse({
+      ...emptyData,
+      formData: { ...validFormData, contactPhone: " +62 812 3456 " },
+    });
+    expect(r.formData.contactPhone).toBe("+62 812 3456");
+  });
+
+  it("tetap menolak email dan telepon yang rusak setelah di-trim", () => {
+    expect(
+      portfolioDataSchema.safeParse({
+        ...emptyData,
+        formData: { ...validFormData, contactEmail: " bukan-email " },
+      }).success,
+    ).toBe(false);
+    expect(
+      portfolioDataSchema.safeParse({
+        ...emptyData,
+        formData: { ...validFormData, contactPhone: " 12 " },
+      }).success,
+    ).toBe(false);
+  });
+});
+
+describe("pesan publish tanpa nama", () => {
+  it("menunjuk field yang salah, bukan akar payload", () => {
+    const result = publishPayloadSchema.safeParse({
+      slug: "teguh-surya",
+      themeId: "glass",
+      data: { ...emptyData, formData: { ...validFormData, heroFirstName: "  " } },
+    });
+    expect(result.success).toBe(false);
+    if (result.success) return;
+    const issue = result.error.issues[0];
+    expect(issue.message).toBe("Isi nama dulu sebelum menerbitkan");
+    expect(issue.path).toEqual(["data", "formData", "heroFirstName"]);
+  });
+});
+

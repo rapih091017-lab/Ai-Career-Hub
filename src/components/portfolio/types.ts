@@ -62,7 +62,11 @@ export interface SectionConfig {
   visible: boolean;
 }
 
-export type FontSize = "small" | "medium" | "large";
+/** Ukuran font yang tersedia. Sumber kebenaran untuk union FontSize sekaligus
+ *  untuk validasi Zod (publishPayloadSchema.fontSize). */
+export const FONT_SIZES = ["small", "medium", "large"] as const;
+
+export type FontSize = (typeof FONT_SIZES)[number];
 export type TextAlignment = "left" | "center" | "right";
 
 export interface TypographySettings {
