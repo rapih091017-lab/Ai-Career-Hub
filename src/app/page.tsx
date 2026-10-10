@@ -30,6 +30,7 @@ import NavDropdown from "@/components/NavDropdown";
 import NavMobileDropdown from "@/components/NavMobileDropdown";
 import HeroCvDemo from "@/components/HeroCvDemo";
 import TestimonialMarquee from "@/components/TestimonialMarquee";
+import PortfolioSpotlight from "@/components/PortfolioSpotlight";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -321,16 +322,7 @@ export default function Home() {
           </Link>
         </motion.div>
 
-        {/* AI Suggestion Floating Chip */}
-        <motion.div className="absolute right-[38%] top-[22%] hidden lg:flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-lowest/90 backdrop-blur-sm rounded-full shadow-premium-sm border border-primary/15 z-20 pointer-events-none"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 1.2, duration: 0.5 }}>
-          <span className="material-symbols-outlined text-[14px] text-primary">
-            auto_awesome
-          </span>
-          <span className="text-[10px] font-bold text-primary">{t("hero.ai-chip")}</span>
-        </motion.div>
+        {/* AI-assisted cue dipindah inline ke card ATS agar tidak menutupi teks */}
 
         {/* Hero Content */}
         <div className="max-w-7xl mx-auto px-margin-mobile md:px-gutter w-full">
@@ -540,6 +532,9 @@ export default function Home() {
       </section>
 
       <Logos3 />
+
+      {/* ── Portfolio spotlight: fitur dengan nilai visual tertinggi ── */}
+      <PortfolioSpotlight />
 
       {/* ── Real user testimonials, hanya tampil bila ada data terbit (R-18) ── */}
       <TestimonialMarquee />
