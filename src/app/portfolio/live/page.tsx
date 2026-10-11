@@ -11,6 +11,9 @@ import { AIPolishButton } from "@/components/ai/AIPolishDialog";
 import PublishDialog from "@/components/portfolio/PublishDialog";
 import { THEMES, DEFAULT_THEME_ID, DEFAULT_SECTION_ORDER } from "@/components/portfolio/themes";
 import { FONT_SIZES } from "@/components/portfolio/types";
+import { applyAiSuggestion, mergeExperiences, type AiChange } from "@/lib/portfolio/ai-map";
+import { useUndoStack } from "@/lib/portfolio/useUndoStack";
+import type { PortfolioData } from "@/components/portfolio-templates/types";
 import type {
   SectionId, SectionVisibility, ThemeId, PortfolioFormData,
   ProjectItem, ExperienceItem, EducationItem,
@@ -76,15 +79,56 @@ function saveDraft(data: LiveData) {
 /* ─── MAIN PAGE ─── */
 export default function PortfolioLiveBuilder() {
   const { t } = useTranslation();
-  const [formData, setFormData] = useState<PortfolioFormData>(DEFAULT_FORM);
-  const [projects, setProjects] = useState<ProjectItem[]>([{ id: genId(), name: "", description: "", techStack: "", link: "" }]);
-  const [experiences, setExperiences] = useState<ExperienceItem[]>([]);
-  const [educations, setEducations] = useState<EducationItem[]>([]);
-  const [certifications, setCertifications] = useState<CertificationItem[]>([]);
-  const [organizations, setOrganizations] = useState<OrganizationItem[]>([]);
-  const [hobbies, setHobbies] = useState<HobbyItem[]>([]);
-  const [testimonials, setTestimonials] = useState<TestimonialItem[]>([]);
-  const [extraLinks, setExtraLinks] = useState<ExtraLink[]>([]);
+
+  const { state: portfolio, set: setPortfolio, undo, redo, canUndo, canRedo, reset: resetPortfolio } = useUndoStack<PortfolioData>({
+    formData: DEFAULT_FORM,
+    projects: [{ id: genId(), name: "", description: "", techStack: "", link: "" }],
+    experiences: [],
+    educations: [],
+    certifications: [],
+    organizations: [],
+    hobbies: [],
+    testimonials: [],
+    extraLinks: [],
+  });
+
+  const formData = portfolio.formData;
+  const setFormData = (updater: React.SetStateAction<PortfolioFormData>) => {
+    setPortfolio(prev => ({ ...prev, formData: typeof updater === "function" ? updater(prev.formData) : updater }));
+  };
+  const projects = portfolio.projects;
+  const setProjects = (updater: React.SetStateAction<ProjectItem[]>) => {
+    setPortfolio(prev => ({ ...prev, projects: typeof updater === "function" ? updater(prev.projects) : updater }));
+  };
+  const experiences = portfolio.experiences;
+  const setExperiences = (updater: React.SetStateAction<ExperienceItem[]>) => {
+    setPortfolio(prev => ({ ...prev, experiences: typeof updater === "function" ? updater(prev.experiences) : updater }));
+  };
+  const educations = portfolio.educations;
+  const setEducations = (updater: React.SetStateAction<EducationItem[]>) => {
+    setPortfolio(prev => ({ ...prev, educations: typeof updater === "function" ? updater(prev.educations) : updater }));
+  };
+  const certifications = portfolio.certifications;
+  const setCertifications = (updater: React.SetStateAction<CertificationItem[]>) => {
+    setPortfolio(prev => ({ ...prev, certifications: typeof updater === "function" ? updater(prev.certifications) : updater }));
+  };
+  const organizations = portfolio.organizations;
+  const setOrganizations = (updater: React.SetStateAction<OrganizationItem[]>) => {
+    setPortfolio(prev => ({ ...prev, organizations: typeof updater === "function" ? updater(prev.organizations) : updater }));
+  };
+  const hobbies = portfolio.hobbies;
+  const setHobbies = (updater: React.SetStateAction<HobbyItem[]>) => {
+    setPortfolio(prev => ({ ...prev, hobbies: typeof updater === "function" ? updater(prev.hobbies) : updater }));
+  };
+  const testimonials = portfolio.testimonials;
+  const setTestimonials = (updater: React.SetStateAction<TestimonialItem[]>) => {
+    setPortfolio(prev => ({ ...prev, testimonials: typeof updater === "function" ? updater(prev.testimonials) : updater }));
+  };
+  const extraLinks = portfolio.extraLinks;
+  const setExtraLinks = (updater: React.SetStateAction<ExtraLink[]>) => {
+    setPortfolio(prev => ({ ...prev, extraLinks: typeof updater === "function" ? updater(prev.extraLinks) : updater }));
+  };
+
   const [sectionOrder, setSectionOrder] = useState<SectionId[]>(DEFAULT_SECTION_ORDER);
   const [themeId, setThemeId] = useState<ThemeId>(DEFAULT_THEME_ID as ThemeId);
   const [sectionVisibility, setSectionVisibility] = useState<Record<SectionId, boolean>>(
@@ -103,20 +147,24 @@ export default function PortfolioLiveBuilder() {
   const [aiLoading, setAiLoading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
   const [aiError, setAiError] = useState("");
+  const [aiDiff, setAiDiff] = useState<{ addedExperiences: number; keptExperiences: number } | null>(null);
+  const [aiChanges, setAiChanges] = useState<AiChange[]>([]);
 
   // Load draft
   useEffect(() => {
     const draft = loadDraft();
     if (draft) {
-      setFormData(draft.formData);
-      setProjects(draft.projects);
-      setExperiences(draft.experiences);
-      setEducations(draft.educations);
-      if (draft.certifications) setCertifications(draft.certifications);
-      if (draft.organizations) setOrganizations(draft.organizations);
-      if (draft.hobbies) setHobbies(draft.hobbies);
-      setTestimonials(draft.testimonials);
-      setExtraLinks(draft.extraLinks);
+      resetPortfolio({
+        formData: draft.formData || DEFAULT_FORM,
+        projects: draft.projects || [],
+        experiences: draft.experiences || [],
+        educations: draft.educations || [],
+        certifications: draft.certifications || [],
+        organizations: draft.organizations || [],
+        hobbies: draft.hobbies || [],
+        testimonials: draft.testimonials || [],
+        extraLinks: draft.extraLinks || [],
+      });
       setSectionOrder(draft.sectionOrder);
       setThemeId(draft.themeId);
       // Draft boleh parsial (hasil parse schema), state builder selalu lengkap.
@@ -156,6 +204,7 @@ export default function PortfolioLiveBuilder() {
   const handleAiGenerate = async () => {
     setAiLoading(true);
     setAiError("");
+    setAiDiff(null);
     try {
       const res = await fetch("/api/portfolio/suggest", { method: "POST" });
       if (!res.ok) {
@@ -163,44 +212,37 @@ export default function PortfolioLiveBuilder() {
         throw new Error(err.message || "Gagal generate");
       }
       const data = await res.json();
-      // Map AI response to form fields
-      if (data.hero) {
-        setFormData(prev => ({
-          ...prev,
-          heroHeadline: data.hero.headline || prev.heroHeadline,
-          heroSubHeadline: data.hero.subheadline || prev.heroSubHeadline,
-          heroBio: data.about?.meta_description || prev.heroBio,
-        }));
-      }
-      if (data.about) {
-        const aboutText = [data.about.paragraph_1, data.about.paragraph_2, data.about.paragraph_3]
-          .filter(Boolean).join("\n\n");
-        if (aboutText) {
-          setFormData(prev => ({ ...prev, aboutText }));
-        }
-      }
-      if (data.experience_highlights?.length) {
-        setExperiences(data.experience_highlights.map((eh: any) => ({
-          id: genId(),
-          company: eh.company || "",
-          position: eh.role || "",
-          startDate: eh.period || "",
-          endDate: "",
-          description: [eh.headline, eh.impact].filter(Boolean).join("\n"),
-        })));
-      }
-      if (data.skills_display?.primary?.length) {
-        setFormData(prev => ({
-          ...prev,
-          skillsMain: data.skills_display.primary.join(", "),
-        }));
-      }
-      if (data.contact_cta) {
-        setFormData(prev => ({
-          ...prev,
-          heroBio: prev.heroBio || data.contact_cta.subtext || "",
-        }));
-      }
+
+      const currentPortfolio: PortfolioData = {
+        formData, projects, experiences, educations, certifications,
+        organizations, hobbies, testimonials, extraLinks,
+      };
+
+      const { data: updatedPortfolio, changes } = applyAiSuggestion(currentPortfolio, data);
+
+      const incomingExperiences: ExperienceItem[] = (data.experience_highlights || []).map((eh: any) => ({
+        id: genId(),
+        company: eh.company || "",
+        position: eh.role || "",
+        startDate: eh.period || "",
+        endDate: "",
+        description: [eh.headline, eh.impact].filter(Boolean).join("\n"),
+      }));
+
+      const mergedExp = mergeExperiences(experiences, incomingExperiences);
+
+      setPortfolio(prev => ({
+        ...prev,
+        formData: updatedPortfolio.formData,
+        experiences: mergedExp.merged,
+      }));
+
+      setAiChanges(changes);
+      setAiDiff({
+        addedExperiences: mergedExp.addedCount,
+        keptExperiences: mergedExp.keptCount,
+      });
+
       setActiveTab("edit");
       setSelectedSection("about");
     } catch (err: any) {
@@ -324,21 +366,43 @@ export default function PortfolioLiveBuilder() {
             style={{ borderColor: "var(--border, rgba(0,0,0,0.06))" }}
           >
             {/* ── TAB BAR ── */}
-            <div className="flex border-b shrink-0" style={{ borderColor: "var(--border, rgba(0,0,0,0.06))" }}>
-              {tabs.map(tab => (
+            <div className="flex items-center border-b shrink-0 px-1" style={{ borderColor: "var(--border, rgba(0,0,0,0.06))" }}>
+              <div className="flex flex-1">
+                {tabs.map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => switchToTab(tab.id)}
+                    className={`flex-1 py-2.5 text-xs font-semibold flex items-center justify-center gap-1 transition-all ${
+                      activeTab === tab.id
+                        ? "text-primary border-b-2 border-primary"
+                        : "text-on-surface-variant hover:text-on-surface"
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-[16px]">{tab.icon}</span>
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-0.5 border-l px-1 py-1" style={{ borderColor: "var(--border, rgba(0,0,0,0.06))" }}>
                 <button
-                  key={tab.id}
-                  onClick={() => switchToTab(tab.id)}
-                  className={`flex-1 py-2.5 text-xs font-semibold flex items-center justify-center gap-1 transition-all ${
-                    activeTab === tab.id
-                      ? "text-primary border-b-2 border-primary"
-                      : "text-on-surface-variant hover:text-on-surface"
-                  }`}
+                  onClick={undo}
+                  disabled={!canUndo}
+                  className="p-1 rounded hover:bg-surface-container-low disabled:opacity-30 disabled:cursor-not-allowed text-on-surface-variant"
+                  title="Urungkan (Undo)"
+                  aria-label="Undo"
                 >
-                  <span className="material-symbols-outlined text-[16px]">{tab.icon}</span>
-                  {tab.label}
+                  <span className="material-symbols-outlined text-sm">undo</span>
                 </button>
-              ))}
+                <button
+                  onClick={redo}
+                  disabled={!canRedo}
+                  className="p-1 rounded hover:bg-surface-container-low disabled:opacity-30 disabled:cursor-not-allowed text-on-surface-variant"
+                  title="Ulangi (Redo)"
+                  aria-label="Redo"
+                >
+                  <span className="material-symbols-outlined text-sm">redo</span>
+                </button>
+              </div>
             </div>
 
             {/* ── TAB CONTENT ── */}
@@ -552,6 +616,40 @@ export default function PortfolioLiveBuilder() {
               {/* ===== AI TAB ===== */}
               {activeTab === "ai" && (
                 <div className="space-y-4">
+                  {/* AI Diff & Changes Summary */}
+                  {aiDiff && (
+                    <div className="p-3 rounded-xl bg-primary/10 border border-primary/20 text-xs text-on-surface space-y-1">
+                      <div className="font-semibold text-primary flex items-center justify-between">
+                        <span>Hasil Perubahan AI</span>
+                        <button onClick={() => setAiDiff(null)} className="text-[10px] text-on-surface-variant hover:text-on-surface">Tutup</button>
+                      </div>
+                      <p className="text-[11px] text-on-surface-variant">
+                        + {aiDiff.addedExperiences} pengalaman baru ditambahkan ({aiDiff.keptExperiences} pengalaman lama dipertahankan).
+                      </p>
+                    </div>
+                  )}
+
+                  {aiChanges.length > 0 && (
+                    <div className="p-3 rounded-xl bg-surface-container-low border border-outline-variant space-y-2">
+                      <div className="flex items-center justify-between text-xs font-semibold text-primary">
+                        <span>Perubahan Field ({aiChanges.length})</span>
+                        <button onClick={() => setAiChanges([])} className="text-[10px] text-on-surface-variant hover:text-on-surface">Tutup</button>
+                      </div>
+                      <div className="space-y-1.5 max-h-40 overflow-y-auto custom-scrollbar">
+                        {aiChanges.map((c, idx) => (
+                          <div key={idx} className="text-[11px] p-2 rounded-lg bg-surface border border-outline-variant/30 flex flex-col gap-0.5">
+                            <span className="font-medium text-on-surface">{c.label} ({c.field})</span>
+                            <div className="flex items-center gap-1.5">
+                              <span className="line-through text-on-surface-variant">{c.from || "(kosong)"}</span>
+                              <span>→</span>
+                              <span className="text-primary font-medium">{c.to}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {/* ── INFO BANNER: Profil Auto-fill ── */}
                   <div className="p-3 rounded-xl bg-primary/5 border border-primary/15 flex items-start gap-2.5">
                     <span className="material-symbols-outlined text-primary text-base shrink-0 mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>info</span>

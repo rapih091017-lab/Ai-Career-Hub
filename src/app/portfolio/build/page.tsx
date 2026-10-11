@@ -10,6 +10,9 @@ import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/components/ui/toast";
 import { ConfirmModal, type ConfirmAction } from "@/components/ui/confirm-modal";
 import PortfolioPhotoUpload from "@/components/portfolio/render/PortfolioPhotoUpload";
+import { applyAiSuggestion, mergeExperiences, type AiChange } from "@/lib/portfolio/ai-map";
+import { useUndoStack } from "@/lib/portfolio/useUndoStack";
+import type { PortfolioData } from "@/components/portfolio-templates/types";
 
 type AccordionKey = "hero" | "about" | "projects" | "skills" | "experience" | "education" | "certifications" | "organizations" | "hobbies" | "testimonials" | "contact";
 
@@ -164,36 +167,78 @@ export default function PortfolioBuildPage() {
   const { t } = useTranslation();
   const { addToast } = useToast();
   const [activeSection, setActiveSection] = useState<AccordionKey | "">("hero");
-  const [formData, setFormData] = useState<PortfolioFormData>(DEFAULT_FORM);
-  const [extraLinks, setExtraLinks] = useState<ExtraLink[]>([]);
-  const [testimonials, setTestimonials] = useState<TestimonialItem[]>([
-    { id: genId(), name: "", position: "", testimonial: "" },
-  ]);
-  const [projects, setProjects] = useState<ProjectItem[]>([
-    { id: genId(), name: "", description: "", techStack: "", link: "" },
-    { id: genId(), name: "", description: "", techStack: "", link: "" },
-    { id: genId(), name: "", description: "", techStack: "", link: "" },
-  ]);
-  const [experiences, setExperiences] = useState<ExperienceItem[]>([
-    { id: genId(), company: "", position: "", startDate: "", endDate: "", description: "" },
-    { id: genId(), company: "", position: "", startDate: "", endDate: "", description: "" },
-  ]);
-  const [educations, setEducations] = useState<EducationItem[]>([
-    { id: genId(), institution: "", degree: "", field: "", startDate: "", endDate: "" },
-  ]);
-  const [certifications, setCertifications] = useState<CertificationItem[]>([
-    { id: genId(), name: "", issuer: "", year: "", url: "" },
-  ]);
-  const [organizations, setOrganizations] = useState<OrganizationItem[]>([
-    { id: genId(), name: "", role: "", period: "", description: "" },
-  ]);
-  const [hobbies, setHobbies] = useState<HobbyItem[]>([
-    { id: genId(), name: "", description: "" },
-  ]);
+
+  const { state: portfolio, set: setPortfolio, undo, redo, canUndo, canRedo, reset: resetPortfolio } = useUndoStack<PortfolioData>({
+    formData: DEFAULT_FORM,
+    projects: [
+      { id: genId(), name: "", description: "", techStack: "", link: "" },
+      { id: genId(), name: "", description: "", techStack: "", link: "" },
+      { id: genId(), name: "", description: "", techStack: "", link: "" },
+    ],
+    experiences: [
+      { id: genId(), company: "", position: "", startDate: "", endDate: "", description: "" },
+      { id: genId(), company: "", position: "", startDate: "", endDate: "", description: "" },
+    ],
+    educations: [
+      { id: genId(), institution: "", degree: "", field: "", startDate: "", endDate: "" },
+    ],
+    certifications: [
+      { id: genId(), name: "", issuer: "", year: "", url: "" },
+    ],
+    organizations: [
+      { id: genId(), name: "", role: "", period: "", description: "" },
+    ],
+    hobbies: [
+      { id: genId(), name: "", description: "" },
+    ],
+    testimonials: [
+      { id: genId(), name: "", position: "", testimonial: "" },
+    ],
+    extraLinks: [],
+  });
+
+  const formData = portfolio.formData;
+  const setFormData = (updater: React.SetStateAction<PortfolioFormData>) => {
+    setPortfolio(prev => ({ ...prev, formData: typeof updater === "function" ? updater(prev.formData) : updater }));
+  };
+  const projects = portfolio.projects;
+  const setProjects = (updater: React.SetStateAction<ProjectItem[]>) => {
+    setPortfolio(prev => ({ ...prev, projects: typeof updater === "function" ? updater(prev.projects) : updater }));
+  };
+  const experiences = portfolio.experiences;
+  const setExperiences = (updater: React.SetStateAction<ExperienceItem[]>) => {
+    setPortfolio(prev => ({ ...prev, experiences: typeof updater === "function" ? updater(prev.experiences) : updater }));
+  };
+  const educations = portfolio.educations;
+  const setEducations = (updater: React.SetStateAction<EducationItem[]>) => {
+    setPortfolio(prev => ({ ...prev, educations: typeof updater === "function" ? updater(prev.educations) : updater }));
+  };
+  const certifications = portfolio.certifications;
+  const setCertifications = (updater: React.SetStateAction<CertificationItem[]>) => {
+    setPortfolio(prev => ({ ...prev, certifications: typeof updater === "function" ? updater(prev.certifications) : updater }));
+  };
+  const organizations = portfolio.organizations;
+  const setOrganizations = (updater: React.SetStateAction<OrganizationItem[]>) => {
+    setPortfolio(prev => ({ ...prev, organizations: typeof updater === "function" ? updater(prev.organizations) : updater }));
+  };
+  const hobbies = portfolio.hobbies;
+  const setHobbies = (updater: React.SetStateAction<HobbyItem[]>) => {
+    setPortfolio(prev => ({ ...prev, hobbies: typeof updater === "function" ? updater(prev.hobbies) : updater }));
+  };
+  const testimonials = portfolio.testimonials;
+  const setTestimonials = (updater: React.SetStateAction<TestimonialItem[]>) => {
+    setPortfolio(prev => ({ ...prev, testimonials: typeof updater === "function" ? updater(prev.testimonials) : updater }));
+  };
+  const extraLinks = portfolio.extraLinks;
+  const setExtraLinks = (updater: React.SetStateAction<ExtraLink[]>) => {
+    setPortfolio(prev => ({ ...prev, extraLinks: typeof updater === "function" ? updater(prev.extraLinks) : updater }));
+  };
+
   const [profileForFill, setProfileForFill] = useState<MasterProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
   const [aiSuggesting, setAiSuggesting] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<Record<string, string> | null>(null);
+  const [aiChanges, setAiChanges] = useState<AiChange[]>([]);
   const [showAiPopup, setShowAiPopup] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -219,15 +264,17 @@ export default function PortfolioBuildPage() {
       extraLinks: ExtraLink[];
     } | null>(STORAGE_KEY, null);
     if (draft && draft.formData) {
-      setFormData(draft.formData);
-      setProjects(draft.projects);
-      setExperiences(draft.experiences);
-      setEducations(draft.educations);
-      if (draft.certifications) setCertifications(draft.certifications);
-      if (draft.organizations) setOrganizations(draft.organizations);
-      if (draft.hobbies) setHobbies(draft.hobbies);
-      setTestimonials(draft.testimonials);
-      setExtraLinks(draft.extraLinks);
+      resetPortfolio({
+        formData: draft.formData,
+        projects: draft.projects || [],
+        experiences: draft.experiences || [],
+        educations: draft.educations || [],
+        certifications: draft.certifications || [],
+        organizations: draft.organizations || [],
+        hobbies: draft.hobbies || [],
+        testimonials: draft.testimonials || [],
+        extraLinks: draft.extraLinks || [],
+      });
       setSaveStatus("saved");
     } else {
       // No draft, tampilkan source picker popup
@@ -299,7 +346,7 @@ export default function PortfolioBuildPage() {
       updates.contactLinkedin = cv.linkedin || "";
 
       // 4. Compute mapped experiences & educations
-      const mappedExperiences = data.experience_highlights?.length > 0
+      const incomingExperiences = data.experience_highlights?.length > 0
         ? data.experience_highlights.map((eh: any) => ({
             id: genId(),
             company: eh.company || "",
@@ -317,7 +364,9 @@ export default function PortfolioBuildPage() {
               endDate: w.endDate || "",
               description: w.description || "",
             }))
-          : experiences;
+          : [];
+
+      const mergedExp = mergeExperiences(experiences, incomingExperiences);
 
       const mappedEducations = cv.education?.length > 0
         ? cv.education.map((e: any) => ({
@@ -333,14 +382,14 @@ export default function PortfolioBuildPage() {
       // ── Apply all state updates ──
       const updatedFormData = { ...formData, ...updates };
       setFormData(updatedFormData);
-      setExperiences(mappedExperiences);
+      setExperiences(mergedExp.merged);
       setEducations(mappedEducations);
 
       // 5. Save to localStorage using LOCAL variables (not closure)
       const payload = {
         formData: updatedFormData,
         projects,
-        experiences: mappedExperiences,
+        experiences: mergedExp.merged,
         educations: mappedEducations,
         certifications,
         organizations,
@@ -410,13 +459,33 @@ export default function PortfolioBuildPage() {
 
   /** Apply a single AI-suggested field */
   const applyAiField = (field: string, value: string) => {
+    const label = fieldLabels[field] || field;
+    const from = String((formData as unknown as Record<string, unknown>)[field] ?? "");
     setFormData((prev) => ({ ...prev, [field]: value }));
+    setAiChanges((prev) => [...prev.filter((c) => c.field !== field), { field, label, from, to: value }]);
   };
 
   /** Apply all AI suggestions */
   const applyAllAi = () => {
     if (!aiSuggestions) return;
-    setFormData((prev) => ({ ...prev, ...aiSuggestions }));
+    const currentPortfolioData: PortfolioData = {
+      formData,
+      projects,
+      experiences,
+      educations,
+      certifications,
+      organizations,
+      hobbies,
+      testimonials,
+      extraLinks,
+    };
+    const { data: merged, changes } = applyAiSuggestion(currentPortfolioData, aiSuggestions);
+    if (changes.length === 0) {
+      setAiError("AI tidak mengembalikan perubahan baru.");
+      return;
+    }
+    setFormData(merged.formData);
+    setAiChanges(changes);
     setShowAiPopup(false);
   };
 
@@ -1103,6 +1172,33 @@ export default function PortfolioBuildPage() {
               </AccordionItem>
             </div>
 
+            {/* Changes list from AI */}
+            {aiChanges.length > 0 && (
+              <div className="bg-surface-container-lowest rounded-2xl p-5 shadow-soft border border-primary/30 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-label-bold text-xs text-primary uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+                    Perubahan AI ({aiChanges.length})
+                  </h3>
+                  <button onClick={() => setAiChanges([])} className="text-xs text-on-surface-variant hover:text-on-surface">
+                    Tutup
+                  </button>
+                </div>
+                <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
+                  {aiChanges.map((c, i) => (
+                    <div key={i} className="text-xs p-2.5 rounded-xl bg-surface-container-low border border-outline-variant/40 flex flex-col gap-1">
+                      <span className="font-semibold text-on-surface">{c.label} ({c.field})</span>
+                      <div className="flex items-center gap-2">
+                        <span className="line-through text-on-surface-variant text-[11px]">{c.from || "(kosong)"}</span>
+                        <span className="text-on-surface-variant">→</span>
+                        <span className="text-primary font-medium">{c.to}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Info, panduan resmi */}
             <a href="/portfolio/preview" className="block p-6 rounded-2xl bg-surface-container border-2 border-dashed border-primary/20 relative overflow-hidden group hover:border-primary/40 transition-colors">
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-500"></div>
@@ -1122,7 +1218,27 @@ export default function PortfolioBuildPage() {
         {/* Bottom Nav */}
         <footer className="fixed bottom-0 left-0 w-full z-50 bg-surface-container-highest shadow-[0_-8px_24px_rgba(0,0,0,0.06)] py-4 px-margin-mobile md:px-margin-desktop">
           <div className="max-w-[800px] mx-auto flex justify-between items-center">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1 border-r border-outline-variant/30 pr-3">
+                <button
+                  onClick={undo}
+                  disabled={!canUndo}
+                  className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  title="Urungkan (Undo)"
+                  aria-label="Undo"
+                >
+                  <span className="material-symbols-outlined text-lg">undo</span>
+                </button>
+                <button
+                  onClick={redo}
+                  disabled={!canRedo}
+                  className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  title="Ulangi (Redo)"
+                  aria-label="Redo"
+                >
+                  <span className="material-symbols-outlined text-lg">redo</span>
+                </button>
+              </div>
               {saveStatus === "saving" ? (
                 <>
                   <span className="material-symbols-outlined text-amber-500 text-lg animate-spin">sync</span>
