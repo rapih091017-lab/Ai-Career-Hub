@@ -53,6 +53,8 @@ export default function TitleUpdater() {
   const { lang } = useTranslation();
 
   useEffect(() => {
+    if (pathname.startsWith("/p/") || pathname.startsWith("/api/")) return;
+
     const siteName = "AI Career Hub";
     const isEnglish = lang === "en";
 

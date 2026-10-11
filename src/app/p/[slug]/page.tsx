@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { db } from "@/db";
 import { portfolioPages } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
+import { SITE_URL } from "@/lib/site-url";
 import { THEMES, DEFAULT_THEME_ID } from "@/components/portfolio/themes";
 import PortfolioDocument, {
   type PortfolioSectionColors,
@@ -36,22 +37,39 @@ const getPublishedPortfolio = cache(async (slug: string) => {
   return row ?? null;
 });
 
+type PortfolioSeo = PortfolioData & {
+  seo?: { pageTitle?: string; metaDescription?: string; keywords?: string[] };
+};
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const row = await getPublishedPortfolio(slug);
+  const [row] = await db
+    .select({ data: portfolioPages.data })
+    .from(portfolioPages)
+    .where(and(eq(portfolioPages.slug, slug), eq(portfolioPages.status, "published")))
+    .limit(1);
 
   if (!row) return { title: "Portfolio tidak ditemukan" };
 
-  const d = row.data as unknown as PortfolioData;
+  const d = row.data as unknown as PortfolioSeo;
   const name = [d.formData?.heroFirstName, d.formData?.heroLastName].filter(Boolean).join(" ") || "Portfolio";
+  const title = d.seo?.pageTitle?.trim() || `${name} | Portfolio`;
+  const description =
+    d.seo?.metaDescription?.trim() || d.formData?.heroBio || d.formData?.heroHeadline || `Portfolio ${name}`;
+
   return {
-    title: `${name} | Portfolio`,
-    description: d.formData?.heroBio || d.formData?.heroHeadline || `Portfolio ${name}`,
+    title,
+    description,
+    keywords: d.seo?.keywords ?? [],
+    alternates: { canonical: `${SITE_URL}/p/${slug}` },
     openGraph: {
-      title: `${name} | Portfolio`,
-      description: d.formData?.heroBio || `Portfolio ${name}`,
+      title,
+      description,
       type: "website",
+      locale: "id_ID",
+      images: [{ url: `${SITE_URL}/api/portfolio/og/${slug}`, width: 1200, height: 630 }],
     },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 

@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { CV_EXAMPLES_EN } from "@/data/cv-examples-en";
 import { SITE_URL } from "@/lib/site-url";
 import { db } from "@/db";
-import { careerPaths, careerHubPosts } from "@/db/schema";
+import { careerPaths, careerHubPosts, portfolioPages } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { CV_EXAMPLES } from "@/data/cv-examples";
 import { getInterviewPositions } from "@/data/interview-questions";
@@ -57,6 +57,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
   } catch {}
 
+  let portfolioEntries: MetadataRoute.Sitemap = [];
+  try {
+    const rows = await db
+      .select({ slug: portfolioPages.slug, updatedAt: portfolioPages.updatedAt })
+      .from(portfolioPages)
+      .where(eq(portfolioPages.status, "published"));
+    portfolioEntries = rows.map((row) => ({
+      url: `${BASE_URL}/p/${row.slug}`,
+      lastModified: row.updatedAt ?? new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    }));
+  } catch {}
+
   return [
     { url: BASE_URL, lastModified: new Date(), changeFrequency: "weekly", priority: 1.0 },
     { url: BASE_URL + "/dashboard", lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
@@ -66,9 +80,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: BASE_URL + "/interview/practice", lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
     { url: BASE_URL + "/karir", lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
     { url: BASE_URL + "/portfolio", lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
-    { url: BASE_URL + "/portfolio/build", lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
-    { url: BASE_URL + "/portfolio/preview", lastModified: new Date(), changeFrequency: "monthly", priority: 0.4 },
-    { url: BASE_URL + "/portfolio/live", lastModified: new Date(), changeFrequency: "monthly", priority: 0.4 },
     { url: BASE_URL + "/about", lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
     { url: BASE_URL + "/faq", lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
     { url: BASE_URL + "/blog", lastModified: new Date(), changeFrequency: "weekly", priority: 0.6 },
@@ -92,5 +103,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...cvExamplesEn,
     ...careerPathEntries,
     ...careerHubEntries,
+    ...portfolioEntries,
   ];
 }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
-import { auth } from "@/lib/auth";
+import { auth as getServerSession } from "@/lib/auth";
 import { errorResponse } from "@/lib/api-utils";
 import { db } from "@/db";
 import { portfolioAssets, portfolioPages } from "@/db/schema";
@@ -21,7 +21,7 @@ export const GET = async (
 
   if (!row) return errorResponse("ASSET_NOT_FOUND", "Gambar tidak ditemukan", 404);
 
-  const session = await auth();
+  const session = await getServerSession();
   const isOwner = !!session?.user?.id && session.user.id === row.userId;
 
   if (!isOwner) {
