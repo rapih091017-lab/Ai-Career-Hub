@@ -35,34 +35,34 @@
 
 ## Fix wave 1
 
-**Commit:** `72e2d7a` � `fix(portfolio): wiring blok SEO AI, kunci filter published, robots & sitemap`
+**Commit:** `72e2d7a` — `fix(portfolio): wiring blok SEO AI, kunci filter published, robots & sitemap`
 
 ### What changed
 | File | Change |
 |---|---|
-| `src/lib/portfolio/schema.ts` | + `portfolioSeoSchema` (pageTitle 120, metaDescription 300, keywords =10�60, tolerate-but-trim) + `seo` optional `.catch(undefined)` di `portfolioDataSchema` |
+| `src/lib/portfolio/schema.ts` | + `portfolioSeoSchema` (pageTitle 120, metaDescription 300, keywords maksimal 10 entri, tiap entri 60 karakter, tolerate-but-trim) + `seo` optional `.catch(undefined)` di `portfolioDataSchema` |
 | `src/components/portfolio-templates/types.ts` | + `seo?: { pageTitle?; metaDescription?; keywords? }` inline di `PortfolioData` |
 | `src/lib/portfolio/ai-map.ts` | `applyAiSuggestion` memetakan `res.seo` (snake_case & camelCase) ke `data.seo`; field ikut `changes` dengan label "Judul SEO"/"Deskripsi SEO"/"Kata kunci SEO" |
 | `src/app/robots.ts` | + `Allow: /api/portfolio/assets/` (longest-match mengalahkan `Disallow: /api/`) |
 | `src/app/sitemap.ts` | hapus `/dashboard` dan `/settings` (diblokir robots) |
 | `src/app/p/[slug]/page.tsx` | judul fallback `${headline} \| ${name}`; deskripsi `.slice(0, 160)` |
-| `src/app/api/portfolio/assets/[id]/route.ts` | alias `auth as getServerSession` ? `auth()` langsung |
+| `src/app/api/portfolio/assets/[id]/route.ts` | alias `auth as getServerSession` — `auth()` langsung |
 | `src/__tests__/portfolio-seo.test.ts` | test status-lock (source-text), robots via config ekspor, sitemap tanpa halaman terblokir, judul/deskripsi, assets pakai `await auth()` |
 | `src/__tests__/portfolio-schema.test.ts` | + 5 test blok seo (round-trip, potong overlong, buang entri rusak, seo non-objek, data lama tanpa seo) |
 | `src/__tests__/portfolio-ai-map.test.ts` | + 3 test seo mapping (snake_case, camelCase, tidak ada perubahan = tidak ada diff) |
 
 ### Red-then-green evidence
-- **Status-filter lock:** filter `eq(portfolioPages.status, "published")` dihapus sementara ? `FAIL ... hanya baris published yang dibaca halaman /p/ lewat satu query bersama` (AssertionError regex `const getPublishedPortfolio[\s\S]*?eq(portfolioPages\.status...)`); filter dikembalikan ? pass.
-- **Seo mapping:** sebelum implementasi, `npx vitest run` (3 file) ? `9 failed | 85 passed`: ai-map "memetakan snake_case�" & "menerima kunci camelCase" gagal (`data.seo` undefined), schema 3 test blok seo gagal, robots/judul/sitemap/assets gagal. Sesudah implementasi ? `94 passed`.
+- **Status-filter lock:** filter `eq(portfolioPages.status, "published")` dihapus sementara — `FAIL ... hanya baris published yang dibaca halaman /p/ lewat satu query bersama` (AssertionError regex `const getPublishedPortfolio[\s\S]*?eq(portfolioPages\.status...)`); filter dikembalikan — pass.
+- **Seo mapping:** sebelum implementasi, `npx vitest run` (3 file) — `9 failed | 85 passed`: ai-map "memetakan snake_case..." & "menerima kunci camelCase" gagal (`data.seo` undefined), schema 3 test blok seo gagal, robots/judul/sitemap/assets gagal. Sesudah implementasi — `94 passed`.
 
 ### Commands
 ```
-npx vitest run (3 file seo/schema/ai-map) ? Test Files 3 passed (3), Tests 94 passed (94)
-npm test ? Test Files 19 passed (19), Tests 347 passed (347)
-npx tsc --noEmit ? clean
+npx vitest run (3 file seo/schema/ai-map) — Test Files 3 passed (3), Tests 94 passed (94)
+npm test — Test Files 19 passed (19), Tests 347 passed (347)
+npx tsc --noEmit — clean
 ```
 
 ### Concerns
-- Schema memilih potong (trim/slice) alih-alih tolak untuk blok `seo`, supaya draft dari output AI tidak pernah gagal simpan � berbeda dengan field teks lain yang ditolak; sengaja, mengikuti pola `draftNameSchema`.
-- `/settings/*` (profile, billing, dst) masih ada di sitemap meskipun robots memblokir prefix `/settings` � brief hanya meminta dua entri (`/dashboard`, `/settings`) dihapus.
-- Test status-lock source-text (bukan query runtime) � sesuai gaya suite, tapi hanya mendeteksi penghapusan literal filter.
+- Schema memilih potong (trim/slice) alih-alih tolak untuk blok `seo`, supaya draft dari output AI tidak pernah gagal simpan — berbeda dengan field teks lain yang ditolak; sengaja, mengikuti pola `draftNameSchema`.
+- `/settings/*` (profile, billing, dst) masih ada di sitemap meskipun robots memblokir prefix `/settings` — brief hanya meminta dua entri (`/dashboard`, `/settings`) dihapus.
+- Test status-lock source-text (bukan query runtime) — sesuai gaya suite, tapi hanya mendeteksi penghapusan literal filter.
