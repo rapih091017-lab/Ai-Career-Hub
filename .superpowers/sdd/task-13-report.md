@@ -99,3 +99,44 @@ npm run lint                                           0 errors, 30 warning (pre
 - `src/app/portfolio/preview/page.tsx` (di luar scope) memakai interface `PortfolioData` lokal tanpa `seo`; runtime tetap membawa `seo` karena JSON.parse tidak membuang kunci ekstra, jadi publish dari preview tetap meneruskan seo — tipe lokal saja yang usang.
 - Path "Terapkan" per-field di popup AI build menulis nilai respons AI apa adanya ke `formData` (berlaku untuk semua kunci bersarang, bukan cuma seo) — pre-existing, tidak disentuh sesuai brief.
 - Antislop (code comments) tidak dikonsultasikan — doc comment diedit persis mengikuti wording brief.
+
+## Fix wave 3
+
+**Commit:** `ba9b8da` — `fix(portfolio): daftar saran AI datar di modal build, buang render objek bersarang`
+
+### What changed
+| File | Touchpoint |
+|---|---|
+| `src/lib/portfolio/ai-map.ts` | + `listFormSuggestions(data, res)`: memanggil `applyAiSuggestion` lalu menyaring `changes` — hanya entri dengan `to` string DAN `field` berupa kunci `formData` yang ada (`hasOwnProperty`), sehingga kunci `seo.*`/bersarang tidak pernah lolos. `applyAiSuggestion`/`mergeExperiences` tidak disentuh. |
+| `src/app/portfolio/build/page.tsx` | **state:** `aiSuggestions: Record<string, string>` (tipe bohong) → `aiRaw: Record<string, unknown> \| null` — respons mentah disimpan apa adanya. **derivation:** `aiFormList = listFormSuggestions(portfolio, aiRaw)` dan `aiSeoList = applyAiSuggestion(...).changes.filter(c => c.field.startsWith("seo."))` lewat `useMemo`. **fetch:** set raw + set `aiError` "AI tidak mengembalikan perubahan baru." bila `changes` nol (respons tanpa apa pun yang bisa dipetakan) tetap buka popup → modal menampilkan error, bukan daftar kosong. **modal 1413-an:** iterasi gabungan `aiFormList` (baris dengan tombol Terapkan) + `aiSeoList` (baris info, chip "Via Terapkan Semua", tanpa tombol per-field); label dari `AiChange.label` (bukan `fieldLabels[field]` yang jatuh ke kunci mentah), diff `from`/`to` dari snapshot perubahan. **applyAiField:** tidak berubah — kini menerima kunci flat + nilai string, `fieldLabels` + `skillsMain: "Keahlian utama"` (tambahan satu baris, sebelumnya `skillsMain` tidak punya label). **applyAllAi:** ganti `aiSuggestions` → `aiRaw`; body sudah benar dari wave 2 (`setPortfolio(prev => ({...prev, formData: merged.formData, seo: merged.seo}))`) — tidak diubah. |
+| `src/__tests__/portfolio-ai-map.test.ts` | +3 test: (1) `listFormSuggestions` dengan respons realistis (hero/about/experience_highlights/skills_display/contact_cta/seo) → hanya entri `to` string, `field` kunci formData, tanpa `seo.*`, tanpa `[object Object]`; (2) respons kosong → daftar kosong; (3) rendering contract source-text: `build/page.tsx` memuat `listFormSuggestions`, `aiFormList.map(`, dan TIDAK memuat `Object.entries(aiSuggestions\|aiRaw)` maupun `useState<Record<string, string> \| null>`. |
+| `src/app/portfolio/live/page.tsx` | Tidak diubah — pola bug tidak ada di sini (lihat bawah). |
+
+### Keputusan: baris SEO di modal
+Dipilih: **SEO tampil di modal sebagai baris info tanpa tombol "Terapkan"** (chip "Via Terapkan Semua"), bukan disembunyikan. Alasan: "Terapkan Semua" memang menerapkan seo, jadi menyembunyikan perubahan yang akan diterapkan membuat UI tidak jujur; sementara helper tetap eksklusif field formulir karena kontrak test (harus `field` kunci formData valid). Akibatnya "AI tidak mengembalikan perubahan baru." hanya muncul saat `changes` nol total (respons benar-benar tak bisa dipetakan) — respons seo-saja tetap menampilkan baris info, bukan modal kosong.
+
+### Live page
+`src/app/portfolio/live/page.tsx` **tidak punya bug yang sama**: tidak ada modal saran/`Object.entries` atas respons mentah; `handleAiGenerate` langsung memanggil `applyAiSuggestion` (line 224) dan render daftar memakai `aiChanges: AiChange[]` (line 643) yang sudah berupa string flat. Tidak diubah.
+
+### Red-then-green evidence
+- **Red:** `npx vitest run src/__tests__/portfolio-ai-map.test.ts` sebelum fix → `Tests 3 failed | 17 passed (20)`:
+  - `listFormSuggestions > hanya entri field formulir: to string, field kunci formData valid, tanpa nilai objek` (ekspor belum ada)
+  - `listFormSuggestions > respons tanpa perubahan menghasilkan daftar kosong`
+  - `modal saran AI memakai daftar datar > rendering contract...` (`expect(build).toContain("listFormSuggestions")` gagal, plus diff `useState<Record<string, string> | null>(null)` yang masih ada)
+- **Green:** setelah fix, test file yang sama → `Tests 20 passed (20)`.
+
+### Commands (output nyata)
+```
+npx vitest run src/__tests__/portfolio-ai-map.test.ts   Test Files 1 passed (1), Tests 20 passed (20)
+npm test                                                Test Files 19 passed (19), Tests 353 passed (353)   (350 lama + 3 baru)
+npx tsc --noEmit                                        exit 0, tanpa output (modal JSX valid terhadap bentuk flat)
+npm run lint                                            30 problems (0 errors, 30 warning) — identik baseline wave 2
+```
+
+### Concerns
+- `handleAiSuggest` dan `useMemo` masing-masing memanggil `applyAiSuggestion` — komputasi dobel tiap fetch/render popup; murah (murni, data kecil), sengaja demi helper tunggal yang jadi kontrak test.
+- Modal kini menampilkan `from` snapshot saat fetch, bukan nilai `formData` hidup — selisih hanya mungkin bila user mengubah form di luar popup (tidak mungkin saat modal terbuka).
+- Baris SEO tanpa tombol per-field mengandalkan chip "Via Terapkan Semua" sebagai penanda; kalau dianggap kurang jelas, tambahkan subteks "diterapkan bersama Terapkan Semua" di baris tsb.
+- Antislop (copy) tidak dikonsultasikan — hanya memakai ulang string yang sudah ada ("AI tidak mengembalikan perubahan baru.") dan chip 3 kata; brief meminta output rapat tanpa gate tambahan.
+- `experience_highlights`/`contact_cta` diabaikan `applyAiSuggestion` sehingga respons yang hanya berisi dua blok itu jatuh ke pesan "tidak ada perubahan" — di luar brief (mapping experiensa ditangani jalur generate terpisah).
+
