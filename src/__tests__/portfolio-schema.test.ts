@@ -9,7 +9,7 @@ import { isSectionVisible, resolveVisibility } from "@/components/portfolio/sect
 import type { PortfolioCanvasProps } from "@/components/portfolio/PortfolioCanvas";
 import type { PublishedPortfolioProps } from "@/components/portfolio/PublishedPortfolio";
 import type { PublishDialogProps } from "@/components/portfolio/PublishDialog";
-import type { LiveData } from "@/app/portfolio/live/page";
+import type { LiveData } from "@/lib/portfolio/live-data";
 import {
   portfolioDataSchema,
   publishPayloadSchema,

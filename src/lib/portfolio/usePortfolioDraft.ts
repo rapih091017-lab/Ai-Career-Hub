@@ -60,6 +60,8 @@ export type UsePortfolioDraftResult = {
   error: string | null;
   lastSavedAt: string | null;
   retry: () => void;
+  /** Paksa flush perubahan tertunda sekarang; true kalau aman (tersimpan / tak ada yang tertunda). */
+  flushNow: () => Promise<boolean>;
   loading: boolean;
 };
 
@@ -126,8 +128,8 @@ export function usePortfolioDraft(draftId: string | null): UsePortfolioDraftResu
     };
   }, [draftId]);
 
-  const flush = useCallback(async () => {
-    if (!draftId || !pending.current) return;
+  const flush = useCallback(async (): Promise<boolean> => {
+    if (!draftId || !pending.current) return true;
     const body = pending.current;
     pending.current = null;
     setStatus("saving");
@@ -144,12 +146,14 @@ export function usePortfolioDraft(draftId: string | null): UsePortfolioDraftResu
       setOffline(false);
       setLastSavedAt(json.updatedAt);
       writeCache(draftId, { name, data: body, updatedAt: json.updatedAt });
+      return true;
     } catch {
       pending.current = body;
       setStatus("error");
       setOffline(true);
       setError("Perubahan belum masuk server. Ketuk coba lagi.");
       writeCache(draftId, { name, data: body, updatedAt: new Date().toISOString() });
+      return false;
     }
   }, [draftId, name]);
 
@@ -218,6 +222,7 @@ export function usePortfolioDraft(draftId: string | null): UsePortfolioDraftResu
     error,
     lastSavedAt,
     retry,
+    flushNow: flush,
     loading,
   };
 }

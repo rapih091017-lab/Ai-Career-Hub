@@ -14,6 +14,7 @@ import "../print.css";
 
 import PublishDialog from "@/components/portfolio/PublishDialog";
 import { STATIC_REVEAL_FALLBACK_CSS } from "@/components/portfolio/render/PortfolioDocument";
+import { readCache } from "@/lib/portfolio/usePortfolioDraft";
 
 interface PortfolioData {
   formData: PortfolioFormData;
@@ -33,6 +34,7 @@ interface PortfolioData {
 export default function PortfolioPreviewPage() {
   const { t } = useTranslation();
   const [data, setData] = useState<PortfolioData | null>(null);
+  const [draftId, setDraftId] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [themeId, setThemeId] = useState<string>(DEFAULT_THEME_ID);
   const [showPublish, setShowPublish] = useState(false);
@@ -69,22 +71,52 @@ export default function PortfolioPreviewPage() {
     };
   }, []);
 
+  // Draft dibaca dari server (draftId di URL, atau draft terbaru). Cache lokal
+  // hanya dipakai sebagai cadangan offline bila server tidak terjangkau.
   useEffect(() => {
-    try {
-      // Draft lengkap builder (urutan, visibilitas, ukuran font) ada di
-      // portfolio_live_data; portfolio_draft hanya data isi.
-      const raw =
-        localStorage.getItem("portfolio_live_data") ??
-        localStorage.getItem("portfolio_draft");
-      if (raw) {
-        const parsed: PortfolioData = JSON.parse(raw);
-        setData(parsed);
-      } else {
-        setNotFound(true);
+    let alive = true;
+    const query = new URLSearchParams(window.location.search);
+    const requested = query.get("draftId");
+
+    const applyFallback = (): boolean => {
+      if (!requested) return false;
+      const cached = readCache(requested);
+      if (cached?.data) {
+        setData(cached.data as unknown as PortfolioData);
+        setDraftId(requested);
+        setNotFound(false);
+        return true;
       }
-    } catch {
-      setNotFound(true);
-    }
+      return false;
+    };
+
+    (async () => {
+      try {
+        const url = requested
+          ? `/api/portfolio/draft?draftId=${encodeURIComponent(requested)}`
+          : "/api/portfolio/draft";
+        const res = await fetch(url, { cache: "no-store" });
+        if (res.ok) {
+          const json = await res.json();
+          if (json?.draftId && json?.data) {
+            if (!alive) return;
+            setData(json.data as unknown as PortfolioData);
+            setDraftId(json.draftId);
+            setNotFound(false);
+            return;
+          }
+        }
+        if (!alive) return;
+        if (!applyFallback()) setNotFound(true);
+      } catch {
+        if (!alive) return;
+        if (!applyFallback()) setNotFound(true);
+      }
+    })();
+
+    return () => {
+      alive = false;
+    };
   }, []);
 
   if (notFound) {
@@ -96,7 +128,7 @@ export default function PortfolioPreviewPage() {
             <span className="material-symbols-outlined text-6xl text-outline">description</span>
             <h1 className="font-headline-md text-on-surface">{t("preview.no-draft-title")}</h1>
             <p className="text-body-md text-on-surface-variant max-w-md">{t("preview.no-draft-desc")}</p>
-            <Link href="/portfolio/live" className="bg-primary text-on-primary font-label-bold rounded-xl px-8 py-3 hover:brightness-110 transition-all shadow-md">
+            <Link href="/portfolio/build" className="bg-primary text-on-primary font-label-bold rounded-xl px-8 py-3 hover:brightness-110 transition-all shadow-md">
               {t("preview.open-builder")}
             </Link>
           </main>
@@ -181,7 +213,7 @@ export default function PortfolioPreviewPage() {
                       </button>
                     ))}
                   </div>
-                  <Link href="/portfolio/live" className="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
+                  <Link href={draftId ? `/portfolio/build/${draftId}` : "/portfolio/build"} className="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
                     style={{ border: `1px solid ${theme.colors.border}`, color: theme.colors.text }}>
                     {t("preview.edit")}
                   </Link>

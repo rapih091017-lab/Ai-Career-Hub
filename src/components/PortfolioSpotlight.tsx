@@ -58,7 +58,7 @@ export default function PortfolioSpotlight() {
           </ul>
           <div className="mt-10">
             <Link
-              href="/portfolio"
+              href="/portfolio/build"
               className="inline-flex items-center gap-2 rounded-xl bg-primary px-7 py-3.5 font-label-bold text-on-primary shadow-lg transition-all hover:brightness-110 active:scale-[0.98]"
             >
               {t("portfolio.spot.cta")}

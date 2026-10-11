@@ -102,9 +102,9 @@ export default function PortfolioPage() {
                   )}
                 </div>
                 <div className="flex gap-3 flex-wrap">
-                  <Link href="/portfolio/live" className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-on-primary font-label-bold hover:opacity-90 transition-opacity shadow-md">
-                    <span className="material-symbols-outlined text-lg">live_tv</span>
-                    <span className="hidden sm:inline">Live Builder</span>
+                  <Link href="/portfolio/build" className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-on-primary font-label-bold hover:opacity-90 transition-opacity shadow-md">
+                    <span className="material-symbols-outlined text-lg">edit</span>
+                    <span className="hidden sm:inline">Buat Portfolio</span>
                   </Link>
                   <Link href={`/portfolio/preview?template=${selectedTheme}`} className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-outline-variant text-on-surface font-label-bold hover:bg-surface-container-low transition-colors">
                     <span className="material-symbols-outlined text-lg">preview</span>
