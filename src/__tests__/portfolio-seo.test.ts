@@ -47,7 +47,8 @@ describe("SEO portfolio", () => {
     expect(src).not.toContain('/dashboard"');
     // Cocokkan sebagai prefiks, bukan string persis: subpath seperti
     // "/settings/profile" harus ikut ketahuan oleh "Disallow: /settings".
-    const rule = Array.isArray(robots().rules) ? robots().rules[0] : robots().rules;
+    const config = robots();
+    const rule = Array.isArray(config.rules) ? config.rules[0] : config.rules;
     const disallow = ([] as string[]).concat(rule.disallow ?? []);
     const urls = [...src.matchAll(/BASE_URL\s*\+\s*"([^"]+)"/g)].map((m) => m[1]);
     const terblokir = urls.filter((u) => disallow.some((d) => u.startsWith(d)));
