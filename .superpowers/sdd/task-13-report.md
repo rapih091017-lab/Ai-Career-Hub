@@ -66,3 +66,36 @@ npx tsc --noEmit — clean
 - Schema memilih potong (trim/slice) alih-alih tolak untuk blok `seo`, supaya draft dari output AI tidak pernah gagal simpan — berbeda dengan field teks lain yang ditolak; sengaja, mengikuti pola `draftNameSchema`.
 - `/settings/*` (profile, billing, dst) masih ada di sitemap meskipun robots memblokir prefix `/settings` — brief hanya meminta dua entri (`/dashboard`, `/settings`) dihapus.
 - Test status-lock source-text (bukan query runtime) — sesuai gaya suite, tapi hanya mendeteksi penghapusan literal filter.
+
+## Fix wave 2
+
+**Commit:** `0d380db` — `fix(portfolio): bawa seo dari AI lewat editor build & live sampai draft dan publish`
+
+### What changed — touchpoint per file
+| File | Touchpoint |
+|---|---|
+| `src/lib/portfolio/ai-map.ts` | Minor 1: pembanding keywords `next.join(", ") === from.join(",")` → keduanya `join(", ")` (≥2 entri identik tidak lagi jadi perubahan hantu). Minor 3: doc comment kini menyatakan blok `seo` disimpan terstruktur dan schema membuang kunci asing. |
+| `src/app/portfolio/build/page.tsx` | **state:** `const seo = portfolio.seo`; `applyAllAi` kini memasukkan `seo` ke `currentPortfolioData` (prevSeo benar → tidak ada diff hantu) dan hasilnya satu langkah `setPortfolio(prev => ({...prev, formData: merged.formData, seo: merged.seo}))` — `merged.seo` = seo lama saat AI tidak mengirim seo, jadi tidak pernah wipe. **load:** tipe draft + `seo: draft.seo` ke `resetPortfolio` (draft lama tanpa kunci → undefined, tidak crash). **save:** 3 payload memuat `seo` — generate-dari-CV localStorage, auto-save debounce, tombol Simpan & Preview — plus dep array auto-save (`..., extraLinks, seo`) supaya perubahan seo saja tetap memicu simpan. **reset:** "Batalkan Semua" mengosongkan `seo`. **publish:** build memang tidak punya path publish (diverifikasi; hanya save → `/portfolio/preview`), cukup persist di draft. |
+| `src/app/portfolio/live/page.tsx` | **state interface:** `LiveData.seo?` (opsional, backward compatible). **state:** `const seo = portfolio.seo`. **load:** `seo: draft.seo` di `resetPortfolio`. **save:** `saveDraft({... , seo})` + dep `..., alignment, seo, mounted`. **AI:** `currentPortfolio` memuat `seo` (prevSeo benar) dan `setPortfolio` menerapkan `seo: updatedPortfolio.seo`. **publish:** `canvasData` memuat `seo` → `PublishDialog` spread `...data` → payload publish. **export-preview:** `previewData` memuat `seo` (fallback key `portfolio_draft`). |
+| `src/app/p/[slug]/page.tsx` | Minor 2: intersection `PortfolioSeo` dihapus; `generateMetadata` cast langsung ke `PortfolioData` (sudah punya `seo?`); bacaan `d.seo.*` tidak berubah. |
+| `src/__tests__/portfolio-ai-map.test.ts` | +3 test: keywords identik ≥2 entri tidak berubah; source-test build (load, 3 payload, dep, input+output applyAllAi); source-test live (LiveData, load, saveDraft, dep, input+output AI, canvasData). |
+
+### Red-then-green evidence
+- Sebelum fix: `npx vitest run src/__tests__/portfolio-ai-map.test.ts` → `Tests 3 failed | 14 passed (17)`:
+  - `kata kunci identik dengan lebih dari satu entri tidak dianggap berubah` — gagal karena `from.join(",")` ≠ `next.join(", ")` → phantom change.
+  - `build: seo ikut load draft, semua payload simpan, dep auto-save, dan applyAllAi` — gagal: tidak ada `seo: draft.seo` / payload tanpa seo.
+  - `live: seo ada di LiveData, load, auto-save, canvasData publish, dan hasil generate AI` — gagal: LiveData tanpa `seo`.
+- Sesudah fix: test file yang sama → `Tests 17 passed (17)`.
+
+### Commands (output nyata)
+```
+npx vitest run src/__tests__/portfolio-ai-map.test.ts  Test Files 1 passed (1), Tests 17 passed (17)
+npm test                                               Test Files 19 passed (19), Tests 350 passed (350)   (347 lama + 3 baru)
+npx tsc --noEmit                                       exit 0, tanpa output
+npm run lint                                           0 errors, 30 warning (pre-existing no-img-element)
+```
+
+### Concerns
+- `src/app/portfolio/preview/page.tsx` (di luar scope) memakai interface `PortfolioData` lokal tanpa `seo`; runtime tetap membawa `seo` karena JSON.parse tidak membuang kunci ekstra, jadi publish dari preview tetap meneruskan seo — tipe lokal saja yang usang.
+- Path "Terapkan" per-field di popup AI build menulis nilai respons AI apa adanya ke `formData` (berlaku untuk semua kunci bersarang, bukan cuma seo) — pre-existing, tidak disentuh sesuai brief.
+- Antislop (code comments) tidak dikonsultasikan — doc comment diedit persis mengikuti wording brief.
