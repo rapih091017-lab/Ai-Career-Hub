@@ -22,10 +22,8 @@ export interface PortfolioFormData {
   heroPhotoUrl: string;
   heroHeadline: string;
   heroSubHeadline: string;
-  heroBgUrl: string;
   heroFirstName: string;
   heroLastName: string;
-  heroCreativeTitle: string;
   heroBio: string;
   aboutText: string;
   aboutYearsExp: string;

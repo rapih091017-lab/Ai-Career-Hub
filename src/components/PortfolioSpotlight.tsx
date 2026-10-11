@@ -5,9 +5,9 @@ import Link from "next/link";
 import { useTranslation } from "@/lib/i18n";
 
 const THEMES = [
-  { name: "Modern Slate", dot: "#1e293b", accent: "#0ea5e9" },
-  { name: "Minimal Dark", dot: "#0f172a", accent: "#2563eb" },
-  { name: "Modern Blue", dot: "#0891b2", accent: "#0284c7" },
+  { name: "Glassmorphism", dot: "#1e293b", accent: "#0ea5e9" },
+  { name: "Neo Brutal", dot: "#0f172a", accent: "#2563eb" },
+  { name: "Editorial Luxe", dot: "#0891b2", accent: "#0284c7" },
 ];
 
 /** Spotlight satu fitur: Portfolio Web. Split layout, preview tipografis

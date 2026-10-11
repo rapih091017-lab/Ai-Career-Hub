@@ -9,7 +9,6 @@ import {
   STATIC_REVEAL_FALLBACK_CSS,
 } from "@/components/portfolio/render/PortfolioDocument";
 import { DEFAULT_SECTION_ORDER } from "@/components/portfolio/themes";
-import PublishedPortfolio from "@/components/portfolio/PublishedPortfolio";
 import { portfolioFormDataSchema } from "@/lib/portfolio/schema";
 import type { FontSize, SectionId, ThemeId } from "@/components/portfolio/types";
 import type { PortfolioData } from "@/components/portfolio-templates/types";
@@ -498,10 +497,10 @@ describe("PortfolioDocument", () => {
   });
 });
 
-describe("PublishedPortfolio", () => {
-  it("merender lewat PortfolioDocument: anchor section ikut terbawa", () => {
+describe("PortfolioDocument sebagai halaman publik", () => {
+  it("merender anchor section lengkap di mode static", () => {
     const { container } = render(
-      <PublishedPortfolio data={data} themeId="glass" />,
+      <PortfolioDocument data={data} themeId="glass" mode="static" />,
     );
     expect(anchors(container)).toEqual(DEFAULT_SECTION_ORDER);
     expect(container.querySelector("[data-mode]")?.getAttribute("data-mode")).toBe(
@@ -511,23 +510,16 @@ describe("PublishedPortfolio", () => {
 
   it("meneruskan urutan, visibilitas, dan warna per section", () => {
     const { container } = render(
-      <PublishedPortfolio
-        data={{ ...data, sectionColors: { contact: { primary: "#0abcde" } } } as unknown as PortfolioData}
+      <PortfolioDocument
+        data={data}
         themeId="glass"
+        mode="static"
         sectionOrder={["contact", "projects"]}
         sectionVisibility={{ projects: false }}
+        sectionColors={{ contact: { primary: "#0abcde" } }}
       />,
     );
     expect(anchors(container)).toEqual(["contact"]);
     expect(subtreeMent(anchor(container, "contact"), "#0abcde")).toBe(true);
-  });
-
-  it("menyembunyikan footer saat showFooter dimatikan", () => {
-    const { container, rerender } = render(
-      <PublishedPortfolio data={data} themeId="glass" />,
-    );
-    expect(container.querySelector("footer")).not.toBeNull();
-    rerender(<PublishedPortfolio data={data} themeId="glass" showFooter={false} />);
-    expect(container.querySelector("footer")).toBeNull();
   });
 });

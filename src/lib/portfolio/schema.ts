@@ -184,12 +184,8 @@ export const portfolioFormDataSchema = z.object({
   heroPhotoUrl: urlField(MAX.url).default(""),
   heroHeadline: text(MAX.name),
   heroSubHeadline: text(MAX.line),
-  // Dua field di bawah masih dipakai form live builder; dihapus di task terpisah.
-  // String biasa (bukan urlField) supaya isinya tidak ditolak/diubah schema.
-  heroBgUrl: text(MAX.url).default(""),
   heroFirstName: text(MAX.name),
   heroLastName: text(MAX.name),
-  heroCreativeTitle: text(MAX.line).default(""),
   heroBio: text(MAX.line),
   aboutText: text(MAX.long),
   aboutYearsExp: z.string().max(MAX.short).default(""),

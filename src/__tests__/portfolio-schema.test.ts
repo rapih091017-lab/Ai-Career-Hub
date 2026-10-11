@@ -4,10 +4,10 @@ import { render, screen } from "@testing-library/react";
 import type { PortfolioData } from "@/components/portfolio-templates/types";
 import { SECTION_IDS } from "@/components/portfolio/types";
 import PortfolioCanvas from "@/components/portfolio/PortfolioCanvas";
-import PublishedPortfolio from "@/components/portfolio/PublishedPortfolio";
+import { PortfolioDocument } from "@/components/portfolio/render/PortfolioDocument";
 import { isSectionVisible, resolveVisibility } from "@/components/portfolio/sectionVisibility";
 import type { PortfolioCanvasProps } from "@/components/portfolio/PortfolioCanvas";
-import type { PublishedPortfolioProps } from "@/components/portfolio/PublishedPortfolio";
+import type { PortfolioDocumentProps } from "@/components/portfolio/render/PortfolioDocument";
 import type { PublishDialogProps } from "@/components/portfolio/PublishDialog";
 import type { LiveData } from "@/lib/portfolio/live-data";
 import {
@@ -356,23 +356,18 @@ describe("portfolioDataSchema", () => {
     expect(r.sectionVisibility).toEqual({ hero: true, about: false });
   });
 
-  it("mempertahankan heroBgUrl dan heroCreativeTitle saat parse", () => {
+  it("membuang kunci asing di formData: field yang sudah dihapus dari schema tidak ikut hasil parse", () => {
     const r = portfolioDataSchema.parse({
       ...emptyData,
-      formData: {
-        ...validFormData,
-        heroBgUrl: "/uploads/hero-bg.jpg",
-        heroCreativeTitle: "Frontend Engineer",
-      },
+      formData: { ...validFormData, kunciTerhapus: "x" },
     });
-    expect(r.formData.heroBgUrl).toBe("/uploads/hero-bg.jpg");
-    expect(r.formData.heroCreativeTitle).toBe("Frontend Engineer");
+    expect("kunciTerhapus" in r.formData).toBe(false);
   });
 
   it("hasil parse tetap memenuhi tipe PortfolioData", () => {
     const parsed: PortfolioData = portfolioDataSchema.parse(emptyData);
-    expect(parsed.formData.heroBgUrl).toBe("");
-    expect(parsed.formData.heroCreativeTitle).toBe("");
+    expect(parsed.formData.heroPhotoUrl).toBe("");
+    expect(parsed.formData.heroFirstName).toBe("Teguh");
   });
 
   it("menerapkan default pada field opsional", () => {
@@ -450,10 +445,8 @@ describe("emptySectionIds", () => {
         heroPhotoUrl: "",
         heroHeadline: "",
         heroSubHeadline: "",
-        heroBgUrl: "",
         heroFirstName: "",
         heroLastName: "",
-        heroCreativeTitle: "",
         heroBio: "",
         aboutText: "",
         aboutYearsExp: "",
@@ -565,7 +558,7 @@ describe("tipe output schema ke konsumen", () => {
     const canvas: Pick<PortfolioCanvasProps, "sectionVisibility"> = {
       sectionVisibility: visibility,
     };
-    const published: Pick<PublishedPortfolioProps, "sectionVisibility"> = {
+    const published: Pick<PortfolioDocumentProps, "sectionVisibility"> = {
       sectionVisibility: visibility,
     };
     const dialog: Pick<NonNullable<PublishDialogProps["extras"]>, "sectionVisibility"> = {
@@ -693,9 +686,10 @@ describe("canvas dan halaman publik membaca peta parsial sama", () => {
     if (!sectionVisibility) throw new Error("sectionVisibility harus ada pada payload ini");
 
     render(
-      createElement(PublishedPortfolio, {
+      createElement(PortfolioDocument, {
         data: parsed as PortfolioData,
         themeId: "glass",
+        mode: "static",
         sectionOrder: ["hero", "about"],
         sectionVisibility,
       }),

@@ -100,10 +100,8 @@ interface PortfolioFormData {
   heroPhotoUrl: string;
   heroHeadline: string;
   heroSubHeadline: string;
-  heroBgUrl: string;
   heroFirstName: string;
   heroLastName: string;
-  heroCreativeTitle: string;
   heroBio: string;
   aboutText: string;
   aboutYearsExp: string;
@@ -122,10 +120,8 @@ const DEFAULT_FORM: PortfolioFormData = {
   heroPhotoUrl: "",
   heroHeadline: "",
   heroSubHeadline: "",
-  heroBgUrl: "",
   heroFirstName: "",
   heroLastName: "",
-  heroCreativeTitle: "",
   heroBio: "",
   aboutText: "",
   aboutYearsExp: "",
@@ -791,10 +787,6 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                     onChange={(url) => setFormData((prev) => ({ ...prev, heroPhotoUrl: url }))}
                     label={t("build.hero-photo-url")}
                   />
-          <Field label={t("build.hero-bg-url")}>
-                    <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="https://example.com/hero-bg.jpg"
-                      value={formData.heroBgUrl} onChange={update("heroBgUrl")} />
-                  </Field>
                   <div className="grid grid-cols-2 gap-4">
                     <Field label={t("build.hero-firstname")}>
                       <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Teguh"
@@ -804,11 +796,6 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                       <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Surya"
                         value={formData.heroLastName} onChange={update("heroLastName")} />
                     </Field>
-                  </div>
-                  <div>
-                    <label className="block text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">{t("build.hero-creative")}</label>
-                    <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Frontend Developer, UI Designer, Content Creator"
-                      value={formData.heroCreativeTitle} onChange={update("heroCreativeTitle")} />
                   </div>
                   <div className="relative">
                     <div className="flex items-center justify-between mb-1">
@@ -1046,12 +1033,12 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
               </AccordionItem>
 
               {/* 6b. Certifications */}
-              <AccordionItem id="certifications" icon="workspace_premium" title="Sertifikat & Penghargaan" isOpen={activeSection === "certifications"} onToggle={toggleSection}>
+              <AccordionItem id="certifications" icon="workspace_premium" title={t("build.certifications")} isOpen={activeSection === "certifications"} onToggle={toggleSection}>
                 <div className="px-6 space-y-6">
                   {certifications.map((cert, idx) => (
                     <div key={cert.id} className="p-4 rounded-xl border border-outline-variant bg-surface-container-low">
                       <div className="flex justify-between items-start mb-3">
-                        <h4 className="font-label-bold text-primary">Sertifikat {idx + 1}</h4>
+                        <h4 className="font-label-bold text-primary">{t("live.form.certification")} {idx + 1}</h4>
                         <button className="text-error hover:bg-error-container/30 p-1 rounded transition-colors"
                           onClick={() => setCertifications(prev => prev.filter(x => x.id !== cert.id))}
                           aria-label="Hapus sertifikat">
@@ -1059,19 +1046,19 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                         </button>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Field label="Nama Sertifikat">
+                        <Field label={t("live.form.cert-name")}>
                           <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="AWS Certified Developer"
                             value={cert.name} onChange={e => setCertifications(prev => prev.map(x => x.id === cert.id ? {...x, name: e.target.value} : x))} />
                         </Field>
-                        <Field label="Penerbit">
+                        <Field label={t("live.form.cert-issuer")}>
                           <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Amazon Web Services"
                             value={cert.issuer} onChange={e => setCertifications(prev => prev.map(x => x.id === cert.id ? {...x, issuer: e.target.value} : x))} />
                         </Field>
-                        <Field label="Tahun">
+                        <Field label={t("live.form.cert-year")}>
                           <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="2024"
                             value={cert.year} onChange={e => setCertifications(prev => prev.map(x => x.id === cert.id ? {...x, year: e.target.value} : x))} />
                         </Field>
-                        <Field label="Link Sertifikat (opsional)">
+                        <Field label={t("live.form.cert-url")}>
                           <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="https://credential.example.com/..."
                             value={cert.url || ""} onChange={e => setCertifications(prev => prev.map(x => x.id === cert.id ? {...x, url: e.target.value} : x))} />
                         </Field>
@@ -1081,18 +1068,18 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                   <button onClick={() => setCertifications(prev => [...prev, { id: genId(), name: "", issuer: "", year: "", url: "" }])}
                     className="w-full py-3 rounded-xl border-2 border-dashed border-outline-variant text-on-surface-variant font-label-bold flex items-center justify-center gap-2 hover:bg-surface-container-low hover:border-primary/50 transition-all">
                     <span className="material-symbols-outlined">add</span>
-                    Tambah Sertifikat
+                    {t("live.form.add-certification")}
                   </button>
                 </div>
               </AccordionItem>
 
               {/* 6c. Organizations */}
-              <AccordionItem id="organizations" icon="groups" title="Organisasi & Kepanitiaan" isOpen={activeSection === "organizations"} onToggle={toggleSection}>
+              <AccordionItem id="organizations" icon="groups" title={t("build.organizations")} isOpen={activeSection === "organizations"} onToggle={toggleSection}>
                 <div className="px-6 space-y-6">
                   {organizations.map((org, idx) => (
                     <div key={org.id} className="p-4 rounded-xl border border-outline-variant bg-surface-container-low">
                       <div className="flex justify-between items-start mb-3">
-                        <h4 className="font-label-bold text-primary">Organisasi {idx + 1}</h4>
+                        <h4 className="font-label-bold text-primary">{t("live.form.organization")} {idx + 1}</h4>
                         <button className="text-error hover:bg-error-container/30 p-1 rounded transition-colors"
                           onClick={() => setOrganizations(prev => prev.filter(x => x.id !== org.id))}
                           aria-label="Hapus organisasi">
@@ -1100,20 +1087,20 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                         </button>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Field label="Nama Organisasi">
+                        <Field label={t("live.form.org-name")}>
                           <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Himpunan Mahasiswa Teknik"
                             value={org.name} onChange={e => setOrganizations(prev => prev.map(x => x.id === org.id ? {...x, name: e.target.value} : x))} />
                         </Field>
-                        <Field label="Peran / Jabatan">
+                        <Field label={t("live.form.org-role")}>
                           <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Ketua Divisi Acara"
                             value={org.role} onChange={e => setOrganizations(prev => prev.map(x => x.id === org.id ? {...x, role: e.target.value} : x))} />
                         </Field>
-                        <Field label="Periode">
+                        <Field label={t("live.form.org-period")}>
                           <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="2022 - 2024"
                             value={org.period} onChange={e => setOrganizations(prev => prev.map(x => x.id === org.id ? {...x, period: e.target.value} : x))} />
                         </Field>
                         <div className="md:col-span-2">
-                          <label className="block text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Deskripsi Kegiatan</label>
+                          <label className="block text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">{t("live.form.org-desc")}</label>
                           <textarea className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={2} placeholder="Jelaskan tanggung jawab & pencapaian..." maxLength={500}
                             value={org.description} onChange={e => setOrganizations(prev => prev.map(x => x.id === org.id ? {...x, description: e.target.value} : x))} />
                         </div>
@@ -1123,18 +1110,18 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                   <button onClick={() => setOrganizations(prev => [...prev, { id: genId(), name: "", role: "", period: "", description: "" }])}
                     className="w-full py-3 rounded-xl border-2 border-dashed border-outline-variant text-on-surface-variant font-label-bold flex items-center justify-center gap-2 hover:bg-surface-container-low hover:border-primary/50 transition-all">
                     <span className="material-symbols-outlined">add</span>
-                    Tambah Organisasi
+                    {t("live.form.add-organization")}
                   </button>
                 </div>
               </AccordionItem>
 
               {/* 6d. Hobbies */}
-              <AccordionItem id="hobbies" icon="favorite" title="Hobi & Minat" isOpen={activeSection === "hobbies"} onToggle={toggleSection}>
+              <AccordionItem id="hobbies" icon="favorite" title={t("build.hobbies")} isOpen={activeSection === "hobbies"} onToggle={toggleSection}>
                 <div className="px-6 space-y-4">
                   {hobbies.map((hobby, idx) => (
                     <div key={hobby.id} className="p-4 rounded-xl border border-outline-variant bg-surface-container-low">
                       <div className="flex justify-between items-start mb-3">
-                        <h4 className="font-label-bold text-primary">Hobi {idx + 1}</h4>
+                        <h4 className="font-label-bold text-primary">{t("live.form.hobby")} {idx + 1}</h4>
                         {hobbies.length > 1 && (
                           <button className="text-error hover:bg-error-container/30 p-1 rounded transition-colors"
                             onClick={() => setHobbies(prev => prev.filter(x => x.id !== hobby.id))}
@@ -1144,11 +1131,11 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                         )}
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Field label="Nama Hobi">
+                        <Field label={t("live.form.hobby-name")}>
                           <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Fotografi"
                             value={hobby.name} onChange={e => setHobbies(prev => prev.map(x => x.id === hobby.id ? {...x, name: e.target.value} : x))} />
                         </Field>
-                        <Field label="Deskripsi Singkat (opsional)">
+                        <Field label={t("live.form.hobby-desc")}>
                           <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Street photography & landscape"
                             value={hobby.description} onChange={e => setHobbies(prev => prev.map(x => x.id === hobby.id ? {...x, description: e.target.value} : x))} />
                         </Field>
@@ -1158,7 +1145,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                   <button onClick={() => setHobbies(prev => [...prev, { id: genId(), name: "", description: "" }])}
                     className="w-full py-3 rounded-xl border-2 border-dashed border-outline-variant text-on-surface-variant font-label-bold flex items-center justify-center gap-2 hover:bg-surface-container-low hover:border-primary/50 transition-all">
                     <span className="material-symbols-outlined">add</span>
-                    Tambah Hobi
+                    {t("live.form.add-hobby")}
                   </button>
                 </div>
               </AccordionItem>
@@ -1186,7 +1173,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                           </div>
                         </div>
                         <div className="flex-grow space-y-4">
-                          <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-4">
                             <Field label="Nama">
                               <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Nama pemberi testimoni"
                                 value={item.name} onChange={updateTestimonial(item.id, "name")} />
@@ -1758,7 +1745,6 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 const fieldLabels: Record<string, string> = {
   heroHeadline: "Job Title Utama",
   heroSubHeadline: "Sub-headline / Tagline",
-  heroCreativeTitle: "Judul Kreatif (Typing Animation)",
   heroBio: "Bio Singkat",
   aboutText: "Tentang Saya",
   aboutYearsExp: "Tahun Pengalaman",

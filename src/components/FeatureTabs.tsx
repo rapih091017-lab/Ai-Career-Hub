@@ -83,24 +83,27 @@ const TABS: TabData[] = [
 /* ─── Portfolio Theme Previews ─── */
 const PORTFOLIO_THEMES = [
   {
-    id: "modern-slate",
-    name: "Modern Slate",
+    id: "glass",
+    name: "Glassmorphism",
+    descKey: "features.theme-glass-desc",
     primary: "#1e293b",
     secondary: "#64748b",
     accent: "#0ea5e9",
     bg: "#f8fafc",
   },
   {
-    id: "minimal-dark",
-    name: "Minimal Dark",
+    id: "brutal",
+    name: "Neo Brutal",
+    descKey: "features.theme-brutal-desc",
     primary: "#0f172a",
     secondary: "#334155",
     accent: "#2563eb",
     bg: "#0f172a",
   },
   {
-    id: "modern-blue",
-    name: "Modern Blue",
+    id: "luxe",
+    name: "Editorial Luxe",
+    descKey: "features.theme-luxe-desc",
     primary: "#0891b2",
     secondary: "#06b6d4",
     accent: "#0284c7",
@@ -280,9 +283,7 @@ function PortfolioShowcase({ t }: { t: (key: string) => string }) {
                   <div>
                     <h4 className="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">{theme.name}</h4>
                     <p className="text-xs text-on-surface-variant mt-0.5">
-                      {theme.id === "modern-slate" && t("features.portfolio-b1")}
-                      {theme.id === "minimal-dark" && t("features.portfolio-b2")}
-                      {theme.id === "modern-blue" && t("features.portfolio-b3")}
+                      {t(theme.descKey)}
                     </p>
                   </div>
                   <motion.div
