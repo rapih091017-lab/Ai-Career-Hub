@@ -142,6 +142,8 @@ const DEFAULT_FORM: PortfolioFormData = {
 
 const genId = () => Math.random().toString(36).slice(2, 9);
 
+const SAVE_FAILED_MESSAGE = "Gagal menyimpan data. Silakan coba lagi.";
+
 /* ── Validation helpers ── */
 const validateEmail = (v: string) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 const validateUrl = (v: string) => !v || /^https?:\/\/.+/.test(v);
@@ -283,7 +285,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
       // supaya tidak ikut terbawa ke draft baru.
       const flushed = await draft.flushNow();
       if (!flushed) {
-        addToast({ type: "error", message: "Gagal menyimpan data. Silakan coba lagi." });
+        addToast({ type: "error", message: SAVE_FAILED_MESSAGE });
         return;
       }
       const res = await fetch("/api/portfolio/draft", {
@@ -365,7 +367,6 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
       const data = await suggestRes.json();
 
       // ── Compute ALL updates BEFORE setState ──
-      // (fix: stale closure values in localStorage save)
 
       // 3. Map AI response ke form fields + CV field
       const updates: Partial<PortfolioFormData> = {};
@@ -738,7 +739,9 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                     <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>person</span>
                   )}
                   {profileLoading ? t("build.fill-loading") : t("build.fill-profile")}
-                </button>                {!profileForFill && !profileLoading && (                    <p className="text-body-sm text-on-surface-variant">
+                </button>
+                {!profileForFill && !profileLoading && (
+                  <p className="text-body-sm text-on-surface-variant">
                     {t("build.profile-hint")}{" "}
                     <a href="/profile" className="text-primary underline">sini</a>
                   </p>
@@ -1522,12 +1525,12 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                     // preview dibuka (server adalah sumber kebenaran preview).
                     const flushed = await draft.flushNow();
                     if (!flushed) {
-                      addToast({ type: "error", message: "Gagal menyimpan data. Silakan coba lagi." });
+                      addToast({ type: "error", message: SAVE_FAILED_MESSAGE });
                       return;
                     }
                     window.open(`/portfolio/preview?draftId=${draft.draftId}`, "_blank");
                   } catch (err) {
-                    addToast({ type: "error", message: "Gagal menyimpan data. Silakan coba lagi." });
+                    addToast({ type: "error", message: SAVE_FAILED_MESSAGE });
                   } finally {
                     setSaving(false);
                   }
