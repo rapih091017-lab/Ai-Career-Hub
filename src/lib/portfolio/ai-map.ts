@@ -33,19 +33,25 @@ export function applyAiSuggestion(
 
   const hero = (res.hero ?? {}) as Dict;
   set("heroHeadline", hero.headline, "Judul peran");
-  set("heroSubHeadline", hero.sub_headline, "Sub-judul");
+  set("heroSubHeadline", hero.sub_headline ?? hero.subheadline, "Sub-judul");
   set("heroBio", hero.bio, "Bio singkat");
 
   const about = (res.about ?? {}) as Dict;
-  const paragraphs = Array.isArray(about.paragraphs) ? about.paragraphs : [];
+  const paragraphs = Array.isArray(about.paragraphs)
+    ? about.paragraphs
+    : [about.paragraph_1, about.paragraph_2, about.paragraph_3, about.meta_description];
   set(
     "aboutText",
-    paragraphs.map(str).filter(Boolean).join("\n\n") || about.meta_description,
+    paragraphs.map(str).filter(Boolean).join("\n\n"),
     "Tentang saya",
   );
 
-  const skills = (res.skills_display ?? {}) as Dict;
-  const mainSkills = Array.isArray(skills.skills) ? skills.skills : [];
+  const skills = ((res.skills_display ?? res.skills) ?? {}) as Dict;
+  const mainSkills = Array.isArray(skills.skills)
+    ? skills.skills
+    : Array.isArray(skills.primary)
+      ? skills.primary
+      : [];
   set(
     "skillsMain",
     mainSkills.map(str).filter(Boolean).join(", "),

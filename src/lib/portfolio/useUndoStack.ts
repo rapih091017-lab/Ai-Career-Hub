@@ -1,58 +1,70 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 
 export function useUndoStack<T>(initial: T, limit = 50) {
-  const [state, setState] = useState<T>(initial);
-  const past = useRef<T[]>([]);
-  const future = useRef<T[]>([]);
+  const [stack, setStack] = useState<{ past: T[]; present: T; future: T[] }>({
+    past: [],
+    present: initial,
+    future: [],
+  });
 
   const set = useCallback(
     (next: T | ((p: T) => T)) => {
-      setState((prev) => {
-        const value = typeof next === "function" ? (next as (p: T) => T)(prev) : next;
-        if (Object.is(value, prev)) return prev;
-        past.current = [...past.current.slice(-(limit - 1)), prev];
-        future.current = [];
-        return value;
+      setStack((current) => {
+        const value = typeof next === "function" ? (next as (p: T) => T)(current.present) : next;
+        if (Object.is(value, current.present)) return current;
+        return {
+          past: [...current.past.slice(-(limit - 1)), current.present],
+          present: value,
+          future: [],
+        };
       });
     },
     [limit],
   );
 
   const undo = useCallback(() => {
-    setState((prev) => {
-      const last = past.current[past.current.length - 1];
-      if (last === undefined) return prev;
-      past.current = past.current.slice(0, -1);
-      future.current = [prev, ...future.current];
-      return last;
+    setStack((current) => {
+      if (current.past.length === 0) return current;
+      const previous = current.past[current.past.length - 1];
+      const newPast = current.past.slice(0, -1);
+      return {
+        past: newPast,
+        present: previous,
+        future: [current.present, ...current.future],
+      };
     });
   }, []);
 
   const redo = useCallback(() => {
-    setState((prev) => {
-      const [next, ...rest] = future.current;
-      if (next === undefined) return prev;
-      future.current = rest;
-      past.current = [...past.current, prev];
-      return next;
+    setStack((current) => {
+      if (current.future.length === 0) return current;
+      const next = current.future[0];
+      const newFuture = current.future.slice(1);
+      return {
+        past: [...current.past, current.present],
+        present: next,
+        future: newFuture,
+      };
     });
   }, []);
 
   const reset = useCallback((value: T) => {
-    past.current = [];
-    future.current = [];
-    setState(value);
+    setStack({
+      past: [],
+      present: value,
+      future: [],
+    });
   }, []);
 
   return {
-    state,
+    state: stack.present,
     set,
     undo,
     redo,
-    canUndo: past.current.length > 0,
-    canRedo: future.current.length > 0,
+    canUndo: stack.past.length > 0,
+    canRedo: stack.future.length > 0,
     reset,
   };
 }
