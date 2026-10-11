@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { renderToStaticMarkup } from "react-dom/server";
 import { createElement } from "react";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { apiHandler, errorResponse, withAuth } from "@/lib/api-utils";
 import { db } from "@/db";
 import { portfolioDrafts } from "@/db/schema";
@@ -9,7 +9,7 @@ import PortfolioDocument from "@/components/portfolio/render/PortfolioDocument";
 import { buildHtmlDocument, inlineAssets } from "@/lib/portfolio/export-html";
 import { portfolioDataSchema } from "@/lib/portfolio/schema";
 import { THEMES } from "@/components/portfolio/themes";
-import type { ThemeId } from "@/components/portfolio/types";
+import type { FontSize, SectionId, ThemeId } from "@/components/portfolio/types";
 
 export const dynamic = "force-dynamic";
 
@@ -18,16 +18,15 @@ export const GET = apiHandler(async (request: NextRequest) => {
   if (auth instanceof NextResponse) return auth;
 
   const draftId = request.nextUrl.searchParams.get("draftId");
-  if (!draftId) {
-    return errorResponse("INVALID_BODY", "draftId wajib diisi", 400);
-  }
+  const where = draftId
+    ? and(eq(portfolioDrafts.id, draftId), eq(portfolioDrafts.userId, auth.userId))
+    : eq(portfolioDrafts.userId, auth.userId);
 
   const [row] = await db
     .select({ data: portfolioDrafts.data, name: portfolioDrafts.name })
     .from(portfolioDrafts)
-    .where(
-      and(eq(portfolioDrafts.id, draftId), eq(portfolioDrafts.userId, auth.userId)),
-    )
+    .where(where)
+    .orderBy(desc(portfolioDrafts.updatedAt))
     .limit(1);
 
   if (!row) {
@@ -40,11 +39,24 @@ export const GET = apiHandler(async (request: NextRequest) => {
   }
 
   const requested = request.nextUrl.searchParams.get("theme") ?? "glass";
-  const themeId = (requested in THEMES ? requested : "glass") as ThemeId;
+  // Object.hasOwn, bukan `in`: `?theme=__proto__` lolos operator `in` lalu
+  // membuat THEMES[themeId].colors melempar saat runtime.
+  const themeId = (Object.hasOwn(THEMES, requested) ? requested : "glass") as ThemeId;
 
   const data = await inlineAssets(parsed.data, auth.userId);
   const markup = renderToStaticMarkup(
-    createElement(PortfolioDocument, { data, themeId, mode: "static" }),
+    createElement(PortfolioDocument, {
+      data,
+      themeId,
+      mode: "static",
+      // sectionOrder datang dari jsonb sebagai string; resolveOrder di dalam
+      // PortfolioDocument membuang id yang tidak dikenal saat runtime.
+      sectionOrder: parsed.data.sectionOrder as SectionId[] | undefined,
+      sectionVisibility: parsed.data.sectionVisibility,
+      // fontSize hanya disimpan draft (live builder), bukan bagian
+      // portfolioDataSchema; Zod tidak memutasi input mentah jsonb.
+      fontSize: (row.data as { fontSize?: FontSize }).fontSize,
+    }),
   );
   const html = buildHtmlDocument(markup, themeId, row.name);
 

@@ -1,3 +1,4 @@
+import { esc } from "@/lib/portfolio-safety";
 import type { ThemeId } from "@/components/portfolio/types";
 import type { PortfolioData } from "@/components/portfolio-templates/types";
 import { THEMES } from "@/components/portfolio/themes";
@@ -22,14 +23,6 @@ const PRINT_CSS = `
   h1, h2, h3, h4 { break-after: avoid; }
   a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.75em; word-break: break-all; }
 }`;
-
-function escTitle(v: string): string {
-  return v
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
 
 /**
  * Membungkus markup dari PortfolioDocument menjadi dokumen HTML mandiri.
@@ -58,7 +51,7 @@ export function buildHtmlDocument(
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${escTitle(title)}</title>
+<title>${esc(title)}</title>
 ${fontLinks}<style>
 ${RESET_CSS}
 body { background: ${bg}; color: ${fg}; font-family: ${font}; }
@@ -82,7 +75,10 @@ function collectAssetIds(data: PortfolioData): string[] {
   };
   push(data.formData.heroPhotoUrl);
   for (const p of data.projects) push(p.imageUrl);
-  for (const e of data.experiences) push(e.imageUrl);
+  for (const e of data.experiences) {
+    push(e.imageUrl);
+    push(e.companyLogo);
+  }
   return [...ids];
 }
 
@@ -123,8 +119,13 @@ export async function inlineAssets(
     projects: data.projects.map((p) =>
       p.imageUrl ? { ...p, imageUrl: swap(p.imageUrl) } : p,
     ),
-    experiences: data.experiences.map((e) =>
-      e.imageUrl ? { ...e, imageUrl: swap(e.imageUrl) } : e,
-    ),
+    experiences: data.experiences.map((e) => {
+      if (!e.imageUrl && !e.companyLogo) return e;
+      return {
+        ...e,
+        imageUrl: e.imageUrl ? swap(e.imageUrl) : e.imageUrl,
+        companyLogo: e.companyLogo ? swap(e.companyLogo) : e.companyLogo,
+      };
+    }),
   };
 }

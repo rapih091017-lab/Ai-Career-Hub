@@ -215,9 +215,32 @@ export default function PortfolioPreviewPage() {
                       setExporting(true);
                       setExportError(null);
                       try {
-                        const params = new URLSearchParams(window.location.search);
-                        const draftId = params.get("draftId") || localStorage.getItem("portfolio_draft_id") || "";
-                        const res = await fetch(`/api/portfolio/export?draftId=${draftId}&theme=${themeId}`);
+                        // Ekspor dibaca dari draft server, jadi data preview
+                        // disinkronkan dulu supaya hasil file == yang dilihat.
+                        const resLatest = await fetch("/api/portfolio/draft").catch(() => null);
+                        const latest =
+                          resLatest && resLatest.ok ? await resLatest.json() : null;
+                        const sync = await fetch("/api/portfolio/draft", {
+                          method: latest?.draftId ? "PATCH" : "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            ...(latest?.draftId ? { draftId: latest.draftId } : {}),
+                            name: name || "Portfolio saya",
+                            data,
+                          }),
+                        }).catch(() => null);
+                        if (!sync || !sync.ok) {
+                          setExportError(
+                            sync?.status === 400
+                              ? t("preview.export-error-save")
+                              : t("preview.export-error"),
+                          );
+                          return;
+                        }
+                        const draftId: string = latest?.draftId ?? (await sync.json()).draftId;
+                        const res = await fetch(
+                          `/api/portfolio/export?draftId=${encodeURIComponent(draftId)}&theme=${encodeURIComponent(themeId)}`,
+                        );
                         if (!res.ok) throw new Error();
                         const blob = await res.blob();
                         const url = URL.createObjectURL(blob);
@@ -227,7 +250,7 @@ export default function PortfolioPreviewPage() {
                         a.click();
                         URL.revokeObjectURL(url);
                       } catch {
-                        setExportError("Export gagal. Coba lagi sebentar.");
+                        setExportError(t("preview.export-error"));
                       } finally {
                         setExporting(false);
                       }
@@ -235,9 +258,18 @@ export default function PortfolioPreviewPage() {
                     className="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all disabled:opacity-50"
                     style={{ border: `1px solid ${theme.colors.border}`, color: theme.colors.text }}
                   >
-                    {exporting ? t("preview.exporting") || "Exporting..." : t("preview.export-html")}
+                    {exporting ? t("preview.exporting") : t("preview.export-html")}
                   </button>
                 </div>
+                {exportError ? (
+                  <p
+                    role="alert"
+                    className="mt-3 w-full text-xs font-medium"
+                    style={{ color: "#D32F2F" }}
+                  >
+                    {exportError}
+                  </p>
+                ) : null}
               </div>
 
               {/* Document */}

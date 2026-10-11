@@ -1,6 +1,8 @@
 /**
- * Helper keamanan untuk konten portfolio (export HTML & publish).
- * Semua user content WAJIB melewati esc() / safeUrl() sebelum masuk ke HTML.
+ * Helper keamanan konten portfolio.
+ * `safeUrl()` adalah validasi otoritatif untuk URL user (dipakai schema Zod
+ * sebagai penapis keabsahan), `esc()` untuk konten yang disusun sebagai
+ * string HTML mandiri (judul dokumen export, dst.).
  */
 
 /** Escape HTML entities, wajib untuk semua user content (anti-XSS). */
@@ -75,8 +77,9 @@ export function safeUrl(v: unknown): string {
  * KONTEKS: komponen React (`SafeLink`, `SafeImg`) yang meneruskan nilai ke
  * atribut href/src. React sudah meng-escape nilai atribut sendiri, jadi
  * meng-escape di sini justru merusak URL — `&` jadi `&amp;amp;`.
- * `safeUrl` tetap ada karena jalur export membangun string HTML secara manual,
- * di situ tidak ada React yang menolong meng-escape.
+ * `safeUrl` tetap ada karena masih ada jalur yang menyusun HTML sebagai string
+ * (cangkang dokumen export di `export-html.ts`, test) — di situ tidak ada React
+ * yang menolong meng-escape.
  */
 export function safeUrlUnescaped(v: unknown): string {
   return resolveUrl(v);
