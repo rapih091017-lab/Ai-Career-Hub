@@ -41,17 +41,13 @@ const getPublishedPortfolio = cache(async (slug: string) => {
   return row ?? null;
 });
 
-type PortfolioSeo = PortfolioData & {
-  seo?: { pageTitle?: string; metaDescription?: string; keywords?: string[] };
-};
-
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const row = await getPublishedPortfolio(slug);
 
   if (!row) return { title: "Portfolio tidak ditemukan" };
 
-  const d = row.data as unknown as PortfolioSeo;
+  const d = row.data as unknown as PortfolioData;
   const name = [d.formData?.heroFirstName, d.formData?.heroLastName].filter(Boolean).join(" ") || "Portfolio";
   const headline = d.formData?.heroHeadline?.trim() || "";
   const title = d.seo?.pageTitle?.trim() || (headline ? `${headline} | ${name}` : `${name} | Portfolio`);

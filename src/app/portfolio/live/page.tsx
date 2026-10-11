@@ -61,6 +61,7 @@ export interface LiveData {
   sectionVisibility: SectionVisibility;
   fontSize: FontSize;
   alignment: Partial<Record<SectionId, TextAlignment>>;
+  seo?: { pageTitle?: string; metaDescription?: string; keywords?: string[] };
 }
 
 function loadDraft(): LiveData | null {
@@ -93,6 +94,7 @@ export default function PortfolioLiveBuilder() {
   });
 
   const formData = portfolio.formData;
+  const seo = portfolio.seo;
   const setFormData = (updater: React.SetStateAction<PortfolioFormData>) => {
     setPortfolio(prev => ({ ...prev, formData: typeof updater === "function" ? updater(prev.formData) : updater }));
   };
@@ -164,6 +166,7 @@ export default function PortfolioLiveBuilder() {
         hobbies: draft.hobbies || [],
         testimonials: draft.testimonials || [],
         extraLinks: draft.extraLinks || [],
+        seo: draft.seo,
       });
       setSectionOrder(draft.sectionOrder);
       setThemeId(draft.themeId);
@@ -179,10 +182,10 @@ export default function PortfolioLiveBuilder() {
   useEffect(() => {
     if (!mounted) return;
     const timer = setTimeout(() => {
-      saveDraft({ formData, projects, experiences, educations, certifications, organizations, hobbies, testimonials, extraLinks, sectionOrder, themeId, sectionVisibility, fontSize, alignment });
+      saveDraft({ formData, projects, experiences, educations, certifications, organizations, hobbies, testimonials, extraLinks, sectionOrder, themeId, sectionVisibility, fontSize, alignment, seo });
     }, 1000);
     return () => clearTimeout(timer);
-  }, [formData, projects, experiences, educations, certifications, organizations, hobbies, testimonials, extraLinks, sectionOrder, themeId, sectionVisibility, fontSize, alignment, mounted]);
+  }, [formData, projects, experiences, educations, certifications, organizations, hobbies, testimonials, extraLinks, sectionOrder, themeId, sectionVisibility, fontSize, alignment, seo, mounted]);
 
   const toggleSection = useCallback((id: SectionId) => {
     setSectionVisibility(prev => ({ ...prev, [id]: !prev[id] }));
@@ -215,7 +218,7 @@ export default function PortfolioLiveBuilder() {
 
       const currentPortfolio: PortfolioData = {
         formData, projects, experiences, educations, certifications,
-        organizations, hobbies, testimonials, extraLinks,
+        organizations, hobbies, testimonials, extraLinks, seo,
       };
 
       const { data: updatedPortfolio, changes } = applyAiSuggestion(currentPortfolio, data);
@@ -235,6 +238,7 @@ export default function PortfolioLiveBuilder() {
         ...prev,
         formData: updatedPortfolio.formData,
         experiences: mergedExp.merged,
+        seo: updatedPortfolio.seo,
       }));
 
       setAiChanges(changes);
@@ -328,7 +332,7 @@ export default function PortfolioLiveBuilder() {
 
   const canvasData = {
     formData, projects, experiences, educations, certifications,
-    organizations, hobbies, testimonials, extraLinks,
+    organizations, hobbies, testimonials, extraLinks, seo,
   };
 
   const editSection = (sid: SectionId) => {
@@ -740,7 +744,7 @@ export default function PortfolioLiveBuilder() {
                   <div className="pt-2 border-t space-y-2" style={{ borderColor: "var(--border, rgba(0,0,0,0.06))" }}>
                     <button
                       onClick={() => {
-                        const previewData = { formData, projects, experiences, educations, certifications, organizations, hobbies, testimonials, extraLinks };
+                        const previewData = { formData, projects, experiences, educations, certifications, organizations, hobbies, testimonials, extraLinks, seo };
                         localStorage.setItem("portfolio_draft", JSON.stringify(previewData));
                         window.open(`/portfolio/preview?template=${themeId}`, "_blank");
                       }}

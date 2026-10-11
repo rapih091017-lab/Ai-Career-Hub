@@ -1,8 +1,12 @@
 import { describe, it, expect } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { applyAiSuggestion, mergeExperiences } from "@/lib/portfolio/ai-map";
 import { useUndoStack } from "@/lib/portfolio/useUndoStack";
 import { renderHook, act } from "@testing-library/react";
 import type { PortfolioData } from "@/components/portfolio-templates/types";
+
+const read = (p: string) => readFileSync(join(process.cwd(), p), "utf8");
 
 const formData = {
   heroPhotoUrl: "",
@@ -187,6 +191,43 @@ describe("applyAiSuggestion seo", () => {
     });
     expect(changes).toHaveLength(0);
     expect(data).toBe(existing);
+  });
+
+  it("kata kunci identik dengan lebih dari satu entri tidak dianggap berubah", () => {
+    const existing: PortfolioData = {
+      ...base,
+      seo: { keywords: ["react", "typescript"] },
+    };
+    const { data, changes } = applyAiSuggestion(existing, {
+      seo: { keywords: ["react", "typescript"] },
+    });
+    expect(changes).toHaveLength(0);
+    expect(data).toBe(existing);
+  });
+});
+
+describe("editor membawa seo dari AI sampai data tersimpan", () => {
+  const build = read("src/app/portfolio/build/page.tsx");
+  const live = read("src/app/portfolio/live/page.tsx");
+
+  it("build: seo ikut load draft, semua payload simpan, dep auto-save, dan applyAllAi", () => {
+    expect(build).toMatch(/seo:\s*draft\.seo/);
+    const payloads = [...build.matchAll(/const payload = \{([^}]*)\}/g)].map((m) => m[1]);
+    expect(payloads.length).toBeGreaterThanOrEqual(3);
+    for (const p of payloads) expect(p).toContain("seo");
+    expect(build).toMatch(/testimonials, extraLinks, seo\]/);
+    expect(build).toMatch(/currentPortfolioData: PortfolioData = \{[^}]*\bseo\b/);
+    expect(build).toContain("seo: merged.seo");
+  });
+
+  it("live: seo ada di LiveData, load, auto-save, canvasData publish, dan hasil generate AI", () => {
+    expect(live).toMatch(/seo\?: \{ pageTitle\?: string; metaDescription\?: string; keywords\?: string\[\] \}/);
+    expect(live).toMatch(/seo:\s*draft\.seo/);
+    expect(live).toMatch(/saveDraft\(\{[^}]*\bseo\b/);
+    expect(live).toMatch(/alignment, seo, mounted\]/);
+    expect(live).toMatch(/currentPortfolio: PortfolioData = \{[^}]*\bseo\b/);
+    expect(live).toContain("seo: updatedPortfolio.seo");
+    expect(live).toMatch(/const canvasData = \{[^}]*\bseo\b/);
   });
 });
 

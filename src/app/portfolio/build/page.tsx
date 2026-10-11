@@ -198,6 +198,7 @@ export default function PortfolioBuildPage() {
   });
 
   const formData = portfolio.formData;
+  const seo = portfolio.seo;
   const setFormData = (updater: React.SetStateAction<PortfolioFormData>) => {
     setPortfolio(prev => ({ ...prev, formData: typeof updater === "function" ? updater(prev.formData) : updater }));
   };
@@ -262,6 +263,7 @@ export default function PortfolioBuildPage() {
       hobbies?: HobbyItem[];
       testimonials: TestimonialItem[];
       extraLinks: ExtraLink[];
+      seo?: PortfolioData["seo"];
     } | null>(STORAGE_KEY, null);
     if (draft && draft.formData) {
       resetPortfolio({
@@ -274,6 +276,7 @@ export default function PortfolioBuildPage() {
         hobbies: draft.hobbies || [],
         testimonials: draft.testimonials || [],
         extraLinks: draft.extraLinks || [],
+        seo: draft.seo,
       });
       setSaveStatus("saved");
     } else {
@@ -396,6 +399,7 @@ export default function PortfolioBuildPage() {
         hobbies,
         testimonials,
         extraLinks,
+        seo,
       };
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch {}
 
@@ -478,13 +482,14 @@ export default function PortfolioBuildPage() {
       hobbies,
       testimonials,
       extraLinks,
+      seo,
     };
     const { data: merged, changes } = applyAiSuggestion(currentPortfolioData, aiSuggestions);
     if (changes.length === 0) {
       setAiError("AI tidak mengembalikan perubahan baru.");
       return;
     }
-    setFormData(merged.formData);
+    setPortfolio(prev => ({ ...prev, formData: merged.formData, seo: merged.seo }));
     setAiChanges(changes);
     setShowAiPopup(false);
   };
@@ -549,14 +554,14 @@ export default function PortfolioBuildPage() {
     if (!isHydrated.current) { isHydrated.current = true; return; }
     setSaveStatus("saving");
     const timer = setTimeout(() => {
-      const payload = { formData, projects, experiences, educations, certifications, organizations, hobbies, testimonials, extraLinks };
+      const payload = { formData, projects, experiences, educations, certifications, organizations, hobbies, testimonials, extraLinks, seo };
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
         setSaveStatus("saved");
       } catch { /* quota exceeded, silent */ }
     }, 1500);
     return () => clearTimeout(timer);
-  }, [formData, projects, experiences, educations, certifications, organizations, hobbies, testimonials, extraLinks]);
+  }, [formData, projects, experiences, educations, certifications, organizations, hobbies, testimonials, extraLinks, seo]);
 
   const update = <K extends keyof PortfolioFormData>(key: K) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({ ...prev, [key]: e.target.value }));
@@ -1264,6 +1269,7 @@ export default function PortfolioBuildPage() {
                     onConfirm: () => {
                       localStorage.removeItem(STORAGE_KEY);
                       setFormData(DEFAULT_FORM);
+                      setPortfolio(prev => ({ ...prev, seo: undefined }));
                       setProjects([{ id: genId(), name: "", description: "", techStack: "", link: "" }, { id: genId(), name: "", description: "", techStack: "", link: "" }, { id: genId(), name: "", description: "", techStack: "", link: "" }]);
                       setExperiences([{ id: genId(), company: "", position: "", startDate: "", endDate: "", description: "" }, { id: genId(), company: "", position: "", startDate: "", endDate: "", description: "" }]);
                       setEducations([{ id: genId(), institution: "", degree: "", field: "", startDate: "", endDate: "" }]);
@@ -1282,7 +1288,7 @@ export default function PortfolioBuildPage() {
               <button
                 onClick={async () => {
                   setSaving(true);
-                  const payload = { formData, projects, experiences, educations, certifications, organizations, hobbies, testimonials, extraLinks };
+                  const payload = { formData, projects, experiences, educations, certifications, organizations, hobbies, testimonials, extraLinks, seo };
                   try {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
                     setSaveStatus("saved");

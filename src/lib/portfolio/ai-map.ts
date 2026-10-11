@@ -12,8 +12,9 @@ const str = (v: unknown): string => (typeof v === "string" ? v.trim() : "");
 
 /**
  * Satu-satunya cara respons /api/portfolio/suggest masuk ke state portfolio.
- * Respons bersarang dipetakan ke field datar PortfolioFormData, jadi tidak
- * mungkin ada kunci asing yang tersimpan dan ikut terbit.
+ * Respons bersarang dipetakan ke field datar PortfolioFormData; hanya blok
+ * `seo` yang disimpan terstruktur (sengaja, untuk metadata). Schema membuang
+ * kunci asing saat simpan, jadi tidak ada kunci sampah yang ikut terbit.
  */
 export function applyAiSuggestion(
   data: PortfolioData,
@@ -82,7 +83,7 @@ export function applyAiSuggestion(
     if (next === undefined) continue;
     const from = prevSeo[key];
     const same = Array.isArray(next)
-      ? Array.isArray(from) && next.join(", ") === from.join(",")
+      ? Array.isArray(from) && next.join(", ") === from.join(", ")
       : from === next;
     if (same) continue;
     changes.push({
