@@ -1,15 +1,38 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
+import robots from "@/app/robots";
 
 const read = (p: string) => readFileSync(join(process.cwd(), p), "utf8");
 
 describe("SEO portfolio", () => {
-  it("robots.ts ada dan mengizinkan /p/", () => {
+  it("robots.ts ada dan konfigurasinya mengizinkan /p/ serta aset, memblokir /portfolio/build", () => {
     expect(existsSync(join(process.cwd(), "src/app/robots.ts"))).toBe(true);
-    const src = read("src/app/robots.ts");
-    expect(src).toMatch(/Allow: \/p\//);
-    expect(src).toMatch(/Disallow: \/portfolio\/build/);
+    const config = robots();
+    const rule = Array.isArray(config.rules) ? config.rules[0] : config.rules;
+    const allow = ([] as string[]).concat(rule.allow ?? []);
+    const disallow = ([] as string[]).concat(rule.disallow ?? []);
+    expect(allow).toContain("/p/");
+    expect(allow).toContain("/api/portfolio/assets/");
+    expect(disallow).toContain("/portfolio/build");
+  });
+
+  it("hanya baris published yang dibaca halaman /p/ lewat satu query bersama", () => {
+    const src = read("src/app/p/[slug]/page.tsx");
+    // filter status ada tepat di query cache bersama getPublishedPortfolio
+    expect(src).toMatch(
+      /const getPublishedPortfolio[\s\S]*?eq\(portfolioPages\.status,\s*"published"\)/,
+    );
+    // generateMetadata dan komponen page memakai query yang sama — tidak ada
+    // kueri kedua yang hanya menyaring slug (itulah yang membuat arsip bocor)
+    expect(src.match(/getPublishedPortfolio\(/g) ?? []).toHaveLength(2);
+    expect(src).not.toMatch(/\.where\(eq\(portfolioPages\.slug/);
+  });
+
+  it("judul fallback memakai heroHeadline dan deskripsi dibatasi 160 karakter", () => {
+    const src = read("src/app/p/[slug]/page.tsx");
+    expect(src).toContain("${headline} | ${name}");
+    expect(src).toContain(".slice(0, 160)");
   });
 
   it("sitemap menyertakan portfolio published", () => {
@@ -17,6 +40,12 @@ describe("SEO portfolio", () => {
     expect(src).toContain("portfolioPages");
     expect(src).toContain('"published"');
     expect(src).toContain("/p/");
+  });
+
+  it("sitemap tidak menyertakan halaman yang diblokir robots", () => {
+    const src = read("src/app/sitemap.ts");
+    expect(src).not.toContain('/dashboard"');
+    expect(src).not.toContain('/settings"');
   });
 
   it("generateMetadata memakai seo, keywords, canonical, dan gambar OG", () => {
@@ -42,7 +71,8 @@ describe("SEO portfolio", () => {
   it("route aset melayani editor sekaligus halaman publik", () => {
     const src = read("src/app/api/portfolio/assets/[id]/route.ts");
     expect(src).not.toContain("withAuth()");
-    expect(src).toContain("getServerSession");
+    expect(src).toContain("await auth()");
+    expect(src).not.toContain("as getServerSession");
     expect(src).toContain("portfolioPages");
     expect(src).toContain("published");
   });

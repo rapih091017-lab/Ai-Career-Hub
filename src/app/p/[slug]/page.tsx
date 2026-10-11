@@ -53,9 +53,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const d = row.data as unknown as PortfolioSeo;
   const name = [d.formData?.heroFirstName, d.formData?.heroLastName].filter(Boolean).join(" ") || "Portfolio";
-  const title = d.seo?.pageTitle?.trim() || `${name} | Portfolio`;
-  const description =
-    d.seo?.metaDescription?.trim() || d.formData?.heroBio || d.formData?.heroHeadline || `Portfolio ${name}`;
+  const headline = d.formData?.heroHeadline?.trim() || "";
+  const title = d.seo?.pageTitle?.trim() || (headline ? `${headline} | ${name}` : `${name} | Portfolio`);
+  const description = (
+    d.seo?.metaDescription?.trim() || d.formData?.heroBio || d.formData?.heroHeadline || `Portfolio ${name}`
+  ).slice(0, 160);
 
   return {
     title,

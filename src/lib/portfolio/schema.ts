@@ -208,6 +208,27 @@ export const portfolioFormDataSchema = z.object({
   contactGithub: urlField(MAX.url),
 });
 
+/** Blok SEO dari saran AI. Ditoleransi, bukan ditolak: output AI dan data lama
+ *  tidak boleh membuat draft gagal simpan — nilai kepanjangan dipotong, entri
+ *  rusak dibuang, kunci asing di-strip Zod. */
+const seoText = (max: number) =>
+  z
+    .string()
+    .catch("")
+    .transform((v) => v.trim().slice(0, max));
+
+export const portfolioSeoSchema = z.object({
+  pageTitle: seoText(120).optional(),
+  metaDescription: seoText(300).optional(),
+  keywords: z
+    .array(z.string().catch(""))
+    .catch([])
+    .transform((ks) =>
+      ks.map((k) => k.trim().slice(0, 60)).filter(Boolean).slice(0, 10),
+    )
+    .optional(),
+});
+
 export const portfolioDataSchema = z.object({
   formData: portfolioFormDataSchema,
   projects: z.array(projectItemSchema).max(LIMITS.projects).default([]),
@@ -226,6 +247,7 @@ export const portfolioDataSchema = z.object({
   // Tipografi termasuk data draft supaya round-trip lewat API draft;
   // publishPayloadSchema punya atasan sendiri untuk payload publish.
   fontSize: z.enum(FONT_SIZES).optional(),
+  seo: portfolioSeoSchema.optional().catch(undefined),
 });
 
 export type ValidatedPortfolioData = z.infer<typeof portfolioDataSchema>;

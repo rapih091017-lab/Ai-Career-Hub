@@ -58,8 +58,51 @@ export function applyAiSuggestion(
     "Keahlian utama",
   );
 
+  // Blok SEO diterima apa adanya (snake_case AI maupun camelCase), lalu
+  // dipotong schema saat simpan draft — di sini hanya dipetakan dan dilaporkan.
+  const seoRes = (res.seo ?? {}) as Dict;
+  const seoNext: NonNullable<PortfolioData["seo"]> = {};
+  const pageTitle = str(seoRes.page_title ?? seoRes.pageTitle);
+  const metaDescription = str(seoRes.meta_description ?? seoRes.metaDescription);
+  const keywords = (Array.isArray(seoRes.keywords) ? seoRes.keywords : [])
+    .map(str)
+    .filter(Boolean);
+  if (pageTitle) seoNext.pageTitle = pageTitle;
+  if (metaDescription) seoNext.metaDescription = metaDescription;
+  if (keywords.length) seoNext.keywords = keywords;
+
+  const prevSeo = (data.seo ?? {}) as NonNullable<PortfolioData["seo"]>;
+  const seoLabels: [keyof NonNullable<PortfolioData["seo"]>, string][] = [
+    ["pageTitle", "Judul SEO"],
+    ["metaDescription", "Deskripsi SEO"],
+    ["keywords", "Kata kunci SEO"],
+  ];
+  for (const [key, label] of seoLabels) {
+    const next = seoNext[key];
+    if (next === undefined) continue;
+    const from = prevSeo[key];
+    const same = Array.isArray(next)
+      ? Array.isArray(from) && next.join(", ") === from.join(",")
+      : from === next;
+    if (same) continue;
+    changes.push({
+      field: `seo.${key}`,
+      label,
+      from: Array.isArray(from) ? from.join(", ") : String(from ?? ""),
+      to: Array.isArray(next) ? next.join(", ") : next,
+    });
+  }
+
   if (changes.length === 0) return { data, changes };
-  return { data: { ...data, formData: form as unknown as PortfolioData["formData"] }, changes };
+  const seo = { ...data.seo, ...seoNext };
+  return {
+    data: {
+      ...data,
+      formData: form as unknown as PortfolioData["formData"],
+      ...(Object.keys(seoNext).length > 0 ? { seo } : {}),
+    },
+    changes,
+  };
 }
 
 /**

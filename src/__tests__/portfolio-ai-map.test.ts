@@ -137,6 +137,59 @@ describe("applyAiSuggestion key fallbacks", () => {
   });
 });
 
+describe("applyAiSuggestion seo", () => {
+  it("memetakan snake_case respons AI ke data.seo dan melaporkan perubahan", () => {
+    const { data, changes } = applyAiSuggestion(base, {
+      seo: {
+        page_title: "Frontend Developer | Teguh Surya",
+        meta_description: "Portofolio Teguh Surya, developer frontend.",
+        keywords: ["react", "typescript"],
+      },
+    });
+
+    expect(data.seo).toEqual({
+      pageTitle: "Frontend Developer | Teguh Surya",
+      metaDescription: "Portofolio Teguh Surya, developer frontend.",
+      keywords: ["react", "typescript"],
+    });
+
+    const fields = changes.map((c) => c.field);
+    expect(fields).toContain("seo.pageTitle");
+    expect(fields).toContain("seo.metaDescription");
+    expect(fields).toContain("seo.keywords");
+    const labels = changes.map((c) => c.label);
+    expect(labels).toContain("Judul SEO");
+    expect(labels).toContain("Deskripsi SEO");
+    expect(labels).toContain("Kata kunci SEO");
+  });
+
+  it("menerima kunci camelCase", () => {
+    const { data, changes } = applyAiSuggestion(base, {
+      seo: {
+        pageTitle: "Judul Camel",
+        metaDescription: "Deskripsi Camel",
+        keywords: ["nextjs"],
+      },
+    });
+    expect(data.seo?.pageTitle).toBe("Judul Camel");
+    expect(data.seo?.metaDescription).toBe("Deskripsi Camel");
+    expect(data.seo?.keywords).toEqual(["nextjs"]);
+    expect(changes.map((c) => c.field)).toContain("seo.pageTitle");
+  });
+
+  it("hanya melaporkan field seo yang nilainya berubah", () => {
+    const existing: PortfolioData = {
+      ...base,
+      seo: { pageTitle: "Sama Persis", metaDescription: "Deskripsi lama", keywords: ["lama"] },
+    };
+    const { data, changes } = applyAiSuggestion(existing, {
+      seo: { page_title: "Sama Persis", meta_description: "Deskripsi lama", keywords: ["lama"] },
+    });
+    expect(changes).toHaveLength(0);
+    expect(data).toBe(existing);
+  });
+});
+
 describe("mergeExperiences", () => {
   const cur = [
     { id: "e1", company: "Acme", position: "Dev", startDate: "2022-01", endDate: "2023-01", description: "" },

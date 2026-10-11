@@ -389,6 +389,59 @@ describe("portfolioDataSchema", () => {
   });
 });
 
+describe("blok seo", () => {
+  it("round-trip mempertahankan seo dan membuang kunci sampah", () => {
+    const r = portfolioDataSchema.parse({
+      ...emptyData,
+      seo: {
+        pageTitle: "Judul SEO",
+        metaDescription: "Deskripsi SEO",
+        keywords: ["react", "nextjs"],
+        junk: "dibuang",
+      },
+    });
+    expect(r.seo).toEqual({
+      pageTitle: "Judul SEO",
+      metaDescription: "Deskripsi SEO",
+      keywords: ["react", "nextjs"],
+    });
+  });
+
+  it("memotong nilai kepanjangan alih-alih menolak simpan", () => {
+    const r = portfolioDataSchema.parse({
+      ...emptyData,
+      seo: {
+        pageTitle: "x".repeat(300),
+        metaDescription: "y".repeat(600),
+        keywords: Array.from({ length: 15 }, (_, i) => `k${i}`),
+      },
+    });
+    expect(r.seo?.pageTitle).toHaveLength(120);
+    expect(r.seo?.metaDescription).toHaveLength(300);
+    expect(r.seo?.keywords).toHaveLength(10);
+    expect(r.seo?.keywords?.every((k) => k.length <= 60)).toBe(true);
+  });
+
+  it("membuang entri keywords yang bukan string", () => {
+    const r = portfolioDataSchema.parse({
+      ...emptyData,
+      seo: { keywords: ["react", 42, null, "  ", "nextjs"] },
+    });
+    expect(r.seo?.keywords).toEqual(["react", "nextjs"]);
+  });
+
+  it("seo berbentuk rusak diabaikan tanpa menggagalkan parse", () => {
+    expect(portfolioDataSchema.safeParse({ ...emptyData, seo: "bukan-objek" }).success).toBe(true);
+    const r = portfolioDataSchema.parse({ ...emptyData, seo: "bukan-objek" });
+    expect(r.seo).toBeUndefined();
+  });
+
+  it("data lama tanpa blok seo tetap lolos tanpa seo", () => {
+    const r = portfolioDataSchema.parse(emptyData);
+    expect(r.seo).toBeUndefined();
+  });
+});
+
 describe("emptySectionIds", () => {
   it("mengembalikan dua belas id saat seluruh data kosong", () => {
     const parsed = portfolioDataSchema.parse({

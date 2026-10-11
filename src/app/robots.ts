@@ -11,7 +11,9 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/p/", "/career-hub/"],
+        // Longest-match menang: /api/portfolio/assets/ mengalahkan Disallow /api/
+        // supaya gambar portfolio tetap bisa di-crawl.
+        allow: ["/", "/p/", "/career-hub/", "/api/portfolio/assets/"],
         disallow: [
           "/api/",
           "/portfolio/build",
