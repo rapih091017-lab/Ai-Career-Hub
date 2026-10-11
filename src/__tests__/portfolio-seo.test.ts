@@ -45,7 +45,13 @@ describe("SEO portfolio", () => {
   it("sitemap tidak menyertakan halaman yang diblokir robots", () => {
     const src = read("src/app/sitemap.ts");
     expect(src).not.toContain('/dashboard"');
-    expect(src).not.toContain('/settings"');
+    // Cocokkan sebagai prefiks, bukan string persis: subpath seperti
+    // "/settings/profile" harus ikut ketahuan oleh "Disallow: /settings".
+    const rule = Array.isArray(robots().rules) ? robots().rules[0] : robots().rules;
+    const disallow = ([] as string[]).concat(rule.disallow ?? []);
+    const urls = [...src.matchAll(/BASE_URL\s*\+\s*"([^"]+)"/g)].map((m) => m[1]);
+    const terblokir = urls.filter((u) => disallow.some((d) => u.startsWith(d)));
+    expect(terblokir).toEqual([]);
   });
 
   it("generateMetadata memakai seo, keywords, canonical, dan gambar OG", () => {
