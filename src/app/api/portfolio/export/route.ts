@@ -6,6 +6,7 @@ import { apiHandler, errorResponse, withAuth } from "@/lib/api-utils";
 import { db } from "@/db";
 import { portfolioDrafts } from "@/db/schema";
 import PortfolioDocument from "@/components/portfolio/render/PortfolioDocument";
+import { alignmentToSectionStyle } from "@/components/portfolio/alignment-style";
 import { buildHtmlDocument, inlineAssets } from "@/lib/portfolio/export-html";
 import { portfolioDataSchema } from "@/lib/portfolio/schema";
 import { THEMES } from "@/components/portfolio/themes";
@@ -55,6 +56,9 @@ export const GET = apiHandler(async (request: NextRequest) => {
       sectionVisibility: parsed.data.sectionVisibility,
       // fontSize sudah bagian portfolioDataSchema, jadi round-trip dari draft.
       fontSize: parsed.data.fontSize,
+      sectionStyle: alignmentToSectionStyle(
+        parsed.data.alignment as Record<string, "left" | "center" | "right"> | undefined,
+      ),
     }),
   );
   const html = buildHtmlDocument(markup, themeId, row.name);

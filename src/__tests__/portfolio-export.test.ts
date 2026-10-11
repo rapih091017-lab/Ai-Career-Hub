@@ -107,10 +107,13 @@ describe("route export meneruskan tampilan yang dilihat user", () => {
     "utf8",
   );
 
-  it("meneruskan sectionOrder, sectionVisibility, dan fontSize", () => {
+  it("meneruskan sectionOrder, sectionVisibility, fontSize, dan alignment", () => {
     expect(route).toContain("sectionOrder:");
     expect(route).toContain("sectionVisibility:");
     expect(route).toContain("fontSize:");
+    // alignment menentukan sectionStyle; tanpa ini hasil export tidak sama
+    // dengan yang dilihat user di preview/halaman publik.
+    expect(route).toContain("alignmentToSectionStyle(");
   });
 
   it("fontSize berasal dari hasil parse schema, bukan jsonb mentah", () => {
