@@ -27,12 +27,16 @@ interface PageProps {
 
 export const dynamic = "force-dynamic";
 
-/** Satu query per request, dipakai bersama generateMetadata & page (React cache). */
+/**
+ * Satu query per request, dipakai bersama generateMetadata & page (React cache).
+ * Hanya `published` yang punya halaman: draft & archived harus 404 di URL publik,
+ * kalau tidak fitur arsip dari Task 10 tidak berarti apa-apa.
+ */
 const getPublishedPortfolio = cache(async (slug: string) => {
   const [row] = await db
     .select({ slug: portfolioPages.slug, theme: portfolioPages.theme, data: portfolioPages.data })
     .from(portfolioPages)
-    .where(eq(portfolioPages.slug, slug))
+    .where(and(eq(portfolioPages.slug, slug), eq(portfolioPages.status, "published")))
     .limit(1);
   return row ?? null;
 });
@@ -43,11 +47,7 @@ type PortfolioSeo = PortfolioData & {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const [row] = await db
-    .select({ data: portfolioPages.data })
-    .from(portfolioPages)
-    .where(and(eq(portfolioPages.slug, slug), eq(portfolioPages.status, "published")))
-    .limit(1);
+  const row = await getPublishedPortfolio(slug);
 
   if (!row) return { title: "Portfolio tidak ditemukan" };
 
