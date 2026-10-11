@@ -223,6 +223,9 @@ export const portfolioDataSchema = z.object({
   sectionColors: z
     .partialRecord(z.enum(SECTION_IDS), z.record(z.string(), colorValue))
     .optional(),
+  // Tipografi termasuk data draft supaya round-trip lewat API draft;
+  // publishPayloadSchema punya atasan sendiri untuk payload publish.
+  fontSize: z.enum(FONT_SIZES).optional(),
 });
 
 export type ValidatedPortfolioData = z.infer<typeof portfolioDataSchema>;

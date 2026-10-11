@@ -113,6 +113,40 @@ describe("route export meneruskan tampilan yang dilihat user", () => {
     expect(route).toContain("fontSize:");
   });
 
+  it("fontSize berasal dari hasil parse schema, bukan jsonb mentah", () => {
+    // Regresi: kunci ini pernah dibaca dari jsonb mentah padahal tidak pernah
+    // tersimpan (satu-satunya penulis lewat API draft), jadi selalu undefined
+    // dan export selalu tampil "medium" apa pun yang dipilih user.
+    expect(route).toContain("fontSize: parsed.data.fontSize");
+    expect(route).not.toContain("row.data as { fontSize");
+  });
+
+  it("portfolioDataSchema mempertahankan fontSize lewat parse", async () => {
+    const { portfolioDataSchema } = await import("@/lib/portfolio/schema");
+    const formData = {
+      heroPhotoUrl: "",
+      heroHeadline: "Frontend Developer",
+      heroSubHeadline: "",
+      heroFirstName: "Teguh",
+      heroLastName: "Surya",
+      heroBio: "",
+      aboutText: "Tentang saya",
+      aboutYearsExp: "",
+      aboutProjectsDone: "",
+      aboutClientsHappy: "",
+      skillsMain: "React",
+      skillsTools: "",
+      skillsLanguages: "",
+      contactEmail: "teguh@example.com",
+      contactPhone: "",
+      contactLinkedin: "",
+      contactGithub: "",
+    };
+    const parsed = portfolioDataSchema.parse({ formData, fontSize: "large" });
+    expect(parsed.fontSize).toBe("large");
+    expect(portfolioDataSchema.parse({ formData }).fontSize).toBeUndefined();
+  });
+
   it("menolak tema lewat Object.hasOwn, bukan operator in", () => {
     // Regresi: `requested in THEMES` loloskan ?theme=__proto__ lalu
     // THEMES[themeId].colors melempar → 500 dari query yang dibuat user.

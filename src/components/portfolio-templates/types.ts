@@ -50,4 +50,8 @@ export interface PortfolioData {
   hobbies: HobbyItem[];
   testimonials: TestimonialItem[];
   extraLinks: ExtraLink[];
+  sectionOrder?: string[];
+  sectionVisibility?: Record<string, boolean>;
+  /** Tipografi draft; union inline supaya tidak membuat siklus impor dengan components/portfolio/types. */
+  fontSize?: "small" | "medium" | "large";
 }

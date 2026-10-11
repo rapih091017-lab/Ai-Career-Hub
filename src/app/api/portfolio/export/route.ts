@@ -9,7 +9,7 @@ import PortfolioDocument from "@/components/portfolio/render/PortfolioDocument";
 import { buildHtmlDocument, inlineAssets } from "@/lib/portfolio/export-html";
 import { portfolioDataSchema } from "@/lib/portfolio/schema";
 import { THEMES } from "@/components/portfolio/themes";
-import type { FontSize, SectionId, ThemeId } from "@/components/portfolio/types";
+import type { SectionId, ThemeId } from "@/components/portfolio/types";
 
 export const dynamic = "force-dynamic";
 
@@ -53,9 +53,8 @@ export const GET = apiHandler(async (request: NextRequest) => {
       // PortfolioDocument membuang id yang tidak dikenal saat runtime.
       sectionOrder: parsed.data.sectionOrder as SectionId[] | undefined,
       sectionVisibility: parsed.data.sectionVisibility,
-      // fontSize hanya disimpan draft (live builder), bukan bagian
-      // portfolioDataSchema; Zod tidak memutasi input mentah jsonb.
-      fontSize: (row.data as { fontSize?: FontSize }).fontSize,
+      // fontSize sudah bagian portfolioDataSchema, jadi round-trip dari draft.
+      fontSize: parsed.data.fontSize,
     }),
   );
   const html = buildHtmlDocument(markup, themeId, row.name);
