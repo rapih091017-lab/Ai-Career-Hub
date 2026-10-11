@@ -54,6 +54,8 @@ export interface PortfolioData {
   sectionVisibility?: Record<string, boolean>;
   /** Tipografi draft; union inline supaya tidak membuat siklus impor dengan components/portfolio/types. */
   fontSize?: "small" | "medium" | "large";
+  /** Perataan teks per section; union inline supaya tidak membuat siklus impor. */
+  alignment?: Record<string, "left" | "center" | "right">;
   /** Blok SEO dari saran AI; inline supaya tidak membuat siklus impor. */
   seo?: { pageTitle?: string; metaDescription?: string; keywords?: string[] };
 }

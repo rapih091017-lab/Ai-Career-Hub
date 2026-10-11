@@ -32,3 +32,42 @@ describe("entry point builder", () => {
     expect(read("src/app/portfolio/page.tsx")).not.toContain("/portfolio/live");
   });
 });
+
+describe("panel tampilan builder dan rantai alignment", () => {
+  it("BuilderEditor memuat kontrol urutan, visibilitas, fontSize, dan alignment", () => {
+    const src = read("src/components/portfolio/builder/BuilderEditor.tsx");
+    expect(src).toContain('t("live.section-order")');
+    expect(src).toContain('t("live.font-size")');
+    expect(src).toContain('t("live.text-align")');
+    expect(src).toContain('t("live.appearance")');
+    expect(src).toContain("moveSection");
+    expect(src).toContain("toggleSectionVisible");
+    expect(src).toContain("setSectionAlignment");
+    expect(src).toContain("setAppearanceFontSize");
+  });
+
+  it("BuilderEditor menyediakan aksi Draft baru", () => {
+    const src = read("src/components/portfolio/builder/BuilderEditor.tsx");
+    expect(src).toContain('t("build.new-draft")');
+    expect(src).toContain('method: "POST"');
+    expect(src).toContain("portfolioDataSchema.parse");
+  });
+
+  it("preview dan halaman publik meneruskan sectionStyle dari alignment", () => {
+    const preview = read("src/app/portfolio/preview/page.tsx");
+    expect(preview).toContain("alignmentToSectionStyle");
+    expect(preview.match(/sectionStyle=\{/g)?.length).toBeGreaterThanOrEqual(2);
+    const published = read("src/app/p/[slug]/page.tsx");
+    expect(published).toContain("alignmentToSectionStyle");
+    expect(published).toContain("sectionStyle=");
+  });
+
+  it("rantai alignment lengkap: schema, tipe data, dan merge publish", () => {
+    const schema = read("src/lib/portfolio/schema.ts");
+    expect(schema).toContain("alignment: z.partialRecord(z.enum(SECTION_IDS), z.enum([\"left\", \"center\", \"right\"])).optional()");
+    const types = read("src/components/portfolio-templates/types.ts");
+    expect(types).toContain('alignment?: Record<string, "left" | "center" | "right">');
+    const publishRoute = read("src/app/api/portfolio/publish/route.ts");
+    expect(publishRoute).toContain("data.alignment");
+  });
+});

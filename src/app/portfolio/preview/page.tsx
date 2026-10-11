@@ -9,6 +9,7 @@ import { useTranslation } from "@/lib/i18n";
 import { THEMES, DEFAULT_THEME_ID } from "@/components/portfolio/themes";
 import type { ThemeDefinition, PortfolioFormData, ProjectItem, ExperienceItem, EducationItem, CertificationItem, OrganizationItem, HobbyItem, TestimonialItem, ExtraLink, SectionId, SectionVisibility, FontSize, ThemeId } from "@/components/portfolio/types";
 import PortfolioDocument from "@/components/portfolio/render/PortfolioDocument";
+import { alignmentToSectionStyle } from "@/components/portfolio/alignment-style";
 
 import "../print.css";
 
@@ -29,6 +30,7 @@ interface PortfolioData {
   sectionOrder?: SectionId[];
   sectionVisibility?: SectionVisibility;
   fontSize?: FontSize;
+  alignment?: Record<string, "left" | "center" | "right">;
 }
 
 export default function PortfolioPreviewPage() {
@@ -149,6 +151,7 @@ export default function PortfolioPreviewPage() {
 
   const theme = THEMES[themeId] || THEMES[DEFAULT_THEME_ID];
   const name = [data.formData.heroFirstName, data.formData.heroLastName].filter(Boolean).join(" ") || "Nama Lengkap";
+  const sectionStyle = alignmentToSectionStyle(data.alignment);
 
   if (printMode) {
     // Tampilan cetak: dokumen polos tanpa chrome builder. Pengguna menyelesaikan
@@ -166,6 +169,7 @@ export default function PortfolioPreviewPage() {
           sectionVisibility={data.sectionVisibility}
           fontSize={data.fontSize}
           sectionColors={null}
+          sectionStyle={sectionStyle}
         />
         <button
           type="button"
@@ -312,6 +316,7 @@ export default function PortfolioPreviewPage() {
                 sectionOrder={data.sectionOrder}
                 sectionVisibility={data.sectionVisibility}
                 fontSize={data.fontSize}
+                sectionStyle={sectionStyle}
               />
 
               {/* Info */}

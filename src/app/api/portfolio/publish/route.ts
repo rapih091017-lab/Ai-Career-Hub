@@ -157,7 +157,10 @@ export const POST = apiHandler(async (request: NextRequest) => {
   const payload = {
     ...data,
     fontSize,
-    alignment,
+    // Alignment top-level dari dialog publish menang; kalau payload hanya
+    // membawanya di dalam data (panggilan API langsung), jangan ditimpa
+    // default {} supaya halaman /p/ tetap membaca perataan yang sama.
+    alignment: Object.keys(alignment).length > 0 ? alignment : (data.alignment ?? alignment),
     sectionOrder: data.sectionOrder ?? null,
     sectionVisibility: data.sectionVisibility ?? null,
     sectionColors: data.sectionColors ?? null,

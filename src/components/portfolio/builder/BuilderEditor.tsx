@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
 import Modal from "@/components/Modal";
@@ -12,10 +13,35 @@ import PortfolioPhotoUpload from "@/components/portfolio/render/PortfolioPhotoUp
 import { applyAiSuggestion, listFormSuggestions, mergeExperiences, type AiChange } from "@/lib/portfolio/ai-map";
 import { useUndoStack } from "@/lib/portfolio/useUndoStack";
 import type { UsePortfolioDraftResult } from "@/lib/portfolio/usePortfolioDraft";
-import type { ValidatedPortfolioData } from "@/lib/portfolio/schema";
+import { portfolioDataSchema, type ValidatedPortfolioData } from "@/lib/portfolio/schema";
 import type { PortfolioData } from "@/components/portfolio-templates/types";
+import { DEFAULT_SECTION_ORDER } from "@/components/portfolio/themes";
+import { FONT_SIZES, SECTION_IDS, type FontSize, type SectionId, type TextAlignment } from "@/components/portfolio/types";
+import { isSectionVisible } from "@/components/portfolio/sectionVisibility";
 
 type AccordionKey = "hero" | "about" | "projects" | "skills" | "experience" | "education" | "certifications" | "organizations" | "hobbies" | "testimonials" | "contact";
+
+/** Nama section untuk panel tampilan, lewat i18n supaya ikut bahasa pengguna. */
+const SECTION_NAME_KEYS: Record<SectionId, string> = {
+  hero: "build.hero-title",
+  about: "build.about",
+  stats: "build.stats",
+  experience: "build.experience",
+  education: "build.education",
+  projects: "build.project",
+  skills: "build.skill",
+  certifications: "build.certifications",
+  organizations: "build.organizations",
+  hobbies: "build.hobbies",
+  testimonials: "build.testimonial",
+  contact: "build.contact",
+};
+
+const ALIGNMENT_OPTIONS: { value: TextAlignment; key: string }[] = [
+  { value: "left", key: "live.align-left" },
+  { value: "center", key: "live.align-center" },
+  { value: "right", key: "live.align-right" },
+];
 
 
 
@@ -166,6 +192,7 @@ function seedFrom(data: ValidatedPortfolioData): PortfolioData {
     sectionOrder: data.sectionOrder,
     sectionVisibility: data.sectionVisibility as PortfolioData["sectionVisibility"],
     fontSize: data.fontSize,
+    alignment: data.alignment,
     seo: data.seo,
   };
 }
@@ -186,6 +213,7 @@ function isDraftEmpty(p: PortfolioData): boolean {
 export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResult }) {
   const { t } = useTranslation();
   const { addToast } = useToast();
+  const router = useRouter();
   const [activeSection, setActiveSection] = useState<AccordionKey | "">("hero");
 
   const { setData: draftSetData } = draft;
@@ -243,6 +271,28 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
   const [userCvList, setUserCvList] = useState<{ id: string; jobTitle: string | null; updatedAt: string }[]>([]);
   const [cvLoading, setCvLoading] = useState(false);
   const [generatingFromCv, setGeneratingFromCv] = useState<string | null>(null);
+  const [creatingDraft, setCreatingDraft] = useState(false);
+
+  /** Draft baru: /portfolio/build selalu mengarahkan ke draft terbaru yang
+   *  sudah ada, jadi awal yang benar-benar kosong dibuat dari sini. */
+  const createNewDraft = async () => {
+    if (creatingDraft) return;
+    setCreatingDraft(true);
+    try {
+      const res = await fetch("/api/portfolio/draft", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: portfolioDataSchema.parse({ formData: DEFAULT_FORM }) }),
+      });
+      const json = await res.json().catch(() => null);
+      if (!res.ok || !json?.draftId) throw new Error("gagal membuat draft");
+      router.replace(`/portfolio/build/${json.draftId}`);
+    } catch {
+      addToast({ type: "error", message: "Gagal membuat draft baru. Coba lagi." });
+    } finally {
+      setCreatingDraft(false);
+    }
+  };
 
   // Status simpan berasal dari hook draft (server adalah sumber kebenaran).
   const saveStatus: "idle" | "saving" | "saved" | "error" =
@@ -552,6 +602,60 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
     setActiveSection((prev) => (prev === key ? "" : key));
   };
 
+  /* ───────── Tampilan: urutan, visibilitas, ukuran teks, perataan ───────── */
+
+  /** Satu jalur tulis untuk semua kontrol tampilan: masuk ke undo stack
+   *  editor dan langsung ke draft server, lewat updater fungsional. */
+  const applyAppearance = (patch: (prev: PortfolioData) => PortfolioData) => {
+    setPortfolio((prev) => patch(prev));
+    draftSetData((prev) =>
+      patch(prev as unknown as PortfolioData) as unknown as ValidatedPortfolioData,
+    );
+  };
+
+  /** Urutan untuk panel: default saat belum diatur; id asing dibuang dan id
+   *  yang hilang ditambahkan di belakang supaya tidak ada section yang lenyap. */
+  const order = useMemo<SectionId[]>(() => {
+    const stored = [...new Set(portfolio.sectionOrder ?? [])].filter((id) =>
+      (SECTION_IDS as readonly string[]).includes(id),
+    ) as SectionId[];
+    const missing = DEFAULT_SECTION_ORDER.filter((id) => !stored.includes(id));
+    return [...stored, ...missing];
+  }, [portfolio.sectionOrder]);
+
+  const fontSizeValue: FontSize = portfolio.fontSize ?? "medium";
+
+  const moveSection = (index: number, delta: number) => {
+    const target = index + delta;
+    if (target < 0 || target >= order.length) return;
+    const next = [...order];
+    [next[index], next[target]] = [next[target], next[index]];
+    applyAppearance((prev) => ({ ...prev, sectionOrder: next }));
+  };
+
+  const toggleSectionVisible = (id: SectionId) => {
+    // Peta parsial: section yang tidak disebut tampil. Toggle selalu menulis
+    // nilai eksplisit true/false, konsisten dengan resolveVisibility.
+    applyAppearance((prev) => ({
+      ...prev,
+      sectionVisibility: {
+        ...prev.sectionVisibility,
+        [id]: !isSectionVisible(prev.sectionVisibility, id),
+      },
+    }));
+  };
+
+  const setAppearanceFontSize = (size: FontSize) => {
+    applyAppearance((prev) => ({ ...prev, fontSize: size }));
+  };
+
+  const setSectionAlignment = (id: SectionId, align: TextAlignment) => {
+    applyAppearance((prev) => ({
+      ...prev,
+      alignment: { ...prev.alignment, [id]: align },
+    }));
+  };
+
   // Progress berdasarkan actual field completeness (lebih akurat)
   const progressPct = useMemo(() => {
     let filled = 0;
@@ -597,7 +701,18 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                   <h1 className="font-headline-lg text-on-background mb-1">{t("build.title")}</h1>
                   <p className="font-body-md text-on-surface-variant">{t("build.subtitle")}</p>
                 </div>
-                <span className="font-label-bold text-primary text-lg">{progressPct}%</span>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={createNewDraft}
+                    disabled={creatingDraft}
+                    className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-outline-variant px-3 text-label-bold text-on-surface-variant hover:bg-surface-container active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <span className="material-symbols-outlined text-lg" aria-hidden="true">note_add</span>
+                    {t("build.new-draft")}
+                  </button>
+                  <span className="font-label-bold text-primary text-lg">{progressPct}%</span>
+                </div>
               </div>
               <div className="w-full h-3 bg-surface-container-high rounded-full overflow-hidden">
                 <div className="h-full bg-primary transition-all duration-500" style={{ width: `${progressPct}%` }}></div>
@@ -1153,6 +1268,128 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                 </div>
               </AccordionItem>
             </div>
+
+            {/* Panel Tampilan: urutan & visibilitas section, ukuran teks, perataan */}
+            <section
+              data-testid="appearance-panel"
+              className="bg-surface-container-lowest rounded-2xl p-6 shadow-soft border border-outline-variant/30 space-y-5"
+            >
+              <div className="flex items-center gap-3">
+                <span className="material-symbols-outlined text-primary" aria-hidden="true">tune</span>
+                <h2 className="font-label-bold text-on-surface">{t("live.appearance")}</h2>
+              </div>
+
+              {/* Ukuran teks */}
+              <div>
+                <span className="block text-label-sm text-on-surface-variant uppercase tracking-wider mb-2">
+                  {t("live.font-size")}
+                </span>
+                <div className="flex gap-2" role="group" aria-label={t("live.font-size")}>
+                  {FONT_SIZES.map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => setAppearanceFontSize(size)}
+                      aria-pressed={fontSizeValue === size}
+                      className={`flex-1 min-h-11 rounded-xl text-sm font-semibold transition-all ${
+                        fontSizeValue === size
+                          ? "bg-primary text-on-primary"
+                          : "bg-surface-container-low text-on-surface-variant hover:bg-surface-container"
+                      }`}
+                    >
+                      {size === "small"
+                        ? t("live.font-small")
+                        : size === "medium"
+                          ? t("live.font-medium")
+                          : t("live.font-large")}
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-2 text-body-sm text-on-surface-variant">
+                  {fontSizeValue === "small"
+                    ? t("live.font-compact")
+                    : fontSizeValue === "medium"
+                      ? t("live.font-standard")
+                      : t("live.font-bold")}
+                </p>
+              </div>
+
+              {/* Daftar section: visibilitas, perataan, urutan */}
+              <div>
+                <span className="block text-label-sm text-on-surface-variant uppercase tracking-wider mb-2">
+                  {t("live.section-order")}
+                </span>
+                <ul className="space-y-1.5">
+                  {order.map((id, index) => {
+                    const visible = isSectionVisible(portfolio.sectionVisibility, id);
+                    const align = portfolio.alignment?.[id] ?? "left";
+                    const name = t(SECTION_NAME_KEYS[id]);
+                    return (
+                      <li
+                        key={id}
+                        className="flex flex-wrap items-center gap-2 rounded-xl border border-outline-variant/40 bg-surface-container-low px-3 py-2"
+                      >
+                        <button
+                          type="button"
+                          onClick={() => toggleSectionVisible(id)}
+                          aria-pressed={visible}
+                          aria-label={visible ? `${t("live.hide-section")}: ${name}` : `${t("live.show-section")}: ${name}`}
+                          title={visible ? t("live.hide-section") : t("live.show-section")}
+                          className={`min-h-11 min-w-11 shrink-0 rounded-lg border flex items-center justify-center transition-all ${
+                            visible
+                              ? "border-primary bg-primary/10 text-primary"
+                              : "border-outline-variant text-outline hover:bg-surface-container"
+                          }`}
+                        >
+                          <span className="material-symbols-outlined text-lg" aria-hidden="true">
+                            {visible ? "visibility" : "visibility_off"}
+                          </span>
+                        </button>
+                        <span
+                          className={`flex-1 min-w-[8rem] truncate text-body-md ${
+                            visible ? "text-on-surface" : "text-on-surface-variant line-through"
+                          }`}
+                        >
+                          {name}
+                        </span>
+                        <select
+                          value={align}
+                          onChange={(e) => setSectionAlignment(id, e.target.value as TextAlignment)}
+                          aria-label={`${t("live.text-align")}: ${name}`}
+                          className="min-h-11 rounded-lg border border-outline-variant bg-background px-2 text-body-md"
+                        >
+                          {ALIGNMENT_OPTIONS.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {t(opt.key)}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => moveSection(index, -1)}
+                          disabled={index === 0}
+                          aria-label={`${t("live.move-up")}: ${name}`}
+                          title={t("live.move-up")}
+                          className="min-h-11 min-w-11 rounded-lg text-on-surface-variant hover:bg-surface-container disabled:opacity-25 disabled:cursor-not-allowed flex items-center justify-center transition-all"
+                        >
+                          <span className="material-symbols-outlined text-lg" aria-hidden="true">keyboard_arrow_up</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveSection(index, 1)}
+                          disabled={index === order.length - 1}
+                          aria-label={`${t("live.move-down")}: ${name}`}
+                          title={t("live.move-down")}
+                          className="min-h-11 min-w-11 rounded-lg text-on-surface-variant hover:bg-surface-container disabled:opacity-25 disabled:cursor-not-allowed flex items-center justify-center transition-all"
+                        >
+                          <span className="material-symbols-outlined text-lg" aria-hidden="true">keyboard_arrow_down</span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </section>
 
             {/* Changes list from AI */}
             {aiChanges.length > 0 && (

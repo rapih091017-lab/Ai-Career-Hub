@@ -10,6 +10,7 @@ import PortfolioDocument, {
   type PortfolioSectionColors,
   STATIC_REVEAL_FALLBACK_CSS,
 } from "@/components/portfolio/render/PortfolioDocument";
+import { alignmentToSectionStyle } from "@/components/portfolio/alignment-style";
 import type {
   FontSize,
   PortfolioData,
@@ -103,6 +104,7 @@ export default async function PublishedPortfolioPage({ params, searchParams }: P
           sectionVisibility={d.sectionVisibility}
           fontSize={d.fontSize ?? "medium"}
           sectionColors={d.sectionColors ?? null}
+          sectionStyle={alignmentToSectionStyle(d.alignment)}
         />
       </div>
       <footer

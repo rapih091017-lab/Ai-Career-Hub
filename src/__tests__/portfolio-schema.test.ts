@@ -808,3 +808,41 @@ describe("pesan publish tanpa nama", () => {
   });
 });
 
+/* ─── Alignment per section: rantai draft → publish → halaman publik ─── */
+
+describe("alignment di portfolioDataSchema", () => {
+  it("round-trip mempertahankan alignment per section", () => {
+    const r = portfolioDataSchema.parse({
+      ...emptyData,
+      alignment: { hero: "center", contact: "right" },
+    });
+    expect(r.alignment).toEqual({ hero: "center", contact: "right" });
+  });
+
+  it("menolak nilai alignment yang tidak diizinkan", () => {
+    expect(
+      portfolioDataSchema.safeParse({ ...emptyData, alignment: { hero: "middle" } }).success,
+    ).toBe(false);
+  });
+
+  it("menolak section id yang tidak dikenal pada alignment", () => {
+    expect(
+      portfolioDataSchema.safeParse({ ...emptyData, alignment: { footer: "left" } }).success,
+    ).toBe(false);
+  });
+
+  it("data tanpa alignment tetap lolos tanpa alignment", () => {
+    expect(portfolioDataSchema.parse(emptyData).alignment).toBeUndefined();
+  });
+
+  it("alignment di data publish ikut terbaca bersama default top-level", () => {
+    const r = publishPayloadSchema.parse({
+      slug: "teguh-surya",
+      themeId: "glass",
+      data: { ...emptyData, alignment: { hero: "center" } },
+    });
+    expect(r.data.alignment).toEqual({ hero: "center" });
+    expect(r.alignment).toEqual({});
+  });
+});
+

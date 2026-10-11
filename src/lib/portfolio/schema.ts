@@ -247,6 +247,9 @@ export const portfolioDataSchema = z.object({
   // Tipografi termasuk data draft supaya round-trip lewat API draft;
   // publishPayloadSchema punya atasan sendiri untuk payload publish.
   fontSize: z.enum(FONT_SIZES).optional(),
+  // Perataan per section termasuk data draft supaya rantai preview & /p/ lengkap;
+  // publishPayloadSchema tetap punya alignment top-level sendiri (default {}).
+  alignment: z.partialRecord(z.enum(SECTION_IDS), z.enum(["left", "center", "right"])).optional(),
   seo: portfolioSeoSchema.optional().catch(undefined),
 });
 
