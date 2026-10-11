@@ -107,6 +107,20 @@ export function applyAiSuggestion(
 }
 
 /**
+ * Daftar saran untuk modal "Saran AI": hanya field formulir yang bisa
+ * diterapkan per-baris (semuanya bertipe string). Perubahan `seo.*`
+ * tidak muncul di sini — SEO diterapkan lewat "Terapkan Semua" dan
+ * dilaporkan terpisah oleh `applyAiSuggestion`.
+ */
+export function listFormSuggestions(data: PortfolioData, res: Dict): AiChange[] {
+  return applyAiSuggestion(data, res).changes.filter(
+    (c) =>
+      typeof c.to === "string" &&
+      Object.prototype.hasOwnProperty.call(data.formData, c.field),
+  );
+}
+
+/**
  * AI tidak boleh menghapus pekerjaan yang sudah diketik user. Entri dengan
  * perusahaan dan posisi yang sama dianggap duplikat dan dilewati.
  */

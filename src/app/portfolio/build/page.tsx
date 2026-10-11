@@ -10,7 +10,7 @@ import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/components/ui/toast";
 import { ConfirmModal, type ConfirmAction } from "@/components/ui/confirm-modal";
 import PortfolioPhotoUpload from "@/components/portfolio/render/PortfolioPhotoUpload";
-import { applyAiSuggestion, mergeExperiences, type AiChange } from "@/lib/portfolio/ai-map";
+import { applyAiSuggestion, listFormSuggestions, mergeExperiences, type AiChange } from "@/lib/portfolio/ai-map";
 import { useUndoStack } from "@/lib/portfolio/useUndoStack";
 import type { PortfolioData } from "@/components/portfolio-templates/types";
 
@@ -238,7 +238,7 @@ export default function PortfolioBuildPage() {
   const [profileForFill, setProfileForFill] = useState<MasterProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
   const [aiSuggesting, setAiSuggesting] = useState(false);
-  const [aiSuggestions, setAiSuggestions] = useState<Record<string, string> | null>(null);
+  const [aiRaw, setAiRaw] = useState<Record<string, unknown> | null>(null);
   const [aiChanges, setAiChanges] = useState<AiChange[]>([]);
   const [showAiPopup, setShowAiPopup] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
@@ -434,6 +434,20 @@ export default function PortfolioBuildPage() {
 
   /* ───────── AI Suggestion ───────── */
 
+  // Respons mentah /api/portfolio/suggest disimpan terpisah; daftar untuk
+  // modal selalu datar (string per kunci formulir), diturunkan lewat ai-map.
+  const aiFormList = useMemo(
+    () => (aiRaw ? listFormSuggestions(portfolio, aiRaw) : []),
+    [aiRaw, portfolio],
+  );
+  const aiSeoList = useMemo(
+    () =>
+      aiRaw
+        ? applyAiSuggestion(portfolio, aiRaw).changes.filter((c) => c.field.startsWith("seo."))
+        : [],
+    [aiRaw, portfolio],
+  );
+
   const handleAiSuggest = async () => {
     if (!profileForFill) return;
     setAiSuggesting(true);
@@ -452,7 +466,10 @@ export default function PortfolioBuildPage() {
       }
 
       const data = await res.json();
-      setAiSuggestions(data);
+      setAiRaw(data);
+      if (applyAiSuggestion(portfolio, data).changes.length === 0) {
+        setAiError("AI tidak mengembalikan perubahan baru.");
+      }
       setShowAiPopup(true);
     } catch (err: any) {
       setAiError(err.message);
@@ -471,7 +488,7 @@ export default function PortfolioBuildPage() {
 
   /** Apply all AI suggestions */
   const applyAllAi = () => {
-    if (!aiSuggestions) return;
+    if (!aiRaw) return;
     const currentPortfolioData: PortfolioData = {
       formData,
       projects,
@@ -484,7 +501,7 @@ export default function PortfolioBuildPage() {
       extraLinks,
       seo,
     };
-    const { data: merged, changes } = applyAiSuggestion(currentPortfolioData, aiSuggestions);
+    const { data: merged, changes } = applyAiSuggestion(currentPortfolioData, aiRaw);
     if (changes.length === 0) {
       setAiError("AI tidak mengembalikan perubahan baru.");
       return;
@@ -1410,41 +1427,46 @@ export default function PortfolioBuildPage() {
             atau <strong>Terapkan Semua</strong> untuk langsung mengisi semua.
           </p>
 
-          {aiSuggestions && (
+          {aiFormList.length + aiSeoList.length > 0 && (
             <div className="space-y-3">
-              {Object.entries(aiSuggestions).map(([field, value]) => {
-                const fieldLabel = fieldLabels[field] || field;
-                const currentValue = (formData as any)[field] || "";
-                return (
-                  <div key={field} className="p-3 rounded-xl border border-outline-variant/40 bg-surface-container-low">
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <span className="font-label-bold text-xs text-on-surface-variant uppercase tracking-wider">
-                        {fieldLabel}
-                      </span>
+              {[
+                ...aiFormList.map((c) => ({ ...c, applyable: true })),
+                ...aiSeoList.map((c) => ({ ...c, applyable: false })),
+              ].map((c) => (
+                <div key={c.field} className="p-3 rounded-xl border border-outline-variant/40 bg-surface-container-low">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <span className="font-label-bold text-xs text-on-surface-variant uppercase tracking-wider">
+                      {c.label}
+                    </span>
+                    {c.applyable ? (
                       <button
-                        onClick={() => applyAiField(field, value)}
+                        onClick={() => applyAiField(c.field, c.to)}
                         className="shrink-0 px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/20 active:scale-95 transition-all"
                       >
                         Terapkan
                       </button>
-                    </div>
-                    <p className="text-sm text-on-surface leading-relaxed">
-                      {currentValue ? (
-                        <>
-                          <span className="line-through text-on-surface-variant mr-2">{currentValue}</span>
-                          <span className="text-primary">{value}</span>
-                        </>
-                      ) : (
-                        value
-                      )}
-                    </p>
+                    ) : (
+                      <span className="shrink-0 px-3 py-1 rounded-lg bg-surface-container-highest text-on-surface-variant text-xs font-semibold">
+                        Via Terapkan Semua
+                      </span>
+                    )}
                   </div>
-                );
-              })}
+                  <p className="text-sm text-on-surface leading-relaxed">
+                    {c.from ? (
+                      <>
+                        <span className="line-through text-on-surface-variant mr-2">{c.from}</span>
+                        <span className="text-primary">{c.to}</span>
+                      </>
+                    ) : (
+                      c.to
+                    )}
+                  </p>
+                </div>
+              ))}
             </div>
           )}
 
-          {/* Error state */}
+          {/* Error state: daftar kosong (AI tidak mengembalikan apa pun yang bisa dipetakan) */}
           {aiError && (
             <div className="flex items-start gap-2 p-4 rounded-xl bg-red-100/30 border border-red-200">
               <span className="material-symbols-outlined text-error text-lg shrink-0">error</span>
@@ -1524,6 +1546,7 @@ const fieldLabels: Record<string, string> = {
   aboutYearsExp: "Tahun Pengalaman",
   aboutProjectsDone: "Project Selesai",
   aboutClientsHappy: "Klien Puas",
+  skillsMain: "Keahlian utama",
   skillsTools: "Tools & Software",
   skillsLanguages: "Bahasa",
 };

@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { applyAiSuggestion, mergeExperiences } from "@/lib/portfolio/ai-map";
+import { applyAiSuggestion, listFormSuggestions, mergeExperiences } from "@/lib/portfolio/ai-map";
 import { useUndoStack } from "@/lib/portfolio/useUndoStack";
 import { renderHook, act } from "@testing-library/react";
 import type { PortfolioData } from "@/components/portfolio-templates/types";
@@ -228,6 +228,55 @@ describe("editor membawa seo dari AI sampai data tersimpan", () => {
     expect(live).toMatch(/currentPortfolio: PortfolioData = \{[^}]*\bseo\b/);
     expect(live).toContain("seo: updatedPortfolio.seo");
     expect(live).toMatch(/const canvasData = \{[^}]*\bseo\b/);
+  });
+});
+
+describe("listFormSuggestions", () => {
+  const realistic = {
+    hero: { headline: "Frontend Developer", sub_headline: "React & TypeScript", bio: "Bio baru dari AI" },
+    about: { paragraphs: ["Paragraf A.", "Paragraf B."] },
+    experience_highlights: [
+      { company: "Acme", role: "Dev", period: "2022–2024", headline: "Memimpin migrasi", impact: "Muat 40% lebih cepat" },
+    ],
+    skills_display: { skills: ["React", "TypeScript"] },
+    contact_cta: { heading: "Mari bekerja sama", button_text: "Hubungi saya" },
+    seo: {
+      page_title: "Frontend Developer | Teguh Surya",
+      meta_description: "Portofolio Teguh Surya.",
+      keywords: ["react", "typescript"],
+    },
+  };
+
+  it("hanya entri field formulir: `to` string, `field` kunci formData valid, tanpa nilai objek", () => {
+    const list = listFormSuggestions(base, realistic);
+    expect(list.length).toBeGreaterThan(0);
+    for (const c of list) {
+      expect(typeof c.to).toBe("string");
+      expect(typeof c.from).toBe("string");
+      expect(Object.keys(base.formData)).toContain(c.field);
+      expect(c.field.startsWith("seo.")).toBe(false);
+      expect(c.to).not.toBe("[object Object]");
+    }
+    const fields = list.map((c) => c.field);
+    expect(fields).toEqual(expect.arrayContaining(["heroHeadline", "heroSubHeadline", "aboutText", "skillsMain"]));
+    expect(fields).not.toContain("seo.pageTitle");
+    expect(fields).not.toContain("experience_highlights");
+  });
+
+  it("respons tanpa perubahan menghasilkan daftar kosong", () => {
+    expect(listFormSuggestions(base, {})).toEqual([]);
+  });
+});
+
+describe("modal saran AI memakai daftar datar", () => {
+  const build = read("src/app/portfolio/build/page.tsx");
+
+  it("rendering contract: baris modal dibangun dari listFormSuggestions, bukan Object.entries respons mentah", () => {
+    expect(build).toContain("listFormSuggestions");
+    expect(build).toMatch(/aiFormList\.map\(/);
+    expect(build).not.toMatch(/Object\.entries\(aiSuggestions\)/);
+    expect(build).not.toMatch(/Object\.entries\(aiRaw\)/);
+    expect(build).not.toContain("useState<Record<string, string> | null>(null)");
   });
 });
 
