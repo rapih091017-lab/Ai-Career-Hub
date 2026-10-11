@@ -150,3 +150,59 @@ $ npx eslint <9 file yang disentuh>
 - Panel memakai source-text test (pola repo untuk `BuilderEditor`); belum ada render/jsdom test untuk interaksi klik reorder/toggle.
 - Baris `stats` tampil di panel (urutan/visibilitas/perataan) walaupun accordion kontennya tidak ada di builder â€” konten stats diisi lewat Tentang Saya, semantik urutan tetap utuh.
 - `/api/portfolio/export` sengaja tidak disentuh (brief: jangan ubah alur print/export); ekspor HTML mengikuti `sectionOrder`/`fontSize` yang sudah ada, perataan belum ikut diekspor.
+
+## Fix wave 2
+
+### Perubahan per file
+
+| File | Aksi | Isi |
+|---|---|---|
+| `src/lib/portfolio/schema.ts` | modify | Ekspor `URL_FIELD_MESSAGE` (pesan refine `urlField`) supaya migrasi mengenali kegagalan URL tanpa menduplikasi string. |
+| `src/lib/portfolio/legacy-migration.ts` | modify | `migrateLegacyPayload(legacy): ValidatedPortfolioData \| null` — coerce per isu Zod: string lewat batas ? `slice(0, maximum)`, custom gagal URL ? `""`, custom tanggal langgar range ? `startDate`/`endDate` entri dibuang; isu lain ? `null` (legacy dipertahankan). Murni: `structuredClone`, input tak dimutasi, maks 5 lewat. Plus `shouldClearLegacy(legacy, migrated)` = `legacy === null \|\| migrated !== null`. |
+| `src/app/portfolio/build/page.tsx` | modify | Pakai `migrateLegacyPayload` + `shouldClearLegacy` (hapus `safeParse(legacy)`); `clearLegacyDraft()` hanya setelah POST sukses ATAU legacy kosong; cabang "draft server sudah ada" tidak lagi menghapus legacy; state `busy` ? tombol `Coba lagi` `disabled` selama POST in-flight (minor d). |
+| `src/lib/portfolio/usePortfolioDraft.ts` | modify | `flush`: `res.status === 400` ? pending dipertahankan, `status "idle"`, `setOffline(false)`, `setError(null)`, return `false` (tanpa banner); 5xx/jaringan ? tetap `error` + offline + retry. `catch` hanya mengembalikan pending bila belum terisi edit yang lebih baru. |
+| `src/components/portfolio/builder/BuilderEditor.tsx` | modify | `createNewDraft`: `await draft.flushNow()` sebelum POST/replace, gagal ? toast + batal (pola tombol preview:1516). Minor b: `text-[10px]`/`text-[11px]` ? `text-xs` (CharCounter:158, error validasi:171, daftar AI:1411, daftar CV:1579). Minor c: undo/redo `p-1.5` ? `min-h-11 min-w-11 flex items-center justify-center`. |
+| `src/lib/i18n.tsx` | modify | Minor e: `preview.no-draft-desc` + `preview.open-builder` "Live Builder" ? "builder" (id+en), salinan Indonesia tetap alami. |
+| `src/__tests__/portfolio-legacy-migration.test.ts` | create | 10 test: 3 koersi lolos, masalah di luar daftar ? `null`, input non-objek ? `null`, kemurnian, dan aturan `shouldClearLegacy` (kosong/sukses ? true, gagal ? false). |
+| `src/__tests__/portfolio-entry-points.test.ts` | modify | +4 test: literal kunci legacy juga dicek di `BuilderEditor.tsx`; urutan `flushNow` sebelum `method: "POST"` di `createNewDraft`; creator memakai `migrateLegacyPayload`/`shouldClearLegacy` tanpa `safeParse(legacy)`; baris i18n `preview.*` bebas "Live Builder". |
+| `src/__tests__/portfolio-draft-store.test.ts` | modify | +2 test: fetch PATCH 400 ? `status "idle"`, `offline false`, `error null`, pending tetap terkirim di flush kedua (PATCH ×2); fetch reject ? `status "error"`, `offline true`, pesan coba lagi. |
+
+### Red ? green (ketiga Important)
+
+Red (test ditulis dulu, sebelum implementasi):
+
+```
+$ npx vitest run portfolio-legacy-migration.test.ts portfolio-entry-points.test.ts portfolio-draft-store.test.ts
+ Test Files  3 failed (3)
+      Tests  4 failed | 14 passed (18)
+
+ - legacy-migration: TypeError: migrateLegacyPayload is not a function (helper belum ada)     [Important 1]
+ - entry-points "Draft baru mem-flush perubahan tertunda sebelum POST": belum ada flushNow    [Important 2]
+ - draft-store "PATCH 400 ditolak server": expected 'error' to be 'idle'                      [Important 3]
+ - entry-points "empty state preview ...": baris i18n masih "Live Builder"                    [minor e]
+```
+
+Green (sesudah implementasi):
+
+```
+$ npx tsc --noEmit
+? (exit 0, tanpa output)
+
+$ npm test
+? Test Files  21 passed (21)
+   Tests  381 passed (381)
+
+$ npx eslint src/lib/portfolio/legacy-migration.ts src/lib/portfolio/schema.ts src/lib/portfolio/usePortfolioDraft.ts src/app/portfolio/build/page.tsx src/components/portfolio/builder/BuilderEditor.tsx src/lib/i18n.tsx src/__tests__/portfolio-legacy-migration.test.ts src/__tests__/portfolio-entry-points.test.ts src/__tests__/portfolio-draft-store.test.ts
+? (exit 0, tanpa output)
+```
+
+366 ? 381 (+15 test); test lama tidak dihapus atau perilakunya diubah. `migrateLegacyPayload` ditulis mengikuti tiga koersi yang diminta brief; aturan hapus legacy dipusatkan di `shouldClearLegacy` supaya bisa diuji sebagai fungsi murni. antislop-code/antislop-copywriting dijalankan selama pengerjaan: komentar baru hanya menjelaskan alasan (tanpa separator/narasi langkah), salinan i18n bebas em dash/buzzword dan tetap alami.
+
+### Concerns
+
+- Pembacaan literal: `clearLegacyDraft()` kini hanya di jalur POST. Cabang "draft server sudah ada" tidak menghapus legacy lagi, jadi kunci lama bisa menetap di localStorage perangkat itu (tidak pernah dibaca lagi di perangkat tersebut).
+- 400 memakai `status "idle"`: footer bisa menampilkan "Tersimpan" (lastSavedAt lama) walaupun ada pending; sesuai brief tanpa banner, pending terkirim pada edit berikutnya atau `flushNow`.
+- `migrateLegacyPayload` hanya menangani tiga koersi yang diminta; masalah lain (email salah format, array lewat LIMITS, field wajib hilang) ? `null`, jadi draft kosong dibuat dan legacy bertahan sampai diperbaiki manual.
+- Sisa race "Draft baru": edit yang dibuat selama POST berlangsung (ratusan ms) masih bisa ikut debounce ke draft baru; menutupnya sepenuhnya butuh pembatalan sync saat ganti draftId.
+- "Live Builder" masih ada di kunci `portfolio.publish-*` (i18n:312-313) — di luar lingkup minor (e), bisa dibersihkan terpisah.
+- `.superpowers/sdd/progress.md` sudah berubah sebelum wave ini (bookkeeping task lain) dan tidak ikut di-commit.

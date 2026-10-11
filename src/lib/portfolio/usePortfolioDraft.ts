@@ -139,6 +139,15 @@ export function usePortfolioDraft(draftId: string | null): UsePortfolioDraftResu
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ draftId, name, data: body }),
       });
+      if (res.status === 400) {
+        // Data ditolak server, bukan masalah jaringan: pending dipertahankan
+        // untuk perbaikan berikutnya, tanpa status error atau klaim offline.
+        if (!pending.current) pending.current = body;
+        setStatus("idle");
+        setOffline(false);
+        setError(null);
+        return false;
+      }
       if (!res.ok) throw new Error("gagal menyimpan");
       const json = (await res.json()) as { updatedAt: string };
       setStatus("saved");
@@ -148,7 +157,7 @@ export function usePortfolioDraft(draftId: string | null): UsePortfolioDraftResu
       writeCache(draftId, { name, data: body, updatedAt: json.updatedAt });
       return true;
     } catch {
-      pending.current = body;
+      if (!pending.current) pending.current = body;
       setStatus("error");
       setOffline(true);
       setError("Perubahan belum masuk server. Ketuk coba lagi.");

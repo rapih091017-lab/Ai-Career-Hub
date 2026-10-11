@@ -5,7 +5,12 @@ import { useRouter } from "next/navigation";
 import AuthGuard from "@/components/AuthGuard";
 import PortfolioSkeleton from "@/components/portfolio/PortfolioSkeleton";
 import { portfolioDataSchema } from "@/lib/portfolio/schema";
-import { readLegacyDraft, clearLegacyDraft } from "@/lib/portfolio/legacy-migration";
+import {
+  readLegacyDraft,
+  clearLegacyDraft,
+  migrateLegacyPayload,
+  shouldClearLegacy,
+} from "@/lib/portfolio/legacy-migration";
 
 /** Draft benar-benar kosong; semua field wajib schema ikut diisi. */
 function emptyFormData() {
@@ -45,33 +50,33 @@ function emptyFormData() {
 /**
  * Halaman pembuat draft: mengarahkan user ke builder terikat draft.
  * - Kalau sudah ada draft server, pakai itu (tidak membuat draft ganda).
- * - Kalau belum ada, isi dari draft legacy localStorage (migrasi sekali) bila
- *   valid, kalau tidak pakai draft kosong, lalu buat draft server.
+ * - Kalau belum ada, isi dari draft legacy localStorage bila lolos migrasi
+ *   (field bermasalah di-coerce dulu); kalau gagal, legacy dipertahankan dan
+ *   draft kosong dipakai, lalu buat draft server.
  */
 export default function NewBuildPage() {
   const router = useRouter();
   const fired = useRef(false);
   const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
   const createDraft = async () => {
     setError(null);
+    setBusy(true);
     try {
       const latestRes = await fetch("/api/portfolio/draft", { cache: "no-store" });
       const latest = latestRes.ok ? await latestRes.json() : null;
 
       if (latest?.draftId) {
-        // Draft server sudah ada: legacy (kalau ada) tidak dipakai supaya
-        // tidak menimpa data yang lebih baru.
-        clearLegacyDraft();
+        // Draft server sudah ada: data di sana lebih baru. Legacy tidak dibaca
+        // dan tidak dihapus; hapus kunci hanya setelah migrasi sukses atau kosong.
         router.replace(`/portfolio/build/${latest.draftId}`);
         return;
       }
 
       const legacy = readLegacyDraft();
-      const legacyParsed = legacy ? portfolioDataSchema.safeParse(legacy) : null;
-      const data = legacyParsed?.success
-        ? legacyParsed.data
-        : portfolioDataSchema.parse(emptyFormData());
+      const migrated = migrateLegacyPayload(legacy);
+      const data = migrated ?? portfolioDataSchema.parse(emptyFormData());
 
       const res = await fetch("/api/portfolio/draft", {
         method: "POST",
@@ -83,12 +88,12 @@ export default function NewBuildPage() {
         setError("Gagal membuat draft. Periksa koneksi lalu coba lagi.");
         return;
       }
-      // Draft server berhasil dibuat: kunci legacy sudah dimigrasi (atau
-      // ditinggalkan), aman dihapus sekali.
-      clearLegacyDraft();
+      if (shouldClearLegacy(legacy, migrated)) clearLegacyDraft();
       router.replace(`/portfolio/build/${json.draftId}`);
     } catch {
       setError("Gagal membuat draft. Periksa koneksi lalu coba lagi.");
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -109,11 +114,12 @@ export default function NewBuildPage() {
           <p className="text-sm text-on-surface-variant">{error}</p>
           <button
             type="button"
+            disabled={busy}
             onClick={() => {
               fired.current = false;
               void createDraft();
             }}
-            className="min-h-11 rounded-xl bg-primary px-5 text-sm font-bold text-on-primary"
+            className="min-h-11 rounded-xl bg-primary px-5 text-sm font-bold text-on-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Coba lagi
           </button>

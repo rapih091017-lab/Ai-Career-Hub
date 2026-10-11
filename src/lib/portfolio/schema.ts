@@ -37,6 +37,10 @@ const MAX = {
 
 const text = (max: number) => z.string().max(max);
 
+/** Pesan gagal urlField; diekspor supaya migrasi legacy mengenali kegagalan URL
+ *  tanpa menduplikasi string. */
+export const URL_FIELD_MESSAGE = "Tautan memakai skema yang tidak diizinkan";
+
 /** URL wajib lolos safeUrl. String kosong tetap sah. */
 const urlField = (max: number) =>
   z
@@ -44,7 +48,7 @@ const urlField = (max: number) =>
     .max(max)
     .transform((v) => v.trim())
     .refine((v) => v === "" || safeUrl(v) !== "", {
-      message: "Tautan memakai skema yang tidak diizinkan",
+      message: URL_FIELD_MESSAGE,
     });
 
 /** Tanggal portfolio: YYYY-MM, atau string kosong (spasi tepi di-trim dulu). */

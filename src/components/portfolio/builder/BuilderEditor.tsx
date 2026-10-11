@@ -155,7 +155,7 @@ function CharCounter({ value, max, warnAt }: { value: string; max: number; warnA
   const isWarning = len >= threshold && len < max;
   const isOver = len > max;
   return (
-    <span className={`text-[10px] mt-0.5 block text-right font-medium ${isOver ? "text-error" : isWarning ? "text-amber-600" : "text-outline"}`}>
+    <span className={`text-xs mt-0.5 block text-right font-medium ${isOver ? "text-error" : isWarning ? "text-amber-600" : "text-outline"}`}>
       {len}/{max}
     </span>
   );
@@ -168,7 +168,7 @@ function ValidatedField({ label, error, children }: { label: string; error?: str
       <label className="text-label-sm text-on-surface-variant uppercase tracking-wider">{label}</label>
       {children}
       {error && (
-        <span className="text-[11px] text-error flex items-center gap-1">
+        <span className="text-xs text-error flex items-center gap-1">
           <span className="material-symbols-outlined text-sm">error</span>
           {error}
         </span>
@@ -279,6 +279,13 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
     if (creatingDraft) return;
     setCreatingDraft(true);
     try {
+      // Perubahan tertunda (debounce 1,2 detik) harus masuk draft lama dulu,
+      // supaya tidak ikut terbawa ke draft baru.
+      const flushed = await draft.flushNow();
+      if (!flushed) {
+        addToast({ type: "error", message: "Gagal menyimpan data. Silakan coba lagi." });
+        return;
+      }
       const res = await fetch("/api/portfolio/draft", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1408,7 +1415,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                     <div key={i} className="text-xs p-2.5 rounded-xl bg-surface-container-low border border-outline-variant/40 flex flex-col gap-1">
                       <span className="font-semibold text-on-surface">{c.label} ({c.field})</span>
                       <div className="flex items-center gap-2">
-                        <span className="line-through text-on-surface-variant text-[11px]">{c.from || "(kosong)"}</span>
+                        <span className="line-through text-on-surface-variant text-xs">{c.from || "(kosong)"}</span>
                         <span className="text-on-surface-variant">→</span>
                         <span className="text-primary font-medium">{c.to}</span>
                       </div>
@@ -1442,7 +1449,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                 <button
                   onClick={undo}
                   disabled={!canUndo}
-                  className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  className="min-h-11 min-w-11 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                   title="Urungkan (Undo)"
                   aria-label="Undo"
                 >
@@ -1451,7 +1458,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                 <button
                   onClick={redo}
                   disabled={!canRedo}
-                  className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  className="min-h-11 min-w-11 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                   title="Ulangi (Redo)"
                   aria-label="Redo"
                 >
@@ -1576,7 +1583,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                     >
                       <div className="text-left">
                         <span className="font-medium text-sm text-on-surface">{cv.jobTitle || t("portfolio.cv-untitled")}</span>
-                        <p className="text-[10px] text-outline">Diperbarui: {new Date(cv.updatedAt).toLocaleDateString("id-ID")}</p>
+                        <p className="text-xs text-outline">Diperbarui: {new Date(cv.updatedAt).toLocaleDateString("id-ID")}</p>
                       </div>
                       {generatingFromCv === cv.id ? (
                         <span className="material-symbols-outlined text-primary animate-spin">sync</span>

@@ -106,3 +106,93 @@ describe("usePortfolioDraft flush & retry", () => {
     expect(readCache("d1")?.updatedAt).toBe("2026-10-10T09:30:00.000Z");
   });
 });
+
+function hydrationResponse(): Response {
+  return jsonResponse({
+    name: "Portfolio saya",
+    data: { formData: {} },
+    updatedAt: "2026-10-10T09:00:00.000Z",
+  });
+}
+
+describe("usePortfolioDraft: 400 server vs kegagalan jaringan", () => {
+  beforeEach(() => {
+    localStorage.clear();
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  });
+
+  it("PATCH 400 ditolak server: pending dipertahankan, tanpa status error atau offline", async () => {
+    let patchCount = 0;
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes("draftId=")) return hydrationResponse();
+      patchCount++;
+      return { ok: false, status: 400, json: async () => ({ error: "INVALID_DATA" }) } as unknown as Response;
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { result } = renderHook(() => usePortfolioDraft("d1"));
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
+    });
+    expect(result.current.loading).toBe(false);
+
+    act(() => {
+      result.current.setData({
+        formData: { skill: "ts" },
+      } as unknown as ValidatedPortfolioData);
+    });
+
+    let flushed = true;
+    await act(async () => {
+      flushed = await result.current.flushNow();
+    });
+    expect(flushed).toBe(false);
+    expect(result.current.status).toBe("idle");
+    expect(result.current.offline).toBe(false);
+    expect(result.current.error).toBeNull();
+
+    await act(async () => {
+      flushed = await result.current.flushNow();
+    });
+    expect(flushed).toBe(false);
+    expect(patchCount).toBe(2);
+  });
+
+  it("fetch gagal (jaringan): status error, offline, dan pesan coba lagi", async () => {
+    let patchCount = 0;
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes("draftId=")) return hydrationResponse();
+      patchCount++;
+      throw new TypeError("fetch failed");
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { result } = renderHook(() => usePortfolioDraft("d1"));
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
+    });
+
+    act(() => {
+      result.current.setData({
+        formData: { skill: "ts" },
+      } as unknown as ValidatedPortfolioData);
+    });
+
+    let flushed = true;
+    await act(async () => {
+      flushed = await result.current.flushNow();
+    });
+    expect(flushed).toBe(false);
+    expect(patchCount).toBe(1);
+    expect(result.current.status).toBe("error");
+    expect(result.current.offline).toBe(true);
+    expect(result.current.error).toBe("Perubahan belum masuk server. Ketuk coba lagi.");
+  });
+});
