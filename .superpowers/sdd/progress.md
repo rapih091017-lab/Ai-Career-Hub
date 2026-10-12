@@ -167,3 +167,16 @@ Task 9+10 (Spec2): complete (commits 4c7ecdc..964278d + gate tanpa perbaikan,474
 
 ## SEMUA 10 TASK SPEC 2 SELESAI - tinggal review akhir cabang
 
+
+## Spec 2.5 — Tema Minimalist + Hero (Selesai)
+
+Commit: b57c538 (token) -> 6b40163 (hero) -> 6203af3 (crop picker, task sebelumnya) -> 12 section minimal -> copy 4 tema.
+Spec: docs/superpowers/specs/2026-10-12-portfolio-minimalist-design.md
+Plan: docs/superpowers/plans/2026-10-12-portfolio-minimalist.md
+
+- Token minimalist: putih/ink, Instrument Sans, radius 0, blur none, shadow none. Token baru adii.circle (semua tema) supaya lingkaran hero tidak butuh borderRadius literal.
+- Hero: MinimalistHero (lingkaran + nama raksasa + bio, tanpa h-screen) + audit 3 hero lama: Luxe dibuang kartunya, Glass diberi scrim.
+- 12 section punya case "minimalist" (termasuk stats/skills/testimonials yang semula?? token-only — koreksi tercatat di spec §6).
+- Copy 3 -> 4 tema di pricing, landing, spotlight. Default tetap Glass, tanpa migrasi DB.
+- Test: 494 passed (1 skipped = harness QA), tsc 0, lint 0 error, build sukses.
+- Catatan QA: harness jsdom membuang nilai clamp() untuk semua tema, jadi skala tipografi harus diverifikasi di browser, bukan dari screenshot harness.
