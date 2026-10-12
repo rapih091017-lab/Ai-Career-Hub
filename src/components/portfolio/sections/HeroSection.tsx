@@ -153,7 +153,7 @@ const STAGGER_CHILD_SLOW: Variants = {
 function GlassHero({ data: f, name, initials }: { data: PortfolioFormData; name: string; initials: string }) {
   const theme = usePortfolioTheme();
   return (
-    <section className="relative overflow-hidden" style={{ padding: "140px 0 80px" }}>
+    <section className="relative overflow-hidden" data-hero-variant="glass" style={{ padding: "140px 0 80px" }}>
       {/* Animated gradient orbs */}
       <div className="pf-atmosphere absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
@@ -256,13 +256,24 @@ function GlassHero({ data: f, name, initials }: { data: PortfolioFormData; name:
             className="mt-16 inline-block"
           >
             <div className="p-1.5" style={{ background: `${theme.colors.primary}08`, borderRadius: theme.radii.image, border: `1px solid ${theme.colors.border}` }}>
-              <div className="overflow-hidden" style={{ borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
+              <div className="overflow-hidden" style={{ borderRadius: theme.radii.card, boxShadow: theme.shadow.card, position: "relative" }}>
                 <motion.img
                   src={f.heroPhotoUrl}
                   alt={name}
                   style={{ width: 200, height: 200, objectFit: "cover", display: "block" }}
                   whileHover={{ scale: 1.05 }}
                   transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
+                />
+                {/* Scrim:玻璃 di atas foto supaya nama di atasnya selalu terbaca */}
+                <div
+                  data-hero-scrim=""
+                  aria-hidden="true"
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    pointerEvents: "none",
+                    background: `linear-gradient(to top, ${theme.colors.bg}, transparent 62%)`,
+                  }}
                 />
               </div>
             </div>
@@ -280,7 +291,7 @@ function GlassHero({ data: f, name, initials }: { data: PortfolioFormData; name:
 function BrutalHero({ data: f, name, initials }: { data: PortfolioFormData; name: string; initials: string }) {
   const theme = usePortfolioTheme();
   return (
-    <section className="relative overflow-hidden" style={{ padding: "120px 0 80px" }}>
+    <section className="relative overflow-hidden" data-hero-variant="brutal" style={{ padding: "120px 0 80px" }}>
       {/* Grain overlay with subtle animation */}
       <motion.div
         className="pf-atmosphere fixed inset-0 pointer-events-none"
@@ -428,7 +439,7 @@ function BrutalHero({ data: f, name, initials }: { data: PortfolioFormData; name
 function LuxeHero({ data: f, name, initials }: { data: PortfolioFormData; name: string; initials: string }) {
   const theme = usePortfolioTheme();
   return (
-    <section className="relative overflow-hidden" style={{ padding: "120px 0 80px" }}>
+    <section className="relative overflow-hidden" data-hero-variant="luxe" style={{ padding: "120px 0 80px" }}>
       {/* Animated grain overlay */}
       <motion.div
         className="pf-atmosphere fixed inset-0 pointer-events-none"
@@ -530,8 +541,10 @@ function LuxeHero({ data: f, name, initials }: { data: PortfolioFormData; name: 
               y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 },
             }}
           >
-            <div className="p-2" style={{ background: theme.colors.bgSecondary, borderRadius: theme.radii.image, border: `1px solid ${theme.colors.border}` }}>
-              <div className="overflow-hidden" style={{ borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
+            {/* Luxe tidak memakai kartu: kolom foto polos, tanpa radius dan
+                tanpa bayangan — hierarki datang dari ruang kosong dan garis. */}
+            <div className="p-0" data-hero-frame="plain">
+              <div className="overflow-hidden" style={{ borderRadius: theme.radii.circle }}>
                 {f.heroPhotoUrl ? (
                   <motion.img
                     src={f.heroPhotoUrl}
@@ -554,6 +567,119 @@ function LuxeHero({ data: f, name, initials }: { data: PortfolioFormData; name: 
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * MINIMALIST, Ink on paper
+ * Lingkaran (foto atau inisial) + nama grotesk raksasa,
+ * bio di bawah garis rambut. Tanpa isian, tanpa bayangan.
+ * Tinggi dari padding + clamp — sengaja tanpa h-screen
+ * supaya tidak melompat di iOS.
+ * ═══════════════════════════════════════════════ */
+function MinimalistHero({ data: f, name, initials }: { data: PortfolioFormData; name: string; initials: string }) {
+  const theme = usePortfolioTheme();
+  return (
+    <section
+      data-section-id="hero"
+      data-hero-variant="minimalist"
+      className="relative w-full"
+      style={{ background: theme.colors.bg, color: theme.colors.text, padding: "clamp(56px, 10vh, 120px) 0" }}
+    >
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: 40 }}>
+          <span
+            data-hero-circle=""
+            style={{
+              width: 96,
+              height: 96,
+              borderRadius: theme.radii.circle,
+              overflow: "hidden",
+              display: "grid",
+              placeItems: "center",
+              border: `1px solid ${theme.colors.border}`,
+              background: theme.colors.bgSecondary,
+              flexShrink: 0,
+            }}
+          >
+            {f.heroPhotoUrl ? (
+              <img
+                src={f.heroPhotoUrl}
+                alt={name}
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              />
+            ) : (
+              <span style={{ fontSize: 26, letterSpacing: "-0.02em", color: theme.colors.text }}>
+                {initials}
+              </span>
+            )}
+          </span>
+          {f.heroHeadline ? (
+            <span
+              style={{
+                fontSize: 12,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: theme.colors.textSecondary,
+              }}
+            >
+              {f.heroHeadline}
+            </span>
+          ) : null}
+        </div>
+
+        <h1
+          style={{
+            fontFamily: theme.typography.display,
+            fontSize: "clamp(44px, 8vw, 88px)",
+            lineHeight: 1.02,
+            letterSpacing: "-0.03em",
+            fontWeight: 500,
+            margin: 0,
+          }}
+        >
+          {name}
+        </h1>
+
+        {f.heroSubHeadline ? (
+          <p
+            style={{
+              fontSize: "clamp(16px, 2vw, 20px)",
+              lineHeight: 1.5,
+              color: theme.colors.textSecondary,
+              margin: "20px 0 0",
+              maxWidth: 640,
+            }}
+          >
+            {f.heroSubHeadline}
+          </p>
+        ) : null}
+
+        {f.heroBio ? (
+          <>
+            <div
+              style={{
+                height: 1,
+                background: theme.colors.border,
+                margin: "32px 0 24px",
+                maxWidth: 1040,
+              }}
+            />
+            <p
+              style={{
+                fontSize: 15,
+                lineHeight: 1.7,
+                color: theme.colors.textSecondary,
+                margin: 0,
+                maxWidth: 620,
+              }}
+            >
+              {f.heroBio}
+            </p>
+          </>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function HeroSection({ data }: Props) {
   const f = data;
@@ -568,6 +694,8 @@ export default function HeroSection({ data }: Props) {
       return <BrutalHero data={f} name={name} initials={initials} />;
     case "luxe":
       return <LuxeHero data={f} name={name} initials={initials} />;
+    case "minimalist":
+      return <MinimalistHero data={f} name={name} initials={initials} />;
     default:
       return <GlassHero data={f} name={name} initials={initials} />;
   }
