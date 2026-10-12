@@ -154,9 +154,17 @@ describe("Layer B: aturan semantik per tema terlihat di markup", () => {
     }
   });
 
-  it("Luxe memakai serif dan berwarna (kroma > 0)", () => {
-    expect(THEMES.luxe.typography.display).toMatch(/serif/i);
-    // Luxe minimal punya satu warna non-netral; uji silang lengkap menutup Spec 2.5
-    expect(THEMES.luxe.colors.bg).not.toBe("#FFFFFF");
+  it("Luxe memakai serif untuk display (bukan sans yang kebetulan mengandung 'serif')", () => {
+    const display = THEMES.luxe.typography.display;
+    expect(display).toMatch(/^'Playfair Display',\s*serif/i);
+    expect(display.toLowerCase()).not.toContain("sans-serif");
+    // Luxe harus berwarna (kromatik) — uji silang lengkap menutup Spec 2.5
+    expect(THEMES.luxe.colors.bg.toLowerCase()).not.toBe("#ffffff");
+  });
+
+  it("Glass dan Brutal memakai sans-serif untuk display", () => {
+    expect(THEMES.glass.typography.display.toLowerCase()).toContain("sans-serif");
+    expect(THEMES.brutal.typography.display.toLowerCase()).toContain("sans-serif");
+    expect(THEMES.brutal.typography.display.toLowerCase()).not.toContain("playfair");
   });
 });
