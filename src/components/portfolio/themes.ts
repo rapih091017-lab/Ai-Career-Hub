@@ -30,7 +30,7 @@ export const THEMES: Record<string, ThemeDefinition> = {
       border: "rgba(255,255,255,0.08)",
       borderHover: "rgba(124,92,252,0.35)",
     },
-    radii: { card: "1.5rem", button: "9999px", pill: "9999px", image: "2rem" },
+    radii: { card: "1.5rem", button: "9999px", pill: "9999px", image: "2rem", circle: "9999px" },
     blur: { card: "blur(20px)", glow: "blur(120px)" },
     shadow: {
       card: "inset 0 1px 1px rgba(255,255,255,0.06)",
@@ -84,7 +84,7 @@ export const THEMES: Record<string, ThemeDefinition> = {
       border: "#1A1A1A",
       borderHover: "#FF3366",
     },
-    radii: { card: "0", button: "0", pill: "0", image: "0" },
+    radii: { card: "0", button: "0", pill: "0", image: "0", circle: "9999px" },
     blur: { card: "", glow: "" },
     shadow: { card: "6px 6px 0 0 currentColor", focus: "0 0 0 3px #FF3366" },
     typography: {
@@ -138,7 +138,7 @@ export const THEMES: Record<string, ThemeDefinition> = {
       border: "#E8DCD0",
       borderHover: "#B8863C",
     },
-    radii: { card: "1.5rem", button: "9999px", pill: "9999px", image: "2rem" },
+    radii: { card: "1.5rem", button: "9999px", pill: "9999px", image: "2rem", circle: "9999px" },
     blur: { card: "", glow: "" },
     shadow: { card: "none", focus: "0 0 0 3px #B8863C" },
     typography: {
@@ -162,6 +162,61 @@ export const THEMES: Record<string, ThemeDefinition> = {
       contact: { primary: "#936B30", accent: "#8FBC8F" },
     },
   },
+
+  /* ═══════════════════════════════════════════════
+   * MINIMALIST, Ink on paper
+   * VIBE: Putih bersih, satu grotesk, kontras skala
+   *       ekstrem, hairline, tanpa isian & bayangan
+   * LAYOUT: Lingkaran + tipografi raksasa, daftar
+   *         satu kolom dipisah garis rambut
+   * ═══════════════════════════════════════════════ */
+  "minimalist": {
+    id: "minimalist",
+    name: "Minimalist",
+    description: "Putih bersih dengan satu huruf sans-serif, tipografi raksasa, garis rambut, tanpa bayangan",
+    font: "Instrument Sans",
+    fontUrl: "https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;700&display=swap",
+    previewGradient: "bg-[#FFFFFF]",
+    colors: {
+      bg: "#FFFFFF",
+      bgSecondary: "#FAFAFA",
+      surface: "#F4F4F5",
+      surfaceHover: "#ECECEE",
+      text: "#111111",
+      textSecondary: "#52525B",
+      textMuted: "#71717A",
+      primary: "#111111",
+      onPrimary: "#FFFFFF",
+      primaryGlow: "rgba(17,17,17,0)",
+      secondary: "#71717A",
+      accent: "#111111",
+      border: "#E4E4E7",
+      borderHover: "#111111",
+    },
+    radii: { card: "0", button: "0", pill: "0", image: "0", circle: "9999px" },
+    blur: { card: "none", glow: "none" },
+    shadow: { card: "none", focus: "none" },
+    typography: {
+      display: "'Instrument Sans', ui-sans-serif, system-ui",
+      body: "'Instrument Sans', ui-sans-serif, system-ui",
+      eyebrow: "'Instrument Sans', ui-sans-serif, system-ui",
+    },
+    focusRing: { color: "#111111", width: "2px" },
+    sectionColors: {
+      hero: { primary: "#111111", accent: "#111111" },
+      about: { primary: "#111111", accent: "#52525B" },
+      stats: { primary: "#111111", accent: "#111111" },
+      experience: { primary: "#111111", accent: "#52525B" },
+      education: { primary: "#111111", accent: "#52525B" },
+      projects: { primary: "#111111", accent: "#111111" },
+      skills: { primary: "#111111", accent: "#52525B" },
+      certifications: { primary: "#111111", accent: "#52525B" },
+      organizations: { primary: "#111111", accent: "#52525B" },
+      hobbies: { primary: "#111111", accent: "#52525B" },
+      testimonials: { primary: "#111111", accent: "#52525B" },
+      contact: { primary: "#111111", accent: "#111111" },
+    },
+  },
 };
 
 export const TEMPLATE_PREVIEWS = {
@@ -176,6 +231,10 @@ export const TEMPLATE_PREVIEWS = {
   luxe: {
     hero: { name: "Maya Chen", title: "UI/UX Designer & Brand Strategist", tagline: "Crafting Human-Centered Experiences", bio: "Transforming complex problems into intuitive, beautiful design solutions." },
     stats: ["7+", "50+", "25+"],
+  },
+  minimalist: {
+    hero: { name: "Nadia P.", title: "Product Engineer", tagline: "Small Systems, Clear Thinking", bio: "I build quiet software for loud problems." },
+    stats: ["6+", "14+", "9+"],
   },
 } as const;
 

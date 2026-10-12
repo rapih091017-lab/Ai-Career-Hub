@@ -39,6 +39,7 @@ const HERO_ONLY: Record<ThemeId, PortfolioData> = {
   glass: thumbnailData("Alex", "Morgan", "Full-Stack Developer", "Designing scalable digital ecosystems", "Antarmuka cepat dengan arsitektur modern."),
   brutal: thumbnailData("Riley", "K.", "Creative Developer & Motion Designer", "Breaking boundaries with code", "Eksperimen interaksi web dan gerak."),
   luxe: thumbnailData("Maya", "Chen", "UI/UX Designer & Brand Strategist", "Crafting human-centered experiences", "Masalah rumit jadi produk yang enak dipakai."),
+  minimalist: thumbnailData("Nadia", "P.", "Product Engineer", "Small systems, clear thinking", "Perangkat lunak tenang untuk masalah yang ribut."),
 };
 
 const RICH: PortfolioData = {

@@ -23,7 +23,7 @@ export type SectionVisibility = Partial<Record<SectionId, boolean>>;
 
 /** Tema yang tersedia. Sumber kebenaran untuk union ThemeId sekaligus untuk
  *  validasi Zod (publishPayloadSchema.themeId). */
-export const THEME_IDS = ["glass", "brutal", "luxe"] as const;
+export const THEME_IDS = ["glass", "brutal", "luxe", "minimalist"] as const;
 
 export type ThemeId = (typeof THEME_IDS)[number];
 
@@ -45,7 +45,10 @@ export interface ThemeColors {
   borderHover: string;
 }
 
-export interface ThemeRadii { card: string; button: string; pill: string; image: string }
+/** `circle` dipakai untuk avatar/lingkaran dekoratif (mis. hero tema minimal).
+ *  Settiga tema lain tetap punya nilainya agar section tidak pernah menulis
+ *  `borderRadius` literal — Larangan Layer A. */
+export interface ThemeRadii { card: string; button: string; pill: string; image: string; circle: string }
 export interface ThemeBlur { card: string; glow: string }
 export interface ThemeShadow { card: string; focus: string }
 export interface ThemeTypography { display: string; body: string; eyebrow: string }

@@ -43,6 +43,26 @@ describe("token layer", () => {
     expect(THEMES.glass.blur.card).toBeTruthy();
   });
 
+  it("tema minimal: monokrom, radius 0, tanpa bayangan, font Google", () => {
+    const m = THEMES.minimalist;
+    expect(m.colors.bg).toBe("#FFFFFF");
+    expect(m.colors.text).toBe("#111111");
+    expect(m.colors.primary).toBe("#111111");
+    expect(m.colors.onPrimary).toBe("#FFFFFF");
+    expect(m.radii.card).toBe("0");
+    expect(m.shadow.card).toBe("none");
+    expect(m.blur.card).toBe("none");
+    expect(m.fontUrl).toContain("fonts.googleapis.com");
+    expect(m.fontUrl).toContain("Instrument+Sans");
+    expect(m.typography.display).toContain("Instrument Sans");
+  });
+
+  it("token circle ada di semua tema (lingkaran hero tidak boleh literal)", () => {
+    for (const id of THEME_IDS) {
+      expect(THEMES[id].radii.circle, `tema ${id} tidak punya radii.circle`).toBeTruthy();
+    }
+  });
+
   it("focusRing tidak lagi memakai teal app", () => {
     for (const id of THEME_IDS) {
       expect(THEMES[id].focusRing.color.toLowerCase()).not.toBe("#0d7377");
