@@ -327,15 +327,16 @@ function BrutalHero({ data: f, name, initials }: { data: PortfolioFormData; name
                   display: "inline-block",
                   boxShadow: theme.shadow.card,
                   background: theme.colors.primary,
-                  color: "#fff",
+                  // Warna teks di elemen INI sengaja tidak diset: currentColor
+                  // adalah bayangan hard-nya, jadi ikut warna teks tema (gelap).
+                  // Teks putihnya ada di span dalam.
                 }}
-                whileHover={{
-                  boxShadow: theme.shadow.card,
-                  scale: 1.02,
-                }}
+                whileHover={{ scale: 1.02 }}
                 transition={{ duration: 0.2 }}
               >
-                {name.split(" ").slice(1).join(" ") || "Saya"}
+                <span style={{ color: "#fff" }}>
+                  {name.split(" ").slice(1).join(" ") || "Saya"}
+                </span>
               </motion.span>
             </motion.h1>
 
