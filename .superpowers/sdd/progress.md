@@ -65,6 +65,23 @@ Base commit: `b8dd9ff`
 - Task 16: `.env` worktree gagal validasi `src/lib/env.ts` (AUTH_SECRET/DEEPSEEK) — semua route DB melempar saat dev tanpa env injection (pre-existing)
 - Task 16: sweep text-xs (37 pelanggaran) di 15 file portofolio; mockup visual setelah sweep belum diperiksa manusia
 
+## Hasil review akhir cabang (final whole-branch)
+
+Verdict awal **FIX FIRST** dengan 7 item — **semua sudah diperbaiki** (commit 6831137 + 82c4ba9):
+1. Critical: PublishDialog menjatuhkan sectionOrder/sectionVisibility (tanpa extras) → fallback ke data draft + test payload
+2. Fail-open quota → plan null + tombol retry "Coba lagi memeriksa"
+3. SLUG_REGEX duplikat di PublishDialog → pakai isValidSlug dari portfolio-safety
+4. Banner offline (draft.offline) di footer BuilderEditor + i18n `build.offline`
+5. `rounded-xl` literal di render/PortfolioPhotoUpload → inline style
+6. Definisi `portfolioTrialUses` mati dihapus dari schema
+7. Housekeeping: `.superpowers/sdd/*-review-package.md` di-gitignore, 3 package untracked, artefak dev dibuang, laporan/brief di-commit
+
+Triage lengkap review akhir (must-fix / follow-up / won't-fix) tercatat di laporan review dan sudah tereksekusi di atas untuk kategori must-fix.
+
+**Catatan flake**: `cv-pdf-debug.test.ts` pernah timeout 5000ms saat suite paralel penuh (test CV, pre-existing, lolos 2x saat dijalankan sendiri) — bukan regresi Spec 1.
+
+Gate akhir: tsc 0 · 390/390 test · build sukses · lint 0 error (28 warning pre-existing) · grep mutu bersih · smoke test server OK.
+
 ## Progress
 
 Task 1: complete (commits b8dd9ff..cdbfecd, spec PASS, quality APPROVED, 115 test, 4 fix wave)
@@ -82,3 +99,71 @@ Task 13: complete (commits 08eb483..ba9b8da, spec PASS, quality APPROVED, 353 te
 Task 14: complete (commits ba9b8da..9d79a7a, spec PASS, quality APPROVED, 381 test, 2 fix wave + 2 controller)
 Task 15: complete (commits 9d79a7a..a819bcb, spec PASS, quality APPROVED, 387 test, 0 fix wave)
 Task 16: complete (commits a819bcb..HEAD, semua gate hijau, 387 test, 1 fix — sweep text-xs)
+---
+
+# SDD Progress - Spec 2: Fondasi Tema
+
+Plan: docs/superpowers/plans/2026-10-12-portfolio-theme-foundation.md
+Spec: docs/superpowers/specs/2026-10-12-portfolio-theme-foundation-design.md
+Branch: feature/portfolio-themes
+Base commit: 641c722
+
+## Keputusan konsultan (mengikat)
+
+- lucide-react & framer-motion DITOLAK; Motion via motion/react, ikon SVG inline
+- Komponen MinimalistHero external DITOLAK sebagai unit; idenya jadi dasar Spec 2.5
+- Tema Minimalist DIUNDUR ke Spec 2.5
+- Token = field bertipe di ThemeDefinition (bukan CSS-var, bukan Tailwind)
+- Enforcement = 2 layer Vitest (bukan ESLint)
+- next/font DITOLAK (mati di export); fontUrl Google Fonts only
+
+## Progress
+
+Task 1 (Spec2): complete (commits d9656ad..b257fe0, spec PASS, quality APPROVED, 411 test, 1 fix wave)
+
+## Minor findings Spec 2
+- T1: shadow.focus glass alpha0.55 vs focusRing hex; focusRing/shadow.focus duplikat colors.primary (sinkron di T5)
+- T1: fallback font bare sans-serif, spec minta stack eksplisit ui-sans-serif, system-ui (selesaikan di T4/T6)
+- T1: list grup token di test hardcoded (tsc yang jaring sub-field)
+- T1: T5 pakai outline via focusRing agar test Luxe box-shadow hanya none tak bentrok shadow.focus
+- T1: tabel survey di report berisi angka brutal pre-revert (tabel deviasi sudah benar)
+
+Task 2 (Spec2): complete (commits 9e9a81c..52fa596, spec PASS, quality fix wave 1, 426 test)
+
+## Minor findings Spec 2 (lanjutan)
+- T2: regex Layer A lebih sempit dari spek (shadow-xs/inner/rounded-[1.25rem] lolos) - belum ada pelanggaran hari ini, perluas sebelum T3
+- T2: file pending PASS normal (bukan todo) - kode menang, catatan proses
+- T2: strip komentar bisa menyembunyikan pelanggaran bila URL // di baris sama - belum terjadi
+- T2: tak ada larangan literal backdropFilter blur (rekrusemen bisa lolos di T3)
+- T2: hex 8 digit #RRGGBBAA lolos aturan hex
+- T2: FloatingParticles dobel sumber (theme radius + colors prop) - disengaja, diff minimal
+
+Task 3 (Spec2): complete (commits f40d2a1..9123c10, spec PASS, quality APPROVED, 426 test, 3 penguatan Layer A)
+
+## Minor findings Spec 2 (lanjutan)
+- T3: boxShadow literal dalam ternary/template luput dari regex quote-anchored - pindah ke T4 (penguatan)
+- T3: rounded-[bracket] tidak tertangkap - sifatnya sama, pindah ke T4
+- T3: filter (sepia luxe), outline, textShadow di luar daftar Layer A - kandidat amandemen spek; sepia mungkin jadi token tanda tangan Luxe
+- T3: hex 4 digit #RGBA lolos
+- T3: blur-[120px] dekoratif di luar aturan; glow token siap jadi target setelah aturan ada
+- T3: sudut bezel glass (image2rem vs card1.5rem) membentuk wedge ~4px - cek visual di T5
+- T3: halo dot timeline + bayangan alternasi testimoni hilang (aturan 1 bayangan/tema) - jalur pemulihan slot shadow.ring masa depan
+- T3: drop-shadow-sm ikut regex (0 kejadian)
+
+Task 5 (Spec2): complete (commits 6179268..31cb6c1, kontras 12/12, token onPrimary additive,455 test, dikerjakan controller - subagent batal)
+Task 6 (Spec2): complete (commits 31cb6c1..6f4d8ca, fontUrl Google-only + ThemeFonts preview2 cabang,459 test)
+
+## Deviasi/kekhawatiran batch A
+- BuilderEditor ternyata form akordeon tanpa kanvas - ThemeFonts cukup di preview (asumsi plan salah)
+- focusRing brutal/luxe hex lama (lolos >=3.0); sinkron ke primary baru ditunda
+- colors.accent brutal #FFCC00 di luar pasangan uji (spek hanya .primary)
+- 12 situs ganti white->onPrimary; lihat laporan task-5-6-report.md
+
+Task 7+8 (Spec2): complete (commits 2fb3803..8e37655, re-compose6x3 + sweep EN->ID + Layer C guard,471 test, subagent sukses)
+- flake 1x tak terulang (2 run bersih), visual via render statis bukan preview live, Tools/Project Selesai per konvensi i18n
+
+Task 9+10 (Spec2): complete (commits 4c7ecdc..964278d + gate tanpa perbaikan,474 test, controller inline - subagent batal)
+- SSR /portfolio client-gated; kebenaran thumbnail dibuktikan test jsdom bukan SSR
+
+## SEMUA 10 TASK SPEC 2 SELESAI - tinggal review akhir cabang
+

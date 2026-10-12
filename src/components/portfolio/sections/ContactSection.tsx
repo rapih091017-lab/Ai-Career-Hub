@@ -11,11 +11,11 @@ function ContactButton({ href, label }: { href: string; label: string }) {
   const theme = usePortfolioTheme();
   return (
     <a href={href} target="_blank" rel="noopener noreferrer"
-      className="group inline-flex items-center gap-3 rounded-full font-semibold transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.98]"
-      style={{ background: theme.colors.primary, color: "#fff", padding: "12px 24px", fontSize: 13 }}>
+      className="group inline-flex items-center gap-3 font-semibold transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.98]"
+      style={{ background: theme.colors.primary, color: theme.colors.onPrimary, padding: "12px 24px", fontSize: 13, borderRadius: theme.radii.button }}>
       <span>{label}</span>
-      <span className="w-7 h-7 rounded-full flex items-center justify-center transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-        style={{ background: "rgba(255,255,255,0.15)" }}>
+      <span className="w-7 h-7 flex items-center justify-center transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+        style={{ background: "rgba(255,255,255,0.15)", borderRadius: theme.radii.pill }}>
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
           <path d="M5 12h14M12 5l7 7-7 7" />
         </svg>
@@ -39,9 +39,10 @@ function GlassContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: Ext
           viewport={{ once: true }}
           transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1] }}
         >
-          <div className="overflow-hidden rounded-2xl" style={{
+          <div className="overflow-hidden" style={{
             background: `${theme.colors.surface}`,
-            backdropFilter: "blur(30px)",
+            borderRadius: theme.radii.card,
+            backdropFilter: theme.blur.card,
             border: `1px solid ${theme.colors.border}`,
           }}>
             {/* Top accent bar */}
@@ -67,8 +68,8 @@ function GlassContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: Ext
                 <div className="flex flex-wrap justify-center gap-2 pt-4" style={{ borderTop: `1px solid ${theme.colors.border}` }}>
                   {extraLinks.filter(l => l.url).map(link => (
                     <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer"
-                      className="px-3 py-1.5 rounded-full text-xs transition-all duration-500 hover:scale-105"
-                      style={{ background: `${theme.colors.primary}08`, color: theme.colors.textMuted, border: `1px solid ${theme.colors.border}` }}>
+                      className="px-3 py-1.5 text-xs transition-all duration-500 hover:scale-105"
+                      style={{ background: `${theme.colors.primary}08`, color: theme.colors.textMuted, border: `1px solid ${theme.colors.border}`, borderRadius: theme.radii.pill }}>
                       {link.label || "Link"}
                     </a>
                   ))}
@@ -99,12 +100,12 @@ function BrutalContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: Ex
           className="relative"
         >
           {/* Full-width bold block */}
-          <div className="p-2" style={{ background: theme.colors.border, borderRadius: "2rem" }}>
+          <div className="p-2" style={{ background: theme.colors.border, borderRadius: theme.radii.card }}>
             <div className="p-10 md:p-14 text-center" style={{
               background: theme.colors.bg,
-              borderRadius: "calc(2rem - 4px)",
+              borderRadius: theme.radii.card,
               border: `4px solid ${theme.colors.border}`,
-              boxShadow: `8px 8px 0px ${theme.colors.border}`,
+              boxShadow: theme.shadow.card,
             }}>
               <h2 className="font-black mb-3" style={{ fontSize: "clamp(1.8rem, 4vw, 2.8rem)", color: theme.colors.text, letterSpacing: "-0.04em" }}>
                 HUBUNGI SAYA
@@ -121,8 +122,8 @@ function BrutalContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: Ex
           </div>
 
           {/* Bold shadow offset */}
-          <div className="absolute -bottom-3 -right-3 -z-10 w-full h-full rounded-[2rem] opacity-12"
-            style={{ background: theme.colors.accent, border: `3px solid ${theme.colors.border}` }} />
+          <div className="absolute -bottom-3 -right-3 -z-10 w-full h-full opacity-12"
+            style={{ background: theme.colors.accent, border: `3px solid ${theme.colors.border}`, borderRadius: theme.radii.card }} />
         </motion.div>
       </div>
     </section>
@@ -145,10 +146,10 @@ function LuxeContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: Extr
           transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1] }}
         >
           {/* Elegant card with small decorative elements */}
-          <div className="p-1" style={{ background: theme.colors.bgSecondary, borderRadius: "2.5rem", border: `1px solid ${theme.colors.border}` }}>
+          <div className="p-1" style={{ background: theme.colors.bgSecondary, borderRadius: theme.radii.image, border: `1px solid ${theme.colors.border}` }}>
             <div className="p-10 md:p-14 text-center" style={{
               background: theme.colors.surface,
-              borderRadius: "calc(2.5rem - 0.25rem)",
+              borderRadius: theme.radii.image,
               position: "relative",
             }}>
               {/* Decorative corner accents */}
@@ -158,23 +159,23 @@ function LuxeContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: Extr
               <div className="absolute bottom-4 right-4 w-6 h-6" style={{ borderBottom: `1px solid ${theme.colors.border}`, borderRight: `1px solid ${theme.colors.border}`, opacity: 0.5 }} />
 
               <span className="font-medium" style={{ color: theme.colors.primary, fontSize: 12, letterSpacing: "0.15em", textTransform: "uppercase" }}>
-                GET IN TOUCH
+                HUBUNGI SAYA
               </span>
 
               <div className="flex items-center gap-4 justify-center mt-2 mb-4">
                 <div style={{ width: 24, height: 1, background: theme.colors.border }} />
-                <h2 className="font-bold" style={{ fontSize: "clamp(1.8rem, 4vw, 2.8rem)", color: theme.colors.text, fontFamily: "Playfair Display, serif" }}>
-                  Let&apos;s Work Together
+                <h2 className="font-bold" style={{ fontSize: "clamp(1.8rem, 4vw, 2.8rem)", color: theme.colors.text, fontFamily: theme.typography.display }}>
+                  Mari Berkolaborasi
                 </h2>
                 <div style={{ width: 24, height: 1, background: theme.colors.border }} />
               </div>
 
               <p className="text-sm mb-8 max-w-md mx-auto" style={{ color: theme.colors.textMuted }}>
-                I&apos;m always open to discussing new projects, creative ideas, or opportunities.
+                Saya selalu terbuka untuk membahas proyek baru, ide kreatif, atau peluang kerja sama.
               </p>
 
               <div className="flex flex-wrap justify-center gap-3">
-                {f.contactEmail && <ContactButton href={`mailto:${f.contactEmail}`} label="Send Email" />}
+                {f.contactEmail && <ContactButton href={`mailto:${f.contactEmail}`} label="Kirim Email" />}
                 {f.contactLinkedin && <ContactButton href={`https://${f.contactLinkedin.replace(/^https?:\/\//, "")}`} label="LinkedIn" />}
                 {f.contactGithub && <ContactButton href={`https://${f.contactGithub.replace(/^https?:\/\//, "")}`} label="GitHub" />}
               </div>

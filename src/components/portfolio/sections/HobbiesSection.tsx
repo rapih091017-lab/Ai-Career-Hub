@@ -44,10 +44,11 @@ function GlassHobbies({ items }: { items: HobbyItem[] }) {
               viewport={{ once: true }}
               transition={{ delay: i * 0.05, duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
             >
-              <div className="px-4 py-2.5 rounded-full flex items-center gap-2" style={{
+              <div className="px-4 py-2.5 flex items-center gap-2" style={{
                 background: `${theme.colors.surface}B3`,
                 border: `1px solid ${theme.colors.border}`,
-                backdropFilter: "blur(20px)",
+                backdropFilter: theme.blur.card,
+                borderRadius: theme.radii.pill,
               }}>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={theme.colors.primary} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   {HOBBY_ICONS[i % HOBBY_ICONS.length]}
@@ -97,11 +98,11 @@ function BrutalHobbies({ items }: { items: HobbyItem[] }) {
               <div className="p-4 text-center" style={{
                 background: theme.colors.surface,
                 border: `3px solid ${theme.colors.border}`,
-                borderRadius: "0.75rem",
-                boxShadow: `4px 4px 0px ${theme.colors.border}`,
+                borderRadius: theme.radii.card,
+                boxShadow: theme.shadow.card,
               }}>
                 <div className="w-9 h-9 mx-auto mb-2 flex items-center justify-center" style={{ background: theme.colors.primary }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={theme.colors.onPrimary} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                     {HOBBY_ICONS[i % HOBBY_ICONS.length]}
                   </svg>
                 </div>
@@ -118,7 +119,7 @@ function BrutalHobbies({ items }: { items: HobbyItem[] }) {
   );
 }
 
-/* ═══ LUXE, editorial list ═══ */
+/* ═══ LUXE, ledger hairline — nomor serif + nama serif, tanpa kartu ═══ */
 function LuxeHobbies({ items }: { items: HobbyItem[] }) {
   const theme = usePortfolioTheme();
   const filtered = items.filter(h => h.name);
@@ -134,17 +135,17 @@ function LuxeHobbies({ items }: { items: HobbyItem[] }) {
           transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
         >
           <span className="font-medium" style={{ color: theme.colors.primary, fontSize: 12, letterSpacing: "0.15em", textTransform: "uppercase" }}>
-            INTERESTS
+            MINAT
           </span>
           <div className="flex items-center gap-4 mt-2 mb-10">
-            <h2 className="font-bold" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: theme.colors.text, fontFamily: "Playfair Display, serif" }}>
+            <h2 className="font-bold" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: theme.colors.text, fontFamily: theme.typography.display }}>
               Hobi &amp; Minat
             </h2>
             <div className="flex-1" style={{ height: 1, background: theme.colors.border }} />
           </div>
         </motion.div>
 
-        <div className="flex flex-wrap gap-3">
+        <div style={{ borderTop: `1px solid ${theme.colors.border}` }}>
           {filtered.map((hobby, i) => (
             <motion.div
               key={hobby.id}
@@ -152,16 +153,19 @@ function LuxeHobbies({ items }: { items: HobbyItem[] }) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.05, duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
+              className="grid grid-cols-[2.5rem_1fr] gap-x-4 items-baseline py-4"
+              style={{ borderBottom: `1px solid ${theme.colors.border}` }}
             >
-              <div className="px-4 py-2.5 flex items-center gap-2" style={{
-                background: theme.colors.surface,
-                border: `1px solid ${theme.colors.border}`,
-                borderRadius: "999px",
-              }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={theme.colors.primary} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                  {HOBBY_ICONS[i % HOBBY_ICONS.length]}
-                </svg>
-                <span className="text-sm" style={{ color: theme.colors.text, fontFamily: "Playfair Display, serif" }}>{hobby.name}</span>
+              <span style={{ fontFamily: theme.typography.display, fontSize: "1.05rem", color: theme.colors.primary }}>
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <div className="flex items-baseline gap-3 flex-wrap">
+                <span style={{ fontFamily: theme.typography.display, fontSize: "1.05rem", color: theme.colors.text }}>
+                  {hobby.name}
+                </span>
+                {hobby.description && (
+                  <span className="text-sm" style={{ color: theme.colors.textMuted }}>— {hobby.description}</span>
+                )}
               </div>
             </motion.div>
           ))}

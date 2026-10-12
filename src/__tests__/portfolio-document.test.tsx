@@ -380,9 +380,9 @@ describe("PortfolioDocument", () => {
     const { container } = render(
       <PortfolioDocument data={data} themeId="brutal" mode="static" />,
     );
-    // projects bawaan brutal: primary #3366FF, hero #FF3366
-    expect(subtreeMent(anchor(container, "projects"), "#3366ff")).toBe(true);
-    expect(subtreeMent(anchor(container, "hero"), "#ff3366")).toBe(true);
+    // projects bawaan brutal: primary biru tua #1D4ED8, hero crimson #E40039 (hasil geser kontras)
+    expect(subtreeMent(anchor(container, "projects"), "#1D4ED8")).toBe(true);
+    expect(subtreeMent(anchor(container, "hero"), "#E40039")).toBe(true);
   });
 
   it("menolak override warna yang bisa menyuntik deklarasi CSS lain", () => {

@@ -36,13 +36,14 @@ function GlassSkills({ f }: { f: PortfolioFormData }) {
                       whileInView={{ opacity: 1, scale: 1, x: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: i * 0.04, duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
-                      className="flex-shrink-0 px-5 py-2.5 rounded-full text-sm font-medium transition-all hover:scale-105"
+                      className="flex-shrink-0 px-5 py-2.5 text-sm font-medium transition-all hover:scale-105"
                       style={{
                         background: `${theme.colors.surface}`,
                         border: `1px solid ${theme.colors.border}`,
                         color: theme.colors.textSecondary,
-                        backdropFilter: "blur(20px)",
-                        boxShadow: `0 2px 8px ${theme.colors.primaryGlow}`,
+                        borderRadius: theme.radii.pill,
+                        backdropFilter: theme.blur.card,
+                        boxShadow: theme.shadow.card,
                       }}>
                       {skill}
                     </motion.span>
@@ -51,9 +52,9 @@ function GlassSkills({ f }: { f: PortfolioFormData }) {
               </div>
               {/* Fade hints */}
               <div className="flex gap-1 mt-3 justify-center">
-                <div className="w-1.5 h-1.5 rounded-full" style={{ background: theme.colors.primary, opacity: 0.5 }} />
-                <div className="w-1.5 h-1.5 rounded-full" style={{ background: theme.colors.border }} />
-                <div className="w-1.5 h-1.5 rounded-full" style={{ background: theme.colors.border }} />
+                <div className="w-1.5 h-1.5" style={{ background: theme.colors.primary, opacity: 0.5, borderRadius: theme.radii.pill }} />
+                <div className="w-1.5 h-1.5" style={{ background: theme.colors.border, borderRadius: theme.radii.pill }} />
+                <div className="w-1.5 h-1.5" style={{ background: theme.colors.border, borderRadius: theme.radii.pill }} />
               </div>
             </>
           )}
@@ -109,14 +110,14 @@ function BrutalSkills({ f }: { f: PortfolioFormData }) {
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.05, duration: 0.4 }}
                   className="p-3 text-center font-bold text-sm transition-all hover:-translate-y-0.5 hover:translate-x-0.5"
-                  style={{ background: theme.colors.surface, border: `3px solid ${theme.colors.border}`, boxShadow: `5px 5px 0px ${theme.colors.border}`, color: theme.colors.text }}>
+                  style={{ background: theme.colors.surface, border: `3px solid ${theme.colors.border}`, boxShadow: theme.shadow.card, color: theme.colors.text }}>
                   {skill}
                 </motion.div>
               ))}
             </div>
           )}
           {(f.skillsTools || f.skillsLanguages) && (
-            <div className="mt-6 p-4" style={{ background: theme.colors.surface, border: `3px solid ${theme.colors.border}`, boxShadow: `6px 6px 0px ${theme.colors.border}` }}>
+            <div className="mt-6 p-4" style={{ background: theme.colors.surface, border: `3px solid ${theme.colors.border}`, boxShadow: theme.shadow.card }}>
               {f.skillsTools && <p className="text-sm" style={{ color: theme.colors.textMuted }}><span className="font-bold" style={{ color: theme.colors.text }}>Tools:</span> {f.skillsTools}</p>}
               {f.skillsLanguages && <p className="text-sm mt-1" style={{ color: theme.colors.textMuted }}><span className="font-bold" style={{ color: theme.colors.text }}>Bahasa:</span> {f.skillsLanguages}</p>}
             </div>
@@ -145,16 +146,16 @@ function LuxeSkills({ f }: { f: PortfolioFormData }) {
           viewport={{ once: true }}
           transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1] }}
         >
-          <span className="font-medium" style={{ color: theme.colors.primary, fontSize: 12, letterSpacing: "0.15em", textTransform: "uppercase" }}>SKILLS</span>
+          <span className="font-medium" style={{ color: theme.colors.primary, fontSize: 12, letterSpacing: "0.15em", textTransform: "uppercase" }}>KEAHLIAN</span>
 
           {/* Decorative header bar */}
           <div className="flex items-center gap-4 my-4">
-            <h2 className="font-bold" style={{ fontSize: "clamp(1.3rem, 2.5vw, 1.8rem)", color: theme.colors.text, fontFamily: "Playfair Display, serif" }}>
-              Expertise
+            <h2 className="font-bold" style={{ fontSize: "clamp(1.3rem, 2.5vw, 1.8rem)", color: theme.colors.text, fontFamily: theme.typography.display }}>
+              Keahlian
             </h2>
             <div className="flex-1" style={{ height: 1, background: theme.colors.border }} />
             <span className="text-xs uppercase tracking-widest" style={{ color: theme.colors.textMuted }}>
-              {skillTags.length} Areas
+              {skillTags.length} Bidang
             </span>
           </div>
 
@@ -162,9 +163,9 @@ function LuxeSkills({ f }: { f: PortfolioFormData }) {
           <div className="space-y-4">
             {/* Primary Skills */}
             {skillTags.length > 0 && (
-              <div className="p-1" style={{ background: theme.colors.bgSecondary, borderRadius: "1.5rem", border: `1px solid ${theme.colors.border}` }}>
-                <div className="p-5" style={{ background: theme.colors.surface, borderRadius: "calc(1.5rem - 0.25rem)" }}>
-                  <span className="text-xs font-medium uppercase tracking-widest" style={{ color: theme.colors.primary }}>Core Competencies</span>
+              <div className="p-1" style={{ background: theme.colors.bgSecondary, borderRadius: theme.radii.card, border: `1px solid ${theme.colors.border}` }}>
+                <div className="p-5" style={{ background: theme.colors.surface, borderRadius: theme.radii.card }}>
+                  <span className="text-xs font-medium uppercase tracking-widest" style={{ color: theme.colors.primary }}>Kompetensi Utama</span>
                   <div className="flex flex-wrap gap-2 mt-3">
                     {skillTags.map((skill, i) => (
                       <motion.span key={skill}
@@ -173,7 +174,7 @@ function LuxeSkills({ f }: { f: PortfolioFormData }) {
                         viewport={{ once: true }}
                         transition={{ delay: i * 0.04, duration: 0.3 }}
                         className="px-4 py-1.5 text-sm font-medium"
-                        style={{ background: `${theme.colors.primary}06`, color: theme.colors.text, border: `1px solid ${theme.colors.border}`, borderRadius: "100px" }}>
+                        style={{ background: `${theme.colors.primary}06`, color: theme.colors.text, border: `1px solid ${theme.colors.border}`, borderRadius: theme.radii.pill }}>
                         {skill}
                       </motion.span>
                     ))}
@@ -185,17 +186,17 @@ function LuxeSkills({ f }: { f: PortfolioFormData }) {
             {/* Tools & Languages rows */}
             <div className="grid md:grid-cols-2 gap-3">
               {f.skillsTools && (
-                <div className="p-1" style={{ background: theme.colors.bgSecondary, borderRadius: "1.5rem", border: `1px solid ${theme.colors.border}` }}>
-                  <div className="p-4" style={{ background: theme.colors.surface, borderRadius: "calc(1.5rem - 0.25rem)" }}>
+                <div className="p-1" style={{ background: theme.colors.bgSecondary, borderRadius: theme.radii.card, border: `1px solid ${theme.colors.border}` }}>
+                  <div className="p-4" style={{ background: theme.colors.surface, borderRadius: theme.radii.card }}>
                     <span className="text-xs font-medium uppercase tracking-widest" style={{ color: theme.colors.textMuted }}>Tools</span>
                     <p className="text-sm mt-1" style={{ color: theme.colors.textSecondary }}>{f.skillsTools}</p>
                   </div>
                 </div>
               )}
               {f.skillsLanguages && (
-                <div className="p-1" style={{ background: theme.colors.bgSecondary, borderRadius: "1.5rem", border: `1px solid ${theme.colors.border}` }}>
-                  <div className="p-4" style={{ background: theme.colors.surface, borderRadius: "calc(1.5rem - 0.25rem)" }}>
-                    <span className="text-xs font-medium uppercase tracking-widest" style={{ color: theme.colors.textMuted }}>Languages</span>
+                <div className="p-1" style={{ background: theme.colors.bgSecondary, borderRadius: theme.radii.card, border: `1px solid ${theme.colors.border}` }}>
+                  <div className="p-4" style={{ background: theme.colors.surface, borderRadius: theme.radii.card }}>
+                    <span className="text-xs font-medium uppercase tracking-widest" style={{ color: theme.colors.textMuted }}>Bahasa</span>
                     <p className="text-sm mt-1" style={{ color: theme.colors.textSecondary }}>{f.skillsLanguages}</p>
                   </div>
                 </div>

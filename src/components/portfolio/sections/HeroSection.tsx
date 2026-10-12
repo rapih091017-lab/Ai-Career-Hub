@@ -14,21 +14,23 @@ function FancyButton({ href, label, primary }: { href: string; label: string; pr
   return (
     <a
       href={href}
-      className="group inline-flex items-center gap-3 rounded-full font-semibold transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.98]"
+      className="group inline-flex items-center gap-3 font-semibold transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.98]"
       style={{
         background: primary ? theme.colors.primary : "transparent",
-        color: primary ? "#fff" : theme.colors.textSecondary,
+        color: primary ? theme.colors.onPrimary : theme.colors.textSecondary,
         border: primary ? "none" : `2px solid ${theme.colors.border}`,
         padding: "12px 24px 12px 28px",
         fontSize: 14,
+        borderRadius: theme.radii.button,
       }}
     >
       <span>{label}</span>
       <span
-        className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:scale-105"
+        className="w-8 h-8 flex items-center justify-center transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:scale-105"
         style={{
           background: primary ? "rgba(255,255,255,0.15)" : `${theme.colors.primary}15`,
-          color: primary ? "#fff" : theme.colors.primary,
+          color: primary ? theme.colors.onPrimary : theme.colors.primary,
+          borderRadius: theme.radii.pill,
         }}
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -44,11 +46,12 @@ function Eyebrow({ text }: { text: string }) {
   const theme = usePortfolioTheme();
   return (
     <span
-      className="inline-block rounded-full px-3 py-1 text-xs uppercase tracking-[0.2em] font-medium mb-6"
+      className="inline-block px-3 py-1 text-xs uppercase tracking-[0.2em] font-medium mb-6"
       style={{
         background: `${theme.colors.primary}12`,
         color: theme.colors.primary,
         border: `1px solid ${theme.colors.primary}20`,
+        borderRadius: theme.radii.pill,
       }}
     >
       {text}
@@ -58,6 +61,7 @@ function Eyebrow({ text }: { text: string }) {
 
 /* ─── Floating particles helper ─── */
 function FloatingParticles({ count = 6, colors }: { count?: number; colors: { primary: string; accent: string } }) {
+  const theme = usePortfolioTheme();
   const reduced = useReducedMotion();
   const particles = useMemo(() =>
     Array.from({ length: count }, (_, i) => ({
@@ -78,7 +82,7 @@ function FloatingParticles({ count = 6, colors }: { count?: number; colors: { pr
       {particles.map((p, i) => (
         <motion.div
           key={i}
-          className="absolute rounded-full"
+          className="absolute"
           style={{
             width: p.size,
             height: p.size,
@@ -86,6 +90,7 @@ function FloatingParticles({ count = 6, colors }: { count?: number; colors: { pr
             opacity: 0.08 + (i % 3) * 0.04,
             left: `${p.left}%`,
             top: `${p.top}%`,
+            borderRadius: theme.radii.pill,
           }}
           animate={{
             y: [0, p.yOffset, 0],
@@ -152,8 +157,8 @@ function GlassHero({ data: f, name, initials }: { data: PortfolioFormData; name:
       {/* Animated gradient orbs */}
       <div className="pf-atmosphere absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
-          className="absolute w-[600px] h-[600px] rounded-full blur-[120px]"
-          style={{ background: theme.colors.primary, top: "-30%", right: "-10%", opacity: 0.08 }}
+          className="absolute w-[600px] h-[600px] blur-[120px]"
+          style={{ background: theme.colors.primary, top: "-30%", right: "-10%", opacity: 0.08, borderRadius: theme.radii.pill }}
           animate={{
             scale: [1, 1.15, 1, 1.1, 1],
             rotate: [0, 10, -5, 5, 0],
@@ -162,8 +167,8 @@ function GlassHero({ data: f, name, initials }: { data: PortfolioFormData; name:
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute w-[500px] h-[500px] rounded-full blur-[100px]"
-          style={{ background: theme.colors.accent, bottom: "-20%", left: "-10%", opacity: 0.06 }}
+          className="absolute w-[500px] h-[500px] blur-[100px]"
+          style={{ background: theme.colors.accent, bottom: "-20%", left: "-10%", opacity: 0.06, borderRadius: theme.radii.pill }}
           animate={{
             scale: [1, 1.2, 0.95, 1.1, 1],
             rotate: [0, -10, 8, -5, 0],
@@ -250,8 +255,8 @@ function GlassHero({ data: f, name, initials }: { data: PortfolioFormData; name:
             }}
             className="mt-16 inline-block"
           >
-            <div className="p-1.5" style={{ background: `${theme.colors.primary}08`, borderRadius: "2rem", border: `1px solid ${theme.colors.border}` }}>
-              <div className="overflow-hidden" style={{ borderRadius: "calc(2rem - 0.375rem)", boxShadow: "inset 0 1px 1px rgba(255,255,255,0.1)" }}>
+            <div className="p-1.5" style={{ background: `${theme.colors.primary}08`, borderRadius: theme.radii.image, border: `1px solid ${theme.colors.border}` }}>
+              <div className="overflow-hidden" style={{ borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
                 <motion.img
                   src={f.heroPhotoUrl}
                   alt={name}
@@ -320,17 +325,18 @@ function BrutalHero({ data: f, name, initials }: { data: PortfolioFormData; name
                 style={{
                   padding: "0 4px",
                   display: "inline-block",
-                  boxShadow: `8px 8px 0px ${theme.colors.border}`,
+                  boxShadow: theme.shadow.card,
                   background: theme.colors.primary,
-                  color: "#fff",
+                  // Warna teks di elemen INI sengaja tidak diset: currentColor
+                  // adalah bayangan hard-nya, jadi ikut warna teks tema (gelap).
+                  // Teks putihnya ada di span dalam.
                 }}
-                whileHover={{
-                  boxShadow: `4px 4px 0px ${theme.colors.border}`,
-                  scale: 1.02,
-                }}
+                whileHover={{ scale: 1.02 }}
                 transition={{ duration: 0.2 }}
               >
-                {name.split(" ").slice(1).join(" ") || "Saya"}
+                <span style={{ color: theme.colors.onPrimary }}>
+                  {name.split(" ").slice(1).join(" ") || "Saya"}
+                </span>
               </motion.span>
             </motion.h1>
 
@@ -369,8 +375,8 @@ function BrutalHero({ data: f, name, initials }: { data: PortfolioFormData; name
             }}
             className="relative"
           >
-            <div className="p-2" style={{ background: theme.colors.border, borderRadius: "1.5rem" }}>
-              <div className="overflow-hidden" style={{ borderRadius: "calc(1.5rem - 0.5rem)", border: `4px solid ${theme.colors.bg}` }}>
+            <div className="p-2" style={{ background: theme.colors.border, borderRadius: theme.radii.image }}>
+              <div className="overflow-hidden" style={{ borderRadius: theme.radii.card, border: `4px solid ${theme.colors.bg}` }}>
                 {f.heroPhotoUrl ? (
                   <motion.img
                     src={f.heroPhotoUrl}
@@ -398,7 +404,7 @@ function BrutalHero({ data: f, name, initials }: { data: PortfolioFormData; name
                 width: "100%",
                 height: "100%",
                 border: `4px solid ${theme.colors.border}`,
-                borderRadius: "1.5rem",
+                borderRadius: theme.radii.card,
                 background: theme.colors.accent,
                 opacity: 0.15,
               }}
@@ -459,10 +465,10 @@ function LuxeHero({ data: f, name, initials }: { data: PortfolioFormData; name: 
                 fontSize: 13,
                 letterSpacing: "0.15em",
                 textTransform: "uppercase",
-                fontFamily: "Sora, sans-serif",
+                fontFamily: theme.typography.eyebrow,
               }}
             >
-              {f.heroSubHeadline || "INTRODUCING"}
+              {f.heroSubHeadline || "PERKENALKAN"}
             </motion.span>
 
             <motion.h1
@@ -472,7 +478,7 @@ function LuxeHero({ data: f, name, initials }: { data: PortfolioFormData; name: 
                 fontSize: "clamp(2.8rem, 7vw, 5rem)",
                 color: theme.colors.text,
                 fontWeight: 700,
-                fontFamily: "Playfair Display, serif",
+                fontFamily: theme.typography.display,
                 letterSpacing: "-0.02em",
               }}
             >
@@ -492,21 +498,21 @@ function LuxeHero({ data: f, name, initials }: { data: PortfolioFormData; name: 
                 animate={{ width: [40, 60, 40] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
               />
-              <span style={{ fontSize: 11, color: theme.colors.textMuted, letterSpacing: "0.2em", textTransform: "uppercase", fontFamily: "Sora, sans-serif" }}>
+              <span style={{ fontSize: 11, color: theme.colors.textMuted, letterSpacing: "0.2em", textTransform: "uppercase", fontFamily: theme.typography.eyebrow }}>
                 {f.heroHeadline || "PORTFOLIO"}
               </span>
               <div className="flex-1" style={{ height: 1, background: theme.colors.border }} />
             </motion.div>
 
             {f.heroBio && (
-              <motion.p variants={STAGGER_CHILD_SLOW} className="max-w-md mb-10 leading-relaxed" style={{ color: theme.colors.textMuted, fontSize: 15, fontFamily: "Sora, sans-serif" }}>
+              <motion.p variants={STAGGER_CHILD_SLOW} className="max-w-md mb-10 leading-relaxed" style={{ color: theme.colors.textMuted, fontSize: 15, fontFamily: theme.typography.body }}>
                 {f.heroBio}
               </motion.p>
             )}
 
             <motion.div variants={STAGGER_CHILD} className="flex gap-4 flex-wrap">
-              <FancyButton href="#projects" label="View Work" primary />
-              <FancyButton href="#contact" label="Get in Touch" />
+              <FancyButton href="#projects" label="Lihat Karya" primary />
+              <FancyButton href="#contact" label="Hubungi Saya" />
             </motion.div>
           </motion.div>
 
@@ -524,8 +530,8 @@ function LuxeHero({ data: f, name, initials }: { data: PortfolioFormData; name: 
               y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 },
             }}
           >
-            <div className="p-2" style={{ background: theme.colors.bgSecondary, borderRadius: "2rem", border: `1px solid ${theme.colors.border}` }}>
-              <div className="overflow-hidden" style={{ borderRadius: "calc(2rem - 0.5rem)", boxShadow: "inset 0 1px 2px rgba(0,0,0,0.05)" }}>
+            <div className="p-2" style={{ background: theme.colors.bgSecondary, borderRadius: theme.radii.image, border: `1px solid ${theme.colors.border}` }}>
+              <div className="overflow-hidden" style={{ borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
                 {f.heroPhotoUrl ? (
                   <motion.img
                     src={f.heroPhotoUrl}
@@ -536,7 +542,7 @@ function LuxeHero({ data: f, name, initials }: { data: PortfolioFormData; name: 
                   />
                 ) : (
                   <div style={{ width: "100%", height: 420, background: theme.colors.surface, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <span style={{ fontSize: 100, fontWeight: 700, color: theme.colors.textMuted, opacity: 0.1, fontFamily: "Playfair Display, serif" }}>{initials}</span>
+                    <span style={{ fontSize: 100, fontWeight: 700, color: theme.colors.textMuted, opacity: 0.1, fontFamily: theme.typography.display }}>{initials}</span>
                   </div>
                 )}
               </div>

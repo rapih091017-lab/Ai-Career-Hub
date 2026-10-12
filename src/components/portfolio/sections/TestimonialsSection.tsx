@@ -21,8 +21,8 @@ function GlassTestimonials({ items }: { items: TestimonialItem[] }) {
     <section className="relative overflow-hidden" style={{ padding: "96px 0" }}>
       <div className="pf-atmosphere absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
-          className="absolute w-[500px] h-[500px] rounded-full blur-[120px]"
-          style={{ background: theme.colors.accent, top: "20%", left: "50%", transform: "translateX(-50%)", opacity: 0.04 }}
+          className="absolute w-[500px] h-[500px] blur-[120px]"
+          style={{ background: theme.colors.accent, top: "20%", left: "50%", transform: "translateX(-50%)", opacity: 0.04, borderRadius: theme.radii.pill }}
           {...(!reduced ? { animate: { scale: [1, 1.1, 1], opacity: [0.04, 0.07, 0.04] }, transition: { duration: 10, repeat: Infinity, ease: "easeInOut" } } : {})}
         />
       </div>
@@ -51,17 +51,17 @@ function GlassTestimonials({ items }: { items: TestimonialItem[] }) {
             >
               <div className="p-[1px]" style={{
                 background: i === 0 ? `linear-gradient(135deg, ${theme.colors.primary}30, ${theme.colors.accent}20, transparent)` : `transparent`,
-                borderRadius: "1.5rem",
+                borderRadius: theme.radii.card,
               }}>
                 <div className="p-5" style={{
                   background: `${theme.colors.surface}B3`,
-                  borderRadius: "calc(1.5rem - 1px)",
-                  backdropFilter: "blur(20px)",
+                  borderRadius: theme.radii.card,
+                  backdropFilter: theme.blur.card,
                   border: `1px solid ${theme.colors.border}`,
                 }}>
                   <div className="flex items-start gap-4">
-                    <div className="w-11 h-11 rounded-full flex-shrink-0 overflow-hidden flex items-center justify-center text-sm font-bold"
-                      style={{ background: `linear-gradient(135deg, ${theme.colors.primary}20, ${theme.colors.accent}10)`, color: theme.colors.primary }}>
+                    <div className="w-11 h-11 flex-shrink-0 overflow-hidden flex items-center justify-center text-sm font-bold"
+                      style={{ background: `linear-gradient(135deg, ${theme.colors.primary}20, ${theme.colors.accent}10)`, color: theme.colors.primary, borderRadius: theme.radii.pill }}>
                       {(tm.name?.[0] || "?").toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -72,7 +72,7 @@ function GlassTestimonials({ items }: { items: TestimonialItem[] }) {
                         <span className="text-sm font-semibold" style={{ color: theme.colors.text }}>{tm.name}</span>
                         {tm.position && (
                           <>
-                            <span className="w-1 h-1 rounded-full" style={{ background: theme.colors.textMuted }} />
+                            <span className="w-1 h-1" style={{ background: theme.colors.textMuted, borderRadius: theme.radii.pill }} />
                             <span className="text-xs" style={{ color: theme.colors.textMuted }}>{tm.position}</span>
                           </>
                         )}
@@ -89,8 +89,8 @@ function GlassTestimonials({ items }: { items: TestimonialItem[] }) {
         {filtered.length > 1 && (
           <div className="flex justify-center gap-2 mt-6">
             {filtered.slice(0, 3).map((_, i) => (
-              <div key={i} className="w-2 h-2 rounded-full transition-all duration-500"
-                style={{ background: i === 0 ? theme.colors.primary : theme.colors.border, opacity: i === 0 ? 1 : 0.5 }}
+              <div key={i} className="w-2 h-2 transition-all duration-500"
+                style={{ background: i === 0 ? theme.colors.primary : theme.colors.border, opacity: i === 0 ? 1 : 0.5, borderRadius: theme.radii.pill }}
               />
             ))}
           </div>
@@ -139,8 +139,8 @@ function BrutalTestimonials({ items }: { items: TestimonialItem[] }) {
                 <div className="p-5" style={{
                   background: theme.colors.surface,
                   border: `3px solid ${theme.colors.border}`,
-                  borderRadius: "0.75rem",
-                  boxShadow: i % 2 === 0 ? `6px 6px 0px ${theme.colors.border}` : `-6px 6px 0px ${theme.colors.border}`,
+                  borderRadius: theme.radii.card,
+                  boxShadow: theme.shadow.card,
                 }}>
                   {/* Bold quote mark */}
                   <div className="text-3xl leading-none font-black mb-1" style={{ color: theme.colors.primary }}>
@@ -151,7 +151,7 @@ function BrutalTestimonials({ items }: { items: TestimonialItem[] }) {
                   </p>
                   <div className="flex items-center gap-2 pt-2" style={{ borderTop: `2px solid ${theme.colors.border}` }}>
                     <div className="w-8 h-8 flex items-center justify-center text-xs font-black"
-                      style={{ background: theme.colors.primary, color: "#fff" }}>
+                      style={{ background: theme.colors.primary, color: theme.colors.onPrimary }}>
                       {(tm.name?.[0] || "?").toUpperCase()}
                     </div>
                     <div>
@@ -190,11 +190,11 @@ function LuxeTestimonials({ items }: { items: TestimonialItem[] }) {
           transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
         >
           <span className="font-medium" style={{ color: theme.colors.primary, fontSize: 12, letterSpacing: "0.15em", textTransform: "uppercase" }}>
-            TESTIMONIALS
+            TESTIMONI
           </span>
           <div className="flex items-center gap-4 mt-2 mb-10">
-            <h2 className="font-bold" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: theme.colors.text, fontFamily: "Playfair Display, serif" }}>
-              Kind Words
+            <h2 className="font-bold" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: theme.colors.text, fontFamily: theme.typography.display }}>
+              Kata Mereka
             </h2>
             <div className="flex-1" style={{ height: 1, background: theme.colors.border }} />
           </div>
@@ -209,16 +209,16 @@ function LuxeTestimonials({ items }: { items: TestimonialItem[] }) {
               viewport={{ once: true }}
               transition={{ delay: i * 0.1, duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
             >
-              <div className="p-1" style={{ background: theme.colors.bgSecondary, borderRadius: "2rem", border: `1px solid ${theme.colors.border}` }}>
+              <div className="p-1" style={{ background: theme.colors.bgSecondary, borderRadius: theme.radii.image, border: `1px solid ${theme.colors.border}` }}>
                 <div className="p-6 md:p-8 text-center" style={{
                   background: theme.colors.surface,
-                  borderRadius: "calc(2rem - 0.25rem)",
+                  borderRadius: theme.radii.card,
                 }}>
                   {/* Large serif quote mark */}
                   <span className="font-bold leading-none" style={{
                     fontSize: "clamp(3rem, 6vw, 5rem)",
                     color: theme.colors.primary,
-                    fontFamily: "Playfair Display, serif",
+                    fontFamily: theme.typography.display,
                     opacity: 0.2,
                     lineHeight: 0.8,
                     display: "block",
@@ -240,7 +240,7 @@ function LuxeTestimonials({ items }: { items: TestimonialItem[] }) {
                     <div style={{ width: 24, height: 1, background: theme.colors.border }} />
                   </div>
 
-                  <div className="font-semibold" style={{ color: theme.colors.text, fontFamily: "Playfair Display, serif" }}>
+                  <div className="font-semibold" style={{ color: theme.colors.text, fontFamily: theme.typography.display }}>
                     {tm.name}
                   </div>
                   {tm.position && (

@@ -21,12 +21,12 @@ function GlassProjects({ items }: { items: ProjectItem[] }) {
           viewport={{ once: true }}
           transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
         >
-          <span className="inline-block rounded-full px-3 py-1 text-xs uppercase tracking-[0.2em] font-medium mb-4"
-            style={{ background: `${theme.colors.primary}12`, color: theme.colors.primary, border: `1px solid ${theme.colors.primary}20` }}>
-            WORK
+          <span className="inline-block px-3 py-1 text-xs uppercase tracking-[0.2em] font-medium mb-4"
+            style={{ background: `${theme.colors.primary}12`, color: theme.colors.primary, border: `1px solid ${theme.colors.primary}20`, borderRadius: theme.radii.pill }}>
+            KARYA
           </span>
           <h2 className="font-bold mb-10" style={{ fontSize: "clamp(1.8rem, 4vw, 2.8rem)", color: theme.colors.text, letterSpacing: "-0.03em" }}>
-            Selected Projects
+            Karya Pilihan
           </h2>
         </motion.div>
 
@@ -45,12 +45,12 @@ function GlassProjects({ items }: { items: ProjectItem[] }) {
                 className={`${isWide ? "md:col-span-8" : "md:col-span-4"} ${isTall ? "md:row-span-2" : ""}`}
               >
                 {/* Double-Bezel */}
-                <div className="p-1.5 h-full group/card cursor-pointer" style={{ background: `${theme.colors.primary}06`, borderRadius: "2rem", border: `1px solid ${theme.colors.border}`, transition: "border-color 0.3s" }}>
+                <div className="p-1.5 h-full group/card cursor-pointer" style={{ background: `${theme.colors.primary}06`, borderRadius: theme.radii.card, border: `1px solid ${theme.colors.border}`, transition: "border-color 0.3s" }}>
                   <div className="h-full flex flex-col overflow-hidden" style={{
                     background: theme.colors.surface,
-                    borderRadius: "calc(2rem - 0.375rem)",
-                    boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06)",
-                    backdropFilter: "blur(20px)",
+                    borderRadius: theme.radii.card,
+                    boxShadow: theme.shadow.card,
+                    backdropFilter: theme.blur.card,
                   }}>
                     {/* Project Image */}
                     {p.imageUrl ? (
@@ -77,8 +77,8 @@ function GlassProjects({ items }: { items: ProjectItem[] }) {
                       {p.techStack && (
                         <div className="flex flex-wrap gap-1.5 mt-4">
                           {p.techStack.split(",").map((tech, idx) => (
-                            <span key={idx} className="text-xs px-2.5 py-1 rounded-full font-medium"
-                              style={{ background: `${theme.colors.primary}10`, color: theme.colors.secondary }}>
+                            <span key={idx} className="text-xs px-2.5 py-1 font-medium"
+                              style={{ background: `${theme.colors.primary}10`, color: theme.colors.secondary, borderRadius: theme.radii.pill }}>
                               {tech.trim()}
                             </span>
                           ))}
@@ -122,7 +122,7 @@ function BrutalProjects({ items }: { items: ProjectItem[] }) {
           transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
         >
           <h2 className="font-black mb-12" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", color: theme.colors.text, letterSpacing: "-0.04em" }}>
-            Projects
+            Proyek
           </h2>
         </motion.div>
 
@@ -136,8 +136,8 @@ function BrutalProjects({ items }: { items: ProjectItem[] }) {
               transition={{ delay: i * 0.12, duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
               className="relative group/card"
             >
-              <div className="p-2" style={{ background: theme.colors.border, borderRadius: "1.25rem" }}>
-                <div style={{ background: theme.colors.bg, borderRadius: "calc(1.25rem - 0.5rem)", border: `3px solid ${theme.colors.border}`, overflow: "hidden" }}>
+              <div className="p-2" style={{ background: theme.colors.border, borderRadius: theme.radii.card }}>
+                <div style={{ background: theme.colors.bg, borderRadius: theme.radii.card, border: `3px solid ${theme.colors.border}`, overflow: "hidden" }}>
                   {p.imageUrl ? (
                     <div className="w-full h-56 overflow-hidden" style={{ borderBottom: `3px solid ${theme.colors.border}` }}>
                       <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105" loading="lazy" />
@@ -153,7 +153,7 @@ function BrutalProjects({ items }: { items: ProjectItem[] }) {
                         <h3 className="font-bold text-lg mb-2" style={{ color: theme.colors.text }}>{p.name}</h3>
                         {p.description && <p className="text-sm leading-relaxed" style={{ color: theme.colors.textMuted }}>{p.description}</p>}
                       </div>
-                      <span className="text-xs font-bold px-3 py-1" style={{ background: theme.colors.primary, color: "#fff" }}>
+                      <span className="text-xs font-bold px-3 py-1" style={{ background: theme.colors.primary, color: theme.colors.onPrimary }}>
                         {String(i + 1).padStart(2, "0")}
                       </span>
                     </div>
@@ -177,8 +177,8 @@ function BrutalProjects({ items }: { items: ProjectItem[] }) {
                   </div>
                 </div>
               </div>
-              <div className="absolute -bottom-2 -right-2 -z-10 w-full h-full rounded-[1.25rem]"
-                style={{ background: theme.colors.accent, border: `2px solid ${theme.colors.border}`, opacity: 0.12 }} />
+              <div className="absolute -bottom-2 -right-2 -z-10 w-full h-full"
+                style={{ background: theme.colors.accent, border: `2px solid ${theme.colors.border}`, borderRadius: theme.radii.card, opacity: 0.12 }} />
             </motion.div>
           ))}
         </div>
@@ -205,11 +205,11 @@ function LuxeProjects({ items }: { items: ProjectItem[] }) {
           className="mb-12"
         >
           <span className="font-medium" style={{ color: theme.colors.primary, fontSize: 13, letterSpacing: "0.15em", textTransform: "uppercase" }}>
-            WORK
+            KARYA
           </span>
           <div className="flex items-center gap-4 mt-2 mb-4">
-            <h2 className="font-bold leading-tight" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", color: theme.colors.text, fontFamily: "Playfair Display, serif", letterSpacing: "-0.02em" }}>
-              Projects
+            <h2 className="font-bold leading-tight" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", color: theme.colors.text, fontFamily: theme.typography.display, letterSpacing: "-0.02em" }}>
+              Karya
             </h2>
             <div className="flex-1" style={{ height: 1, background: theme.colors.border }} />
           </div>
@@ -225,11 +225,11 @@ function LuxeProjects({ items }: { items: ProjectItem[] }) {
               transition={{ delay: i * 0.1, duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
               className="group/card"
             >
-              <div className="p-1.5" style={{ background: theme.colors.bgSecondary, borderRadius: "2rem", border: `1px solid ${theme.colors.border}` }}>
+              <div className="p-1.5" style={{ background: theme.colors.bgSecondary, borderRadius: theme.radii.card, border: `1px solid ${theme.colors.border}` }}>
                 <div style={{
                   background: theme.colors.surface,
-                  borderRadius: "calc(2rem - 0.375rem)",
-                  boxShadow: "inset 0 1px 2px rgba(0,0,0,0.03)",
+                  borderRadius: theme.radii.card,
+                  boxShadow: theme.shadow.card,
                   overflow: "hidden",
                 }}>
                   {p.imageUrl && (
@@ -243,7 +243,7 @@ function LuxeProjects({ items }: { items: ProjectItem[] }) {
                         <span className="text-xs font-medium" style={{ color: theme.colors.textMuted, letterSpacing: "0.1em", textTransform: "uppercase" }}>
                           {String(i + 1).padStart(2, "0")}
                         </span>
-                        <h3 className="font-bold mt-1" style={{ fontSize: "1.2rem", color: theme.colors.text, fontFamily: "Playfair Display, serif" }}>
+                        <h3 className="font-bold mt-1" style={{ fontSize: "1.2rem", color: theme.colors.text, fontFamily: theme.typography.display }}>
                           {p.name}
                         </h3>
                       </div>
@@ -256,8 +256,8 @@ function LuxeProjects({ items }: { items: ProjectItem[] }) {
                         {p.techStack && (
                           <div className="flex flex-wrap gap-1.5 mb-4">
                             {p.techStack.split(",").map((tech, idx) => (
-                              <span key={idx} className="text-xs px-2.5 py-1 rounded-full font-medium"
-                                style={{ background: `${theme.colors.primary}08`, color: theme.colors.secondary, border: `1px solid ${theme.colors.border}` }}>
+                              <span key={idx} className="text-xs px-2.5 py-1 font-medium"
+                                style={{ background: `${theme.colors.primary}08`, color: theme.colors.secondary, border: `1px solid ${theme.colors.border}`, borderRadius: theme.radii.pill }}>
                                 {tech.trim()}
                             </span>
                             ))}
@@ -267,7 +267,7 @@ function LuxeProjects({ items }: { items: ProjectItem[] }) {
                           <a href={p.link} target="_blank" rel="noopener noreferrer"
                             className="inline-flex items-center gap-2 text-xs font-semibold transition-all"
                             style={{ color: theme.colors.primary }}>
-                            View Project
+                            Lihat Proyek
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                               <path d="M7 17L17 7M7 7h10v10"/>
                             </svg>

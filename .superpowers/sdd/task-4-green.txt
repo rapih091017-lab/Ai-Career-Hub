@@ -1,0 +1,64 @@
+﻿
+> ai-career-hub@0.1.0 test
+> vitest run
+
+node.exe : [33mBoth esbuild and oxc options were set. oxc options will be used and esbuild options will be 
+ignored.[39m The following esbuild options were set: `{ jsx: 'automatic' }`
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([33mBoth esbui... 'automatic' }`:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+ RUN  v4.1.10 D:/ai-career-hub-portfolio-trust
+
+Not implemented: navigation to another Document
+
+ Test Files  26 passed (26)
+      Tests  442 passed (442)
+   Start at  15:10:48
+   Duration  10.13s (transform 4.28s, setup 5.34s, import 16.89s, tests 16.92s, environment 50.09s)
+
+
+=== npx vitest run src/__tests__/portfolio-theme-rules.test.ts ===
+node.exe : [33mBoth esbuild and oxc options were set. oxc options will be used and esbuild options will be 
+ignored.[39m The following esbuild options were set: `{ jsx: 'automatic' }`
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([33mBoth esbui... 'automatic' }`:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+ RUN  v4.1.10 D:/ai-career-hub-portfolio-trust
+
+
+ Test Files  1 passed (1)
+      Tests  24 passed (24)
+   Start at  15:12:28
+   Duration  2.01s (transform 252ms, setup 130ms, import 675ms, tests 49ms, environment 988ms)
+
+
+=== npx vitest run src/__tests__/portfolio-theme-fingerprint.test.ts ===
+node.exe : [33mBoth esbuild and oxc options were set. oxc options will be used and esbuild options will be 
+ignored.[39m The following esbuild options were set: `{ jsx: 'automatic' }`
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([33mBoth esbui... 'automatic' }`:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+ RUN  v4.1.10 D:/ai-career-hub-portfolio-trust
+
+
+ Test Files  1 passed (1)
+      Tests  12 passed (12)
+   Start at  15:12:31
+   Duration  3.14s (transform 231ms, setup 94ms, import 559ms, tests 1.33s, environment 722ms)
+
+
+=== npx tsc --noEmit ===
+
+tsc exit=0
