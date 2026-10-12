@@ -201,6 +201,67 @@ function LuxeOrganizations({ items }: { items: OrganizationItem[] }) {
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * MINIMALIST — nama di kiri, peran di kanan, hairline
+ * di antara baris. Tanpa avatar, tanpa chip.
+ * ═══════════════════════════════════════════════ */
+function MinimalistOrganizations({ items }: { items: OrganizationItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((o) => o.name);
+  if (!filtered.length) return null;
+
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(64px, 9vh, 112px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)" }}>
+        <span style={{ fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: theme.colors.textSecondary }}>
+          06 / Komunitas
+        </span>
+        <h2 style={{
+          fontFamily: theme.typography.display,
+          fontSize: "clamp(24px, 3vw, 34px)",
+          fontWeight: 500,
+          letterSpacing: "-0.02em",
+          color: theme.colors.text,
+          margin: "16px 0 32px",
+        }}>
+          Organisasi & Komunitas
+        </h2>
+
+        <div>
+          {filtered.map((o) => (
+            <div
+              key={o.id}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr minmax(120px, 240px)",
+                gap: 16,
+                padding: "20px 0",
+                borderTop: `1px solid ${theme.colors.border}`,
+              }}
+            >
+              <div>
+                <span style={{ fontFamily: theme.typography.display, fontSize: 16, color: theme.colors.text }}>
+                  {o.name}
+                </span>
+                {o.description ? (
+                  <p style={{ fontSize: 14, color: theme.colors.textSecondary, margin: "6px 0 0", maxWidth: 560 }}>
+                    {o.description}
+                  </p>
+                ) : null}
+              </div>
+              <span style={{ fontSize: 13, color: theme.colors.textSecondary, textAlign: "right" }}>
+                {o.role}
+                {o.period ? ` · ${o.period}` : ""}
+              </span>
+            </div>
+          ))}
+          <div style={{ height: 1, background: theme.colors.border }} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function OrganizationsSection({ items }: Props) {
   const theme = usePortfolioTheme();
@@ -208,6 +269,7 @@ export default function OrganizationsSection({ items }: Props) {
     case "glass": return <GlassOrganizations items={items} />;
     case "brutal": return <BrutalOrganizations items={items} />;
     case "luxe": return <LuxeOrganizations items={items} />;
+    case "minimalist": return <MinimalistOrganizations items={items} />;
     default: return <GlassOrganizations items={items} />;
   }
 }

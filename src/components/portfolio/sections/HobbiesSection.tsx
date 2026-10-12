@@ -175,6 +175,47 @@ function LuxeHobbies({ items }: { items: HobbyItem[] }) {
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * MINIMALIST — label + teks interest. Tanpa ikon:
+ * di tema putih ini, hemat ruang lebih penting.
+ * ═══════════════════════════════════════════════ */
+function MinimalistHobbies({ items }: { items: HobbyItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((h) => h.name);
+  if (!filtered.length) return null;
+
+  return (
+    <section style={{ background: theme.colors.bgSecondary, padding: "clamp(64px, 9vh, 112px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)" }}>
+        <span style={{ fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: theme.colors.textSecondary }}>
+          07 / Minat
+        </span>
+        <h2 style={{
+          fontFamily: theme.typography.display,
+          fontSize: "clamp(24px, 3vw, 34px)",
+          fontWeight: 500,
+          letterSpacing: "-0.02em",
+          color: theme.colors.text,
+          margin: "16px 0 24px",
+        }}>
+          Hobi & Minat
+        </h2>
+
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px 32px" }}>
+          {filtered.map((h) => (
+            <span key={h.id} style={{ fontSize: 15, color: theme.colors.text }}>
+              {h.name}
+              {h.description ? (
+                <span style={{ color: theme.colors.textSecondary }}> — {h.description}</span>
+              ) : null}
+            </span>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function HobbiesSection({ items }: Props) {
   const theme = usePortfolioTheme();
@@ -182,6 +223,7 @@ export default function HobbiesSection({ items }: Props) {
     case "glass": return <GlassHobbies items={items} />;
     case "brutal": return <BrutalHobbies items={items} />;
     case "luxe": return <LuxeHobbies items={items} />;
+    case "minimalist": return <MinimalistHobbies items={items} />;
     default: return <GlassHobbies items={items} />;
   }
 }

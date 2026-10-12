@@ -286,6 +286,92 @@ function LuxeProjects({ items }: { items: ProjectItem[] }) {
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * MINIMALIST — daftar satu kolom bernomor; gambar
+ * full-bleed bila ada (satu-satunya sumber "warna"
+ * di tema putih ini). Tanpa kartu, tanpa bayangan.
+ * ═══════════════════════════════════════════════ */
+function MinimalistProjects({ items }: { items: ProjectItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((p) => p.name);
+  if (!filtered.length) return null;
+
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(64px, 9vh, 112px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)" }}>
+        <span style={{ fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: theme.colors.textSecondary }}>
+          04 / Karya
+        </span>
+        <h2 style={{
+          fontFamily: theme.typography.display,
+          fontSize: "clamp(28px, 4vw, 44px)",
+          fontWeight: 500,
+          letterSpacing: "-0.02em",
+          color: theme.colors.text,
+          margin: "16px 0 40px",
+        }}>
+          Karya
+        </h2>
+
+        <div>
+          {filtered.map((p, i) => (
+            <article key={p.id} style={{ padding: "32px 0", borderTop: `1px solid ${theme.colors.border}` }}>
+              <span style={{ fontSize: 12, letterSpacing: "0.1em", color: theme.colors.textSecondary }}>
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              {p.imageUrl ? (
+                <div style={{ margin: "16px 0 20px", overflow: "hidden" }}>
+                  <img
+                    src={p.imageUrl}
+                    alt={p.name}
+                    loading="lazy"
+                    style={{ width: "100%", height: "clamp(200px, 32vw, 340px)", objectFit: "cover", display: "block" }}
+                  />
+                </div>
+              ) : null}
+              <div style={{ display: "grid", gridTemplateColumns: "minmax(120px, 200px) 1fr", gap: "clamp(16px, 3vw, 40px)" }}>
+                <h3 style={{ fontFamily: theme.typography.display, fontSize: 18, fontWeight: 500, color: theme.colors.text, margin: 0 }}>
+                  {p.name}
+                </h3>
+                <div>
+                  {p.description ? (
+                    <p style={{ fontSize: 14, lineHeight: 1.7, color: theme.colors.textSecondary, margin: 0, maxWidth: 620 }}>
+                      {p.description}
+                    </p>
+                  ) : null}
+                  {p.techStack ? (
+                    <p style={{ fontSize: 13, color: theme.colors.textSecondary, margin: "12px 0 0" }}>
+                      {p.techStack}
+                    </p>
+                  ) : null}
+                  {p.link ? (
+                    <a
+                      href={p.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: "inline-block",
+                        marginTop: 14,
+                        fontSize: 13,
+                        color: theme.colors.text,
+                        textDecoration: "underline",
+                        textUnderlineOffset: 4,
+                      }}
+                    >
+                      Lihat proyek
+                    </a>
+                  ) : null}
+                </div>
+              </div>
+            </article>
+          ))}
+          <div style={{ height: 1, background: theme.colors.border }} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function ProjectsSection({ items }: Props) {
   const theme = usePortfolioTheme();
@@ -293,6 +379,7 @@ export default function ProjectsSection({ items }: Props) {
     case "glass": return <GlassProjects items={items} />;
     case "brutal": return <BrutalProjects items={items} />;
     case "luxe": return <LuxeProjects items={items} />;
+    case "minimalist": return <MinimalistProjects items={items} />;
     default: return <GlassProjects items={items} />;
   }
 }

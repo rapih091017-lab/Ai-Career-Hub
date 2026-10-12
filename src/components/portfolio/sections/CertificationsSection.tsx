@@ -213,6 +213,61 @@ function LuxeCertifications({ items }: { items: CertificationItem[] }) {
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * MINIMALIST — baris satu baris: Nama — Penerbit ·
+ * Tahun, dipisah hairline. Tanpa ikon, tanpa chip.
+ * ═══════════════════════════════════════════════ */
+function MinimalistCertifications({ items }: { items: CertificationItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((c) => c.name);
+  if (!filtered.length) return null;
+
+  return (
+    <section style={{ background: theme.colors.bgSecondary, padding: "clamp(64px, 9vh, 112px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)" }}>
+        <span style={{ fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: theme.colors.textSecondary }}>
+          05 / Sertifikasi
+        </span>
+        <h2 style={{
+          fontFamily: theme.typography.display,
+          fontSize: "clamp(24px, 3vw, 34px)",
+          fontWeight: 500,
+          letterSpacing: "-0.02em",
+          color: theme.colors.text,
+          margin: "16px 0 32px",
+        }}>
+          Sertifikasi
+        </h2>
+
+        <div>
+          {filtered.map((c) => (
+            <div
+              key={c.id}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "baseline",
+                gap: 16,
+                flexWrap: "wrap",
+                padding: "18px 0",
+                borderTop: `1px solid ${theme.colors.border}`,
+              }}
+            >
+              <span style={{ fontFamily: theme.typography.display, fontSize: 16, color: theme.colors.text }}>
+                {c.name}
+              </span>
+              <span style={{ fontSize: 13, color: theme.colors.textSecondary }}>
+                {[c.issuer, c.year].filter(Boolean).join(" · ")}
+              </span>
+            </div>
+          ))}
+          <div style={{ height: 1, background: theme.colors.border }} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function CertificationsSection({ items }: Props) {
   const theme = usePortfolioTheme();
@@ -220,6 +275,7 @@ export default function CertificationsSection({ items }: Props) {
     case "glass": return <GlassCertifications items={items} />;
     case "brutal": return <BrutalCertifications items={items} />;
     case "luxe": return <LuxeCertifications items={items} />;
+    case "minimalist": return <MinimalistCertifications items={items} />;
     default: return <GlassCertifications items={items} />;
   }
 }

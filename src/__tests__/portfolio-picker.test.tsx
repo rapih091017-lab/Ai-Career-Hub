@@ -48,7 +48,7 @@ beforeEach(() => {
   localStorage.clear();
 });
 
-const THEME_NAMES = ["Glassmorphism", "Neo Brutal", "Editorial Luxe"] as const;
+const THEME_NAMES = ["Glassmorphism", "Neo Brutal", "Editorial Luxe", "Minimalist"] as const;
 
 function renderPage() {
   return render(
@@ -151,6 +151,26 @@ describe("picker tema: thumbnail nyata + deskripsi per tema", () => {
     expect(inner, "wrapper berskala harus berlabel").toBeTruthy();
     expect(inner!.style.transform).toBe("scale(0.8)");
     expect(viewport!.style.height).toBe("220px");
+  });
+
+  it("empat tema tampil: glass, brutal, luxe, dan minimal", () => {
+    const { container } = renderPage();
+    const [glass, brutal, luxe, minimalist] = themeCards(container);
+
+    expect(glass).toBeTruthy();
+    expect(minimalist.textContent).toContain("ruang kosong lega");
+    // Tema bawaan tetap Glass, bukan tema baru.
+    expect(glass.textContent).toContain("Tema bawaan");
+    expect(minimalist.textContent).not.toContain("Tema bawaan");
+    expect(luxe.textContent).not.toContain("Tema bawaan");
+    expect(brutal.textContent).not.toContain("Tema bawaan");
+  });
+
+  it("keempat kartu thumbnail punya struktur berbeda satu sama lain", () => {
+    const { container } = renderPage();
+    const cards = themeCards(container);
+    const skels = cards.map((c) => skeleton(c.firstElementChild as Element));
+    expect(new Set(skels).size).toBe(cards.length);
   });
 
   it("page berhenti memakai mockup TEMPLATE_PREVIEWS dan merender via renderer", () => {

@@ -187,6 +187,101 @@ function LuxeContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: Extr
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * MINIMALIST — email besar sebagai tautan (underline
+ * hairline, bukan blok), kolom kanan berisi tautan
+ * lain. Tanpa form, tanpa kartu.
+ * ═══════════════════════════════════════════════ */
+function MinimalistContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: ExtraLink[] }) {
+  const theme = usePortfolioTheme();
+  const links = extraLinks.filter((l) => l.url);
+
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(64px, 9vh, 112px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)" }}>
+        <span style={{ fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: theme.colors.textSecondary }}>
+          10 / Kontak
+        </span>
+        <h2 style={{
+          fontFamily: theme.typography.display,
+          fontSize: "clamp(28px, 4vw, 44px)",
+          fontWeight: 500,
+          letterSpacing: "-0.02em",
+          color: theme.colors.text,
+          margin: "16px 0 32px",
+        }}>
+          Mari Berbicara
+        </h2>
+
+        <div style={{ display: "grid", gridTemplateColumns: "minmax(200px, 1.2fr) minmax(160px, 0.8fr)", gap: "clamp(24px, 5vw, 64px)" }}>
+          <div>
+            {f.contactEmail ? (
+              <a
+                href={`mailto:${f.contactEmail}`}
+                style={{
+                  fontFamily: theme.typography.display,
+                  fontSize: "clamp(20px, 3vw, 30px)",
+                  color: theme.colors.text,
+                  textDecoration: "underline",
+                  textUnderlineOffset: 6,
+                  wordBreak: "break-word",
+                }}
+              >
+                {f.contactEmail}
+              </a>
+            ) : (
+              <span style={{ fontSize: 15, color: theme.colors.textSecondary }}>
+                Email belum diisi.
+              </span>
+            )}
+
+            <div style={{ height: 1, background: theme.colors.border, margin: "32px 0 24px", maxWidth: 480 }} />
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {f.contactPhone ? (
+                <a href={`tel:${f.contactPhone}`} style={{ fontSize: 14, color: theme.colors.textSecondary, width: "fit-content" }}>
+                  {f.contactPhone}
+                </a>
+              ) : null}
+              {f.contactLinkedin ? (
+                <a
+                  href={f.contactLinkedin.startsWith("http") ? f.contactLinkedin : `https://${f.contactLinkedin}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ fontSize: 14, color: theme.colors.textSecondary, width: "fit-content" }}
+                >
+                  LinkedIn
+                </a>
+              ) : null}
+              {f.contactGithub ? (
+                <a
+                  href={f.contactGithub.startsWith("http") ? f.contactGithub : `https://${f.contactGithub}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ fontSize: 14, color: theme.colors.textSecondary, width: "fit-content" }}
+                >
+                  GitHub
+                </a>
+              ) : null}
+              {links.map((l) => (
+                <a
+                  key={l.id}
+                  href={l.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ fontSize: 14, color: theme.colors.textSecondary, width: "fit-content" }}
+                >
+                  {l.label}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function ContactSection({ data: f, extraLinks }: Props) {
   const theme = usePortfolioTheme();
@@ -196,6 +291,7 @@ export default function ContactSection({ data: f, extraLinks }: Props) {
     case "glass": return <GlassContact f={f} extraLinks={extraLinks} />;
     case "brutal": return <BrutalContact f={f} extraLinks={extraLinks} />;
     case "luxe": return <LuxeContact f={f} extraLinks={extraLinks} />;
+    case "minimalist": return <MinimalistContact f={f} extraLinks={extraLinks} />;
     default: return <GlassContact f={f} extraLinks={extraLinks} />;
   }
 }

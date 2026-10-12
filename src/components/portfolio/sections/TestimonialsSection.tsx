@@ -258,6 +258,65 @@ function LuxeTestimonials({ items }: { items: TestimonialItem[] }) {
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * MINIMALIST — kutipan tanpa kartu: tanda kutip besar,
+ * teks, lalu nama. Hairline di atas tiap kutipan.
+ * ═══════════════════════════════════════════════ */
+function MinimalistTestimonials({ items }: { items: TestimonialItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((t) => t.testimonial);
+  if (!filtered.length) return null;
+
+  return (
+    <section style={{ background: theme.colors.bgSecondary, padding: "clamp(64px, 9vh, 112px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)" }}>
+        <span style={{ fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: theme.colors.textSecondary }}>
+          09 / Testimoni
+        </span>
+        <h2 style={{
+          fontFamily: theme.typography.display,
+          fontSize: "clamp(24px, 3vw, 34px)",
+          fontWeight: 500,
+          letterSpacing: "-0.02em",
+          color: theme.colors.text,
+          margin: "16px 0 32px",
+        }}>
+          Testimoni
+        </h2>
+
+        <div style={{ display: "grid", gap: 32 }}>
+          {filtered.map((t) => (
+            <figure key={t.id} style={{ margin: 0, paddingTop: 24, borderTop: `1px solid ${theme.colors.border}` }}>
+              <span aria-hidden="true" style={{
+                fontFamily: theme.typography.display,
+                fontSize: 40,
+                lineHeight: 1,
+                color: theme.colors.textMuted,
+              }}>
+                &ldquo;
+              </span>
+              <blockquote style={{
+                fontFamily: theme.typography.display,
+                fontSize: "clamp(17px, 2.2vw, 21px)",
+                lineHeight: 1.55,
+                color: theme.colors.text,
+                margin: "12px 0 16px",
+                maxWidth: 720,
+              }}>
+                {t.testimonial}
+              </blockquote>
+              <figcaption style={{ fontSize: 13, color: theme.colors.textSecondary }}>
+                {t.name}
+                {t.position ? ` — ${t.position}` : ""}
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function TestimonialsSection({ items }: Props) {
   const theme = usePortfolioTheme();
@@ -265,6 +324,7 @@ export default function TestimonialsSection({ items }: Props) {
     case "glass": return <GlassTestimonials items={items} />;
     case "brutal": return <BrutalTestimonials items={items} />;
     case "luxe": return <LuxeTestimonials items={items} />;
+    case "minimalist": return <MinimalistTestimonials items={items} />;
     default: return <GlassTestimonials items={items} />;
   }
 }

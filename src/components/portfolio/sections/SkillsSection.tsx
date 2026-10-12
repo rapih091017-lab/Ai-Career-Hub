@@ -209,6 +209,67 @@ function LuxeSkills({ f }: { f: PortfolioFormData }) {
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * MINIMALIST — tag hairline siku, tanpa isian warna.
+ * Teks tetap satu baris per kelompok skill.
+ * ═══════════════════════════════════════════════ */
+function MinimalistSkills({ f }: { f: PortfolioFormData }) {
+  const theme = usePortfolioTheme();
+  const groups = [
+    { label: "Utama", value: f.skillsMain },
+    { label: "Alat", value: f.skillsTools },
+    { label: "Bahasa", value: f.skillsLanguages },
+  ].filter((g) => g.value);
+
+  if (!groups.length) return null;
+
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(64px, 9vh, 112px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)" }}>
+        <span style={{ fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: theme.colors.textSecondary }}>
+          08 / Keahlian
+        </span>
+        <h2 style={{
+          fontFamily: theme.typography.display,
+          fontSize: "clamp(24px, 3vw, 34px)",
+          fontWeight: 500,
+          letterSpacing: "-0.02em",
+          color: theme.colors.text,
+          margin: "16px 0 32px",
+        }}>
+          Keahlian
+        </h2>
+
+        <div style={{ display: "grid", gap: 24 }}>
+          {groups.map((g) => (
+            <div key={g.label} style={{ display: "grid", gridTemplateColumns: "minmax(90px, 140px) 1fr", gap: 16 }}>
+              <span style={{ fontSize: 12, letterSpacing: "0.1em", textTransform: "uppercase", color: theme.colors.textSecondary, paddingTop: 6 }}>
+                {g.label}
+              </span>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {g.value.split(",").map((skill, i) => (
+                  <span
+                    key={`${g.label}-${i}`}
+                    style={{
+                      fontSize: 13,
+                      color: theme.colors.text,
+                      border: `1px solid ${theme.colors.border}`,
+                      borderRadius: theme.radii.pill,
+                      padding: "5px 12px",
+                    }}
+                  >
+                    {skill.trim()}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function SkillsSection({ data: f }: Props) {
   const theme = usePortfolioTheme();
@@ -216,6 +277,7 @@ export default function SkillsSection({ data: f }: Props) {
     case "glass": return <GlassSkills f={f} />;
     case "brutal": return <BrutalSkills f={f} />;
     case "luxe": return <LuxeSkills f={f} />;
+    case "minimalist": return <MinimalistSkills f={f} />;
     default: return <GlassSkills f={f} />;
   }
 }

@@ -248,6 +248,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "portfolio.theme.glass-desc": { id: "Kaca buram, bento asimetris, cahaya lembut.", en: "Frosted glass, asymmetric bento, soft light." },
   "portfolio.theme.brutal-desc": { id: "Kotak tajam, bayangan keras, tanpa garis melengkung.", en: "Sharp corners, hard shadows, no curves." },
   "portfolio.theme.luxe-desc": { id: "Serif besar, ruang kosong lega, tata letak majalah.", en: "Large serif, generous space, magazine layout." },
+  "portfolio.theme.minimalist-desc": { id: "Putih bersih, satu huruf, ruang kosong lega.", en: "Clean white, one typeface, generous space." },
   "portfolio.theme.default-badge": { id: "Tema bawaan", en: "Default theme" },
   "portfolio.stats-fullname": { id: "Nama Lengkap", en: "Full Name" },
   "portfolio.stats-experience": { id: "Pengalaman Kerja", en: "Work Experience" },

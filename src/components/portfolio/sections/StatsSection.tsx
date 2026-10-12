@@ -167,6 +167,42 @@ function LuxeStats({ stats }: { stats: { value: string; label: string; icon: str
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * MINIMALIST — angka dan label sebaris, dipisah garis
+ * rambut vertikal. Tanpa lingkaran, tanpa kartu.
+ * ═══════════════════════════════════════════════ */
+function MinimalistStats({ stats }: { stats: { value: string; label: string; icon: string }[] }) {
+  const theme = usePortfolioTheme();
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(48px, 7vh, 80px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)" }}>
+        <div style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "clamp(20px, 4vw, 56px)",
+          paddingTop: 24,
+          borderTop: `1px solid ${theme.colors.border}`,
+        }}>
+          {stats.map((s) => (
+            <div key={s.label} style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
+              <span style={{
+                fontFamily: theme.typography.display,
+                fontSize: "clamp(28px, 4vw, 40px)",
+                fontWeight: 500,
+                letterSpacing: "-0.02em",
+                color: theme.colors.text,
+              }}>
+                {s.value}
+              </span>
+              <span style={{ fontSize: 13, color: theme.colors.textSecondary }}>{s.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function StatsSection({ data: f }: Props) {
   const theme = usePortfolioTheme();
@@ -181,6 +217,7 @@ export default function StatsSection({ data: f }: Props) {
     case "glass": return <GlassStats stats={stats} />;
     case "brutal": return <BrutalStats stats={stats} />;
     case "luxe": return <LuxeStats stats={stats} />;
+    case "minimalist": return <MinimalistStats stats={stats} />;
     default: return <GlassStats stats={stats} />;
   }
 }
