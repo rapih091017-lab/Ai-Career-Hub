@@ -43,6 +43,12 @@ export interface ThemeColors {
   borderHover: string;
 }
 
+export interface ThemeRadii { card: string; button: string; pill: string; image: string }
+export interface ThemeBlur { card: string; glow: string }
+export interface ThemeShadow { card: string; focus: string }
+export interface ThemeTypography { display: string; body: string; eyebrow: string }
+export interface ThemeFocusRing { color: string; width: string }
+
 export interface ThemeDefinition {
   id: ThemeId;
   name: string;
@@ -50,8 +56,12 @@ export interface ThemeDefinition {
   font: string;
   fontUrl: string;
   colors: ThemeColors;
+  radii: ThemeRadii;
+  blur: ThemeBlur;
+  shadow: ThemeShadow;
+  typography: ThemeTypography;
+  focusRing: ThemeFocusRing;
   sectionColors?: Partial<Record<SectionId, Partial<ThemeColors>>>;
-  cssVars: Record<string, string>;
   previewGradient: string;
 }
 
