@@ -42,15 +42,16 @@ function GlassStats({ stats }: { stats: { value: string; label: string; icon: st
             >
               <div className="p-[1px]" style={{
                 background: `linear-gradient(135deg, ${theme.colors.primary}30, ${theme.colors.accent}20, ${theme.colors.border})`,
-                borderRadius: "100%",
+                borderRadius: theme.radii.pill,
                 aspectRatio: "1 / 1",
                 maxWidth: 200,
                 margin: "0 auto",
               }}>
-                <div className="w-full h-full rounded-full flex flex-col items-center justify-center text-center p-6" style={{
+                <div className="w-full h-full flex flex-col items-center justify-center text-center p-6" style={{
                   background: `${theme.colors.surface}B3`,
-                  backdropFilter: "blur(30px)",
-                  boxShadow: `inset 0 1px 1px rgba(255,255,255,0.06), 0 8px 32px ${theme.colors.primaryGlow}`,
+                  borderRadius: theme.radii.pill,
+                  backdropFilter: theme.blur.card,
+                  boxShadow: theme.shadow.card,
                 }}>
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
                     stroke={theme.colors.accent} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
@@ -90,8 +91,8 @@ function BrutalStats({ stats }: { stats: { value: string; label: string; icon: s
           className="relative"
         >
           {/* Horizontal bar, full width with sections */}
-          <div className="p-2" style={{ background: theme.colors.border, borderRadius: "100px" }}>
-            <div className="flex items-stretch rounded-[calc(100px-4px)] overflow-hidden" style={{ background: theme.colors.bg }}>
+          <div className="p-2" style={{ background: theme.colors.border, borderRadius: theme.radii.card }}>
+            <div className="flex items-stretch overflow-hidden" style={{ background: theme.colors.bg, borderRadius: theme.radii.card }}>
               {stats.map((s, i) => (
                 <motion.div
                   key={s.label}
@@ -147,7 +148,7 @@ function LuxeStats({ stats }: { stats: { value: string; label: string; icon: str
                 <span className="font-bold leading-none" style={{
                   fontSize: "clamp(2.5rem, 5vw, 3.5rem)",
                   color: theme.colors.primary,
-                  fontFamily: "Playfair Display, serif",
+                  fontFamily: theme.typography.display,
                 }}>
                   {s.value}
                 </span>

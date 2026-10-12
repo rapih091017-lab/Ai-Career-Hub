@@ -1,4 +1,6 @@
 import { describe, it, expect } from "vitest";
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 import { THEMES, TEMPLATE_PREVIEWS } from "@/components/portfolio/themes";
 import { THEME_IDS } from "@/components/portfolio/types";
 
@@ -42,5 +44,48 @@ describe("token layer", () => {
     for (const id of THEME_IDS) {
       expect(THEMES[id].focusRing.color.toLowerCase()).not.toBe("#0d7377");
     }
+  });
+});
+
+const SECTIONS_DIR = join(process.cwd(), "src/components/portfolio/sections");
+const RENDER_DIR = join(process.cwd(), "src/components/portfolio/render");
+
+/** Literal yang dilarang — wajib lewat token tema. */
+const BANNED: { label: string; re: RegExp }[] = [
+  { label: "rounded-*", re: /\brounded-(full|[a-z0-9]+)\b/ },
+  { label: "shadow-*", re: /\bshadow-(sm|md|lg|xl|2xl|premium[\w-]*)\b/ },
+  { label: "backdrop-blur*", re: /\bbackdrop-blur\b/ },
+  { label: "borderRadius literal", re: /borderRadius:\s*["'`]/ },
+  { label: "boxShadow literal", re: /boxShadow:\s*["'`]/ },
+  { label: "inline fontFamily", re: /fontFamily:\s*["'`]/ },
+  { label: "hex warna", re: /#[0-9a-fA-F]{6}\b/ },
+];
+
+// File yang belum dimigrasi: Task 3 menyelesaikannya. Hapus entri ini di Task 3.
+const PENDING_FILES = [
+  "ExperienceSection.tsx", "EducationSection.tsx", "CertificationsSection.tsx",
+  "OrganizationsSection.tsx", "HobbiesSection.tsx", "TestimonialsSection.tsx",
+];
+
+const sourceFiles = [
+  ...readdirSync(SECTIONS_DIR).map((f) => join(SECTIONS_DIR, f)),
+  ...readdirSync(RENDER_DIR).filter((f) => f.endsWith(".tsx")).map((f) => join(RENDER_DIR, f)),
+];
+
+function stripAllowed(src: string): string {
+  // allowlist putih; komentar diabaikan agar aturan tidak menangkap diskusi
+  return src
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/\/\/[^\n]*/g, "")
+    .replace(/#fff(?:fff)?\b/gi, "");
+}
+
+describe("Layer A: larangan literal di section & render", () => {
+  it.each(sourceFiles.map((f) => [f]))("%s bebas literal", (file: string) => {
+    const name = file.split(/[\\/]/).pop()!;
+    if (PENDING_FILES.includes(name)) return; // Task 3 menghapus entri ini
+    const src = stripAllowed(readFileSync(file, "utf8"));
+    const found = BANNED.filter((b) => b.re.test(src)).map((b) => b.label);
+    expect(found, `${name}: literal terlarang`).toEqual([]);
   });
 });

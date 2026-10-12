@@ -27,8 +27,8 @@ function GlassAbout({ f }: { f: PortfolioFormData }) {
           <rect width="100%" height="100%" fill="url(#glass-dots)" />
         </svg>
         <motion.div
-          className="absolute w-[300px] h-[300px] rounded-full blur-[80px]"
-          style={{ background: theme.colors.primary, top: "10%", left: "5%", opacity: 0.06 }}
+          className="absolute w-[300px] h-[300px] blur-[80px]"
+          style={{ background: theme.colors.primary, top: "10%", left: "5%", opacity: 0.06, borderRadius: theme.radii.pill }}
           {...(!reduced ? { animate: { y: [0, -20, 0], opacity: [0.06, 0.1, 0.06] }, transition: { duration: 8, repeat: Infinity, ease: "easeInOut" } } : {})}
         />
       </div>
@@ -41,9 +41,10 @@ function GlassAbout({ f }: { f: PortfolioFormData }) {
           transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1] }}
         >
           {/* Large floating glass card */}
-          <div className="relative overflow-hidden rounded-2xl" style={{
+          <div className="relative overflow-hidden" style={{
             background: `${theme.colors.surface}`,
-            backdropFilter: "blur(30px)",
+            borderRadius: theme.radii.card,
+            backdropFilter: theme.blur.card,
             border: `1px solid ${theme.colors.border}`,
           }}>
             {/* Internal gradient bar */}
@@ -69,11 +70,12 @@ function GlassAbout({ f }: { f: PortfolioFormData }) {
                     { value: f.aboutYearsExp, label: "Tahun Pengalaman", icon: "M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" },
                     { value: f.aboutProjectsDone, label: "Project Selesai", icon: "M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" },
                   ].filter(s => s.value).map((s, i) => (
-                    <div key={s.label} className="flex items-center gap-3 p-3 rounded-xl" style={{
+                    <div key={s.label} className="flex items-center gap-3 p-3" style={{
                       background: `${theme.colors.primary}08`,
                       border: `1px solid ${theme.colors.border}`,
+                      borderRadius: theme.radii.card,
                     }}>
-                      <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: `${theme.colors.primary}15` }}>
+                      <div className="w-9 h-9 flex items-center justify-center" style={{ background: `${theme.colors.primary}15`, borderRadius: theme.radii.card }}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={theme.colors.accent} strokeWidth="1.5">
                           <path d={s.icon} />
                         </svg>
@@ -117,8 +119,8 @@ function BrutalAbout({ f }: { f: PortfolioFormData }) {
             <div className="p-8 md:p-10" style={{
               background: theme.colors.surface,
               border: `4px solid ${theme.colors.border}`,
-              borderRadius: "1rem",
-              boxShadow: `10px 10px 0px ${theme.colors.border}`,
+              borderRadius: theme.radii.card,
+              boxShadow: theme.shadow.card,
             }}>
               {/* Eyebrow as bold badge */}
               <div className="inline-block mb-6 px-4 py-1 text-xs font-black tracking-widest"
@@ -191,7 +193,7 @@ function LuxeAbout({ f }: { f: PortfolioFormData }) {
                 <h2 className="font-bold mt-6 leading-tight" style={{
                   fontSize: "clamp(1.2rem, 2.5vw, 1.8rem)",
                   color: theme.colors.text,
-                  fontFamily: "Playfair Display, serif",
+                  fontFamily: theme.typography.display,
                 }}>
                   About Me
                 </h2>
@@ -205,7 +207,7 @@ function LuxeAbout({ f }: { f: PortfolioFormData }) {
                   <span className="float-left mr-3 font-bold leading-none" style={{
                     fontSize: "clamp(3.5rem, 6vw, 5rem)",
                     color: theme.colors.primary,
-                    fontFamily: "Playfair Display, serif",
+                    fontFamily: theme.typography.display,
                     lineHeight: 0.8,
                   }}>
                     {firstWord[0]}
