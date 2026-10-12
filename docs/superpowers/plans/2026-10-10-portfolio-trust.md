@@ -2209,8 +2209,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
 
 ```ts
 import { NextRequest, NextResponse } from "next/server";
-import { and, eq } from "drizzle-orm";
-import { getServerSession } from "next-auth";
+import { eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { errorResponse } from "@/lib/api-utils";
 import { db } from "@/db";
@@ -2232,7 +2231,7 @@ export const GET = async (
 
   if (!row) return errorResponse("ASSET_NOT_FOUND", "Gambar tidak ditemukan", 404);
 
-  const session = await getServerSession(auth);
+  const session = await auth();
   const isOwner = !!session?.user?.id && session.user.id === row.userId;
 
   if (!isOwner) {
@@ -2259,9 +2258,7 @@ export const GET = async (
 };
 ```
 
-Sesuaikan nama import session dengan yang dipakai repo ini - baca `src/lib/api-utils.ts` bagian `withAuth` untuk melihat bagaimana session diambil, lalu pakai pola yang sama tanpa fungsi tersebut.
-
-Hapusroute privat terpisah; tidak ada lagi.
+Repo ini memakai NextAuth v5, jadi session diambil dengan `await auth()` dari `@/lib/auth` - bukan `getServerSession`. `errorResponse` dari `@/lib/api-utils` bisa dipanggil tanpa `apiHandler`.
 
 - [ ] **Step 7: Buat `src/components/portfolio/render/PortfolioPhotoUpload.tsx`**
 
@@ -3529,7 +3526,7 @@ describe("SEO portfolio", () => {
   it("route aset melayani editor sekaligus halaman publik", () => {
     const src = read("src/app/api/portfolio/assets/[id]/route.ts");
     expect(src).not.toContain("withAuth()");
-    expect(src).toContain("getServerSession");
+    expect(src).toContain('from "@/lib/auth"');
     expect(src).toContain("portfolioPages");
     expect(src).toContain("published");
   });
