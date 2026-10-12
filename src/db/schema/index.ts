@@ -238,15 +238,8 @@ export const portfolioPages = pgTable("portfolio_pages", {
   index("portfolio_pages_status_idx").on(table.status),
 ]);
 
-/** Penanda pemakaian trial publish portfolio (1x gratis per akun, permanen).
- * Dipakai supaya unpublish → publish ulang tidak bisa mem-bypass trial.
- * User berbayar (paket portfolio_web / premium / bundle / business) tidak
- * perlu baris ini, entitlement dihitung dari paket aktif. */
-export const portfolioTrialUses = pgTable("portfolio_trial_uses", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  userId: uuid("user_id").notNull().unique().references(() => users.id, { onDelete: "cascade" }),
-  usedAt: timestamp("used_at", { mode: "date" }).defaultNow(),
-});
+// portfolio_trial_uses sudah dihapus (migrasi 0023): entitlement publish kini
+// dihitung dari jumlah baris portfolio_pages berstatus 'published'.
 
 /** Draft portfolio milik user. Banyak draft per user. Data disimpan utuh
  *  sebagai JSONB dan divalidasi Zod di server sebelum ditulis. */

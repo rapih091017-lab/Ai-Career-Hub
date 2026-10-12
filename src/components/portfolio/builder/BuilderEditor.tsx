@@ -1455,7 +1455,14 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                   <span className="material-symbols-outlined text-lg">redo</span>
                 </button>
               </div>
-              {saveStatus === "saving" ? (
+              {draft.offline && saveStatus !== "saving" && saveStatus !== "error" ? (
+                <>
+                  <span className="material-symbols-outlined text-amber-600 text-lg">cloud_off</span>
+                  <span className="text-label-sm text-amber-700" role="status">
+                    {t("build.offline")}
+                  </span>
+                </>
+              ) : saveStatus === "saving" ? (
                 <>
                   <span className="material-symbols-outlined text-amber-500 text-lg animate-spin">sync</span>
                   <span className="text-label-sm text-amber-600">{t("build.saving")}</span>

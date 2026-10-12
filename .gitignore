@@ -74,3 +74,6 @@ nul
 temp_*.json
 .tmp-*.mjs
 scratch/
+
+# artefak review subagent (snapshot diff besar, derived)
+.superpowers/sdd/*-review-package.md

@@ -30,9 +30,55 @@ Base commit: `b8dd9ff`
 - Task 3: `resetKey={data}` di SectionBoundary memakai seluruh objek data; `data.formData` cukup
 - Task 3: `componentDidCatch` mengetik `info.componentStack` manual; import `ErrorInfo` lebih bersih
 - Task 3: ownership background/footer pindah dari wrapper ke root dokumen (disengaja, terdokumentasi)
+- Task 4: `PublishedPortfolio.tsx` kini tak dipakai produksi (hanya test); hapus di Task 15 atau pindahkan testnya ke PortfolioDocument
+- Task 4: `alignment` (text-align) belum ter-persist di PublishDialog extras — dijadwalkan Task 10
+- Task 4: handle drag `PortfolioCanvas.tsx:68` ~24px, di bawah 44x44 — antre untuk pass touch-target
+- Task 4: footer canvas baca `--p-font-size-sm` yang sudah tidak berlaku (var di-set di dalam dokumen) — referensi mati, kosmetik
+- Task 5: dua literal `@page { size: A4; margin: 12mm }` inline di 2 halaman print; ekstrak jadi konstanta bersama agar tak divergen
+- Task 5: boxShadow hardcoded rgba di tombol print floating (screen-only, kosmetik)
+- Task 5: butuh verifikasi visual print di browser nyata (pagination, warna) — statis saja belum cukup
+- Task 6/7: apply script pakai path relatif `drizzle/…`, pecah bila dijalankan di luar root (mengikuti konvensi 0020)
+- Task 6/7: `created_at`/`updated_at` nullable di SQL; API task wajib set `updated_at` eksplisit
+- Task 6/7: komentar bytea bilang "node-postgres" padahal runtime postgres-js — fungsional benar, komentar menyesatkan
+- Task 9: `GET /api/portfolio/assets/[id]` stringify JSON in-memory untuk rujukan public assets; pertimbangkan SQL `LIKE` jika data tumbuh.
+- Task 11: key fallback AI schema & StrictMode-safe `{ past, present, future }` undo stack terpasang.
+- Task 12: GET draft transient gagal → jalur POST membuat draft duplikat (baris yatim; export tetap benar)
+- Task 12: sync overwrite — data preview bisa menimpa draft server lebih baru bila dua tab terbuka (laten, belum ada pembaca lain)
+- Task 12: `mt-3` di error ekspor menambah jarak pada parent `gap-4` toolbar (kosmetik)
+- Task 13: test mati `portfolio-ai-map.test.ts:277` (`not.toMatch Object.entries(aiSuggestions)` — identifier sudah hilang, tak bisa gagal)
+- Task 13: preview/page.tsx masih punya interface `PortfolioData` lokal tanpa `seo` (runtime aman, type tak bisa mendeteksi drop masa depan)
+- Task 13: inline seo type diduplikasi di live/page.tsx:64 + test mengunci teks persisnya (refactor bersih akan gagal lock)
+- Task 13: scan prefiks di `portfolio-seo.test.ts:53` hanya cocok entri `BASE_URL + "..."`; entri template-literal tak terjangkau
+- Task 13: prompt AI `portfolio-v1.ts:115-117` tak pernah menghasilkan `seo.meta_description` (fallback deskripsi menutupinya)
+- Task 13: concern laporan wave-3 soal "from snapshot" keliru ke arah aman — nilai sekarang live-derived
+- Task 14: kedua legacy key dimakan saat key1 parseable-tapi-invalid (terjaga tak terjangkau) — tanpa catatan user-visible bahwa ada field yang di-coerce
+- Task 14: 400 INVALID_DATA membuat footer sementara bilang "Tersimpan" sambil pending — beforeunload menutupinya
+- Task 14: race sub-detik di "Draft baru" (pending tidak invalidasi saat draftId berubah, jendela 100-500ms)
+- Task 14: preview/page.tsx:210 masih `text-[11px]` (pre-existing, di luar diff)
+- Task 14: `portfolio as unknown as ValidatedPortfolioData` double-cast di BuilderEditor:328 — server PATCH 400 satu-satunya batas
+- Task 14: `portfolio.publish-*` i18n masih menyebut "Live Builder" (dilaporkan di luar lingkup)
+- Task 14: 0 test render/jsdom untuk BuilderEditor (semua source-text + tsc)
+- Task 15: PortfolioSpotlight cuma dapat nama tema tanpa deskripsi (tile sempit, opsional per brief)
+- Task 15: re-indent whitespace tak sengaja pada grid testimonial di BuilderEditor (churn kecil di diff)
+- Task 15: aria-label hardcoded di 3 section form dibiarkan agar konsisten dengan saudaranya
+- Task 16: **soft-404 app-wide (pre-existing)** — semua detail page (`/p/`, `/career-hub/`, `/contoh-cv/`) mengembalikan 200 dengan konten tak-ditemukan; identik di master; dampak SEO; butuh tiket terpisah
+- Task 16: `.env` worktree gagal validasi `src/lib/env.ts` (AUTH_SECRET/DEEPSEEK) — semua route DB melempar saat dev tanpa env injection (pre-existing)
+- Task 16: sweep text-xs (37 pelanggaran) di 15 file portofolio; mockup visual setelah sweep belum diperiksa manusia
 
 ## Progress
 
 Task 1: complete (commits b8dd9ff..cdbfecd, spec PASS, quality APPROVED, 115 test, 4 fix wave)
 Task 2: complete (commits cdbfecd..8b6810e, spec PASS, quality APPROVED, 241 test, 3 fix wave)
 Task 3: complete (commits 8b6810e..4037944, spec PASS, quality APPROVED, 272 test, 0 fix wave)
+Task 4: complete (commits 4037944..b5e56b8, spec PASS, quality APPROVED, 276 test, 0 fix wave)
+Task 5: complete (commits b5e56b8..b1fc2b2, spec PASS, quality APPROVED, 285 test, 1 fix wave)
+Task 6+7: complete (commits b1fc2b2..d3bad69, spec PASS, quality APPROVED, 285 test, 0 fix wave)
+Task 8: complete (commits d3bad69..72dcd7e, spec PASS, quality APPROVED, 290 test, 1 fix wave)
+Task 9: complete (commits 72dcd7e..72ff562, spec PASS, quality APPROVED, 296 test, 1 fix wave)
+Task 10: complete (commits 72ff562..f1b921f, spec PASS, quality APPROVED, 301 test, 0 fix wave)
+Task 11: complete (commits f1b921f..f9d13ce, spec PASS, quality APPROVED, 312 test, 1 fix wave)
+Task 12: complete (commits f9d13ce..08eb483, spec PASS, quality APPROVED, 330 test, 2 fix wave)
+Task 13: complete (commits 08eb483..ba9b8da, spec PASS, quality APPROVED, 353 test, 3 fix wave + 2 controller)
+Task 14: complete (commits ba9b8da..9d79a7a, spec PASS, quality APPROVED, 381 test, 2 fix wave + 2 controller)
+Task 15: complete (commits 9d79a7a..a819bcb, spec PASS, quality APPROVED, 387 test, 0 fix wave)
+Task 16: complete (commits a819bcb..HEAD, semua gate hijau, 387 test, 1 fix — sweep text-xs)

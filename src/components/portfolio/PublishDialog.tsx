@@ -5,13 +5,14 @@ import { useRouter } from "next/navigation";
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/components/ui/toast";
 import type { PortfolioData } from "@/components/portfolio/types";
+import { isValidSlug } from "@/lib/portfolio-safety";
 
 export interface PublishDialogProps {
   open: boolean;
   onClose: () => void;
   data: PortfolioData | null;
   themeId: string;
-  /** Tambahan data live-builder (sectionOrder / visibility) */
+  /** Override urutan/visibilitas; bila tidak dikirim, ambil dari data draft. */
   extras?: { sectionOrder?: string[]; sectionVisibility?: Record<string, boolean> };
 }
 
@@ -22,8 +23,6 @@ interface PortfolioPlan {
   entitled: boolean;
   upgradeUrl: string;
 }
-
-const SLUG_REGEX = /^[a-z0-9][a-z0-9-]{2,49}$/;
 
 function slugifyName(name: string): string {
   return name
@@ -67,22 +66,13 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
           if (body.slug) setSlug(body.slug);
         }
       } else {
-        setPlan({
-          maxActive: 1,
-          used: 0,
-          remaining: 1,
-          entitled: true,
-          upgradeUrl: "/settings/billing?plan=portfolio-web",
-        });
+        // Kuota gagal diketahui: plan tetap null sehingga tombol Publish
+        // tetap nonaktif. Server tetap jadi otoritas; UI tidak boleh berbohong
+        // bahwa kuota tersedia (spec §6).
+        setPlan(null);
       }
     } catch {
-      setPlan({
-        maxActive: 1,
-        used: 0,
-        remaining: 1,
-        entitled: true,
-        upgradeUrl: "/settings/billing?plan=portfolio-web",
-      });
+      setPlan(null);
     } finally {
       setChecked(true);
     }
@@ -121,7 +111,7 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
     if (!data) return;
     setError(null);
     const s = slug.trim().toLowerCase();
-    if (!SLUG_REGEX.test(s)) {
+    if (!isValidSlug(s)) {
       setError(t("publish.slug-invalid"));
       return;
     }
@@ -135,8 +125,11 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
           ...data,
           fontSize: dataRecord?.fontSize,
           alignment: dataRecord?.alignment,
-          sectionOrder: extras?.sectionOrder,
-          sectionVisibility: extras?.sectionVisibility,
+          // Urutan/visibilitas: extras (bila penulis lama mengirim) lalu jatuh
+          // ke data draft — tanpa fallback ini halaman publik diam-diam
+          // kembali ke urutan bawaan dan meng-unhide section yang disembunyikan.
+          sectionOrder: extras?.sectionOrder ?? data.sectionOrder,
+          sectionVisibility: extras?.sectionVisibility ?? data.sectionVisibility,
         },
         fontSize: dataRecord?.fontSize,
         alignment: dataRecord?.alignment,
@@ -436,9 +429,16 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
               </p>
             )}
 
+            {checked && plan === null && (
+              <p className="text-xs text-error flex items-center gap-1.5 bg-error-container/20 rounded-lg px-3 py-2" role="alert">
+                <span className="material-symbols-outlined text-sm">error</span>
+                Gagal memeriksa kuota. Pastikan koneksi internetmu lalu coba lagi.
+              </p>
+            )}
+
             <button
-              onClick={handlePublish}
-              disabled={publishing || !quotaKnown}
+              onClick={checked && plan === null ? refresh : handlePublish}
+              disabled={publishing || !checked}
               className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary text-on-primary font-label-bold hover:opacity-90 active:scale-95 transition-all disabled:opacity-50"
             >
               {publishing ? (
@@ -446,10 +446,15 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
                   <span className="material-symbols-outlined text-lg animate-spin">sync</span>
                   {t("publish.publishing")}
                 </>
-              ) : !quotaKnown ? (
+              ) : !checked ? (
                 <>
                   <span className="material-symbols-outlined text-lg animate-spin">sync</span>
                   Memeriksa ketersediaan...
+                </>
+              ) : plan === null ? (
+                <>
+                  <span className="material-symbols-outlined text-lg">refresh</span>
+                  Coba lagi memeriksa
                 </>
               ) : (
                 <>

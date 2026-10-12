@@ -72,7 +72,8 @@ export default function PortfolioPhotoUpload({
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={busy}
-          className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-outline-variant px-4 text-sm font-semibold disabled:opacity-60"
+          style={{ borderRadius: 12 }}
+          className="inline-flex min-h-11 items-center gap-2 border border-outline-variant px-4 text-sm font-semibold disabled:opacity-60"
         >
           <span className="material-symbols-outlined text-lg" aria-hidden>upload</span>
           {busy ? "Mengunggah" : "Pilih gambar"}

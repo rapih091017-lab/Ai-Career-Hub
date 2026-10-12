@@ -773,6 +773,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "build.confirm-cancel": { id: "Yakin ingin membatalkan semua perubahan? Data yang belum disimpan akan hilang.", en: "Are you sure you want to cancel all changes? Unsaved data will be lost." },
   "build.save-preview": { id: "Simpan & Lihat Preview", en: "Save & View Preview" },
   "build.saving": { id: "Menyimpan...", en: "Saving..." },
+  "build.offline": { id: "Offline - perubahan disimpan di perangkat ini", en: "Offline - changes saved on this device" },
   "build.saved": { id: "Tersimpan!", en: "Saved!" },
   "build.unsaved": { id: "Data belum disimpan", en: "Data not saved" },
   "build.preview-hint-title": { id: "Lihat Hasil Portfolio", en: "View Portfolio Result" },
