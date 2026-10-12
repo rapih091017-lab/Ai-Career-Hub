@@ -277,7 +277,7 @@ function MinimalistExperience({ items }: { items: ExperienceItem[] }) {
               key={e.id}
               style={{
                 display: "grid",
-                gridTemplateColumns: "minmax(120px, 200px) 1fr",
+                gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
                 gap: "clamp(16px, 3vw, 40px)",
                 padding: "24px 0",
                 borderTop: `1px solid ${theme.colors.border}`,

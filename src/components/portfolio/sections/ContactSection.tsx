@@ -213,7 +213,7 @@ function MinimalistContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks
           Mari Berbicara
         </h2>
 
-        <div style={{ display: "grid", gridTemplateColumns: "minmax(200px, 1.2fr) minmax(160px, 0.8fr)", gap: "clamp(24px, 5vw, 64px)" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "clamp(24px, 5vw, 64px)" }}>
           <div>
             {f.contactEmail ? (
               <a

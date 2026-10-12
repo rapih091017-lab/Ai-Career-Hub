@@ -329,7 +329,7 @@ function MinimalistProjects({ items }: { items: ProjectItem[] }) {
                   />
                 </div>
               ) : null}
-              <div style={{ display: "grid", gridTemplateColumns: "minmax(120px, 200px) 1fr", gap: "clamp(16px, 3vw, 40px)" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "clamp(16px, 3vw, 40px)" }}>
                 <h3 style={{ fontFamily: theme.typography.display, fontSize: 18, fontWeight: 500, color: theme.colors.text, margin: 0 }}>
                   {p.name}
                 </h3>

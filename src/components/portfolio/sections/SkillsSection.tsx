@@ -242,7 +242,7 @@ function MinimalistSkills({ f }: { f: PortfolioFormData }) {
 
         <div style={{ display: "grid", gap: 24 }}>
           {groups.map((g) => (
-            <div key={g.label} style={{ display: "grid", gridTemplateColumns: "minmax(90px, 140px) 1fr", gap: 16 }}>
+            <div key={g.label} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
               <span style={{ fontSize: 12, letterSpacing: "0.1em", textTransform: "uppercase", color: theme.colors.textSecondary, paddingTop: 6 }}>
                 {g.label}
               </span>

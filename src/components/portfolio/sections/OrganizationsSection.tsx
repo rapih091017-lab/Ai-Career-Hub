@@ -233,7 +233,7 @@ function MinimalistOrganizations({ items }: { items: OrganizationItem[] }) {
               key={o.id}
               style={{
                 display: "grid",
-                gridTemplateColumns: "1fr minmax(120px, 240px)",
+                gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
                 gap: 16,
                 padding: "20px 0",
                 borderTop: `1px solid ${theme.colors.border}`,

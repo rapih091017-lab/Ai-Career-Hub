@@ -185,6 +185,20 @@ describe("Layer B: aturan semantik per tema terlihat di markup", () => {
     expect(shadows.filter((s) => s !== "none" && s !== "")).toEqual([]);
   });
 
+  it("varian minimal tidak memakai kolom tetap (harus auto-fit)", async () => {
+    const { readFileSync, readdirSync } = await import("node:fs");
+    const { join } = await import("node:path");
+    const dir = join(process.cwd(), "src/components/portfolio/sections");
+    // Kolom tetap seperti `minmax(120px, 200px) 1fr` tidak menyempit di
+    // layar sempit: teks tergencet, dan thumbnail picker jadi pita sempit.
+    const fixed = /gridTemplateColumns:\s*"(?![^"]*auto-fit)[^"]*\bminmax\(\s*\d+px/;
+    for (const f of readdirSync(dir)) {
+      const src = readFileSync(join(dir, f), "utf8");
+      if (!src.includes("Minimalist")) continue;
+      expect(src.match(fixed), `${f} masih memakai kolom tetap`).toBeNull();
+    }
+  });
+
   it("setiap tema punya case eksplisit di switch section (bukan default diam-diam ke glass)", async () => {
     const { readFileSync, readdirSync } = await import("node:fs");
     const { join } = await import("node:path");
