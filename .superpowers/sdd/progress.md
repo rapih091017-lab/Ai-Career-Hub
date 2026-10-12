@@ -128,3 +128,13 @@ Task 1 (Spec2): complete (commits d9656ad..b257fe0, spec PASS, quality APPROVED,
 - T1: T5 pakai outline via focusRing agar test Luxe box-shadow hanya none tak bentrok shadow.focus
 - T1: tabel survey di report berisi angka brutal pre-revert (tabel deviasi sudah benar)
 
+Task 2 (Spec2): complete (commits 9e9a81c..52fa596, spec PASS, quality fix wave 1, 426 test)
+
+## Minor findings Spec 2 (lanjutan)
+- T2: regex Layer A lebih sempit dari spek (shadow-xs/inner/rounded-[1.25rem] lolos) - belum ada pelanggaran hari ini, perluas sebelum T3
+- T2: file pending PASS normal (bukan todo) - kode menang, catatan proses
+- T2: strip komentar bisa menyembunyikan pelanggaran bila URL // di baris sama - belum terjadi
+- T2: tak ada larangan literal backdropFilter blur (rekrusemen bisa lolos di T3)
+- T2: hex 8 digit #RRGGBBAA lolos aturan hex
+- T2: FloatingParticles dobel sumber (theme radius + colors prop) - disengaja, diff minimal
+
