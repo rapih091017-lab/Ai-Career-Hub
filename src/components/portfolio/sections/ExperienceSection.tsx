@@ -18,8 +18,8 @@ function GlassExperience({ items }: { items: ExperienceItem[] }) {
           viewport={{ once: true }}
           transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
         >
-          <span className="inline-block rounded-full px-3 py-1 text-xs uppercase tracking-[0.2em] font-medium mb-4"
-            style={{ background: `${theme.colors.primary}12`, color: theme.colors.primary, border: `1px solid ${theme.colors.primary}20` }}>
+          <span className="inline-block px-3 py-1 text-xs uppercase tracking-[0.2em] font-medium mb-4"
+            style={{ background: `${theme.colors.primary}12`, color: theme.colors.primary, border: `1px solid ${theme.colors.primary}20`, borderRadius: theme.radii.pill }}>
             EXPERIENCE
           </span>
           <h2 className="font-bold mb-10" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: theme.colors.text }}>
@@ -42,8 +42,8 @@ function GlassExperience({ items }: { items: ExperienceItem[] }) {
                 className="relative pl-14"
               >
                 {/* Timeline dot with company logo */}
-                <div className="absolute left-0 top-1 w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold overflow-hidden"
-                  style={{ background: theme.colors.primary, color: "#fff", boxShadow: `0 0 0 4px ${theme.colors.primary}20` }}>
+                <div className="absolute left-0 top-1 w-10 h-10 flex items-center justify-center text-xs font-bold overflow-hidden"
+                  style={{ background: theme.colors.primary, color: "#fff", borderRadius: theme.radii.pill, boxShadow: theme.shadow.card }}>
                   {exp.companyLogo ? (
                     <img src={exp.companyLogo} alt={exp.company} className="w-full h-full object-cover" />
                   ) : (
@@ -52,12 +52,12 @@ function GlassExperience({ items }: { items: ExperienceItem[] }) {
                 </div>
 
                 {/* Double-Bezel with optional image */}
-                <div className="p-1" style={{ background: `${theme.colors.primary}06`, borderRadius: "2rem", border: `1px solid ${theme.colors.border}`, marginLeft: 4 }}>
+                <div className="p-1" style={{ background: `${theme.colors.primary}06`, borderRadius: theme.radii.image, border: `1px solid ${theme.colors.border}`, marginLeft: 4 }}>
                   <div style={{
                     background: `${theme.colors.surface}B3`,
-                    borderRadius: "calc(2rem - 0.25rem)",
-                    boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06)",
-                    backdropFilter: "blur(20px)",
+                    borderRadius: theme.radii.card,
+                    boxShadow: theme.shadow.card,
+                    backdropFilter: theme.blur.card,
                     overflow: "hidden",
                   }}>
                     {exp.imageUrl && (
@@ -124,10 +124,10 @@ function BrutalExperience({ items }: { items: ExperienceItem[] }) {
               transition={{ delay: i * 0.1, duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
               className="relative"
             >
-              <div className="p-2" style={{ background: theme.colors.border, borderRadius: "1.25rem" }}>
+              <div className="p-2" style={{ background: theme.colors.border, borderRadius: theme.radii.card }}>
                 <div style={{
                   background: theme.colors.bg,
-                  borderRadius: "calc(1.25rem - 0.5rem)",
+                  borderRadius: theme.radii.card,
                   border: `3px solid ${theme.colors.border}`,
                   overflow: "hidden",
                 }}>
@@ -169,8 +169,8 @@ function BrutalExperience({ items }: { items: ExperienceItem[] }) {
                 </div>
               </div>
               {/* Shadow */}
-              <div className="absolute -bottom-2 -right-2 -z-10 w-full h-full rounded-[1.25rem] opacity-12"
-                style={{ background: theme.colors.accent, border: `2px solid ${theme.colors.border}` }} />
+              <div className="absolute -bottom-2 -right-2 -z-10 w-full h-full opacity-12"
+                style={{ background: theme.colors.accent, border: `2px solid ${theme.colors.border}`, borderRadius: theme.radii.card }} />
             </motion.div>
           ))}
         </div>
@@ -198,7 +198,7 @@ function LuxeExperience({ items }: { items: ExperienceItem[] }) {
             EXPERIENCE
           </span>
           <div className="flex items-center gap-4 mt-2 mb-10">
-            <h2 className="font-bold" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: theme.colors.text, fontFamily: "Playfair Display, serif" }}>
+            <h2 className="font-bold" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: theme.colors.text, fontFamily: theme.typography.display }}>
               Work History
             </h2>
             <div className="flex-1" style={{ height: 1, background: theme.colors.border }} />
@@ -214,11 +214,11 @@ function LuxeExperience({ items }: { items: ExperienceItem[] }) {
               viewport={{ once: true }}
               transition={{ delay: i * 0.1, duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
             >
-              <div className="p-1" style={{ background: theme.colors.bgSecondary, borderRadius: "2rem", border: `1px solid ${theme.colors.border}` }}>
+              <div className="p-1" style={{ background: theme.colors.bgSecondary, borderRadius: theme.radii.image, border: `1px solid ${theme.colors.border}` }}>
                 <div style={{
                   background: theme.colors.surface,
-                  borderRadius: "calc(2rem - 0.25rem)",
-                  boxShadow: "inset 0 1px 2px rgba(0,0,0,0.03)",
+                  borderRadius: theme.radii.card,
+                  boxShadow: theme.shadow.card,
                   overflow: "hidden",
                 }}>
                   {exp.imageUrl && (
@@ -229,7 +229,7 @@ function LuxeExperience({ items }: { items: ExperienceItem[] }) {
                   <div className="p-5">
                     <div className="grid md:grid-cols-[1fr_auto] gap-3 items-start">
                       <div>
-                        <h3 className="font-semibold" style={{ color: theme.colors.text, fontFamily: "Playfair Display, serif" }}>
+                        <h3 className="font-semibold" style={{ color: theme.colors.text, fontFamily: theme.typography.display }}>
                           {exp.position || "Posisi"}
                         </h3>
                         <div className="text-sm font-medium mt-1" style={{ color: theme.colors.primary }}>
@@ -241,8 +241,8 @@ function LuxeExperience({ items }: { items: ExperienceItem[] }) {
                           </p>
                         )}
                       </div>
-                      <div className="text-xs font-medium py-1 px-3 rounded-full text-center md:text-right"
-                        style={{ background: `${theme.colors.primary}0A`, color: theme.colors.primary }}>
+                      <div className="text-xs font-medium py-1 px-3 text-center md:text-right"
+                        style={{ background: `${theme.colors.primary}0A`, color: theme.colors.primary, borderRadius: theme.radii.pill }}>
                         {exp.startDate}{exp.startDate ? ", " : ""}{exp.isPresent ? "Present" : exp.endDate || ""}
                       </div>
                     </div>

@@ -53,18 +53,13 @@ const RENDER_DIR = join(process.cwd(), "src/components/portfolio/render");
 /** Literal yang dilarang — wajib lewat token tema. */
 const BANNED: { label: string; re: RegExp }[] = [
   { label: "rounded-*", re: /\brounded-(full|[a-z0-9]+)\b/ },
-  { label: "shadow-*", re: /\bshadow-(sm|md|lg|xl|2xl|premium[\w-]*)\b/ },
+  { label: "shadow-*", re: /\bshadow-(xs|sm|md|lg|xl|2xl|inner|none|premium[\w-]*|\[[^\]]+\])/ },
   { label: "backdrop-blur*", re: /\bbackdrop-blur\b/ },
   { label: "borderRadius literal", re: /borderRadius:\s*["'`]/ },
   { label: "boxShadow literal", re: /boxShadow:\s*["'`]/ },
+  { label: "backdropFilter literal", re: /backdropFilter:\s*["'`]/ },
   { label: "inline fontFamily", re: /fontFamily:\s*["'`]/ },
-  { label: "hex warna", re: /#[0-9a-fA-F]{6}\b/ },
-];
-
-// File yang belum dimigrasi: Task 3 menyelesaikannya. Hapus entri ini di Task 3.
-const PENDING_FILES = [
-  "ExperienceSection.tsx", "EducationSection.tsx", "CertificationsSection.tsx",
-  "OrganizationsSection.tsx", "HobbiesSection.tsx", "TestimonialsSection.tsx",
+  { label: "hex warna", re: /#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6})\b/ },
 ];
 
 const sourceFiles = [
@@ -83,7 +78,6 @@ function stripAllowed(src: string): string {
 describe("Layer A: larangan literal di section & render", () => {
   it.each(sourceFiles.map((f) => [f]))("%s bebas literal", (file: string) => {
     const name = file.split(/[\\/]/).pop()!;
-    if (PENDING_FILES.includes(name)) return; // Task 3 menghapus entri ini
     const src = stripAllowed(readFileSync(file, "utf8"));
     const found = BANNED.filter((b) => b.re.test(src)).map((b) => b.label);
     expect(found, `${name}: literal terlarang`).toEqual([]);

@@ -44,10 +44,11 @@ function GlassHobbies({ items }: { items: HobbyItem[] }) {
               viewport={{ once: true }}
               transition={{ delay: i * 0.05, duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
             >
-              <div className="px-4 py-2.5 rounded-full flex items-center gap-2" style={{
+              <div className="px-4 py-2.5 flex items-center gap-2" style={{
                 background: `${theme.colors.surface}B3`,
                 border: `1px solid ${theme.colors.border}`,
-                backdropFilter: "blur(20px)",
+                backdropFilter: theme.blur.card,
+                borderRadius: theme.radii.pill,
               }}>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={theme.colors.primary} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   {HOBBY_ICONS[i % HOBBY_ICONS.length]}
@@ -97,8 +98,8 @@ function BrutalHobbies({ items }: { items: HobbyItem[] }) {
               <div className="p-4 text-center" style={{
                 background: theme.colors.surface,
                 border: `3px solid ${theme.colors.border}`,
-                borderRadius: "0.75rem",
-                boxShadow: `4px 4px 0px ${theme.colors.border}`,
+                borderRadius: theme.radii.card,
+                boxShadow: theme.shadow.card,
               }}>
                 <div className="w-9 h-9 mx-auto mb-2 flex items-center justify-center" style={{ background: theme.colors.primary }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -137,7 +138,7 @@ function LuxeHobbies({ items }: { items: HobbyItem[] }) {
             INTERESTS
           </span>
           <div className="flex items-center gap-4 mt-2 mb-10">
-            <h2 className="font-bold" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: theme.colors.text, fontFamily: "Playfair Display, serif" }}>
+            <h2 className="font-bold" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: theme.colors.text, fontFamily: theme.typography.display }}>
               Hobi &amp; Minat
             </h2>
             <div className="flex-1" style={{ height: 1, background: theme.colors.border }} />
@@ -156,12 +157,12 @@ function LuxeHobbies({ items }: { items: HobbyItem[] }) {
               <div className="px-4 py-2.5 flex items-center gap-2" style={{
                 background: theme.colors.surface,
                 border: `1px solid ${theme.colors.border}`,
-                borderRadius: "999px",
+                borderRadius: theme.radii.pill,
               }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={theme.colors.primary} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
                   {HOBBY_ICONS[i % HOBBY_ICONS.length]}
                 </svg>
-                <span className="text-sm" style={{ color: theme.colors.text, fontFamily: "Playfair Display, serif" }}>{hobby.name}</span>
+                <span className="text-sm" style={{ color: theme.colors.text, fontFamily: theme.typography.display }}>{hobby.name}</span>
               </div>
             </motion.div>
           ))}

@@ -41,18 +41,19 @@ function GlassEducation({ items }: { items: EducationItem[] }) {
               >
                 <div className="p-[1px]" style={{
                   background: `linear-gradient(135deg, ${theme.colors.primary}30, ${theme.colors.accent}15, transparent)`,
-                  borderRadius: "2rem",
+                  borderRadius: theme.radii.image,
                 }}>
                   <div className="p-5" style={{
                     background: `${theme.colors.surface}B3`,
-                    borderRadius: "calc(2rem - 1px)",
-                    backdropFilter: "blur(20px)",
-                    boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06)",
+                    borderRadius: theme.radii.card,
+                    backdropFilter: theme.blur.card,
+                    boxShadow: theme.shadow.card,
                   }}>
                     <div className="flex items-start gap-4">
                       {/* Decorative icon */}
-                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0" style={{
+                      <div className="w-12 h-12 flex items-center justify-center flex-shrink-0" style={{
                         background: i === 0 ? `linear-gradient(135deg, ${theme.colors.primary}20, ${theme.colors.accent}10)` : `${theme.colors.primary}10`,
+                        borderRadius: theme.radii.card,
                       }}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={theme.colors.primary} strokeWidth="1.5" strokeLinecap="round">
                           <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
@@ -140,14 +141,14 @@ function BrutalEducation({ items }: { items: EducationItem[] }) {
                   <div className="p-5" style={{
                     background: theme.colors.surface,
                     border: `3px solid ${theme.colors.border}`,
-                    borderRadius: "0.75rem",
-                    boxShadow: `6px 6px 0px ${theme.colors.border}`,
+                    borderRadius: theme.radii.card,
+                    boxShadow: theme.shadow.card,
                   }}>
                     <div className="flex items-baseline justify-between gap-3 flex-wrap mb-1">
                       <h3 className="font-bold" style={{ color: theme.colors.text }}>
                         {edu.degree || "Gelar"}
                       </h3>
-                      <span className="text-xs font-bold px-2 py-0.5" style={{ background: theme.colors.accent, color: "#1A1A1A" }}>
+                      <span className="text-xs font-bold px-2 py-0.5" style={{ background: theme.colors.accent, color: theme.colors.text }}>
                         {edu.startDate}{edu.startDate ? ", " : ""}{edu.isPresent ? "Sekarang" : edu.endDate || ""}
                       </span>
                     </div>
@@ -192,7 +193,7 @@ function LuxeEducation({ items }: { items: EducationItem[] }) {
             EDUCATION
           </span>
           <div className="flex items-center gap-4 mt-2 mb-10">
-            <h2 className="font-bold" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: theme.colors.text, fontFamily: "Playfair Display, serif" }}>
+            <h2 className="font-bold" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: theme.colors.text, fontFamily: theme.typography.display }}>
               Education
             </h2>
             <div className="flex-1" style={{ height: 1, background: theme.colors.border }} />
@@ -212,7 +213,7 @@ function LuxeEducation({ items }: { items: EducationItem[] }) {
             >
               {/* Decorative year marker on left */}
               <div className="absolute left-0 top-0 bottom-0 flex flex-col items-center">
-                <div className="w-3 h-3 rounded-full border-2" style={{ borderColor: theme.colors.primary, background: theme.colors.bg }} />
+                <div className="w-3 h-3 border-2" style={{ borderColor: theme.colors.primary, background: theme.colors.bg, borderRadius: theme.radii.pill }} />
                 {i < filtered.length - 1 && (
                   <div className="flex-1 w-[1px]" style={{ background: theme.colors.border }} />
                 )}
@@ -220,14 +221,14 @@ function LuxeEducation({ items }: { items: EducationItem[] }) {
 
               <div className="pb-2">
                 {/* Year as badge */}
-                <span className="inline-block text-xs font-medium px-3 py-0.5 rounded-full mb-2"
-                  style={{ background: `${theme.colors.primary}0A`, color: theme.colors.primary, border: `1px solid ${theme.colors.border}` }}>
+                <span className="inline-block text-xs font-medium px-3 py-0.5 mb-2"
+                  style={{ background: `${theme.colors.primary}0A`, color: theme.colors.primary, border: `1px solid ${theme.colors.border}`, borderRadius: theme.radii.pill }}>
                   {edu.startDate || "-"} {edu.endDate ? `– ${edu.endDate}` : edu.isPresent ? "– Present" : ""}
                 </span>
 
-                <div className="p-1" style={{ background: theme.colors.bgSecondary, borderRadius: "1.5rem", border: `1px solid ${theme.colors.border}` }}>
-                  <div className="p-4" style={{ background: theme.colors.surface, borderRadius: "calc(1.5rem - 0.25rem)" }}>
-                    <h3 className="font-semibold" style={{ color: theme.colors.text, fontFamily: "Playfair Display, serif" }}>
+                <div className="p-1" style={{ background: theme.colors.bgSecondary, borderRadius: theme.radii.card, border: `1px solid ${theme.colors.border}` }}>
+                  <div className="p-4" style={{ background: theme.colors.surface, borderRadius: theme.radii.card }}>
+                    <h3 className="font-semibold" style={{ color: theme.colors.text, fontFamily: theme.typography.display }}>
                       {edu.degree || "Gelar"}
                     </h3>
                     <p className="text-sm font-medium mt-0.5" style={{ color: theme.colors.textSecondary }}>

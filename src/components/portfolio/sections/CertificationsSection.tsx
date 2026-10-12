@@ -42,17 +42,17 @@ function GlassCertifications({ items }: { items: CertificationItem[] }) {
                 className="block p-[1px] h-full"
                 style={{
                   background: `linear-gradient(135deg, ${theme.colors.primary}30, ${theme.colors.accent}15, transparent)`,
-                  borderRadius: "1.5rem",
+                  borderRadius: theme.radii.card,
                 }}
               >
                 <div className="p-5 h-full flex items-start gap-4" style={{
                   background: `${theme.colors.surface}B3`,
-                  borderRadius: "calc(1.5rem - 1px)",
-                  backdropFilter: "blur(20px)",
-                  boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06)",
+                  borderRadius: theme.radii.card,
+                  backdropFilter: theme.blur.card,
+                  boxShadow: theme.shadow.card,
                 }}>
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
-                    style={{ background: `linear-gradient(135deg, ${theme.colors.primary}20, ${theme.colors.accent}10)` }}>
+                  <div className="w-12 h-12 flex items-center justify-center flex-shrink-0"
+                    style={{ background: `linear-gradient(135deg, ${theme.colors.primary}20, ${theme.colors.accent}10)`, borderRadius: theme.radii.card }}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={theme.colors.primary} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="12" cy="9" r="6" />
                       <path d="M8.5 14.5 7 22l5-3 5 3-1.5-7.5" />
@@ -66,8 +66,8 @@ function GlassCertifications({ items }: { items: CertificationItem[] }) {
                       {cert.issuer}
                     </p>
                     {cert.year && (
-                      <span className="inline-block text-xs font-medium mt-2 px-2 py-0.5 rounded-full"
-                        style={{ background: `${theme.colors.primary}10`, color: theme.colors.accent }}>
+                      <span className="inline-block text-xs font-medium mt-2 px-2 py-0.5"
+                        style={{ background: `${theme.colors.primary}10`, color: theme.colors.accent, borderRadius: theme.radii.pill }}>
                         {cert.year}
                       </span>
                     )}
@@ -119,13 +119,13 @@ function BrutalCertifications({ items }: { items: CertificationItem[] }) {
                 style={{
                   background: theme.colors.surface,
                   border: `3px solid ${theme.colors.border}`,
-                  borderRadius: "0.75rem",
-                  boxShadow: `6px 6px 0px ${theme.colors.border}`,
+                  borderRadius: theme.radii.card,
+                  boxShadow: theme.shadow.card,
                 }}
               >
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="w-10 h-10 flex items-center justify-center shrink-0" style={{ background: theme.colors.accent }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={theme.colors.text} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="12" cy="9" r="6" />
                       <path d="M8.5 14.5 7 22l5-3 5 3-1.5-7.5" />
                     </svg>
@@ -168,7 +168,7 @@ function LuxeCertifications({ items }: { items: CertificationItem[] }) {
             CERTIFICATIONS
           </span>
           <div className="flex items-center gap-4 mt-2 mb-10">
-            <h2 className="font-bold" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: theme.colors.text, fontFamily: "Playfair Display, serif" }}>
+            <h2 className="font-bold" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: theme.colors.text, fontFamily: theme.typography.display }}>
               Sertifikat
             </h2>
             <div className="flex-1" style={{ height: 1, background: theme.colors.border }} />
@@ -189,17 +189,17 @@ function LuxeCertifications({ items }: { items: CertificationItem[] }) {
                 target={cert.url ? "_blank" : undefined}
                 rel={cert.url ? "noopener noreferrer" : undefined}
                 className="flex items-center justify-between gap-4 p-5"
-                style={{ background: theme.colors.surface, border: `1px solid ${theme.colors.border}`, borderRadius: "1.25rem" }}
+                style={{ background: theme.colors.surface, border: `1px solid ${theme.colors.border}`, borderRadius: theme.radii.card }}
               >
                 <div className="flex items-center gap-4 min-w-0">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ border: `1px solid ${theme.colors.primary}` }}>
+                  <div className="w-10 h-10 flex items-center justify-center flex-shrink-0" style={{ border: `1px solid ${theme.colors.primary}`, borderRadius: theme.radii.pill }}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={theme.colors.primary} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="12" cy="9" r="6" />
                       <path d="M8.5 14.5 7 22l5-3 5 3-1.5-7.5" />
                     </svg>
                   </div>
                   <div className="min-w-0">
-                    <h3 className="font-semibold truncate" style={{ color: theme.colors.text, fontFamily: "Playfair Display, serif" }}>
+                    <h3 className="font-semibold truncate" style={{ color: theme.colors.text, fontFamily: theme.typography.display }}>
                       {cert.name}
                     </h3>
                     {cert.issuer && (
@@ -208,8 +208,8 @@ function LuxeCertifications({ items }: { items: CertificationItem[] }) {
                   </div>
                 </div>
                 {cert.year && (
-                  <span className="text-xs font-medium px-3 py-1 rounded-full flex-shrink-0"
-                    style={{ background: `${theme.colors.primary}0A`, color: theme.colors.primary }}>
+                  <span className="text-xs font-medium px-3 py-1 flex-shrink-0"
+                    style={{ background: `${theme.colors.primary}0A`, color: theme.colors.primary, borderRadius: theme.radii.pill }}>
                     {cert.year}
                   </span>
                 )}

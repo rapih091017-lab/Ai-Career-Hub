@@ -37,17 +37,17 @@ function GlassOrganizations({ items }: { items: OrganizationItem[] }) {
             >
               <div className="p-[1px]" style={{
                 background: `linear-gradient(135deg, ${theme.colors.primary}30, ${theme.colors.accent}15, transparent)`,
-                borderRadius: "1.5rem",
+                borderRadius: theme.radii.card,
               }}>
                 <div className="p-5" style={{
                   background: `${theme.colors.surface}B3`,
-                  borderRadius: "calc(1.5rem - 1px)",
-                  backdropFilter: "blur(20px)",
-                  boxShadow: "inset 0 1px 1px rgba(255,255,255,0.06)",
+                  borderRadius: theme.radii.card,
+                  backdropFilter: theme.blur.card,
+                  boxShadow: theme.shadow.card,
                 }}>
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
-                      style={{ background: `linear-gradient(135deg, ${theme.colors.primary}20, ${theme.colors.accent}10)` }}>
+                    <div className="w-12 h-12 flex items-center justify-center flex-shrink-0"
+                      style={{ background: `linear-gradient(135deg, ${theme.colors.primary}20, ${theme.colors.accent}10)`, borderRadius: theme.radii.card }}>
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={theme.colors.primary} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                         <circle cx="9" cy="8" r="3.5" />
                         <circle cx="17" cy="10" r="2.5" />
@@ -112,13 +112,13 @@ function BrutalOrganizations({ items }: { items: OrganizationItem[] }) {
               <div className="p-5" style={{
                 background: theme.colors.surface,
                 border: `3px solid ${theme.colors.border}`,
-                borderRadius: "0.75rem",
-                boxShadow: `6px 6px 0px ${theme.colors.border}`,
+                borderRadius: theme.radii.card,
+                boxShadow: theme.shadow.card,
               }}>
                 <div className="flex items-center justify-between gap-3 flex-wrap mb-2">
                   <h3 className="font-bold" style={{ color: theme.colors.text }}>{org.name}</h3>
                   {org.period && (
-                    <span className="text-xs font-bold px-2 py-0.5" style={{ background: theme.colors.accent, color: "#1A1A1A" }}>{org.period}</span>
+                    <span className="text-xs font-bold px-2 py-0.5" style={{ background: theme.colors.accent, color: theme.colors.text }}>{org.period}</span>
                   )}
                 </div>
                 {org.role && (
@@ -155,7 +155,7 @@ function LuxeOrganizations({ items }: { items: OrganizationItem[] }) {
             ORGANIZATIONS
           </span>
           <div className="flex items-center gap-4 mt-2 mb-10">
-            <h2 className="font-bold" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: theme.colors.text, fontFamily: "Playfair Display, serif" }}>
+            <h2 className="font-bold" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: theme.colors.text, fontFamily: theme.typography.display }}>
               Organisasi
             </h2>
             <div className="flex-1" style={{ height: 1, background: theme.colors.border }} />
@@ -173,15 +173,15 @@ function LuxeOrganizations({ items }: { items: OrganizationItem[] }) {
               className="flex gap-5"
             >
               <div className="flex flex-col items-center">
-                <div className="w-9 h-9 rounded-full flex items-center justify-center font-semibold text-sm"
-                  style={{ background: theme.colors.primary, color: "#fff" }}>
+                <div className="w-9 h-9 flex items-center justify-center font-semibold text-sm"
+                  style={{ background: theme.colors.primary, color: "#fff", borderRadius: theme.radii.pill }}>
                   {String(i + 1).padStart(2, "0")}
                 </div>
                 {i < filtered.length - 1 && <div className="flex-1 w-[1px] my-1" style={{ background: theme.colors.border }} />}
               </div>
               <div className="pb-6 flex-1">
                 <div className="flex items-baseline justify-between gap-3 flex-wrap">
-                  <h3 className="font-semibold" style={{ color: theme.colors.text, fontFamily: "Playfair Display, serif" }}>{org.name}</h3>
+                  <h3 className="font-semibold" style={{ color: theme.colors.text, fontFamily: theme.typography.display }}>{org.name}</h3>
                   {org.period && (
                     <span className="text-xs font-medium" style={{ color: theme.colors.primary }}>{org.period}</span>
                   )}
