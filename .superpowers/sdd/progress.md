@@ -138,3 +138,15 @@ Task 2 (Spec2): complete (commits 9e9a81c..52fa596, spec PASS, quality fix wave 
 - T2: hex 8 digit #RRGGBBAA lolos aturan hex
 - T2: FloatingParticles dobel sumber (theme radius + colors prop) - disengaja, diff minimal
 
+Task 3 (Spec2): complete (commits f40d2a1..9123c10, spec PASS, quality APPROVED, 426 test, 3 penguatan Layer A)
+
+## Minor findings Spec 2 (lanjutan)
+- T3: boxShadow literal dalam ternary/template luput dari regex quote-anchored - pindah ke T4 (penguatan)
+- T3: rounded-[bracket] tidak tertangkap - sifatnya sama, pindah ke T4
+- T3: filter (sepia luxe), outline, textShadow di luar daftar Layer A - kandidat amandemen spek; sepia mungkin jadi token tanda tangan Luxe
+- T3: hex 4 digit #RGBA lolos
+- T3: blur-[120px] dekoratif di luar aturan; glow token siap jadi target setelah aturan ada
+- T3: sudut bezel glass (image2rem vs card1.5rem) membentuk wedge ~4px - cek visual di T5
+- T3: halo dot timeline + bayangan alternasi testimoni hilang (aturan 1 bayangan/tema) - jalur pemulihan slot shadow.ring masa depan
+- T3: drop-shadow-sm ikut regex (0 kejadian)
+
