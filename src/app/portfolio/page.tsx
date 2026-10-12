@@ -9,9 +9,39 @@ import AuthGuard from "@/components/AuthGuard";
 import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
 
-import { THEMES, TEMPLATE_PREVIEWS, DEFAULT_THEME_ID } from "@/components/portfolio/themes";
+import { THEMES, DEFAULT_THEME_ID } from "@/components/portfolio/themes";
+import { PortfolioDocument, EMPTY_FORM_DATA } from "@/components/portfolio/render/PortfolioDocument";
+import type { PortfolioData, ThemeId } from "@/components/portfolio/types";
 
 const THEME_LIST = Object.values(THEMES);
+
+/** Data mini per kartu — hanya hero, cukup untuk thumbnail. */
+function thumbnailData(first: string, last: string, headline: string, sub: string, bio: string): PortfolioData {
+  return {
+    formData: {
+      ...EMPTY_FORM_DATA,
+      heroFirstName: first,
+      heroLastName: last,
+      heroHeadline: headline,
+      heroSubHeadline: sub,
+      heroBio: bio,
+    },
+    projects: [],
+    experiences: [],
+    educations: [],
+    certifications: [],
+    organizations: [],
+    hobbies: [],
+    testimonials: [],
+    extraLinks: [],
+  };
+}
+
+const THEME_THUMBNAILS: Record<ThemeId, PortfolioData> = {
+  glass: thumbnailData("Alex", "Morgan", "Full-Stack Developer", "Designing scalable digital ecosystems", "Antarmuka cepat dengan arsitektur modern."),
+  brutal: thumbnailData("Riley", "K.", "Creative Developer & Motion Designer", "Breaking boundaries with code", "Eksperimen interaksi web dan gerak."),
+  luxe: thumbnailData("Maya", "Chen", "UI/UX Designer & Brand Strategist", "Crafting human-centered experiences", "Masalah rumit jadi produk yang enak dipakai."),
+};
 
 export default function PortfolioPage() {
   const { t, lang, toggleLang } = useTranslation();
@@ -123,8 +153,7 @@ export default function PortfolioPage() {
             >
               <h2 className="font-headline-md text-on-surface mb-4">{t("portfolio.choose-theme")}</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {THEME_LIST.map((theme, i) => {
-                  const preview = TEMPLATE_PREVIEWS[theme.id as keyof typeof TEMPLATE_PREVIEWS];
+                {THEME_LIST.map((theme, i) => {
                   return (
                     <motion.div
                       key={theme.id}
@@ -141,41 +170,18 @@ export default function PortfolioPage() {
                             : "border-outline-variant/30 bg-surface-container-lowest hover:border-primary/50"
                         }`}
                       >
-                        {/* Live preview with dummy data */}
-                        <div className="w-full" style={{ background: theme.colors.bg, minHeight: 160 }}>
-                          <div className="px-4 py-3" style={{ fontFamily: theme.font.includes(" ") ? `'${theme.font}', sans-serif` : `${theme.font}, sans-serif` }}>
-                            {/* Mini nav mockup */}
-                            <div className="flex justify-between items-center mb-2" style={{ fontSize: 10, color: theme.colors.textMuted }}>
-                              <span style={{ fontWeight: 700, fontSize: 12, color: theme.colors.text }}>
-                                {preview?.hero.name.split(" ")[0] || "Nama"}<span style={{ color: theme.colors.primary }}>.</span>
-                              </span>
-                              <div className="flex gap-2">
-                                <span style={{ color: theme.colors.textMuted }}>Tentang</span>
-                                <span style={{ color: theme.colors.textMuted }}>Proyek</span>
-                              </div>
-                            </div>
-                            {/* Mini hero mockup */}
-                            <div className="mb-2">
-                              <h3 className="font-bold leading-tight" style={{
-                                fontSize: 14,
-                                color: theme.colors.text,
-                                letterSpacing: "-0.03em",
-                              }}>
-                                Halo, Saya{" "}
-                                <span style={{ color: theme.colors.primary }}>{preview?.hero.name.split(" ")[0] || "User"}</span>
-                              </h3>
-                              <p className="text-xs mt-0.5" style={{ color: theme.colors.primary, fontWeight: 600 }}>
-                                {preview?.hero.title || "Developer"}
-                              </p>
-                            </div>
-                            {/* Mini stats mockup */}
-                            <div className="flex gap-1.5 mt-2">
-                              {preview?.stats.map((s, si) => (
-                                <div key={si} className="flex-1 py-1 rounded text-center" style={{ background: `${theme.colors.primary}12`, fontSize: 9, color: theme.colors.textMuted }}>
-                                  <div style={{ fontWeight: 700, color: theme.colors.primary, fontSize: 11 }}>{s}</div>
-                                </div>
-                              ))}
-                            </div>
+                        {/* Thumbnail: render asli per tema — beda struktur, bukan beda warna */}
+                        <div className="relative w-full overflow-hidden" style={{ background: theme.colors.bg, height: 168 }}>
+                          <div
+                            aria-hidden="true"
+                            className="absolute top-0 left-0 origin-top-left"
+                            style={{ width: "calc(100% / 0.62)", transform: "scale(0.62)" }}
+                          >
+                            <PortfolioDocument
+                              data={THEME_THUMBNAILS[theme.id as ThemeId]}
+                              themeId={theme.id as ThemeId}
+                              mode="static"
+                            />
                           </div>
                         </div>
                         {/* Info */}
@@ -183,8 +189,13 @@ export default function PortfolioPage() {
                           <div className="flex items-center gap-2 mb-1">
                             <div className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: theme.colors.primary }}></div>
                             <h3 className="font-label-bold text-on-surface text-sm">{theme.name}</h3>
+                            {theme.id === DEFAULT_THEME_ID && (
+                              <span className="ml-1 rounded bg-primary/10 px-1.5 py-0.5 text-xs font-semibold text-primary">
+                                {t("portfolio.theme.default-badge")}
+                              </span>
+                            )}
                           </div>
-                          <p className="text-label-sm text-on-surface-variant">{theme.description}</p>
+                          <p className="text-label-sm text-on-surface-variant">{t(`portfolio.theme.${theme.id}-desc`)}</p>
                         </div>
                       </button>
                     </motion.div>
