@@ -32,8 +32,10 @@ export interface PackageDef {
 export const PACKAGES: Record<string, PackageDef> = {
   // ── SATUAN ──
   cv_starter: {
-    id: "cv_starter", name: "CV Starter", price: 7000, periodDays: 7, maxActivePortfolios: 0,
-    limits: { ai_cv_generate: false, cv_analyzer: false, ai_revision: false, ai_suggestion: false, cover_letter: false, portfolio_web: false, pdf_export: 1, bulk_analyzer: false, white_label: false },
+    id: "cv_starter", name: "Coba Pro 3 Hari", price: 7000, periodDays: 3, maxActivePortfolios: 0,
+    // Trial akses Pro 3 hari: harus jelas lebih baik dari FREE_LIMITS (2 AI,
+    // 2 analisis, 3 polish, 2 PDF) supaya 7rb bukan pembelian yang meniru gratis.
+    limits: { ai_cv_generate: 10, cv_analyzer: 3, ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: "unlimited", portfolio_web: false, pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
   },
   cv_ai_generate: {
     id: "cv_ai_generate", name: "CV + AI Generate", price: 12000, periodDays: 30, maxActivePortfolios: 0,
@@ -45,11 +47,12 @@ export const PACKAGES: Record<string, PackageDef> = {
   },
   portfolio_web: {
     id: "portfolio_web", name: "Portfolio Web", price: 35000, periodDays: 30, maxActivePortfolios: 5,
-    limits: { ai_cv_generate: false, cv_analyzer: false, ai_revision: false, ai_suggestion: false, cover_letter: false, portfolio_web: 1, pdf_export: false, bulk_analyzer: false, white_label: false },
+    // Kartu pricing menjanjikan AI portfolio + PDF; batas harus membuktikannya.
+    limits: { ai_cv_generate: false, cv_analyzer: false, ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: false, portfolio_web: "unlimited", pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
   },
   bundle_hemat: {
-    id: "bundle_hemat", name: "Bundle Hemat", price: 49000, periodDays: 60, maxActivePortfolios: 5,
-    limits: { ai_cv_generate: "unlimited", cv_analyzer: 1, ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: "unlimited", portfolio_web: 1, pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
+    id: "bundle_hemat", name: "Paket Lamaran", price: 49000, periodDays: 60, maxActivePortfolios: 5,
+    limits: { ai_cv_generate: "unlimited", cv_analyzer: 1, ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: "unlimited", portfolio_web: "unlimited", pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
   },
 
   // ── SINGLE CV (legacy) ──
@@ -159,7 +162,7 @@ export const FREE_LIMITS: Record<Feature, number | "unlimited" | false> = {
   ai_revision: 3,
   ai_suggestion: 3,
   cover_letter: 3,
-  portfolio_web: false,
+  portfolio_web: 1, // cicip AI portfolio gratis: 1x generate/bulan (usage_logs)
   pdf_export: 2,
   bulk_analyzer: false,
   white_label: false,

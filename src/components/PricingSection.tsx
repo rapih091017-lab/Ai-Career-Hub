@@ -42,10 +42,11 @@ const SATUAN_PLAN_DATA: Omit<PlanData, "nameKey" | "descKey" | "ctaKey" | "unitK
     id: "cv-starter", price: 7000, unit: "per CV", icon: "description",
     ctaStyle: "outline", href: "/builder/new", featured: false,
     features: [
-      { key: "pricing.feat.form-editor", included: true },
-      { key: "pricing.feat.1-template", included: true },
-      { key: "pricing.feat.pdf-export", included: true },
-      { key: "pricing.feat.7-days", included: true },
+      { key: "pricing.feat.trial-ai", included: true },
+      { key: "pricing.feat.trial-analyzer", included: true },
+      { key: "pricing.feat.trial-cover", included: true },
+      { key: "pricing.feat.pdf-unlimited", included: true },
+      { key: "pricing.feat.3-days", included: true },
     ],
   },
   {
@@ -77,6 +78,7 @@ const SATUAN_PLAN_DATA: Omit<PlanData, "nameKey" | "descKey" | "ctaKey" | "unitK
     ctaStyle: "outline", href: "/portfolio", badgeKey: "pricing.badge-premium",
     features: [
       { key: "pricing.feat.ai-portfolio", included: true },
+      { key: "pricing.feat.pdf-unlimited", included: true },
       { key: "pricing.feat.3-themes", included: true },
       { key: "pricing.feat.public-link", included: true },
       { key: "pricing.feat.mobile-responsive", included: true },
@@ -89,12 +91,11 @@ const LANGGANAN_PLAN_DATA: Omit<PlanData, "nameKey" | "descKey" | "ctaKey" | "un
     id: "free", price: 0, unit: "selamanya", icon: "card_giftcard",
     ctaStyle: "muted", href: "/login",
     features: [
-      { key: "pricing.feat.1-cv", included: true },
-      { key: "pricing.feat.preview-all", included: true },
+      { key: "pricing.feat.free-ai", included: true },
+      { key: "pricing.feat.free-analyzer", included: true },
+      { key: "pricing.feat.free-portfolio", included: true },
       { key: "pricing.feat.cover-free-3", included: true },
-      { key: "pricing.feat.ai-gen", included: false },
-      { key: "pricing.feat.cv-analyzer", included: false },
-      { key: "pricing.feat.portfolio-web", included: false },
+      { key: "pricing.feat.preview-all", included: true },
     ],
   },
   {
@@ -142,14 +143,14 @@ const LANGGANAN_PLAN_DATA: Omit<PlanData, "nameKey" | "descKey" | "ctaKey" | "un
 const FAQ_KEYS = [0, 1, 2, 3, 4];
 
 const COMPARISON_ROW_KEYS = [
-  { labelKey: "pricing.compare.ai-gen", free: "-", starter: "5x/bln", pro: "Unlimited", business: "20x/bln" },
+  { labelKey: "pricing.compare.ai-gen", free: "2x/bln", starter: "5x/bln", pro: "Unlimited", business: "20x/bln" },
   { labelKey: "pricing.compare.templates", free: "Preview", starter: "5", pro: "10+", business: "10+" },
-  { labelKey: "pricing.compare.pdf-export", free: "-", starter: "✓", pro: "✓", business: "White-label" },
-  { labelKey: "pricing.compare.analyzer", free: "-", starter: "-", pro: "Unlimited", business: "Bulk" },
-  { labelKey: "pricing.compare.portfolio", free: "-", starter: "-", pro: "1 aktif", business: "3 aktif" },
+  { labelKey: "pricing.compare.pdf-export", free: "2x/bln", starter: "✓", pro: "✓", business: "White-label" },
+  { labelKey: "pricing.compare.analyzer", free: "2x/bln", starter: "-", pro: "Unlimited", business: "Bulk" },
+  { labelKey: "pricing.compare.portfolio", free: "1x AI/bln", starter: "-", pro: "1 aktif", business: "3 aktif" },
   { labelKey: "pricing.compare.saved-cvs", free: "-", starter: "3", pro: "20", business: "Unlimited" },
   { labelKey: "pricing.compare.cover-letter", free: "3x/bln", starter: "-", pro: "Unlimited", business: "Unlimited" },
-  { labelKey: "pricing.compare.ai-revision", free: "-", starter: "-", pro: "✓", business: "✓" },
+  { labelKey: "pricing.compare.ai-revision", free: "3x/bln", starter: "-", pro: "✓", business: "✓" },
   { labelKey: "pricing.compare.priority-support", free: "-", starter: "-", pro: "-", business: "✓" },
 ];
 
@@ -163,7 +164,7 @@ interface PricingSectionProps {
 function makePlan(base: Omit<PlanData, "nameKey" | "descKey" | "ctaKey" | "unitKey">, t: (k: string) => string): PlanData {
   const id = base.id;
   const idMap: Record<string, { name: string; desc: string; cta: string; unit: string }> = {
-    "cv-starter": { name: "pricing.plan.cv-starter.name", desc: "pricing.plan.cv-starter.desc", cta: "pricing.plan.cv-starter.cta", unit: "pricing.unit.per-cv" },
+    "cv-starter": { name: "pricing.plan.cv-starter.name", desc: "pricing.plan.cv-starter.desc", cta: "pricing.plan.cv-starter.cta", unit: "pricing.unit.3-days" },
     "cv-ai-generate": { name: "pricing.plan.cv-ai.name", desc: "pricing.plan.cv-ai.desc", cta: "pricing.plan.cv-ai.cta", unit: "pricing.unit.per-cv" },
     "cv-analyzer": { name: "pricing.plan.analyzer.name", desc: "pricing.plan.analyzer.desc", cta: "pricing.plan.analyzer.cta", unit: "pricing.unit.per-analysis" },
     "portfolio-web": { name: "pricing.plan.portfolio.name", desc: "pricing.plan.portfolio.desc", cta: "pricing.plan.portfolio.cta", unit: "pricing.unit.per-portfolio" },
@@ -239,6 +240,48 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
             {mode === "satuan" ? t("pricing.value-satuan") : t("pricing.value-langganan")}
           </p>
         </div>
+
+        {/* ─── BUNDLE HERO (mode langganan) ─── */}
+        {mode === "langganan" && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.45 }}
+            className="relative overflow-hidden mb-6 rounded-2xl border-2 border-primary bg-surface-container-lowest p-6 md:p-8 shadow-premium-md"
+          >
+            <span className="absolute top-0 right-6 inline-flex items-center gap-1.5 rounded-b-lg bg-primary px-3 py-1.5 text-xs font-bold text-on-primary">
+              <span className="material-symbols-outlined text-sm" aria-hidden="true">sell</span>
+              {t("pricing.bundle.badge")}
+            </span>
+            <div className="flex flex-col md:flex-row md:items-center gap-5">
+              <div className="flex-1 pr-16 md:pr-0">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="material-symbols-outlined text-primary" aria-hidden="true">workspace_premium</span>
+                  <h3 className="font-label-bold text-lg md:text-xl text-on-surface dark:text-white">
+                    {t("pricing.bundle.title")}
+                  </h3>
+                </div>
+                <div className="flex items-baseline gap-2 mb-2">
+                  <span className="font-bold tabular-nums text-[32px] leading-none text-primary">Rp49.000</span>
+                  <span className="text-xs text-on-surface-variant">/ 60 hari, sekali bayar</span>
+                </div>
+                <p className="text-sm text-on-surface-variant max-w-2xl">{t("pricing.bundle.desc")}</p>
+              </div>
+              <div className="shrink-0">
+                <MagneticButton>
+                  <Link
+                    href="/settings/billing"
+                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary px-6 text-sm font-bold text-on-primary hover:brightness-110 active:scale-[0.98] transition-all"
+                  >
+                    <span className="material-symbols-outlined text-lg" aria-hidden="true">rocket_launch</span>
+                    {t("pricing.bundle.cta")}
+                  </Link>
+                </MagneticButton>
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         {/* ─── PRICING CARDS ─── */}
         <AnimatePresence mode="wait">
