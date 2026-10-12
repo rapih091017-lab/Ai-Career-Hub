@@ -235,6 +235,76 @@ function LuxeAbout({ f }: { f: PortfolioFormData }) {
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * MINIMALIST — dua kolom asimetris: label + garis
+ * rambut di kiri, paragraf lebar di kanan. Angka
+ * statistik jadi teks polos yang dipisah garis
+ * vertikal, bukan kartu.
+ * ═══════════════════════════════════════════════ */
+function MinimalistAbout({ f }: { f: PortfolioFormData }) {
+  const theme = usePortfolioTheme();
+  const stats = [
+    { value: f.aboutYearsExp, label: "Tahun" },
+    { value: f.aboutProjectsDone, label: "Proyek" },
+    { value: f.aboutClientsHappy, label: "Klien" },
+  ].filter((s) => s.value);
+
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(64px, 9vh, 112px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "minmax(120px, 200px) 1fr", gap: "clamp(24px, 5vw, 64px)" }}>
+          <div>
+            <span style={{
+              fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase",
+              color: theme.colors.textSecondary,
+            }}>
+              01 / Tentang
+            </span>
+            <div style={{ height: 1, background: theme.colors.border, marginTop: 16 }} />
+          </div>
+
+          <div>
+            {f.aboutText ? (
+              <p style={{
+                fontFamily: theme.typography.display,
+                fontSize: "clamp(18px, 2.4vw, 22px)",
+                lineHeight: 1.6,
+                letterSpacing: "-0.01em",
+                color: theme.colors.text,
+                margin: 0,
+                maxWidth: 680,
+              }}>
+                {f.aboutText}
+              </p>
+            ) : null}
+
+            {stats.length ? (
+              <div style={{ display: "flex", gap: "clamp(24px, 4vw, 48px)", marginTop: 40, flexWrap: "wrap" }}>
+                {stats.map((s, i) => (
+                  <div key={s.label} style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                    {i > 0 ? (
+                      <span aria-hidden="true" style={{ color: theme.colors.border, marginRight: 8 }}>|</span>
+                    ) : null}
+                    <span style={{
+                      fontFamily: theme.typography.display,
+                      fontSize: "clamp(24px, 3vw, 32px)",
+                      fontWeight: 500,
+                      color: theme.colors.text,
+                    }}>
+                      {s.value}
+                    </span>
+                    <span style={{ fontSize: 13, color: theme.colors.textSecondary }}>{s.label}</span>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function AboutSection({ data: f }: Props) {
   const theme = usePortfolioTheme();
@@ -243,6 +313,7 @@ export default function AboutSection({ data: f }: Props) {
     case "glass": return <GlassAbout f={f} />;
     case "brutal": return <BrutalAbout f={f} />;
     case "luxe": return <LuxeAbout f={f} />;
+    case "minimalist": return <MinimalistAbout f={f} />;
     default: return <GlassAbout f={f} />;
   }
 }

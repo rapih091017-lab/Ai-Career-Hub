@@ -578,7 +578,6 @@ function MinimalistHero({ data: f, name, initials }: { data: PortfolioFormData; 
   const theme = usePortfolioTheme();
   return (
     <section
-      data-section-id="hero"
       data-hero-variant="minimalist"
       className="relative w-full"
       style={{ background: theme.colors.bg, color: theme.colors.text, padding: "clamp(56px, 10vh, 120px) 0" }}

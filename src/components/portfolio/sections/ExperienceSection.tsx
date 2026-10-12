@@ -244,6 +244,80 @@ function LuxeExperience({ items }: { items: ExperienceItem[] }) {
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * MINIMALIST — daftar satu kolom: periode di kiri,
+ * perusahaan di kanan, dipisah garis rambut. Tanpa
+ * kartu, tanpa aksen blok.
+ * ═══════════════════════════════════════════════ */
+function MinimalistExperience({ items }: { items: ExperienceItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((e) => e.company || e.position);
+  if (!filtered.length) return null;
+
+  return (
+    <section style={{ background: theme.colors.bgSecondary, padding: "clamp(64px, 9vh, 112px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)" }}>
+        <span style={{ fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: theme.colors.textSecondary }}>
+          02 / Pengalaman
+        </span>
+        <h2 style={{
+          fontFamily: theme.typography.display,
+          fontSize: "clamp(28px, 4vw, 44px)",
+          fontWeight: 500,
+          letterSpacing: "-0.02em",
+          color: theme.colors.text,
+          margin: "16px 0 40px",
+        }}>
+          Pengalaman Kerja
+        </h2>
+
+        <div>
+          {filtered.map((e) => (
+            <div
+              key={e.id}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "minmax(120px, 200px) 1fr",
+                gap: "clamp(16px, 3vw, 40px)",
+                padding: "24px 0",
+                borderTop: `1px solid ${theme.colors.border}`,
+              }}
+            >
+              <div style={{ fontSize: 13, color: theme.colors.textSecondary, letterSpacing: "0.04em" }}>
+                {e.startDate} — {e.isPresent ? "sekarang" : e.endDate}
+              </div>
+              <div>
+                <div style={{
+                  display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap",
+                }}>
+                  <h3 style={{
+                    fontFamily: theme.typography.display,
+                    fontSize: 18,
+                    fontWeight: 500,
+                    color: theme.colors.text,
+                    margin: 0,
+                  }}>
+                    {e.company}
+                  </h3>
+                  {e.position ? (
+                    <span style={{ fontSize: 14, color: theme.colors.textSecondary }}>{e.position}</span>
+                  ) : null}
+                </div>
+                {e.description ? (
+                  <p style={{ fontSize: 14, lineHeight: 1.7, color: theme.colors.textSecondary, margin: "8px 0 0", maxWidth: 620 }}>
+                    {e.description}
+                  </p>
+                ) : null}
+              </div>
+            </div>
+          ))}
+          <div style={{ height: 1, background: theme.colors.border }} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function ExperienceSection({ items }: Props) {
   const theme = usePortfolioTheme();
@@ -251,6 +325,7 @@ export default function ExperienceSection({ items }: Props) {
     case "glass": return <GlassExperience items={items} />;
     case "brutal": return <BrutalExperience items={items} />;
     case "luxe": return <LuxeExperience items={items} />;
+    case "minimalist": return <MinimalistExperience items={items} />;
     default: return <GlassExperience items={items} />;
   }
 }

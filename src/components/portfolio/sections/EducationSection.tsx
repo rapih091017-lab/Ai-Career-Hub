@@ -233,6 +233,71 @@ function LuxeEducation({ items }: { items: EducationItem[] }) {
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * MINIMALIST — label di kiri, daftar pendidikan di
+ * kanan; tiap baris dipisah garis rambut.
+ * ═══════════════════════════════════════════════ */
+function MinimalistEducation({ items }: { items: EducationItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((e) => e.institution || e.degree);
+  if (!filtered.length) return null;
+
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(64px, 9vh, 112px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "minmax(120px, 200px) 1fr", gap: "clamp(24px, 5vw, 64px)" }}>
+          <div>
+            <span style={{ fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: theme.colors.textSecondary }}>
+              03 / Pendidikan
+            </span>
+            <div style={{ height: 1, background: theme.colors.border, marginTop: 16 }} />
+          </div>
+
+          <div>
+            <h2 style={{
+              fontFamily: theme.typography.display,
+              fontSize: "clamp(28px, 4vw, 44px)",
+              fontWeight: 500,
+              letterSpacing: "-0.02em",
+              color: theme.colors.text,
+              margin: "0 0 32px",
+            }}>
+              Pendidikan
+            </h2>
+            {filtered.map((e) => (
+              <div
+                key={e.id}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "baseline",
+                  gap: 16,
+                  flexWrap: "wrap",
+                  padding: "20px 0",
+                  borderTop: `1px solid ${theme.colors.border}`,
+                }}
+              >
+                <div>
+                  <h3 style={{ fontFamily: theme.typography.display, fontSize: 17, fontWeight: 500, color: theme.colors.text, margin: 0 }}>
+                    {e.institution}
+                  </h3>
+                  <p style={{ fontSize: 14, color: theme.colors.textSecondary, margin: "6px 0 0" }}>
+                    {[e.degree, e.field].filter(Boolean).join(" · ")}
+                  </p>
+                </div>
+                <span style={{ fontSize: 13, color: theme.colors.textSecondary }}>
+                  {e.startDate} — {e.endDate}
+                </span>
+              </div>
+            ))}
+            <div style={{ height: 1, background: theme.colors.border }} />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function EducationSection({ items }: Props) {
   const theme = usePortfolioTheme();
@@ -240,6 +305,7 @@ export default function EducationSection({ items }: Props) {
     case "glass": return <GlassEducation items={items} />;
     case "brutal": return <BrutalEducation items={items} />;
     case "luxe": return <LuxeEducation items={items} />;
+    case "minimalist": return <MinimalistEducation items={items} />;
     default: return <GlassEducation items={items} />;
   }
 }
