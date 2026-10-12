@@ -119,3 +119,12 @@ Base commit: 641c722
 
 ## Progress
 
+Task 1 (Spec2): complete (commits d9656ad..b257fe0, spec PASS, quality APPROVED, 411 test, 1 fix wave)
+
+## Minor findings Spec 2
+- T1: shadow.focus glass alpha0.55 vs focusRing hex; focusRing/shadow.focus duplikat colors.primary (sinkron di T5)
+- T1: fallback font bare sans-serif, spec minta stack eksplisit ui-sans-serif, system-ui (selesaikan di T4/T6)
+- T1: list grup token di test hardcoded (tsc yang jaring sub-field)
+- T1: T5 pakai outline via focusRing agar test Luxe box-shadow hanya none tak bentrok shadow.focus
+- T1: tabel survey di report berisi angka brutal pre-revert (tabel deviasi sudah benar)
+
