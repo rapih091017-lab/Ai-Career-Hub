@@ -159,3 +159,6 @@ Task 6 (Spec2): complete (commits 31cb6c1..6f4d8ca, fontUrl Google-only + ThemeF
 - colors.accent brutal #FFCC00 di luar pasangan uji (spek hanya .primary)
 - 12 situs ganti white->onPrimary; lihat laporan task-5-6-report.md
 
+Task 7+8 (Spec2): complete (commits 2fb3803..8e37655, re-compose6x3 + sweep EN->ID + Layer C guard,471 test, subagent sukses)
+- flake 1x tak terulang (2 run bersih), visual via render statis bukan preview live, Tools/Project Selesai per konvensi i18n
+
