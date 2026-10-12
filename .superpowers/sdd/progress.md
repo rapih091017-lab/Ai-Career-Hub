@@ -65,6 +65,23 @@ Base commit: `b8dd9ff`
 - Task 16: `.env` worktree gagal validasi `src/lib/env.ts` (AUTH_SECRET/DEEPSEEK) — semua route DB melempar saat dev tanpa env injection (pre-existing)
 - Task 16: sweep text-xs (37 pelanggaran) di 15 file portofolio; mockup visual setelah sweep belum diperiksa manusia
 
+## Hasil review akhir cabang (final whole-branch)
+
+Verdict awal **FIX FIRST** dengan 7 item — **semua sudah diperbaiki** (commit 6831137 + 82c4ba9):
+1. Critical: PublishDialog menjatuhkan sectionOrder/sectionVisibility (tanpa extras) → fallback ke data draft + test payload
+2. Fail-open quota → plan null + tombol retry "Coba lagi memeriksa"
+3. SLUG_REGEX duplikat di PublishDialog → pakai isValidSlug dari portfolio-safety
+4. Banner offline (draft.offline) di footer BuilderEditor + i18n `build.offline`
+5. `rounded-xl` literal di render/PortfolioPhotoUpload → inline style
+6. Definisi `portfolioTrialUses` mati dihapus dari schema
+7. Housekeeping: `.superpowers/sdd/*-review-package.md` di-gitignore, 3 package untracked, artefak dev dibuang, laporan/brief di-commit
+
+Triage lengkap review akhir (must-fix / follow-up / won't-fix) tercatat di laporan review dan sudah tereksekusi di atas untuk kategori must-fix.
+
+**Catatan flake**: `cv-pdf-debug.test.ts` pernah timeout 5000ms saat suite paralel penuh (test CV, pre-existing, lolos 2x saat dijalankan sendiri) — bukan regresi Spec 1.
+
+Gate akhir: tsc 0 · 390/390 test · build sukses · lint 0 error (28 warning pre-existing) · grep mutu bersih · smoke test server OK.
+
 ## Progress
 
 Task 1: complete (commits b8dd9ff..cdbfecd, spec PASS, quality APPROVED, 115 test, 4 fix wave)
@@ -82,3 +99,23 @@ Task 13: complete (commits 08eb483..ba9b8da, spec PASS, quality APPROVED, 353 te
 Task 14: complete (commits ba9b8da..9d79a7a, spec PASS, quality APPROVED, 381 test, 2 fix wave + 2 controller)
 Task 15: complete (commits 9d79a7a..a819bcb, spec PASS, quality APPROVED, 387 test, 0 fix wave)
 Task 16: complete (commits a819bcb..HEAD, semua gate hijau, 387 test, 1 fix — sweep text-xs)
+---
+
+# SDD Progress - Spec 2: Fondasi Tema
+
+Plan: docs/superpowers/plans/2026-10-12-portfolio-theme-foundation.md
+Spec: docs/superpowers/specs/2026-10-12-portfolio-theme-foundation-design.md
+Branch: feature/portfolio-themes
+Base commit: 641c722
+
+## Keputusan konsultan (mengikat)
+
+- lucide-react & framer-motion DITOLAK; Motion via motion/react, ikon SVG inline
+- Komponen MinimalistHero external DITOLAK sebagai unit; idenya jadi dasar Spec 2.5
+- Tema Minimalist DIUNDUR ke Spec 2.5
+- Token = field bertipe di ThemeDefinition (bukan CSS-var, bukan Tailwind)
+- Enforcement = 2 layer Vitest (bukan ESLint)
+- next/font DITOLAK (mati di export); fontUrl Google Fonts only
+
+## Progress
+
