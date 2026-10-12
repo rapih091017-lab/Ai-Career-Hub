@@ -12,7 +12,7 @@ export const THEMES: Record<string, ThemeDefinition> = {
     name: "Glassmorphism",
     description: "Dark premium dengan frosted glass, purple-emerald mesh, bento grid asimetris, lebih terang dari sebelumnya",
     font: "Geist",
-    fontUrl: "https://fonts.cdnfonts.com/css/geist",
+    fontUrl: "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700&display=swap",
     previewGradient: "bg-gradient-to-br from-[#12121F] via-[#1A1A2E] to-[#1A1A35]",
     colors: {
       bg: "#12121F",
@@ -36,7 +36,7 @@ export const THEMES: Record<string, ThemeDefinition> = {
       card: "inset 0 1px 1px rgba(255,255,255,0.06)",
       focus: "0 0 0 3px rgba(167,139,250,0.55)",
     },
-    typography: { display: "'Geist', sans-serif", body: "'Geist', sans-serif", eyebrow: "'Geist', sans-serif" },
+    typography: { display: "'Geist', ui-sans-serif, system-ui", body: "'Geist', ui-sans-serif, system-ui", eyebrow: "'Geist', ui-sans-serif, system-ui" },
     focusRing: { color: "#A78BFA", width: "3px" },
     sectionColors: {
       hero: { primary: "#8365FC", accent: "#6DD5FA" },
@@ -88,9 +88,9 @@ export const THEMES: Record<string, ThemeDefinition> = {
     blur: { card: "", glow: "" },
     shadow: { card: "6px 6px 0 0 currentColor", focus: "0 0 0 3px #FF3366" },
     typography: {
-      display: "'Space Grotesk', sans-serif",
-      body: "'Space Grotesk', sans-serif",
-      eyebrow: "'Space Grotesk', sans-serif",
+      display: "'Space Grotesk', ui-sans-serif, system-ui",
+      body: "'Space Grotesk', ui-sans-serif, system-ui",
+      eyebrow: "'Space Grotesk', ui-sans-serif, system-ui",
     },
     focusRing: { color: "#FF3366", width: "3px" },
     sectionColors: {
@@ -143,8 +143,8 @@ export const THEMES: Record<string, ThemeDefinition> = {
     shadow: { card: "none", focus: "0 0 0 3px #B8863C" },
     typography: {
       display: "'Playfair Display', serif",
-      body: "'Sora', sans-serif",
-      eyebrow: "'Sora', sans-serif",
+      body: "'Sora', ui-sans-serif, system-ui",
+      eyebrow: "'Sora', ui-sans-serif, system-ui",
     },
     focusRing: { color: "#B8863C", width: "3px" },
     sectionColors: {

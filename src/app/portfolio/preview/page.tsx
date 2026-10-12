@@ -16,6 +16,7 @@ import "../print.css";
 import PublishDialog from "@/components/portfolio/PublishDialog";
 import { STATIC_REVEAL_FALLBACK_CSS } from "@/components/portfolio/render/PortfolioDocument";
 import { readCache } from "@/lib/portfolio/usePortfolioDraft";
+import ThemeFonts from "@/components/portfolio/render/ThemeFonts";
 
 interface PortfolioData {
   formData: PortfolioFormData;
@@ -158,6 +159,7 @@ export default function PortfolioPreviewPage() {
     // lewat dialog cetak browser (Ctrl+P → Simpan sebagai PDF).
     return (
       <div data-pf-print="true" className="min-h-screen" style={{ backgroundColor: theme.colors.bg }}>
+        <ThemeFonts themeId={themeId} />
         {/* @page tidak bisa di-scope selector; dirender di sini (bukan
             print.css yang di-share lintas rute) agar tak bocor ke app lain. */}
         <style media="print">{`@page { size: A4; margin: 12mm; } ${STATIC_REVEAL_FALLBACK_CSS}`}</style>
@@ -186,6 +188,7 @@ export default function PortfolioPreviewPage() {
 
   return (
     <AuthGuard>
+      <ThemeFonts themeId={themeId} />
       <div
           className="min-h-screen"
           style={{

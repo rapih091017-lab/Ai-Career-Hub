@@ -168,3 +168,30 @@ describe("Layer B: aturan semantik per tema terlihat di markup", () => {
     expect(THEMES.brutal.typography.display.toLowerCase()).not.toContain("playfair");
   });
 });
+
+describe("font tema", () => {
+  it("semua fontUrl memakai origin Google Fonts", () => {
+    for (const id of THEME_IDS) {
+      expect(THEMES[id].fontUrl, `fontUrl ${id}`).toContain("fonts.googleapis.com");
+      expect(THEMES[id].fontUrl).not.toContain("cdnfonts");
+    }
+  });
+
+  it("ThemeFonts ada dan dipasang di preview (kedua cabang render)", async () => {
+    const { readFileSync } = await import("node:fs");
+    const { join } = await import("node:path");
+    const comp = readFileSync(
+      join(process.cwd(), "src/components/portfolio/render/ThemeFonts.tsx"), "utf8");
+    expect(comp).toContain('rel="stylesheet"');
+    expect(comp).toContain("preconnect");
+    const preview = readFileSync(join(process.cwd(), "src/app/portfolio/preview/page.tsx"), "utf8");
+    const mounts = preview.match(/<ThemeFonts /g) ?? [];
+    // cabang print + cabang utama
+    expect(mounts.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("export tidak lagi merujuk cdnfonts", () => {
+    const src = readFileSync(join(process.cwd(), "src/lib/portfolio/export-html.ts"), "utf8");
+    expect(src).not.toContain("cdnfonts");
+  });
+});
