@@ -159,23 +159,23 @@ function LuxeContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: Extr
               <div className="absolute bottom-4 right-4 w-6 h-6" style={{ borderBottom: `1px solid ${theme.colors.border}`, borderRight: `1px solid ${theme.colors.border}`, opacity: 0.5 }} />
 
               <span className="font-medium" style={{ color: theme.colors.primary, fontSize: 12, letterSpacing: "0.15em", textTransform: "uppercase" }}>
-                GET IN TOUCH
+                HUBUNGI SAYA
               </span>
 
               <div className="flex items-center gap-4 justify-center mt-2 mb-4">
                 <div style={{ width: 24, height: 1, background: theme.colors.border }} />
                 <h2 className="font-bold" style={{ fontSize: "clamp(1.8rem, 4vw, 2.8rem)", color: theme.colors.text, fontFamily: theme.typography.display }}>
-                  Let&apos;s Work Together
+                  Mari Berkolaborasi
                 </h2>
                 <div style={{ width: 24, height: 1, background: theme.colors.border }} />
               </div>
 
               <p className="text-sm mb-8 max-w-md mx-auto" style={{ color: theme.colors.textMuted }}>
-                I&apos;m always open to discussing new projects, creative ideas, or opportunities.
+                Saya selalu terbuka untuk membahas proyek baru, ide kreatif, atau peluang kerja sama.
               </p>
 
               <div className="flex flex-wrap justify-center gap-3">
-                {f.contactEmail && <ContactButton href={`mailto:${f.contactEmail}`} label="Send Email" />}
+                {f.contactEmail && <ContactButton href={`mailto:${f.contactEmail}`} label="Kirim Email" />}
                 {f.contactLinkedin && <ContactButton href={`https://${f.contactLinkedin.replace(/^https?:\/\//, "")}`} label="LinkedIn" />}
                 {f.contactGithub && <ContactButton href={`https://${f.contactGithub.replace(/^https?:\/\//, "")}`} label="GitHub" />}
               </div>

@@ -119,7 +119,7 @@ function BrutalHobbies({ items }: { items: HobbyItem[] }) {
   );
 }
 
-/* ═══ LUXE, editorial list ═══ */
+/* ═══ LUXE, ledger hairline — nomor serif + nama serif, tanpa kartu ═══ */
 function LuxeHobbies({ items }: { items: HobbyItem[] }) {
   const theme = usePortfolioTheme();
   const filtered = items.filter(h => h.name);
@@ -135,7 +135,7 @@ function LuxeHobbies({ items }: { items: HobbyItem[] }) {
           transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
         >
           <span className="font-medium" style={{ color: theme.colors.primary, fontSize: 12, letterSpacing: "0.15em", textTransform: "uppercase" }}>
-            INTERESTS
+            MINAT
           </span>
           <div className="flex items-center gap-4 mt-2 mb-10">
             <h2 className="font-bold" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: theme.colors.text, fontFamily: theme.typography.display }}>
@@ -145,7 +145,7 @@ function LuxeHobbies({ items }: { items: HobbyItem[] }) {
           </div>
         </motion.div>
 
-        <div className="flex flex-wrap gap-3">
+        <div style={{ borderTop: `1px solid ${theme.colors.border}` }}>
           {filtered.map((hobby, i) => (
             <motion.div
               key={hobby.id}
@@ -153,16 +153,19 @@ function LuxeHobbies({ items }: { items: HobbyItem[] }) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.05, duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
+              className="grid grid-cols-[2.5rem_1fr] gap-x-4 items-baseline py-4"
+              style={{ borderBottom: `1px solid ${theme.colors.border}` }}
             >
-              <div className="px-4 py-2.5 flex items-center gap-2" style={{
-                background: theme.colors.surface,
-                border: `1px solid ${theme.colors.border}`,
-                borderRadius: theme.radii.pill,
-              }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={theme.colors.primary} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                  {HOBBY_ICONS[i % HOBBY_ICONS.length]}
-                </svg>
-                <span className="text-sm" style={{ color: theme.colors.text, fontFamily: theme.typography.display }}>{hobby.name}</span>
+              <span style={{ fontFamily: theme.typography.display, fontSize: "1.05rem", color: theme.colors.primary }}>
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <div className="flex items-baseline gap-3 flex-wrap">
+                <span style={{ fontFamily: theme.typography.display, fontSize: "1.05rem", color: theme.colors.text }}>
+                  {hobby.name}
+                </span>
+                {hobby.description && (
+                  <span className="text-sm" style={{ color: theme.colors.textMuted }}>— {hobby.description}</span>
+                )}
               </div>
             </motion.div>
           ))}

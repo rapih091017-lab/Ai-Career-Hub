@@ -23,10 +23,10 @@ function GlassProjects({ items }: { items: ProjectItem[] }) {
         >
           <span className="inline-block px-3 py-1 text-xs uppercase tracking-[0.2em] font-medium mb-4"
             style={{ background: `${theme.colors.primary}12`, color: theme.colors.primary, border: `1px solid ${theme.colors.primary}20`, borderRadius: theme.radii.pill }}>
-            WORK
+            KARYA
           </span>
           <h2 className="font-bold mb-10" style={{ fontSize: "clamp(1.8rem, 4vw, 2.8rem)", color: theme.colors.text, letterSpacing: "-0.03em" }}>
-            Selected Projects
+            Karya Pilihan
           </h2>
         </motion.div>
 
@@ -122,7 +122,7 @@ function BrutalProjects({ items }: { items: ProjectItem[] }) {
           transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
         >
           <h2 className="font-black mb-12" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", color: theme.colors.text, letterSpacing: "-0.04em" }}>
-            Projects
+            Proyek
           </h2>
         </motion.div>
 
@@ -205,11 +205,11 @@ function LuxeProjects({ items }: { items: ProjectItem[] }) {
           className="mb-12"
         >
           <span className="font-medium" style={{ color: theme.colors.primary, fontSize: 13, letterSpacing: "0.15em", textTransform: "uppercase" }}>
-            WORK
+            KARYA
           </span>
           <div className="flex items-center gap-4 mt-2 mb-4">
             <h2 className="font-bold leading-tight" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", color: theme.colors.text, fontFamily: theme.typography.display, letterSpacing: "-0.02em" }}>
-              Projects
+              Karya
             </h2>
             <div className="flex-1" style={{ height: 1, background: theme.colors.border }} />
           </div>
@@ -267,7 +267,7 @@ function LuxeProjects({ items }: { items: ProjectItem[] }) {
                           <a href={p.link} target="_blank" rel="noopener noreferrer"
                             className="inline-flex items-center gap-2 text-xs font-semibold transition-all"
                             style={{ color: theme.colors.primary }}>
-                            View Project
+                            Lihat Proyek
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                               <path d="M7 17L17 7M7 7h10v10"/>
                             </svg>

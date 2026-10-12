@@ -468,7 +468,7 @@ function LuxeHero({ data: f, name, initials }: { data: PortfolioFormData; name: 
                 fontFamily: theme.typography.eyebrow,
               }}
             >
-              {f.heroSubHeadline || "INTRODUCING"}
+              {f.heroSubHeadline || "PERKENALKAN"}
             </motion.span>
 
             <motion.h1
@@ -511,8 +511,8 @@ function LuxeHero({ data: f, name, initials }: { data: PortfolioFormData; name: 
             )}
 
             <motion.div variants={STAGGER_CHILD} className="flex gap-4 flex-wrap">
-              <FancyButton href="#projects" label="View Work" primary />
-              <FancyButton href="#contact" label="Get in Touch" />
+              <FancyButton href="#projects" label="Lihat Karya" primary />
+              <FancyButton href="#contact" label="Hubungi Saya" />
             </motion.div>
           </motion.div>
 

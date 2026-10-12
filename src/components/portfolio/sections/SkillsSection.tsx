@@ -146,16 +146,16 @@ function LuxeSkills({ f }: { f: PortfolioFormData }) {
           viewport={{ once: true }}
           transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1] }}
         >
-          <span className="font-medium" style={{ color: theme.colors.primary, fontSize: 12, letterSpacing: "0.15em", textTransform: "uppercase" }}>SKILLS</span>
+          <span className="font-medium" style={{ color: theme.colors.primary, fontSize: 12, letterSpacing: "0.15em", textTransform: "uppercase" }}>KEAHLIAN</span>
 
           {/* Decorative header bar */}
           <div className="flex items-center gap-4 my-4">
             <h2 className="font-bold" style={{ fontSize: "clamp(1.3rem, 2.5vw, 1.8rem)", color: theme.colors.text, fontFamily: theme.typography.display }}>
-              Expertise
+              Keahlian
             </h2>
             <div className="flex-1" style={{ height: 1, background: theme.colors.border }} />
             <span className="text-xs uppercase tracking-widest" style={{ color: theme.colors.textMuted }}>
-              {skillTags.length} Areas
+              {skillTags.length} Bidang
             </span>
           </div>
 
@@ -165,7 +165,7 @@ function LuxeSkills({ f }: { f: PortfolioFormData }) {
             {skillTags.length > 0 && (
               <div className="p-1" style={{ background: theme.colors.bgSecondary, borderRadius: theme.radii.card, border: `1px solid ${theme.colors.border}` }}>
                 <div className="p-5" style={{ background: theme.colors.surface, borderRadius: theme.radii.card }}>
-                  <span className="text-xs font-medium uppercase tracking-widest" style={{ color: theme.colors.primary }}>Core Competencies</span>
+                  <span className="text-xs font-medium uppercase tracking-widest" style={{ color: theme.colors.primary }}>Kompetensi Utama</span>
                   <div className="flex flex-wrap gap-2 mt-3">
                     {skillTags.map((skill, i) => (
                       <motion.span key={skill}
@@ -196,7 +196,7 @@ function LuxeSkills({ f }: { f: PortfolioFormData }) {
               {f.skillsLanguages && (
                 <div className="p-1" style={{ background: theme.colors.bgSecondary, borderRadius: theme.radii.card, border: `1px solid ${theme.colors.border}` }}>
                   <div className="p-4" style={{ background: theme.colors.surface, borderRadius: theme.radii.card }}>
-                    <span className="text-xs font-medium uppercase tracking-widest" style={{ color: theme.colors.textMuted }}>Languages</span>
+                    <span className="text-xs font-medium uppercase tracking-widest" style={{ color: theme.colors.textMuted }}>Bahasa</span>
                     <p className="text-sm mt-1" style={{ color: theme.colors.textSecondary }}>{f.skillsLanguages}</p>
                   </div>
                 </div>

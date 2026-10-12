@@ -190,11 +190,11 @@ function LuxeTestimonials({ items }: { items: TestimonialItem[] }) {
           transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
         >
           <span className="font-medium" style={{ color: theme.colors.primary, fontSize: 12, letterSpacing: "0.15em", textTransform: "uppercase" }}>
-            TESTIMONIALS
+            TESTIMONI
           </span>
           <div className="flex items-center gap-4 mt-2 mb-10">
             <h2 className="font-bold" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: theme.colors.text, fontFamily: theme.typography.display }}>
-              Kind Words
+              Kata Mereka
             </h2>
             <div className="flex-1" style={{ height: 1, background: theme.colors.border }} />
           </div>

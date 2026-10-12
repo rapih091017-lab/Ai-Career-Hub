@@ -92,6 +92,29 @@ describe("Layer A: larangan literal di section & render", () => {
 });
 
 /**
+ * Sasaran pass copy publik: frasa Inggris yang pernah muncul sebagai teks
+ * tampilan dan kini dilarang kembali. Huruf besar-sensitif supaya identifier
+ * seperti `isPresent`/`EducationItem` tidak ikut tertangkap.
+ */
+const FORBIDDEN_COPY = [
+  "View Work", "Get in Touch", "INTRODUCING", "Selected Projects", "View Project",
+  "Core Competencies", "Work History", "Send Email", "Kind Words", "About Me",
+  "GET IN TOUCH", "Work Together", "always open to discussing",
+  "EXPERIENCE", "EDUCATION", "ORGANIZATIONS", "CERTIFICATIONS", "INTERESTS",
+  "TESTIMONIALS", "SKILLS", "WORK", "ABOUT",
+];
+
+describe("Layer C: copy publik section berbahasa Indonesia", () => {
+  const sectionFiles = readdirSync(SECTIONS_DIR).map((f) => join(SECTIONS_DIR, f));
+  it.each(sectionFiles.map((f) => [f]))("%s tanpa string Inggris terdeteksi", (file: string) => {
+    const name = file.split(/[\\/]/).pop()!;
+    const src = stripAllowed(readFileSync(file, "utf8"));
+    const found = FORBIDDEN_COPY.filter((w) => src.includes(w));
+    expect(found, `${name}: string Inggris tersisa`).toEqual([]);
+  });
+});
+
+/**
  * Dua API browser yang dipakai section saat merender di jsdom: matchMedia
  * (useReducedMotion dari motion/react) dan IntersectionObserver (whileInView).
  * Tanpa keduanya renderToStaticMarkup melempar, bukan dokumennya yang salah.

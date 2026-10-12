@@ -152,7 +152,7 @@ function LuxeOrganizations({ items }: { items: OrganizationItem[] }) {
           transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
         >
           <span className="font-medium" style={{ color: theme.colors.primary, fontSize: 12, letterSpacing: "0.15em", textTransform: "uppercase" }}>
-            ORGANIZATIONS
+            ORGANISASI
           </span>
           <div className="flex items-center gap-4 mt-2 mb-10">
             <h2 className="font-bold" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: theme.colors.text, fontFamily: theme.typography.display }}>
@@ -173,10 +173,10 @@ function LuxeOrganizations({ items }: { items: OrganizationItem[] }) {
               className="flex gap-5"
             >
               <div className="flex flex-col items-center">
-                <div className="w-9 h-9 flex items-center justify-center font-semibold text-sm"
-                  style={{ background: theme.colors.primary, color: theme.colors.onPrimary, borderRadius: theme.radii.pill }}>
+                {/* Nomor serif murni — hierarki tipografi, bukan lencana berlatar */}
+                <span style={{ fontFamily: theme.typography.display, fontSize: "1.15rem", lineHeight: 1.4, color: theme.colors.primary }}>
                   {String(i + 1).padStart(2, "0")}
-                </div>
+                </span>
                 {i < filtered.length - 1 && <div className="flex-1 w-[1px] my-1" style={{ background: theme.colors.border }} />}
               </div>
               <div className="pb-6 flex-1">

@@ -149,7 +149,7 @@ function BrutalCertifications({ items }: { items: CertificationItem[] }) {
   );
 }
 
-/* ═══ LUXE, editorial list with serif titles ═══ */
+/* ═══ LUXE, ledger hairline — nama serif + angka tahun, tanpa kartu ═══ */
 function LuxeCertifications({ items }: { items: CertificationItem[] }) {
   const theme = usePortfolioTheme();
   const filtered = items.filter(c => c.name);
@@ -165,7 +165,7 @@ function LuxeCertifications({ items }: { items: CertificationItem[] }) {
           transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
         >
           <span className="font-medium" style={{ color: theme.colors.primary, fontSize: 12, letterSpacing: "0.15em", textTransform: "uppercase" }}>
-            CERTIFICATIONS
+            SERTIFIKAT
           </span>
           <div className="flex items-center gap-4 mt-2 mb-10">
             <h2 className="font-bold" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: theme.colors.text, fontFamily: theme.typography.display }}>
@@ -175,7 +175,7 @@ function LuxeCertifications({ items }: { items: CertificationItem[] }) {
           </div>
         </motion.div>
 
-        <div className="space-y-4">
+        <div style={{ borderTop: `1px solid ${theme.colors.border}` }}>
           {filtered.map((cert, i) => (
             <motion.div
               key={cert.id}
@@ -183,33 +183,24 @@ function LuxeCertifications({ items }: { items: CertificationItem[] }) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.08, duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+              style={{ borderBottom: `1px solid ${theme.colors.border}` }}
             >
               <a
                 href={cert.url || undefined}
                 target={cert.url ? "_blank" : undefined}
                 rel={cert.url ? "noopener noreferrer" : undefined}
-                className="flex items-center justify-between gap-4 p-5"
-                style={{ background: theme.colors.surface, border: `1px solid ${theme.colors.border}`, borderRadius: theme.radii.card }}
+                className="flex items-baseline justify-between gap-4 py-5"
               >
-                <div className="flex items-center gap-4 min-w-0">
-                  <div className="w-10 h-10 flex items-center justify-center flex-shrink-0" style={{ border: `1px solid ${theme.colors.primary}`, borderRadius: theme.radii.pill }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={theme.colors.primary} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="9" r="6" />
-                      <path d="M8.5 14.5 7 22l5-3 5 3-1.5-7.5" />
-                    </svg>
-                  </div>
-                  <div className="min-w-0">
-                    <h3 className="font-semibold truncate" style={{ color: theme.colors.text, fontFamily: theme.typography.display }}>
-                      {cert.name}
-                    </h3>
-                    {cert.issuer && (
-                      <p className="text-xs mt-0.5" style={{ color: theme.colors.textMuted }}>{cert.issuer}</p>
-                    )}
-                  </div>
+                <div className="min-w-0">
+                  <h3 style={{ fontFamily: theme.typography.display, fontSize: "1.1rem", color: theme.colors.text }}>
+                    {cert.name}
+                  </h3>
+                  {cert.issuer && (
+                    <p className="text-xs mt-1" style={{ color: theme.colors.textMuted }}>{cert.issuer}</p>
+                  )}
                 </div>
                 {cert.year && (
-                  <span className="text-xs font-medium px-3 py-1 flex-shrink-0"
-                    style={{ background: `${theme.colors.primary}0A`, color: theme.colors.primary, borderRadius: theme.radii.pill }}>
+                  <span style={{ fontFamily: theme.typography.display, fontSize: "1.3rem", color: theme.colors.primary, flexShrink: 0 }}>
                     {cert.year}
                   </span>
                 )}
