@@ -77,3 +77,5 @@ scratch/
 
 # artefak review subagent (snapshot diff besar, derived)
 .superpowers/sdd/*-review-package.md
+dev-pid.txt
+dev-log.txt
