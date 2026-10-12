@@ -150,3 +150,12 @@ Task 3 (Spec2): complete (commits f40d2a1..9123c10, spec PASS, quality APPROVED,
 - T3: halo dot timeline + bayangan alternasi testimoni hilang (aturan 1 bayangan/tema) - jalur pemulihan slot shadow.ring masa depan
 - T3: drop-shadow-sm ikut regex (0 kejadian)
 
+Task 5 (Spec2): complete (commits 6179268..31cb6c1, kontras 12/12, token onPrimary additive,455 test, dikerjakan controller - subagent batal)
+Task 6 (Spec2): complete (commits 31cb6c1..6f4d8ca, fontUrl Google-only + ThemeFonts preview2 cabang,459 test)
+
+## Deviasi/kekhawatiran batch A
+- BuilderEditor ternyata form akordeon tanpa kanvas - ThemeFonts cukup di preview (asumsi plan salah)
+- focusRing brutal/luxe hex lama (lolos >=3.0); sinkron ke primary baru ditunda
+- colors.accent brutal #FFCC00 di luar pasangan uji (spek hanya .primary)
+- 12 situs ganti white->onPrimary; lihat laporan task-5-6-report.md
+
