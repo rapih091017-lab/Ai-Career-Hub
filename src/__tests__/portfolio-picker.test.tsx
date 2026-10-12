@@ -121,6 +121,38 @@ describe("picker tema: thumbnail nyata + deskripsi per tema", () => {
     expect(stray, `elemen interaktif di luar area inert: ${stray.map((el) => el.tagName).join(", ")}`).toHaveLength(0);
   });
 
+  it("thumbnail membingkas section yang berbeda strukturnya, bukan hero", () => {
+    const { container } = renderPage();
+    const [glass] = themeCards(container);
+
+    const viewport = glass.querySelector("[data-thumb-viewport]");
+    expect(viewport, "thumbnail butuh viewport berlabel agar bisa diuji").toBeTruthy();
+
+    // Hero disembunyikan hanya di dalam thumbnail: dialah area yang paling
+    // seragam antar tema, sehingga crop selalu tampak "tidak berubah".
+    const rules = (viewport as HTMLElement).querySelector("style")?.textContent ?? "";
+    expect(rules).toMatch(/data-section-id="hero"\]\s*\{\s*display:\s*none/);
+
+    // Sisanya harus benar-benar terisi, kalau tidak crop jadi kosong.
+    const sections = Array.from(viewport!.querySelectorAll("[data-section-id]")).map((s) =>
+      s.getAttribute("data-section-id"),
+    );
+    expect(sections.length).toBeGreaterThanOrEqual(3);
+    expect(sections).toContain("about");
+    expect(sections).toContain("experience");
+  });
+
+  it(" skala dan tinggi thumbnail cukup besar untuk membaca pembeda tema", () => {
+    const { container } = renderPage();
+    const [glass] = themeCards(container);
+
+    const viewport = glass.querySelector("[data-thumb-viewport]") as HTMLElement | null;
+    const inner = viewport?.querySelector("[data-thumb-scale]") as HTMLElement | null;
+    expect(inner, "wrapper berskala harus berlabel").toBeTruthy();
+    expect(inner!.style.transform).toBe("scale(0.8)");
+    expect(viewport!.style.height).toBe("220px");
+  });
+
   it("page berhenti memakai mockup TEMPLATE_PREVIEWS dan merender via renderer", () => {
     const src = readFileSync(join(process.cwd(), "src/app/portfolio/page.tsx"), "utf8");
     expect(src).not.toContain("TEMPLATE_PREVIEWS");

@@ -25,14 +25,31 @@ function thumbnailData(first: string, last: string, headline: string, sub: strin
       heroHeadline: headline,
       heroSubHeadline: sub,
       heroBio: bio,
+      aboutText: "Sembilan tahun menyusun produk digital yang dipakai lintas tim.",
+      aboutYearsExp: "9",
+      aboutProjectsDone: "24",
+      aboutClientsHappy: "18",
+      skillsMain: "TypeScript, React, Node",
+      skillsTools: "Figma, Playwright",
+      contactEmail: "hello@example.com",
     },
-    projects: [],
-    experiences: [],
-    educations: [],
-    certifications: [],
-    organizations: [],
-    hobbies: [],
-    testimonials: [],
+    projects: [
+      { id: "p1", name: "Portal Rekrutmen", description: "Pendaftaran untuk 40 kampus.", techStack: "Next.js, Postgres", link: "" },
+      { id: "p2", name: "Dompet Bersama", description: "Rekonsiliasi pembayaran roommates.", techStack: "Node", link: "" },
+      { id: "p3", name: "Peta Logistik", description: "Dashboard armada pengiriman.", techStack: "React", link: "" },
+    ],
+    experiences: [
+      { id: "e1", company: "Studio Nusantara", position: "Lead Engineer", startDate: "2023", endDate: "2026", description: "Mengsatukan enam tim produk.", isPresent: true },
+      { id: "e2", company: "Karya Digital", position: "Frontend Engineer", startDate: "2021", endDate: "2023", description: "Migrasi design system." },
+      { id: "e3", company: "Freelance", position: "Developer", startDate: "2020", endDate: "2021", description: "Aplikasi internal." },
+    ],
+    educations: [
+      { id: "ed1", institution: "Universitas Indonesia", degree: "S1", field: "Informatika", startDate: "2016", endDate: "2020" },
+    ],
+    certifications: [{ id: "c1", name: "AWS Solutions Architect", issuer: "Amazon", year: "2024" }],
+    organizations: [{ id: "o1", name: "DevSquad", role: "Mentor komunitas", period: "2022-2025", description: "Kelas mingguan frontend." }],
+    hobbies: [{ id: "h1", name: "Fotografi", description: "Jalan pagi perkotaan" }],
+    testimonials: [{ id: "t1", name: "Rina", position: "Product Manager", testimonial: "Kerja paling rapi yang saya temui." }],
     extraLinks: [],
   };
 }
@@ -170,13 +187,22 @@ export default function PortfolioPage() {
                             : "border-outline-variant/30 bg-surface-container-lowest hover:border-primary/50"
                         }`}
                       >
-                        {/* Thumbnail: render asli per tema — beda struktur, bukan beda warna */}
-                        <div className="relative w-full overflow-hidden" style={{ background: theme.colors.bg, height: 168 }}>
+                        {/* Thumbnail: render asli per tema — beda struktur, bukan beda warna.
+                            Hero disembunyikan di sini: itu bagian paling seragam antar tema
+                            (tinggi layar, fokus pada nama), sehingga crop 220px selalu
+                            tampak sama. Yang代替-nya section About/Experience hasil re-compose. */}
+                        <div
+                          data-thumb-viewport=""
+                          className="relative w-full overflow-hidden"
+                          style={{ background: theme.colors.bg, height: 220 }}
+                        >
+                          <style>{`[data-thumb-viewport] [data-section-id="hero"] { display: none !important; }`}</style>
                           <div
+                            data-thumb-scale=""
                             aria-hidden="true"
                             inert
                             className="absolute top-0 left-0 origin-top-left"
-                            style={{ width: "calc(100% / 0.62)", transform: "scale(0.62)" }}
+                            style={{ width: "calc(100% / 0.8)", transform: "scale(0.8)" }}
                           >
                             <PortfolioDocument
                               data={THEME_THUMBNAILS[theme.id as ThemeId]}
