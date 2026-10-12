@@ -47,7 +47,7 @@ export interface ThemeColors {
 
 /** `circle` dipakai untuk avatar/lingkaran dekoratif (mis. hero tema minimal).
  *  Settiga tema lain tetap punya nilainya agar section tidak pernah menulis
- *  `borderRadius` literal — Larangan Layer A. */
+ *  `borderRadius` literal â€” Larangan Layer A. */
 export interface ThemeRadii { card: string; button: string; pill: string; image: string; circle: string }
 export interface ThemeBlur { card: string; glow: string }
 export interface ThemeShadow { card: string; focus: string }

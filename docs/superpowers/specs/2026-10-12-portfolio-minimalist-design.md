@@ -80,24 +80,27 @@ Bahan: putih, hairline `#E4E4E7`, teks tinta, satu grotesk, tanpa isian, tanpa b
 |---|---|
 | Hero | Lingkaran + nama raksasa + bio |
 | About | Dua kolom asimetris: kiri `01 / TENTANG` + hairline, kanan paragraf 20px; tiga angka stats sebagai teks polos dipisah garis vertikal |
+| Stats | Angka + label sebaris, dipisah hairline; tanpa lingkaran (`radius 0` + tanpa shadow) |
 | Experience | Satu kolom; baris `2023—2026 · Posisi` kiri, perusahaan 18px kanan; `borderTop` hairline; tanpa kartu |
 | Education | Dua kolom; label `02 / PENDIDIKAN`; baris institution + degree + tahun dipisah hairline |
 | Projects | Satu kolom daftar besar: nomor `01`, gambar full-bleed bila ada, nama + deskripsi + tech |
+| Skills | Tag hairline siku (tanpa isian warna) |
 | Certifications | Baris `Nama — Penerbit · Tahun` dipisah hairline; tanpa ikon, tanpa chip |
 | Organizations | Baris `Nama` kiri, `Peran` kanan, hairline di tengah |
 | Hobbies | Label + teks Interest; tanpa ikon |
+| Testimonials | Kutipan tanpa kartu: tanda kutip besar + teks + nama; hairline di atas |
 | Contact | Email besar 30px sebagai tautan (underline hairline, bukan blok); kolom kanan tautan sosial; tanpa form |
 
-Token-only: `stats` (angka + label, garis pemisah), `skills` (tag hairline siku), `testimonials` (kutipan tanpa kartu, hairline di atas).
+**Koreksi saat implementasi:** `stats`, `skills`, dan `testimonials` ternyata sudah punya tiga varian eksplisit per tema (bukan sekadar token). Membiarkan Minimalist jatuh ke `default` berarti kartu gelap Glass bocor ke halaman putih, jadi ketiganya ikut diberi varian Minimalist yang ringan. Konsekuensinya favorable: seluruh 12 section tetap punya `case "minimalist"`, sehingga tidak diperlukan pengecualian di test paritas.
 
 Semua nilai berasal dari token; aturan Layer A yang ada tetap berlaku dan diperluas ke 4 tema.
 
 ## 7. Penegakan test
 
 1. `portfolio-theme-rules.test.ts` — loop 4 tema: Layer A, `fontUrl` Google-only, `minimalist` wajib `radius 0` + `shadow none`.
-2. `portfolio-theme-fingerprint.test.ts` — 9 section wajib pairwise-distinct untuk keempat tema; 3 token-only dinyatakan lewat konstanta `TOKEN_ONLY_SECTIONS = ["stats","skills","testimonials"]`.
+2. `portfolio-theme-fingerprint.test.ts` — **seluruh 12 section** wajib pairwise-distinct untuk keempat tema (lihat koreksi §6: tidak ada section token-only).
 3. `portfolio-contrast.test.ts` — pasangan kontras `minimalist` (≥7 pasangan, ambang AA).
-4. **Paritas switch-case baru** — setiap `SectionId` punya komposisi untuk tiap `themeId`, kecuali 3 token-only.
+4. **Paritas switch-case** — tiap section sudah punya `case "minimalist"`; dijaga test Layer B yang sudah ada (`portfolio-theme-rules.test.ts`), jadi tidak perlu test paritas baru.
 5. `portfolio-picker.test.tsx` — 4 kartu; `Tema bawaan` tetap di Glass; deskripsi satu baris untuk Minimalist; thumbnail tetap menyembunyikan hero.
 
 ## 8. Copy
