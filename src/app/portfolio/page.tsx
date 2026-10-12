@@ -174,6 +174,7 @@ export default function PortfolioPage() {
                         <div className="relative w-full overflow-hidden" style={{ background: theme.colors.bg, height: 168 }}>
                           <div
                             aria-hidden="true"
+                            inert
                             className="absolute top-0 left-0 origin-top-left"
                             style={{ width: "calc(100% / 0.62)", transform: "scale(0.62)" }}
                           >

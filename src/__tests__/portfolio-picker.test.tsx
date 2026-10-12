@@ -109,6 +109,18 @@ describe("picker tema: thumbnail nyata + deskripsi per tema", () => {
     expect(luxe.textContent).not.toContain("Tema bawaan");
   });
 
+  it("thumbnail di dalam <button> tidak menyisakan elemen interaktif aktif", () => {
+    const { container } = renderPage();
+    const [glass] = themeCards(container);
+
+    const thumb = glass.querySelector("[aria-hidden='true'][inert]");
+    expect(thumb, "wrapper thumbnail harus inert agar anchor di dalamnya tidak jadi nested interactive").toBeTruthy();
+    const stray = Array.from(glass.querySelectorAll("a, button, input, select, textarea")).filter(
+      (el) => !thumb!.contains(el),
+    );
+    expect(stray, `elemen interaktif di luar area inert: ${stray.map((el) => el.tagName).join(", ")}`).toHaveLength(0);
+  });
+
   it("page berhenti memakai mockup TEMPLATE_PREVIEWS dan merender via renderer", () => {
     const src = readFileSync(join(process.cwd(), "src/app/portfolio/page.tsx"), "utf8");
     expect(src).not.toContain("TEMPLATE_PREVIEWS");
