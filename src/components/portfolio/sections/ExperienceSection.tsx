@@ -20,7 +20,7 @@ function GlassExperience({ items }: { items: ExperienceItem[] }) {
         >
           <span className="inline-block px-3 py-1 text-xs uppercase tracking-[0.2em] font-medium mb-4"
             style={{ background: `${theme.colors.primary}12`, color: theme.colors.primary, border: `1px solid ${theme.colors.primary}20`, borderRadius: theme.radii.pill }}>
-            EXPERIENCE
+            PENGALAMAN
           </span>
           <h2 className="font-bold mb-10" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: theme.colors.text }}>
             Pengalaman Kerja
@@ -179,7 +179,7 @@ function BrutalExperience({ items }: { items: ExperienceItem[] }) {
   );
 }
 
-/* ─── LUXE: Elegant serif timeline cards ─── */
+/* ─── LUXE: ledger hairline — baris tanggal serif + isi, tanpa kartu ─── */
 function LuxeExperience({ items }: { items: ExperienceItem[] }) {
   const theme = usePortfolioTheme();
   const filtered = items.filter(e => e.company || e.position);
@@ -195,17 +195,18 @@ function LuxeExperience({ items }: { items: ExperienceItem[] }) {
           transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
         >
           <span className="font-medium" style={{ color: theme.colors.primary, fontSize: 12, letterSpacing: "0.15em", textTransform: "uppercase" }}>
-            EXPERIENCE
+            PENGALAMAN
           </span>
           <div className="flex items-center gap-4 mt-2 mb-10">
             <h2 className="font-bold" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: theme.colors.text, fontFamily: theme.typography.display }}>
-              Work History
+              Riwayat Pekerjaan
             </h2>
             <div className="flex-1" style={{ height: 1, background: theme.colors.border }} />
           </div>
         </motion.div>
 
-        <div className="space-y-6">
+        {/* Ledger: satu garis rambut per baris, tanggal serif di kolom kiri */}
+        <div style={{ borderTop: `1px solid ${theme.colors.border}` }}>
           {filtered.map((exp, i) => (
             <motion.div
               key={exp.id}
@@ -213,41 +214,27 @@ function LuxeExperience({ items }: { items: ExperienceItem[] }) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1, duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+              className="grid md:grid-cols-[13rem_1fr] gap-x-8 gap-y-1 py-6"
+              style={{ borderBottom: `1px solid ${theme.colors.border}` }}
             >
-              <div className="p-1" style={{ background: theme.colors.bgSecondary, borderRadius: theme.radii.image, border: `1px solid ${theme.colors.border}` }}>
-                <div style={{
-                  background: theme.colors.surface,
-                  borderRadius: theme.radii.card,
-                  boxShadow: theme.shadow.card,
-                  overflow: "hidden",
-                }}>
-                  {exp.imageUrl && (
-                    <div className="w-full h-48" style={{ borderBottom: `1px solid ${theme.colors.border}` }}>
-                      <img src={exp.imageUrl} alt={`${exp.position} at ${exp.company}`} className="w-full h-full object-cover" loading="lazy" />
-                    </div>
-                  )}
-                  <div className="p-5">
-                    <div className="grid md:grid-cols-[1fr_auto] gap-3 items-start">
-                      <div>
-                        <h3 className="font-semibold" style={{ color: theme.colors.text, fontFamily: theme.typography.display }}>
-                          {exp.position || "Posisi"}
-                        </h3>
-                        <div className="text-sm font-medium mt-1" style={{ color: theme.colors.primary }}>
-                          {exp.company}
-                        </div>
-                        {exp.description && (
-                          <p className="text-sm leading-relaxed mt-2" style={{ color: theme.colors.textMuted }}>
-                            {exp.description}
-                          </p>
-                        )}
-                      </div>
-                      <div className="text-xs font-medium py-1 px-3 text-center md:text-right"
-                        style={{ background: `${theme.colors.primary}0A`, color: theme.colors.primary, borderRadius: theme.radii.pill }}>
-                        {exp.startDate}{exp.startDate ? ", " : ""}{exp.isPresent ? "Present" : exp.endDate || ""}
-                      </div>
-                    </div>
-                  </div>
+              <div style={{ fontFamily: theme.typography.display, fontSize: "1.05rem", color: theme.colors.primary }}>
+                {exp.startDate}{exp.startDate ? " – " : ""}{exp.isPresent ? "Sekarang" : exp.endDate || ""}
+              </div>
+              <div>
+                <div className="flex items-baseline gap-3 flex-wrap">
+                  <h3 style={{ fontFamily: theme.typography.display, fontSize: "1.2rem", color: theme.colors.text }}>
+                    {exp.position || "Posisi"}
+                  </h3>
+                  <span className="text-sm" style={{ color: theme.colors.primary }}>{exp.company}</span>
                 </div>
+                {exp.imageUrl && (
+                  <img src={exp.imageUrl} alt={`${exp.position} di ${exp.company}`} className="mt-3 w-full max-w-xs h-36 object-cover" style={{ borderRadius: theme.radii.image }} loading="lazy" />
+                )}
+                {exp.description && (
+                  <p className="text-sm leading-relaxed mt-2" style={{ color: theme.colors.textMuted }}>
+                    {exp.description}
+                  </p>
+                )}
               </div>
             </motion.div>
           ))}

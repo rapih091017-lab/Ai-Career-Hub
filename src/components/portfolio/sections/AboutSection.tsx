@@ -125,7 +125,7 @@ function BrutalAbout({ f }: { f: PortfolioFormData }) {
               {/* Eyebrow as bold badge */}
               <div className="inline-block mb-6 px-4 py-1 text-xs font-black tracking-widest"
                 style={{ background: theme.colors.primary, color: theme.colors.onPrimary }}>
-                ABOUT
+                TENTANG
               </div>
 
               <div className="flex items-start gap-6">
@@ -187,7 +187,7 @@ function LuxeAbout({ f }: { f: PortfolioFormData }) {
             <div className="relative">
               <div className="md:sticky md:top-24">
                 <span className="font-medium tracking-[0.2em] text-xs" style={{ color: theme.colors.primary }}>
-                  ABOUT
+                  TENTANG
                 </span>
                 <div className="mt-3 w-12 h-[1px]" style={{ background: theme.colors.primary }} />
                 <h2 className="font-bold mt-6 leading-tight" style={{
@@ -195,7 +195,7 @@ function LuxeAbout({ f }: { f: PortfolioFormData }) {
                   color: theme.colors.text,
                   fontFamily: theme.typography.display,
                 }}>
-                  About Me
+                  Tentang Saya
                 </h2>
               </div>
             </div>

@@ -127,13 +127,10 @@ function BrutalEducation({ items }: { items: EducationItem[] }) {
                 transition={{ delay: i * 0.1, duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
                 className="relative pl-14"
               >
-                {/* Number badge */}
+                {/* Nomor langkah, bukan ikon — penanda urut khas Brutal */}
                 <div className="absolute left-0 top-0 w-[41px] h-[41px] flex items-center justify-center"
                   style={{ background: theme.colors.primary, color: theme.colors.onPrimary, border: `3px solid ${theme.colors.border}` }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
-                  </svg>
+                  <span className="font-black text-sm">{String(i + 1).padStart(2, "0")}</span>
                 </div>
 
                 {/* Card with shadow */}
@@ -172,8 +169,8 @@ function BrutalEducation({ items }: { items: EducationItem[] }) {
 }
 
 /* ═══════════════════════════════════════════════
- * LUXE, Gallery-style with year markers,
- *        elegant serif, decorative timeline dots
+ * LUXE, Ledger baris hairline — tahun serif besar
+ *        di kolom kiri, tanpa kartu & tanpa bayangan
  * ═══════════════════════════════════════════════ */
 function LuxeEducation({ items }: { items: EducationItem[] }) {
   const theme = usePortfolioTheme();
@@ -190,18 +187,18 @@ function LuxeEducation({ items }: { items: EducationItem[] }) {
           transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
         >
           <span className="font-medium" style={{ color: theme.colors.primary, fontSize: 12, letterSpacing: "0.15em", textTransform: "uppercase" }}>
-            EDUCATION
+            PENDIDIKAN
           </span>
           <div className="flex items-center gap-4 mt-2 mb-10">
             <h2 className="font-bold" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: theme.colors.text, fontFamily: theme.typography.display }}>
-              Education
+              Pendidikan
             </h2>
             <div className="flex-1" style={{ height: 1, background: theme.colors.border }} />
           </div>
         </motion.div>
 
-        {/* Gallery-style layout */}
-        <div className="space-y-6">
+        {/* Ledger: rentang tahun serif di kiri, rincian di kanan */}
+        <div style={{ borderTop: `1px solid ${theme.colors.border}` }}>
           {filtered.map((edu, i) => (
             <motion.div
               key={edu.id}
@@ -209,38 +206,24 @@ function LuxeEducation({ items }: { items: EducationItem[] }) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1, duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-              className="relative pl-8"
+              className="grid md:grid-cols-[13rem_1fr] gap-x-8 gap-y-1 py-6"
+              style={{ borderBottom: `1px solid ${theme.colors.border}` }}
             >
-              {/* Decorative year marker on left */}
-              <div className="absolute left-0 top-0 bottom-0 flex flex-col items-center">
-                <div className="w-3 h-3 border-2" style={{ borderColor: theme.colors.primary, background: theme.colors.bg, borderRadius: theme.radii.pill }} />
-                {i < filtered.length - 1 && (
-                  <div className="flex-1 w-[1px]" style={{ background: theme.colors.border }} />
-                )}
+              <div style={{ fontFamily: theme.typography.display, fontSize: "1.05rem", color: theme.colors.primary }}>
+                {edu.startDate || "-"} {edu.endDate ? `– ${edu.endDate}` : edu.isPresent ? "– Sekarang" : ""}
               </div>
-
-              <div className="pb-2">
-                {/* Year as badge */}
-                <span className="inline-block text-xs font-medium px-3 py-0.5 mb-2"
-                  style={{ background: `${theme.colors.primary}0A`, color: theme.colors.primary, border: `1px solid ${theme.colors.border}`, borderRadius: theme.radii.pill }}>
-                  {edu.startDate || "-"} {edu.endDate ? `– ${edu.endDate}` : edu.isPresent ? "– Present" : ""}
-                </span>
-
-                <div className="p-1" style={{ background: theme.colors.bgSecondary, borderRadius: theme.radii.card, border: `1px solid ${theme.colors.border}` }}>
-                  <div className="p-4" style={{ background: theme.colors.surface, borderRadius: theme.radii.card }}>
-                    <h3 className="font-semibold" style={{ color: theme.colors.text, fontFamily: theme.typography.display }}>
-                      {edu.degree || "Gelar"}
-                    </h3>
-                    <p className="text-sm font-medium mt-0.5" style={{ color: theme.colors.textSecondary }}>
-                      {edu.institution}
-                    </p>
-                    {edu.field && (
-                      <p className="text-xs mt-1" style={{ color: theme.colors.textMuted }}>
-                        {edu.field}
-                      </p>
-                    )}
-                  </div>
-                </div>
+              <div>
+                <h3 style={{ fontFamily: theme.typography.display, fontSize: "1.2rem", color: theme.colors.text }}>
+                  {edu.degree || "Gelar"}
+                </h3>
+                <p className="text-sm mt-1" style={{ color: theme.colors.textSecondary }}>
+                  {edu.institution}
+                </p>
+                {edu.field && (
+                  <p className="text-xs mt-1" style={{ color: theme.colors.textMuted }}>
+                    {edu.field}
+                  </p>
+                )}
               </div>
             </motion.div>
           ))}
