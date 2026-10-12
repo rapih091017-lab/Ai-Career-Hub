@@ -1,0 +1,167 @@
+﻿node.exe : [33mBoth esbuild and oxc options were set. oxc options will be used and esbuild options will be 
+ignored.[39m The following esbuild options were set: `{ jsx: 'automatic' }`
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([33mBoth esbui... 'automatic' }`:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+ RUN  v4.1.10 D:/ai-career-hub-portfolio-trust
+
+ Γ¥» src/__tests__/_red-evidence.test.ts (13 tests | 7 failed) 237ms
+     ├ù aturan Luxe (tanpa bayangan) bila dijalankan di markup Brutal harus gagal 13ms
+     ├ù aturan Brutal (radius nol) bila dijalankan di markup Glass harus gagal 6ms
+     ├ù aturan switch-case bila satu tema absen dari sumber harus gagal 1ms
+     ├ù aturan blur Glass bila dialihkan ke Luxe harus gagal 0ms
+     ├ù regex boxShadow LAMA melewatkan escape ternary ΓÇö harus gagal (bukti lolos) 1ms
+     ├ù regex rounded LAMA melewatkan rounded-[2rem] ΓÇö harus gagal (bukti lolos) 0ms
+     ├ù tiga render dipaksa memakai tema sama harus menghasilkan kerangka identik 189ms
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ» Failed Tests 7 ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+
+ FAIL  src/__tests__/_red-evidence.test.ts > RED: Layer B mutation ΓÇö pasangan tema ditukar harus gagal > aturan Luxe 
+(tanpa bayangan) bila dijalankan di markup Brutal harus gagal
+AssertionError: expected [ '6px 6px 0 0 currentColor', ΓÇª(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "6px 6px 0 0 currentColor",
++   "6px 6px 0 0 currentColor",
++ ]
+
+ Γ¥» src/__tests__/_red-evidence.test.ts:41:61
+     39|     const brutal = staticFor("brutal");
+     40|     const shadows = [...brutal.matchAll(/box-shadow:\s*([^;"]+)/g)].maΓÇª
+     41|     expect(shadows.filter((s) => s !== "none" && s !== "")).toEqual([]ΓÇª
+       |                                                             ^
+     42|   });
+     43|
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1/7]ΓÄ»
+
+ FAIL  src/__tests__/_red-evidence.test.ts > RED: Layer B mutation ΓÇö pasangan tema ditukar harus gagal > aturan 
+Brutal (radius nol) bila dijalankan di markup Glass harus gagal
+AssertionError: expected [ '1.5rem' ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "1.5rem",
++ ]
+
+ Γ¥» src/__tests__/_red-evidence.test.ts:47:84
+     45|     const glass = staticFor("glass");
+     46|     const radii = [...glass.matchAll(/border-radius:\s*([^;"]+)/g)].maΓÇª
+     47|     expect(radii.filter((r) => r !== "0" && r !== "0px" && !r.startsWiΓÇª
+       |                                                                                    ^
+     48|   });
+     49|
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[2/7]ΓÄ»
+
+ FAIL  src/__tests__/_red-evidence.test.ts > RED: Layer B mutation ΓÇö pasangan tema ditukar harus gagal > aturan 
+switch-case bila satu tema absen dari sumber harus gagal
+AssertionError: expected 'case "glass": return <GlassX />; caseΓÇª' to match /["']luxe["']/
+
+- Expected:
+/["']luxe["']/
+
++ Received:
+"case \"glass\": return <GlassX />; case \"brutal\": return <BrutalX />;"
+
+ Γ¥» src/__tests__/_red-evidence.test.ts:52:17
+     50|   it("aturan switch-case bila satu tema absen dari sumber harus gagal"ΓÇª
+     51|     const src = `case "glass": return <GlassX />; case "brutal": returΓÇª
+     52|     expect(src).toMatch(new RegExp(`["']${THEME_IDS[2]}["']`));
+       |                 ^
+     53|   });
+     54|
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[3/7]ΓÄ»
+
+ FAIL  src/__tests__/_red-evidence.test.ts > RED: Layer B mutation ΓÇö pasangan tema ditukar harus gagal > aturan blur 
+Glass bila dialihkan ke Luxe harus gagal
+AssertionError: expected '' not to be '' // Object.is equality
+ Γ¥» src/__tests__/_red-evidence.test.ts:60:39
+     58|
+     59|   it("aturan blur Glass bila dialihkan ke Luxe harus gagal", () => {
+     60|     expect(THEMES.luxe.blur.card).not.toBe("");
+       |                                       ^
+     61|   });
+     62| });
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[4/7]ΓÄ»
+
+ FAIL  src/__tests__/_red-evidence.test.ts > RED: dua pelebaran aturan Layer A > regex boxShadow LAMA melewatkan 
+escape ternary ΓÇö harus gagal (bukti lolos)
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ Γ¥» src/__tests__/_red-evidence.test.ts:72:58
+     70|
+     71|   it("regex boxShadow LAMA melewatkan escape ternary ΓÇö harus gagal (buΓÇª
+     72|     expect(/boxShadow:\s*["'`]/.test(boxShadowHistoris)).toBe(true);
+       |                                                          ^
+     73|   });
+     74|
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[5/7]ΓÄ»
+
+ FAIL  src/__tests__/_red-evidence.test.ts > RED: dua pelebaran aturan Layer A > regex rounded LAMA melewatkan 
+rounded-[2rem] ΓÇö harus gagal (bukti lolos)
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ Γ¥» src/__tests__/_red-evidence.test.ts:85:66
+     83|
+     84|   it("regex rounded LAMA melewatkan rounded-[2rem] ΓÇö harus gagal (buktΓÇª
+     85|     expect(/\brounded-(full|[a-z0-9]+)\b/.test(roundedHistoris)).toBe(ΓÇª
+       |                                                                  ^
+     86|   });
+     87|
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[6/7]ΓÄ»
+
+ FAIL  src/__tests__/_red-evidence.test.ts > RED: fingerprint DOM benar-benar menggigit > tiga render dipaksa memakai 
+tema sama harus menghasilkan kerangka identik
+AssertionError: expected 1 to be 3 // Object.is equality
+
+- Expected
++ Received
+
+- 3
++ 1
+
+ Γ¥» src/__tests__/_red-evidence.test.ts:135:33
+    133|       return tags.join(">");
+    134|     });
+    135|     expect(new Set(skels).size).toBe(3);
+       |                                 ^
+    136|   });
+    137| });
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[7/7]ΓÄ»
+
+
+ Test Files  1 failed (1)
+      Tests  7 failed | 6 passed (13)
+   Start at  15:10:17
+   Duration  2.28s (transform 251ms, setup 104ms, import 635ms, tests 237ms, environment 794ms)
+
+

@@ -1,222 +1,104 @@
-### Task 2: `SafeLink` dan `SafeImg`
-
-Menutup celah XSS halaman publik sekarang juga mencegahnya kembali muncul di spec berikutnya.
+### Task 2: Migrasi token file A + test larangan sumber (Layer A)
 
 **Files:**
-- Create: `src/components/portfolio/render/SafeLink.tsx`
-- Test: `src/__tests__/portfolio-safe-link.test.tsx`
+- Modify: `src/components/portfolio/sections/HeroSection.tsx`, `AboutSection.tsx`, `StatsSection.tsx`, `ProjectsSection.tsx`, `SkillsSection.tsx`, `ContactSection.tsx`
+- Modify: `src/__tests__/portfolio-theme-rules.test.ts` (tambah blok Layer A)
 
 **Interfaces:**
-- Consumes: `safeUrl(v: string): string`
-- Produces:
-  - `<SafeLink href mode className target rel children>` dengan `mode: "editor" | "static"`
-  - `<SafeImg src mode alt width height className>`
-  - `export type SafeRenderMode = "editor" | "static"`
+- Consumes: token dari Task 1 (`theme.radii.card`, `theme.blur.card`, `theme.shadow.card`, `theme.typography.display`, `theme.focusRing`).
+- Produks: keenam file bebas literal; Layer A test hijau untuk keenam file (file lain menyusul di Task 3 — test sudah menyapu semua, jadi Task 2 hanya boleh menyalakan subset atau menulis penuh + Task 3 menyelesaikan: **pilih menulis penuh dan pasang `expect` per-file di akhir Task 3** — instruksi: tulis test penuh sekarang dengan pasangan file→daftar, `it.each` per file; file Task 3 ditandai `todo` sementara dan dihapus tandanya di Task 3).
 
-- [ ] **Step 1: Tulis test yang gagal**
+- [ ] **Step 1: Tulis test Layer A (gagal untuk file yang belum dimigrasi)**
 
-`src/__tests__/portfolio-safe-link.test.tsx`:
+Tambahkan ke `portfolio-theme-rules.test.ts`:
 
-```tsx
-import "@testing-library/jest-dom/vitest";
-import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
-import { SafeLink, SafeImg } from "@/components/portfolio/render/SafeLink";
+```ts
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 
-describe("SafeLink", () => {
-  it("merender tautan https tanpa perubahan", () => {
-    render(
-      <SafeLink href="https://github.com/teguh" mode="static">Repo</SafeLink>,
-    );
-    expect(screen.getByRole("link", { name: "Repo" })).toHaveAttribute(
-      "href",
-      "https://github.com/teguh",
-    );
-  });
+const SECTIONS_DIR = join(process.cwd(), "src/components/portfolio/sections");
+const RENDER_DIR = join(process.cwd(), "src/components/portfolio/render");
 
-  it("tidak menghasilkan href untuk javascript: di mode static", () => {
-    render(<SafeLink href="javascript:alert(1)" mode="static">Jahat</SafeLink>);
-    expect(screen.queryByRole("link")).toBeNull();
-    expect(screen.getByText("Jahat")).toBeInTheDocument();
-  });
+/** Literal yang dilarang — wajib lewat token tema. */
+const BANNED: { label: string; re: RegExp }[] = [
+  { label: "rounded-*", re: /\brounded-(full|[a-z0-9]+)\b/ },
+  { label: "shadow-*", re: /\bshadow-(sm|md|lg|xl|2xl|premium[\w-]*)\b/ },
+  { label: "backdrop-blur*", re: /\bbackdrop-blur\b/ },
+  { label: "borderRadius literal", re: /borderRadius:\s*["'`]/ },
+  { label: "boxShadow literal", re: /boxShadow:\s*["'`]/ },
+  { label: "inline fontFamily", re: /fontFamily:\s*["'`]/ },
+  { label: "hex warna", re: /#[0-9a-fA-F]{6}\b/ },
+];
 
-  it("memberi prefiks https pada domain telanjang", () => {
-    render(
-      <SafeLink href="linkedin.com/in/teguh" mode="static">LinkedIn</SafeLink>,
-    );
-    expect(screen.getByRole("link")).toHaveAttribute(
-      "href",
-      "https://linkedin.com/in/teguh",
-    );
-  });
+// File yang belum dimigrasi: Task 3 menyelesaikannya. Hapus entri ini di Task 3.
+const PENDING_FILES = [
+  "ExperienceSection.tsx", "EducationSection.tsx", "CertificationsSection.tsx",
+  "OrganizationsSection.tsx", "HobbiesSection.tsx", "TestimonialsSection.tsx",
+];
 
-  it("memperingatkan editor saat tautan ditolak", () => {
-    render(<SafeLink href="data:text/html,x" mode="editor">Fail</SafeLink>);
-    expect(screen.queryByRole("link")).toBeNull();
-    expect(screen.getByText(/tautan ditolak/i)).toBeInTheDocument();
-  });
+const sourceFiles = [
+  ...readdirSync(SECTIONS_DIR).map((f) => join(SECTIONS_DIR, f)),
+  ...readdirSync(RENDER_DIR).filter((f) => f.endsWith(".tsx")).map((f) => join(RENDER_DIR, f)),
+];
 
-  it("membuka tautan eksternal di tab baru dengan rel aman", () => {
-    render(
-      <SafeLink href="https://example.com" mode="static" target="_blank">Ext</SafeLink>,
-    );
-    const a = screen.getByRole("link");
-    expect(a).toHaveAttribute("target", "_blank");
-    expect(a).toHaveAttribute("rel", "noopener noreferrer");
-  });
+function stripAllowed(src: string): string {
+  // allowlist putih; komentar diabaikan agar aturan tidak menangkap diskusi
+  return src
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/\/\/[^\n]*/g, "")
+    .replace(/#fff(?:fff)?\b/gi, "");
+}
 
-  it("merender mailto dan tel", () => {
-    render(
-      <>
-        <SafeLink href="mailto:teguh@example.com" mode="static">Mail</SafeLink>
-        <SafeLink href="tel:+628123456789" mode="static">Tel</SafeLink>
-      </>,
-    );
-    expect(screen.getByRole("link", { name: "Mail" })).toHaveAttribute(
-      "href",
-      "mailto:teguh@example.com",
-    );
-    expect(screen.getByRole("link", { name: "Tel" })).toHaveAttribute(
-      "href",
-      "tel:+628123456789",
-    );
-  });
-});
-
-describe("SafeImg", () => {
-  it("merender gambar yang diizinkan", () => {
-    render(
-      <SafeImg src="/api/portfolio/assets/abc" mode="static" alt="Foto Teguh" width={200} height={200} />,
-    );
-    expect(screen.getByAltText("Foto Teguh")).toBeInTheDocument();
-  });
-
-  it("mengganti gambar dengan skema terlarang menjadi placeholder", () => {
-    render(<SafeImg src="javascript:alert(1)" mode="static" alt="X" width={100} height={100} />);
-    expect(screen.queryByAltText("X")).toBeNull();
-    expect(screen.getByText(/gambar tidak dapat ditampilkan/i)).toBeInTheDocument();
-  });
-
-  it("menampilkan placeholder saat src kosong", () => {
-    render(<SafeImg src="" mode="static" alt="Kosong" width={10} height={10} />);
-    expect(screen.getByText(/gambar tidak dapat ditampilkan/i)).toBeInTheDocument();
+describe("Layer A: larangan literal di section & render", () => {
+  it.each(sourceFiles.map((f) => [f]))("%s bebas literal", (file: string) => {
+    const name = file.split(/[\\/]/).pop()!;
+    if (PENDING_FILES.includes(name)) return; // Task 3 menghapus entri ini
+    const src = stripAllowed(readFileSync(file, "utf8"));
+    const found = BANNED.filter((b) => b.re.test(src)).map((b) => b.label);
+    expect(found, `${name}: literal terlarang`).toEqual([]);
   });
 });
 ```
 
-- [ ] **Step 2: Jalankan test, pastikan gagal**
+- [ ] **Step 2: Jalankan — 6 file Task 3 (todo) lolos; keenam file Task 2 gagal**
 
-Run: `npx vitest run src/__tests__/portfolio-safe-link.test.tsx`
-Expected: FAIL — modul tidak ada
+Run: `npx vitest run src/__tests__/portfolio-theme-rules.test.ts`
+Expected: kegagalan berisi daftar literal di file Task 2.
 
-- [ ] **Step 3: Buat `src/components/portfolio/render/SafeLink.tsx`**
+- [ ] **Step 3: Migrasi 6 file — pola pertukaran**
+
+Untuk SETIAP literal, ganti dengan token. Pola:
 
 ```tsx
-"use client";
+// SEBELUM (contoh nyata AboutSection)
+style={{ borderRadius: "1.5rem", boxShadow: "0 8px 32px rgba(0,0,0,.35)", backdropFilter: "blur(12px)" }}
+style={{ fontFamily: "Playfair Display, serif" }}
+className="text-[24px] font-bold"
 
-import { safeUrl } from "@/lib/portfolio-safety";
-
-export type SafeRenderMode = "editor" | "static";
-
-type SafeLinkProps = {
-  href: string;
-  mode: SafeRenderMode;
-  className?: string;
-  target?: string;
-  children: React.ReactNode;
-};
-
-/**
- * Satu-satunya jalan masuk user-supplied URL ke atribut href.
- * Mode static: skema terlarang dirender jadi span tanpa href.
- * Mode editor: skema terlarang diberi tanda merah supaya terlihat saat menyunting.
- */
-export function SafeLink({ href, mode, className, target, children }: SafeLinkProps) {
-  const safe = safeUrl(href ?? "");
-
-  if (!safe) {
-    if (mode !== "editor") return <span className={className}>{children}</span>;
-    return (
-      <span className="inline-flex flex-wrap items-center gap-1">
-        <span className={className}>{children}</span>
-        <span className="rounded bg-red-100 px-1.5 py-0.5 text-xs font-medium text-red-700">
-          tautan ditolak - skema tidak diizinkan
-        </span>
-      </span>
-    );
-  }
-
-  const external = /^https?:\/\//i.test(safe);
-
-  return (
-    <a
-      href={safe}
-      className={className}
-      {...(target ? { target } : {})}
-      {...(external ? { rel: "noopener noreferrer" } : {})}
-    >
-      {children}
-    </a>
-  );
-}
-
-type SafeImgProps = {
-  src: string;
-  mode: SafeRenderMode;
-  alt: string;
-  width?: number | string;
-  height?: number | string;
-  className?: string;
-};
-
-/**
- * src yang lolos safeUrl. Data URI gambar tetap boleh supaya aset yang
- * sudah di-inline saat export bisa dirender.
- */
-export function SafeImg({ src, mode, alt, width, height, className }: SafeImgProps) {
-  const value = src ?? "";
-  const ok =
-    /^data:image\/(png|jpeg|jpg|webp|gif|svg\+xml);/i.test(value) ||
-    safeUrl(value) !== "";
-
-  if (!ok) {
-    return (
-      <div
-        className={`flex items-center justify-center bg-surface-container text-on-surface-variant ${className ?? ""}`}
-        style={{ width, height }}
-        role="img"
-        aria-label={alt}
-      >
-        <span className="px-2 text-center text-xs">gambar tidak dapat ditampilkan</span>
-      </div>
-    );
-  }
-
-  return (
-    <img
-      src={value}
-      alt={alt}
-      width={width}
-      height={height}
-      className={className}
-      loading="lazy"
-      data-editor-mode={mode}
-    />
-  );
-}
+// SESUDAH
+style={{ borderRadius: theme.radii.card, boxShadow: theme.shadow.card, backdropFilter: theme.blur.card }}
+style={{ fontFamily: theme.typography.display }}
 ```
 
-- [ ] **Step 4: Jalankan test**
+Aturan per templat ketiga varian di tiap file:
+- `borderRadius` literal → `theme.radii.*` (`card`/`button`/`pill`/`image`, pilih yang paling sesuai per pemakaian; nilai Brutal otomatis `"0"`).
+- `boxShadow` literal → `theme.shadow.card` (bila bayangannya berbeda per posisi, pakai `card` juga — satu bayangan per tema adalah bagian signature).
+- `backdropFilter`/`blur(` literal → gabung `theme.blur.card` + `theme.blur.glow` bila keduanya dipakai di tempat berbeda; kosongkan string bila token kosong (Brutal).
+- `fontFamily` inline → `theme.typography.display` / `.body` / `.eyebrow`.
+- Hex di JSX → warna dari `theme.colors.*`. Hex **hanya** `#fff`/`#ffffff` (stroke) diperbolehkan. Khusus hex yang tersembunyi di `previewGradient`/SVG `stroke` — `previewGradient` (theme-level, bukan file section) di luar scan; `stroke="#fff"` aman.
+- Class Tailwind `rounded-*`/`shadow-*` → pindah ke objek `style` token atau hapus bila redundan.
 
-Run: `npx vitest run src/__tests__/portfolio-safe-link.test.tsx`
-Expected: PASS — 9 test
+Nilai token Task 1 bisa terbukti tidak cocok dengan literal yang dihapus (mis. ada 3 ukuran radius berbeda dalam satu tema). Dalam kasus itu: **jangan** menambah field token baru tanpa menambahkannya ke `ThemeDefinition` + ketiga tema + test kelengkapan. Laporkan di laporan bila menambah.
 
-- [ ] **Step 5: Typecheck dan commit**
+- [ ] **Step 4: Jalankan Layer A untuk keenam file (hijau) + seluruh suite**
+
+Run: `npx vitest run src/__tests__/portfolio-theme-rules.test.ts` lalu `npm test`, `npx tsc --noEmit`
+
+- [ ] **Step 5: Commit**
 
 ```bash
-npx tsc --noEmit
-git add src/components/portfolio/render/SafeLink.tsx src/__tests__/portfolio-safe-link.test.tsx
-git commit -m "feat(portfolio): SafeLink dan SafeImg menutup stored XSS"
+git add src/components/portfolio/sections/HeroSection.tsx src/components/portfolio/sections/AboutSection.tsx src/components/portfolio/sections/StatsSection.tsx src/components/portfolio/sections/ProjectsSection.tsx src/components/portfolio/sections/SkillsSection.tsx src/components/portfolio/sections/ContactSection.tsx src/__tests__/portfolio-theme-rules.test.ts
+git commit -m "refactor(portfolio): migrasi token 6 section pertama, Layer A larangan literal"
 ```
 
 ---

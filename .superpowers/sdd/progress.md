@@ -162,3 +162,8 @@ Task 6 (Spec2): complete (commits 31cb6c1..6f4d8ca, fontUrl Google-only + ThemeF
 Task 7+8 (Spec2): complete (commits 2fb3803..8e37655, re-compose6x3 + sweep EN->ID + Layer C guard,471 test, subagent sukses)
 - flake 1x tak terulang (2 run bersih), visual via render statis bukan preview live, Tools/Project Selesai per konvensi i18n
 
+Task 9+10 (Spec2): complete (commits 4c7ecdc..964278d + gate tanpa perbaikan,474 test, controller inline - subagent batal)
+- SSR /portfolio client-gated; kebenaran thumbnail dibuktikan test jsdom bukan SSR
+
+## SEMUA 10 TASK SPEC 2 SELESAI - tinggal review akhir cabang
+

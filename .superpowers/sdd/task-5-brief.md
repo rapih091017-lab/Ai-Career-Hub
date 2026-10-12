@@ -1,171 +1,95 @@
-### Task 5: Print stylesheet + tombol Simpan PDF
+### Task 5: Kontras AA — rumus WCAG di test + geser nilai warna
 
 **Files:**
-- Create: `src/app/portfolio/print.css`
-- Modify: `src/app/portfolio/preview/page.tsx`
-- Modify: `src/app/p/[slug]/page.tsx`
-- Modify: `src/components/portfolio/sections/HeroSection.tsx` (kelas `pf-atmosphere`)
-- Test: `src/__tests__/portfolio-print.test.ts`
+- Create: `src/__tests__/portfolio-contrast.test.ts`
+- Modify: `src/components/portfolio/themes.ts` (nilai warna 3 tema + `sectionColors`)
+- Modify: test hex lama yang mengunci warna: `src/__tests__/portfolio-export.test.ts`, `src/__tests__/portfolio-document.test.tsx`, `src/__tests__/portfolio-dead-code.test.ts`
 
 **Interfaces:**
-- Consumes: kelas `pf-section` dari `PortfolioDocument`
-- Produces: `?print=1` yang memaksa `mode="static"` dan menyalakan gaya cetak
+- Produces: `contrastRatio(hexA, hexB): number` di dalam test (tanpa dependensi), semua pasangan ≥ ambang.
 
-- [ ] **Step 1: Tulis test yang gagal**
+- [ ] **Step 1: Tulis test kontras (gagal untuk warna saat ini)**
 
-`src/__tests__/portfolio-print.test.ts`:
+`src/__tests__/portfolio-contrast.test.ts`:
 
 ```ts
 import { describe, it, expect } from "vitest";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { THEMES } from "@/components/portfolio/themes";
+import { THEME_IDS } from "@/components/portfolio/types";
 
-const css = readFileSync(join(process.cwd(), "src/app/portfolio/print.css"), "utf8");
+/** WCAG 2.1 relative luminance. Hex 3/6 digit, opasitas di luar cakupan (dilaporkan terpisah). */
+function luminance(hex: string): number {
+  const h = hex.replace("#", "");
+  const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h.slice(0, 6);
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(full.slice(i, i + 2), 16) / 255);
+  const lin = (c: number) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+}
+function contrast(a: string, b: string): number {
+  const [l1, l2] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  return (l1 + 0.05) / (l2 + 0.05);
+}
+/** Hitung rasio putih terhadap warna sumber (untuk badge putih-di-primary). */
+function whiteOn(hex: string): number {
+  return contrast("#ffffff", hex);
+}
 
-describe("print stylesheet", () => {
-  it("menyembunyikan lapisan atmosfer saat print", () => {
-    expect(css).toMatch(/@media print/);
-    expect(css).toMatch(/\.pf-atmosphere/);
-    expect(css).toContain("display: none");
+describe("WCAG AA per tema", () => {
+  it.each([...THEME_IDS])("%s: pasangan teks utama ≥ 4.5", (id) => {
+    const c = THEMES[id].colors;
+    const pairs: [string, string][] = [
+      ["text", c.text],
+      ["textSecondary", c.textSecondary],
+      ["textMuted", c.textMuted],
+      ["primary", c.primary],
+    ];
+    for (const [label, value] of pairs) {
+      // token transparan/rgba dilewati dengan catatan di laporan
+      if (!value.startsWith("#")) continue;
+      expect(contrast(value, c.bg), `${id}.${label} (${value})`).toBeGreaterThanOrEqual(4.5);
+    }
+    expect(whiteOn(c.primary), `${id}: putih di atas primary`).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(c.focusRing?.color ?? "#000", c.bg), `${id}: focus ring`).toBeGreaterThanOrEqual(3);
   });
 
-  it("memaksa cetak warna", () => {
-    expect(css).toContain("print-color-adjust: exact");
-  });
-
-  it("menghapus shadow dan blur yang tidak tercetak", () => {
-    expect(css).toMatch(/box-shadow:\s*none/);
-    expect(css).toMatch(/backdrop-filter:\s*none/);
-  });
-
-  it("mencegah kartu terbelah antar halaman", () => {
-    expect(css).toMatch(/break-inside:\s*avoid/);
-  });
-
-  it("mengatur ukuran dan margin halaman A4", () => {
-    expect(css).toMatch(/@page/);
-    expect(css).toMatch(/size:\s*A4/);
+  it.each([...THEME_IDS])("%s: setiap warna sectionColors utama ≥ 4.5", (id) => {
+    const theme = THEMES[id];
+    const sc = theme.sectionColors ?? {};
+    for (const [section, colors] of Object.entries(sc)) {
+      const primary = (colors as { primary?: string }).primary;
+      if (!primary || !primary.startsWith("#")) continue;
+      expect(contrast(primary, theme.colors.bg), `${id}.${section} primary ${primary}`).toBeGreaterThanOrEqual(4.5);
+    }
   });
 });
 ```
 
-- [ ] **Step 2: Jalankan test, pastikan gagal**
+Catatan: `focusRing` ada di objek tema hasil Task 1; bila akses `colors.focusRing` tidak ada, pakai `THEMES[id].focusRing.color`. Sesuaikan referensi agar kompilasi bersih.
 
-Run: `npx vitest run src/__tests__/portfolio-print.test.ts`
-Expected: FAIL — file tidak ada
+- [ ] **Step 2: Jalankan — pantau daftar kegagalan sebagai daftar kerja**
 
-- [ ] **Step 3: Buat `src/app/portfolio/print.css`**
+Run: `npx vitest run src/__tests__/portfolio-contrast.test.ts`
+Output daftar pasangan yang gagal. Catat semuanya.
 
-```css
-/* Gaya cetak portfolio. Dimuat hanya ketika ?print=1 aktif.
-   Prinsip: atmosphere (grain, orb, particle) adalah dekorasi layar dan
-   tidak pernah menjadi bagian dari dokumen cetak. */
+- [ ] **Step 3: Geser nilai warna (karakter sama, nilai pekat/terang)**
 
-@media print {
-  @page {
-    size: A4;
-    margin: 12mm;
-  }
+Di `themes.ts`, ubah HANYA nilai yang gagal — hue dipertahankan:
+- Luxe: emas `#B8863C` → kuningan lebih tua (target ≥4.5 vs `#FDFBF7`), body `#8C7A6A` → cokelat tua (≥4.5), `focusRing` ikut emas tua.
+- Brutal: aksen `#FF3366` → merah lebih pekat (≥4.5 vs `#FFFAF0`), statistik kuning `#FFCC00` di `sectionColors` → kuning-jingga pekat yang lolos ≥4.5 (bila mustahil tanpa kehilangan "kuning", ganti pasangan primary section itu ke warna teks gelap dan catat di laporan).
+- Glass: ungu `#7C5CFC` → violet terang (≥4.5 vs `#12121F`), `focusRing` → violet terang.
+Geser `borderHover`, `primaryGlow` yang berkaitan agar tidak ada pasangan baru yang turun di bawah ambang.
 
-  html,
-  body {
-    background: #ffffff !important;
-  }
+- [ ] **Step 4: Perbarui test yang mengunci hex/copy lama**
 
-  .pf-atmosphere,
-  .pf-chrome,
-  [data-pf-print-hidden="true"] {
-    display: none !important;
-  }
+`rg -n "#FFFAF0|#3366ff|#ff3366|#6dd5fa|#7C5CFC" src/__tests__/` → ganti nilai dalam assertion dengan nilai BARU hasil Step 3 (assertion tetap menuntut warna itu muncul di markup).
 
-  * {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-
-  .pf-card,
-  .pf-section > * {
-    box-shadow: none !important;
-    backdrop-filter: none !important;
-    break-inside: avoid;
-    page-break-inside: avoid;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4 {
-    break-after: avoid;
-    page-break-after: avoid;
-  }
-
-  a {
-    text-decoration: underline;
-  }
-
-  a[href^="http"]::after {
-    content: " (" attr(href) ")";
-    font-size: 0.75em;
-    word-break: break-all;
-  }
-}
-```
-
-- [ ] **Step 4: Tandai lapisan atmosfer**
-
-Run:
-```
-rg -n 'feTurbulence|fixed inset-0|position: ?fixed' src/components/portfolio/sections/
-```
-
-Untuk setiap hasil, tambahkan kelas `pf-atmosphere` pada elemen dekoratif terluar tersebut. Contoh:
-
-```tsx
-<div className="pf-atmosphere pointer-events-none fixed inset-0 z-0 opacity-[0.03]" aria-hidden />
-```
-
-- [ ] **Step 5: Selesaikan `?print=1` di halaman publik**
-
-Di `src/app/p/[slug]/page.tsx`:
-
-```tsx
-const printMode = searchParams?.print === "1";
-
-if (printMode) {
-  await import("../portfolio/print.css");
-}
-```
-
-Sematkan `data-pf-print-hidden="true"` pada elemen chrome builder dan tombol navigasi.
-
-- [ ] **Step 6: Tambahkan tombol Simpan PDF di preview**
-
-```tsx
-<button
-  type="button"
-  onClick={() => {
-    const target = publishedSlug
-      ? `/p/${publishedSlug}?print=1`
-      : `/portfolio/preview?print=1`;
-    window.open(target, "_blank", "noopener");
-  }}
-  className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-outline-variant px-4 text-sm font-semibold"
->
-  <span className="material-symbols-outlined text-lg" aria-hidden>picture_as_pdf</span>
-  Simpan PDF
-</button>
-```
-
-`publishedSlug` diambil dari status publish yang sudah ada di halaman ini.
-
-- [ ] **Step 7: Jalankan test, typecheck, commit**
+- [ ] **Step 5: Verifikasi + commit**
 
 ```bash
-npx vitest run src/__tests__/portfolio-print.test.ts
-npm test
-npx tsc --noEmit
-git add src/app/portfolio/print.css src/app/portfolio/preview/page.tsx "src/app/p/[slug]/page.tsx" src/components/portfolio/sections src/__tests__/portfolio-print.test.ts
-git commit -m "feat(portfolio): tampilan cetak dan tombol Simpan PDF"
+npx vitest run src/__tests__/portfolio-contrast.test.ts
+npm test && npx tsc --noEmit
+git add src/components/portfolio/themes.ts src/__tests__/portfolio-contrast.test.ts src/__tests__/
+git commit -m "fix(portfolio): kontras WCAG AA semua tema, rumus rasio di test"
 ```
 
 ---
