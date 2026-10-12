@@ -43,7 +43,7 @@ function GlassExperience({ items }: { items: ExperienceItem[] }) {
               >
                 {/* Timeline dot with company logo */}
                 <div className="absolute left-0 top-1 w-10 h-10 flex items-center justify-center text-xs font-bold overflow-hidden"
-                  style={{ background: theme.colors.primary, color: "#fff", borderRadius: theme.radii.pill, boxShadow: theme.shadow.card }}>
+                  style={{ background: theme.colors.primary, color: theme.colors.onPrimary, borderRadius: theme.radii.pill, boxShadow: theme.shadow.card }}>
                   {exp.companyLogo ? (
                     <img src={exp.companyLogo} alt={exp.company} className="w-full h-full object-cover" />
                   ) : (
@@ -139,7 +139,7 @@ function BrutalExperience({ items }: { items: ExperienceItem[] }) {
                   <div className="p-5">
                     <div className="flex items-start gap-4">
                       <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center text-lg font-black overflow-hidden"
-                        style={{ background: theme.colors.primary, color: "#fff" }}>
+                        style={{ background: theme.colors.primary, color: theme.colors.onPrimary }}>
                         {exp.companyLogo ? (
                           <img src={exp.companyLogo} alt={exp.company} className="w-full h-full object-cover" />
                         ) : (

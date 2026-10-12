@@ -151,7 +151,7 @@ function BrutalTestimonials({ items }: { items: TestimonialItem[] }) {
                   </p>
                   <div className="flex items-center gap-2 pt-2" style={{ borderTop: `2px solid ${theme.colors.border}` }}>
                     <div className="w-8 h-8 flex items-center justify-center text-xs font-black"
-                      style={{ background: theme.colors.primary, color: "#fff" }}>
+                      style={{ background: theme.colors.primary, color: theme.colors.onPrimary }}>
                       {(tm.name?.[0] || "?").toUpperCase()}
                     </div>
                     <div>

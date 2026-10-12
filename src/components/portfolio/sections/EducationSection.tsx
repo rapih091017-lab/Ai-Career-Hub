@@ -129,7 +129,7 @@ function BrutalEducation({ items }: { items: EducationItem[] }) {
               >
                 {/* Number badge */}
                 <div className="absolute left-0 top-0 w-[41px] h-[41px] flex items-center justify-center"
-                  style={{ background: theme.colors.primary, color: "#fff", border: `3px solid ${theme.colors.border}` }}>
+                  style={{ background: theme.colors.primary, color: theme.colors.onPrimary, border: `3px solid ${theme.colors.border}` }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
                     <path d="M6 12v5c3 3 9 3 12 0v-5" />

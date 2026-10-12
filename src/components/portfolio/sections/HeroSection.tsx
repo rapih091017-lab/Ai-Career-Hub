@@ -17,7 +17,7 @@ function FancyButton({ href, label, primary }: { href: string; label: string; pr
       className="group inline-flex items-center gap-3 font-semibold transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.98]"
       style={{
         background: primary ? theme.colors.primary : "transparent",
-        color: primary ? "#fff" : theme.colors.textSecondary,
+        color: primary ? theme.colors.onPrimary : theme.colors.textSecondary,
         border: primary ? "none" : `2px solid ${theme.colors.border}`,
         padding: "12px 24px 12px 28px",
         fontSize: 14,
@@ -29,7 +29,7 @@ function FancyButton({ href, label, primary }: { href: string; label: string; pr
         className="w-8 h-8 flex items-center justify-center transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:scale-105"
         style={{
           background: primary ? "rgba(255,255,255,0.15)" : `${theme.colors.primary}15`,
-          color: primary ? "#fff" : theme.colors.primary,
+          color: primary ? theme.colors.onPrimary : theme.colors.primary,
           borderRadius: theme.radii.pill,
         }}
       >
@@ -334,7 +334,7 @@ function BrutalHero({ data: f, name, initials }: { data: PortfolioFormData; name
                 whileHover={{ scale: 1.02 }}
                 transition={{ duration: 0.2 }}
               >
-                <span style={{ color: "#fff" }}>
+                <span style={{ color: theme.colors.onPrimary }}>
                   {name.split(" ").slice(1).join(" ") || "Saya"}
                 </span>
               </motion.span>

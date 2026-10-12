@@ -153,7 +153,7 @@ function BrutalProjects({ items }: { items: ProjectItem[] }) {
                         <h3 className="font-bold text-lg mb-2" style={{ color: theme.colors.text }}>{p.name}</h3>
                         {p.description && <p className="text-sm leading-relaxed" style={{ color: theme.colors.textMuted }}>{p.description}</p>}
                       </div>
-                      <span className="text-xs font-bold px-3 py-1" style={{ background: theme.colors.primary, color: "#fff" }}>
+                      <span className="text-xs font-bold px-3 py-1" style={{ background: theme.colors.primary, color: theme.colors.onPrimary }}>
                         {String(i + 1).padStart(2, "0")}
                       </span>
                     </div>

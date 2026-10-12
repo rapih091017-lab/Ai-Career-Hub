@@ -36,6 +36,8 @@ export interface ThemeColors {
   textSecondary: string;
   textMuted: string;
   primary: string;
+  /** Warna teks/stroke di atas background primary (putih di tema gelap, tinta di tema terang-bright). */
+  onPrimary: string;
   primaryGlow: string;
   secondary: string;
   accent: string;

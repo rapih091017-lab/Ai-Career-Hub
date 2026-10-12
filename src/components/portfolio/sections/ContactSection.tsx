@@ -12,7 +12,7 @@ function ContactButton({ href, label }: { href: string; label: string }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer"
       className="group inline-flex items-center gap-3 font-semibold transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.98]"
-      style={{ background: theme.colors.primary, color: "#fff", padding: "12px 24px", fontSize: 13, borderRadius: theme.radii.button }}>
+      style={{ background: theme.colors.primary, color: theme.colors.onPrimary, padding: "12px 24px", fontSize: 13, borderRadius: theme.radii.button }}>
       <span>{label}</span>
       <span className="w-7 h-7 flex items-center justify-center transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
         style={{ background: "rgba(255,255,255,0.15)", borderRadius: theme.radii.pill }}>

@@ -174,7 +174,7 @@ function LuxeOrganizations({ items }: { items: OrganizationItem[] }) {
             >
               <div className="flex flex-col items-center">
                 <div className="w-9 h-9 flex items-center justify-center font-semibold text-sm"
-                  style={{ background: theme.colors.primary, color: "#fff", borderRadius: theme.radii.pill }}>
+                  style={{ background: theme.colors.primary, color: theme.colors.onPrimary, borderRadius: theme.radii.pill }}>
                   {String(i + 1).padStart(2, "0")}
                 </div>
                 {i < filtered.length - 1 && <div className="flex-1 w-[1px] my-1" style={{ background: theme.colors.border }} />}

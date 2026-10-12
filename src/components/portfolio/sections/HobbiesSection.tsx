@@ -102,7 +102,7 @@ function BrutalHobbies({ items }: { items: HobbyItem[] }) {
                 boxShadow: theme.shadow.card,
               }}>
                 <div className="w-9 h-9 mx-auto mb-2 flex items-center justify-center" style={{ background: theme.colors.primary }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={theme.colors.onPrimary} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                     {HOBBY_ICONS[i % HOBBY_ICONS.length]}
                   </svg>
                 </div>

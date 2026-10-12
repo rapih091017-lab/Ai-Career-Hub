@@ -124,7 +124,7 @@ function BrutalAbout({ f }: { f: PortfolioFormData }) {
             }}>
               {/* Eyebrow as bold badge */}
               <div className="inline-block mb-6 px-4 py-1 text-xs font-black tracking-widest"
-                style={{ background: theme.colors.primary, color: "#fff" }}>
+                style={{ background: theme.colors.primary, color: theme.colors.onPrimary }}>
                 ABOUT
               </div>
 

@@ -131,7 +131,7 @@ function BrutalCertifications({ items }: { items: CertificationItem[] }) {
                     </svg>
                   </div>
                   {cert.year && (
-                    <span className="text-xs font-black px-2 py-1" style={{ background: theme.colors.primary, color: "#fff" }}>
+                    <span className="text-xs font-black px-2 py-1" style={{ background: theme.colors.primary, color: theme.colors.onPrimary }}>
                       {cert.year}
                     </span>
                   )}
