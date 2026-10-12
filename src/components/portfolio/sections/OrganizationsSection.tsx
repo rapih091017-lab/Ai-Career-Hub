@@ -59,7 +59,7 @@ function GlassOrganizations({ items }: { items: OrganizationItem[] }) {
                       <div className="flex items-baseline justify-between gap-3 flex-wrap">
                         <h3 className="font-semibold" style={{ fontSize: "1rem", color: theme.colors.text }}>{org.name}</h3>
                         {org.period && (
-                          <span className="text-[11px] font-medium flex-shrink-0" style={{ color: theme.colors.accent }}>{org.period}</span>
+                          <span className="text-xs font-medium flex-shrink-0" style={{ color: theme.colors.accent }}>{org.period}</span>
                         )}
                       </div>
                       {org.role && (
@@ -118,7 +118,7 @@ function BrutalOrganizations({ items }: { items: OrganizationItem[] }) {
                 <div className="flex items-center justify-between gap-3 flex-wrap mb-2">
                   <h3 className="font-bold" style={{ color: theme.colors.text }}>{org.name}</h3>
                   {org.period && (
-                    <span className="text-[11px] font-bold px-2 py-0.5" style={{ background: theme.colors.accent, color: "#1A1A1A" }}>{org.period}</span>
+                    <span className="text-xs font-bold px-2 py-0.5" style={{ background: theme.colors.accent, color: "#1A1A1A" }}>{org.period}</span>
                   )}
                 </div>
                 {org.role && (
@@ -183,7 +183,7 @@ function LuxeOrganizations({ items }: { items: OrganizationItem[] }) {
                 <div className="flex items-baseline justify-between gap-3 flex-wrap">
                   <h3 className="font-semibold" style={{ color: theme.colors.text, fontFamily: "Playfair Display, serif" }}>{org.name}</h3>
                   {org.period && (
-                    <span className="text-[11px] font-medium" style={{ color: theme.colors.primary }}>{org.period}</span>
+                    <span className="text-xs font-medium" style={{ color: theme.colors.primary }}>{org.period}</span>
                   )}
                 </div>
                 {org.role && (

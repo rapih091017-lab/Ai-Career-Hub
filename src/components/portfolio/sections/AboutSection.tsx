@@ -80,7 +80,7 @@ function GlassAbout({ f }: { f: PortfolioFormData }) {
                       </div>
                       <div>
                         <div className="text-lg font-bold" style={{ color: theme.colors.primary }}>{s.value}</div>
-                        <div className="text-[11px]" style={{ color: theme.colors.textMuted }}>{s.label}</div>
+                        <div className="text-xs" style={{ color: theme.colors.textMuted }}>{s.label}</div>
                       </div>
                     </div>
                   ))}

@@ -64,7 +64,7 @@ function GlassEducation({ items }: { items: EducationItem[] }) {
                           <h3 className="font-semibold" style={{ fontSize: i === 0 ? "1.1rem" : "0.95rem", color: theme.colors.text }}>
                             {edu.degree || "Gelar"}
                           </h3>
-                          <span className="text-[11px] font-medium flex-shrink-0" style={{ color: theme.colors.accent }}>
+                          <span className="text-xs font-medium flex-shrink-0" style={{ color: theme.colors.accent }}>
                             {edu.startDate}{edu.startDate ? ", " : ""}{edu.isPresent ? "Sekarang" : edu.endDate || ""}
                           </span>
                         </div>
@@ -147,7 +147,7 @@ function BrutalEducation({ items }: { items: EducationItem[] }) {
                       <h3 className="font-bold" style={{ color: theme.colors.text }}>
                         {edu.degree || "Gelar"}
                       </h3>
-                      <span className="text-[11px] font-bold px-2 py-0.5" style={{ background: theme.colors.accent, color: "#1A1A1A" }}>
+                      <span className="text-xs font-bold px-2 py-0.5" style={{ background: theme.colors.accent, color: "#1A1A1A" }}>
                         {edu.startDate}{edu.startDate ? ", " : ""}{edu.isPresent ? "Sekarang" : edu.endDate || ""}
                       </span>
                     </div>
@@ -220,7 +220,7 @@ function LuxeEducation({ items }: { items: EducationItem[] }) {
 
               <div className="pb-2">
                 {/* Year as badge */}
-                <span className="inline-block text-[11px] font-medium px-3 py-0.5 rounded-full mb-2"
+                <span className="inline-block text-xs font-medium px-3 py-0.5 rounded-full mb-2"
                   style={{ background: `${theme.colors.primary}0A`, color: theme.colors.primary, border: `1px solid ${theme.colors.border}` }}>
                   {edu.startDate || "-"} {edu.endDate ? `– ${edu.endDate}` : edu.isPresent ? "– Present" : ""}
                 </span>

@@ -426,7 +426,7 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
                   maxLength={50}
                 />
               </div>
-              <p className="text-[11px] text-on-surface-variant mt-1.5">{t("publish.slug-hint")}</p>
+              <p className="text-xs text-on-surface-variant mt-1.5">{t("publish.slug-hint")}</p>
             </div>
 
             {error && (

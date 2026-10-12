@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { renderToStaticMarkup } from "react-dom/server";
 import { createElement } from "react";
 import { and, desc, eq } from "drizzle-orm";
 import { apiHandler, errorResponse, withAuth } from "@/lib/api-utils";
@@ -45,6 +44,7 @@ export const GET = apiHandler(async (request: NextRequest) => {
   const themeId = (Object.hasOwn(THEMES, requested) ? requested : "glass") as ThemeId;
 
   const data = await inlineAssets(parsed.data, auth.userId);
+  const { renderToStaticMarkup } = await import("react-dom/server");
   const markup = renderToStaticMarkup(
     createElement(PortfolioDocument, {
       data,

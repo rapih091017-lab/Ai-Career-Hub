@@ -18,7 +18,7 @@ function GlassExperience({ items }: { items: ExperienceItem[] }) {
           viewport={{ once: true }}
           transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
         >
-          <span className="inline-block rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.2em] font-medium mb-4"
+          <span className="inline-block rounded-full px-3 py-1 text-xs uppercase tracking-[0.2em] font-medium mb-4"
             style={{ background: `${theme.colors.primary}12`, color: theme.colors.primary, border: `1px solid ${theme.colors.primary}20` }}>
             EXPERIENCE
           </span>

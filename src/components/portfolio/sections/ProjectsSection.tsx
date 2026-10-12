@@ -21,7 +21,7 @@ function GlassProjects({ items }: { items: ProjectItem[] }) {
           viewport={{ once: true }}
           transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
         >
-          <span className="inline-block rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.2em] font-medium mb-4"
+          <span className="inline-block rounded-full px-3 py-1 text-xs uppercase tracking-[0.2em] font-medium mb-4"
             style={{ background: `${theme.colors.primary}12`, color: theme.colors.primary, border: `1px solid ${theme.colors.primary}20` }}>
             WORK
           </span>
@@ -77,7 +77,7 @@ function GlassProjects({ items }: { items: ProjectItem[] }) {
                       {p.techStack && (
                         <div className="flex flex-wrap gap-1.5 mt-4">
                           {p.techStack.split(",").map((tech, idx) => (
-                            <span key={idx} className="text-[10px] px-2.5 py-1 rounded-full font-medium"
+                            <span key={idx} className="text-xs px-2.5 py-1 rounded-full font-medium"
                               style={{ background: `${theme.colors.primary}10`, color: theme.colors.secondary }}>
                               {tech.trim()}
                             </span>
@@ -160,7 +160,7 @@ function BrutalProjects({ items }: { items: ProjectItem[] }) {
                     {p.techStack && (
                       <div className="flex flex-wrap gap-1.5 mt-4">
                         {p.techStack.split(",").map((tech, idx) => (
-                          <span key={idx} className="text-[10px] px-2.5 py-1 font-bold"
+                          <span key={idx} className="text-xs px-2.5 py-1 font-bold"
                             style={{ background: theme.colors.bg, border: `2px solid ${theme.colors.border}`, color: theme.colors.text }}>
                             {tech.trim()}
                           </span>
@@ -256,7 +256,7 @@ function LuxeProjects({ items }: { items: ProjectItem[] }) {
                         {p.techStack && (
                           <div className="flex flex-wrap gap-1.5 mb-4">
                             {p.techStack.split(",").map((tech, idx) => (
-                              <span key={idx} className="text-[10px] px-2.5 py-1 rounded-full font-medium"
+                              <span key={idx} className="text-xs px-2.5 py-1 rounded-full font-medium"
                                 style={{ background: `${theme.colors.primary}08`, color: theme.colors.secondary, border: `1px solid ${theme.colors.border}` }}>
                                 {tech.trim()}
                             </span>

@@ -70,7 +70,7 @@ export default function PhotoUpload({ value, onChange, label = "Foto Profil" }: 
 
   return (
     <div className="space-y-2">
-      <label className="block text-[11px] font-medium text-on-surface-variant mb-1">{label}</label>
+      <label className="block text-xs font-medium text-on-surface-variant mb-1">{label}</label>
 
       {/* Preview + Upload Area */}
       <div
@@ -122,7 +122,7 @@ export default function PhotoUpload({ value, onChange, label = "Foto Profil" }: 
                 <span className="text-xs text-on-surface-variant font-medium">
                   Klik atau tarik foto ke sini
                 </span>
-                <span className="text-[10px] text-on-surface-variant/60">
+                <span className="text-xs text-on-surface-variant/60">
                   PNG, JPG, WebP. Maks 5MB
                 </span>
               </>
@@ -154,7 +154,7 @@ export default function PhotoUpload({ value, onChange, label = "Foto Profil" }: 
       </div>
 
       {error && (
-        <p className="text-[11px] text-red-500 flex items-center gap-1">
+        <p className="text-xs text-red-500 flex items-center gap-1">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>

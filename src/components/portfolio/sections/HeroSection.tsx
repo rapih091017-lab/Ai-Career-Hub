@@ -44,7 +44,7 @@ function Eyebrow({ text }: { text: string }) {
   const theme = usePortfolioTheme();
   return (
     <span
-      className="inline-block rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.2em] font-medium mb-6"
+      className="inline-block rounded-full px-3 py-1 text-xs uppercase tracking-[0.2em] font-medium mb-6"
       style={{
         background: `${theme.colors.primary}12`,
         color: theme.colors.primary,

@@ -107,7 +107,7 @@ function BrutalHobbies({ items }: { items: HobbyItem[] }) {
                 </div>
                 <div className="font-bold text-sm" style={{ color: theme.colors.text }}>{hobby.name}</div>
                 {hobby.description && (
-                  <div className="text-[11px] mt-1 leading-snug" style={{ color: theme.colors.textMuted }}>{hobby.description}</div>
+                  <div className="text-xs mt-1 leading-snug" style={{ color: theme.colors.textMuted }}>{hobby.description}</div>
                 )}
               </div>
             </motion.div>

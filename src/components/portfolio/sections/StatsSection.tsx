@@ -60,7 +60,7 @@ function GlassStats({ stats }: { stats: { value: string; label: string; icon: st
                   <div className="text-2xl font-bold mb-0.5" style={{ color: theme.colors.primary }}>
                     {s.value}
                   </div>
-                  <div className="text-[10px] font-medium" style={{ color: theme.colors.textMuted }}>
+                  <div className="text-xs font-medium" style={{ color: theme.colors.textMuted }}>
                     {s.label}
                   </div>
                 </div>

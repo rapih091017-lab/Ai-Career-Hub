@@ -207,7 +207,7 @@ export default function PortfolioPreviewPage() {
                       <button
                         key={tid}
                         onClick={() => setThemeId(tid)}
-                        className="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all"
+                        className="px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all"
                         style={{
                           backgroundColor: themeId === tid ? theme.colors.primary : "transparent",
                           color: themeId === tid ? "#fff" : theme.colors.textMuted,

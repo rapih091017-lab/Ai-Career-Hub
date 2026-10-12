@@ -66,7 +66,7 @@ function GlassCertifications({ items }: { items: CertificationItem[] }) {
                       {cert.issuer}
                     </p>
                     {cert.year && (
-                      <span className="inline-block text-[11px] font-medium mt-2 px-2 py-0.5 rounded-full"
+                      <span className="inline-block text-xs font-medium mt-2 px-2 py-0.5 rounded-full"
                         style={{ background: `${theme.colors.primary}10`, color: theme.colors.accent }}>
                         {cert.year}
                       </span>
@@ -131,7 +131,7 @@ function BrutalCertifications({ items }: { items: CertificationItem[] }) {
                     </svg>
                   </div>
                   {cert.year && (
-                    <span className="text-[11px] font-black px-2 py-1" style={{ background: theme.colors.primary, color: "#fff" }}>
+                    <span className="text-xs font-black px-2 py-1" style={{ background: theme.colors.primary, color: "#fff" }}>
                       {cert.year}
                     </span>
                   )}
@@ -208,7 +208,7 @@ function LuxeCertifications({ items }: { items: CertificationItem[] }) {
                   </div>
                 </div>
                 {cert.year && (
-                  <span className="text-[11px] font-medium px-3 py-1 rounded-full flex-shrink-0"
+                  <span className="text-xs font-medium px-3 py-1 rounded-full flex-shrink-0"
                     style={{ background: `${theme.colors.primary}0A`, color: theme.colors.primary }}>
                     {cert.year}
                   </span>

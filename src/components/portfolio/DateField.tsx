@@ -62,7 +62,7 @@ export default function DateField({
 
   return (
     <div className="relative">
-      {label && <label className="block text-[11px] font-medium text-on-surface-variant mb-1">{label}</label>}
+      {label && <label className="block text-xs font-medium text-on-surface-variant mb-1">{label}</label>}
 
       {showPresent && isPresent ? (
         <div
@@ -148,7 +148,7 @@ export default function DateField({
             }}
             className="w-3.5 h-3.5 rounded border-outline-variant text-primary focus:ring-primary/30"
           />
-          <span className="text-[11px] text-on-surface-variant group-hover:text-on-surface transition-colors">
+          <span className="text-xs text-on-surface-variant group-hover:text-on-surface transition-colors">
             Sampai Sekarang
           </span>
         </label>

@@ -61,14 +61,14 @@ function GlassSkills({ f }: { f: PortfolioFormData }) {
             <div className="mt-6 flex flex-wrap gap-x-8 gap-y-2">
               {f.skillsTools && (
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: theme.colors.textMuted }}>Tools</span>
+                  <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: theme.colors.textMuted }}>Tools</span>
                   <span className="w-3 h-[1px]" style={{ background: theme.colors.primary }} />
                   <span className="text-sm" style={{ color: theme.colors.textSecondary }}>{f.skillsTools}</span>
                 </div>
               )}
               {f.skillsLanguages && (
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: theme.colors.textMuted }}>Bahasa</span>
+                  <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: theme.colors.textMuted }}>Bahasa</span>
                   <span className="w-3 h-[1px]" style={{ background: theme.colors.accent }} />
                   <span className="text-sm" style={{ color: theme.colors.textSecondary }}>{f.skillsLanguages}</span>
                 </div>
@@ -153,7 +153,7 @@ function LuxeSkills({ f }: { f: PortfolioFormData }) {
               Expertise
             </h2>
             <div className="flex-1" style={{ height: 1, background: theme.colors.border }} />
-            <span className="text-[10px] uppercase tracking-widest" style={{ color: theme.colors.textMuted }}>
+            <span className="text-xs uppercase tracking-widest" style={{ color: theme.colors.textMuted }}>
               {skillTags.length} Areas
             </span>
           </div>
@@ -164,7 +164,7 @@ function LuxeSkills({ f }: { f: PortfolioFormData }) {
             {skillTags.length > 0 && (
               <div className="p-1" style={{ background: theme.colors.bgSecondary, borderRadius: "1.5rem", border: `1px solid ${theme.colors.border}` }}>
                 <div className="p-5" style={{ background: theme.colors.surface, borderRadius: "calc(1.5rem - 0.25rem)" }}>
-                  <span className="text-[10px] font-medium uppercase tracking-widest" style={{ color: theme.colors.primary }}>Core Competencies</span>
+                  <span className="text-xs font-medium uppercase tracking-widest" style={{ color: theme.colors.primary }}>Core Competencies</span>
                   <div className="flex flex-wrap gap-2 mt-3">
                     {skillTags.map((skill, i) => (
                       <motion.span key={skill}
@@ -187,7 +187,7 @@ function LuxeSkills({ f }: { f: PortfolioFormData }) {
               {f.skillsTools && (
                 <div className="p-1" style={{ background: theme.colors.bgSecondary, borderRadius: "1.5rem", border: `1px solid ${theme.colors.border}` }}>
                   <div className="p-4" style={{ background: theme.colors.surface, borderRadius: "calc(1.5rem - 0.25rem)" }}>
-                    <span className="text-[10px] font-medium uppercase tracking-widest" style={{ color: theme.colors.textMuted }}>Tools</span>
+                    <span className="text-xs font-medium uppercase tracking-widest" style={{ color: theme.colors.textMuted }}>Tools</span>
                     <p className="text-sm mt-1" style={{ color: theme.colors.textSecondary }}>{f.skillsTools}</p>
                   </div>
                 </div>
@@ -195,7 +195,7 @@ function LuxeSkills({ f }: { f: PortfolioFormData }) {
               {f.skillsLanguages && (
                 <div className="p-1" style={{ background: theme.colors.bgSecondary, borderRadius: "1.5rem", border: `1px solid ${theme.colors.border}` }}>
                   <div className="p-4" style={{ background: theme.colors.surface, borderRadius: "calc(1.5rem - 0.25rem)" }}>
-                    <span className="text-[10px] font-medium uppercase tracking-widest" style={{ color: theme.colors.textMuted }}>Languages</span>
+                    <span className="text-xs font-medium uppercase tracking-widest" style={{ color: theme.colors.textMuted }}>Languages</span>
                     <p className="text-sm mt-1" style={{ color: theme.colors.textSecondary }}>{f.skillsLanguages}</p>
                   </div>
                 </div>
