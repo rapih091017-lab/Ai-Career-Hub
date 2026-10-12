@@ -82,7 +82,7 @@ export const THEMES: Record<string, ThemeDefinition> = {
       border: "#1A1A1A",
       borderHover: "#FF3366",
     },
-    radii: { card: "0.75rem", button: "9999px", pill: "100px", image: "1.25rem" },
+    radii: { card: "0", button: "0", pill: "0", image: "0" },
     blur: { card: "", glow: "" },
     shadow: { card: "6px 6px 0 0 currentColor", focus: "0 0 0 3px #FF3366" },
     typography: {
@@ -137,7 +137,7 @@ export const THEMES: Record<string, ThemeDefinition> = {
     },
     radii: { card: "1.5rem", button: "9999px", pill: "9999px", image: "2rem" },
     blur: { card: "", glow: "" },
-    shadow: { card: "inset 0 1px 2px rgba(0,0,0,0.03)", focus: "0 0 0 3px #B8863C" },
+    shadow: { card: "none", focus: "0 0 0 3px #B8863C" },
     typography: {
       display: "'Playfair Display', serif",
       body: "'Sora', sans-serif",

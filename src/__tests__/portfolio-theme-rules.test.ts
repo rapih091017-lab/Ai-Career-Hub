@@ -29,6 +29,15 @@ describe("token layer", () => {
     expect(themes).not.toContain("cssVars");
   });
 
+  it("signature tema sesuai spec (brutal radius 0, luxe tanpa shadow, glass blur terisi)", () => {
+    expect(THEMES.brutal.radii.card).toBe("0");
+    expect(THEMES.brutal.radii.button).toBe("0");
+    expect(THEMES.brutal.radii.pill).toBe("0");
+    expect(THEMES.brutal.radii.image).toBe("0");
+    expect(THEMES.luxe.shadow.card).toBe("none");
+    expect(THEMES.glass.blur.card).toBeTruthy();
+  });
+
   it("focusRing tidak lagi memakai teal app", () => {
     for (const id of THEME_IDS) {
       expect(THEMES[id].focusRing.color.toLowerCase()).not.toBe("#0d7377");
