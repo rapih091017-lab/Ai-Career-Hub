@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -8,17 +8,28 @@ import {
   suggestBundle,
   PackageSelectionError,
 } from "@/lib/package-selection";
-import { activePaymentProvider, checkoutDestination } from "@/lib/payment-client";
+import { activePaymentProvider, checkoutDestination, type CreateOrderResponse } from "@/lib/payment-client";
+import {
+  readStoredCart,
+  writeStoredCart,
+  clearStoredCart,
+  useCheckoutIntent,
+  markCheckoutStarted,
+} from "@/lib/checkout-cart";
 import { MARKETED_PACKAGE_KEYS, formatRupiah } from "@/lib/pricing-catalog";
+import { PackageChooser } from "@/components/checkout/PackageChooser";
 import type { PackageDef } from "@/lib/access";
 
 interface CatalogPackage {
   key: string;
+  /** `PackageDef` memakai `id`; katalog mengirim keduanya supaya tidak ada slot kosong. */
+  id?: string;
   name: string;
   price: number;
   periodDays: number;
   monthly: boolean;
   maxActivePortfolios: number;
+  limits?: Record<string, number | "unlimited" | false>;
 }
 
 export default function CheckoutPage({
@@ -32,6 +43,15 @@ export default function CheckoutPage({
   const [cvId, setCvId] = useState<string | undefined>();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const chooserRef = useRef<HTMLDivElement | null>(null);
+
+  // Keranjang kosong: langsung arahkan mata ke pilihan paket. Dulu halaman ini
+  // hanya menampilkan catatan kosong tanpa pilihan paket apa pun.
+  useEffect(() => {
+    if (!catalog || selected.length > 0) return;
+    chooserRef.current?.scrollIntoView({ block: "start" });
+    chooserRef.current?.focus({ preventScroll: true });
+  }, [catalog, selected.length]);
 
   useEffect(() => {
     Promise.all([
@@ -44,15 +64,35 @@ export default function CheckoutPage({
         : typeof sp.package === "string" && sp.package
           ? [sp.package]
           : [];
-      setSelected(keys);
-      setCvId(typeof sp.cvId === "string" ? sp.cvId : undefined);
+      const spCvId = typeof sp.cvId === "string" ? sp.cvId : undefined;
+      if (keys.length > 0) {
+        setSelected(keys);
+        setCvId(spCvId);
+        return;
+      }
+      // Datang tanpa paket di URL: pakai keranjang yang disimpan supaya tidak
+      // memintanya memilih ulang.
+      const stored = readStoredCart();
+      if (stored) {
+        setSelected(stored.keys);
+        if (stored.cvId) setCvId(stored.cvId);
+      }
       if (data?.packages) {
         const map: Record<string, CatalogPackage> = {};
-        for (const p of data.packages) map[p.key] = p;
+        // `id` diturunkan dari `key` di sisi klien supaya `PackageDef` yang
+        // dipakai `mergePackageSelection` selalu punya identitas. Kalau `id`
+        // kosong, kunci paket terkirim ke server sebagai `null` dan order gagal.
+        for (const p of data.packages) map[p.key] = { ...p, id: p.id ?? p.key };
         setCatalog(map);
       }
     });
   }, [searchParams]);
+
+  // Simpan keranjang setiap kali isinya berubah.
+  useEffect(() => {
+    if (!catalog || selected.length === 0) return;
+    writeStoredCart({ keys: selected, cvId });
+  }, [selected, cvId, catalog]);
 
   const selection = useMemo(() => {
     if (!catalog || selected.length === 0) return null;
@@ -62,6 +102,9 @@ export default function CheckoutPage({
       return null;
     }
   }, [catalog, selected]);
+
+  // Niat checkout: dicatat saat ada isi keranjang, ditutup saat dikosongkan.
+  useCheckoutIntent(selected, selection?.total, cvId, !!catalog);
 
   const bundleAdvice = useMemo(() => {
     if (!catalog || selected.length === 0) return null;
@@ -96,10 +139,24 @@ export default function CheckoutPage({
           body: JSON.stringify({ packageTypes: selection.keys, packageType: selection.keys[0], cvDocumentId: cvId }),
         },
       );
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.message || "Gagal membuat pesanan");
+      const raw = await res
+        .json()
+        .catch(() => null);
+      const result: Partial<CreateOrderResponse> & { message?: string } = raw ?? {};
+      if (!res.ok) {
+        throw new Error(
+          result.message ||
+            (res.status === 401
+              ? "Sesi kamu habis. Masuk ulang lalu lanjutkan."
+              : `Pembayaran gagal (${res.status}). Coba lagi beberapa saat.`),
+        );
+      }
       if (!result.redirect_url && !result.qr_string) throw new Error("Respons pembayaran tidak lengkap");
-      const dest = checkoutDestination(activePaymentProvider(), result, window.location.origin);
+      // Niat sudah jadi order: tandai supaya tidak lagi dihitung sebagai
+      // keranjang ditinggalkan, dan bersihkan keranjang di peramban.
+      markCheckoutStarted(result.paymentId);
+      clearStoredCart();
+      const dest = checkoutDestination(activePaymentProvider(), result as CreateOrderResponse, window.location.origin);
       window.location.href = dest.url;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal membuat pesanan");
@@ -117,19 +174,41 @@ export default function CheckoutPage({
 
   return (
     <main className="min-h-screen bg-background px-6 py-10">
-      <div className="max-w-3xl mx-auto space-y-8">
-        <div>
-          <h1 className="font-headline-lg text-2xl md:text-3xl font-bold text-on-surface">
-            Ringkasan pembelian
-          </h1>
-          <p className="text-on-surface-variant mt-1">
-            Periksa dulu apa yang mau dibeli. Pembayaran hanya dibuat setelah kamu menekan tombol bayar.
-          </p>
-        </div>
-
+<div className="max-w-3xl mx-auto space-y-8">
         {selected.length === 0 ? (
-          <p className="text-on-surface-variant">Belum ada paket yang dipilih.</p>
-        ) : null}
+          <>
+            <div>
+              <h1 className="font-headline-lg text-2xl md:text-3xl font-bold text-on-surface">
+                Pilih paket dulu
+              </h1>
+              <p className="text-on-surface-variant mt-1">
+                Keranjangmu masih kosong. Pilih satu paket di bawah, cek lagi, baru bayar.
+              </p>
+            </div>
+            <div ref={chooserRef} className="scroll-mt-24" tabIndex={-1}>
+              <PackageChooser
+                options={options}
+                selected={selected}
+                onToggle={toggle}
+                headingId="checkout-choose-heading"
+              />
+            </div>
+            <div className="flex justify-center">
+              <Link href="/settings/billing" className="text-sm font-semibold text-primary hover:underline">
+                Lihat semua paket
+              </Link>
+            </div>
+          </>
+        ) : (
+          <>
+            <div>
+              <h1 className="font-headline-lg text-2xl md:text-3xl font-bold text-on-surface">
+                Ringkasan pembelian
+              </h1>
+              <p className="text-on-surface-variant mt-1">
+                Periksa dulu apa yang mau dibeli. Pembayaran hanya dibuat setelah kamu menekan tombol bayar.
+              </p>
+            </div>
 
         <section className="space-y-3">
           <h2 className="font-label-bold text-on-surface">Paket dipilih</h2>
@@ -186,29 +265,12 @@ export default function CheckoutPage({
           </section>
         ) : null}
 
-        <section className="space-y-3">
-          <h2 className="font-label-bold text-on-surface">Tambah paket lain</h2>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {options
-              .filter((p) => !selected.includes(p.key))
-              .map((pkg) => (
-                <button
-                  key={pkg.key}
-                  type="button"
-                  onClick={() => toggle(pkg.key)}
-                  className="flex items-center justify-between gap-3 p-3 rounded-xl border border-outline-variant/30 text-left hover:border-primary/40"
-                >
-                  <span>
-                    <span className="block text-sm font-semibold text-on-surface">{pkg.name}</span>
-                    <span className="block text-xs text-on-surface-variant">
-                      {pkg.monthly ? "per bulan" : `${pkg.periodDays} hari`}
-                    </span>
-                  </span>
-                  <span className="text-sm font-bold text-primary">{formatRupiah(pkg.price)}</span>
-                </button>
-              ))}
-          </div>
-        </section>
+        <PackageChooser
+          options={options}
+          selected={selected}
+          onToggle={toggle}
+          heading="Tambah paket lain"
+        />
 
         {error ? <p className="text-sm text-error">{error}</p> : null}
         {selection === null && selected.length > 0 ? (
@@ -244,6 +306,8 @@ export default function CheckoutPage({
           </Link>
           .
         </p>
+          </>
+        )}
       </div>
     </main>
   );

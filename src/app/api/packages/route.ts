@@ -16,6 +16,10 @@ export async function GET() {
     
     .map((p) => ({
       key: p.id,
+      // `id` ikut dikirim karena `PackageDef` memakainya. Tanpa ini, konsumen
+      // yang memetakan katalog jadi `PackageDef` berakhir punya `id` kosong
+      // dan kunci paket terkirim ke server jadi `null`.
+      id: p.id,
       name: p.name,
       price: p.price,
       periodDays: p.periodDays,

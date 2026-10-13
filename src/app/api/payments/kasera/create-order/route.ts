@@ -66,12 +66,17 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json().catch(() => ({}));
   const { packageType, packageTypes, cvDocumentId } = body ?? {};
-  // Boleh satu paket (panggilan lama) atau beberapa paket sekaligus.
-  const requested: string[] = Array.isArray(packageTypes) && packageTypes.length
+  // Boleh satu paket (panggilan lama) atau beberapa paket sekaligus. Entri yang
+  // bukan teks dibuang di sini supaya permintaan rusak berakhir sebagai 400
+  // dengan pesan jelas, bukan 500 dari server.
+  const rawList: unknown[] = Array.isArray(packageTypes) && packageTypes.length
     ? packageTypes
     : packageType
       ? [packageType]
       : [];
+  // Entri yang bukan teks sudah dibuang, jadi daftar kosong berarti permintaan
+  // memang tidak menunjuk paket apa pun.
+  const requested: string[] = rawList.filter((k): k is string => typeof k === "string" && k.trim().length > 0);
 
   const rawReferral = request.cookies.get(REFERRAL_COOKIE)?.value?.trim().toLowerCase() ?? null;
   const referralCode = rawReferral && isValidAffiliateCode(rawReferral) ? rawReferral : null;
@@ -95,7 +100,6 @@ export async function POST(request: NextRequest) {
       { status: 400 },
     );
   }
-  const primaryKey = selection.keys[0];
 
   // Anti double-klik: pakai lagi order pending yang QR-nya masih hidup.
   const existing = await findLivePending(session.user.id, selection.joinedType, cvDocumentId);

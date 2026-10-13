@@ -198,6 +198,39 @@ export const payments = pgTable("payments", {
   updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow(),
 });
 
+/**
+ * Niat checkout: pengguna sudah memilih paket tapi belum membayar.
+ *
+ * Satu baris terbuka per user, diperbarui setiap kali isi keranjang berubah.
+ * Baris yang masih `open` setelah satu jam dianggap keranjang ditinggalkan dan
+ * dipakai sebagai pemicu follow-up (misalnya pesan WhatsApp atau email)
+ * tanpa perlu menebak dari log server.
+ */
+export const checkoutIntents = pgTable(
+  "checkout_intents",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    /** Kunci paket yang dipilih, mis. ["pro_monthly"] atau ["single_cv","pro_monthly"]. */
+    packageKeys: text("package_keys").array().notNull().default([]),
+    amount: integer("amount").notNull().default(0),
+    /** open = masih di keranjang, started = sudah buat order, converted = sudah bayar. */
+    status: varchar("status", { length: 16 }).notNull().default("open"),
+    /** Order pembayaran yang dibuat dari niat ini, diisi saat status jadi started/converted. */
+    paymentId: uuid("payment_id").references(() => payments.id, { onDelete: "set null" }),
+    firstSeenAt: timestamp("first_seen_at", { mode: "date" }).notNull().defaultNow(),
+    lastSeenAt: timestamp("last_seen_at", { mode: "date" }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow(),
+  },
+  (table) => [
+    // Satu niat terbuka per user: update in place, bukan menumpuk.
+    index("checkout_intents_user_status_idx").on(table.userId, table.status),
+  ],
+);
+
+/** Niat yang masih `open` dan sudah lewat satu jam = pesanan ditinggalkan. */
+export const CHECKOUT_INTENT_ABANDON_MINUTES = 60;
+
 export const profiles = pgTable("profiles", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").notNull().unique().references(() => users.id, { onDelete: "cascade" }),

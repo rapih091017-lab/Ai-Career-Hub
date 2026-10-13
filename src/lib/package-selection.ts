@@ -66,7 +66,12 @@ export function mergePackageSelection(
   requestedKeys: string[],
   catalog: Record<string, PackageDef>,
 ): PackageSelection {
-  const keys = requestedKeys.map((k) => k.trim()).filter(Boolean);
+  // Kunci yang bukan teks kosong diabaikan. Kiriman yang salah bentuk harus
+  // berakhir sebagai 400 dengan pesan jelas, bukan 500 karena `.trim()`.
+  const keys = requestedKeys
+    .filter((k): k is string => typeof k === "string")
+    .map((k) => k.trim())
+    .filter(Boolean);
   if (keys.length === 0) throw new PackageSelectionError("Pilih minimal satu paket", "EMPTY");
 
   const unique = [...new Set(keys)];
