@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import { describeAuthError } from "@/lib/auth-errors";
 
 const Ripple = dynamic(
   () => import("@/components/blocks/modern-animated-sign-in").then((m) => m.Ripple),
@@ -14,6 +15,13 @@ const Ripple = dynamic(
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Google yang menolak otorisasi mengarahkan balik ke /login dengan ?error=.
+  // Tanpa dibacakan di sini, penolakan itu tidak kelihatan sama sekali.
+  useEffect(() => {
+    const code = new URLSearchParams(window.location.search).get("error");
+    if (code) setError(describeAuthError(code));
+  }, []);
 
   const handleGoogleLogin = async () => {
     setLoading(true);
