@@ -20,6 +20,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Google({
       clientId: process.env.AUTH_GOOGLE_ID,
       clientSecret: process.env.AUTH_GOOGLE_SECRET,
+      // User lama bisa sudah punya baris `users` tanpa baris `accounts`
+      // (misalnya dibuat dari data awal atau Google account-nya berubah).
+      // Tanpa ini Auth.js menolak dengan OAuthAccountNotLinked dan tidak ada
+      // jalan masuk sama sekali. Email dari Google sudah terverifikasi Google,
+      // jadi menautkan ke user dengan email sama tidak menurunkan keamanan.
+      allowDangerousEmailAccountLinking: true,
     }),
   ],
   session: {
