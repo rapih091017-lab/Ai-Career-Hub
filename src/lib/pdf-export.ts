@@ -363,6 +363,11 @@ export async function exportPdfViaServer(
         // dipakai lagi karena melanggar syarat "PDF harus teks".
         console.warn("[pdf] server PDF tidak tersedia, membuka dialog cetak:", err.message);
         try {
+          // Beri tahu pengguna dulu supaya dia memilih "Simpan sebagai PDF",
+          // bukan sekadar tercetak diam-diam ke printer.
+          console.info(
+            "[pdf] pilih printer 'Save as PDF' untuk menyimpan file, bukan mencetak.",
+          );
           await exportPreviewToPrintPdf(element, fileName, marginMm);
           return { ok: true, error: "server unavailable, print dialog opened", usedFallback: true };
         } catch {

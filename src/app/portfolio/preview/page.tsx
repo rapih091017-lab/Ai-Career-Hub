@@ -122,6 +122,66 @@ export default function PortfolioPreviewPage() {
     };
   }, []);
 
+  /**
+   * Unduh PDF portfolio.
+   *
+   * Dulu tombol ini memanggil `window.print()`, jadi yang muncul adalah dialog
+   * cetak Windows, bukan file PDF. Sekarang HTML portfolio yang sama dikirim
+   * ke server PDF dan hasilnya diunduh langsung.
+   */
+  const downloadPdf = async () => {
+    setExporting(true);
+    setExportError(null);
+    try {
+      const resLatest = await fetch("/api/portfolio/draft").catch(() => null);
+      const latest = resLatest && resLatest.ok ? await resLatest.json() : null;
+      const sync = await fetch("/api/portfolio/draft", {
+        method: latest?.draftId ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...(latest?.draftId ? { draftId: latest.draftId } : {}),
+          name: name || "Portfolio saya",
+          data,
+        }),
+      }).catch(() => null);
+      if (!sync || !sync.ok) {
+        setExportError(
+          sync?.status === 400 ? t("preview.export-error-save") : t("preview.export-error"),
+        );
+        return;
+      }
+      const syncDraftId: string = latest?.draftId ?? (await sync.json()).draftId;
+      const htmlRes = await fetch(
+        `/api/portfolio/export?draftId=${encodeURIComponent(syncDraftId)}&theme=${encodeURIComponent(themeId)}`,
+      );
+      if (!htmlRes.ok) throw new Error();
+      const html = await htmlRes.text();
+
+      const pdfRes = await fetch("/api/export-pdf-v2", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ html, margin: "12mm", fileName: "portfolio.pdf" }),
+      });
+      if (!pdfRes.ok) {
+        const err = await pdfRes.json().catch(() => null);
+        throw new Error(err?.message || t("preview.pdf-error"));
+      }
+      const blob = await pdfRes.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${name || "portfolio"}`.toLowerCase().replace(/[^a-z0-9.-]+/g, "-") + ".pdf";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      setExportError(t("preview.pdf-error"));
+    } finally {
+      setExporting(false);
+    }
+  };
+
   if (notFound) {
     return (
       <AuthGuard>
@@ -226,12 +286,7 @@ export default function PortfolioPreviewPage() {
                   </Link>
                   <button
                     type="button"
-                    onClick={() => {
-                      const target = publishedSlug
-                        ? `/p/${publishedSlug}?print=1`
-                        : "/portfolio/preview?print=1";
-                      window.open(target, "_blank", "noopener");
-                    }}
+                    onClick={() => downloadPdf()}
                     className="inline-flex min-h-11 items-center gap-1.5 px-3 rounded-xl text-xs font-semibold transition-all"
                     style={{ border: `1px solid ${theme.colors.border}`, color: theme.colors.text }}
                     title={t("preview.save-pdf")}
