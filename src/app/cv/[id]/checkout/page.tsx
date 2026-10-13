@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
+import { activePaymentProvider, checkoutDestination } from "@/lib/payment-client";
 import { useEffect, useState } from "react";
 import AppHeader from "@/components/AppHeader";
 import AuthGuard from "@/components/AuthGuard";
@@ -64,7 +65,11 @@ export default function CheckoutPage() {
     setIsProcessing(true);
     setError(null);
     try {
-      const res = await fetch("/api/payments/create-order", {
+      const res = await fetch(
+        activePaymentProvider() === "kasera"
+          ? "/api/payments/kasera/create-order"
+          : "/api/payments/create-order",
+        {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -73,9 +78,10 @@ export default function CheckoutPage() {
         }),
       });
       const result = await res.json();
-      if (res.ok && result.redirect_url) {
+      if (res.ok && (result.redirect_url || result.qr_string)) {
         setPaymentStatus("pending");
-        window.location.href = result.redirect_url;
+        const dest = checkoutDestination(activePaymentProvider(), result, window.location.origin);
+        window.location.href = dest.url;
       } else {
         throw new Error(result.message || "Gagal membuat pesanan");
       }

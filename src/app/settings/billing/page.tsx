@@ -3,6 +3,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { activePaymentProvider, checkoutDestination } from "@/lib/payment-client";
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/components/ui/toast";
 
@@ -168,16 +169,20 @@ export default function SettingsBillingPage() {
   const handleBuyPackage = async (packageType: string, cvDocumentId?: string) => {
     setCheckoutLoading(packageType);
     try {
-      const res = await fetch("/api/payments/create-order", {
+      const res = await fetch(
+        activePaymentProvider() === "kasera"
+          ? "/api/payments/kasera/create-order"
+          : "/api/payments/create-order",
+        {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ packageType, cvDocumentId }),
       });
 
       const result = await res.json();
-      if (res.ok && result.redirect_url) {
-        // Open Midtrans Snap
-        window.location.href = result.redirect_url;
+      if (res.ok && (result.redirect_url || result.qr_string)) {
+        const dest = checkoutDestination(activePaymentProvider(), result, window.location.origin);
+        window.location.href = dest.url;
       } else {
         addToast({ type: "error", message: result.message || "Gagal membuat pesanan" });
       }
