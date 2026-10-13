@@ -1,9 +1,16 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { activePaymentProvider, checkoutDestination } from "@/lib/payment-client";
-import { useCatalogPrices, formatRupiah } from "@/lib/pricing-catalog";
+
+import {
+  useCatalogPrices,
+  useCatalogPackages,
+  formatRupiah,
+  packageBenefits,
+  benefitLabel,
+  periodLabel,
+} from "@/lib/pricing-catalog";
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/components/ui/toast";
 
@@ -87,6 +94,7 @@ export default function SettingsBillingPage() {
   const [error, setError] = useState<string | null>(null);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const catalogPrice = useCatalogPrices();
+  const { packages: catalogPackages, loading: catalogLoading } = useCatalogPackages();
   // Single CV selector
   const [showCvPicker, setShowCvPicker] = useState(false);
   const [cvList, setCvList] = useState<CvItem[]>([]);
@@ -171,33 +179,6 @@ export default function SettingsBillingPage() {
   const goToCheckout = (packageType: string) => {
     setError(null);
     router.push(`/checkout?packages=${encodeURIComponent(packageType)}${selectedCvId ? `&cvId=${encodeURIComponent(selectedCvId)}` : ""}`);
-  };
-
-  const handleBuyPackage = async (packageType: string, cvDocumentId?: string) => {
-    setCheckoutLoading(packageType);
-    try {
-      const res = await fetch(
-        activePaymentProvider() === "kasera"
-          ? "/api/payments/kasera/create-order"
-          : "/api/payments/create-order",
-        {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ packageType, cvDocumentId }),
-      });
-
-      const result = await res.json();
-      if (res.ok && (result.redirect_url || result.qr_string)) {
-        const dest = checkoutDestination(activePaymentProvider(), result, window.location.origin);
-        window.location.href = dest.url;
-      } else {
-        addToast({ type: "error", message: result.message || "Gagal membuat pesanan" });
-      }
-    } catch {
-      addToast({ type: "error", message: "Gagal terhubung ke server pembayaran" });
-    } finally {
-      setCheckoutLoading(null);
-    }
   };
 
   // Build limits display: merge usage with limits from API
@@ -305,96 +286,101 @@ export default function SettingsBillingPage() {
               </div>
             </div>
 
-            {/* Buy Package */}
+{/* Buy Package */}
             <div className="pt-6 border-t border-outline-variant/30">
               <h3 className="font-label-bold text-on-surface mb-1">{t("billing.buy-package")}</h3>
               <p className="text-sm text-on-surface-variant mb-4">{t("billing.buy-package-hint")}</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Premium Pass */}
-                <div className="relative p-5 rounded-xl border-2 border-primary/30 bg-primary-fixed/5 overflow-hidden group hover:border-primary/60 transition-all">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-10 -mt-10" />
-                  <div className="relative z-10">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="material-symbols-outlined text-primary">workspace_premium</span>
-                      <h4 className="font-label-bold text-on-surface">{t("billing.premium-pass-title")}</h4>
-                      <span className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface-variant">
-                        {t("billing.badge-rutin")}
-                      </span>
-                    </div>
-                    <p className="text-2xl font-bold text-primary mb-1">
-                      {formatRupiah(catalogPrice("premium_pass_30d", 119000))}
-                      <span className="text-sm font-normal text-on-surface-variant ml-1">/bulan</span>
-                    </p>
-                    <p className="text-body-md text-on-surface-variant mb-4">
-                      {t("billing.premium-pass-subtitle")}
-                    </p>
-                    <ul className="space-y-1.5 mb-4">
-                      {["Unlimited CV Builder", "Unlimited ATS Checker", "Unlimited AI Revisions", "Unlimited AI Suggestions", "Prioritas support"].map(
-                        (benefit) => (
-                          <li key={benefit} className="flex items-center gap-2 text-sm text-on-surface-variant">
-                            <span className="material-symbols-outlined text-green-600 text-[16px]">
-                              check
-                            </span>
-                            {benefit}
-                          </li>
-                        ),
-                      )}
-                    </ul>
-                    <button
-                      onClick={() => goToCheckout("premium_pass_30d")}
-                      disabled={checkoutLoading === "premium_pass_30d"}
-                      className="w-full py-3 bg-primary text-on-primary font-label-bold rounded-xl hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
-                    >
-                      {checkoutLoading === "premium_pass_30d" ? (
-                        <>
-                          <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-                          {t("billing.processing")}
-                        </>
-                      ) : (
-                        t("billing.buy-now")
-                      )}
-                    </button>
-                  </div>
-                </div>
 
-                {/* Single CV */}
-                <div className="p-5 rounded-xl border border-outline-variant/30 hover:border-secondary/40 transition-all group">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="material-symbols-outlined text-secondary">description</span>                      <h4 className="font-label-bold text-on-surface">{t("billing.single-cv-title")}</h4>
-                  </div>
-                  <p className="text-2xl font-bold text-secondary mb-1">
-                    {formatRupiah(catalogPrice("single_cv", 25000))}
-                    <span className="text-sm font-normal text-on-surface-variant ml-1">/sekali</span>
-                  </p>
-                  <p className="text-body-md text-on-surface-variant mb-4">                      {t("billing.single-cv-subtitle")}
-                  </p>
-                  <ul className="space-y-1.5 mb-4">
-                    {["1x AI Smart Revision", "Bisa untuk CV mana saja", "Masa berlaku 1 tahun"].map(
-                      (benefit) => (
-                        <li key={benefit} className="flex items-center gap-2 text-sm text-on-surface-variant">
-                          <span className="material-symbols-outlined text-green-600 text-[16px]">
-                            check
-                          </span>
-                          {benefit}
-                        </li>
-                      ),
-                    )}
-                  </ul>
-                  <button
-                    onClick={handleSingleCvClick}
-                    disabled={checkoutLoading === "single_cv"}
-                    className="w-full py-3 bg-secondary text-on-secondary font-label-bold rounded-xl hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
-                  >
-                    {checkoutLoading === "single_cv" ? (
-                      <>
-                        <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-                        Memproses...
-                      </>
-                    ) : (                        t("billing.select-cv")
-                    )}
-                  </button>
+              {!catalogLoading && catalogPackages.length === 0 ? (
+                <p className="text-sm text-on-surface-variant">{t("billing.empty-catalog")}</p>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {catalogPackages.map((pkg) => {
+                    const benefits = packageBenefits(pkg);
+                    const highlighted = pkg.monthly;
+                    const needsCv = pkg.key === "single_cv";
+                    return (
+                      <div
+                        key={pkg.key}
+                        className={`relative p-5 rounded-xl transition-all overflow-hidden ${
+                          highlighted
+                            ? "border-2 border-primary/30 bg-primary-fixed/5 group hover:border-primary/60"
+                            : "border border-outline-variant/30 hover:border-secondary/40 group"
+                        }`}
+                      >
+                        {highlighted && (
+                          <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-10 -mt-10" />
+                        )}
+                        <div className="relative z-10">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span
+                              className={`material-symbols-outlined ${highlighted ? "text-primary" : "text-secondary"}`}
+                            >
+                              {pkg.monthly ? "workspace_premium" : "sell"}
+                            </span>
+                            <h4 className="font-label-bold text-on-surface">{pkg.name}</h4>
+                            {pkg.monthly && (
+                              <span className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface-variant">
+                                {t("billing.badge-rutin")}
+                              </span>
+                            )}
+                          </div>
+
+                          <p className={`text-2xl font-bold mb-1 ${highlighted ? "text-primary" : "text-secondary"}`}>
+                            {formatRupiah(pkg.price)}
+                            <span className="text-sm font-normal text-on-surface-variant ml-1">
+                              {periodLabel(pkg, t)}
+                            </span>
+                          </p>
+
+                          {benefits.length > 0 && (
+                            <ul className="space-y-1.5 mb-4">
+                              {benefits.map((benefit) => (
+                                <li
+                                  key={benefit.key}
+                                  className="flex items-center gap-2 text-sm text-on-surface-variant"
+                                >
+                                  <span className="material-symbols-outlined text-green-600 text-[16px]">
+                                    check
+                                  </span>
+                                  {benefitLabel(benefit, t)}
+                                </li>
+                              ))}
+                              {pkg.maxActivePortfolios > 0 && (
+                                <li className="flex items-center gap-2 text-sm text-on-surface-variant">
+                                  <span className="material-symbols-outlined text-green-600 text-[16px]">
+                                    check
+                                  </span>
+                                  {pkg.maxActivePortfolios} {t("billing.period.portfolio")}
+                                </li>
+                              )}
+                            </ul>
+                          )}
+
+                          <button
+                            onClick={() => (needsCv ? handleSingleCvClick() : goToCheckout(pkg.key))}
+                            disabled={checkoutLoading === pkg.key}
+                            className={`w-full py-3 font-label-bold rounded-xl hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-60 flex items-center justify-center gap-2 ${
+                              highlighted
+                                ? "bg-primary text-on-primary"
+                                : "bg-secondary text-on-secondary"
+                            }`}
+                          >
+                            {checkoutLoading === pkg.key ? (
+                              <>
+                                <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                                {t("billing.processing")}
+                              </>
+                            ) : (
+                              t("billing.buy-now")
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Billing History */}
@@ -447,7 +433,7 @@ export default function SettingsBillingPage() {
         )}
       </section>
 
-      {/* ── Single CV Picker Modal ── */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Single CV Picker Modal Ã¢â€â‚¬Ã¢â€â‚¬ */}
       {showCvPicker && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onClick={(e) => { if (e.target === e.currentTarget) setShowCvPicker(false); }}>
           <div className="bg-surface-container-lowest rounded-2xl shadow-xl w-full max-w-md overflow-hidden" onClick={(e) => e.stopPropagation()}>
@@ -506,15 +492,15 @@ export default function SettingsBillingPage() {
                 {t("billing.cancel")}
               </button>
               <button
-                onClick={() => {
-                  if (!selectedCvId) { addToast({ type: "warning", message: "Pilih CV terlebih dahulu" }); return; }
+onClick={() => {
+                  if (!selectedCvId) { addToast({ type: "warning", message: t("billing.pick-cv-first") }); return; }
                   setShowCvPicker(false);
-                  handleBuyPackage("single_cv", selectedCvId);
+                  goToCheckout("single_cv");
                 }}
-                disabled={!selectedCvId || checkoutLoading === "single_cv"}
+                disabled={!selectedCvId}
                 className="flex-1 py-2.5 rounded-xl bg-secondary text-on-secondary text-sm font-medium hover:brightness-110 transition-all disabled:opacity-50"
               >
-                {checkoutLoading === "single_cv" ? t("billing.processing") : t("billing.continue")}
+                {t("billing.continue")}
               </button>
             </div>
           </div>
@@ -556,7 +542,7 @@ function UsageBar({
       <div className="flex justify-between text-sm mb-1">
         <span className="font-label-bold text-on-surface">{label}</span>
         <span className="text-on-surface-variant">
-          {isUnlimited ? `${used} / ∞` : `${used}/${total}`}
+          {isUnlimited ? `${used} / Ã¢Ë†Å¾` : `${used}/${total}`}
         </span>
       </div>
       <div className="w-full h-2.5 bg-surface-container-high rounded-full overflow-hidden">

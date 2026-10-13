@@ -21,6 +21,7 @@ export async function GET() {
       periodDays: p.periodDays,
       monthly: p.monthly === true,
       maxActivePortfolios: p.maxActivePortfolios ?? 0,
+      limits: p.limits,
     }))
     .sort((a, b) => a.price - b.price);
 
