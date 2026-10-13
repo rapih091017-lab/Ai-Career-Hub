@@ -95,6 +95,7 @@ export default function Home() {
               { title: t("nav.dropdown.cover-letter.title"), description: t("nav.dropdown.cover-letter.desc"), icon: "mail", href: "/surat-lamaran" },
             ]} />
             <a className="flex min-h-11 items-center rounded-lg px-3 text-label-bold text-on-surface-variant hover:bg-surface-container hover:text-primary focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2" href="#pricing">{t("nav.pricing")}</a>
+            <Link className="flex min-h-11 items-center rounded-lg px-3 text-label-bold text-on-surface-variant hover:bg-surface-container hover:text-primary focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2" href="/checkout">{t("nav.checkout")}</Link>
             <NavDropdown label={t("nav.resources")} items={[
               { title: t("nav.dropdown.hub.title"), description: t("nav.dropdown.hub.desc"), icon: "auto_stories", href: "/career-hub" },
               { title: t("nav.dropdown.career-path.title"), description: t("nav.dropdown.career-path.desc"), icon: "route", href: "/career-path" },
@@ -160,6 +161,7 @@ export default function Home() {
                   { title: t("nav.dropdown.cover-letter.title"), description: t("nav.dropdown.cover-letter.desc"), icon: "mail", href: "/surat-lamaran" },
                 ]} />
               <a onClick={() => setMobileMenuOpen(false)} className="w-full min-h-12 px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all text-left" href="#pricing">{t("nav.pricing")}</a>
+                <Link onClick={() => setMobileMenuOpen(false)} className="w-full min-h-12 px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all text-left" href="/checkout">{t("nav.checkout")}</Link>
                 <NavMobileDropdown label={t("nav.resources")} onItemClick={() => setMobileMenuOpen(false)} items={[
                   { title: t("nav.dropdown.hub.title"), description: t("nav.dropdown.hub.desc"), icon: "auto_stories", href: "/career-hub" },
                   { title: t("nav.dropdown.career-path.title"), description: t("nav.dropdown.career-path.desc"), icon: "route", href: "/career-path" },

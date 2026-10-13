@@ -11,12 +11,15 @@ export function PackageCard({
   onBuy,
   busy,
   highlighted,
+  selected,
   t,
 }: {
   pkg: CatalogPackage;
   onBuy: () => void;
   busy?: boolean;
   highlighted?: boolean;
+  /** Tandai kartu yang isinya sudah ada di keranjang. */
+  selected?: boolean;
   t: (key: string) => string;
 }) {
   const benefits = packageBenefits(pkg);
@@ -72,7 +75,11 @@ export function PackageCard({
           onClick={onBuy}
           disabled={busy}
           className={`w-full py-3 font-label-bold rounded-xl hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-60 flex items-center justify-center gap-2 ${
-            highlighted ? "bg-primary text-on-primary" : "bg-secondary text-on-secondary"
+            selected
+              ? "border border-primary/40 text-primary bg-primary/5"
+              : highlighted
+                ? "bg-primary text-on-primary"
+                : "bg-secondary text-on-secondary"
           }`}
         >
           {busy ? (
@@ -80,8 +87,10 @@ export function PackageCard({
               <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
               {t("billing.processing")}
             </>
+          ) : selected ? (
+            t("checkout.in-cart")
           ) : (
-            t("billing.buy-now")
+            t("checkout.add-to-cart")
           )}
         </button>
       </div>

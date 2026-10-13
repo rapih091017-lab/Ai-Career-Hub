@@ -70,7 +70,7 @@ describe("keranjang checkout bertahan dan fokus ke pilihan paket", () => {
   it("keranjang kosong langsung diarahkan ke pilihan paket", () => {
     expect(checkoutSrc).toContain("chooserRef");
     expect(checkoutSrc).toContain("scrollIntoView");
-    expect(checkoutSrc).toContain("PackageChooser");
+    expect(checkoutSrc).toContain("PackageCard");
     expect(checkoutSrc).not.toContain("Belum ada paket yang dipilih");
   });
 

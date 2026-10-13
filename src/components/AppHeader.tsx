@@ -16,6 +16,7 @@ const NAV_ITEMS = [
   { label: "Tracker", href: "/tracker" },
   { label: "Templates", href: "/builder/new" },
   { label: "Resources", href: "/checker" },
+  { label: "Checkout", href: "/checkout" },
 ];
 
 /**

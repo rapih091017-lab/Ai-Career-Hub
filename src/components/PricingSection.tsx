@@ -101,7 +101,7 @@ const LANGGANAN_PLAN_DATA: Omit<PlanData, "nameKey" | "descKey" | "ctaKey" | "un
   },
   {
     id: "starter", price: 15000, unit: "/ bulan", icon: "rocket_launch",
-    ctaStyle: "outline", href: "/settings/billing", originalPrice: 19000,
+    ctaStyle: "outline", href: "/checkout?packages=starter_monthly", originalPrice: 19000,
     features: [
       { key: "pricing.feat.5-ai-gen", included: true },
       { key: "pricing.feat.5-templates", included: true },
@@ -114,7 +114,7 @@ const LANGGANAN_PLAN_DATA: Omit<PlanData, "nameKey" | "descKey" | "ctaKey" | "un
   },
   {
     id: "pro", price: 29000, unit: "/ bulan", icon: "workspace_premium",
-    ctaStyle: "filled", href: "/settings/billing", featured: true, badgeKey: "pricing.badge-populer",
+    ctaStyle: "filled", href: "/checkout?packages=pro_monthly", featured: true, badgeKey: "pricing.badge-populer",
     microcopyKey: "pricing.plan.pro.microcopy",
     features: [
       { key: "pricing.feat.unlimited-ai", included: true },
@@ -284,7 +284,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
               <div className="shrink-0">
                 <MagneticButton>
                   <Link
-                    href="/settings/billing"
+                    href="/checkout?packages=bundle_hemat"
                     className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary px-6 text-sm font-bold text-on-primary hover:brightness-110 active:scale-[0.98] transition-all"
                   >
                     <span className="material-symbols-outlined text-lg" aria-hidden="true">rocket_launch</span>
@@ -412,7 +412,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
                     </p>
                   </div>
                   <MagneticButton>
-                    <Link href="/settings/billing"
+                    <Link href="/checkout?packages=bundle_hemat"
                       className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-on-primary rounded-xl font-label-bold hover:brightness-110 active:scale-[0.98] transition-all shadow-md whitespace-nowrap">
                       {t("pricing.bundle-cta")}
                     </Link>

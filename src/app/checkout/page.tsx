@@ -16,8 +16,9 @@ import {
   useCheckoutIntent,
   markCheckoutStarted,
 } from "@/lib/checkout-cart";
-import { MARKETED_PACKAGE_KEYS, formatRupiah } from "@/lib/pricing-catalog";
-import { PackageChooser } from "@/components/checkout/PackageChooser";
+import { MARKETED_PACKAGE_KEYS, formatRupiah, packageGroup } from "@/lib/pricing-catalog";
+import { PackageCard } from "@/components/checkout/PackageCard";
+import { useTranslation } from "@/lib/i18n";
 import type { PackageDef } from "@/lib/access";
 
 interface CatalogPackage {
@@ -38,6 +39,7 @@ export default function CheckoutPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const router = useRouter();
+  const { t } = useTranslation();
   const [catalog, setCatalog] = useState<Record<string, CatalogPackage> | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
   const [cvId, setCvId] = useState<string | undefined>();
@@ -164,7 +166,7 @@ export default function CheckoutPage({
     }
   };
 
-  if (!catalog) {
+if (!catalog) {
     return (
       <main className="min-h-screen bg-background flex items-center justify-center">
         <p className="text-on-surface-variant">Memuat katalog paket…</p>
@@ -174,140 +176,157 @@ export default function CheckoutPage({
 
   return (
     <main className="min-h-screen bg-background px-6 py-10">
-<div className="max-w-3xl mx-auto space-y-8">
-        {selected.length === 0 ? (
-          <>
-            <div>
-              <h1 className="font-headline-lg text-2xl md:text-3xl font-bold text-on-surface">
-                Pilih paket dulu
-              </h1>
-              <p className="text-on-surface-variant mt-1">
-                Keranjangmu masih kosong. Pilih satu paket di bawah, cek lagi, baru bayar.
-              </p>
-            </div>
-            <div ref={chooserRef} className="scroll-mt-24" tabIndex={-1}>
-              <PackageChooser
-                options={options}
-                selected={selected}
-                onToggle={toggle}
-                headingId="checkout-choose-heading"
-              />
-            </div>
-            <div className="flex justify-center">
-              <Link href="/settings/billing" className="text-sm font-semibold text-primary hover:underline">
-                Lihat semua paket
-              </Link>
-            </div>
-          </>
-        ) : (
-          <>
-            <div>
-              <h1 className="font-headline-lg text-2xl md:text-3xl font-bold text-on-surface">
-                Ringkasan pembelian
-              </h1>
-              <p className="text-on-surface-variant mt-1">
-                Periksa dulu apa yang mau dibeli. Pembayaran hanya dibuat setelah kamu menekan tombol bayar.
-              </p>
-            </div>
+      <div className="max-w-6xl mx-auto">
+        <header className="mb-8">
+          <h1 className="font-headline-lg text-2xl md:text-3xl font-bold text-on-surface">Checkout</h1>
+          <p className="text-on-surface-variant mt-1 max-w-2xl">
+            Pilih paket di kiri, lihat di keranjang kanan. Tetap di halaman ini sampai kamu menekan
+            tombol bayar.
+          </p>
+        </header>
 
-        <section className="space-y-3">
-          <h2 className="font-label-bold text-on-surface">Paket dipilih</h2>
-          {selected.map((key) => {
-            const pkg = catalog[key];
-            if (!pkg) return null;
-            return (
-              <div key={key} className="flex items-center justify-between gap-4 p-4 rounded-xl border border-outline-variant/30 bg-surface-container-lowest">
-                <div>
-                  <p className="font-semibold text-on-surface">{pkg.name}</p>
-                  <p className="text-xs text-on-surface-variant">
-                    {pkg.monthly ? "per bulan" : `${pkg.periodDays} hari`}
-                  </p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="font-bold text-on-surface">{formatRupiah(pkg.price)}</span>
-                  <button
-                    type="button"
-                    onClick={() => toggle(key)}
-                    className="text-sm text-on-surface-variant hover:text-error"
-                    aria-label={`Hapus ${pkg.name}`}
-                  >
-                    Hapus
-                  </button>
-                </div>
+        <div className="grid lg:grid-cols-[1fr_360px] gap-8 items-start">
+          {/* Katalog: pilih paket tanpa pindah halaman */}
+          <div ref={chooserRef} tabIndex={-1} className="scroll-mt-24 space-y-8 outline-none">
+            {(["single", "monthly"] as const).map((group) => {
+              const inGroup = options.filter((pkg) => packageGroup(pkg) === group);
+              if (inGroup.length === 0) return null;
+              return (
+                <section key={group} className="space-y-4">
+                  <div>
+                    <h2 className="font-headline-lg text-lg font-bold text-on-surface">
+                      {t(group === "monthly" ? "billing.group.monthly" : "billing.group.single")}
+                    </h2>
+                    <p className="text-xs text-on-surface-variant">
+                      {t(group === "monthly" ? "billing.group.monthly-hint" : "billing.group.single-hint")}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {inGroup.map((pkg) => (
+                      <PackageCard
+                        key={pkg.key}
+                        pkg={pkg}
+                        t={t}
+                        highlighted={pkg.monthly}
+                        selected={selected.includes(pkg.key)}
+                        onBuy={() => toggle(pkg.key)}
+                      />
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
+          </div>
+
+          {/* Keranjang: ringkasan singkat yang selalu terlihat */}
+          <aside className="lg:sticky lg:top-8 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-5 space-y-4">
+            <h2 className="font-headline-lg text-base font-bold text-on-surface">
+              Keranjang
+              {selected.length > 0 ? (
+                <span className="ml-2 text-xs font-normal text-on-surface-variant">
+                  {selected.length} paket
+                </span>
+              ) : null}
+            </h2>
+
+            {selected.length === 0 ? (
+              <p className="text-sm text-on-surface-variant">
+                Belum ada paket di keranjang. Pilih dari daftar di samping.
+              </p>
+            ) : (
+              <ul className="space-y-2">
+                {selected.map((key) => {
+                  const pkg = catalog[key];
+                  if (!pkg) return null;
+                  return (
+                    <li
+                      key={key}
+                      className="flex items-start justify-between gap-3 p-3 rounded-xl border border-outline-variant/30"
+                    >
+                      <span>
+                        <span className="block text-sm font-semibold text-on-surface">{pkg.name}</span>
+                        <span className="block text-xs text-on-surface-variant">
+                          {pkg.monthly ? "per bulan" : `${pkg.periodDays} hari`}
+                        </span>
+                      </span>
+                      <span className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-on-surface">
+                          {formatRupiah(pkg.price)}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => toggle(key)}
+                          aria-label={`Hapus ${pkg.name}`}
+                          title={`Hapus ${pkg.name}`}
+                          className="material-symbols-outlined text-lg text-on-surface-variant hover:text-error"
+                        >
+                          close
+                        </button>
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+
+            {selection ? (
+              <div className="flex items-center justify-between pt-2 border-t border-outline-variant/30">
+                <span className="font-semibold text-on-surface">Total</span>
+                <span className="font-headline-lg text-lg font-bold text-primary">
+                  {formatRupiah(selection.total)}
+                </span>
               </div>
-            );
-          })}
+            ) : null}
 
-          {selection ? (
-            <div className="flex items-center justify-between p-4 rounded-xl bg-primary/5 border border-primary/20">
-              <span className="font-semibold text-on-surface">Total</span>
-              <span className="font-bold text-lg text-primary">{formatRupiah(selection.total)}</span>
-            </div>
-          ) : null}
-        </section>
+            {bundleAdvice ? (
+              <div className="rounded-xl border border-secondary/30 bg-secondary/5 p-3">
+                <p className="text-sm text-on-surface">
+                  <span className="font-semibold">Catatan:</span> {bundleAdvice.missingCount} hak belum
+                  terakup paket pilihanmu. Paket Lamaran bisa lebih murah (
+                  {formatRupiah(bundleAdvice.price)}).
+                </p>
+                <button
+                  type="button"
+                  onClick={() => toggle(bundleAdvice.bundleKey)}
+                  className="mt-2 text-sm font-semibold text-primary hover:underline"
+                >
+                  {selected.includes(bundleAdvice.bundleKey)
+                    ? "Lepas Paket Lamaran"
+                    : `Pakai Paket Lamaran (${formatRupiah(bundleAdvice.price)})`}
+                </button>
+              </div>
+            ) : null}
 
-        {bundleAdvice ? (
-          <section className="p-4 rounded-xl border border-secondary/30 bg-secondary/5">
-            <p className="text-sm text-on-surface">
-              <span className="font-semibold">Catatan:</span> {bundleAdvice.missingCount} hak belum
-              terakup paket pilihanmu. Paket Lamaran bisa lebih murah daripada beli sisanya terpisah
-              ({formatRupiah(bundleAdvice.price)}).
-            </p>
+            {error ? <p className="text-sm text-error">{error}</p> : null}
+            {selection === null && selected.length > 0 ? (
+              <p className="text-sm text-error">
+                Kombinasi paket ini tidak bisa dibeli. Coba pilih satu paket saja.
+              </p>
+            ) : null}
+
             <button
               type="button"
-              onClick={() => toggle(bundleAdvice.bundleKey)}
-              className="mt-3 text-sm font-semibold text-primary hover:underline"
+              onClick={pay}
+              disabled={!selection || submitting}
+              className="w-full py-3 rounded-xl bg-primary text-on-primary font-bold disabled:opacity-50"
             >
-              {selected.includes(bundleAdvice.bundleKey)
-                ? "Lepas Paket Lamaran"
-                : `Pakai Paket Lamaran (${formatRupiah(bundleAdvice.price)})`}
+              {submitting
+                ? "Menyiapkan pembayaranâ€¦"
+                : selection
+                  ? `Bayar ${formatRupiah(selection.total)}`
+                  : "Pilih paket dulu"}
             </button>
-          </section>
-        ) : null}
 
-        <PackageChooser
-          options={options}
-          selected={selected}
-          onToggle={toggle}
-          heading="Tambah paket lain"
-        />
-
-        {error ? <p className="text-sm text-error">{error}</p> : null}
-        {selection === null && selected.length > 0 ? (
-          <p className="text-sm text-error">Kombinasi paket ini tidak bisa dibeli. Coba pilih satu paket saja.</p>
-        ) : null}
-
-        <div className="flex flex-col sm:flex-row gap-3 pt-2 border-t border-outline-variant/30">
-          <button
-            type="button"
-            onClick={pay}
-            disabled={!selection || submitting}
-            className="inline-flex min-h-11 items-center justify-center px-6 rounded-xl bg-primary text-on-primary font-bold disabled:opacity-50"
-          >
-            {submitting
-              ? "Menyiapkan pembayaran…"
-              : selection
-                ? `Bayar ${formatRupiah(selection.total)}`
-                : "Pilih paket dulu"}
-          </button>
-          <Link
-            href="/settings/billing"
-            className="inline-flex min-h-11 items-center justify-center px-6 rounded-xl border border-outline-variant/40 text-on-surface hover:border-primary/40"
-          >
-            Batal
-          </Link>
+            <p className="text-xs text-on-surface-variant">
+              Pembayaran hanya dibuat setelah kamu menekan tombol bayar. Butuh bantuan?{" "}
+              <Link href="/contact" className="text-primary hover:underline">
+                Hubungi kami
+              </Link>
+              .
+            </p>
+          </aside>
         </div>
-
-        <p className="text-xs text-on-surface-variant">
-          Satu pembayaran untuk semua paket di halaman ini. Semua hak aktif setelah pembayaran
-          diterima. Butuh bantuan?{" "}
-          <Link href="/contact" className="text-primary hover:underline">
-            Hubungi kami
-          </Link>
-          .
-        </p>
-          </>
-        )}
       </div>
     </main>
   );
