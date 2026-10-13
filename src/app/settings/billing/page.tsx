@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from "react";
 import { activePaymentProvider, checkoutDestination } from "@/lib/payment-client";
+import { useCatalogPrices, formatRupiah } from "@/lib/pricing-catalog";
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/components/ui/toast";
 
@@ -72,6 +73,7 @@ export default function SettingsBillingPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const catalogPrice = useCatalogPrices();
   // Single CV selector
   const [showCvPicker, setShowCvPicker] = useState(false);
   const [cvList, setCvList] = useState<CvItem[]>([]);
@@ -311,7 +313,7 @@ export default function SettingsBillingPage() {
                       <h4 className="font-label-bold text-on-surface">{t("billing.premium-pass-title")}</h4>
                     </div>
                     <p className="text-2xl font-bold text-primary mb-1">
-                      Rp119.000
+                      {formatRupiah(catalogPrice("premium_pass_30d", 119000))}
                       <span className="text-sm font-normal text-on-surface-variant ml-1">/bulan</span>
                     </p>
                     <p className="text-body-md text-on-surface-variant mb-4">
@@ -352,7 +354,7 @@ export default function SettingsBillingPage() {
                     <span className="material-symbols-outlined text-secondary">description</span>                      <h4 className="font-label-bold text-on-surface">{t("billing.single-cv-title")}</h4>
                   </div>
                   <p className="text-2xl font-bold text-secondary mb-1">
-                    Rp25.000
+                    {formatRupiah(catalogPrice("single_cv", 25000))}
                     <span className="text-sm font-normal text-on-surface-variant ml-1">/sekali</span>
                   </p>
                   <p className="text-body-md text-on-surface-variant mb-4">                      {t("billing.single-cv-subtitle")}

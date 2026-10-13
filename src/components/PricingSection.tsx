@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useTranslation } from "@/lib/i18n";
 import TiltCard from "@/components/TiltCard";
 import MagneticButton from "@/components/MagneticButton";
+import { useCatalogPrices, formatRupiah } from "@/lib/pricing-catalog";
 
 /* ─── Types ─── */
 
@@ -194,6 +195,16 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
     return raw.map((p) => makePlan(p, t));
   }, [mode, t]);
 
+  const catalogPrice = useCatalogPrices();
+
+  // Harga coret pada kartu bundle: jumlah paket di dalamnya kalau dibeli terpisah.
+  const bundleSeparateTotal = useMemo(() => {
+    const price = (key: string, fallback: number) => catalogPrice(key, fallback);
+    return (
+      price("cv_ai_generate", 12000) + price("cv_analyzer", 9000) + price("portfolio_web", 35000)
+    );
+  }, [catalogPrice]);
+
   return (
     <section id="pricing" className="relative overflow-hidden bg-gradient-to-b from-white via-[#f0fafb] to-white dark:from-[#0F0F0F] dark:via-[#1A1A2E] dark:to-[#0F0F0F] py-24 md:py-32">
       {/* Satu orb ambient statis, kedalaman halus tanpa loop (R-01/R-19) */}
@@ -263,7 +274,9 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
                   </h3>
                 </div>
                 <div className="flex items-baseline gap-2 mb-2">
-                  <span className="font-bold tabular-nums text-[32px] leading-none text-primary">Rp49.000</span>
+                  <span className="font-bold tabular-nums text-[32px] leading-none text-primary">
+                    {formatRupiah(catalogPrice("bundle_hemat", 49000))}
+                  </span>
                   <span className="text-xs text-on-surface-variant">/ 60 hari, sekali bayar</span>
                 </div>
                 <p className="text-sm text-on-surface-variant max-w-2xl">{t("pricing.bundle.desc")}</p>
@@ -391,8 +404,12 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
                 </div>
                 <div className="md:ml-auto flex items-center gap-4">
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-primary">Rp49.000</p>
-                    <p className="text-xs text-on-surface-variant dark:text-gray-400 line-through">Rp56.000</p>
+                    <p className="text-2xl font-bold text-primary">
+                      {formatRupiah(catalogPrice("bundle_hemat", 49000))}
+                    </p>
+                    <p className="text-xs text-on-surface-variant dark:text-gray-400 line-through">
+                      {formatRupiah(bundleSeparateTotal)}
+                    </p>
                   </div>
                   <MagneticButton>
                     <Link href="/settings/billing"
