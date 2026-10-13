@@ -141,7 +141,7 @@ const LANGGANAN_PLAN_DATA: Omit<PlanData, "nameKey" | "descKey" | "ctaKey" | "un
   },
 ];
 
-const FAQ_KEYS = [0, 1, 2, 3, 4];
+const FAQ_KEYS = [0, 1, 2, 3, 4, 5, 6];
 
 const COMPARISON_ROW_KEYS = [
   { labelKey: "pricing.compare.ai-gen", free: "2x/bln", starter: "5x/bln", pro: "Unlimited", business: "20x/bln" },
@@ -469,7 +469,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
                   <motion.span animate={{ rotate: openFaq === idx ? 180 : 0 }} transition={{ duration: 0.2 }}
                     className="material-symbols-outlined text-on-surface-variant shrink-0">expand_more</motion.span>
                 </button>
-                <div className="accordion-content" style={{ maxHeight: openFaq === idx ? "500px" : "0px", paddingBottom: openFaq === idx ? "1.25rem" : "0px" }}>
+                <div className="accordion-content" style={{ maxHeight: openFaq === idx ? "900px" : "0px", paddingBottom: openFaq === idx ? "1.25rem" : "0px" }}>
                   <p className="px-6 text-sm text-on-surface-variant leading-relaxed">{t("pricing.faq." + idx + ".a")}</p>
                 </div>
               </div>

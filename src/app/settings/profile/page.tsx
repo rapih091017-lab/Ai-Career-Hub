@@ -8,6 +8,7 @@ import { useTranslation } from "@/lib/i18n";
 import MagneticButton from "@/components/MagneticButton";
 import { useToast } from "@/components/ui/toast";
 import { ImportResumeModal } from "@/components/profile/ImportResumeModal";
+import { DeleteAccountSection } from "@/components/settings/DeleteAccountSection";
 import { mergeImportedProfile, type ImportedProfile, type MergeMode } from "@/lib/profile-merge";
 
 interface PersonalInfo {
@@ -449,6 +450,7 @@ const handleImported = (imported: ImportedProfile, mode: MergeMode) => {
           onClose={() => setShowImport(false)}
           onImported={handleImported}
         />
+        <DeleteAccountSection />
     </div>
   );
 }

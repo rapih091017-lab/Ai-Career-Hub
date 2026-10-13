@@ -318,7 +318,7 @@ return (
               className="w-full py-3 rounded-xl bg-primary text-on-primary font-bold disabled:opacity-50"
             >
               {submitting
-                ? "Menyiapkan pembayaranâ€¦"
+                ? "Menyiapkan pembayaran…"
                 : selection
                   ? `Bayar ${formatRupiah(selection.total)}`
                   : "Pilih paket dulu"}
