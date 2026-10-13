@@ -88,12 +88,18 @@ export function mergePackageSelection(
 
   // Bundle dan paket penyusunnya tidak boleh dibeli bareng: haknya sama,
   // jadi pengguna akan membayar dua kali untuk kemampuan yang sama.
-  const contains = (bundle: PackageDef, other: PackageDef) =>
-    Object.entries(other.limits).every(
-      ([feature, value]) =>
-        bundle.limits[feature] === "unlimited" ||
-        (typeof bundle.limits[feature] === "number" && (bundle.limits[feature] as number) >= (value === false ? 0 : (value as number))),
-    );
+  const contains = (bundle: PackageDef, other: PackageDef) => {
+    const b = bundle.limits as FeatureLimits;
+    const o = other.limits as FeatureLimits;
+    return Object.entries(o).every(([feature, value]) => {
+      const current = b[feature];
+      if (current === "unlimited") return true;
+      if (typeof value === "number") {
+        return typeof current === "number" && current >= value;
+      }
+      return typeof current === "number";
+    });
+  };
   for (const a of picked) {
     for (const b of picked) {
       if (a.id === b.id) continue;
@@ -140,7 +146,8 @@ export function suggestBundle(
     return null;
   }
 
-  const missing = Object.entries(bundle.limits).filter(([feature, value]) => {
+  const bundleLimits = bundle.limits as FeatureLimits;
+  const missing = Object.entries(bundleLimits).filter(([feature, value]) => {
     const current = selection.limits[feature];
     if (value === "unlimited") return current !== "unlimited";
     if (typeof value === "number") return typeof current !== "number" || current < value;
@@ -149,14 +156,14 @@ export function suggestBundle(
 
   if (missing.length === 0) return null;
 
-  // Harga paket yang belum terbeli, untuk dibandingkan dengan harga bundle.
+  // Perkiraan harga paket yang belum terbeli, dipakai untuk membandingkan
+  // apakah bundle lebih murah daripada membeli sisanya satu per satu.
   const missingPrice = missing.reduce((sum, [feature]) => {
-    const cheapest = Object.values(catalog)
-      .map((p) => p.limits[feature])
-      .filter((v): v is number | "unlimited" => typeof v === "number")
-      .sort((a, b) => (typeof a === "number" ? a - b : 0));
-    const cheapestNumber = cheapest.find((v) => typeof v === "number");
-    return sum + (typeof cheapestNumber === "number" ? cheapestNumber : 0);
+    const prices = Object.values(catalog)
+      .map((p) => (p.limits as FeatureLimits)[feature])
+      .filter((v): v is number => typeof v === "number")
+      .sort((a, b) => a - b);
+    return sum + (prices[0] ?? 0);
   }, 0);
 
   return {
