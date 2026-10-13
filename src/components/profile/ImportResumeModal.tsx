@@ -7,53 +7,14 @@ import { useTranslation } from "@/lib/i18n";
 import { extractPdfTextClient, renderPdfPagesToBlobs } from "@/lib/pdf-extract-client";
 import { runClientOcr, type OcrMsgs } from "@/lib/ocr-client";
 
-/** Struktur hasil ekstraksi AI, kompatibel dengan form halaman /profile. */
-export interface ImportedProfile {
-  personalInfo: {
-    fullName: string;
-    phone: string;
-    email: string;
-    address: string;
-    linkedin: string;
-    portfolioUrl: string;
-    summary: string;
-  };
-  workHistory: Array<{
-    id: string;
-    company: string;
-    position: string;
-    startDate: string;
-    endDate: string;
-    description: string;
-    isPresent?: boolean;
-  }>;
-  education: Array<{
-    id: string;
-    institution: string;
-    degree: string;
-    field: string;
-    startDate: string;
-    endDate: string;
-    gpa?: string;
-    isPresent?: boolean;
-  }>;
-  organisations: Array<{
-    id: string;
-    name: string;
-    position: string;
-    startDate: string;
-    endDate: string;
-    description: string;
-    isPresent?: boolean;
-  }>;
-  skills: Array<{ id: string; name: string; level: "beginner" | "intermediate" | "advanced" }>;
-  certifications: Array<{ id: string; name: string; issuer: string; year: string }>;
-}
+/** Struktur hasil ekstraksi AI, kompatibel dengan form halaman profil. */
+import type { ImportedProfile, MergeMode } from "@/lib/profile-merge";
+export type { ImportedProfile } from "@/lib/profile-merge";
 
 interface ImportResumeModalProps {
   open: boolean;
   onClose: () => void;
-  onImported: (profile: ImportedProfile) => void;
+  onImported: (profile: ImportedProfile, mode: MergeMode) => void;
 }
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -68,6 +29,8 @@ export function ImportResumeModal({ open, onClose, onImported }: ImportResumeMod
   const [note, setNote] = useState("");
   const [error, setError] = useState("");
   const [profile, setProfile] = useState<ImportedProfile | null>(null);
+  // Default: isi yang kosong saja, supaya data yang sudah benar tidak hilang.
+  const [mergeMode, setMergeMode] = useState<MergeMode>("fill-empty");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const ocrMsgs: OcrMsgs = {
@@ -193,7 +156,7 @@ export function ImportResumeModal({ open, onClose, onImported }: ImportResumeMod
 
   const handleApply = () => {
     if (!profile) return;
-    onImported(profile);
+    onImported(profile, mergeMode);
     addToast({ type: "success", message: t("profile.import.applied") });
     onClose();
   };
@@ -287,7 +250,46 @@ export function ImportResumeModal({ open, onClose, onImported }: ImportResumeMod
                   {profile.certifications.length} {t("profile.import.preview-certs")}
                 </span>
               ) : null}
+              {profile.organisations.length > 0 ? (
+                <span className="rounded-full bg-surface-container px-2.5 py-0.5 text-label-sm text-on-surface-variant">
+                  {profile.organisations.length} {t("profile.import.preview-organisations")}
+                </span>
+              ) : null}
             </div>
+
+            {/* Dua pilihan dengan konsekuensi yang jelas, bukan tombol diam-diam
+                menimpa profil. */}
+            <div className="space-y-1.5 pt-1">
+              {(
+                [
+                  { mode: "fill-empty" as MergeMode, title: t("profile.import.mode-fill"), desc: t("profile.import.mode-fill-desc") },
+                  { mode: "replace" as MergeMode, title: t("profile.import.mode-replace"), desc: t("profile.import.mode-replace-desc") },
+                ]
+              ).map((option) => (
+                <label
+                  key={option.mode}
+                  className={`flex cursor-pointer items-start gap-2.5 rounded-lg border p-2.5 transition-colors ${
+                    mergeMode === option.mode
+                      ? "border-primary bg-primary/5"
+                      : "border-outline-variant hover:bg-surface-container"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="import-merge-mode"
+                    value={option.mode}
+                    checked={mergeMode === option.mode}
+                    onChange={() => setMergeMode(option.mode)}
+                    className="mt-0.5"
+                  />
+                  <span>
+                    <span className="block text-label-bold text-on-surface">{option.title}</span>
+                    <span className="block text-label-sm text-on-surface-variant">{option.desc}</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+
             <button
               type="button"
               onClick={handleApply}

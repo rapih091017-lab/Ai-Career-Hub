@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
@@ -7,7 +7,8 @@ import AuthGuard from "@/components/AuthGuard";
 import { useTranslation } from "@/lib/i18n";
 import MagneticButton from "@/components/MagneticButton";
 import { useToast } from "@/components/ui/toast";
-import { ImportResumeModal, type ImportedProfile } from "@/components/profile/ImportResumeModal";
+import { ImportResumeModal } from "@/components/profile/ImportResumeModal";
+import { mergeImportedProfile, type ImportedProfile, type MergeMode } from "@/lib/profile-merge";
 
 interface PersonalInfo {
   fullName: string;
@@ -198,15 +199,42 @@ export default function ProfilePage() {
   };
 
   /** Isi form dari hasil import AI. Tidak disimpan otomatis: user review dulu. */
-  const handleImported = (imported: ImportedProfile) => {
-    setPersonalInfo({ ...imported.personalInfo });
-    setWorkHistory(imported.workHistory);
-    setEducation(imported.education);
-    setOrganisation(imported.organisations);
-    setSkills(imported.skills);
-    setCertifications(imported.certifications);
-    setActiveSection("section-personal");
-  };
+  /**
+ * Terapkan hasil impor.
+ *
+ * Dulu semua kolom ditimpa apa adanya, jadi satu field yang tidak ditemukan
+ * AI menghapus data yang sudah benar. Sekarang ada dua mode; default hanya
+ * mengisi yang kosong dan menggabungkan daftar tanpa menggandakan entri.
+ */
+const handleImported = (imported: ImportedProfile, mode: MergeMode) => {
+  const merged = mergeImportedProfile(
+    {
+      personalInfo: {
+        fullName: personalInfo.fullName ?? "",
+        phone: personalInfo.phone ?? "",
+        email: personalInfo.email ?? "",
+        address: personalInfo.address ?? "",
+        linkedin: personalInfo.linkedin ?? "",
+        portfolioUrl: personalInfo.portfolioUrl ?? "",
+        summary: personalInfo.summary ?? "",
+      },
+      workHistory: workHistory as unknown as ImportedProfile["workHistory"],
+      education: education as unknown as ImportedProfile["education"],
+      organisations: organisations as unknown as ImportedProfile["organisations"],
+      skills: skills as unknown as ImportedProfile["skills"],
+      certifications: certifications as unknown as ImportedProfile["certifications"],
+    },
+    imported,
+    mode,
+  );
+  setPersonalInfo(merged.personalInfo);
+  setWorkHistory(merged.workHistory as unknown as typeof workHistory);
+  setEducation(merged.education as unknown as typeof education);
+  setOrganisation(merged.organisations as unknown as typeof organisations);
+  setSkills(merged.skills as unknown as typeof skills);
+  setCertifications(merged.certifications as unknown as typeof certifications);
+  setActiveSection("section-personal");
+};
 
   if (isLoading) {
     return (
