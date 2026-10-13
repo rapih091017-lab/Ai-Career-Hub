@@ -74,7 +74,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     { url: BASE_URL, lastModified: new Date(), changeFrequency: "weekly", priority: 1.0 },
     { url: BASE_URL + "/checker", lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
-    { url: BASE_URL + "/builder/new", lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
     { url: BASE_URL + "/interview", lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
     { url: BASE_URL + "/interview/practice", lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
     { url: BASE_URL + "/karir", lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
@@ -86,7 +85,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: BASE_URL + "/privacy", lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
     { url: BASE_URL + "/terms", lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
     { url: BASE_URL + "/profile", lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
-    { url: BASE_URL + "/login", lastModified: new Date(), changeFrequency: "yearly", priority: 0.4 },
     { url: BASE_URL + "/contoh-cv", lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
     { url: BASE_URL + "/sinonim", lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
     { url: BASE_URL + "/cv-examples", lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
