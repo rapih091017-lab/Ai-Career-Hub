@@ -29,6 +29,16 @@ const envSchema = z.object({
     .default("false")
     .transform((v) => v === "true"),
 
+  // ── Kasera Pay ───────────────────────────────────────────
+  // Midtrans sengaja dibiarkan utuh untuk bisa balik lagi sewaktu-waktu.
+  // Ganti lewat PAYMENT_PROVIDER tanpa menyentuh kode pembayaran lama.
+  PAYMENT_PROVIDER: z.enum(["midtrans", "kasera"]).default("midtrans"),
+  KASERA_API_KEY: z.string().optional(),
+  /** Signing secret webhook dari dashboard Kasera (Developer → Webhooks). */
+  KASERA_WEBHOOK_SECRET: z.string().optional(),
+  /** Base URL Kasera; diisi untuk sandbox, default produksi. */
+  KASERA_API_BASE: z.string().url().optional(),
+
   // ── Admin ───────────────────────────────────────────────
   ADMIN_EMAILS: z.string().optional(),
 
