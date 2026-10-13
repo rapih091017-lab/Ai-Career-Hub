@@ -88,7 +88,9 @@ describe("bundel tampil sebagai hero di mode langganan", () => {
     expect(pricing).toContain("pricing.bundle.badge");
     expect(pricing).toContain("pricing.bundle.title");
     expect(pricing).toContain("pricing.bundle.cta");
-    expect(pricing).toContain("Rp49.000");
+    // Harga banner diambil dari katalog server. Angka Rp49.000 sebagai teks
+    // literal pernah membuat harga tampilan melenceng dari yang ditagih.
+    expect(pricing).toContain('catalogPrice("bundle_hemat"');
   });
 
   it("nama paket di master list diganti menjadi Paket Lamaran", () => {
