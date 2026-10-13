@@ -7,9 +7,6 @@ import { PackageCard } from "@/components/checkout/PackageCard";
 import {
   useCatalogPrices,
   useCatalogPackages,
-  packageGroup,
-  singleProductOf,
-  SINGLE_PRODUCT_ORDER,
 } from "@/lib/pricing-catalog";
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/components/ui/toast";
@@ -344,59 +341,18 @@ export default function SettingsBillingPage() {
               {!catalogLoading && catalogPackages.length === 0 ? (
                 <p className="text-sm text-on-surface-variant">{t("billing.empty-catalog")}</p>
               ) : (
-                <div className="space-y-8">
-                  {(["single", "monthly"] as const).map((group) => {
-                    const inGroup = catalogPackages.filter((pkg) => packageGroup(pkg) === group);
-                    if (inGroup.length === 0) return null;
-                    return (
-                      <section key={group} className="space-y-4">
-                        <div>
-                          <h4 className="font-label-bold text-on-surface">
-                            {t(group === "monthly" ? "billing.group.monthly" : "billing.group.single")}
-                          </h4>
-                          <p className="text-xs text-on-surface-variant">
-                            {t(group === "monthly" ? "billing.group.monthly-hint" : "billing.group.single-hint")}
-                          </p>
-                        </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {catalogPackages.map((pkg) => (
+                    <PackageCard
+                      key={pkg.key}
+                      t={t}
+                      pkg={pkg}
+                      highlighted={pkg.monthly}
+                      busy={checkoutLoading === pkg.key}
+                      onBuy={pkg.key === "single_cv" ? handleSingleCvClick : () => goToCheckout(pkg.key)}
+                    />
+                  ))}
 
-                        {group === "single"
-                          ? SINGLE_PRODUCT_ORDER.map((product) => {
-                              const inProduct = inGroup.filter((pkg) => singleProductOf(pkg.key) === product);
-                              if (inProduct.length === 0) return null;
-                              return (
-                                <div key={product} className="space-y-2">
-                                  <h5 className="text-xs font-semibold uppercase tracking-wide text-on-surface-variant">
-                                    {t(`billing.product.${product}`)}
-                                  </h5>
-                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {inProduct.map((pkg) => (
-                                      <PackageCard t={t}
-                                        key={pkg.key}
-                                        pkg={pkg}
-                                        onBuy={pkg.key === "single_cv" ? handleSingleCvClick : () => goToCheckout(pkg.key)}
-                                        busy={checkoutLoading === pkg.key}
-                                      />
-                                    ))}
-                                  </div>
-                                </div>
-                              );
-                            })
-                          : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              {inGroup.map((pkg) => (
-                                <PackageCard t={t}
-                                  key={pkg.key}
-                                  pkg={pkg}
-                                  onBuy={() => goToCheckout(pkg.key)}
-                                  busy={checkoutLoading === pkg.key}
-                                  highlighted
-                                />
-                              ))}
-                            </div>
-                          )}
-                      </section>
-                    );
-                  })}
                 </div>
               )}
             </div>

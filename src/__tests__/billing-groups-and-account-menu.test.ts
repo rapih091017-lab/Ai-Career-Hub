@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { packageGroup, singleProductOf, SINGLE_PRODUCT_ORDER } from "@/lib/pricing-catalog";
 
 const billingSrc = readFileSync(join(process.cwd(), "src/app/settings/billing/page.tsx"), "utf8");
+const checkoutSrc = readFileSync(join(process.cwd(), "src/app/checkout/page.tsx"), "utf8");
 const landingSrc = readFileSync(join(process.cwd(), "src/app/page.tsx"), "utf8");
 const i18nSrc = readFileSync(join(process.cwd(), "src/lib/i18n.tsx"), "utf8");
 const accountMenuSrc = readFileSync(join(process.cwd(), "src/components/AccountMenu.tsx"), "utf8");
@@ -25,9 +26,13 @@ describe("daftar paket dikelompokkan", () => {
     expect(SINGLE_PRODUCT_ORDER[0]).toBe("cv");
   });
 
-  it("halaman tagihan memakai pengelompokan itu", () => {
-    expect(billingSrc).toContain('packageGroup(pkg) === group');
-    expect(billingSrc).toContain("SINGLE_PRODUCT_ORDER.map");
+  it("pengelompokan dipakai di halaman checkout, bukan diulang di halaman tagihan", () => {
+    // Halaman tagihan sengaja menampilkan satu daftar polos. Penjelasan
+    // satuan vs bulanan hanya perlu satu kali, di halaman checkout.
+    expect(billingSrc).not.toContain("billing.group.single");
+    expect(billingSrc).not.toContain("billing.group.monthly");
+    expect(checkoutSrc).toContain("packageGroup(pkg) === group");
+    expect(checkoutSrc).toContain("billing.group.single");
   });
 });
 

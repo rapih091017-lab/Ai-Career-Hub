@@ -18,6 +18,7 @@ import {
 } from "@/lib/checkout-cart";
 import { MARKETED_PACKAGE_KEYS, formatRupiah, packageGroup } from "@/lib/pricing-catalog";
 import { PackageCard } from "@/components/checkout/PackageCard";
+import AppHeader from "@/components/AppHeader";
 import { useTranslation } from "@/lib/i18n";
 import type { PackageDef } from "@/lib/access";
 
@@ -168,15 +169,20 @@ export default function CheckoutPage({
 
 if (!catalog) {
     return (
-      <main className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-on-surface-variant">Memuat katalog paket…</p>
-      </main>
+      <div className="min-h-screen bg-background text-on-background">
+        <AppHeader />
+        <main className="pt-24 flex items-center justify-center">
+          <p className="text-on-surface-variant">Memuat katalog paket…</p>
+        </main>
+      </div>
     );
   }
 
-  return (
-    <main className="min-h-screen bg-background px-6 py-10">
-      <div className="max-w-6xl mx-auto">
+return (
+    <div className="min-h-screen bg-background text-on-background">
+      <AppHeader />
+      <main className="pt-24 pb-32 px-margin-mobile md:px-gutter">
+        <div className="max-w-6xl mx-auto">
         <header className="mb-8">
           <h1 className="font-headline-lg text-2xl md:text-3xl font-bold text-on-surface">Checkout</h1>
           <p className="text-on-surface-variant mt-1 max-w-2xl">
@@ -325,9 +331,10 @@ if (!catalog) {
               </Link>
               .
             </p>
-          </aside>
+</aside>
         </div>
-      </div>
-    </main>
+        </div>
+      </main>
+    </div>
   );
 }
