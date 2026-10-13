@@ -1,12 +1,24 @@
 "use client";
 
-"use client";
-
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { activePaymentProvider, checkoutDestination } from "@/lib/payment-client";
 import { useCatalogPrices, formatRupiah } from "@/lib/pricing-catalog";
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/components/ui/toast";
+
+/** Parameter ?plan= dari landing dipetakan ke key paket di database. */
+const PLAN_QUERY_TO_PACKAGE_KEY: Record<string, string> = {
+  single_cv: "single_cv",
+  "cv-starter": "cv_starter",
+  "cv-ai-generate": "cv_ai_generate",
+  "cv-analyzer": "cv_analyzer",
+  "portfolio-web": "portfolio_web",
+  "bundle-hemat": "bundle_hemat",
+  pro: "pro_monthly",
+  premium_pass_30d: "premium_pass_30d",
+  starter: "starter_monthly",
+};
 
 interface FeatureLimits {
   ai_cv_generate: number | "unlimited" | false;
@@ -69,6 +81,7 @@ interface CvItem {
 export default function SettingsBillingPage() {
   const { t } = useTranslation();
   const { addToast } = useToast();
+  const router = useRouter();
   const [data, setData] = useState<UsageResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -106,25 +119,11 @@ export default function SettingsBillingPage() {
     const params = new URLSearchParams(window.location.search);
     const plan = params.get("plan");
 
-    // Plan pre-selected from PricingSection, trigger checkout
+    // Plan dari landing: buka ringkasan dulu, jangan langsung buat QR.
     if (plan) {
-      if (plan === "single_cv") {
-        handleSingleCvClick();
-      } else if (plan === "cv-starter") {
-        // Buat sementara, langsung checkout ke create-order
-        handleBuyPackage("cv_starter");
-      } else if (plan === "cv-ai-generate") {
-        handleBuyPackage("cv_ai_generate");
-      } else if (plan === "cv-analyzer") {
-        handleBuyPackage("cv_analyzer");
-      } else if (plan === "portfolio-web") {
-        handleBuyPackage("portfolio_web");
-      } else if (plan === "bundle-hemat") {
-        handleBuyPackage("bundle_hemat");
-      } else if (plan === "pro" || plan === "premium_pass_30d") {
-        handleBuyPackage("premium_pass_30d");
-      } else if (plan === "starter") {
-        handleBuyPackage("starter_monthly");
+      const key = PLAN_QUERY_TO_PACKAGE_KEY[plan];
+      if (key) {
+        goToCheckout(key);
       } else if (plan === "business") {
         window.location.href = "mailto:hello@aicareerhub.com";
       }
@@ -166,6 +165,12 @@ export default function SettingsBillingPage() {
     } finally {
       setCvListLoading(false);
     }
+  };
+
+  /** Buka halaman ringkasan; pembayaran hanya dibuat dari sana. */
+  const goToCheckout = (packageType: string) => {
+    setError(null);
+    router.push(`/checkout?packages=${encodeURIComponent(packageType)}${selectedCvId ? `&cvId=${encodeURIComponent(selectedCvId)}` : ""}`);
   };
 
   const handleBuyPackage = async (packageType: string, cvDocumentId?: string) => {
@@ -336,7 +341,7 @@ export default function SettingsBillingPage() {
                       )}
                     </ul>
                     <button
-                      onClick={() => handleBuyPackage("premium_pass_30d")}
+                      onClick={() => goToCheckout("premium_pass_30d")}
                       disabled={checkoutLoading === "premium_pass_30d"}
                       className="w-full py-3 bg-primary text-on-primary font-label-bold rounded-xl hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
                     >

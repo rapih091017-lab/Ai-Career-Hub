@@ -7,6 +7,7 @@ import { eq, and, gte } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { getPackagesDb, PACKAGES as HARDCODED_PACKAGES } from "@/lib/access";
 import { REFERRAL_COOKIE, isValidAffiliateCode } from "@/lib/affiliate";
+import { mergePackageSelection, PackageSelectionError } from "@/lib/package-selection";
 
 export const runtime = "nodejs";
 
@@ -64,28 +65,40 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json().catch(() => ({}));
-  const { packageType, cvDocumentId } = body ?? {};
+  const { packageType, packageTypes, cvDocumentId } = body ?? {};
+  // Boleh satu paket (panggilan lama) atau beberapa paket sekaligus.
+  const requested: string[] = Array.isArray(packageTypes) && packageTypes.length
+    ? packageTypes
+    : packageType
+      ? [packageType]
+      : [];
 
   const rawReferral = request.cookies.get(REFERRAL_COOKIE)?.value?.trim().toLowerCase() ?? null;
   const referralCode = rawReferral && isValidAffiliateCode(rawReferral) ? rawReferral : null;
 
   const dbPackages = await getPackagesDb();
-  const pkgDef = dbPackages[packageType] || HARDCODED_PACKAGES[packageType];
-  if (!pkgDef) {
-    return NextResponse.json(
-      { error: "INVALID_PACKAGE", message: "Paket tidak valid" },
-      { status: 400 },
-    );
+  const catalog = { ...HARDCODED_PACKAGES, ...dbPackages };
+
+  let selection;
+  try {
+    selection = mergePackageSelection(requested, catalog);
+  } catch (error) {
+    if (error instanceof PackageSelectionError) {
+      return NextResponse.json({ error: error.code, message: error.message }, { status: 400 });
+    }
+    throw error;
   }
-  if (packageType === "single_cv" && !cvDocumentId) {
+
+  if (selection.keys.includes("single_cv") && !cvDocumentId) {
     return NextResponse.json(
       { error: "CV_REQUIRED", message: "Pilih CV terlebih dahulu" },
       { status: 400 },
     );
   }
+  const primaryKey = selection.keys[0];
 
   // Anti double-klik: pakai lagi order pending yang QR-nya masih hidup.
-  const existing = await findLivePending(session.user.id, packageType, cvDocumentId);
+  const existing = await findLivePending(session.user.id, selection.joinedType, cvDocumentId);
   if (existing?.transactionId) {
     const retrieved = await fetch(
       `${baseUrl ?? "https://pay.kasera.id/v1"}/transactions/${existing.transactionId}`,
@@ -126,10 +139,10 @@ export async function POST(request: NextRequest) {
       userId: session.user.id,
       cvDocumentId: cvDocumentId ?? null,
       orderId,
-      packageType,
-      packageName: pkgDef.name,
-      amount: pkgDef.price,
-      limits: pkgDef.limits,
+      packageType: selection.joinedType,
+      packageName: selection.joinedName,
+      amount: selection.total,
+      limits: selection.limits,
       referralCode,
       paymentMethod: "qris",
       paymentStatus: "pending",
@@ -141,9 +154,9 @@ export async function POST(request: NextRequest) {
 
   try {
     const created = await createPaymentRequest({
-      amount: pkgDef.price,
+      amount: selection.total,
       externalId: orderId,
-      description: pkgDef.name,
+      description: selection.joinedName,
       paymentMethods: ["qris"],
       idempotencyKey: orderId,
       apiKey,
@@ -165,8 +178,8 @@ export async function POST(request: NextRequest) {
       orderId,
       paymentRequestId: created.id,
       qr_string: qrString,
-      amount: pkgDef.price,
-      packageName: pkgDef.name,
+      amount: selection.total,
+      packageName: selection.joinedName,
       expires_at: created.expires_at ?? qrExpiresAt.toISOString(),
       // Dipakai halaman QR untuk menampilkan instruksi milik Kasera.
       instructions: created.instructions ?? null,
