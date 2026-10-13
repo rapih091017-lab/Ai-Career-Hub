@@ -163,7 +163,7 @@ export default function AppHeader() {
                   </button>
                   <button
                     className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-high transition-colors"
-                    onClick={() => { setIsDropdownOpen(false); router.push("/profile"); }}
+                    onClick={() => { setIsDropdownOpen(false); router.push("/settings/profile"); }}
                   >
                     <span className="material-symbols-outlined text-lg text-on-surface-variant">person</span>
                     {t("header.profile")}

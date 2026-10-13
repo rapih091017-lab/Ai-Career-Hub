@@ -57,7 +57,7 @@ export function AccountMenu() {
 
   const items: MenuItem[] = [
     { key: "dashboard", icon: "dashboard", label: t("nav.dashboard"), href: "/dashboard" },
-    { key: "profile", icon: "person", label: t("nav.profile"), href: "/profile" },
+    { key: "profile", icon: "person", label: t("nav.profile"), href: "/settings/profile" },
     { key: "settings", icon: "settings", label: t("header.settings"), href: "/settings/security" },
     { key: "affiliate", icon: "redeem", label: t("header.affiliate"), href: "/affiliate" },
   ];

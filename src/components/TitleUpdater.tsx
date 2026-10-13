@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
@@ -14,7 +14,6 @@ const pageTitles: Record<string, { id: string; en: string }> = {
   "/portfolio/build": { id: "Buat Portofolio", en: "Build Portfolio" },
   "/portfolio/preview": { id: "Pratinjau Portofolio", en: "Portfolio Preview" },
   "/portfolio/live": { id: "Portofolio Live", en: "Live Portfolio" },
-  "/profile": { id: "Profil", en: "Profile" },
   "/login": { id: "Masuk", en: "Sign In" },
   "/settings": { id: "Pengaturan", en: "Settings" },
   "/settings/profile": { id: "Pengaturan Profil", en: "Profile Settings" },
@@ -36,7 +35,6 @@ const pageDescriptions: Record<string, { id: string; en: string }> = {
   "/portfolio/build": { id: "Bangun portofolio website dengan template dan editor yang mudah digunakan.", en: "Build a portfolio website with easy-to-use templates and editor." },
   "/portfolio/preview": { id: "Pratinjau portofolio website sebelum dipublikasikan.", en: "Preview your portfolio website before publishing." },
   "/portfolio/live": { id: "Lihat portofolio websitemu yang sudah live.", en: "View your published portfolio website." },
-  "/profile": { id: "Atur data diri, foto profil, dan preferensi akun AI Career Hub.", en: "Manage your personal data, profile photo, and AI Career Hub account preferences." },
   "/login": { id: "Masuk atau daftar akun AI Career Hub untuk mulai membuat CV dan portofolio.", en: "Sign in or create your AI Career Hub account to start building CVs and portfolios." },
   "/settings": { id: "Atur preferensi akun, langganan, dan keamanan akun.", en: "Manage account preferences, subscription, and security settings." },
   "/settings/profile": { id: "Ubah data diri dan preferensi profil akunmu.", en: "Edit your personal data and profile preferences." },
@@ -60,7 +58,7 @@ export default function TitleUpdater() {
 
     // Find best matching page title
     let pageKey = pathname;
-    // Match nested routes (e.g., /builder/[id] → /builder, /portfolio/build → /portfolio/build)
+    // Match nested routes (e.g., /builder/[id] â†’ /builder, /portfolio/build â†’ /portfolio/build)
     const matchedKey = Object.keys(pageTitles).find((key) => {
       if (key === pathname) return true;
       // Match parent route for nested pages

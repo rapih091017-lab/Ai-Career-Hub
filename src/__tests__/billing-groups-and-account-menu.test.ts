@@ -78,7 +78,7 @@ describe("menu akun di landing", () => {
   });
 
   it("dropdown punya pilihan profil, pengaturan, afiliasi, dan keluar", () => {
-    expect(accountMenuSrc).toContain('href: "/profile"');
+    expect(accountMenuSrc).toContain('href: "/settings/profile"');
     expect(accountMenuSrc).toContain('href: "/dashboard"');
     expect(accountMenuSrc).toContain('href: "/settings/security"');
     expect(accountMenuSrc).toContain('href: "/affiliate"');

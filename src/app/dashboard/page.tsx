@@ -138,10 +138,10 @@ export default function DashboardPage() {
   /* ── Next best action: satu langkah paling berguna mengikuti kondisi user ── */
   const nextAction = useMemo(() => {
     if (profileData && !profileData.hasProfile) {
-      return { icon: "person_add", label: t("dashboard.next-profile"), href: "/profile" };
+      return { icon: "person_add", label: t("dashboard.next-profile"), href: "/settings/profile" };
     }
     if (profileData && profileData.score < 100) {
-      return { icon: "fact_check", label: t("dashboard.next-complete-profile"), href: "/profile" };
+      return { icon: "fact_check", label: t("dashboard.next-complete-profile"), href: "/settings/profile" };
     }
     if (cvList.length === 0) {
       return { icon: "edit_note", label: t("dashboard.next-create-cv"), href: "/builder/new" };
@@ -208,7 +208,7 @@ export default function DashboardPage() {
         setIsCreating(false);
         if (data.error === "PROFILE_NOT_FOUND") {
           setShowTemplatePicker(false);
-          router.push(data.redirectUrl || "/profile");
+          router.push(data.redirectUrl || "/settings/profile");
         } else {
           addToast({ type: "error", message: data.message || t("dashboard.create-failed") });
         }
@@ -268,7 +268,7 @@ export default function DashboardPage() {
                   </div>
                 ) : profileData && (
                   <Link
-                    href="/profile"
+                    href="/settings/profile"
                     className="shrink-0 bg-surface-container-lowest rounded-2xl p-4 shadow-premium-sm border border-outline-variant/50 hover:shadow-premium-md hover:border-primary/30 transition-shadow group min-w-[200px]"
                   >
                     <div className="flex items-center justify-between mb-2">

@@ -173,7 +173,7 @@ export default function Home() {
                 <a onClick={() => setMobileMenuOpen(false)} className="w-full min-h-12 px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all text-left" href="/karir">{t("nav.karir")}</a>
                 <hr className="border-outline-variant/20 my-2" />
                 {!mounted ? null : session ? (
-                  <Link onClick={() => setMobileMenuOpen(false)} href="/profile" className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all">
+                  <Link onClick={() => setMobileMenuOpen(false)} href="/settings/profile" className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all">
                     <span className="material-symbols-outlined text-lg">person</span>
                     Profile
                   </Link>
@@ -539,7 +539,7 @@ export default function Home() {
               { icon: "record_voice_over", titleKey: "new.interview-title", descKey: "new.interview-desc", href: "/interview/practice", stat: `${INTERVIEW_QUESTION_COUNT.toLocaleString("id-ID")} ${t("new.stat-questions")}` },
               { icon: "description", titleKey: "new.examples-title", descKey: "new.examples-desc", href: lang === "en" ? "/cv-examples" : "/contoh-cv", stat: null },
               { icon: "swap_horiz", titleKey: "new.synonym-title", descKey: "new.synonym-desc", href: "/sinonim", stat: null },
-              { icon: "upload_file", titleKey: "new.import-title", descKey: "new.import-desc", href: "/profile", stat: null },
+              { icon: "upload_file", titleKey: "new.import-title", descKey: "new.import-desc", href: "/settings/profile", stat: null },
               { icon: "work", titleKey: "new.jobs-title", descKey: "new.jobs-desc", href: "/karir", stat: null },
             ].map((item, index) => (
               <motion.div key={item.titleKey} variants={slideUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} transition={{ delay: index * 0.05 }}>

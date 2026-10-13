@@ -270,7 +270,7 @@ export default function PortfolioPage() {
                 <p className="text-body-md text-on-surface-variant">{profileData ? t("portfolio.profile-filled") + " " + (stats.name !== "-" ? stats.name.toLowerCase() : t("portfolio.existing-data")) + "." : t("portfolio.profile-empty")}</p>
               </div>
               <Link
-                href={profileData ? "/portfolio/build" : "/profile"}
+                href={profileData ? "/portfolio/build" : "/settings/profile"}
                 className="flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-on-primary font-label-bold hover:opacity-90 transition-opacity shadow-md whitespace-nowrap"
               >
                 <span className="material-symbols-outlined text-lg" aria-hidden="true">{profileData ? "edit" : "person"}</span>

@@ -75,7 +75,7 @@ function BuilderNewFormContent() {
           setErrorMessage(
             t("cv.new.profile-redirect"),
           );
-          setTimeout(() => router.push(data.redirectUrl || "/profile"), 1500);
+          setTimeout(() => router.push(data.redirectUrl || "/settings/profile"), 1500);
         } else {
           setErrorMessage(data.message || t("cv.new.generic-error"));
         }

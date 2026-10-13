@@ -739,7 +739,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                 {!profileForFill && !profileLoading && (
                   <p className="text-body-sm text-on-surface-variant">
                     {t("build.profile-hint")}{" "}
-                    <a href="/profile" className="text-primary underline">sini</a>
+                    <a href="/settings/profile" className="text-primary underline">sini</a>
                   </p>
                 )}
 

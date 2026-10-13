@@ -113,7 +113,7 @@ export default function MyResumesPage() {
         setIsCreating(false);
         if (data.error === "PROFILE_NOT_FOUND") {
           setShowTemplatePicker(false);
-          router.push(data.redirectUrl || "/profile");
+          router.push(data.redirectUrl || "/settings/profile");
         } else {
           addToast({ type: "error", message: data.message || t("dashboard.create-failed") });
         }
