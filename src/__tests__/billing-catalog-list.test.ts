@@ -37,11 +37,14 @@ const t = (key: string) => key;
 describe("daftar paket di halaman tagihan", () => {
   it("isi paket dibaca dari limits katalog, bukan ditulis manual per kartu", () => {
     // Dulu tiap kartu punya daftar benefits yang diketik tangan di JSX, sehingga
-    // bisa berbeda dengan kuota di database.
+    // bisa berbeda dengan kuota di database. Sekarang kartu paket membaca
+    // `limits` dari katalog.
     expect(billingSrc).not.toMatch(/"Unlimited CV Builder"/);
     expect(billingSrc).not.toMatch(/"1x AI Smart Revision"/);
-    expect(billingSrc).toContain("packageBenefits(pkg)");
-    expect(billingSrc).toContain("catalogPackages.map");
+    const cardSrc = readFileSync(join(process.cwd(), "src/components/checkout/PackageCard.tsx"), "utf8");
+    expect(cardSrc).toContain("packageBenefits(pkg)");
+    expect(cardSrc).toContain("benefitLabel(benefit, t)");
+    expect(billingSrc).toContain("catalogPackages");
   });
 
   it("katalog yang dipakai billing mengirim limits", () => {
@@ -69,7 +72,7 @@ describe("daftar paket di halaman tagihan", () => {
   it("semua tombol beli mengarah ke checkout atau pemilih CV", () => {
     // Satu langkah setelah pilih paket: rangkum dulu, baru QR. Tidak ada order
     // yang dibuat sebelum pengguna mengonfirmasi di halaman checkout.
-    expect(billingSrc).toContain('needsCv ? handleSingleCvClick() : goToCheckout(pkg.key)');
+    expect(billingSrc).toContain('pkg.key === "single_cv" ? handleSingleCvClick');
     expect(billingSrc).not.toContain("create-order");
   });
 });

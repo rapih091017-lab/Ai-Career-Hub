@@ -8,6 +8,7 @@ import AppFooter from "@/components/AppFooter";
 import Logos3 from "@/components/blocks/logos3";
 import PricingSection from "@/components/PricingSection";
 import ScrollProgress from "@/components/ScrollProgress";
+import { AccountMenu } from "@/components/AccountMenu";
 import CountUp from "@/components/CountUp";
 import MouseGlow from "@/components/MouseGlow";
 import TiltCard from "@/components/TiltCard";
@@ -128,10 +129,7 @@ export default function Home() {
                 <MagneticButton>
                   <Link href="/dashboard" className="bg-primary text-on-primary px-5 py-2.5 rounded-lg font-label-bold hover:opacity-90 active:scale-95 transition-all shadow-sm cursor-pointer block">{t("nav.dashboard")}</Link>
                 </MagneticButton>
-                <Link href="/profile" className="w-11 h-11 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary/20 transition-all active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                  title={t("nav.profile")} aria-label={t("nav.profile")}>
-                  <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>person</span>
-                </Link>
+                <AccountMenu />
               </div>
             ) : (
               <>

@@ -1,15 +1,15 @@
-﻿"use client";
+"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { PackageCard } from "@/components/checkout/PackageCard";
 
 import {
   useCatalogPrices,
   useCatalogPackages,
-  formatRupiah,
-  packageBenefits,
-  benefitLabel,
-  periodLabel,
+  packageGroup,
+  singleProductOf,
+  SINGLE_PRODUCT_ORDER,
 } from "@/lib/pricing-catalog";
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/components/ui/toast";
@@ -38,6 +38,9 @@ interface FeatureLimits {
   white_label: number | "unlimited" | false;
 }
 
+/** Pembayaran sukses dalam jendela ini dianggap "baru saja masuk". */
+const TOPUP_SUCCESS_WINDOW_MS = 10 * 60 * 1000;
+const TOPUP_SEEN_PREFIX = "ach:topup-seen:";
 interface UsageData {
   cvBuilds: number;
   checkerChecks: number;
@@ -95,6 +98,9 @@ export default function SettingsBillingPage() {
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const catalogPrice = useCatalogPrices();
   const { packages: catalogPackages, loading: catalogLoading } = useCatalogPackages();
+  const buySectionRef = useRef<HTMLDivElement | null>(null);
+  const [highlightBuy, setHighlightBuy] = useState(false);
+  const [topupDone, setTopupDone] = useState<{ packageType: string; amount: number } | null>(null);
   // Single CV selector
   const [showCvPicker, setShowCvPicker] = useState(false);
   const [cvList, setCvList] = useState<CvItem[]>([]);
@@ -108,6 +114,7 @@ export default function SettingsBillingPage() {
       if (res.ok) {
         const json = await res.json();
         setData(json);
+        maybeCelebrateTopup(json);
       } else {
         setError(t("admin.load-error"));
       }
@@ -118,11 +125,32 @@ export default function SettingsBillingPage() {
     }
   };
 
+  /**
+   * QRIS tidak selalu membawa pengguna balik ke halaman ini dengan parameter
+   * sukses, jadi keberhasilan dibaca dari pembayaran sukses terbaru. Popup-nya
+   * muncul sekali per pembayaran supaya tidak mengganggu setiap muat ulang.
+   */
+  const maybeCelebrateTopup = (payload: UsageResponse) => {
+    const latest = payload?.payments?.history?.[0];
+    if (!latest?.paidAt) return;
+    const paidAt = new Date(latest.paidAt).getTime();
+    if (!Number.isFinite(paidAt)) return;
+    if (Date.now() - paidAt > TOPUP_SUCCESS_WINDOW_MS) return;
+    const seenKey = `${TOPUP_SEEN_PREFIX}${latest.id}`;
+    try {
+      if (window.sessionStorage.getItem(seenKey)) return;
+      window.sessionStorage.setItem(seenKey, "1");
+    } catch {
+      // Penyimpanan diblokir: tetap tampilkan popup sekali saja di sesi ini.
+    }
+    setTopupDone({ packageType: latest.packageType, amount: latest.amount });
+  };
+
   useEffect(() => {
     fetchUsage();
   }, []);
 
-  // Handle redirect from PricingSection plan selection and Midtrans callback
+  // Handle redirect from PricingSection plan selection and payment callbacks
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const plan = params.get("plan");
@@ -179,6 +207,18 @@ export default function SettingsBillingPage() {
   const goToCheckout = (packageType: string) => {
     setError(null);
     router.push(`/checkout?packages=${encodeURIComponent(packageType)}${selectedCvId ? `&cvId=${encodeURIComponent(selectedCvId)}` : ""}`);
+  };
+
+  /**
+   * Pintasan dari bagian pemakaian ke daftar paket. Section-nya diberi sorotan
+   * singkat supaya mata langsung tahu ke mana harus pilih, lalu sorotannya
+   * hilang sendiri.
+   */
+  const jumpToPackages = () => {
+    setHighlightBuy(true);
+    buySectionRef.current?.scrollIntoView({ block: "start" });
+    const timer = setTimeout(() => setHighlightBuy(false), 4000);
+    return () => clearTimeout(timer);
   };
 
   // Build limits display: merge usage with limits from API
@@ -261,7 +301,17 @@ export default function SettingsBillingPage() {
 
             {/* Usage */}
             <div>
-              <h3 className="font-label-bold text-on-surface mb-4">{t("billing.usage-title")}</h3>
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <h3 className="font-label-bold text-on-surface">{t("billing.usage-title")}</h3>
+                <button
+                  type="button"
+                  onClick={jumpToPackages}
+                  className="inline-flex min-h-11 items-center gap-2 px-4 rounded-xl border border-primary/40 text-sm font-semibold text-primary hover:bg-primary/5"
+                >
+                  <span className="material-symbols-outlined text-lg">shopping_bag</span>
+                  {t("billing.jump-to-packages")}
+                </button>
+              </div>
               <div className="space-y-4">
                 <UsageBar
                   label="CV Dibuat"
@@ -287,103 +337,71 @@ export default function SettingsBillingPage() {
             </div>
 
 {/* Buy Package */}
-            <div className="pt-6 border-t border-outline-variant/30">
+            <div id="beli-paket" ref={buySectionRef} className={`pt-6 border-t scroll-mt-24 ${highlightBuy ? "ring-2 ring-primary/50 rounded-2xl bg-primary/[0.03] px-4 py-4 -mx-4 transition-shadow" : "border-outline-variant/30"}`}>
               <h3 className="font-label-bold text-on-surface mb-1">{t("billing.buy-package")}</h3>
               <p className="text-sm text-on-surface-variant mb-4">{t("billing.buy-package-hint")}</p>
 
               {!catalogLoading && catalogPackages.length === 0 ? (
                 <p className="text-sm text-on-surface-variant">{t("billing.empty-catalog")}</p>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {catalogPackages.map((pkg) => {
-                    const benefits = packageBenefits(pkg);
-                    const highlighted = pkg.monthly;
-                    const needsCv = pkg.key === "single_cv";
+                <div className="space-y-8">
+                  {(["single", "monthly"] as const).map((group) => {
+                    const inGroup = catalogPackages.filter((pkg) => packageGroup(pkg) === group);
+                    if (inGroup.length === 0) return null;
                     return (
-                      <div
-                        key={pkg.key}
-                        className={`relative p-5 rounded-xl transition-all overflow-hidden ${
-                          highlighted
-                            ? "border-2 border-primary/30 bg-primary-fixed/5 group hover:border-primary/60"
-                            : "border border-outline-variant/30 hover:border-secondary/40 group"
-                        }`}
-                      >
-                        {highlighted && (
-                          <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-10 -mt-10" />
-                        )}
-                        <div className="relative z-10">
-                          <div className="flex items-center gap-2 mb-2">
-                            <span
-                              className={`material-symbols-outlined ${highlighted ? "text-primary" : "text-secondary"}`}
-                            >
-                              {pkg.monthly ? "workspace_premium" : "sell"}
-                            </span>
-                            <h4 className="font-label-bold text-on-surface">{pkg.name}</h4>
-                            {pkg.monthly && (
-                              <span className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface-variant">
-                                {t("billing.badge-rutin")}
-                              </span>
-                            )}
-                          </div>
-
-                          <p className={`text-2xl font-bold mb-1 ${highlighted ? "text-primary" : "text-secondary"}`}>
-                            {formatRupiah(pkg.price)}
-                            <span className="text-sm font-normal text-on-surface-variant ml-1">
-                              {periodLabel(pkg, t)}
-                            </span>
+                      <section key={group} className="space-y-4">
+                        <div>
+                          <h4 className="font-label-bold text-on-surface">
+                            {t(group === "monthly" ? "billing.group.monthly" : "billing.group.single")}
+                          </h4>
+                          <p className="text-xs text-on-surface-variant">
+                            {t(group === "monthly" ? "billing.group.monthly-hint" : "billing.group.single-hint")}
                           </p>
-
-                          {benefits.length > 0 && (
-                            <ul className="space-y-1.5 mb-4">
-                              {benefits.map((benefit) => (
-                                <li
-                                  key={benefit.key}
-                                  className="flex items-center gap-2 text-sm text-on-surface-variant"
-                                >
-                                  <span className="material-symbols-outlined text-green-600 text-[16px]">
-                                    check
-                                  </span>
-                                  {benefitLabel(benefit, t)}
-                                </li>
-                              ))}
-                              {pkg.maxActivePortfolios > 0 && (
-                                <li className="flex items-center gap-2 text-sm text-on-surface-variant">
-                                  <span className="material-symbols-outlined text-green-600 text-[16px]">
-                                    check
-                                  </span>
-                                  {pkg.maxActivePortfolios} {t("billing.period.portfolio")}
-                                </li>
-                              )}
-                            </ul>
-                          )}
-
-                          <button
-                            onClick={() => (needsCv ? handleSingleCvClick() : goToCheckout(pkg.key))}
-                            disabled={checkoutLoading === pkg.key}
-                            className={`w-full py-3 font-label-bold rounded-xl hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-60 flex items-center justify-center gap-2 ${
-                              highlighted
-                                ? "bg-primary text-on-primary"
-                                : "bg-secondary text-on-secondary"
-                            }`}
-                          >
-                            {checkoutLoading === pkg.key ? (
-                              <>
-                                <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-                                {t("billing.processing")}
-                              </>
-                            ) : (
-                              t("billing.buy-now")
-                            )}
-                          </button>
                         </div>
-                      </div>
+
+                        {group === "single"
+                          ? SINGLE_PRODUCT_ORDER.map((product) => {
+                              const inProduct = inGroup.filter((pkg) => singleProductOf(pkg.key) === product);
+                              if (inProduct.length === 0) return null;
+                              return (
+                                <div key={product} className="space-y-2">
+                                  <h5 className="text-xs font-semibold uppercase tracking-wide text-on-surface-variant">
+                                    {t(`billing.product.${product}`)}
+                                  </h5>
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {inProduct.map((pkg) => (
+                                      <PackageCard t={t}
+                                        key={pkg.key}
+                                        pkg={pkg}
+                                        onBuy={pkg.key === "single_cv" ? handleSingleCvClick : () => goToCheckout(pkg.key)}
+                                        busy={checkoutLoading === pkg.key}
+                                      />
+                                    ))}
+                                  </div>
+                                </div>
+                              );
+                            })
+                          : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {inGroup.map((pkg) => (
+                                <PackageCard t={t}
+                                  key={pkg.key}
+                                  pkg={pkg}
+                                  onBuy={() => goToCheckout(pkg.key)}
+                                  busy={checkoutLoading === pkg.key}
+                                  highlighted
+                                />
+                              ))}
+                            </div>
+                          )}
+                      </section>
                     );
                   })}
                 </div>
               )}
             </div>
 
-            {/* Billing History */}
+{/* Billing History */}
             {data?.payments.history && data.payments.history.length > 0 && (
               <div className="pt-6 border-t border-outline-variant/30">
                 <h3 className="font-label-bold text-on-surface mb-4">{t("billing.billing-history")}</h3>
@@ -433,7 +451,7 @@ export default function SettingsBillingPage() {
         )}
       </section>
 
-      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Single CV Picker Modal Ã¢â€â‚¬Ã¢â€â‚¬ */}
+      {/* Single CV Picker Modal */}
       {showCvPicker && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onClick={(e) => { if (e.target === e.currentTarget) setShowCvPicker(false); }}>
           <div className="bg-surface-container-lowest rounded-2xl shadow-xl w-full max-w-md overflow-hidden" onClick={(e) => e.stopPropagation()}>
@@ -507,6 +525,41 @@ onClick={() => {
         </div>
       )}
 
+      {/* Konfirmasi top-up sukses. Muncul sekali per pembayaran, lalu ditutup
+          sendiri supaya tidak menghalangi pemakaian halaman. */}
+      {topupDone && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setTopupDone(null)}
+        >
+          <div
+            className="w-full max-w-sm rounded-2xl bg-surface-container-lowest border border-outline-variant/30 shadow-soft p-6"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="w-12 h-12 rounded-xl bg-green-600/10 text-green-600 flex items-center justify-center mb-4">
+              <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+                check_circle
+              </span>
+            </div>
+            <h3 className="font-headline-lg text-lg font-bold text-on-surface">{t("billing.topup-done-title")}</h3>
+            <p className="text-sm text-on-surface-variant mt-1">{t("billing.topup-done-desc")}</p>
+            <div className="mt-4 flex items-center justify-between rounded-xl bg-surface-container px-4 py-3">
+              <span className="text-sm text-on-surface-variant">{topupDone.packageType}</span>
+              <span className="font-bold text-on-surface">Rp{topupDone.amount.toLocaleString("id-ID")}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setTopupDone(null)}
+              className="mt-4 w-full py-3 rounded-xl bg-primary text-on-primary font-bold"
+            >
+              {t("billing.continue")}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* How to Pay Info */}
       <section className="bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/30 p-6">
         <div className="flex items-start gap-4">
@@ -542,7 +595,7 @@ function UsageBar({
       <div className="flex justify-between text-sm mb-1">
         <span className="font-label-bold text-on-surface">{label}</span>
         <span className="text-on-surface-variant">
-          {isUnlimited ? `${used} / Ã¢Ë†Å¾` : `${used}/${total}`}
+          {isUnlimited ? `${used} / \u221E` : `${used}/${total}`}
         </span>
       </div>
       <div className="w-full h-2.5 bg-surface-container-high rounded-full overflow-hidden">

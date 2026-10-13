@@ -53,6 +53,38 @@ export function formatRupiah(value: number): string {
   return `Rp${value.toLocaleString("id-ID")}`;
 }
 
+/**
+ * Pengelompokan paket supaya pembeli tidak perlu menebak bedanya.
+ *
+ * Dua kelompok besar: paket satuan (dibeli sekali untuk satu kebutuhan) dan
+ * paket bulanan (langganan). Paket satuan dikelompokkan lagi per produk supaya
+ * yang dicari CV tidak tenggelam di antara paket lain.
+ */
+export type PackageGroup = "single" | "monthly";
+
+/** Produk untuk mengelompokkan paket satuan. */
+export type SingleProduct = "cv" | "checker" | "portfolio" | "writing";
+
+const SINGLE_PRODUCT_BY_KEY: Record<string, SingleProduct> = {
+  cv_starter: "cv",
+  cv_ai_generate: "cv",
+  single_cv: "cv",
+  cv_analyzer: "checker",
+  portfolio_web: "portfolio",
+};
+
+export function packageGroup(pkg: { key: string; monthly?: boolean }): PackageGroup {
+  // Bulanan selalu jadi kelompok langganan; sisanya paket satuan.
+  return pkg.monthly ? "monthly" : "single";
+}
+
+export function singleProductOf(key: string): SingleProduct {
+  return SINGLE_PRODUCT_BY_KEY[key] ?? "writing";
+}
+
+/** Urutan tampil paket satuan: CV dulu karena paling dicari. */
+export const SINGLE_PRODUCT_ORDER: readonly SingleProduct[] = ["cv", "checker", "portfolio", "writing"];
+
 /** Label fitur untuk daftar isi paket. Satu nama fitur = satu baris benefits. */
 const FEATURE_ORDER: readonly string[] = [
   "ai_cv_generate",
