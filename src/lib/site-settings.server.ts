@@ -8,7 +8,7 @@ import { siteSettings } from "@/db/schema";
 
 export const SITE_SETTING_DEFAULTS: Record<string, string> = {
   site_name: "AI Career Hub",
-  contact_email: "support@aicareerhub.com",
+  contact_email: "aicareerhub@gmail.com",
   contact_whatsapp: "",
   social_handle: "@aicareerhub",
   social_instagram: "",

@@ -11,8 +11,8 @@ const SECTIONS = [
   {
     title: "Siapa pengelolanya",
     body: [
-      "Kebijakan ini menjelaskan cara [ISI: nama badan atau nama resmi produk] (dalam dokumen ini disebut “pengelola data”) mengelola data pribadi Anda di AI Career Hub.",
-      "Pertanyaan mengenai kebijakan ini bisa dikirim ke [ISI: email resmi untuk privasi dan hak data].",
+      "Kebijakan ini menjelaskan cara [ISI: nama badan atau PT pemilik produk; sementara memakai nama produk] AI Career Hub (dalam dokumen ini disebut “pengelola data”) mengelola data pribadi Anda di AI Career Hub.",
+      "Pertanyaan mengenai kebijakan ini bisa dikirim ke aicareerhub@gmail.com.",
     ],
   },
   {
@@ -28,10 +28,10 @@ const SECTIONS = [
   {
     title: "Pemrosesan AI dan pihak ketiga",
     body: [
-      "Untuk menghasilkan CV, cover letter, atau deskripsi proyek, teks yang Anda kirim ke fitur AI diteruskan ke penyedia AI kami, yaitu [ISI: konfirmasi nama penyedia AI dan negara lokasi pemrosesannya — saat ini DeepSeek lewat endpoint OpenAI-compatible].",
+      "Untuk menghasilkan CV, cover letter, atau deskripsi proyek, teks yang Anda kirim ke fitur AI diteruskan ke penyedia AI kami, yaitu DeepSeek, lewat endpoint OpenAI-compatible [ISI: negara lokasi pemrosesan data AI].",
       "Kami hanya mengirim potongan teks yang memang dibutuhkan fitur tersebut, bukan seluruh data akun Anda.",
       "Login memakai Google OAuth. Data yang dibagikan ke Google saat login adalah nama, email, dan foto profil, sesuai izin yang Anda berikan di layar persetujuan Google.",
-      "Data disimpan di [ISI: nama penyedia hosting dan negara lokasi datanya — saat ini Neon].",
+      "Data disimpan di Neon [ISI: negara lokasi data yang disimpan].",
       "Pembayaran diproses oleh Midtrans. Kami tidak menerima atau menyimpan nomor kartu Anda.",
     ],
   },
@@ -57,9 +57,9 @@ const SECTIONS = [
     title: "Berapa lama data disimpan",
     body: [
       "Data akun dan portofolio: disimpan selama akun Anda aktif.",
-      "Dokumen CV dan data portofolio pada paket berbayar: disimpan [ISI: masa simpan setelah paket habis, contoh 30 hari setelah paket berakhir].",
+      "Dokumen CV dan data portofolio pada paket berbayar: disimpan 30 hari setelah paket berakhir.",
       "Catatan penggunaan dan pembayaran: disimpan sesuai kewajiban pencatatan yang berlaku.",
-      "Akun yang tidak aktif selama [ISI: jangka waktu tidak aktif sebelum akun dihapus otomatis] dapat dihapus otomatis.",
+      "Akun yang tidak aktif selama 100 hari dapat dihapus otomatis.",
     ],
   },
   {
@@ -81,12 +81,18 @@ const SECTIONS = [
     ],
   },
   {
+    title: "Usia pengguna",
+    body: [
+      "Layanan ini ditujukan untuk pengguna dewasa. Usia minimum yang kami tetapkan: [ISI: batas usia minimum, contoh 17 tahun atau 18 tahun].",
+    ],
+  },
+  {
     title: "Keamanan",
     body: [
       "Password tidak pernah disimpan. Login memakai Google OAuth.",
       "Koneksi ke situs memakai HTTPS.",
       "Akses ke basis data dibatasi pada server aplikasi.",
-      "Tidak ada sistem yang bebas dari risiko. Jika Anda menemukan kebocoran data yang berkaitan dengan akun Anda, laporkan ke [ISI: email pengaduan kebocoran].",
+      "Tidak ada sistem yang bebas dari risiko. Jika Anda menemukan kebocoran data yang berkaitan dengan akun Anda, laporkan ke aicareerhub@gmail.com.",
     ],
   },
   {

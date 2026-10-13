@@ -24,8 +24,22 @@ describe("halaman legal & publik: sinkron dengan produk", () => {
   });
 
   it("privacy menandai fakta yang harus diisi pemilik produk", () => {
-    const marks = privacy.match(/\[ISI:[^\]]+\]/g) ?? [];
-    expect(marks.length, "l Expect 5 titik [ISI:...] di privacy").toBeGreaterThanOrEqual(4);
+    const marks = (privacy.match(/\[ISI:[^\]]+\]/g) ?? []).filter((m) => !m.includes("…"));
+    // Sisa yang boleh terbuka hanya empat: nama badan, negara pemrosesan AI,
+    // negara hosting, dan batas usia. Email serta retensi sudah diisi pemilik.
+    expect(marks.length, "Expect 4 titik [ISI:...] tersisa di privacy").toBe(4);
+  });
+
+  it("email resmi dan masa retensi sudah terisi", () => {
+    expect(privacy).toContain("aicareerhub@gmail.com");
+    expect(privacy).toContain("30 hari setelah paket berakhir");
+    expect(privacy).toContain("100 hari");
+  });
+
+  it("halaman kontak memakai email yang bisa dihubungi, bukan domain mati", () => {
+    const settings = read("src/lib/site-settings.server.ts");
+    expect(settings).toContain("aicareerhub@gmail.com");
+    expect(settings).not.toContain("support@aicareerhub.com");
   });
 
   it("privacy jujur soal portofolio yang dipublikasikan", () => {
