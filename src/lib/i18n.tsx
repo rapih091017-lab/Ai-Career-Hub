@@ -851,6 +851,8 @@ const DICT: Record<string, { id: string; en: string }> = {
   "billing.ai-revisions": { id: "AI Smart Revision", en: "AI Smart Revision" },
   "billing.ai-suggestions": { id: "AI Suggestions", en: "AI Suggestions" },
   "billing.buy-package": { id: "Beli Paket", en: "Buy Package" },
+  "billing.buy-package-hint": { id: "Paket di bawah ini adalah daftar lengkap. Paket satuan cocok untuk satu kali kebutuhan; paket bulanan untuk pemakaian rutin.", en: "The list below is the complete catalog. Single-use packages fit one need; monthly packages fit regular use." },
+  "billing.badge-rutin": { id: "Untuk pemakaian rutin", en: "For regular use" },
   "billing.premium-pass-title": { id: "Premium Pass 30 Hari", en: "Premium Pass 30 Days" },
   "billing.premium-pass-subtitle": { id: "Unlimited CV builds, checker checks, AI revisions, dan AI suggestions.", en: "Unlimited CV builds, checker checks, AI revisions, and AI suggestions." },
   "billing.buy-now": { id: "Beli Sekarang", en: "Buy Now" },

@@ -302,7 +302,8 @@ export default function SettingsBillingPage() {
 
             {/* Buy Package */}
             <div className="pt-6 border-t border-outline-variant/30">
-              <h3 className="font-label-bold text-on-surface mb-4">{t("billing.buy-package")}</h3>
+              <h3 className="font-label-bold text-on-surface mb-1">{t("billing.buy-package")}</h3>
+              <p className="text-sm text-on-surface-variant mb-4">{t("billing.buy-package-hint")}</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Premium Pass */}
                 <div className="relative p-5 rounded-xl border-2 border-primary/30 bg-primary-fixed/5 overflow-hidden group hover:border-primary/60 transition-all">
@@ -311,6 +312,9 @@ export default function SettingsBillingPage() {
                     <div className="flex items-center gap-2 mb-2">
                       <span className="material-symbols-outlined text-primary">workspace_premium</span>
                       <h4 className="font-label-bold text-on-surface">{t("billing.premium-pass-title")}</h4>
+                      <span className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface-variant">
+                        {t("billing.badge-rutin")}
+                      </span>
                     </div>
                     <p className="text-2xl font-bold text-primary mb-1">
                       {formatRupiah(catalogPrice("premium_pass_30d", 119000))}
