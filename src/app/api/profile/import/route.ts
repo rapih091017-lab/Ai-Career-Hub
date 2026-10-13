@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { withAuth, apiHandler, errorResponse, logUsage } from "@/lib/api-utils";
 import { callAI, MODELS } from "@/lib/ai/adapter";
 import { PROFILE_IMPORT_PROMPT } from "@/lib/ai/prompts/profile-import-v1";
+import { clampMarkdown } from "@/lib/doc-markdown";
 
 /**
  * POST /api/profile/import
@@ -16,7 +17,6 @@ import { PROFILE_IMPORT_PROMPT } from "@/lib/ai/prompts/profile-import-v1";
  * kecil (satu kali per user, bukan fitur berulang).
  */
 
-const MAX_TEXT_LENGTH = 60000;
 
 const textItem = (max: number) => z.string().catch("").transform((v) => v.trim().slice(0, max));
 const dateText = () => z.string().catch("").transform((v) => v.trim().slice(0, 10));
@@ -115,14 +115,23 @@ export const POST = apiHandler(async (request: NextRequest) => {
     );
   }
 
+  // Potong dengan penanda eksplisit. Potongan diam-diam membuat data profil
+  // terlihat lengkap padahal isinya belum.
+  const clamped = clampMarkdown(text);
+  if (clamped.truncated) {
+    console.warn(
+      `[profile/import] teks ${text.length} karakter melebihi batas dan dipotong. Data akhir mungkin kurang lengkap.`
+    );
+  }
+
   let aiResult: unknown;
   try {
     aiResult = await callAI<unknown>({
       systemPrompt: PROFILE_IMPORT_PROMPT,
-      userPrompt: text.slice(0, MAX_TEXT_LENGTH),
+      userPrompt: clamped.text,
       temperature: 0.1,
       model: MODELS.CHAT,
-      maxTokens: 4096,
+      maxTokens: 8192,
     });
   } catch (err) {
     console.error("[profile/import] AI gagal:", err instanceof Error ? err.message : err);

@@ -7,6 +7,8 @@ let nextConfig: NextConfig = {
     "@napi-rs/canvas",
     "puppeteer-core",
     "@sparticuz/chromium",
+    "@firecrawl/anydoc",
+    "mammoth",
   ],
 
   // Optimasi gambar: remotePatterns untuk CDN eksternal

@@ -1,4 +1,5 @@
 import { ocrImage } from "@/lib/ocr";
+import { docToMarkdown } from "@/lib/doc-markdown";
 
 /**
  * Fallback DOMMatrix/ImageData minimal untuk pdfjs-dist di runtime tanpa DOM.
@@ -137,6 +138,12 @@ async function extractPdfWithPdfjs(buffer: ArrayBuffer): Promise<{
       useSystemFonts: true,
     }).promise;
 
+    // Dokumen 500 halaman diproses penuh hanya memperlambat dan menghabiskan
+    // kuota; CV nyata berhenti di 1-3 halaman.
+    if (pdf.numPages > MAX_PDF_PAGES) {
+      throw Object.assign(new Error("PDF_TOO_MANY_PAGES"), { pages: pdf.numPages });
+    }
+
     let fullText = "";
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
@@ -206,14 +213,24 @@ async function extractPdfWithPdfjs(buffer: ArrayBuffer): Promise<{
 }
 
 /**
- * Coba ekstrak teks dari DOCX menggunakan mammoth.
+ * Baca DOCX menjadi Markdown.
+ *
+ * AnyDoc mengembalikan struktur sungguhan (judul, daftar, tabel) dan membuang
+ * markup yang tidak berguna, jadi Structured Output lebih akurat dan token
+ * lebih hemat. Mammoth hanya menghasilkan teks polos, yang membuat CV
+ * dua-kolom berantakan.
  */
 async function extractDocx(buf: ArrayBuffer): Promise<string> {
-  const mammoth = await import("mammoth");
-  // mammoth expects a Node.js Buffer, not ArrayBuffer
-  const nodeBuffer = Buffer.from(buf);
-  const result = await mammoth.extractRawText({ buffer: nodeBuffer });
-  return result.value.trim();
+  const result = await docToMarkdown(Buffer.from(buf));
+  if (result.ok) return result.markdown.trim();
+  // NeedsOcr berarti dokumennya sah, tapi isinya gambar.isons Caller yang
+  // dijelaskan ke pengguna bahwa perlu paste manual atau OCR.
+  if (result.reason === "needsOcr") {
+    const err = new Error("DOKUMEN_PERLU_OCR") as Error & { pages?: number[] };
+    err.pages = "pages" in result ? result.pages : [];
+    throw err;
+  }
+  throw new Error(result.message);
 }
 
 /* ── Helpers ── */
@@ -248,6 +265,16 @@ function buildErrorResponse(
   return Response.json({ error: errorCode, message, ...extras }, { status: 400 });
 }
 
+/**
+ * Batas keras unggahan.
+ *
+ * Route ini mem-parsing PDF dan menjalankan OCR; tanpa batas, satu permintaan
+ * bisa membuat fungsi/serverless kehabisan memori atau waktu.
+ */
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+/** PDF 500 halaman akan diproses penuh; itu tidak berguna untuk satu CV. */
+const MAX_PDF_PAGES = 40;
+
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
@@ -255,6 +282,15 @@ export async function POST(request: Request) {
 
     if (!file || !(file instanceof File)) {
       return buildErrorResponse("INVALID_REQUEST", "File tidak ditemukan");
+    }
+
+    // Diperiksa sebelum file dibaca ke memori, bukan sesudahnya.
+    if (file.size > MAX_UPLOAD_BYTES) {
+      return buildErrorResponse(
+        "FILE_TOO_LARGE",
+        `Ukuran file maksimal ${Math.round(MAX_UPLOAD_BYTES / 1024 / 1024)} MB.`,
+        { suggestOcr: true }
+      );
     }
 
     // ── Detect file type ──
@@ -298,7 +334,7 @@ export async function POST(request: Request) {
 
     const rawArrayBuffer = await file.arrayBuffer();
 
-    // ── DOCX: langsung pakai mammoth ──
+    // ── DOCX: dibaca AnyDoc jadi Markdown ──
     if (fileType === "docx") {
       try {
         const textResult = await extractDocx(rawArrayBuffer);
@@ -317,10 +353,14 @@ export async function POST(request: Request) {
           format: "docx",
         });
       } catch (docxErr) {
-        console.error("[extract] mammoth failed:", docxErr);
+        const needsOcr =
+          docxErr instanceof Error && docxErr.message === "DOKUMEN_PERLU_OCR";
+        console.error("[extract] DOCX via AnyDoc gagal:", docxErr);
         return buildErrorResponse(
-          "DOCX_PARSE_FAILED",
-          "Gagal membaca file DOCX. Pastikan file bukan hasil scan/gambar atau rusak.",
+          needsOcr ? "SCANNED_DOCX" : "DOCX_PARSE_FAILED",
+          needsOcr
+            ? "Isi file DOCX ini berupa gambar. Salin teksnya dan tempel di kotak analyze, atau kirim versi DOCX yang teksnya bisa diseleksi."
+            : "Gagal membaca file DOCX. Pastikan file bukan hasil scan/gambar atau rusak.",
           { suggestPaste: true }
         );
       }

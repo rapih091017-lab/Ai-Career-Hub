@@ -1604,6 +1604,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "builder.ai-revise-title": { id: "Optimalkan, Ringkasan Profesional", en: "Optimize, Professional Summary" },
   "builder.pdf-quota": { id: "Kuota PDF habis Â· Upgrade untuk unlimited", en: "PDF quota exhausted Â· Upgrade for unlimited" },
   "builder.pdf-export-failed": { id: "Gagal mengekspor PDF", en: "Failed to export PDF" },
+  "builder.pdf-export-success": { id: "PDF berhasil diunduh", en: "PDF downloaded" },
   "builder.pdf-export-error": { id: "Gagal mengekspor PDF. Silakan coba lagi.", en: "Failed to export PDF. Please try again." },
   "builder.save-success": { id: "CV berhasil disimpan!", en: "CV saved successfully!" },
   "builder.save-failed": { id: "Gagal menyimpan", en: "Failed to save" },

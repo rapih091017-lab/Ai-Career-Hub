@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "motion/react";
 import AppHeader from "@/components/AppHeader";
 import AuthGuard from "@/components/AuthGuard";
 import { AtsBaseRenderer, TEMPLATE_STYLES, type CvData } from "@/components/cv-templates";
-import { exportPdfViaServer } from "@/lib/pdf-export";
+import { downloadCvPdf } from "@/lib/pdf/generate-cv-pdf";
 import dynamic from "next/dynamic";
 const AIProposalModal = dynamic(() => import("@/components/AIProposalModal"), { ssr: false });
 import { useToast } from "@/components/ui/toast";
@@ -42,7 +42,7 @@ const STEP_KEYS = [
   "builder.step-review",
 ];
 
-/* ───────── component ───────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ component â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 export default function BuilderPage() {
   const params = useParams();
@@ -56,16 +56,16 @@ export default function BuilderPage() {
   const [collapsedWorkIds, setCollapsedWorkIds] = useState<Set<string>>(new Set());
   const { addToast } = useToast();
 
-  /* ── Data Fetch ── */
+  /* â”€â”€ Data Fetch â”€â”€ */
   const { cvData, isLoading, fetchError, selectedTemplateId, setCvData, setSelectedTemplateId } = useFetchCvData(cvId);
 
-  /* ── Auto-Save ── */
+  /* â”€â”€ Auto-Save â”€â”€ */
   const { saveStatus, lastSaved } = useAutoSave(cvId, cvData);
 
-  /* ── Format Settings Hook ── */
+  /* â”€â”€ Format Settings Hook â”€â”€ */
   const format = useBuilderFormat({ cvId });
 
-  /* ── Compute margin & page dimensions ── */
+  /* â”€â”€ Compute margin & page dimensions â”€â”€ */
   const contentRef = useRef<HTMLDivElement>(null);
   const [allPageCount, setAllPageCount] = useState(1);
   const previewRef = useRef<HTMLDivElement>(null);
@@ -106,10 +106,10 @@ export default function BuilderPage() {
     };
   });
 
-  /* ── AI & Scoring Hook ── */
+  /* â”€â”€ AI & Scoring Hook â”€â”€ */
   const ai = useBuilderAI({ cvData, setCvData, cvId, activeStep, setActiveStep, addToast });
 
-  /* ── CRUD Helpers Hook ── */
+  /* â”€â”€ CRUD Helpers Hook â”€â”€ */
   const helpers = useBuilderHelpers({ setCvData, setCustomSections: format.setCustomSections, setSectionOrder: format.setSectionOrder });
 
   const {
@@ -140,41 +140,34 @@ export default function BuilderPage() {
 
 
 
-  /* ── PDF Export ── */
+  /* â”€â”€ PDF Export â”€â”€ */
 
   const handleExportPdf = async () => {
-    if (!previewRef.current) return;
-    const el = previewRef.current;
     setIsPdfExporting(true);
     try {
-      const result = await exportPdfViaServer(
-        el,
-        `${cvData.fullName || "CV"}_AI_Career_Hub.pdf`,
-        marginPadding,
-        contentAreaMm
-      );
-      if (!result.ok) {
-        if (result.redirectUrl) {
-          addToast({ 
-            type: "warning", 
-            message: result.error || t("builder.pdf-quota") 
-          });
-          setTimeout(() => router.push(result.redirectUrl!), 1500);
-        } else {
-          addToast({ type: "error", message: result.error || t("builder.pdf-export-failed") });
-        }
-      } else if (result.usedFallback) {
-        // Server PDF tidak tersedia; dialog cetak dibuka untuk hasil teks.
-        addToast({
-          type: "warning",
-          message: "Server PDF sedang sibuk, jadi dialog cetak dibuka. Pilih 'Save as PDF' untuk file teks yang bisa dibaca ATS.",
-        });
-      } else {
-        addToast({ type: "success", message: "PDF teks berhasil diunduh!" });
-      }
+      // PDF dibuat di peramban dengan @react-pdf/renderer: teks asli yang bisa
+      // dibaca ATS, tanpa server Chromium dan tanpa dialog cetak.
+      await downloadCvPdf({ ...cvData, customSections } as CvData, {
+        fileName: `${cvData.fullName || "CV"}_AI_Career_Hub.pdf`,
+        marginMm: marginPadding,
+        sectionOrder: sectionOrder.filter((key) => sectionVisibility[key] !== false),
+        templateStyle: {
+          ...(TEMPLATE_STYLES[selectedTemplateId] || TEMPLATE_STYLES["industrial-pro"]),
+          bodySize: fontSize,
+          bodyFont: fontFamily,
+          headingFont: fontFamily,
+          textAlign,
+          ...(customPrimaryColor ? { primary: customPrimaryColor, sectionTitle: customPrimaryColor } : {}),
+        },
+        showDividers,
+        headerLayout,
+        lineHeight: spacingMode === "compact" ? 1.3 : spacingMode === "spacious" ? 1.8 : 1.5,
+        lang: cvData.cvLang,
+      });
+      addToast({ type: "success", message: t("builder.pdf-export-success") });
     } catch (err) {
       console.error("PDF Export Error:", err);
-      addToast({ type: "error", message: t("builder.pdf-export-error") });
+      addToast({ type: "error", message: t("builder.pdf-export-failed") });
     } finally {
       setIsPdfExporting(false);
     }
@@ -182,7 +175,7 @@ export default function BuilderPage() {
 
 
 
-  /* ── save ── */
+  /* â”€â”€ save â”€â”€ */
 
   const handleSave = useCallback(async () => {
     setIsSaving(true);
@@ -201,7 +194,7 @@ export default function BuilderPage() {
     }
   }, [cvId, cvData, addToast, t]);
 
-  /* ── section title helper ── */
+  /* â”€â”€ section title helper â”€â”€ */
 
   const sectionMeta = [
     { title: t("builder.step-personal"), desc: t("builder.desc-personal"), icon: "person" },
@@ -217,7 +210,7 @@ export default function BuilderPage() {
 
 
 
-  /* ── Keyboard Shortcuts ── */
+  /* â”€â”€ Keyboard Shortcuts â”€â”€ */
   const handleSaveRef = useRef(handleSave);
   handleSaveRef.current = handleSave;
   const isSavingRef = useRef(isSaving);
@@ -225,7 +218,7 @@ export default function BuilderPage() {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      // Ctrl+Enter → Save (with guard against double-save)
+      // Ctrl+Enter â†’ Save (with guard against double-save)
       if (e.ctrlKey && e.key === 'Enter') {
         e.preventDefault();
         if (!isSavingRef.current) {
@@ -245,12 +238,12 @@ export default function BuilderPage() {
           target.isContentEditable);
       if (typing) return;
 
-      // Ctrl+ArrowLeft → Previous step
+      // Ctrl+ArrowLeft â†’ Previous step
       if (e.ctrlKey && e.key === 'ArrowLeft') {
         e.preventDefault();
         setActiveStep((s) => Math.max(0, s - 1));
       }
-      // Ctrl+ArrowRight → Next step
+      // Ctrl+ArrowRight â†’ Next step
       if (e.ctrlKey && e.key === 'ArrowRight') {
         e.preventDefault();
         setActiveStep((s) => Math.min(6, s + 1));
@@ -260,26 +253,26 @@ export default function BuilderPage() {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
-  /* ── loading / error ── */
+  /* â”€â”€ loading / error â”€â”€ */
 
   if (isLoading) return <BuilderLoadingSkeleton />;
   if (fetchError) return <BuilderErrorState message={fetchError} />;
 
-  /* ── main render ── */
+  /* â”€â”€ main render â”€â”€ */
 
   return (
     <AuthGuard>
       <div className="h-[100dvh] flex flex-col bg-background">
         <AppHeader />
 
-        {/* ── STEPPER (connector lines style) ── */}
+        {/* â”€â”€ STEPPER (connector lines style) â”€â”€ */}
         <div className="w-full bg-surface-container-lowest border-b border-outline-variant/30 py-4 md:py-5 px-3 md:px-8 overflow-x-auto shrink-0">
           <StepperSteps steps={steps} activeStep={activeStep} setActiveStep={setActiveStep} sectionCompletion={sectionCompletion} sectionMeta={sectionMeta} />
         </div>
 
-        {/* ── WORKSPACE LAYOUT ── */}
+        {/* â”€â”€ WORKSPACE LAYOUT â”€â”€ */}
         <div className="flex-1 flex flex-col lg:flex-row overflow-hidden h-auto lg:h-[calc(100vh-64px-80px)]">
-          {/* ── LEFT PANEL ── */}
+          {/* â”€â”€ LEFT PANEL â”€â”€ */}
           <div className="w-full lg:w-1/2 bg-background border-b lg:border-b-0 lg:border-r border-outline-variant/30 overflow-y-auto custom-scrollbar">
             <div className="px-6 pt-8 pb-4 flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
@@ -294,7 +287,7 @@ export default function BuilderPage() {
                 </p>
               </div>
             </div>
-            {/* ── AI Keyword Suggestions Banner ── */}
+            {/* â”€â”€ AI Keyword Suggestions Banner â”€â”€ */}
             {aiJdKeywords && aiJdKeywords.length > 0 && activeStep !== 1 && activeStep !== 6 && (
               <div className="flex flex-wrap items-center gap-2 px-1 py-2 mb-2 bg-primary/5 border border-primary/10 rounded-xl">
                 <div className="flex items-center gap-1.5 text-[11px] font-semibold text-primary shrink-0">
@@ -523,9 +516,9 @@ export default function BuilderPage() {
             </AnimatePresence>
           </div>
 
-          {/* ── RIGHT PANEL ── */}
+          {/* â”€â”€ RIGHT PANEL â”€â”€ */}
           <div className="w-full lg:w-1/2 flex flex-col bg-surface-dim/20 relative overflow-hidden h-full">
-            {/* ── FORMATTING TOOLBAR ── */}
+            {/* â”€â”€ FORMATTING TOOLBAR â”€â”€ */}
             <FormatToolbar
               cvCompleteness={cvCompleteness}
               saveStatus={saveStatus}
@@ -547,7 +540,7 @@ export default function BuilderPage() {
               onExportPdf={handleExportPdf}
             />
 
-            {/* ── PREVIEW AREA, scrollable continuous with page break indicators ── */}
+            {/* â”€â”€ PREVIEW AREA, scrollable continuous with page break indicators â”€â”€ */}
             <div className="flex-1 flex flex-col items-center bg-surface-dim/20 custom-scrollbar" style={{ minHeight: 0, overflowY: 'auto' }}>
               <div className="w-full max-w-[210mm] px-[15mm] py-4 md:py-6">
                 {/* Page count badge */}
@@ -659,7 +652,7 @@ export default function BuilderPage() {
           </div>
         </div>
 
-        {/* ── AI PROPOSAL MODAL ── */}
+        {/* â”€â”€ AI PROPOSAL MODAL â”€â”€ */}
         <AIProposalModal
           open={aiModal.open}
           onClose={() => setAiModal((prev) => ({ ...prev, open: false }))}
@@ -673,7 +666,7 @@ export default function BuilderPage() {
           onAccept={aiModal.onAccept}
         />
 
-        {/* ── SECTION ORDER MODAL ── */}
+        {/* â”€â”€ SECTION ORDER MODAL â”€â”€ */}
         <SectionOrderModal
           open={showSectionOrderModal}
           onClose={() => setShowSectionOrderModal(false)}
@@ -684,7 +677,7 @@ export default function BuilderPage() {
           onMoveDown={moveSectionDown}
         />
 
-        {/* ── DISPLAY SETTINGS MODAL ── */}
+        {/* â”€â”€ DISPLAY SETTINGS MODAL â”€â”€ */}
         <DisplaySettingsModal
           open={showDisplaySettings}
           customPrimaryColor={customPrimaryColor}
@@ -702,7 +695,7 @@ export default function BuilderPage() {
           }
         />
 
-        {/* ── BOTTOM NAV ── */}
+        {/* â”€â”€ BOTTOM NAV â”€â”€ */}
         <BottomNav steps={steps} activeStep={activeStep} setActiveStep={setActiveStep} sectionCompletion={sectionCompletion} sectionMeta={sectionMeta} handleSave={handleSave} isSaving={isSaving} />
       </div>
     </AuthGuard>

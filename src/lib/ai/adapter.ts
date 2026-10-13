@@ -208,6 +208,11 @@ export async function callAI<T = unknown>({
       });
 
       const raw = response.choices[0]?.message?.content ?? "";
+      // Output yang terpotong akan selalu gagal validasi JSON. Menundanya hanya
+      // membuang kuota; lebih baik berhenti dan melaporkannya apa adanya.
+      if (response.choices[0]?.finish_reason === "length") {
+        throw new Error("AI_TRUNCATED_OUTPUT");
+      }
 
       if (isTextMode) {
         // Text mode, return teks mentah (tanpa JSON.parse); retry jika kosong
@@ -225,7 +230,11 @@ export async function callAI<T = unknown>({
     }
 
     if (attempt < maxAttempts - 1) {
-      console.warn(`AI call attempt ${attempt + 1}/${maxAttempts} gagal (${lastError}). Mencoba ulang...`);
+      const delayMs = 400 * 2 ** attempt;
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+      console.warn(
+        `AI call attempt ${attempt + 1}/${maxAttempts} gagal (${lastError}). Coba lagi dalam ${delayMs}ms...`
+      );
     }
   }
 
