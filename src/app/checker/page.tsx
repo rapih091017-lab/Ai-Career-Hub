@@ -28,6 +28,9 @@ export default function CheckerPage() {
   const [file, setFile] = useState<File | null>(null);
   const [jdText, setJdText] = useState("");
   const [roleCategory, setRoleCategory] = useState("general");
+  // "auto" mengikuti jatah paket; "fast" dan "deep"dipilih pengguna.
+  // Tanpa pilihan ini, pembeli paket hanya bisa menunggu model berpikir.
+  const [analyzeMode, setAnalyzeMode] = useState<"auto" | "fast" | "deep">("auto");
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -113,6 +116,7 @@ export default function CheckerPage() {
         jobDescription: jdText.trim(),
         roleCategory,
         lang,
+        mode: analyzeMode,
         originalFileName: file?.name ?? "cv.pdf",
       }),
     });
@@ -129,7 +133,7 @@ export default function CheckerPage() {
       throw new Error(data.message || data.error || t("checker.error-failed"));
     }
     return data as AnalysisResult;
-  }, [jdText, roleCategory, file, lang, t]);
+  }, [jdText, roleCategory, file, lang, analyzeMode, t]);
 
   /* ---- Analyze with pasted text (skip extract) ---- */
   /* ---- OCR (PDF scan / gambar) sepenuhnya di browser, aset lokal ---- */
@@ -517,6 +521,38 @@ export default function CheckerPage() {
                 <p className="text-[11px] text-on-surface-variant ml-1">
                   {t("checker.role-hint")}
                 </p>
+              </div>
+
+              {/* Kecepatan analisis: pilihan nyata, bukan janji kecepatan. */}
+              <div className="flex flex-col gap-2">
+                <span className="text-sm font-semibold text-on-surface-variant ml-1">
+                  {t("checker.mode-label")}
+                </span>
+                <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={t("checker.mode-label")}>
+                  {(
+                    [
+                      { value: "auto", label: t("checker.mode-auto"), hint: t("checker.mode-auto-hint") },
+                      { value: "fast", label: t("checker.mode-fast"), hint: t("checker.mode-fast-hint") },
+                      { value: "deep", label: t("checker.mode-deep"), hint: t("checker.mode-deep-hint") },
+                    ] as const
+                  ).map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      role="radio"
+                      aria-checked={analyzeMode === option.value}
+                      onClick={() => setAnalyzeMode(option.value)}
+                      className={`flex flex-col items-start gap-0.5 rounded-lg border px-3 py-2 text-left transition-colors ${
+                        analyzeMode === option.value
+                          ? "border-primary bg-primary/10"
+                          : "border-outline hover:border-primary/50"
+                      }`}
+                    >
+                      <span className="text-sm font-semibold text-on-surface">{option.label}</span>
+                      <span className="text-[11px] text-on-surface-variant">{option.hint}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {error && (

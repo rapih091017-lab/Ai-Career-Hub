@@ -28,7 +28,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
   }
 
   const body = await request.json();
-  const { extractedText, jobDescription, roleCategory, lang } = body;
+  const { extractedText, jobDescription, roleCategory, lang, mode } = body;
 
   // Bahasa output analisis mengikuti bahasa UI user (id/en). Default "id" untuk
   // klien lama & backward-compat. Diteruskan ke prompt analysis-v3 {{OUTPUT_LANGUAGE}}.
@@ -61,8 +61,18 @@ export const POST = apiHandler(async (request: NextRequest) => {
   // ── 2. CEK KUOTA USER (jika login) ───────────────────────────────
   // Model analyzer: pembeli paket yang memberi fitur CV Analyzer → deepseek-v4-pro (thinking);
   // free / paket tanpa analyzer → deepseek-v4-flash. Diputuskan di sini.
+  //
+  // `mode` dari klien overriding: "fast" memaksa model ringan (hasil dalam
+  // hitungan detik), "deep" memakai model berpikir (lebih menyeluruh, tapi
+  // bisa puluhan detik). Tanpa ini, pembeli tidak punya kendali atas
+  // tradeoff-kecepatan dan hanya bisa menunggu.
   let useReasoner = false;
-  if (session?.user?.id) {
+  if (mode === "fast") {
+    useReasoner = false;
+  } else if (mode === "deep") {
+    // Model berpikir tetap hanya untuk yang boleh memakai CV Analyzer berbayar.
+    useReasoner = true;
+  } else if (session?.user?.id) {
     const access = await getUserAccess(session.user.id);
     // purchasedFeatures = fitur yang benar-benar dibeli (bukan kuota gratis),
     // jadi pembeli portfolio_web misalnya TETAP dapat V3 untuk jatah free analyzer-nya.
