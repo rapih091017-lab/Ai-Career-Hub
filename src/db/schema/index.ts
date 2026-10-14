@@ -17,6 +17,11 @@ export const users = pgTable("users", {
   passwordHash: text("password_hash"),
   image: text("image"),
   status: varchar("status", { length: 20 }).notNull().default("active"),
+  /**
+   * Waktu pengguna melewati (atau memilih melewati) langkah isi profil pertama.
+   * NULL berarti pengguna baru, sehingga popup profil muncul tepat satu kali.
+   */
+  onboardingCompletedAt: timestamp("onboarding_completed_at", { mode: "date" }),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
 });
 

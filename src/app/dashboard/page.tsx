@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { ProfileOnboardingPopup } from "@/components/onboarding/ProfileOnboardingPopup";
 import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
 import AppHeader from "@/components/AppHeader";
@@ -710,8 +711,10 @@ export default function DashboardPage() {
           </div>
         </main>
         <AppFooter bordered />
-        <TemplatePicker isOpen={showTemplatePicker} onClose={() => { if (!isCreating) setShowTemplatePicker(false); }} onSelect={handleCreateCV} isCreating={isCreating} />
+<TemplatePicker isOpen={showTemplatePicker} onClose={() => { if (!isCreating) setShowTemplatePicker(false); }} onSelect={handleCreateCV} isCreating={isCreating} />
         <ConfirmModal confirm={confirmAction} onClose={() => setConfirmAction(null)} />
+        {/* Langkah pertama untuk pengguna baru: isi profil dari LinkedIn atau berkas. */}
+        <ProfileOnboardingPopup onStartImport={() => router.push("/settings/profile?import=1")} />
       </div>
     </AuthGuard>
   );

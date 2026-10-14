@@ -97,6 +97,16 @@ export default function ProfilePage() {
   const [justSaved, setJustSaved] = useState(false);
   const [showImport, setShowImport] = useState(false);
 
+  // Popup langkah pertama membawa pengguna ke sini untuk langsung membuka
+  // importer (tempel LinkedIn atau unggah berkas).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("import") === "1") {
+      setShowImport(true);
+      window.history.replaceState({}, "", "/settings/profile");
+    }
+  }, []);
+
   useEffect(() => {
     fetch("/api/profile")
       .then(async (res) => {
