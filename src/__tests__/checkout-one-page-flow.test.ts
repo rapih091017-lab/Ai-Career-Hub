@@ -12,7 +12,7 @@ const pricingSrc = readFileSync(join(process.cwd(), "src/components/PricingSecti
  * halaman tagihan -> baru diarahkan lagi ke checkout. Dua langkah untuk satu
  * pembelian, dan di tengah jalan muncul halaman yang bukan tempat membeli.
  */
-describe("checkout adalah satu halaman dla purchase", () => {
+describe("checkout adalah satu halaman untuk pembelian", () => {
   it("halaman checkout punya katalog dan keranjang di satu layar", () => {
     expect(checkoutSrc).toContain("<PackageCard");
     expect(checkoutSrc).toContain("Keranjang");
@@ -36,6 +36,6 @@ describe("checkout adalah satu halaman dla purchase", () => {
 
   it("tombol Beli di landing langsung ke checkout, tidak lewat halaman tagihan", () => {
     expect(pricingSrc).not.toContain('href="/settings/billing"');
-    expect(pricingSrc).toContain("/checkout?packages=pro_monthly");
+    expect(pricingSrc).toContain("paket_lamaran");
   });
 });

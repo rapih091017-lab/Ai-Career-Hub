@@ -9,6 +9,7 @@ import { ANALYSIS_PROMPT_V4 } from "@/lib/ai/prompts/analysis-v4";
 import type { AnalysisResult } from "@/lib/ai/prompts/schemas";
 import { apiHandler } from "@/lib/api-utils";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limiter";
+import { checkProCheckAllowance } from "@/lib/fair-use";
 
 export const POST = apiHandler(async (request: NextRequest) => {
   // ── 0. RATE LIMIT ─────────────────────────────────────────────────
@@ -102,13 +103,27 @@ export const POST = apiHandler(async (request: NextRequest) => {
           {
             error: "QUOTA_EXCEEDED",
             message: t(
-              `Batas gratis pengecekan (${cvAnalyzerLimit}x) sudah habis. Upgrade ke Premium untuk unlimited.`,
-              `Free check limit (${cvAnalyzerLimit}x) reached. Upgrade to Premium for unlimited checks.`
+              `Batas mengecek (${cvAnalyzerLimit}x) sudah habis. Paket satuan Cek CV Rp9.000 menambah 1x cek lagi.`,
+              `Check limit (${cvAnalyzerLimit}x) reached. The one-off Check CV package (Rp9,000) adds 1 more check.`
             ),
           },
           { status: 403 },
         );
       }
+    }
+  }
+
+  // ── 2b. BATAS WAJAR MODEL MENDALAM ────────────────────────────────
+  // Paket Pro/Max menjanjikan cek CV tanpa batas, dan itu yang ditulis di
+  // kartu harga. Batas di sini hanya menjaga biaya server: pemakaian di
+  // luar batas dialihkan ke model ringan, bukan diblokir.
+  let fairUse = { allowed: true, used: 0, limit: Number.POSITIVE_INFINITY };
+  let fairUseApplied = false;
+  if (useReasoner && session?.user?.id) {
+    fairUse = await checkProCheckAllowance(session.user.id);
+    if (!fairUse.allowed) {
+      useReasoner = false;
+      fairUseApplied = true;
     }
   }
 
@@ -302,6 +317,20 @@ export const POST = apiHandler(async (request: NextRequest) => {
     resourceId: newResult.id,
   });
 
+  // Catat pemakaian model mendalam terpisah supaya batas wajar per bulan bisa
+  // dihitung dan HPP cek CV bisa dilacak.
+  if (userId && !fairUseApplied) {
+    const wasReasoner = useReasoner;
+    await db
+      .insert(usageLogs)
+      .values({
+        userId,
+        actionType: wasReasoner ? "checker_check_pro" : "checker_check_light",
+        resourceId: newResult.id,
+      })
+      .catch(() => {});
+  }
+
   // ── 9. RETURN ────────────────────────────────────────────────────
   return NextResponse.json(
     {
@@ -313,6 +342,15 @@ export const POST = apiHandler(async (request: NextRequest) => {
       // Hanya dikirim jika AI benar-benar berhasil (aiAnalysis non-null),
       // supaya badge tidak muncul di response fallback tanpa analisis AI.
       aiModel: aiAnalysis ? (useReasoner ? "V4 Pro" : "V4 Flash") : undefined,
+      // Diberi tahu kalau analisis ini memakai model ringan karena jatah
+      // model mendalam bulan ini sudah habis. Analisis tetap jalan.
+      fairUseNote: fairUseApplied
+        ? {
+            used: fairUse.used,
+            limit: fairUse.limit,
+            message: "Analisis ini memakai model ringan karena jatah model mendalam bulan ini sudah habis. Hasil tetap keluar, hanya kurang mendalam.",
+          }
+        : undefined,
       ...aiStructuredData,
     },
     { status: 200 },

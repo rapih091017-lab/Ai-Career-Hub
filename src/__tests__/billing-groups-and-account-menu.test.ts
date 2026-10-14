@@ -17,12 +17,12 @@ describe("daftar paket dikelompokkan", () => {
   });
 
   it("paket satuan dikelompokkan per produk", () => {
-    expect(singleProductOf("cv_starter")).toBe("cv");
-    expect(singleProductOf("cv_ai_generate")).toBe("cv");
-    expect(singleProductOf("single_cv")).toBe("cv");
-    expect(singleProductOf("cv_analyzer")).toBe("checker");
+    expect(singleProductOf("cek_cv")).toBe("checker");
+    expect(singleProductOf("bikin_cv")).toBe("cv");
+    expect(singleProductOf("paket_lamaran")).toBe("cv");
+    expect(singleProductOf("surat_lamaran")).toBe("writing");
     expect(singleProductOf("portfolio_web")).toBe("portfolio");
-    expect(singleProductOf("bundle_hemat")).toBe("writing");
+    expect(singleProductOf("portfolio_web")).toBe("portfolio");
     expect(SINGLE_PRODUCT_ORDER[0]).toBe("cv");
   });
 

@@ -840,17 +840,13 @@ export default function Home() {
       {/* ── Pricing ── */}
       <PricingSection
         onSelectPlan={(planId, mode) => {
+          // Satu langkah ke checkout, paket langsung masuk keranjang. Dulu
+          // plan ini harus lewat halaman tagihan dulu.
           if (planId === "free") {
             router.push("/login");
-          } else if (
-            planId === "cv-starter" || planId === "cv-ai-generate" ||
-            planId === "cv-analyzer" || planId === "portfolio-web" ||
-            planId === "starter" || planId === "pro" || planId === "business"
-          ) {
-            router.push("/settings/billing?plan=" + planId + "&mode=" + mode);
-          } else {
-            router.push("/settings/billing");
+            return;
           }
+          router.push(`/checkout?packages=${encodeURIComponent(planId)}`);
         }}
       />
 

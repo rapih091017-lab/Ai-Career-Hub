@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { DEFAULT_TEMPLATE_ID } from "@/lib/templates";
 import { callAI, MODELS } from "@/lib/ai/adapter";
 import { GENERATOR_PROMPT_V2 } from "@/lib/ai/prompts/generator-v2";
+import { checkQuota, logUsage } from "@/lib/api-utils";
 
 export async function POST(request: NextRequest) {
   const session = await auth();
@@ -18,6 +19,11 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json();
   const { jobTitle, jobDescription, templateId, useProfile = true, rawText, targetLanguage } = body;
+
+  // Generate CV memanggil model AI berbayar dan sebelumnya tidak pernah
+  // dibatasi. free tier punya jatah 2/bulan, paket satuan punya kuota sendiri.
+  const quota = await checkQuota(session.user.id, "cv_build");
+  if (quota instanceof NextResponse) return quota;
 
   // Always fetch profile to get a valid FK id (masterProfileId is NOT NULL in schema)
   const [masterProfile] = await db
@@ -206,6 +212,10 @@ export async function POST(request: NextRequest) {
       templateId: templateId?.trim() || DEFAULT_TEMPLATE_ID,
     })
     .returning();
+
+  // Catat pemakaian setelah CV berhasil dibuat, supaya kuota terpakai untuk
+  // generate yang benar-benar terjadi dan HPP bisa dilacak.
+  await logUsage(session.user.id, "cv_build").catch(() => {});
 
   return NextResponse.json({ ...newDoc, consolidationSuggestion: aiNote }, { status: 201 });
 }

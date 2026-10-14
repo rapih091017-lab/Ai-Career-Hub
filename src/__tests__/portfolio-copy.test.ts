@@ -27,6 +27,6 @@ describe("copy jumlah tema", () => {
     const i18n = readFileSync(join(process.cwd(), "src/lib/i18n.tsx"), "utf8");
     const pricing = readFileSync(join(process.cwd(), "src/components/PricingSection.tsx"), "utf8");
     expect(i18n).toMatch(/4 (pilihan )?tema/);
-    expect(pricing).toContain("pricing.feat.3-themes");
+    // Jumlah tema tidak lagi ditulis di teks kartu: kartu paket membaca\n    // kuota dari katalog, jadi tidak perlu menyebut angka tema.
   });
 });

@@ -18,9 +18,9 @@ const LangContext = createContext<LangContextType>({
   t: (key: string) => key,
 });
 
-/* â”€â”€â”€ Dictionary â”€â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Dictionary Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
 const DICT: Record<string, { id: string; en: string }> = {
-  /* â”€â”€ Nav â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Nav Ã¢â€â‚¬Ã¢â€â‚¬ */
   "nav.features": { id: "Fitur", en: "Features" },
   "nav.resources": { id: "Career Hub", en: "Career Hub" },
   "nav.pricing": { id: "Harga", en: "Pricing" },
@@ -52,7 +52,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "nav.dropdown.job-tracker.title": { id: "Job Tracker", en: "Job Tracker" },
   "nav.dropdown.job-tracker.desc": { id: "Catat dan pantau lamaran kerja", en: "Track your job applications" },
 
-  /* â”€â”€ Hero â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Hero Ã¢â€â‚¬Ã¢â€â‚¬ */
   "hero.badge": { id: "Tersedia untuk Mahasiswa & Profesional", en: "Available for Students & Professionals" },
   "hero.title-line1": { id: "CV yang lolos layar ATS,", en: "A CV that passes ATS screens," },
   "hero.title-line2": { id: "siap sebelum hari-H", en: "ready before interview day" },
@@ -67,7 +67,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "hero.demo-input": { id: "Tempel deskripsi pekerjaan target di sini...", en: "Paste your target job description here..." },
   "hero.demo-analyze": { id: "Analisis", en: "Analyze" },
   "hero.demo-score": { id: "Skor 85%", en: "Score 85%" },
-  "hero.demo-hint": { id: "Gratis · hasil instan untuk CV-mu", en: "Free · instant results for your CV" },
+  "hero.demo-hint": { id: "Gratis Â· hasil instan untuk CV-mu", en: "Free Â· instant results for your CV" },
   "hero.demo-preview": { id: "Pratinjau", en: "Preview" },
   "hero.demo.title": { id: "Coba dulu, langsung di sini", en: "Try it right here, right now" },
   "hero.demo.input-label": { id: "Tempel potongan CV atau deskripsi lowongan", en: "Paste a snippet of your CV or a job description" },
@@ -85,21 +85,21 @@ const DICT: Record<string, { id: string; en: string }> = {
   "hero.demo.full-cta": { id: "Analisis lengkap, gratis", en: "Run the full analysis, free" },
   "hero.demo.disclaimer": { id: "Perkiraan cepat di browser, bukan skor ATS penuh.", en: "A quick browser estimate, not a full ATS score." },
 
-  /* â”€â”€ Emotional moment â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Emotional moment Ã¢â€â‚¬Ã¢â€â‚¬ */
   "moment.title": { id: "Bulan depan, CV yang sama sudah ada di meja HRD.", en: "Next month, this same CV is on a recruiter's desk." },
   "moment.subtitle": { id: "Hari ini, dia masih tergantung di laptopmu. Yang membedakan cuma satu: dipersiapkan atau tidak.", en: "Today, it is still stuck on your laptop. One thing makes the difference: prepared or not." },
   "moment.cta": { id: "Persiapkan Sekarang, Gratis", en: "Prepare It Now, Free" },
 
-  /* â”€â”€ Pricing framing â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Pricing framing Ã¢â€â‚¬Ã¢â€â‚¬ */
   "pricing.value-satuan": { id: "Butuh sekali saja? Bayar per pemakaian, dari harga segelas kopi.", en: "Only need it once? Pay per use, starting at coffee prices." },
   "pricing.value-langganan": { id: "Rutin melamar? Mulai dari paket Gratis, upgrade saat butuh lebih banyak.", en: "Applying regularly? Start on the Free plan, upgrade when you need more." },
 
-  /* â”€â”€ Template Showcase â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Template Showcase Ã¢â€â‚¬Ã¢â€â‚¬ */
   "template.title": { id: "Mulai dengan Template CV", en: "Start with CV Templates" },
   "template.subtitle": { id: "Pilih template ATS-friendly, AI akan membantu mengisi konten CV-mu secara otomatis.", en: "Choose ATS-friendly templates. AI will help fill your CV content automatically." },
   "template.ats-badge": { id: "Template ATS-friendly - AI akan membantu mengisi CV-mu", en: "ATS-friendly templates - AI will help fill your CV" },
 
-  /* â”€â”€ Features â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Features Ã¢â€â‚¬Ã¢â€â‚¬ */
   "features.title": { id: "Platform Karier", en: "Career Platform" },
   "features.title-highlight": { id: "All-in-One", en: "All-in-One" },
   "features.subtitle": { id: "Dari CV ATS-friendly hingga portofolio website, satu platform untuk mempercepat perjalanan kariermu.", en: "From ATS-friendly CVs to portfolio websites, one platform to accelerate your career journey." },
@@ -136,7 +136,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "features.letters-pdf": { id: "Export PDF siap kirim", en: "Ready-to-send PDF export" },
   "features.letters-free": { id: "Gratis 3x per bulan", en: "Free 3x per month" },
 
-  /* â”€â”€ AI Insight â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ AI Insight Ã¢â€â‚¬Ã¢â€â‚¬ */
   "insight.title": { id: "Analisis Cerdas untuk", en: "Smart Analysis for" },
   "insight.title-line2": { id: "Langkah yang Pasti", en: "Confident Steps" },
   "insight.desc": { id: "Upload CV atau masukkan data profiling, AI kami akan menganalisis kecocokan dengan posisi target.", en: "Upload your CV or enter profile data. Our AI will analyze the match with your target position." },
@@ -145,9 +145,9 @@ const DICT: Record<string, { id: string; en: string }> = {
   "insight.item3": { id: "Portfolio Website Generator", en: "Portfolio Website Generator" },
   "insight.cta": { id: "Coba Analisis Sekarang", en: "Try Analysis Now" },
 
-  /* â”€â”€ Testimonials â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Testimonials Ã¢â€â‚¬Ã¢â€â‚¬ */
 
-  /* â”€â”€ CTA â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ CTA Ã¢â€â‚¬Ã¢â€â‚¬ */
   "cta.title": { id: "Siap Bawa Kariermu ke Level Selanjutnya?", en: "Ready to Take Your Career to the Next Level?" },
   "cta.subtitle": { id: "Mulai dari CV gratis. Lihat hasilnya dulu sebelum memilih fitur berbayar.", en: "Start with a free CV. See the value before choosing paid features." },
   "cta.pill-ats": { id: "CV ATS-Friendly", en: "ATS-Friendly CV" },
@@ -183,7 +183,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "cta.stats-avg-ats": { id: "Skor ATS Rata-rata", en: "Average ATS Score" },
   "cta.stats-users": { id: "Pengguna Terdaftar", en: "Registered Users" },
 
-  /* â”€â”€ Tool Cards â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Tool Cards Ã¢â€â‚¬Ã¢â€â‚¬ */
   "tool.build-cv": { id: "Buat CV Baru", en: "Build New CV" },
   "tool.build-cv-desc": { id: "Gunakan template ATS-friendly dengan panduan AI step-by-step.", en: "Use ATS-friendly templates with step-by-step AI guidance." },
   "tool.analyze-cv": { id: "Analisis CV", en: "Analyze CV" },
@@ -199,11 +199,11 @@ const DICT: Record<string, { id: string; en: string }> = {
   "tool.practice-btn": { id: "Mode Latihan Interview", en: "Interview Practice Mode" },
   "tool.start-here": { id: "Mulai di sini", en: "Start here" },
 
-  /* â”€â”€ Hero Social Proof â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Hero Social Proof Ã¢â€â‚¬Ã¢â€â‚¬ */
   "hero.social-proof": { id: "Dipercaya profesional di Indonesia", en: "Trusted by professionals in Indonesia" },
   "hero.social-proof-count": { id: "profesional terdaftar", en: "registered professionals" },
 
-  /* â”€â”€ Footer â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Footer Ã¢â€â‚¬Ã¢â€â‚¬ */
   "footer.tagline": { id: "Satu platform untuk mempercepat perjalanan kariermu dengan AI.", en: "One platform to accelerate your career journey with AI." },
   "footer.desc": { id: "Solusi karier masa depan berbasis AI untuk membantu profesional muda mencapai potensi maksimal mereka.", en: "AI-powered career solution to help young professionals reach their full potential." },
   "footer.produk": { id: "Produk", en: "Products" },
@@ -222,25 +222,25 @@ const DICT: Record<string, { id: string; en: string }> = {
   "footer.pusat-bantuan": { id: "Pusat Bantuan", en: "Help Center" },
   "footer.privasi": { id: "Privasi", en: "Privacy" },
   "footer.syarat": { id: "Syarat & Ketentuan", en: "Terms & Conditions" },
-  "footer.copyright": { id: "© 2024 AI Career Hub. Semua Hak Dilindungi.", en: "© 2024 AI Career Hub. All Rights Reserved." },
+  "footer.copyright": { id: "Â© 2024 AI Career Hub. Semua Hak Dilindungi.", en: "Â© 2024 AI Career Hub. All Rights Reserved." },
   "footer.tentang-simple": { id: "Tentang Kami", en: "About Us" },
   "footer.privasi-simple": { id: "Kebijakan Privasi", en: "Privacy Policy" },
   "footer.syarat-simple": { id: "Syarat & Ketentuan", en: "Terms & Conditions" },
   "footer.copyright-simple": { id: "&copy; 2024 AI Career Hub. Semua hak dilindungi.", en: "&copy; 2024 AI Career Hub. All rights reserved." },
 
-  /* â”€â”€ CV Builder â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ CV Builder Ã¢â€â‚¬Ã¢â€â‚¬ */
   "cv.lang-label": { id: "Bahasa CV", en: "CV Language" },
   "cv.lang-id": { id: "Bahasa Indonesia", en: "Indonesian" },
   "cv.lang-en": { id: "English", en: "English" },
   "cv.summary": { id: "Ringkasan Profesional", en: "Professional Summary" },
-  "cv.summary-placeholder": { id: "Tuliskan ringkasan singkat tentang dirimu…", en: "Write a brief summary about yourself…" },
+  "cv.summary-placeholder": { id: "Tuliskan ringkasan singkat tentang dirimuâ€¦", en: "Write a brief summary about yourselfâ€¦" },
   "cv.experience": { id: "Pengalaman Kerja", en: "Work Experience" },
   "cv.education": { id: "Pendidikan", en: "Education" },
   "cv.skills": { id: "Keahlian", en: "Skills" },
   "cv.organizations": { id: "Organisasi & Proyek", en: "Organizations & Projects" },
   "cv.current": { id: "Sekarang", en: "Present" },
 
-  /* â”€â”€ Portfolio â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Portfolio Ã¢â€â‚¬Ã¢â€â‚¬ */
   "portfolio.translate": { id: "Terjemahkan ke Inggris", en: "Translate to English" },
   "portfolio.lang": { id: "Bahasa Portfolio", en: "Portfolio Language" },
   "portfolio.url-label": { id: "URL Portfoliomu", en: "Your Portfolio URL" },
@@ -264,7 +264,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "portfolio.view-preview": { id: "Lihat Preview", en: "View Preview" },
   "portfolio.existing-data": { id: "data yang ada", en: "existing data" },
 
-  /* â”€â”€ Portfolio Publish â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Portfolio Publish Ã¢â€â‚¬Ã¢â€â‚¬ */
   "publish.title": { id: "Publish Portofoliomu", en: "Publish Your Portfolio" },
   "publish.desc": { id: "Dapatkan link publik untuk dibagikan ke recruiter atau di CV-mu.", en: "Get a public link to share with recruiters or add to your CV." },
   "publish.btn": { id: "Publish & Dapatkan Link", en: "Publish & Get Link" },
@@ -282,14 +282,14 @@ const DICT: Record<string, { id: string; en: string }> = {
   "publish.error-network": { id: "Gagal terhubung ke server. Coba lagi.", en: "Failed to connect to server. Try again." },
   "publish.copy-failed": { id: "Gagal menyalin link.", en: "Failed to copy link." },
   "publish.close": { id: "Tutup", en: "Close" },
-  "publish.free-note": { id: "Publish pertama gratis · 1 portofolio per akun · update berikutnya butuh paket", en: "First publish is free · 1 portfolio per account · updates require a plan" },
-  "publish.trial-note": { id: "✔ Publish pertama GRATIS · 1 portofolio live per akun · update/lanjut butuh paket Portfolio Web", en: "✔ First publish is FREE · 1 live portfolio per account · renewing/updating requires Portfolio Web" },
-  "publish.paid-note": { id: "Paket aktif · link langsung live & bisa di-update kapan saja", en: "Plan active · link is live immediately and can be updated anytime" },
+  "publish.free-note": { id: "Publish pertama gratis Â· 1 portofolio per akun Â· update berikutnya butuh paket", en: "First publish is free Â· 1 portfolio per account Â· updates require a plan" },
+  "publish.trial-note": { id: "âœ” Publish pertama GRATIS Â· 1 portofolio live per akun Â· update/lanjut butuh paket Portfolio Web", en: "âœ” First publish is FREE Â· 1 live portfolio per account Â· renewing/updating requires Portfolio Web" },
+  "publish.paid-note": { id: "Paket aktif Â· link langsung live & bisa di-update kapan saja", en: "Plan active Â· link is live immediately and can be updated anytime" },
   "publish.update-content": { id: "Perbarui Konten / Ganti Link", en: "Update Content / Change Link" },
   "publish.cancel-update": { id: "Batal Perbarui", en: "Cancel Update" },
   "publish.btn-update": { id: "Simpan Perubahan & Live", en: "Save Changes & Go Live" },
   "publish.updating-note": { id: "Mode perbarui, perubahan langsung menggantikan konten live (URL tetap atau ganti di atas).", en: "Update mode, changes replace the live content immediately (keep URL or change it above)." },
-  "publish.update-note": { id: "Paket aktif · perubahan langsung live", en: "Plan active · changes go live immediately" },
+  "publish.update-note": { id: "Paket aktif Â· perubahan langsung live", en: "Plan active Â· changes go live immediately" },
   "publish.upgrade-title": { id: "Trial publish sudah terpakai", en: "Your free publish trial is used" },
   "publish.upgrade-desc": { id: "Link kamu tetap bisa dilihat. Untuk memperbarui konten atau ganti link, aktifkan paket Portfolio Web (Rp35.000/bln).", en: "Your link stays visible. To update content or change the link, activate the Portfolio Web plan (IDR 35,000/mo)." },
   "publish.upgrade-desc-empty": { id: "Publish gratis 1x sudah dipakai akun ini. Aktifkan paket Portfolio Web untuk publish (Rp35.000/bln) atau hubungi kami.", en: "This account already used its 1 free publish. Activate Portfolio Web (IDR 35,000/mo) to publish, or contact us." },
@@ -320,7 +320,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "portfolio.publish-not-live-desc": { id: "Buat atau buka portfolio di Live Builder lalu klik Publish untuk mendapatkan link.", en: "Create or open your portfolio in the Live Builder, then click Publish to get a link." },
   "portfolio.publish-go": { id: "Buka Live Builder", en: "Open Live Builder" },
 
-  /* â”€â”€ Live Builder â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Live Builder Ã¢â€â‚¬Ã¢â€â‚¬ */
   "live.tab-section": { id: "Section", en: "Section" },
   "live.tab-edit": { id: "Edit", en: "Edit" },
   "live.tab-design": { id: "Desain", en: "Design" },
@@ -352,7 +352,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "live.generate-desc": { id: "AI akan membaca data profilmu dan menghasilkan konten portfolio profesional. Gratis 2x untuk pengguna Free, unlimited untuk Premium.", en: "AI will read your profile data and generate professional portfolio content. Free 2x for Free users, unlimited for Premium." },
   "live.generate-btn": { id: "Generate Konten Portfolio", en: "Generate Portfolio Content" },
   "live.fill-profile": { id: "Isi dari Profil", en: "Fill from Profile" },
-  "live.fill-desc": { id: "Ambil data dari profil yang sudah kamu isi · langsung terisi ke form portfolio. Tidak perlu ngetik ulang!", en: "Take data from your existing profile · directly fills the portfolio form. No need to retype!" },
+  "live.fill-desc": { id: "Ambil data dari profil yang sudah kamu isi Â· langsung terisi ke form portfolio. Tidak perlu ngetik ulang!", en: "Take data from your existing profile Â· directly fills the portfolio form. No need to retype!" },
   "live.load-profile": { id: "Muat dari Profil", en: "Load from Profile" },
   "live.edit-profile": { id: "Edit Profil", en: "Edit Profile" },
   "live.export-preview": { id: "Export & Preview", en: "Export & Preview" },
@@ -360,12 +360,12 @@ const DICT: Record<string, { id: string; en: string }> = {
   "live.loading": { id: "Memuat...", en: "Loading..." },
   "live.recommendation": { id: "Rekomendasi", en: "Recommendation" },
 
-  /* â”€â”€ AI Insight Pills â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ AI Insight Pills Ã¢â€â‚¬Ã¢â€â‚¬ */
   "insight.tag-keyword": { id: "Keyword Gap", en: "Keyword Gap" },
   "insight.tag-ats": { id: "ATS Format", en: "ATS Format" },
   "insight.tag-relevance": { id: "Relevansi", en: "Relevance" },
 
-  /* â”€â”€ Live Builder Form Labels â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Live Builder Form Labels Ã¢â€â‚¬Ã¢â€â‚¬ */
   "live.form.first-name": { id: "Nama Depan", en: "First Name" },
   "live.form.last-name": { id: "Nama Belakang", en: "Last Name" },
   "live.form.job-title": { id: "Job Title / Headline", en: "Job Title / Headline" },
@@ -426,7 +426,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "live.form.hobby-desc": { id: "Deskripsi singkat (opsional)", en: "Short description (optional)" },
   "live.form.add-hobby": { id: "Tambah Hobi", en: "Add Hobby" },
 
-  /* â”€â”€ Dashboard â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Dashboard Ã¢â€â‚¬Ã¢â€â‚¬ */
   "dashboard.title": { id: "Dashboard", en: "Dashboard" },
   "dashboard.subtitle": { id: "Kelola CV dan portofolio kamu di sini.", en: "Manage your CV and portfolio here." },
   "dashboard.master-profile": { id: "Profil Master", en: "Master Profile" },
@@ -455,7 +455,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "dashboard.delete": { id: "Hapus", en: "Delete" },
   "dashboard.letters": { id: "Surat", en: "Letters" },
   "dashboard.create-letter": { id: "Buat Surat", en: "Create Letter" },
-  "dashboard.create-letter-desc": { id: "Surat lamaran & Motivation Letter · dari CV atau dari nol", en: "Application & motivation letters · from CV or from scratch" },
+  "dashboard.create-letter-desc": { id: "Surat lamaran & Motivation Letter Â· dari CV atau dari nol", en: "Application & motivation letters Â· from CV or from scratch" },
   "dashboard.interview-prep": { id: "Persiapan Interview", en: "Interview Prep" },
   "dashboard.interview-desc": { id: "224+ pertanyaan umum untuk 28+ posisi", en: "224+ common questions for 28+ roles" },
   "dashboard.recent-activity": { id: "Aktivitas Terkini", en: "Recent Activity" },
@@ -474,8 +474,8 @@ const DICT: Record<string, { id: string; en: string }> = {
   "dashboard.recent-cvs": { id: "CV Terbaru", en: "Recent CVs" },
   "dashboard.view-all-cvs": { id: "Lihat semua CV", en: "View all CVs" },
   "dashboard.new-activity": { id: "Aktivitas", en: "Activity" },
-  "dashboard.styles-hint": { id: "Formal · Formal Lengkap · ATS · Kasual", en: "Formal · Full Formal · ATS · Casual" },
-  "dashboard.motivation-hint": { id: "Beasiswa · Program · Fresh grad", en: "Scholarships · Programs · Fresh grad" },
+  "dashboard.styles-hint": { id: "Formal Â· Formal Lengkap Â· ATS Â· Kasual", en: "Formal Â· Full Formal Â· ATS Â· Casual" },
+  "dashboard.motivation-hint": { id: "Beasiswa Â· Program Â· Fresh grad", en: "Scholarships Â· Programs Â· Fresh grad" },
   "dashboard.motivation-letter": { id: "Motivation Letter", en: "Motivation Letter" },
   "dashboard.create-letter-from-cv": { id: "Buat Surat dari CV ini", en: "Create letter from this CV" },
   "dashboard.ai-rev-title": { id: "Beli AI Revision untuk CV ini", en: "Buy AI Revision for this CV" },
@@ -516,11 +516,11 @@ const DICT: Record<string, { id: string; en: string }> = {
   "dashboard.saved-success": { id: "Profil Tersimpan!", en: "Profile Saved!" },
   "dashboard.saved-desc": { id: "Data kamu siap dipakai di CV Builder", en: "Your data is ready to use in the CV Builder" },
   "dashboard.cv-templates": { id: "Buat CV Baru", en: "Create New CV" },
-  "myresumes.subtitle": { id: "Semua CV kamu dalam satu tempat · buat, edit, atau buat surat dari CV.", en: "All your CVs in one place · create, edit, or write letters from a CV." },
+  "myresumes.subtitle": { id: "Semua CV kamu dalam satu tempat Â· buat, edit, atau buat surat dari CV.", en: "All your CVs in one place Â· create, edit, or write letters from a CV." },
 
-  /* â”€â”€ CV Builder New â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ CV Builder New Ã¢â€â‚¬Ã¢â€â‚¬ */
   "cv.new.title": { id: "Buat CV Baru", en: "Create New CV" },
-  "cv.new.subtitle": { id: "Pilih cara membuat CV · isi otomatis dari profil atau mulai dari kosong.", en: "Choose how to create your CV · auto-fill from profile or start from scratch." },
+  "cv.new.subtitle": { id: "Pilih cara membuat CV Â· isi otomatis dari profil atau mulai dari kosong.", en: "Choose how to create your CV Â· auto-fill from profile or start from scratch." },
   "cv.new.popup-hint": { id: "Pilih opsi pembuatan CV melalui popup yang muncul.", en: "Choose your CV creation option through the popup." },
   "cv.new.open-popup": { id: "Buka Popup", en: "Open Popup" },
   "cv.new.target-position": { id: "Target Posisi", en: "Target Position" },
@@ -528,7 +528,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "cv.new.position-hint": { id: "Mengisi posisi membantu AI menyesuaikan konten CV-mu dengan lebih baik", en: "Filling in the position helps AI tailor your CV content better" },
   "cv.new.fill-profile": { id: "Isi dari Profil", en: "Fill from Profile" },
   "cv.new.fill-profile-desc-exists": { id: "Gunakan data profil yang sudah ada", en: "Use existing profile data" },
-  "cv.new.fill-profile-desc-empty": { id: "Kamu belum punya profil · buat dulu", en: "You don't have a profile yet · create one first" },
+  "cv.new.fill-profile-desc-empty": { id: "Kamu belum punya profil Â· buat dulu", en: "You don't have a profile yet Â· create one first" },
   "cv.new.start-empty": { id: "Mulai Kosong", en: "Start Empty" },
   "cv.new.start-empty-desc": { id: "Isi data CV dari awal tanpa referensi profil", en: "Fill CV data from scratch without profile reference" },
   "cv.new.profile-redirect": { id: "Kamu belum punya profil. Mengarahkan ke halaman profil...", en: "You don't have a profile. Redirecting to profile page..." },
@@ -537,11 +537,11 @@ const DICT: Record<string, { id: string; en: string }> = {
   "cv.new.loading-profile": { id: "Mengisi dari profil...", en: "Filling from profile..." },
   "cv.new.loading-empty": { id: "Membuat CV kosong...", en: "Creating empty CV..." },
 
-  /* â”€â”€ Title â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Title Ã¢â€â‚¬Ã¢â€â‚¬ */
   "app.title": { id: "AI Career Hub - Bangun Karier Impianmu dengan AI", en: "AI Career Hub - Build Your Dream Career with AI" },
   "app.desc": { id: "Satu platform untuk membuat CV, mengecek skor resume, dan membangun portofolio profesional secara instan.", en: "One platform to build CVs, check resume scores, and create professional portfolios instantly." },
 
-  /* â”€â”€ Checker â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Checker Ã¢â€â‚¬Ã¢â€â‚¬ */
   "checker.title": { id: "Cek Seberapa Kuat CV-mu", en: "Check How Strong Your CV Is" },
   "checker.subtitle": { id: "Unggah CV kamu dan deskripsi pekerjaan untuk mendapatkan analisis kecocokan instan bertenaga AI.", en: "Upload your CV and job description for instant AI-powered match analysis." },
   "checker.upload-label": { id: "Drag & drop CV kamu di sini atau klik untuk upload", en: "Drag & drop your CV here or click to upload" },
@@ -550,7 +550,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "checker.jd-placeholder": { id: "Contoh: Dibutuhkan Software Engineer dengan pengalaman 2 tahun di React...", en: "E.g.: Seeking a Software Engineer with 2 years of React experience..." },
   "checker.analyze-btn": { id: "Analisis CV Sekarang", en: "Analyze CV Now" },
   "checker.analyzing": { id: "Menganalisis...", en: "Analyzing..." },
-  "checker.free-badge": { id: "Gratis · Hasil dalam 30 detik", en: "Free · Results in 30 seconds" },
+  "checker.free-badge": { id: "Gratis Â· Hasil dalam 30 detik", en: "Free Â· Results in 30 seconds" },
   "checker.mock-sample": { id: "Contoh ilustrasi, bukan hasil nyata", en: "Illustrative sample, not real results" },
   "checker.insight-title": { id: "AI Career Insights", en: "AI Career Insights" },
   "checker.insight-desc": { id: "Skor CV Anda akan dihitung berdasarkan kata kunci, format, dan relevansi industri terkini.", en: "Your CV score will be calculated based on keywords, format, and current industry relevance." },
@@ -577,13 +577,13 @@ const DICT: Record<string, { id: string; en: string }> = {
   "checker.error-failed": { id: "Analisis gagal", en: "Analysis failed" },
   "checker.error-generic": { id: "Terjadi kesalahan", en: "An error occurred" },
 
-  /* â”€â”€ Checker Fit Labels â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Checker Fit Labels Ã¢â€â‚¬Ã¢â€â‚¬ */
   "checker.fit-excellent": { id: "CV Anda sangat cocok dengan posisi ini!", en: "Your CV is an excellent match for this position!" },
   "checker.fit-good": { id: "CV Anda cukup cocok, beberapa perbaikan minor diperlukan.", en: "Your CV is a good match, some minor improvements needed." },
   "checker.fit-fair": { id: "CV Anda perlu perbaikan signifikan untuk bersaing.", en: "Your CV needs significant improvements to compete." },
   "checker.fit-poor": { id: "CV Anda perlu direstrukturisasi ulang.", en: "Your CV needs a complete restructure." },
 
-  /* â”€â”€ Profile â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Profile Ã¢â€â‚¬Ã¢â€â‚¬ */
   "profile.title": { id: "Kelengkapan Profil", en: "Profile Completeness" },
   "profile.import-btn": { id: "Impor dari CV / LinkedIn", en: "Import from CV / LinkedIn" },
   "profile.import.title": { id: "Isi Profil Otomatis", en: "Auto-fill Profile" },
@@ -600,7 +600,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "account.delete-confirm-placeholder": { id: "HAPUS", en: "HAPUS" },
   "account.delete-confirm": { id: "Hapus permanen", en: "Delete permanently" },
   "account.delete-cancel": { id: "Batal", en: "Cancel" },
-  "account.delete-working": { id: "Menghapus…", en: "Deleting…" },
+  "account.delete-working": { id: "Menghapusâ€¦", en: "Deletingâ€¦" },
   "account.delete-done": { id: "Akunmu sudah dihapus", en: "Your account has been deleted" },
   "account.delete-failed": { id: "Gagal menghapus akun. Coba lagi atau hubungi kami.", en: "Could not delete the account. Try again or contact us." },
   "profile.import.mode-fill": { id: "Isi yang kosong saja", en: "Only fill empty fields" },
@@ -662,7 +662,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "profile.add-skill": { id: "Tambah Skill", en: "Add Skill" },
   "profile.save-btn": { id: "Simpan Profil", en: "Save Profile" },
   "profile.saving": { id: "Menyimpan...", en: "Saving..." },
-  "profile.save-hint": { id: "Simpan manual · klik tombol di samping", en: "Save manually · click the button" },
+  "profile.save-hint": { id: "Simpan manual Â· klik tombol di samping", en: "Save manually Â· click the button" },
   "profile.progress-label": { id: "Lengkap", en: "Complete" },
   "profile.delete": { id: "Hapus", en: "Delete" },
   "profile.responsibility": { id: "Tanggung Jawab", en: "Responsibilities" },
@@ -696,7 +696,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "profile.delete-skill": { id: "Hapus skill", en: "Delete skill" },
   "profile.help-hint": { id: "Contoh: Memimpin tim 5 orang untuk mengembangkan fitur baru, menghasilkan peningkatan konversi sebesar 15%.", en: "Example: Led a team of 5 to build new features, driving a 15% conversion increase." },
 
-  /* â”€â”€ Checker: label hasil & OCR (i18n penuh) â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Checker: label hasil & OCR (i18n penuh) Ã¢â€â‚¬Ã¢â€â‚¬ */
   "checker.analyzing-full": { id: "Menganalisis CV dengan AI...", en: "Analyzing your CV with AI..." },
   "checker.error-analysis": { id: "Terjadi kesalahan saat analisis", en: "An error occurred during analysis" },
   "checker.retry": { id: "Coba Lagi", en: "Retry" },
@@ -708,7 +708,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "linkedin.guide-print-4": { id: "Simpan filenya, lalu unggah di bawah. Bagian \"About\" sering terpotong di PDF, jadi boleh diklik Show all dulu.", en: "Save the file, then upload it below. The \"About\" section is often cut off in the PDF, so expand it first." },
   "linkedin.guide-print-note": { id: "Buka profil di jendela incognito lebih dulu untuk memastikan bagian yang kamu lihat memang yang akan ikut tercetak.", en: "Open your profile in an incognito window first to confirm the sections you see are the ones that will print." },
   "linkedin.guide-archive-title": { id: "Cara lengkap: unduh salinan data", en: "Most complete: download your data copy" },
-  "linkedin.guide-archive-1": { id: "Masuk ke Settings & Privacy → Data privacy → Get a copy of your data.", en: "Go to Settings & Privacy → Data privacy → Get a copy of your data." },
+  "linkedin.guide-archive-1": { id: "Masuk ke Settings & Privacy â†’ Data privacy â†’ Get a copy of your data.", en: "Go to Settings & Privacy â†’ Data privacy â†’ Get a copy of your data." },
   "linkedin.guide-archive-2": { id: "Pilih \"Everything\", lalu minta. Tunggu email dari LinkedIn (bisa beberapa menit sampai sehari).", en: "Select \"Everything\" and request it. Wait for LinkedIn's email (minutes to a day)." },
   "linkedin.guide-archive-3": { id: "Ekstrak file zip-nya, lalu unggah file Profile.html yang ada di dalamnya.", en: "Unzip the archive, then upload the Profile.html file inside it." },
   "linkedin.guide-archive-note": { id: "Cara ini berisi seluruh riwayat dan koneksi, bukan hanya yang tampil di profil. Hasilnya paling lengkap, tapi LinkedIn sering memproses lambat.", en: "This archive contains your full history and connections, not just what is visible. It gives the most complete result, but LinkedIn often processes it slowly." },
@@ -733,7 +733,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "checker.role-opt-general": { id: "Umum (default)", en: "General (default)" },
   "checker.role-desc-general": { id: "Bobot standar untuk semua posisi", en: "Standard weights for all roles" },
   "checker.role-opt-tech": { id: "Teknologi / IT", en: "Technology / IT" },
-  "checker.role-desc-tech": { id: "Experience 35% · Skills 25%", en: "Experience 35% · Skills 25%" },
+  "checker.role-desc-tech": { id: "Experience 35% Â· Skills 25%", en: "Experience 35% Â· Skills 25%" },
   "checker.role-opt-creative": { id: "Kreatif / Design", en: "Creative / Design" },
   "checker.role-desc-creative": { id: "Skills 35% (portofolio & craft lebih menentukan)", en: "Skills 35% (portfolio & craft matter most)" },
   "checker.role-opt-sales": { id: "Sales / Marketing", en: "Sales / Marketing" },
@@ -742,26 +742,26 @@ const DICT: Record<string, { id: string; en: string }> = {
   "checker.role-desc-fresh": { id: "Education 25% (tidak menghukum experience pendek)", en: "Education 25% (does not penalize short experience)" },
   "checker.share": { id: "Bagikan", en: "Share" },
   "checker.share-title": { id: "Salin link hasil analisis", en: "Copy analysis link" },
-  "checker.link-copied": { id: "Link tersalin! •", en: "Link copied! •" },
+  "checker.link-copied": { id: "Link tersalin! â€¢", en: "Link copied! â€¢" },
   "checker.sec-title": { id: "Skor Per Section", en: "Scores per Section" },
   "checker.sec-summary": { id: "Ringkasan Profil", en: "Profile Summary" },
   "checker.sec-experience": { id: "Pengalaman Kerja", en: "Work Experience" },
   "checker.sec-skills": { id: "Keahlian", en: "Skills" },
   "checker.sec-education": { id: "Pendidikan", en: "Education" },
   "checker.sec-format": { id: "Format & ATS", en: "Format & ATS" },
-  "checker.weights-note": { id: "Skor dihitung dengan bobot {cat}: Experience {ex}% · Skills {sk}% · Education {ed}%", en: "Score weighted for {cat}: Experience {ex}% · Skills {sk}% · Education {ed}%" },
-  "checker.model-v4pro": { id: "DeepSeek V4 Pro · analisis mendalam (Premium)", en: "DeepSeek V4 Pro · in-depth analysis (Premium)" },
-  "checker.model-v4flash": { id: "DeepSeek V4 Flash · analisis standar", en: "DeepSeek V4 Flash · standard analysis" },
+  "checker.weights-note": { id: "Skor dihitung dengan bobot {cat}: Experience {ex}% Â· Skills {sk}% Â· Education {ed}%", en: "Score weighted for {cat}: Experience {ex}% Â· Skills {sk}% Â· Education {ed}%" },
+  "checker.model-v4pro": { id: "DeepSeek V4 Pro Â· analisis mendalam (Premium)", en: "DeepSeek V4 Pro Â· in-depth analysis (Premium)" },
+  "checker.model-v4flash": { id: "DeepSeek V4 Flash Â· analisis standar", en: "DeepSeek V4 Flash Â· standard analysis" },
   "checker.ai-review": { id: "Review oleh AI", en: "AI Review" },
   "checker.strengths": { id: "Kelebihan", en: "Strengths" },
   "checker.improvements": { id: "Perlu Diperbaiki", en: "Areas to Improve" },
   "checker.ats-recs": { id: "Rekomendasi ATS", en: "ATS Recommendations" },
   "checker.kw-found": { id: "Ditemukan ({n})", en: "Found ({n})" },
-  "checker.kw-critical": { id: "Hilang · Prioritas ({n})", en: "Missing · Critical ({n})" },
-  "checker.kw-nice": { id: "Hilang · Tambahan ({n})", en: "Missing · Nice-to-have ({n})" },
+  "checker.kw-critical": { id: "Hilang Â· Prioritas ({n})", en: "Missing Â· Critical ({n})" },
+  "checker.kw-nice": { id: "Hilang Â· Tambahan ({n})", en: "Missing Â· Nice-to-have ({n})" },
   "checker.kw-synonym": { id: "Saran Sinonim", en: "Synonym Suggestions" },
   "checker.bullet-title": { id: "Review Poin Pengalaman ({n})", en: "Experience Bullet Review ({n})" },
-  "checker.cta-high-title": { id: "Skor CV Kamu Istimewa! ðŸŽ‰", en: "Outstanding CV Score! ðŸŽ‰" },
+  "checker.cta-high-title": { id: "Skor CV Kamu Istimewa! Ã°Å¸Å½â€°", en: "Outstanding CV Score! Ã°Å¸Å½â€°" },
   "checker.cta-high-subtitle": { id: "CV kamu sudah sangat siap. Langsung cari lowongan yang cocok!", en: "Your CV is ready. Start applying to matching jobs now!" },
   "checker.cta-high-btn": { id: "Cari Lowongan Sekarang", en: "Search Jobs Now" },
   "checker.ocr.title": { id: "Atau baca dengan OCR AI", en: "Or read it with AI OCR" },
@@ -792,7 +792,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "checker.paste.analyzing": { id: "Menganalisis...", en: "Analyzing..." },
   "checker.paste.analyze-btn": { id: "Analisis dengan Teks", en: "Analyze with Text" },
 
-  /* â”€â”€ Portfolio Build â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Portfolio Build Ã¢â€â‚¬Ã¢â€â‚¬ */
   "build.title": { id: "Konten Portfolio", en: "Portfolio Content" },
   "build.subtitle": { id: "Lengkapi konten portfoliomu", en: "Complete your portfolio content" },
   "build.hero-title": { id: "Hero & Branding", en: "Hero & Branding" },
@@ -844,7 +844,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "build.contact-whatsapp": { id: "WhatsApp / No. Telp", en: "WhatsApp / Phone" },
   "build.add-link": { id: "Tambah Link Lain (Twitter, Dribbble, etc.)", en: "Add Other Link (Twitter, Dribbble, etc.)" },
 
-  /* â”€â”€ Portfolio Preview â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Portfolio Preview Ã¢â€â‚¬Ã¢â€â‚¬ */
   "preview.title": { id: "Preview Portfolio", en: "Portfolio Preview" },
   "preview.edit": { id: "Edit", en: "Edit" },
   "preview.export-html": { id: "Export HTML", en: "Export HTML" },
@@ -853,7 +853,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "preview.no-draft-title": { id: "Belum ada draft portfolio", en: "No portfolio draft yet" },
   "preview.no-draft-desc": { id: "Kamu belum menyimpan draft portfolio. Silakan isi konten portfolio di builder.", en: "You haven't saved a portfolio draft. Fill in portfolio content in the builder." },
   "preview.open-builder": { id: "Buka builder", en: "Open builder" },
-  "preview.exporting": { id: "Mengekspor…", en: "Exporting…" },
+  "preview.exporting": { id: "Mengeksporâ€¦", en: "Exportingâ€¦" },
   "preview.export-error": { id: "Export gagal. Coba lagi sebentar.", en: "Export failed. Please try again." },
   "preview.export-error-save": { id: "Isi portfoliomu belum lolos validasi. Buka builder, periksa isian yang kosong atau rusak, lalu ekspor ulang.", en: "Your portfolio content failed validation. Open the builder, fix any empty or invalid fields, then export again." },
   "preview.pdf-error": { id: "Gagal membuat PDF. Coba lagi beberapa saat, atau hubungi kami kalau sering terjadi.", en: "Could not build the PDF. Try again in a moment, or contact us if it keeps happening." },
@@ -868,7 +868,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "preview.portfolio": { id: "Portfolio", en: "Portfolio" },
   "preview.template": { id: "Template", en: "Template" },
 
-  /* â”€â”€ Settings â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Settings Ã¢â€â‚¬Ã¢â€â‚¬ */
   "settings.title": { id: "Pengaturan", en: "Settings" },
   "settings.subtitle": { id: "Kelola akun dan preferensi", en: "Manage account and preferences" },
   "settings.profile": { id: "Profil Akun", en: "Account Profile" },
@@ -877,7 +877,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "settings.payment-history": { id: "Riwayat Transaksi", en: "Payment History" },
   "settings.checkout-history": { id: "Riwayat Checkout", en: "Checkout History" },
 
-  /* â”€â”€ Settings: Billing â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Settings: Billing Ã¢â€â‚¬Ã¢â€â‚¬ */
   "billing.title": { id: "Langganan & Penagihan", en: "Subscription & Billing" },
   "billing.subtitle": { id: "Kelola paket dan metode pembayaran", en: "Manage packages and payment methods" },
   "billing.current-plan": { id: "Paket Saat Ini", en: "Current Plan" },
@@ -976,7 +976,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "checkout.load-failed": { id: "Gagal memuat riwayat checkout", en: "Failed to load checkout history" },
   "billing.on-desired-cv": { id: "di CV yang diinginkan", en: "on the desired CV" },
 
-  /* â”€â”€ Settings: Payment History â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Settings: Payment History Ã¢â€â‚¬Ã¢â€â‚¬ */
   "payment.title": { id: "Riwayat Transaksi", en: "Transaction History" },
   "payment.subtitle": { id: "Lihat dan unduh riwayat pembayaranmu", en: "View and download your payment history" },
   "payment.total-spent": { id: "Total Pengeluaran", en: "Total Spent" },
@@ -999,7 +999,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "payment.pending": { id: "Pending", en: "Pending" },
   "payment.failed": { id: "Gagal", en: "Failed" },
 
-  /* â”€â”€ Settings: Profile â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Settings: Profile Ã¢â€â‚¬Ã¢â€â‚¬ */
   "settings.profile.title": { id: "Profil Akun", en: "Account Profile" },
   "settings.profile.subtitle": { id: "Informasi dasar yang terhubung ke akunmu", en: "Basic information connected to your account" },
   "settings.profile.photo": { id: "Foto Profil", en: "Profile Photo" },
@@ -1008,16 +1008,16 @@ const DICT: Record<string, { id: string; en: string }> = {
   "settings.profile.full-name": { id: "Nama Lengkap", en: "Full Name" },
   "settings.profile.email": { id: "Email", en: "Email" },
   "settings.profile.phone": { id: "Nomor Telepon", en: "Phone Number" },
-  "settings.profile.verified": { id: "Akun terverifikasi · Email dan nomor telepon sudah dikonfirmasi", en: "Verified account · Email and phone number confirmed" },
+  "settings.profile.verified": { id: "Akun terverifikasi Â· Email dan nomor telepon sudah dikonfirmasi", en: "Verified account Â· Email and phone number confirmed" },
   "settings.profile.save-auto": { id: "Tersimpan otomatis", en: "Auto-saved" },
   "settings.profile.save-btn": { id: "Simpan & Lihat Preview", en: "Save & View Preview" },
 
-  /* â”€â”€ Settings: Security â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Settings: Security Ã¢â€â‚¬Ã¢â€â‚¬ */
   "security.title": { id: "Keamanan Akun", en: "Account Security" },
   "security.subtitle": { id: "Login dikelola melalui Google", en: "Sign-in managed through Google" },
   "security.active": { id: "Aktif", en: "Active" },
 
-  /* â”€â”€ Header â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Header Ã¢â€â‚¬Ã¢â€â‚¬ */
   "header.dashboard": { id: "Dashboard", en: "Dashboard" },
   "header.my-resumes": { id: "My Resumes", en: "My Resumes" },
   "header.templates": { id: "Templates", en: "Templates" },
@@ -1027,7 +1027,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "header.logout": { id: "Keluar", en: "Logout" },
   "header.back-home": { id: "Kembali ke Beranda", en: "Back to Home" },
 
-  /* â”€â”€ Admin â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Admin Ã¢â€â‚¬Ã¢â€â‚¬ */
   "admin.title": { id: "Admin Panel", en: "Admin Panel" },
   "admin.subtitle": { id: "Kelola package pricing, diskon, dan aktivasi fitur", en: "Manage package pricing, discounts, and feature activation" },
   "admin.seed": { id: "Seed Data", en: "Seed Data" },
@@ -1055,21 +1055,21 @@ const DICT: Record<string, { id: string; en: string }> = {
   "admin.info-title": { id: "Cara Kerja Admin Panel", en: "How Admin Panel Works" },
   "admin.info-desc1": { id: "Edit nama atau harga langsung di tabel, lalu klik Simpan per baris.", en: "Edit name or price directly in the table, then click Save per row." },
   "admin.info-desc2": { id: "Toggle status aktif/nonaktif dengan klik icon check/close di kolom Status.", en: "Toggle active/inactive status by clicking the check/close icon in the Status column." },
-  "admin.info-desc3": { id: "Perubahan real-time · semua user langsung melihat harga terbaru.", en: "Real-time changes · all users immediately see updated prices." },
+  "admin.info-desc3": { id: "Perubahan real-time Â· semua user langsung melihat harga terbaru.", en: "Real-time changes Â· all users immediately see updated prices." },
   "admin.info-desc4": { id: "Seed Data untuk mengisi data awal dari konfigurasi hardcoded (hanya jika tabel kosong).", en: "Seed Data to populate initial data from hardcoded config (only if table is empty)." },
   "admin.info-desc5": { id: "Untuk tambah package baru atau edit field lain (limits, badge, dll), hubungi developer.", en: "To add new packages or edit other fields (limits, badge, etc.), contact developer." },
 
-  /* â”€â”€ Login (Google only) â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Login (Google only) Ã¢â€â‚¬Ã¢â€â‚¬ */
   "login.signin": { id: "Masuk", en: "Sign In" },
   "login.welcome-subtitle": { id: "Masuk dengan akun Google Anda untuk mulai menggunakan AI Career Hub", en: "Sign in with your Google account to start using AI Career Hub" },
   "login.google-signin": { id: "Masuk dengan Google", en: "Sign in with Google" },
-  "login.secure": { id: "Aman & terenkripsi · Tidak perlu daftar manual", en: "Secure & encrypted · No manual signup needed" },
+  "login.secure": { id: "Aman & terenkripsi Â· Tidak perlu daftar manual", en: "Secure & encrypted Â· No manual signup needed" },
   "login.error-generic": { id: "Terjadi kesalahan saat masuk dengan Google. Silakan coba lagi.", en: "An error occurred signing in with Google. Please try again." },
   "login.privacy": { id: "Kebijakan Privasi", en: "Privacy Policy" },
   "login.terms": { id: "Syarat & Ketentuan", en: "Terms & Conditions" },
   "login.help": { id: "Bantuan", en: "Help" },
 
-  /* â”€â”€ Pricing Section â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Pricing Section Ã¢â€â‚¬Ã¢â€â‚¬ */
   "pricing.section-title": { id: "Pilih yang Paling Cocok Untukmu", en: "Pick the Best Fit For You" },
   "pricing.section-subtitle": { id: "Mulai gratis. Bayar sekali kalau sudah ketemu paketnya.", en: "Start free. Pay once when you find the right plan." },
   "pricing.toggle-satuan": { id: "Satuan", en: "One-time" },
@@ -1079,6 +1079,34 @@ const DICT: Record<string, { id: string; en: string }> = {
   "pricing.badge-populer": { id: "Paling Populer", en: "Most Popular" },
   "pricing.badge-premium": { id: "Premium", en: "Premium" },
 
+  /* â”€â”€ Paket satuan & bulanan (kunci katalog = kunci i18n) â”€â”€ */
+  "pricing.plan.cek-cv.name": { id: "Cek CV", en: "CV Check" },
+  "pricing.plan.cek-cv.desc": { id: "Satu kali cek CV terhadap lowongan. Skor ATS, kata kunci yang hilang, dan daftar perbaikannya.", en: "One CV check against a job posting: ATS score, missing keywords, and a fix list." },
+  "pricing.plan.bikin-cv.name": { id: "Bikin CV", en: "Build CV" },
+  "pricing.plan.bikin-cv.desc": { id: "CV ATS jadi dari profil yang kamu isi, lengkap dengan revisi.", en: "An ATS-ready CV from your profile, with revisions included." },
+  "pricing.plan.surat.name": { id: "Surat Lamaran", en: "Cover Letter" },
+  "pricing.plan.surat.desc": { id: "Satu surat lamaran yang disesuaikan dengan lowongan yang dituju.", en: "One cover letter tailored to the job you are applying to." },
+  "pricing.plan.portfolio-web.name": { id: "Portfolio Web", en: "Web Portfolio" },
+  "pricing.plan.portfolio-web.desc": { id: "Satu portfolio yang bisa dikirim ke rekruter lewat tautan.", en: "One portfolio you can send to recruiters as a link." },
+  "pricing.plan.paket-lamaran.name": { id: "Paket Lengkap 1 Lamaran", en: "Complete Application Pack" },
+  "pricing.plan.paket-lamaran.desc": { id: "Satu lamaran siap kirim: CV, cek ATS, dan surat lamaran.", en: "One ready-to-send application: CV, ATS check, and cover letter." },
+  "pricing.plan.paket-lamaran.microcopy": { id: "Lebih murah daripada beli ketiganya terpisah.", en: "Cheaper than buying the three separately." },
+  "pricing.plan.lite.name": { id: "Lite", en: "Lite" },
+  "pricing.plan.lite.desc": { id: "Buat CV dan revisi tanpa batas setiap bulan.", en: "Unlimited CV builds and revisions every month." },
+  "pricing.plan.max.name": { id: "Max", en: "Max" },
+  "pricing.plan.max.desc": { id: "Semua fitur Lite dan Pro, portfolio web tanpa batas.", en: "Everything in Lite and Pro, with unlimited web portfolios." },
+  "pricing.plan.max.microcopy": { id: "Untuk yang aktif melamar beberapa posisi.", en: "For job seekers applying to several roles." },
+  "pricing.cta-buy": { id: "Pilih paket ini", en: "Choose this plan" },
+  "pricing.badge-lamaran": { id: "Paling banyak dipilih", en: "Most chosen" },
+  "pricing.badge-free": { id: "Gratis selamanya", en: "Free forever" },
+  "pricing.unit.one-check": { id: "per 1 cek", en: "per check" },
+  "pricing.unit.one-letter": { id: "per 1 surat", en: "per letter" },
+  "pricing.unit.one-portfolio": { id: "per 1 portfolio", en: "per portfolio" },
+  "pricing.unit.one-application": { id: "per 1 lamaran", en: "per application" },
+  "pricing.unit.per-cv": { id: "sekali bayar", en: "one-time" },
+  "pricing.table.unlimited": { id: "Tanpa batas", en: "Unlimited" },
+  "pricing.benefit-note": { id: "Kuota mengikuti isi paket.", en: "Quotas follow the package contents." },
+  "pricing.fair-use-note": { id: "Cek CV tanpa batas, dengan batas wajar 60 analisis mendalam per bulan. Setelah itu analisis tetap jalan memakai model ringan.", en: "Unlimited CV checks, with a fair-use ceiling of 60 deep analyses per month. After that checks still run on the lighter model." },
   /* Plan Names */
   "pricing.plan.cv-starter.name": { id: "Coba Pro 3 Hari", en: "Try Pro for 3 Days" },
   "pricing.plan.cv-starter.desc": { id: "Akses Pro penuh 3 hari: 10x AI CV, analisis ATS, cover letter, ekspor PDF sepuasnya. Pintu masuk termurah sebelum berlangganan.", en: "Full Pro access for 3 days: 10x AI CV, ATS analysis, cover letter, unlimited PDF export. Cheapest way in before subscribing." },
@@ -1093,7 +1121,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "pricing.plan.portfolio.name": { id: "Portfolio Web", en: "Portfolio Web" },
   "pricing.plan.portfolio.desc": { id: "AI generate website portfolio dari data CV kamu. Dapat link publik yang bisa langsung dikirim ke recruiter.", en: "AI generates a portfolio website from your CV data. Get a public link to share with recruiters." },
   "pricing.plan.portfolio.cta": { id: "Buat Portfolio Saya", en: "Create My Portfolio" },
-  "pricing.plan.free.name": { id: "Free", en: "Free" },
+  "pricing.plan.free.name": { id: "Gratis", en: "Free" },
   "pricing.plan.free.desc": { id: "Coba dulu, tidak perlu kartu kredit.", en: "Try first, no credit card needed." },
   "pricing.plan.free.cta": { id: "Mulai Gratis", en: "Start Free" },
   "pricing.plan.starter.name": { id: "Starter", en: "Starter" },
@@ -1121,7 +1149,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "pricing.feat.free-portfolio": { id: "1x AI portfolio / bulan", en: "1x AI portfolio / month" },
   "pricing.bundle.badge": { id: "Paling Hemat", en: "Best Value" },
   "pricing.bundle.title": { id: "Paket Lamaran", en: "Application Pack" },
-  "pricing.bundle.desc": { id: "AI generate unlimited, ekspor PDF unlimited, sampai AI portfolio dan analisis ATS — cukup untuk 2 minggu lamaran yang serius. Masa aktif 60 hari, satu kali bayar.", en: "Unlimited AI generation, unlimited PDF export, plus AI portfolio and ATS analysis — enough for two weeks of serious applications. 60 days, one payment." },
+  "pricing.bundle.desc": { id: "AI generate unlimited, ekspor PDF unlimited, sampai AI portfolio dan analisis ATS â€” cukup untuk 2 minggu lamaran yang serius. Masa aktif 60 hari, satu kali bayar.", en: "Unlimited AI generation, unlimited PDF export, plus AI portfolio and ATS analysis â€” enough for two weeks of serious applications. 60 days, one payment." },
   "pricing.bundle.cta": { id: "Ambil Paket Lamaran", en: "Get Application Pack" },
   "pricing.feat.ai-generate": { id: "AI auto-generate deskripsi dari teks bebas", en: "AI auto-generate description from free text" },
   "pricing.feat.ai-revision": { id: "AI Smart Revision bullet point pengalaman kerja", en: "AI Smart Revision for work experience bullet points" },
@@ -1165,13 +1193,12 @@ const DICT: Record<string, { id: string; en: string }> = {
 
   /* Pricing Bundle */
   "pricing.bundle-title": { id: "Bundle Hemat", en: "Bundle Deal" },
-  "pricing.bundle-desc": { id: "CV AI + Analyzer + Portfolio · Hemat Rp7.000 vs beli satuan · Berlaku 60 hari", en: "CV AI + Analyzer + Portfolio · Save Rp7,000 vs buying separately · Valid 60 days" },
+  "pricing.bundle-desc": { id: "CV AI + Analyzer + Portfolio Â· Hemat Rp7.000 vs beli satuan Â· Berlaku 60 hari", en: "CV AI + Analyzer + Portfolio Â· Save Rp7,000 vs buying separately Â· Valid 60 days" },
   "pricing.bundle-cta": { id: "Ambil Bundle", en: "Get Bundle" },
   "pricing.surat-banner.title": { id: "Surat Lamaran, Cover Letter & Motivation Letter", en: "Cover Letters & Motivation Letters" },
   "pricing.surat-banner.desc": { id: "Tulis surat lamaran formal, cover letter ATS, hingga motivation letter beasiswa dengan AI, datanya otomatis diambil dari CV-mu.", en: "Write formal application letters, ATS cover letters, and scholarship motivation letters with AI, automatically sourced from your CV." },
-  "pricing.surat-banner.free-note": { id: "Gratis 3x per bulan · Unlimited untuk Pro", en: "3x free per month · Unlimited for Pro" },
+  "pricing.surat-banner.free-note": { id: "Gratis 3x per bulan Â· Unlimited untuk Pro", en: "3x free per month Â· Unlimited for Pro" },
   "pricing.surat-banner.cta": { id: "Buat Surat Gratis", en: "Create Letter Free" },
-  "pricing.unit.per-cv": { id: "per CV", en: "per CV" },
   "pricing.unit.3-days": { id: "/ 3 hari", en: "/ 3 days" },
   "pricing.unit.per-analysis": { id: "per analisis", en: "per analysis" },
   "pricing.unit.per-portfolio": { id: "per portfolio", en: "per portfolio" },
@@ -1210,26 +1237,27 @@ const DICT: Record<string, { id: string; en: string }> = {
   "pricing.compare.analyzer": { id: "CV Analyzer", en: "CV Analyzer" },
   "pricing.compare.portfolio": { id: "Portfolio Web", en: "Portfolio Web" },
   "pricing.compare.saved-cvs": { id: "CV disimpan", en: "Saved CVs" },
+  "pricing.compare.ai-suggestion": { id: "AI Suggestions", en: "AI Suggestions" },
   "pricing.compare.ai-revision": { id: "AI Smart Revision", en: "AI Smart Revision" },
   "pricing.compare.priority-support": { id: "Prioritas support", en: "Priority Support" },
   "pricing.compare.cover-letter": { id: "Surat Lamaran & Cover Letter", en: "Cover Letters" },
 
-  /* â”€â”€ Error â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Error Ã¢â€â‚¬Ã¢â€â‚¬ */
   "error.title": { id: "Terjadi Kesalahan", en: "Something Went Wrong" },
   "error.subtitle": { id: "Terjadi kesalahan yang tidak terduga.", en: "An unexpected error occurred." },
   "error.retry": { id: "Coba Lagi", en: "Try Again" },
 
-  /* â”€â”€ Landing Page Testimonials â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Landing Page Testimonials Ã¢â€â‚¬Ã¢â€â‚¬ */
 
-  /* â”€â”€ Landing Page Hero â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Landing Page Hero Ã¢â€â‚¬Ã¢â€â‚¬ */
   "hero.mockup-name": { id: "CV Builder", en: "CV Builder" },
   "hero.mockup-desc": { id: "Drag & drop sections", en: "Drag & drop sections" },
 
-  /* â”€â”€ Before-After â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Before-After Ã¢â€â‚¬Ã¢â€â‚¬ */
   "before-after.badge": { id: "Simulasi hasil", en: "Sample result" },
   "before-after.title": { id: "Lihat Perbedaannya", en: "See the Difference" },
   "before-after.subtitle": { id: "Simulasi perubahan struktur CV setelah melewati pengecekan dan perbaikan. Hasil nyata tetap bergantung pada isi dan lowongan yang kamu targetkan.", en: "A simulation of structural CV improvements after checking and revision. Real outcomes still depend on your content and target role." },
-  "before-after.example": { id: "Contoh simulasi · skor ilustratif, bukan hasil analisis nyata", en: "Sample simulation · illustrative scores, not real analysis results" },
+  "before-after.example": { id: "Contoh simulasi Â· skor ilustratif, bukan hasil analisis nyata", en: "Sample simulation Â· illustrative scores, not real analysis results" },
   "before-after.before-label": { id: "CV Biasa", en: "Standard CV" },
   "before-after.after-label": { id: "CV + AI Career Hub", en: "CV + AI Career Hub" },
   "before-after.ats-label": { id: "Skor ATS", en: "ATS Score" },
@@ -1238,54 +1266,54 @@ const DICT: Record<string, { id: string; en: string }> = {
   "before-after.score-before": { id: "Skor ATS: ", en: "ATS Score: " },
   "before-after.score-after": { id: "Skor ATS: ", en: "ATS Score: " },
   "before-after.difference": { id: "Yang berubah: struktur dan relevansi", en: "What changes: structure and relevance" },
-  "before-after.bullet1": { id: "Format PDF teks (bukan gambar) · terbaca ATS", en: "Text-based PDF (not image) · ATS-readable" },
+  "before-after.bullet1": { id: "Format PDF teks (bukan gambar) Â· terbaca ATS", en: "Text-based PDF (not image) Â· ATS-readable" },
   "before-after.bullet2": { id: "Keyword otomatis disesuaikan dengan Job Description", en: "Keywords auto-matched to Job Description" },
   "before-after.bullet3": { id: "Struktur section rapi + action verbs profesional", en: "Clean section structure + professional action verbs" },
   "before-after.cta": { id: "Optimasi CV Saya Sekarang", en: "Optimize My CV Now" },
 
-  /* â”€â”€ Risk Reversal â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Risk Reversal Ã¢â€â‚¬Ã¢â€â‚¬ */
   "pricing.garansi": { id: "PDF Berbasis Teks", en: "Text-based PDF" },
   "pricing.garansi-desc": { id: "Dapat dibaca mesin ATS", en: "Readable by ATS software" },
   "pricing.no-contract": { id: "Sekali Bayar", en: "Pay Once" },
   "pricing.no-contract-desc": { id: "Tidak diperpanjang otomatis", en: "Never auto-renews" },
   "pricing.best-value": { id: "Best Value", en: "Best Value" },
 
-  /* â”€â”€ Pricing Decoy â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Pricing Decoy Ã¢â€â‚¬Ã¢â€â‚¬ */
   "pricing.decoy": { id: "Paling Laris", en: "Best Selling" },
   "pricing.decoy-desc": { id: "Pilihan 80% pengguna", en: "Chosen by 80% of users" },
 
-  /* â”€â”€ Hero Interactive Demo â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Hero Interactive Demo Ã¢â€â‚¬Ã¢â€â‚¬ */
   "hero.demo-result": { id: "Skor ATS rata-rata untuk posisi ini", en: "Average ATS score for this position" },
 
-  /* â”€â”€ Sticky Mobile CTA â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Sticky Mobile CTA Ã¢â€â‚¬Ã¢â€â‚¬ */
   "sticky.cta": { id: "Mulai Gratis", en: "Start Free" },
   "sticky.cta-sub": { id: "Tidak perlu kartu kredit", en: "No credit card needed" },
 
-  /* â”€â”€ Feature Tabs â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Feature Tabs Ã¢â€â‚¬Ã¢â€â‚¬ */
   "features.tab-builder": { id: "CV Builder", en: "CV Builder" },
   "features.tab-portfolio": { id: "Portfolio", en: "Portfolio" },
   "features.tab-checker": { id: "CV Checker", en: "CV Checker" },
   "features.tab-analysis": { id: "Analisis", en: "Analysis" },
 
-  /* â”€â”€ Analysis Bullets â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Analysis Bullets Ã¢â€â‚¬Ã¢â€â‚¬ */
   "features.analysis-b1": { id: "Upload CV + paste Job Description target", en: "Upload CV + paste target Job Description" },
   "features.analysis-b2": { id: "AI analisis kecocokan real-time per section", en: "AI analyzes match per section in real-time" },
   "features.analysis-b3": { id: "Skor ATS + keyword gap + saran perbaikan", en: "ATS score + keyword gap + improvement tips" },
 
-  /* â”€â”€ Section Progress â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Section Progress Ã¢â€â‚¬Ã¢â€â‚¬ */
   "progress.hero": { id: "Awal", en: "Start" },
   "progress.features": { id: "Fitur", en: "Features" },
   "progress.pricing": { id: "Harga", en: "Pricing" },
   "progress.testimonials": { id: "Testimoni", en: "Testimonials" },
   "progress.cta": { id: "Mulai", en: "Start" },
 
-  /* â”€â”€ Testimonial marquee â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Testimonial marquee Ã¢â€â‚¬Ã¢â€â‚¬ */
   "testimonials.heading.many": { id: "Yang sudah merasakannya", en: "Those who already felt the difference" },
   "testimonials.heading.few": { id: "Kata pengguna kami", en: "What our users say" },
   "testimonials.heading.sub": { id: "Kutipan dari pengguna yang mengizinkan pengalamannya ditampilkan.", en: "Quotes from users who allowed their experience to be shown." },
   "testimonials.item.aria": { id: "Testimoni pengguna", en: "User testimonials" },
 
-  /* â”€â”€ Portfolio spotlight â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Portfolio spotlight Ã¢â€â‚¬Ã¢â€â‚¬ */
   "portfolio.spot.badge": { id: "Portfolio Web Generator", en: "Web Portfolio Generator" },
   "portfolio.spot.title": { id: "Punya karya? Waktunya dipamerkan, bukan disimpan di folder.", en: "Got work to show? Put it on display, not in a folder." },
   "portfolio.spot.desc": { id: "Isi datamu sekali, AI menyusun jadi halaman portfolio yang bisa dibagikan ke recruiter lewat satu link.", en: "Fill in your data once. AI arranges it into a shareable portfolio page, one link for recruiters." },
@@ -1296,10 +1324,10 @@ const DICT: Record<string, { id: string; en: string }> = {
   "portfolio.spot.cta": { id: "Buat Portfolio", en: "Build a Portfolio" },
   "portfolio.spot.preview-label": { id: "Contoh tampilan", en: "Sample layout" },
   "portfolio.spot.sample-title": { id: "Merancang pengalaman digital yang terukur.", en: "Designing measurable digital experiences." },
-  "portfolio.spot.sample-sub": { id: "Digital Marketer · Jakarta", en: "Digital Marketer · Jakarta" },
+  "portfolio.spot.sample-sub": { id: "Digital Marketer Â· Jakarta", en: "Digital Marketer Â· Jakarta" },
   "portfolio.spot.sample-note": { id: "Contoh ilustrasi tata letak. Isi akhirmu sepenuhnya dari datamu.", en: "Illustrative layout sample. Your final content comes from your own data." },
 
-  /* â”€â”€ Logos / Social Proof Stats â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Logos / Social Proof Stats Ã¢â€â‚¬Ã¢â€â‚¬ */
   "logos.heading": { id: "Mulai perjalanan kariermu bersama", en: "Start your career journey with" },
   "logos.badge-ats-title": { id: "CV ATS-Friendly", en: "ATS-Friendly CV" },
   "logos.badge-ats-desc": { id: "Format siap lolos seleksi ATS", en: "Format ready to pass ATS screening" },
@@ -1316,7 +1344,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "logos.badge-portfolio-title": { id: "Portofolio Web", en: "Web Portfolio" },
   "logos.badge-portfolio-desc": { id: "Website pribadi dari data CV", en: "Personal site from CV data" },
 
-  /* â”€â”€ Logos / Activity Feed â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Logos / Activity Feed Ã¢â€â‚¬Ã¢â€â‚¬ */
   "logos.action-create": { id: "membuat CV baru", en: "created a new CV" },
   "logos.action-analyze": { id: "menganalisis CV", en: "analyzed their CV" },
   "logos.action-update": { id: "memperbarui profil", en: "updated their profile" },
@@ -1330,12 +1358,12 @@ const DICT: Record<string, { id: string; en: string }> = {
   "logos.time-11": { id: "11 menit lalu", en: "11 min ago" },
   "logos.time-14": { id: "14 menit lalu", en: "14 min ago" },
 
-  /* â”€â”€ App Header â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ App Header Ã¢â€â‚¬Ã¢â€â‚¬ */
   "header.lang": { id: "ID", en: "EN" },
   "header.lang-full": { id: "Bahasa Indonesia", en: "English" },
   "header.lang-toggle": { id: "Ganti bahasa", en: "Switch language" },
 
-  /* â”€â”€ Checker Detail Page â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Checker Detail Page Ã¢â€â‚¬Ã¢â€â‚¬ */
   "checker.detail.back-dashboard": { id: "Dashboard", en: "Dashboard" },
   "checker.detail.title": { id: "Hasil Analisis CV", en: "CV Analysis Result" },
   "checker.detail.summary-fallback": { id: "Analisis CV telah selesai. Lihat detail di bawah untuk saran perbaikan.", en: "Your CV analysis is complete. See details below for improvement suggestions." },
@@ -1356,15 +1384,15 @@ const DICT: Record<string, { id: string; en: string }> = {
   "checker.detail.ats-recs": { id: "Rekomendasi ATS", en: "ATS Recommendations" },
   "checker.detail.keyword-title": { id: "Keyword Analysis", en: "Keyword Analysis" },
   "checker.detail.keyword-found": { id: "Ditemukan", en: "Found" },
-  "checker.detail.keyword-missing-critical": { id: "Hilang · Prioritas", en: "Missing · Priority" },
-  "checker.detail.keyword-missing-nice": { id: "Hilang · Tambahan", en: "Missing · Nice to Have" },
+  "checker.detail.keyword-missing-critical": { id: "Hilang Â· Prioritas", en: "Missing Â· Priority" },
+  "checker.detail.keyword-missing-nice": { id: "Hilang Â· Tambahan", en: "Missing Â· Nice to Have" },
   "checker.detail.keyword-synonyms": { id: "Saran Sinonim", en: "Synonym Suggestions" },
   "checker.detail.bullet-title": { id: "Review Poin Pengalaman", en: "Experience Bullet Review" },
-  "checker.detail.cta-letters": { id: "Lanjutkan · Buat Surat dari CV Ini", en: "Continue · Create Letters from This CV" },
+  "checker.detail.cta-letters": { id: "Lanjutkan Â· Buat Surat dari CV Ini", en: "Continue Â· Create Letters from This CV" },
   "checker.detail.cover-letter": { id: "Surat Lamaran", en: "Cover Letter" },
-  "checker.detail.cover-formats": { id: "Formal · Formal Lengkap · ATS · Kasual", en: "Formal · Full Formal · ATS · Casual" },
+  "checker.detail.cover-formats": { id: "Formal Â· Formal Lengkap Â· ATS Â· Kasual", en: "Formal Â· Full Formal Â· ATS Â· Casual" },
   "checker.detail.motivation-letter": { id: "Motivation Letter", en: "Motivation Letter" },
-  "checker.detail.motivation-formats": { id: "Beasiswa · Program · Fresh grad", en: "Scholarship · Program · Fresh grad" },
+  "checker.detail.motivation-formats": { id: "Beasiswa Â· Program Â· Fresh grad", en: "Scholarship Â· Program Â· Fresh grad" },
   "checker.detail.cta-good": { id: "Skor CV Kamu Sudah Baik!", en: "Your CV Score Looks Great!" },
   "checker.detail.cta-improve": { id: "Masih Bisa Ditingkatkan!", en: "Can Still Be Improved!" },
   "checker.detail.cta-good-desc": { id: "Gunakan insight di atas untuk fine-tuning CV-mu.", en: "Use the insights above to fine-tune your CV." },
@@ -1378,15 +1406,15 @@ const DICT: Record<string, { id: string; en: string }> = {
   "checker.detail.suggestions": { id: "Saran", en: "Suggestions" },
   "checker.detail.no-notes": { id: "Tidak ada catatan tambahan.", en: "No additional notes." },
   "checker.detail.checklist-title": { id: "Checklist Perbaikan", en: "Improvement Checklist" },
-  "checker.detail.checklist-sub": { id: "Tandai tiap langkah yang sudah kamu lakukan · {done}/{total} selesai", en: "Mark each step you have completed · {done}/{total} done" },
+  "checker.detail.checklist-sub": { id: "Tandai tiap langkah yang sudah kamu lakukan Â· {done}/{total} selesai", en: "Mark each step you have completed Â· {done}/{total} done" },
   "checker.detail.checklist-copy-header": { id: "Rencana Perbaikan CV ({n} langkah)", en: "CV Improvement Plan ({n} steps)" },
   "checker.detail.copy": { id: "Salin", en: "Copy" },
   "checker.detail.copied": { id: "Tersalin!", en: "Copied!" },
   "checker.detail.copy-plan": { id: "Salin seluruh rencana perbaikan", en: "Copy the entire improvement plan" },
   "checker.detail.checklist-progress": { id: "{pct}% selesai", en: "{pct}% done" },
-  "checker.detail.group-quick": { id: "Quick Wins · 5-10 menit", en: "Quick Wins · 5-10 min" },
-  "checker.detail.group-short": { id: "Jangka Pendek · 1-2 jam", en: "Short Term · 1-2 hrs" },
-  "checker.detail.group-long": { id: "Jangka Panjang · restrukturisasi", en: "Long Term · restructure" },
+  "checker.detail.group-quick": { id: "Quick Wins Â· 5-10 menit", en: "Quick Wins Â· 5-10 min" },
+  "checker.detail.group-short": { id: "Jangka Pendek Â· 1-2 jam", en: "Short Term Â· 1-2 hrs" },
+  "checker.detail.group-long": { id: "Jangka Panjang Â· restrukturisasi", en: "Long Term Â· restructure" },
   "checker.detail.group-section": { id: "Section yang belum ada", en: "Missing Sections" },
   "checker.detail.group-keyword": { id: "Keyword kritis yang hilang", en: "Missing Critical Keywords" },
   "checker.detail.group-quick-short": { id: "Quick Wins", en: "Quick Wins" },
@@ -1399,7 +1427,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "checker.detail.cari-fair": { id: "Cukup", en: "Fair" },
   "checker.detail.cari-weak": { id: "Lemah", en: "Weak" },
   "checker.detail.cari-strength-title": { id: "Kekuatan Kalimat (CARI)", en: "Sentence Strength (CARI)" },
-  "checker.detail.cari-desc": { id: "CARI = Context (konteks) · Action (aksi) · Result (hasil terukur) · Impact (dampak bisnis). Semakin tinggi, semakin menarik bagi recruiter & ATS.", en: "CARI = Context · Action · Result · Impact. The higher the score, the more attractive to recruiters & ATS." },
+  "checker.detail.cari-desc": { id: "CARI = Context (konteks) Â· Action (aksi) Â· Result (hasil terukur) Â· Impact (dampak bisnis). Semakin tinggi, semakin menarik bagi recruiter & ATS.", en: "CARI = Context Â· Action Â· Result Â· Impact. The higher the score, the more attractive to recruiters & ATS." },
   "checker.detail.cari-aria": { id: "Skor CARI {score} dari 100", en: "CARI score {score} out of 100" },
   "checker.detail.issues-found": { id: "Masalah yang Ditemukan", en: "Issues Found" },
   "checker.detail.before": { id: "Sebelum", en: "Before" },
@@ -1417,7 +1445,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "checker.impact-quick": { id: "Setelah perbaikan cepat", en: "After quick wins" },
   "checker.impact-all": { id: "Setelah semua perbaikan", en: "After all fixes" },
 
-  /* â”€â”€ Tracker Page â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Tracker Page Ã¢â€â‚¬Ã¢â€â‚¬ */
   "tracker.title": { id: "Job Tracker", en: "Job Tracker" },
   "tracker.subtitle": { id: "Simpan lowongan, atur tahapnya, dan pantau proses lamaran dari satu papan.", en: "Save jobs, arrange the stages, and follow every application from one board." },
   "tracker.add-job": { id: "Tambah Lowongan", en: "Add Job" },
@@ -1475,7 +1503,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "tracker.toast.stage-deleted": { id: "Tahap dihapus.", en: "Stage deleted." },
   "tracker.toast.error": { id: "Terjadi kesalahan. Coba lagi.", en: "Something went wrong. Please try again." },
 
-  /* â”€â”€ Sinonim Page â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Sinonim Page Ã¢â€â‚¬Ã¢â€â‚¬ */
   "sinonim.title": { id: "Sinonim CV", en: "Resume Synonyms" },
   "sinonim.subtitle": { id: "Ganti kata lemah di CV-mu dengan pilihan yang lebih kuat. Klik pengganti untuk menyalin.", en: "Replace weak CV phrasing with stronger wording. Click an alternative to copy it." },
   "sinonim.search-placeholder": { id: "Cari kata atau frasa, mis. 'bertanggung jawab'...", en: "Search a word or phrase, e.g. 'responsible'..." },
@@ -1512,7 +1540,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "new.jobs-title": { id: "Lowongan Pilihan", en: "Featured Jobs" },
   "new.jobs-desc": { id: "Lowongan terkurasi dari tim kami di halaman karir, lengkap dengan tautan lamar.", en: "Curated openings from our team on the career page, each with an apply link." },
 
-  /* â”€â”€ Interview: STAR â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Interview: STAR Ã¢â€â‚¬Ã¢â€â‚¬ */
   "interview.star-title": { id: "Jawab dengan Metode STAR", en: "Answer with the STAR Method" },
   "interview.star-generate": { id: "Susun Jawaban (AI)", en: "Draft My Answer (AI)" },
   "interview.star-generating": { id: "Menyusun...", en: "Drafting..." },
@@ -1536,7 +1564,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "interview.star-feedback": { id: "Umpan Balik", en: "Feedback" },
   "interview.star-improved": { id: "Versi Perbaikan", en: "Improved Version" },
 
-  /* â”€â”€ Dashboard: next best action â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Dashboard: next best action Ã¢â€â‚¬Ã¢â€â‚¬ */
   "dashboard.next-title": { id: "Langkah berikutnya", en: "Next step" },
   "dashboard.next-profile": { id: "Lengkapi profil kariermu dulu", en: "Set up your career profile first" },
   "dashboard.next-complete-profile": { id: "Lengkapi sisa bagian profilmu", en: "Complete the remaining profile sections" },
@@ -1544,7 +1572,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "dashboard.next-check-cv": { id: "Cek skor CV-mu dengan ATS Checker", en: "Check your CV score with the ATS Checker" },
   "dashboard.next-track-job": { id: "Mulai lacak lamaran di Job Tracker", en: "Start tracking applications in Job Tracker" },
 
-  /* â”€â”€ Affiliate â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Affiliate Ã¢â€â‚¬Ã¢â€â‚¬ */
   "header.affiliate": { id: "Program Affiliate", en: "Affiliate Program" },
   "affiliate.title": { id: "Program Affiliate", en: "Affiliate Program" },
   "affiliate.subtitle": { id: "Bagikan linkmu. Setiap user yang daftar lewat linkmu dan membayar pertama kali memberi kamu komisi.", en: "Share your link. Every user who signs up and makes their first payment through it earns you a commission." },
@@ -1585,14 +1613,14 @@ const DICT: Record<string, { id: string; en: string }> = {
   "affiliate.payout-note": { id: "Komisi baru bisa dicairkan setelah {days} hari sejak tercatat (antisipasi refund). Payout diproses manual oleh admin lewat transfer; kamu akan dihubungi lewat email akun.", en: "Commission matures {days} days after it is recorded (to cover refunds). Payouts are processed manually by the admin via transfer; you will be contacted through your account email." },
   "affiliate.error": { id: "Gagal memuat data affiliate.", en: "Failed to load affiliate data." },
 
-  /* â”€â”€ Karir: loker â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Karir: loker Ã¢â€â‚¬Ã¢â€â‚¬ */
   "karir.badge-open": { id: "Loker Tersedia", en: "Jobs Available" },
   "karir.jobs-title": { id: "Loker Pilihan", en: "Featured Jobs" },
   "karir.jobs-desc": { id: "Lowongan terkurasi dari tim kami. Klik Lamar untuk membuka halaman pendaftaran perusahaan.", en: "Curated openings from our team. Click Apply to open the company's application page." },
   "karir.jobs-empty": { id: "Belum ada loker baru saat ini. Cek lagi nanti atau telusuri portal di bawah.", en: "No new openings right now. Check back later or browse the portals below." },
   "karir.apply": { id: "Lamar", en: "Apply" },
 
-  /* â”€â”€ Karir Page â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Karir Page Ã¢â€â‚¬Ã¢â€â‚¬ */
   "karir.meta-title": { id: "Info Karir | AI Career Hub", en: "Careers | AI Career Hub" },
   "karir.meta-desc": { id: "Cari lowongan kerja? Kami sedang menyiapkan job board khusus untuk Anda. Sementara itu, jelajahi portal lowongan eksternal.", en: "Looking for jobs? We are building a dedicated job board for you. Meanwhile, explore trusted external job portals." },
   "karir.back-home": { id: "Kembali ke Beranda", en: "Back to Home" },
@@ -1605,8 +1633,8 @@ const DICT: Record<string, { id: string; en: string }> = {
   "karir.coming-desc": { id: "Tim kami sedang membangun fitur Job Board yang akan membantu kamu menemukan lowongan pekerjaan terbaru yang sesuai dengan profil dan preferensimu.", en: "Our team is building a Job Board feature that will help you find the latest job openings matching your profile and preferences." },
   "karir.coming-1": { id: "Rekomendasi lowongan berdasarkan skill & pengalaman", en: "Job recommendations based on skills & experience" },
   "karir.coming-2": { id: "Notifikasi real-time saat lowongan baru diposting", en: "Real-time notifications for new job postings" },
-  "karir.coming-3": { id: "Lamaran cepat · kirim CV langsung dari platform", en: "Quick apply · submit your CV directly from the platform" },
-  "karir.coming-4": { id: "AI Match · skor kecocokan CV dengan lowongan", en: "AI Match · CV-to-job compatibility score" },
+  "karir.coming-3": { id: "Lamaran cepat Â· kirim CV langsung dari platform", en: "Quick apply Â· submit your CV directly from the platform" },
+  "karir.coming-4": { id: "AI Match Â· skor kecocokan CV dengan lowongan", en: "AI Match Â· CV-to-job compatibility score" },
   "karir.trusted-source": { id: "Sumber Terpercaya", en: "Trusted Sources" },
   "karir.portals-title": { id: "Portal Lowongan Eksternal", en: "External Job Portals" },
   "karir.portals-desc": { id: "Sambil menunggu job board kami rilis, Anda bisa mencari lowongan di portal-portal berikut:", en: "While waiting for our job board to launch, you can search for jobs on these portals:" },
@@ -1620,7 +1648,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "karir.cta-desc": { id: "Sembari menunggu job board rilis, gunakan CV Builder kami untuk membuat CV ATS-friendly yang siap dikirim ke perusahaan impianmu.", en: "While waiting for the job board, use our CV Builder to create an ATS-friendly CV ready to send to your dream company." },
   "karir.cta-btn": { id: "Buat CV Baru", en: "Create New CV" },
 
-  /* â”€â”€ CV Builder â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ CV Builder Ã¢â€â‚¬Ã¢â€â‚¬ */
   "builder.step-personal": { id: "Data Pribadi", en: "Personal Data" },
   "builder.step-target": { id: "Target Pekerjaan", en: "Target Job" },
   "builder.step-experience": { id: "Pengalaman Kerja", en: "Work Experience" },
@@ -1647,10 +1675,10 @@ const DICT: Record<string, { id: string; en: string }> = {
   "builder.add-org": { id: "Tambah Organisasi", en: "Add Organization" },
   "builder.keywords-label": { id: "Kata Kunci:", en: "Keywords:" },
   "builder.keywords-more": { id: "{n} lainnya", en: "{n} more" },
-  "builder.page-badge": { id: "CV {pages} halaman · margin {margin}mm", en: "CV {pages} pages · margin {margin}mm" },
+  "builder.page-badge": { id: "CV {pages} halaman Â· margin {margin}mm", en: "CV {pages} pages Â· margin {margin}mm" },
   "builder.ai-suggest-title": { id: "Saran AI, Ringkasan Profesional", en: "AI Suggestions, Professional Summary" },
   "builder.ai-revise-title": { id: "Optimalkan, Ringkasan Profesional", en: "Optimize, Professional Summary" },
-  "builder.pdf-quota": { id: "Kuota PDF habis · Upgrade untuk unlimited", en: "PDF quota exhausted · Upgrade for unlimited" },
+  "builder.pdf-quota": { id: "Kuota PDF habis Â· Upgrade untuk unlimited", en: "PDF quota exhausted Â· Upgrade for unlimited" },
   "builder.pdf-export-failed": { id: "Gagal mengekspor PDF", en: "Failed to export PDF" },
   "builder.pdf-export-success": { id: "PDF berhasil diunduh", en: "PDF downloaded" },
   "builder.pdf-export-error": { id: "Gagal mengekspor PDF. Silakan coba lagi.", en: "Failed to export PDF. Please try again." },
@@ -1659,7 +1687,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "builder.prev": { id: "Sebelumnya", en: "Previous" },
   "builder.next": { id: "Selanjutnya", en: "Next" },
   "builder.save": { id: "Simpan CV", en: "Save CV" },
-  "builder.saving": { id: "Menyimpan…", en: "Saving…" },
+  "builder.saving": { id: "Menyimpanâ€¦", en: "Savingâ€¦" },
   "builder.saving-short": { id: "Menyimpan...", en: "Saving..." },
   "builder.saved": { id: "Tersimpan", en: "Saved" },
   "builder.save-error": { id: "Gagal simpan", en: "Save failed" },

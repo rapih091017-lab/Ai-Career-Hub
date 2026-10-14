@@ -55,6 +55,6 @@ describe("setiap klaim di halaman harga benar", () => {
   });
 
   it("teks rusak akibat salah enkode dibersihkan", () => {
-    expect(i18nSrc).not.toContain("Â·");
+    // Tiga berkas ini pernah memuat karakter rusak hasil salah enkode.\n    for (const src of [i18nSrc, pricingSrc, deleteUiSrc]) {\n      expect(src).not.toMatch(/[Ââ]/);\n    }
   });
 });

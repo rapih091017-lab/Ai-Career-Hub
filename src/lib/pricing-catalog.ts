@@ -22,15 +22,30 @@ export interface CatalogPackage {
   limits?: Record<string, number | "unlimited" | false>;
 }
 
-/** Id plan di PricingSection dipetakan ke key paket di database. */
+/** Pemetaan plan lama di landing → kunci paket di katalog. */
+/**
+ * Peta backwards-compatible untuk plan id lama, kalau ada tautan lama yang
+ * masih membawa `?plan=`. Plan id sekarang sama dengan kunci paket, jadi peta
+ * ini hanya untuk tautan lama.
+ */
 export const PLAN_ID_TO_PACKAGE_KEY: Record<string, string> = {
-  "cv-starter": "cv_starter",
-  "cv-ai-generate": "cv_ai_generate",
-  "cv-analyzer": "cv_analyzer",
+  "cv-starter": "bikin_cv",
+  "cv-ai-generate": "bikin_cv",
+  "cv-analyzer": "cek_cv",
   "portfolio-web": "portfolio_web",
-  starter: "starter_monthly",
-  pro: "pro_monthly",
-  business: "business_monthly",
+  starter: "lite_bulanan",
+  pro: "pro_bulanan",
+  business: "max_bulanan",
+  bundle: "paket_lamaran",
+  // Plan id yang sekarang sama dengan kunci paket.
+  cek_cv: "cek_cv",
+  portfolio_web: "portfolio_web",
+  bikin_cv: "bikin_cv",
+  surat_lamaran: "surat_lamaran",
+  paket_lamaran: "paket_lamaran",
+  lite_bulanan: "lite_bulanan",
+  pro_bulanan: "pro_bulanan",
+  max_bulanan: "max_bulanan",
 };
 
 /**
@@ -39,14 +54,14 @@ export const PLAN_ID_TO_PACKAGE_KEY: Record<string, string> = {
  * tiba-tiba dan tidak butuh penjelasan.
  */
 export const MARKETED_PACKAGE_KEYS: readonly string[] = [
-  "cv_starter",
-  "cv_ai_generate",
-  "cv_analyzer",
+  "cek_cv",
+  "bikin_cv",
+  "surat_lamaran",
   "portfolio_web",
-  "starter_monthly",
-  "pro_monthly",
-  "business_monthly",
-  "bundle_hemat",
+  "paket_lamaran",
+  "lite_bulanan",
+  "pro_bulanan",
+  "max_bulanan",
 ];
 
 export function formatRupiah(value: number): string {
@@ -66,10 +81,10 @@ export type PackageGroup = "single" | "monthly";
 export type SingleProduct = "cv" | "checker" | "portfolio" | "writing";
 
 const SINGLE_PRODUCT_BY_KEY: Record<string, SingleProduct> = {
-  cv_starter: "cv",
-  cv_ai_generate: "cv",
-  single_cv: "cv",
-  cv_analyzer: "checker",
+  cek_cv: "checker",
+  bikin_cv: "cv",
+  surat_lamaran: "writing",
+  paket_lamaran: "cv",
   portfolio_web: "portfolio",
 };
 

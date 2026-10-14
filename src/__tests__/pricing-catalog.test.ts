@@ -12,11 +12,14 @@ const read = (f: string) => readFileSync(join(process.cwd(), f), "utf8");
 describe("katalog harga", () => {
   it("setiap plan di PricingSection punya pasangan key paket", () => {
     const src = read("src/components/PricingSection.tsx");
-    const planIds = [...src.matchAll(/id:\s*"([a-z0-9-]+)",\s*price:/g)].map((m) => m[1]);
-    expect(planIds.length).toBeGreaterThan(5);
+    // Id plan sekarang sama dengan kunci paket di katalog, jadi tidak ada
+    // pemetaan terpisah yang bisa basi.
+    const planIds = [...src.matchAll(/key:\s*"([a-z_0-9]+)",\s*\n\s*nameKey:/g)].map((m) => m[1]);
+    expect(planIds.length).toBeGreaterThanOrEqual(7);
     for (const id of planIds) {
       if (id === "free") continue; // paket gratis tidak ada di tabel packages
-      expect(PLAN_ID_TO_PACKAGE_KEY[id], `plan "${id}" belum dipetakan ke key paket`).toBeTruthy();
+      expect(MARKETED_PACKAGE_KEYS, `paket "${id}" tidak ada di katalog`).toContain(id);
+      expect(PLAN_ID_TO_PACKAGE_KEY[id], `paket "${id}" belum dipetakan`).toBeTruthy();
     }
   });
 

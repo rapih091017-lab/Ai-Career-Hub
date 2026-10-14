@@ -6,181 +6,191 @@ import Link from "next/link";
 import { useTranslation } from "@/lib/i18n";
 import TiltCard from "@/components/TiltCard";
 import MagneticButton from "@/components/MagneticButton";
-import { useCatalogPrices, formatRupiah } from "@/lib/pricing-catalog";
+import { useCatalogPackages, formatRupiah, packageBenefits } from "@/lib/pricing-catalog";
 
 /* â”€â”€â”€ Types â”€â”€â”€ */
 
 export type BillingMode = "satuan" | "langganan";
+/**
+ * Plan id = kunci paket di katalog, supaya kartu di landing dan yang dibayar
+ * di checkout tidak pernah berbeda. `free` adalah satu-satunya id tanpa
+ * paket (tidak dibeli).
+ */
 export type PlanId =
-  | "cv-starter" | "cv-ai-generate" | "cv-analyzer" | "portfolio-web"
-  | "free" | "starter" | "pro" | "business";
+  | "cek_cv" | "bikin_cv" | "surat_lamaran" | "portfolio_web" | "paket_lamaran"
+  | "free" | "lite_bulanan" | "pro_bulanan" | "max_bulanan";
 
 interface Feature {
   key: string;
   included: boolean;
 }
 
-interface PlanData {
-  id: PlanId;
+/**
+ * Data paket untuk landing.
+ *
+ * Harga dan daftar isi kartu BUKAN ditulis di sini. Keduanya dibaca dari
+ * katalog database lewat `useCatalogPackages()`, supaya yang tertulis di kartu
+ * selalu sama dengan yang benar-benar dibayar saat checkout. Kalau kuota paket
+ * berubah, teksnya ikut berubah tanpa perlu disunting.
+ */
+
+interface LandingPlan {
+  /** Kunci paket di katalog. */
+  key: string;
+  /** Kunci i18n untuk nama dan deskripsi singkat. */
   nameKey: string;
-  price: number;
-  unit: string;
-  unitKey: string;
   descKey: string;
-  features: Feature[];
-  ctaKey: string;
-  ctaStyle: "filled" | "outline" | "ghost" | "muted";
-  badgeKey?: string;
-  featured?: boolean;
+  unitKey: string;
   icon: string;
-  href?: string;
+  ctaStyle: "filled" | "outline" | "ghost" | "muted";
+  featured?: boolean;
+  badgeKey?: string;
   microcopyKey?: string;
+  /** Paket gratis: tanpa kunci katalog. */
+  isFree?: boolean;
 }
 
-const SATUAN_PLAN_DATA: Omit<PlanData, "nameKey" | "descKey" | "ctaKey" | "unitKey">[] = [
+/** Paket satuan: satu hasil yang dibeli sekali, berlaku 30 hari. */
+const SATUAN_PLAN_DATA: LandingPlan[] = [
   {
-    id: "cv-starter", price: 7000, unit: "per CV", icon: "description",
-    ctaStyle: "outline", href: "/builder/new", featured: false,
-    features: [
-      { key: "pricing.feat.trial-ai", included: true },
-      { key: "pricing.feat.trial-analyzer", included: true },
-      { key: "pricing.feat.trial-cover", included: true },
-      { key: "pricing.feat.pdf-unlimited", included: true },
-      { key: "pricing.feat.3-days", included: true },
-    ],
+    key: "cek_cv",
+    nameKey: "pricing.plan.cek-cv.name",
+    descKey: "pricing.plan.cek-cv.desc",
+    unitKey: "pricing.unit.one-check",
+    icon: "fact_check",
+    ctaStyle: "outline",
   },
   {
-    id: "cv-ai-generate", price: 12000, unit: "per CV", icon: "auto_awesome",
-    ctaStyle: "filled", href: "/builder/new", featured: true, badgeKey: "pricing.badge-terlaris",
-    microcopyKey: "pricing.plan.cv-ai.microcopy",
-    features: [
-      { key: "pricing.feat.ai-generate", included: true },
-      { key: "pricing.feat.ai-revision", included: true },
-      { key: "pricing.feat.3-templates", included: true },
-      { key: "pricing.feat.realtime-preview", included: true },
-      { key: "pricing.feat.pdf-ats", included: true },
-      { key: "pricing.feat.30-days", included: true },
-    ],
+    key: "bikin_cv",
+    nameKey: "pricing.plan.bikin-cv.name",
+    descKey: "pricing.plan.bikin-cv.desc",
+    unitKey: "pricing.unit.per-cv",
+    icon: "auto_awesome",
+    ctaStyle: "outline",
   },
   {
-    id: "cv-analyzer", price: 9000, unit: "per analisis", icon: "fact_check",
-    ctaStyle: "outline", href: "/checker",
-    features: [
-      { key: "pricing.feat.ats-score", included: true },
-      { key: "pricing.feat.keyword-detect", included: true },
-      { key: "pricing.feat.suggestions", included: true },
-      { key: "pricing.feat.fast-analysis", included: true },
-      { key: "pricing.feat.1-analysis", included: true },
-    ],
+    key: "surat_lamaran",
+    nameKey: "pricing.plan.surat.name",
+    descKey: "pricing.plan.surat.desc",
+    unitKey: "pricing.unit.one-letter",
+    icon: "mail",
+    ctaStyle: "outline",
   },
   {
-    id: "portfolio-web", price: 35000, unit: "per portfolio", icon: "language",
-    ctaStyle: "outline", href: "/portfolio", badgeKey: "pricing.badge-premium",
-    features: [
-      { key: "pricing.feat.ai-portfolio", included: true },
-      { key: "pricing.feat.pdf-unlimited", included: true },
-      { key: "pricing.feat.3-themes", included: true },
-      { key: "pricing.feat.public-link", included: true },
-      { key: "pricing.feat.mobile-responsive", included: true },
-    ],
+    key: "portfolio_web",
+    nameKey: "pricing.plan.portfolio-web.name",
+    descKey: "pricing.plan.portfolio-web.desc",
+    unitKey: "pricing.unit.one-portfolio",
+    icon: "language",
+    ctaStyle: "outline",
+  },
+  {
+    key: "paket_lamaran",
+    nameKey: "pricing.plan.paket-lamaran.name",
+    descKey: "pricing.plan.paket-lamaran.desc",
+    unitKey: "pricing.unit.one-application",
+    icon: "workspace_premium",
+    ctaStyle: "filled",
+    featured: true,
+    badgeKey: "pricing.badge-lamaran",
+    microcopyKey: "pricing.plan.paket-lamaran.microcopy",
   },
 ];
 
-const LANGGANAN_PLAN_DATA: Omit<PlanData, "nameKey" | "descKey" | "ctaKey" | "unitKey">[] = [
+/** Paket bulanan: 30 hari, dibayar sekali, tidak diperpanjang otomatis. */
+const LANGGANAN_PLAN_DATA: LandingPlan[] = [
   {
-    id: "free", price: 0, unit: "selamanya", icon: "card_giftcard",
-    ctaStyle: "muted", href: "/login",
-    features: [
-      { key: "pricing.feat.free-ai", included: true },
-      { key: "pricing.feat.free-analyzer", included: true },
-      { key: "pricing.feat.free-portfolio", included: true },
-      { key: "pricing.feat.cover-free-3", included: true },
-      { key: "pricing.feat.preview-all", included: true },
-    ],
+    key: "free",
+    nameKey: "pricing.plan.free.name",
+    descKey: "pricing.plan.free.desc",
+    unitKey: "pricing.unit.forever",
+    icon: "card_giftcard",
+    ctaStyle: "filled",
+    isFree: true,
+    badgeKey: "pricing.badge-free",
   },
   {
-    id: "starter", price: 15000, unit: "/ bulan", icon: "rocket_launch",
-    ctaStyle: "outline", href: "/checkout?packages=starter_monthly",
-    features: [
-      { key: "pricing.feat.5-ai-gen", included: true },
-      { key: "pricing.feat.5-templates", included: true },
-      { key: "pricing.feat.pdf-unlimited", included: true },
-      { key: "pricing.feat.save-3", included: true },
-      { key: "pricing.feat.cv-analyzer", included: false },
-      { key: "pricing.feat.portfolio-web", included: false },
-      { key: "pricing.feat.cover-letter", included: false },
-    ],
+    key: "lite_bulanan",
+    nameKey: "pricing.plan.lite.name",
+    descKey: "pricing.plan.lite.desc",
+    unitKey: "pricing.unit.per-month",
+    icon: "rocket_launch",
+    ctaStyle: "outline",
   },
   {
-    id: "pro", price: 29000, unit: "/ bulan", icon: "workspace_premium",
-    ctaStyle: "filled", href: "/checkout?packages=pro_monthly", featured: true, badgeKey: "pricing.badge-populer",
+    key: "pro_bulanan",
+    nameKey: "pricing.plan.pro.name",
+    descKey: "pricing.plan.pro.desc",
+    unitKey: "pricing.unit.per-month",
+    icon: "workspace_premium",
+    ctaStyle: "filled",
+    featured: true,
+    badgeKey: "pricing.badge-populer",
     microcopyKey: "pricing.plan.pro.microcopy",
-    features: [
-      { key: "pricing.feat.unlimited-ai", included: true },
-      { key: "pricing.feat.all-templates", included: true },
-      { key: "pricing.feat.unlimited-analyzer", included: true },
-      { key: "pricing.feat.ai-smart", included: true },
-      { key: "pricing.feat.cover-letter", included: true },
-      { key: "pricing.feat.1-portfolio", included: true },
-      { key: "pricing.feat.save-20", included: true },
-      { key: "pricing.feat.priority", included: true },
-    ],
   },
   {
-    id: "business", price: 79000, unit: "/ bulan", icon: "business_center",
-    ctaStyle: "outline", href: "mailto:hello@aicareerhub.com",
-    features: [
-      { key: "pricing.feat.up-to-20", included: true },
-      { key: "pricing.feat.bulk-analyzer", included: true },
-      { key: "pricing.feat.3-portfolios", included: true },
-      { key: "pricing.feat.white-label", included: true },
-      { key: "pricing.feat.unlimited-save", included: true },
-      { key: "pricing.feat.priority-support", included: true },
-    ],
+    key: "max_bulanan",
+    nameKey: "pricing.plan.max.name",
+    descKey: "pricing.plan.max.desc",
+    unitKey: "pricing.unit.per-month",
+    icon: "business_center",
+    ctaStyle: "outline",
+    microcopyKey: "pricing.plan.max.microcopy",
   },
+];
+
+/** Baris tabel perbandingan: nilai diambil dari katalog, bukan ditulis manual. */
+const COMPARISON_ROWS: { key: string; labelKey: string }[] = [
+  { key: "ai_cv_generate", labelKey: "pricing.compare.ai-gen" },
+  { key: "cv_analyzer", labelKey: "pricing.compare.analyzer" },
+  { key: "ai_revision", labelKey: "pricing.compare.ai-revision" },
+  { key: "ai_suggestion", labelKey: "pricing.compare.ai-suggestion" },
+  { key: "cover_letter", labelKey: "pricing.compare.cover-letter" },
+  { key: "portfolio_web", labelKey: "pricing.compare.portfolio" },
+  { key: "pdf_export", labelKey: "pricing.compare.pdf-export" },
 ];
 
 const FAQ_KEYS = [0, 1, 2, 3, 4, 5, 6];
 
-const COMPARISON_ROW_KEYS = [
-  { labelKey: "pricing.compare.ai-gen", free: "2x/bln", starter: "5x/bln", pro: "Unlimited", business: "20x/bln" },
-  { labelKey: "pricing.compare.templates", free: "Preview", starter: "5", pro: "10+", business: "10+" },
-  { labelKey: "pricing.compare.pdf-export", free: "2x/bln", starter: "âœ“", pro: "âœ“", business: "White-label" },
-  { labelKey: "pricing.compare.analyzer", free: "2x/bln", starter: "-", pro: "Unlimited", business: "Bulk" },
-  { labelKey: "pricing.compare.portfolio", free: "1x AI/bln", starter: "-", pro: "1 aktif", business: "3 aktif" },
-  { labelKey: "pricing.compare.saved-cvs", free: "-", starter: "3", pro: "20", business: "Unlimited" },
-  { labelKey: "pricing.compare.cover-letter", free: "3x/bln", starter: "-", pro: "Unlimited", business: "Unlimited" },
-  { labelKey: "pricing.compare.ai-revision", free: "3x/bln", starter: "-", pro: "âœ“", business: "âœ“" },
-  { labelKey: "pricing.compare.priority-support", free: "-", starter: "-", pro: "-", business: "âœ“" },
-];
+
+
 
 /* â”€â”€â”€ Component â”€â”€â”€ */
 
+/** Kuota paket gratis. Tidak ada paket untuk dibaca, jadi ditulis di sini. */
+const FREE_LIMITS: Record<string, number | "unlimited" | false> = {
+  ai_cv_generate: 2,
+  cv_analyzer: 2,
+  ai_revision: 3,
+  ai_suggestion: 3,
+  cover_letter: 3,
+  portfolio_web: 1,
+  pdf_export: 2,
+};
+
+/** Satu sel tabel perbandingan, nilainya dari kuota paket di katalog. */
+function limitCell(
+  packages: { key: string; limits?: Record<string, number | "unlimited" | false> }[],
+  packageKey: string,
+  featureKey: string,
+  t: (key: string) => string,
+): string {
+  const value = packages.find((p) => p.key === packageKey)?.limits?.[featureKey];
+  if (value === false || value === undefined) return "—";
+  if (value === "unlimited") return t("pricing.table.unlimited");
+  return `${value}x`;
+}
+
+/** Sel untuk paket gratis. */
+function freeCell(featureKey: string, t: (key: string) => string): string {
+  const value = FREE_LIMITS[featureKey];
+  if (value === false) return "—";
+  if (value === "unlimited") return t("pricing.table.unlimited");
+  return `${value}x`;
+}
 interface PricingSectionProps {
   defaultMode?: BillingMode;
   onSelectPlan?: (planId: PlanId, mode: BillingMode) => void;
-}
-
-function makePlan(base: Omit<PlanData, "nameKey" | "descKey" | "ctaKey" | "unitKey">, t: (k: string) => string): PlanData {
-  const id = base.id;
-  const idMap: Record<string, { name: string; desc: string; cta: string; unit: string }> = {
-    "cv-starter": { name: "pricing.plan.cv-starter.name", desc: "pricing.plan.cv-starter.desc", cta: "pricing.plan.cv-starter.cta", unit: "pricing.unit.3-days" },
-    "cv-ai-generate": { name: "pricing.plan.cv-ai.name", desc: "pricing.plan.cv-ai.desc", cta: "pricing.plan.cv-ai.cta", unit: "pricing.unit.per-cv" },
-    "cv-analyzer": { name: "pricing.plan.analyzer.name", desc: "pricing.plan.analyzer.desc", cta: "pricing.plan.analyzer.cta", unit: "pricing.unit.per-analysis" },
-    "portfolio-web": { name: "pricing.plan.portfolio.name", desc: "pricing.plan.portfolio.desc", cta: "pricing.plan.portfolio.cta", unit: "pricing.unit.per-portfolio" },
-    "free": { name: "pricing.plan.free.name", desc: "pricing.plan.free.desc", cta: "pricing.plan.free.cta", unit: "pricing.unit.forever" },
-    "starter": { name: "pricing.plan.starter.name", desc: "pricing.plan.starter.desc", cta: "pricing.plan.starter.cta", unit: "pricing.unit.per-month" },
-    "pro": { name: "pricing.plan.pro.name", desc: "pricing.plan.pro.desc", cta: "pricing.plan.pro.cta", unit: "pricing.unit.per-month" },
-    "business": { name: "pricing.plan.business.name", desc: "pricing.plan.business.desc", cta: "pricing.plan.business.cta", unit: "pricing.unit.per-month" },
-  };
-  const keys = idMap[id];
-  return {
-    ...base,
-    nameKey: keys.name,
-    descKey: keys.desc,
-    ctaKey: keys.cta,
-    unitKey: keys.unit,
-  };
 }
 
 export default function PricingSection({ defaultMode = "satuan", onSelectPlan }: PricingSectionProps) {
@@ -189,20 +199,45 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
   const [showComparison, setShowComparison] = useState(true);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
+  const { packages, loading: catalogLoading } = useCatalogPackages();
+
+  /**
+   * Kartu dibangun dari katalog, bukan dari daftar yang ditulis manual.
+   * Harga, masa berlaku, dan daftar hak diambil apa adanya dari database,
+   * sehingga yang tertulis di landing tidak mungkin berbeda dari yang
+   * ditagih di checkout.
+   */
   const plans = useMemo(() => {
     const raw = mode === "satuan" ? SATUAN_PLAN_DATA : LANGGANAN_PLAN_DATA;
-    return raw.map((p) => makePlan(p, t));
-  }, [mode, t]);
+    return raw.map((plan) => {
+      const pkg = plan.isFree ? null : packages.find((p) => p.key === plan.key);
+      const benefits = pkg ? packageBenefits(pkg) : [];
+      return {
+        id: plan.key as PlanId,
+        nameKey: plan.nameKey,
+        descKey: plan.descKey,
+        ctaKey: plan.isFree ? "pricing.plan.free.cta" : "pricing.cta-buy",
+        unitKey: plan.unitKey,
+        icon: plan.icon,
+        ctaStyle: plan.ctaStyle,
+        featured: plan.featured,
+        badgeKey: plan.badgeKey,
+        microcopyKey: plan.microcopyKey,
+        price: plan.isFree ? 0 : (pkg?.price ?? 0),
+        periodDays: pkg?.periodDays ?? 30,
+        monthly: pkg?.monthly ?? false,
+        // benefits: teks fitur apa adanya dari kuota paket.
+        features: benefits.map((b) => ({ key: `benefit.${b.key}`, included: true, value: b.value })),
+      };
+    });
+  }, [mode, packages]);
 
-  const catalogPrice = useCatalogPrices();
-
-  // Harga coret pada kartu bundle: jumlah paket di dalamnya kalau dibeli terpisah.
+  // Harga paket lengkap dihitung dari paket satuan pembentuknya, supaya angka
+  // penghematan yang ditampilkan benar, bukan angka yang diketik tangan.
   const bundleSeparateTotal = useMemo(() => {
-    const price = (key: string, fallback: number) => catalogPrice(key, fallback);
-    return (
-      price("cv_ai_generate", 12000) + price("cv_analyzer", 9000) + price("portfolio_web", 35000)
-    );
-  }, [catalogPrice]);
+    const price = (key: string) => packages.find((p) => p.key === key)?.price ?? 0;
+    return price("bikin_cv") + price("cek_cv") + price("surat_lamaran");
+  }, [packages]);
 
   return (
     <section id="pricing" className="relative overflow-hidden bg-gradient-to-b from-white via-[#f0fafb] to-white dark:from-[#0F0F0F] dark:via-[#1A1A2E] dark:to-[#0F0F0F] py-24 md:py-32">
@@ -274,7 +309,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
                 </div>
                 <div className="flex items-baseline gap-2 mb-2">
                   <span className="font-bold tabular-nums text-[32px] leading-none text-primary">
-                    {formatRupiah(catalogPrice("bundle_hemat", 49000))}
+                    {formatRupiah(packages.find((p) => p.key === "paket_lamaran")?.price ?? 0)}
                   </span>
                   <span className="text-xs text-on-surface-variant">/ 60 hari, sekali bayar</span>
                 </div>
@@ -283,7 +318,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
               <div className="shrink-0">
                 <MagneticButton>
                   <Link
-                    href="/checkout?packages=bundle_hemat"
+                    href="/checkout?packages=paket_lamaran"
                     className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary px-6 text-sm font-bold text-on-primary hover:brightness-110 active:scale-[0.98] transition-all"
                   >
                     <span className="material-symbols-outlined text-lg" aria-hidden="true">rocket_launch</span>
@@ -304,7 +339,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
             {plans.map((plan, idx) => (
               <div key={plan.id} className="[perspective:800px]">
                 <TiltCard tiltOptions={{ maxAngle: 5, scale: 1.01, glare: false }}>
-                  <PricingCard plan={plan} delay={idx * 0.06} mode={mode} onSelectPlan={onSelectPlan} tFn={t} />
+                  <PricingCard plan={plan} delay={idx * 0.06} mode={mode} onSelectPlan={onSelectPlan} tFn={t} catalogLoading={catalogLoading} />
                 </TiltCard>
               </div>
             ))}
@@ -321,7 +356,12 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
             </p>
             <p className="text-sm text-on-surface-variant inline-flex items-center gap-1.5">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              {t("pricing.footnote-cancel")}
+                          {t("pricing.footnote-cancel")}
+            </p>
+            {/* Batas wajar ini ditulis apa adanya: yang tertulis di kartu sama
+                dengan yang terjadi di sistem. */}
+<p className="text-xs text-on-surface-variant max-w-2xl mx-auto">
+              {t("pricing.fair-use-note")}
             </p>
             {/* Risk Reversal Badges */}
             <div className="flex items-center justify-center gap-4 pt-2">
@@ -363,19 +403,19 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
                         <tr className="bg-surface-container-low border-b border-outline-variant/30">
                           <th className="p-4 text-label-sm font-bold text-on-surface-variant">{t("pricing.comparison-header")}</th>
                           <th className="p-4 text-label-sm font-bold text-on-surface-variant">Free</th>
-                          <th className="p-4 text-label-sm font-bold text-on-surface-variant">Starter</th>
+                          <th className="p-4 text-label-sm font-bold text-on-surface-variant">Lite</th>
                           <th className="p-4 text-label-sm font-bold text-primary bg-primary/5">Pro</th>
-                          <th className="p-4 text-label-sm font-bold text-on-surface-variant">Business</th>
+                          <th className="p-4 text-label-sm font-bold text-on-surface-variant">Max</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {COMPARISON_ROW_KEYS.map((row, i) => (
+                        {COMPARISON_ROWS.map((row, i) => (
                           <tr key={row.labelKey} className={`border-b border-outline-variant/10 ${i % 2 === 0 ? "bg-surface-container-lowest" : "bg-surface-container-low/50"}`}>
                             <td className="p-4 text-sm font-medium text-on-surface">{t(row.labelKey)}</td>
-                            <td className="p-4 text-sm text-on-surface-variant">{row.free}</td>
-                            <td className="p-4 text-sm text-on-surface-variant">{row.starter}</td>
-                            <td className="p-4 text-sm font-semibold text-primary bg-primary/5">{row.pro}</td>
-                            <td className="p-4 text-sm text-on-surface-variant">{row.business}</td>
+                            <td className="p-4 text-sm text-on-surface-variant">{freeCell(row.key, t)}</td>
+                            <td className="p-4 text-sm text-on-surface-variant">{limitCell(packages, "lite_bulanan", row.key, t)}</td>
+                            <td className="p-4 text-sm font-semibold text-primary bg-primary/5">{limitCell(packages, "pro_bulanan", row.key, t)}</td>
+                            <td className="p-4 text-sm text-on-surface-variant">{limitCell(packages, "max_bulanan", row.key, t)}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -404,14 +444,14 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
                 <div className="md:ml-auto flex items-center gap-4">
                   <div className="text-right">
                     <p className="text-2xl font-bold text-primary">
-                      {formatRupiah(catalogPrice("bundle_hemat", 49000))}
+                      {formatRupiah(packages.find((p) => p.key === "paket_lamaran")?.price ?? 0)}
                     </p>
                     <p className="text-xs text-on-surface-variant dark:text-gray-400 line-through">
                       {formatRupiah(bundleSeparateTotal)}
                     </p>
                   </div>
                   <MagneticButton>
-                    <Link href="/checkout?packages=bundle_hemat"
+                    <Link href="/checkout?packages=paket_lamaran"
                       className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-on-primary rounded-xl font-label-bold hover:brightness-110 active:scale-[0.98] transition-all shadow-md whitespace-nowrap">
                       {t("pricing.bundle-cta")}
                     </Link>
@@ -480,14 +520,49 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
   );
 }
 
-/* â”€â”€â”€ Pricing Card â”€â”€â”€ */
+/** Kartu paket. Isi dan harga berasal dari katalog, bukan dari teks statis. */
 
-function PricingCard({ plan, delay, onSelectPlan, mode, tFn }: {
-  plan: PlanData;
+/**
+ * Teks satu baris benefit, misalnya "3x AI CV Builder" atau
+ * "Cover Letter tanpa batas". Diturunkan dari kuota paket supaya kartu dan
+ * akun selalu sama.
+ */
+function benefitText(
+  key: string,
+  value: number | "unlimited" | undefined,
+  t: (key: string) => string,
+): string {
+  const feature = key.replace("benefit.", "");
+  const name = t(`billing.limit.${feature}`);
+  if (value === undefined) return name;
+  if (value === "unlimited") return `${name} ${t("billing.limit.unlimited")}`;
+  return `${value}x ${name}`;
+}
+
+export interface PricingCardPlan {
+  id: PlanId;
+  nameKey: string;
+  descKey: string;
+  ctaKey: string;
+  unitKey: string;
+  icon: string;
+  ctaStyle: "filled" | "outline" | "ghost" | "muted";
+  featured?: boolean;
+  badgeKey?: string;
+  microcopyKey?: string;
+  price: number;
+  periodDays: number;
+  monthly: boolean;
+  features: { key: string; included: boolean; value: number | "unlimited" }[];
+}
+
+function PricingCard({ plan, delay, onSelectPlan, mode, tFn, catalogLoading }: {
+  plan: PricingCardPlan;
   delay: number;
   onSelectPlan?: (planId: PlanId, mode: BillingMode) => void;
   mode: BillingMode;
   tFn: (key: string) => string;
+  catalogLoading?: boolean;
 }) {
   const [isHovered, setIsHovered] = useState(false);
   const t = tFn;
@@ -499,7 +574,7 @@ function PricingCard({ plan, delay, onSelectPlan, mode, tFn }: {
     ghost: "border-2 border-outline-variant text-on-surface-variant hover:bg-surface-container font-medium",
   };
 
-  const isExternal = plan.href?.startsWith("mailto:") || plan.href?.startsWith("https:");
+  // Semua paket punya tujuannya sendiri: gratis ke /login,langsung ke checkout.
   const buttonClasses = "w-full py-3.5 rounded-xl text-sm text-center transition-all active:scale-[0.97] " + btnClass[plan.ctaStyle];
 
   const handleClick = () => {
@@ -538,7 +613,7 @@ function PricingCard({ plan, delay, onSelectPlan, mode, tFn }: {
             <span className="material-symbols-outlined text-[24px]">{plan.icon}</span>
           </div>                    <h3 className="font-label-bold text-on-surface text-lg dark:text-white">{t(plan.nameKey)}</h3>
                     <p className="text-xs text-on-surface-variant mt-1 leading-relaxed dark:text-gray-400">{t(plan.descKey)}</p>
-                    {plan.id === "pro" && (
+                    {plan.id === "pro_bulanan" && (
                       <div className="mt-3 inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 border border-amber-200 rounded-full">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500 shrink-0"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                         <span className="text-xs font-bold text-amber-700">{t("pricing.best-value")}</span>
@@ -556,7 +631,8 @@ function PricingCard({ plan, delay, onSelectPlan, mode, tFn }: {
           </div>
         </div>
 
-        {/* Features */}
+        {/* Benefits: dibaca dari kuota paket, jadi kartu tidak pernah
+            menjanjikan sesuatu yang tidak ada di akun. */}
         <div className="flex-1 space-y-3 mb-8">
           {plan.features.map((feat) => (
             <div key={feat.key} className="flex items-start gap-2.5">
@@ -567,9 +643,12 @@ function PricingCard({ plan, delay, onSelectPlan, mode, tFn }: {
               )}
               <span className={"text-sm leading-relaxed " + (
                 feat.included ? "text-on-surface dark:text-gray-200" : "text-on-surface-variant line-through dark:text-gray-500"
-              )}>{t(feat.key)}</span>
+              )}>{benefitText(feat.key, feat.value, t)}</span>
             </div>
           ))}
+          {plan.features.length === 0 && !catalogLoading ? (
+            <p className="text-sm text-on-surface-variant">{t("pricing.benefit-note")}</p>
+          ) : null}
         </div>
 
         {/* CTA */}
@@ -577,13 +656,14 @@ function PricingCard({ plan, delay, onSelectPlan, mode, tFn }: {
           <MagneticButton className="w-full">
             <button onClick={handleClick} className={buttonClasses}>{t(plan.ctaKey)}</button>
           </MagneticButton>
-        ) : isExternal ? (
-          <MagneticButton className="w-full">
-            <a href={plan.href} target="_blank" rel="noopener noreferrer" className={buttonClasses + " block w-full"}>{t(plan.ctaKey)}</a>
-          </MagneticButton>
         ) : (
           <MagneticButton className="w-full">
-            <Link href={plan.href || "/login"} className={buttonClasses + " block w-full"}>{t(plan.ctaKey)}</Link>
+            <Link
+              href={plan.id === "free" ? "/login" : `/checkout?packages=${plan.id}`}
+              className={buttonClasses + " block w-full"}
+            >
+              {t(plan.ctaKey)}
+            </Link>
           </MagneticButton>
         )}
 

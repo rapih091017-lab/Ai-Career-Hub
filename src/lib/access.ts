@@ -27,15 +27,55 @@ export interface PackageDef {
 }
 
 /**
- * Master list of all buyable packages.
- * Sync this with PricingSection.tsx plans.
+ * Master list paket.
+ *
+ * Dua peran:
+ * 1. Fallback saat database tidak bisa dibaca.
+ * 2. Sumber untuk paket lama yang sudah tidak dijual, supaya pembayaran yang
+ *    sudah dibuat sebelumnya tetap resolve dan pembeli tidak kehilangan haknya.
+ *
+ * Paket yang dijual saat ini ada di tabel `packages` (kolom `active = true`).
  */
 export const PACKAGES: Record<string, PackageDef> = {
-  // â”€â”€ SATUAN â”€â”€
+  // ── SATUAN ──
+  cek_cv: {
+    id: "cek_cv", name: "Cek CV", price: 9000, periodDays: 30, maxActivePortfolios: 0,
+    limits: { ai_cv_generate: false, cv_analyzer: 1, ai_revision: false, ai_suggestion: false, cover_letter: false, portfolio_web: false, pdf_export: false, bulk_analyzer: false, white_label: false },
+  },
+  bikin_cv: {
+    id: "bikin_cv", name: "Bikin CV", price: 19000, periodDays: 30, maxActivePortfolios: 0,
+    limits: { ai_cv_generate: 3, cv_analyzer: false, ai_revision: 5, ai_suggestion: 5, cover_letter: false, portfolio_web: false, pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
+  },
+  surat_lamaran: {
+    id: "surat_lamaran", name: "Surat Lamaran", price: 9000, periodDays: 30, maxActivePortfolios: 0,
+    limits: { ai_cv_generate: false, cv_analyzer: false, ai_revision: false, ai_suggestion: false, cover_letter: 1, portfolio_web: false, pdf_export: false, bulk_analyzer: false, white_label: false },
+  },
+  paket_lamaran: {
+    id: "paket_lamaran", name: "Paket Lengkap 1 Lamaran", price: 34000, periodDays: 30, maxActivePortfolios: 0,
+    limits: { ai_cv_generate: 2, cv_analyzer: 1, ai_revision: 5, ai_suggestion: 5, cover_letter: 1, portfolio_web: false, pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
+  },
+
+  // ── BULANAN (30 hari, dibayar sekali) ──
+  lite_bulanan: {
+    id: "lite_bulanan", name: "Lite Bulanan", price: 19000, periodDays: 30, monthly: true, maxActivePortfolios: 0,
+    limits: { ai_cv_generate: 10, cv_analyzer: 3, ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: 5, portfolio_web: false, pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
+  },
+  pro_bulanan: {
+    id: "pro_bulanan", name: "Pro Bulanan", price: 39000, periodDays: 30, monthly: true, maxActivePortfolios: 1,
+    limits: { ai_cv_generate: "unlimited", cv_analyzer: "unlimited", ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: "unlimited", portfolio_web: 1, pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
+  },
+  max_bulanan: {
+    id: "max_bulanan", name: "Max Bulanan", price: 79000, periodDays: 30, monthly: true, maxActivePortfolios: 5,
+    limits: { ai_cv_generate: "unlimited", cv_analyzer: "unlimited", ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: "unlimited", portfolio_web: "unlimited", pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
+  },
+
+  // ── LAMA: tidak dijual lagi, tapi pembayaran lama masih memakainya ──
+  portfolio_web: {
+    id: "portfolio_web", name: "Portfolio Web", price: 29000, periodDays: 30, maxActivePortfolios: 1,
+    limits: { ai_cv_generate: false, cv_analyzer: false, ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: false, portfolio_web: 1, pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
+  },
   cv_starter: {
     id: "cv_starter", name: "Coba Pro 3 Hari", price: 7000, periodDays: 3, maxActivePortfolios: 0,
-    // Trial akses Pro 3 hari: harus jelas lebih baik dari FREE_LIMITS (2 AI,
-    // 2 analisis, 3 polish, 2 PDF) supaya 7rb bukan pembelian yang meniru gratis.
     limits: { ai_cv_generate: 10, cv_analyzer: 3, ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: "unlimited", portfolio_web: false, pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
   },
   cv_ai_generate: {
@@ -46,23 +86,18 @@ export const PACKAGES: Record<string, PackageDef> = {
     id: "cv_analyzer", name: "CV Analyzer", price: 9000, periodDays: 30, maxActivePortfolios: 0,
     limits: { ai_cv_generate: false, cv_analyzer: 1, ai_revision: false, ai_suggestion: false, cover_letter: false, portfolio_web: false, pdf_export: false, bulk_analyzer: false, white_label: false },
   },
-  portfolio_web: {
-    id: "portfolio_web", name: "Portfolio Web", price: 35000, periodDays: 30, maxActivePortfolios: 5,
-    // Kartu pricing menjanjikan AI portfolio + PDF; batas harus membuktikannya.
-    limits: { ai_cv_generate: false, cv_analyzer: false, ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: false, portfolio_web: "unlimited", pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
-  },
   bundle_hemat: {
     id: "bundle_hemat", name: "Paket Lamaran", price: 49000, periodDays: 60, maxActivePortfolios: 5,
     limits: { ai_cv_generate: "unlimited", cv_analyzer: 1, ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: "unlimited", portfolio_web: "unlimited", pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
   },
 
-  // â”€â”€ SINGLE CV (legacy) â”€â”€
+  // SINGLE CV (lama)
   single_cv: {
     id: "single_cv", name: "Single CV AI Revision", price: 25000, periodDays: 365, maxActivePortfolios: 0,
     limits: { ai_cv_generate: false, cv_analyzer: false, ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: "unlimited", portfolio_web: false, pdf_export: false, bulk_analyzer: false, white_label: false },
   },
 
-  // â”€â”€ LANGGANAN BULANAN â”€â”€
+  // BULANAN (lama)
   premium_pass_30d: {
     id: "premium_pass_30d", name: "Premium Pass 30 Hari", price: 119000, periodDays: 30, monthly: true, maxActivePortfolios: 5,
     limits: { ai_cv_generate: "unlimited", cv_analyzer: "unlimited", ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: "unlimited", portfolio_web: "unlimited", pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
