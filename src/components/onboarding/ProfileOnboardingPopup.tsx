@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslation } from "@/lib/i18n";
 import Modal from "@/components/Modal";
+import { LinkedinImportGuide } from "@/components/profile/LinkedinImportGuide";
 
 type OnboardingAction = "linkedin" | "upload" | "skip";
 
@@ -14,11 +15,10 @@ type OnboardingAction = "linkedin" | "upload" | "skip";
  * (`users.onboarding_completed_at`), jadi tidak muncul lagi di browser lain
  * dan tidak muncul lagi setelah profil diisi.
  *
- * Opsi yang ditawarkan adalah yang benar-benar bekerja hari ini: menyalin
- * teks profil LinkedIn sendiri, atau mengunggah berkas CV. Membaca tautan
- * LinkedIn secara otomatis tidak bisa dilakukan karena LinkedIn memblokir
- * akses otomatis — jadi tidak ditawarkan sebagai janji yang tidak bisa
- * ditepati.
+* Untuk LinkedIn, tautan tidak bisa dibaca otomatis karena LinkedIn memblokir
+ * akses otomatis. Yang bisa adalah pengguna menyimpan salinan profilnya
+ * sendiri, lalu mengunggahnya — langkahnya dituntun di halaman profil, dan
+ * isian manual tetap tersedia.
  */
 export function ProfileOnboardingPopup({
   onStartImport,
