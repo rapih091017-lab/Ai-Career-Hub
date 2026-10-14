@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
@@ -14,19 +14,35 @@ const Ripple = dynamic(
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   // Google yang menolak otorisasi mengarahkan balik ke /login dengan ?error=.
   // Tanpa dibacakan di sini, penolakan itu tidak kelihatan sama sekali.
-  // Hanya path internal yang dipakai. Nilai dari query dipakai apa adanya
-  // bisa membuat pengalihan ke situs lain setelah login.
-  const rawNext = new URLSearchParams(window.location.search).get("next");
-  const nextPath =
-    rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/dashboard";
+  const [errorCode, setErrorCode] = useState<string | null>(null);
+  // Pesan lain (gagal jaringan, dll) ditulis langsung lewat setError.
+  const [errorMessage, setErrorMessage] = useState("");
+  const error = errorCode ? describeAuthError(errorCode) : errorMessage;
+  const setError = (value: string) => {
+    setErrorCode(null);
+    setErrorMessage(value);
+  };
+
+  // Kembalikan pengguna ke halaman yang tadi ingin dibuka, misalnya checkout.
+  // Tanpa ini, semua orang mendarat di dashboard dan pilihan paket yang sudah
+  // dibuat terasa hilang. Query dibaca di peramban supaya halaman tetap bisa
+  // dirender di server.
+  const [nextPath, setNextPath] = useState("/dashboard");
 
   useEffect(() => {
-    const code = new URLSearchParams(window.location.search).get("error");
-    if (code) setError(describeAuthError(code));
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("error");
+    if (code) setErrorCode(code);
+
+    const rawNext = params.get("next");
+    // Hanya path internal yang dipakai. Nilai mentah dari query bisa membuat
+    // pengalihan ke situs lain tepat setelah login.
+    if (rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//")) {
+      setNextPath(rawNext);
+    }
   }, []);
 
   const handleGoogleLogin = async () => {
@@ -125,7 +141,7 @@ export default function LoginPage() {
               {/* Trust indicators */}
               <div className="flex items-center justify-center gap-2 text-xs text-on-surface-variant">
                 <span className="material-symbols-outlined text-sm">verified_user</span>
-                Aman & terenkripsi · Tidak perlu daftar manual
+                Aman & terenkripsi Â· Tidak perlu daftar manual
               </div>
             </motion.div>
 
