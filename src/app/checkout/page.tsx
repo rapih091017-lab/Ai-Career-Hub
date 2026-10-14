@@ -146,11 +146,19 @@ export default function CheckoutPage({
         .json()
         .catch(() => null);
       const result: Partial<CreateOrderResponse> & { message?: string } = raw ?? {};
+      if (res.status === 401) {
+        // Bayar butuh sesi. Kembalikan ke login sambil membawa tujuan supaya
+        // pilihan paket tidak hilang.
+        window.location.href = `/login?next=${encodeURIComponent(
+          `/checkout?packages=${selected.join(",")}`,
+        )}`;
+        return;
+      }
       if (!res.ok) {
         throw new Error(
           result.message ||
             (res.status === 401
-              ? "Sesi kamu habis. Masuk ulang lalu lanjutkan."
+              ? "Masuk dulu supaya pembayaran bisa diproses. Pilihan paketmu sudah tersimpan."
               : `Pembayaran gagal (${res.status}). Coba lagi beberapa saat.`),
         );
       }

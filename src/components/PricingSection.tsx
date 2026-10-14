@@ -8,7 +8,7 @@ import TiltCard from "@/components/TiltCard";
 import MagneticButton from "@/components/MagneticButton";
 import { useCatalogPrices, formatRupiah } from "@/lib/pricing-catalog";
 
-/* ─── Types ─── */
+/* â”€â”€â”€ Types â”€â”€â”€ */
 
 export type BillingMode = "satuan" | "langganan";
 export type PlanId =
@@ -35,7 +35,6 @@ interface PlanData {
   icon: string;
   href?: string;
   microcopyKey?: string;
-  originalPrice?: number;
 }
 
 const SATUAN_PLAN_DATA: Omit<PlanData, "nameKey" | "descKey" | "ctaKey" | "unitKey">[] = [
@@ -101,7 +100,7 @@ const LANGGANAN_PLAN_DATA: Omit<PlanData, "nameKey" | "descKey" | "ctaKey" | "un
   },
   {
     id: "starter", price: 15000, unit: "/ bulan", icon: "rocket_launch",
-    ctaStyle: "outline", href: "/checkout?packages=starter_monthly", originalPrice: 19000,
+    ctaStyle: "outline", href: "/checkout?packages=starter_monthly",
     features: [
       { key: "pricing.feat.5-ai-gen", included: true },
       { key: "pricing.feat.5-templates", included: true },
@@ -146,16 +145,16 @@ const FAQ_KEYS = [0, 1, 2, 3, 4, 5, 6];
 const COMPARISON_ROW_KEYS = [
   { labelKey: "pricing.compare.ai-gen", free: "2x/bln", starter: "5x/bln", pro: "Unlimited", business: "20x/bln" },
   { labelKey: "pricing.compare.templates", free: "Preview", starter: "5", pro: "10+", business: "10+" },
-  { labelKey: "pricing.compare.pdf-export", free: "2x/bln", starter: "✓", pro: "✓", business: "White-label" },
+  { labelKey: "pricing.compare.pdf-export", free: "2x/bln", starter: "âœ“", pro: "âœ“", business: "White-label" },
   { labelKey: "pricing.compare.analyzer", free: "2x/bln", starter: "-", pro: "Unlimited", business: "Bulk" },
   { labelKey: "pricing.compare.portfolio", free: "1x AI/bln", starter: "-", pro: "1 aktif", business: "3 aktif" },
   { labelKey: "pricing.compare.saved-cvs", free: "-", starter: "3", pro: "20", business: "Unlimited" },
   { labelKey: "pricing.compare.cover-letter", free: "3x/bln", starter: "-", pro: "Unlimited", business: "Unlimited" },
-  { labelKey: "pricing.compare.ai-revision", free: "3x/bln", starter: "-", pro: "✓", business: "✓" },
-  { labelKey: "pricing.compare.priority-support", free: "-", starter: "-", pro: "-", business: "✓" },
+  { labelKey: "pricing.compare.ai-revision", free: "3x/bln", starter: "-", pro: "âœ“", business: "âœ“" },
+  { labelKey: "pricing.compare.priority-support", free: "-", starter: "-", pro: "-", business: "âœ“" },
 ];
 
-/* ─── Component ─── */
+/* â”€â”€â”€ Component â”€â”€â”€ */
 
 interface PricingSectionProps {
   defaultMode?: BillingMode;
@@ -211,7 +210,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none dark:bg-primary/10" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-margin-mobile md:px-gutter">
-        {/* ─── HEADER ─── */}
+        {/* â”€â”€â”€ HEADER â”€â”€â”€ */}
         <motion.div className="text-center mb-12 md:mb-16"
           initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
           <h2 className="font-display text-[36px] md:text-display text-on-background dark:text-white mb-4 leading-tight">
@@ -222,7 +221,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
           </p>
         </motion.div>
 
-        {/* ─── TOGGLE ─── */}
+        {/* â”€â”€â”€ TOGGLE â”€â”€â”€ */}
         <div className="flex justify-center mb-10">
           <motion.div className="inline-flex bg-surface-container-lowest dark:bg-[#1F1F2E] rounded-2xl p-1.5 shadow-premium-md border border-outline-variant/30 dark:border-gray-700"
             initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.1 }}>
@@ -245,14 +244,14 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
           </motion.div>
         </div>
 
-        {/* ─── VALUE FRAMING per mode ─── */}
+        {/* â”€â”€â”€ VALUE FRAMING per mode â”€â”€â”€ */}
         <div className="mx-auto mb-8 max-w-xl text-center">
           <p className="text-body-md text-on-surface-variant dark:text-gray-400">
             {mode === "satuan" ? t("pricing.value-satuan") : t("pricing.value-langganan")}
           </p>
         </div>
 
-        {/* ─── BUNDLE HERO (mode langganan) ─── */}
+        {/* â”€â”€â”€ BUNDLE HERO (mode langganan) â”€â”€â”€ */}
         {mode === "langganan" && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -296,7 +295,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
           </motion.div>
         )}
 
-        {/* ─── PRICING CARDS ─── */}
+        {/* â”€â”€â”€ PRICING CARDS â”€â”€â”€ */}
         <AnimatePresence mode="wait">
           <motion.div key={mode}
             initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}
@@ -312,7 +311,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
           </motion.div>
         </AnimatePresence>
 
-        {/* ─── FOOTNOTE (langganan mode) ─── */}
+        {/* â”€â”€â”€ FOOTNOTE (langganan mode) â”€â”€â”€ */}
         {mode === "langganan" && (
           <motion.div className="mt-8 text-center space-y-3"
             initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.3 }}>
@@ -344,7 +343,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
           </motion.div>
         )}
 
-        {/* ─── COMPARISON TABLE ─── */}
+        {/* â”€â”€â”€ COMPARISON TABLE â”€â”€â”€ */}
         <motion.div className="mt-16"
           initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }}>
           <button onClick={() => setShowComparison(!showComparison)}
@@ -388,7 +387,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
           </AnimatePresence>
         </motion.div>
 
-        {/* ─── BUNDLE BOX (satuan mode only) ─── */}
+        {/* â”€â”€â”€ BUNDLE BOX (satuan mode only) â”€â”€â”€ */}
         {mode === "satuan" && (
           <motion.div className="mt-8"
             initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.3 }}>
@@ -423,7 +422,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
           </motion.div>
         )}
 
-        {/* ─── SURAT LAMARAN BANNER (satuan mode only) ─── */}
+        {/* â”€â”€â”€ SURAT LAMARAN BANNER (satuan mode only) â”€â”€â”€ */}
         {mode === "satuan" && (
           <motion.div className="mt-6"
             initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.15 }}>
@@ -455,8 +454,8 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
           </motion.div>
         )}
 
-        {/* ─── 
-{/* ─── FAQ ─── */}
+        {/* â”€â”€â”€ 
+{/* â”€â”€â”€ FAQ â”€â”€â”€ */}
         <motion.div className="mt-16"
           initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.1 }}>
           <h3 className="font-headline-md text-center text-on-surface dark:text-white mb-8">{t("pricing.faq-title")}</h3>
@@ -481,7 +480,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
   );
 }
 
-/* ─── Pricing Card ─── */
+/* â”€â”€â”€ Pricing Card â”€â”€â”€ */
 
 function PricingCard({ plan, delay, onSelectPlan, mode, tFn }: {
   plan: PlanData;
@@ -555,11 +554,6 @@ function PricingCard({ plan, delay, onSelectPlan, mode, tFn }: {
             </span>
             <span className="text-sm text-on-surface-variant dark:text-gray-400">{t(plan.unitKey)}</span>
           </div>
-          {plan.originalPrice && (
-            <span className="text-xs text-on-surface-variant line-through dark:text-gray-500">
-              Rp{plan.originalPrice.toLocaleString("id-ID")}
-            </span>
-          )}
         </div>
 
         {/* Features */}

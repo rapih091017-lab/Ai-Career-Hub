@@ -56,7 +56,7 @@ describe("kunci paket tidak pernah null saat order dibuat", () => {
     // Halaman menyiapkan pesan sendiri kalau server membalas HTML atau bodies
     // kosong, bukan melempar "Unexpected end of JSON input" ke pengguna.
     expect(checkoutSrc).toContain(".catch(() => null)");
-    expect(checkoutSrc).toContain("Sesi kamu habis");
+    expect(checkoutSrc).toContain("Masuk dulu supaya pembayaran bisa diproses");
   });
 });
 

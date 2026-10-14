@@ -1,3 +1,5 @@
+import { checkRateLimit, rateLimitResponse, clientIp } from "@/lib/rate-limiter";
+
 import { ocrImage } from "@/lib/ocr";
 
 /**
@@ -10,6 +12,14 @@ import { ocrImage } from "@/lib/ocr";
  * Output: { extractedText: string, pages: number }
  */
 export async function POST(request: Request) {
+  // OCR berjalan di server dan cukup berat, jadi jumlah permintaannya dibatasi.
+  const rl = checkRateLimit({
+    key: `checker-ocr:${clientIp(request)}`,
+    maxRequests: 10,
+    windowSeconds: 60,
+  });
+  if (!rl.allowed) return rateLimitResponse(rl.resetInSeconds);
+
   try {
     const formData = await request.formData();
 

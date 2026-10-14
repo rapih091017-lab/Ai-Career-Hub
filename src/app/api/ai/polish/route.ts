@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit, rateLimitResponse, clientIp } from "@/lib/rate-limiter";
 import { callAI, MODELS } from "@/lib/ai/adapter";
 import { SECURITY_GUARDRAIL } from "@/lib/ai/prompts/shared";
 
@@ -22,7 +23,7 @@ Gunakan pendekatan 3 langkah:
 3. VALIDASI: Pastikan tidak ada informasi yang diubah maknanya, hanya memperbaiki cara penyampaian
 
 --- ATURAN OPTIMASI ---
-1. Ganti action verb lemah (helped, assisted, did, made) → stronger (developed, built, optimized, delivered)
+1. Ganti action verb lemah (helped, assisted, did, made) â†’ stronger (developed, built, optimized, delivered)
 2. Tambahkan metrik/angka HANYA jika relevan dan datanya tersedia; jika memperkirakan, tandai [est.]
 3. Sisipkan keyword dari target role secara NATURAL (bukan keyword stuffing)
 4. Pertahankan format input, jika bullet list, tetap bullet list
@@ -33,7 +34,7 @@ Gunakan pendekatan 3 langkah:
 
 --- BAHASA ---
 - Deteksi bahasa input secara otomatis
-- Output dalam bahasa yang SAMA dengan input, jangan campur (input Inggris → output Inggris, input Indonesia → output Indonesia)
+- Output dalam bahasa yang SAMA dengan input, jangan campur (input Inggris â†’ output Inggris, input Indonesia â†’ output Indonesia)
 - Gunakan PAST TENSE untuk role lama, PRESENT TENSE untuk role saat ini
 - Pertahankan istilah teknis (React, CI/CD, API) apa adanya
 
@@ -66,6 +67,15 @@ interface PolishRequest {
 }
 
 export async function POST(request: NextRequest) {
+  // Endpoint ini memanggil model AI berbayar: perlu batas permintaan supaya
+  // tidak bisa dipakai tanpa jejak.
+  const rl = checkRateLimit({
+    key: `ai-polish:${clientIp(request)}`,
+    maxRequests: 10,
+    windowSeconds: 60,
+  });
+  if (!rl.allowed) return rateLimitResponse(rl.resetInSeconds);
+
   try {
     const body: PolishRequest = await request.json();
     const { content, jobTitle, skills, jobDescription, field } = body;

@@ -18,6 +18,12 @@ export default function LoginPage() {
 
   // Google yang menolak otorisasi mengarahkan balik ke /login dengan ?error=.
   // Tanpa dibacakan di sini, penolakan itu tidak kelihatan sama sekali.
+  // Hanya path internal yang dipakai. Nilai dari query dipakai apa adanya
+  // bisa membuat pengalihan ke situs lain setelah login.
+  const rawNext = new URLSearchParams(window.location.search).get("next");
+  const nextPath =
+    rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/dashboard";
+
   useEffect(() => {
     const code = new URLSearchParams(window.location.search).get("error");
     if (code) setError(describeAuthError(code));
@@ -27,7 +33,10 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
     try {
-      await signIn("google", { callbackUrl: "/dashboard" });
+      // Kembalikan pengguna ke halaman yang tadi ingin dibuka, misalnya
+      // checkout. Tanpa ini, semua orang mendarat di dashboard dan pilihan
+      // paket yang sudah dibuat terasa hilang.
+      await signIn("google", { callbackUrl: nextPath });
     } catch {
       setError("Terjadi kesalahan saat masuk dengan Google. Silakan coba lagi.");
       setLoading(false);

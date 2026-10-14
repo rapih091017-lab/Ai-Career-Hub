@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit, rateLimitResponse, clientIp } from "@/lib/rate-limiter";
 import { callAI, MODELS } from "@/lib/ai/adapter";
 import { SECURITY_GUARDRAIL } from "@/lib/ai/prompts/shared";
 import { z } from "zod";
@@ -90,6 +91,15 @@ Output: {"errors": [], "totalErrors": 0, "summary": "Tidak ditemukan error"}
 
 export async function POST(request: NextRequest) {
   try {
+    // Endpoint ini memanggil model AI berbayar. Tanpa autentikasi dan tanpa
+    // batas permintaan, siapa pun bisa memakainya tanpa jejak.
+    const rl = checkRateLimit({
+      key: `ai-grammar:${clientIp(request)}`,
+      maxRequests: 10,
+      windowSeconds: 60,
+    });
+    if (!rl.allowed) return rateLimitResponse(rl.resetInSeconds);
+
     const body = await request.json();
     const { content, language = "auto" } = body as {
       content: string;

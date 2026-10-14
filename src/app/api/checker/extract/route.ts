@@ -1,3 +1,5 @@
+import { checkRateLimit, rateLimitResponse, clientIp } from "@/lib/rate-limiter";
+
 import { ocrImage } from "@/lib/ocr";
 import { docToMarkdown } from "@/lib/doc-markdown";
 
@@ -276,6 +278,15 @@ const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 const MAX_PDF_PAGES = 40;
 
 export async function POST(request: Request) {
+  // Membaca PDF/DOCX cukup berat (pdfjs, AnyDoc, pdf-parse), jadi jumlah
+  // permintaannya dibatasi.
+  const rl = checkRateLimit({
+    key: `checker-extract:${clientIp(request)}`,
+    maxRequests: 15,
+    windowSeconds: 60,
+  });
+  if (!rl.allowed) return rateLimitResponse(rl.resetInSeconds);
+
   try {
     const formData = await request.formData();
     const file = formData.get("file");

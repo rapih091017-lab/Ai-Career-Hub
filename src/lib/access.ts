@@ -1,8 +1,9 @@
 import { db } from "@/db";
 import { payments, packages as packagesTable } from "@/db/schema";
 import { eq, and, gte, asc } from "drizzle-orm";
+import { normalizePackageLimits } from "@/lib/package-limits";
 
-/* ─── Feature Keys ─── */
+/* â”€â”€â”€ Feature Keys â”€â”€â”€ */
 export type Feature =
   | "ai_cv_generate"
   | "cv_analyzer"
@@ -14,7 +15,7 @@ export type Feature =
   | "bulk_analyzer"
   | "white_label";
 
-/* ─── Package Definitions ─── */
+/* â”€â”€â”€ Package Definitions â”€â”€â”€ */
 export interface PackageDef {
   id: string;
   name: string;
@@ -30,7 +31,7 @@ export interface PackageDef {
  * Sync this with PricingSection.tsx plans.
  */
 export const PACKAGES: Record<string, PackageDef> = {
-  // ── SATUAN ──
+  // â”€â”€ SATUAN â”€â”€
   cv_starter: {
     id: "cv_starter", name: "Coba Pro 3 Hari", price: 7000, periodDays: 3, maxActivePortfolios: 0,
     // Trial akses Pro 3 hari: harus jelas lebih baik dari FREE_LIMITS (2 AI,
@@ -55,13 +56,13 @@ export const PACKAGES: Record<string, PackageDef> = {
     limits: { ai_cv_generate: "unlimited", cv_analyzer: 1, ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: "unlimited", portfolio_web: "unlimited", pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
   },
 
-  // ── SINGLE CV (legacy) ──
+  // â”€â”€ SINGLE CV (legacy) â”€â”€
   single_cv: {
     id: "single_cv", name: "Single CV AI Revision", price: 25000, periodDays: 365, maxActivePortfolios: 0,
     limits: { ai_cv_generate: false, cv_analyzer: false, ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: "unlimited", portfolio_web: false, pdf_export: false, bulk_analyzer: false, white_label: false },
   },
 
-  // ── LANGGANAN BULANAN ──
+  // â”€â”€ LANGGANAN BULANAN â”€â”€
   premium_pass_30d: {
     id: "premium_pass_30d", name: "Premium Pass 30 Hari", price: 119000, periodDays: 30, monthly: true, maxActivePortfolios: 5,
     limits: { ai_cv_generate: "unlimited", cv_analyzer: "unlimited", ai_revision: "unlimited", ai_suggestion: "unlimited", cover_letter: "unlimited", portfolio_web: "unlimited", pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
@@ -80,7 +81,7 @@ export const PACKAGES: Record<string, PackageDef> = {
   },
 };
 
-/* ─── Get Packages from DB (with fallback to hardcoded) ─── */
+/* â”€â”€â”€ Get Packages from DB (with fallback to hardcoded) â”€â”€â”€ */
 
 interface DbPackageRow {
   key: string;
@@ -98,6 +99,11 @@ const CACHE_TTL_MS = 60_000; // 1 menit
 
 function dbRowToPackageDef(row: DbPackageRow): PackageDef {
   const hardcoded = PACKAGES[row.key];
+  // Bentuk teks di database pernah terjadi. Kalau tidak diparsing, paket yang
+  // sudah dibayar tidak membuka fiturnya.
+  const limits = (normalizePackageLimits(row.limits) ??
+    hardcoded?.limits ??
+    FREE_LIMITS) as Record<Feature, number | "unlimited" | false>;
   return {
     id: row.key,
     name: row.name,
@@ -105,7 +111,7 @@ function dbRowToPackageDef(row: DbPackageRow): PackageDef {
     periodDays: row.periodDays,
     monthly: row.monthly || undefined,
     maxActivePortfolios: hardcoded?.maxActivePortfolios ?? 0,
-    limits: row.limits || hardcoded?.limits || FREE_LIMITS,
+    limits,
   };
 }
 
@@ -155,7 +161,7 @@ export async function getPackagesDb(): Promise<Record<string, PackageDef>> {
   }
 }
 
-/* ─── Default free limits ─── */
+/* â”€â”€â”€ Default free limits â”€â”€â”€ */
 export const FREE_LIMITS: Record<Feature, number | "unlimited" | false> = {
   ai_cv_generate: 2,
   cv_analyzer: 2,
@@ -168,7 +174,7 @@ export const FREE_LIMITS: Record<Feature, number | "unlimited" | false> = {
   white_label: false,
 };
 
-/* ─── User Access Result ─── */
+/* â”€â”€â”€ User Access Result â”€â”€â”€ */
 export interface UserAccess {
   /** Best-tier package name for display */
   tierName: string;

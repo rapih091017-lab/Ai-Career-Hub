@@ -1071,10 +1071,10 @@ const DICT: Record<string, { id: string; en: string }> = {
 
   /* â”€â”€ Pricing Section â”€â”€ */
   "pricing.section-title": { id: "Pilih yang Paling Cocok Untukmu", en: "Pick the Best Fit For You" },
-  "pricing.section-subtitle": { id: "Mulai gratis. Upgrade kapan saja. Tanpa kontrak.", en: "Start free. Upgrade anytime. No contract." },
+  "pricing.section-subtitle": { id: "Mulai gratis. Bayar sekali kalau sudah ketemu paketnya.", en: "Start free. Pay once when you find the right plan." },
   "pricing.toggle-satuan": { id: "Satuan", en: "One-time" },
-  "pricing.toggle-langganan": { id: "Langganan Bulanan", en: "Monthly" },
-  "pricing.badge-hemat": { id: "Hemat 30%", en: "Save 30%" },
+  "pricing.toggle-langganan": { id: "Paket Bulanan (30 hari)", en: "Monthly plans (30 days)" },
+  "pricing.badge-hemat": { id: "Lebih hemat untuk yang rutin pakai", en: "Cheaper for regular use" },
   "pricing.badge-terlaris": { id: "Terlaris", en: "Best Seller" },
   "pricing.badge-populer": { id: "Paling Populer", en: "Most Popular" },
   "pricing.badge-premium": { id: "Premium", en: "Premium" },
@@ -1102,7 +1102,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "pricing.plan.pro.name": { id: "Pro", en: "Pro" },
   "pricing.plan.pro.desc": { id: "Semua fitur aktif. Paling worth it untuk yang serius mencari kerja.", en: "All features active. Best value for serious job seekers." },
   "pricing.plan.pro.cta": { id: "Mulai Pro", en: "Start Pro" },
-  "pricing.plan.pro.microcopy": { id: "Setara harga 1 cup kopi. Cancel kapan saja.", en: "Price of 1 cup of coffee. Cancel anytime." },
+  "pricing.plan.pro.microcopy": { id: "Sekali bayar, berlaku 30 hari. Tidak ada tagihan berikutnya.", en: "Pay once, valid for 30 days. No second bill." },
   "pricing.plan.business.name": { id: "Business", en: "Business" },
   "pricing.plan.business.desc": { id: "Untuk HR, career coach, atau agen rekrutmen yang handle banyak kandidat.", en: "For HR, career coaches, or recruitment agencies handling many candidates." },
   "pricing.plan.business.cta": { id: "Hubungi Kami", en: "Contact Us" },

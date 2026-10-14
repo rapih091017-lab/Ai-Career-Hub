@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { errorResponse, apiHandler, checkQuota, logUsage } from "@/lib/api-utils";
+import { isPrivateUrl } from "@/lib/private-url";
 
 export const runtime = "nodejs";
 // Cold start: ekstraksi binary Chromium + launch butuh waktu. Warm: ~2-4s.
@@ -67,6 +68,26 @@ export const POST = apiHandler(async (request: NextRequest) => {
 
     try {
       const page = await browser.newPage();
+
+      /**
+       * HTML datang dari peramban, jadi tanpa penyaringan, `<img src>` bisa
+       * mengambil alamat internal server (mis. 169.254.169.254) dan
+       * membocorkan isinya lewat PDF. Semua permintaan ke jaringan internal
+       * diblokir; hanya http/https, data:, dan blob: yang diizinkan.
+       */
+      await page.setRequestInterception(true);
+      page.on("request", (req) => {
+        const url = req.url();
+        if (url.startsWith("data:") || url.startsWith("blob:") || url.startsWith("about:")) {
+          void req.continue();
+          return;
+        }
+        if (isPrivateUrl(url)) {
+          void req.abort();
+          return;
+        }
+        void req.continue();
+      });
 
       // setContent lebih andal daripada goto(data:) untuk HTML besar.
       // "load": tunggu resource sinkron; webfont diverifikasi lewat document.fonts.ready.
