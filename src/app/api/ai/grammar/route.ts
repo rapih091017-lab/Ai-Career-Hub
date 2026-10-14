@@ -4,7 +4,9 @@ import { callAI, MODELS } from "@/lib/ai/adapter";
 import { SECURITY_GUARDRAIL } from "@/lib/ai/prompts/shared";
 import { z } from "zod";
 
-export const runtime = "edge";
+// Runtime Node, bukan edge: rate limiter memakai setInterval().unref() yang
+// tidak ada di runtime edge.
+export const runtime = "nodejs";
 
 /**
  * AI Grammar Check API, Endpoint untuk memeriksa ejaan dan tanda baca pada CV

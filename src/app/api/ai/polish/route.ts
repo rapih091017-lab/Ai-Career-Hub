@@ -1,9 +1,11 @@
-﻿import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit, rateLimitResponse, clientIp } from "@/lib/rate-limiter";
 import { callAI, MODELS } from "@/lib/ai/adapter";
 import { SECURITY_GUARDRAIL } from "@/lib/ai/prompts/shared";
 
-export const runtime = "edge";
+// Runtime Node, bukan edge: rate limiter memakai setInterval().unref() yang
+// tidak ada di runtime edge.
+export const runtime = "nodejs";
 
 /**
  * AI Polish API v2, Quick polish dengan CV context
