@@ -118,10 +118,28 @@ export default function CheckoutPage({
     }
   }, [catalog, selected]);
 
-  const options = useMemo(() => {
+const options = useMemo(() => {
     if (!catalog) return [];
     return MARKETED_PACKAGE_KEYS.map((key) => catalog[key]).filter(Boolean);
   }, [catalog]);
+
+  /**
+   * Total kalau paket yang dipilih dibeli satuan-satu, bukan sebagai paket
+   * gabungan. Dipakai untuk menghitung penghematan yang sebenarnya.
+   */
+  const separateTotal = useMemo(() => {
+    if (!catalog || selected.length === 0) return 0;
+    // Satu paket digabung = hasil satu lamaran; bandingkan dengan tiga
+    // paket satuan pembentuknya.
+    const bundle = selection;
+    if (bundle && selected.includes("paket_lamaran")) {
+      const parts = ["bikin_cv", "cek_cv", "surat_lamaran"]
+        .map((key) => catalog[key]?.price ?? 0)
+        .reduce((sum, price) => sum + price, 0);
+      return parts;
+    }
+    return selected.reduce((sum, key) => sum + (catalog[key]?.price ?? 0), 0);
+  }, [catalog, selected, selection]);
 
   const toggle = (key: string) => {
     setError(null);
@@ -284,6 +302,31 @@ return (
               </ul>
             )}
 
+{/*
+              * Penghematan dihitung dari harga katalog: kalau pengguna memilih
+              * paket lengkap, jumlah yang dihemat adalah selisih nyata antara
+              * paket itu dan pembelian satuan pembentuknya. Tidak ada angka
+              * diskon yang diketik tangan.
+              */}
+            {separateTotal > (selection?.total ?? 0) && selection ? (
+              <div className="rounded-xl border border-green-600/25 bg-green-600/5 px-3 py-2.5">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-on-surface-variant">
+                    {selected.length > 1
+                      ? "Beli terpisah lebih mahal"
+                      : "Paket ini lebih murah daripada beli terpisah"}
+                  </span>
+                  <span className="font-bold text-green-700">
+                    −{formatRupiah(separateTotal - selection.total)}
+                  </span>
+                </div>
+                <p className="mt-1 text-xs text-on-surface-variant">
+                  {formatRupiah(selection.total)} dari {formatRupiah(separateTotal)} kalau dibeli
+                  terpisah.
+                </p>
+              </div>
+            ) : null}
+
             {selection ? (
               <div className="flex items-center justify-between pt-2 border-t border-outline-variant/30">
                 <span className="font-semibold text-on-surface">Total</span>
@@ -332,14 +375,43 @@ return (
                   : "Pilih paket dulu"}
             </button>
 
-            <p className="text-xs text-on-surface-variant">
+<p className="text-xs text-on-surface-variant">
               Pembayaran hanya dibuat setelah kamu menekan tombol bayar. Butuh bantuan?{" "}
               <Link href="/contact" className="text-primary hover:underline">
                 Hubungi kami
               </Link>
               .
             </p>
-</aside>
+
+            {/* Tiga hal yang paling sering ditanyakan sebelum bayar. Semuanya
+                bisa diperiksa sendiri, jadi ditulis apa adanya. */}
+            <ul className="space-y-1.5 border-t border-outline-variant/30 pt-3">
+              <li className="flex items-start gap-2 text-xs text-on-surface-variant">
+                <span className="material-symbols-outlined text-[14px] text-primary shrink-0">
+                  picture_as_pdf
+                </span>
+                PDF-nya berbasis teks, bukan gambar, jadi bisa dibaca mesin ATS.
+              </li>
+              <li className="flex items-start gap-2 text-xs text-on-surface-variant">
+                <span className="material-symbols-outlined text-[14px] text-primary shrink-0">
+                  event_available
+                </span>
+                Sekali bayar. Masa berlaku tertera di tiap paket, tidak ada tagihan berikutnya.
+              </li>
+              <li className="flex items-start gap-2 text-xs text-on-surface-variant">
+                <span className="material-symbols-outlined text-[14px] text-primary shrink-0">
+                  delete
+                </span>
+                Data CV-mu bisa kamu hapus sendiri kapan saja dari halaman Pengaturan.
+              </li>
+            </ul>
+            <Link
+              href="/terms"
+              className="text-xs text-on-surface-variant underline hover:text-primary"
+            >
+              Syarat &amp; Ketentuan
+            </Link>
+          </aside>
         </div>
         </div>
       </main>

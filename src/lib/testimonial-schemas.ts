@@ -21,3 +21,15 @@ export const testimonialUpdateSchema = z
   .refine((data) => Object.values(data).some((value) => value !== undefined), {
     message: "Minimal satu field harus diubah.",
   });
+
+/**
+ * Testimoni yang dikirim pengguna sendiri (bukan admin).
+ *
+ * Tidak punya `isPublished` dan `sortOrder` dengan sengaja: pengguna tidak
+ * bisa menerbitkan sendiri. Nama diambil dari akun supaya bisa ditelusuri.
+ */
+export const testimonialSubmissionSchema = z.object({
+  displayName: z.string().trim().min(2, "Nama wajib diisi.").max(100),
+  role: z.string().trim().min(2, "Sebutkan perannya, misalnya Mahasiswa atau Data Analyst.").max(100),
+  text: z.string().trim().min(20, "Ceritakan sedikit lebih banyak (minimal 20 karakter).").max(600),
+});

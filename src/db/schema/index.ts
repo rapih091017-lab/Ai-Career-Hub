@@ -527,14 +527,20 @@ export const careerHubPosts = pgTable("career_hub_posts", {
  * Bukti sosial dari pengguna nyata, dikelola dari /admin/testimonials.
  * Landing menampilkan marquee hanya bila ada testimoni terbit. */
 
-export const testimonials = pgTable("testimonials", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  name: varchar("name", { length: 100 }).notNull(),
-  role: varchar("role", { length: 100 }).notNull(),
-  text: varchar("text", { length: 600 }).notNull(),
-  avatarUrl: text("avatar_url"),
-  isPublished: boolean("is_published").notNull().default(false),
-  sortOrder: integer("sort_order").notNull().default(0),
-  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
-});
+export const testimonials = pgTable(
+  "testimonials",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    name: varchar("name", { length: 100 }).notNull(),
+    role: varchar("role", { length: 100 }).notNull(),
+    text: varchar("text", { length: 600 }).notNull(),
+    avatarUrl: text("avatar_url"),
+    /** Akun pengirim, supaya satu orang hanya bisa mengirim satu testimoni. */
+    userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+    isPublished: boolean("is_published").notNull().default(false),
+    sortOrder: integer("sort_order").notNull().default(0),
+    createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
+  },
+  (table) => [index("testimonials_user_idx").on(table.userId)],
+);

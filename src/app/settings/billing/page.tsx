@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { PackageCard } from "@/components/checkout/PackageCard";
+import { TestimonialRequest } from "@/components/billing/TestimonialRequest";
 
 import {
   useCatalogPrices,
@@ -515,6 +516,12 @@ onClick={() => {
           </div>
         </div>
       )}
+
+      {/* Minta testimoni setelah pembayaran masuk. Testimoni masuk antrean admin,
+          jadi tidak ada yang bisa terbit sendiri tanpa ditinjau. */}
+      <section className="bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/30 p-6">
+        <TestimonialRequest />
+      </section>
 
       {/* How to Pay Info */}
       <section className="bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/30 p-6">
