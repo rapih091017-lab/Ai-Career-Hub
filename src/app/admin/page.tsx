@@ -89,21 +89,17 @@ const formatDateTime = (date: string | null) => {
 };
 
 const PAYMENT_LABELS: Record<string, string> = {
-  settlement: "Lunas",
-  success: "Sukses",
+  success: "Lunas",
   pending: "Pending",
-  failure: "Gagal",
+  failed: "Gagal",
   expired: "Kadaluarsa",
-  deny: "Ditolak",
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  settlement: "bg-emerald-500/10 text-emerald-700",
   success: "bg-emerald-500/10 text-emerald-700",
   pending: "bg-amber-500/10 text-amber-700",
-  failure: "bg-error-container/60 text-on-error-container",
+  failed: "bg-error-container/60 text-on-error-container",
   expired: "bg-surface-container text-on-surface-variant",
-  deny: "bg-error-container/60 text-on-error-container",
 };
 
 const PACKAGE_LABELS: Record<string, string> = {

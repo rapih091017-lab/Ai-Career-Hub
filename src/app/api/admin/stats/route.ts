@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { users, cvDocuments, usageLogs, payments, checkerResults } from "@/db/schema";
 import { count, gte, lte, sql, and, eq } from "drizzle-orm";
 import { withAdmin, apiHandler } from "@/lib/api-utils";
+import { PAYMENT_SUCCESS_STATUS } from "@/lib/kasera-webhook";
 
 /* ─── Helper: past date ─── */
 function daysAgo(n: number): Date {
@@ -68,13 +69,13 @@ export const GET = apiHandler(async () => {
         ),
       );
 
-    // Revenue today (settled payments)
+    // Revenue hari ini (pembayaran berhasil)
     const [revenueRow] = await db
       .select({ value: sql<number>`COALESCE(SUM(${payments.amount}), 0)` })
       .from(payments)
       .where(
         and(
-          eq(payments.paymentStatus, "settlement"),
+          eq(payments.paymentStatus, PAYMENT_SUCCESS_STATUS),
           gte(payments.paidAt, startToday),
           lte(payments.paidAt, endToday),
         ),
@@ -115,7 +116,7 @@ export const GET = apiHandler(async () => {
       db
         .select({ date: payToChar, value: sql<number>`COALESCE(SUM(${payments.amount}), 0)` })
         .from(payments)
-        .where(and(eq(payments.paymentStatus, "settlement"), gte(payments.paidAt, sevenDaysAgo)))
+        .where(and(eq(payments.paymentStatus, PAYMENT_SUCCESS_STATUS), gte(payments.paidAt, sevenDaysAgo)))
         .groupBy(payToChar)
         .orderBy(payToChar),
       db
@@ -152,9 +153,9 @@ export const GET = apiHandler(async () => {
         revenue: sql<number>`COALESCE(SUM(${payments.amount}), 0)`,
       })
       .from(payments)
-      .where(eq(payments.paymentStatus, "settlement"))
+      .where(eq(payments.paymentStatus, PAYMENT_SUCCESS_STATUS))
       .groupBy(payments.packageType)
-      .orderBy(sql`sales DESC`);
+      .orderBy(sql`COUNT(*) DESC`);
 
     /* ── 4. Recent Users ── */
     const recentUsers = await db
@@ -195,7 +196,7 @@ export const GET = apiHandler(async () => {
     const [totalRevenueRow] = await db
       .select({ value: sql<number>`COALESCE(SUM(${payments.amount}), 0)` })
       .from(payments)
-      .where(eq(payments.paymentStatus, "settlement"));
+      .where(eq(payments.paymentStatus, PAYMENT_SUCCESS_STATUS));
     const [totalCheckRow] = await db
       .select({ value: count() })
       .from(checkerResults);

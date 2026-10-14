@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { users, cvDocuments, usageLogs, payments } from "@/db/schema";
 import { count, gte, lte, sql, and, eq, desc } from "drizzle-orm";
 import { withAdmin, apiHandler } from "@/lib/api-utils";
+import { PAYMENT_SUCCESS_STATUS } from "@/lib/kasera-webhook";
 
 /* ─── CSV Helpers ─── */
 function escapeCSV(val: unknown): string {
@@ -78,7 +79,7 @@ export const GET = apiHandler(async (request: NextRequest) => {
 
       // Summary footer
       const totalRevenue = rows
-        .filter((r) => r.paymentStatus === "settlement" || r.paymentStatus === "success")
+        .filter((r) => r.paymentStatus === PAYMENT_SUCCESS_STATUS)
         .reduce((sum, r) => sum + r.amount, 0);
       csv += `\nTotal Revenue (settled),${totalRevenue}\n`;
       csv += `Total Transactions,${rows.length}\n`;
@@ -150,7 +151,7 @@ export const GET = apiHandler(async (request: NextRequest) => {
           .from(payments)
           .where(
             and(
-              eq(payments.paymentStatus, "settlement"),
+              eq(payments.paymentStatus, PAYMENT_SUCCESS_STATUS),
               gte(payments.paidAt, thirtyDaysAgo),
             ),
           )

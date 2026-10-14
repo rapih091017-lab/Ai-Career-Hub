@@ -9,6 +9,15 @@
 
 export type KaseraEventType = "payment.paid" | "payment.expired" | "payment.failed";
 
+/**
+ * Status `payments` yang berarti uang sudah masuk.
+ *
+ * Webhook Kasera menulis `success`, jadi semua pembacaan harus pakai konstanta
+ * ini. Sebelumnya halaman admin masih menanyakan `settlement` (kosakata era
+ * Midtrans), sehingga Omzet dan penjualan di dashboard selalu kosong.
+ */
+export const PAYMENT_SUCCESS_STATUS = "success";
+
 export interface KaseraWebhookPayload {
   id?: string;
   type?: string;
