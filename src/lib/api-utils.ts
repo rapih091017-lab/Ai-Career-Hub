@@ -108,6 +108,39 @@ export function noCache(): Record<string, string> {
   };
 }
 
+/** Paket yang menjual fitur tertentu, dipakai untuk mengarahkan pengguna yang
+ *  fiturnya tidak termasuk ke tempat yang benar. */
+const PACKAGE_SELLING_FEATURE: Record<string, string> = {
+  cv_analyzer: "Paket Cek CV",
+  cover_letter: "Paket Surat Lamaran",
+  ai_cv_generate: "Paket Bikin CV",
+  portfolio_web: "Paket Pro",
+  ai_revision: "Paket Pro",
+  ai_suggestion: "Paket Pro",
+  pdf_export: "Paket Bikin CV",
+};
+
+const LIMIT_KEY_LABEL: Record<string, string> = {
+  ai_suggestion: "saran perbaikan",
+  ai_revision: "penulisan ulang",
+  checker_check: "cek CV",
+  cv_build: "pembuatan CV",
+  portfolio_generate: "portfolio web",
+  pdf_export: "ekspor PDF",
+  cover_letter_generate: "surat lamaran",
+};
+
+const FEATURE_NOT_AVAILABLE_LABEL: Record<string, string> = {
+  ...LIMIT_KEY_LABEL,
+  cv_analyzer: "cek CV",
+  cover_letter: "surat lamaran",
+  ai_cv_generate: "pembuatan CV",
+  pdf_export: "ekspor PDF",
+  portfolio_web: "portfolio web",
+  ai_revision: "penulisan ulang",
+  ai_suggestion: "saran perbaikan",
+};
+
 /* ─── Quota check helper ─── */
 export async function checkQuota(
   userId: string,
@@ -140,11 +173,17 @@ export async function checkQuota(
   }
 
   const limit = (access.limits as Record<string, number | "unlimited" | false>)[limitKey];
+  const label = FEATURE_NOT_AVAILABLE_LABEL[actionType] ?? actionType;
 
   if (limit === false) {
+    // Paket berbayar pun bisa punya fitur yang tidak termasuk, jadi pesannya
+    // menyebut paket yang memang menjual fitur itu, bukan "upgrade" generik.
+    const owner = PACKAGE_SELLING_FEATURE[limitKey];
     return errorResponse(
       "FEATURE_NOT_AVAILABLE",
-      `Fitur ${actionType} tidak tersedia di paket kamu. Upgrade untuk mengakses.`,
+      owner
+        ? `${label} tidak termasuk di paket yang kamu punya. ${owner} sudah memuatnya.`
+        : `${label} tidak tersedia di paket kamu.`,
       403,
     ) as NextResponse;
   }
@@ -166,9 +205,15 @@ export async function checkQuota(
       );
 
     if (usageRow.value >= limit) {
+      // Dua kasus yang perlu kalimat berbeda: pengguna yang belum bayar, dan
+      // pengguna yang sudah membayar lalu kehabisan kuota. Memberi tahu orang
+      // yang sudah beli "upgrade" adalah cara tercepat jadi tiket kecewa.
+      const extra = access.isPremium
+        ? `Kuotanya habis bulan ini, sudah termasuk dalam paket yang kamu beli.`
+        : `Kuota paketmu bulan ini sudah habis.`;
       return errorResponse(
         "QUOTA_EXCEEDED",
-        `Batas gratis ${actionType} sudah terpakai (${limit}/${limit}). Upgrade ke Premium untuk unlimited.`,
+        `${label} sudah terpakai ${limit}/${limit}. ${extra} Bisa dipakai lagi tanggal 1, atau naik paket lewat halaman tagihan.`,
         403,
       ) as NextResponse;
     }

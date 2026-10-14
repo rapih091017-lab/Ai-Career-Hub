@@ -157,9 +157,9 @@ export const POST = apiHandler(async (request: NextRequest) => {
       return NextResponse.json(
         {
           error: "QUOTA_EXCEEDED",
-          message: t(
-            "Batas gratis 2x pengecekan sudah habis. Silakan login untuk melanjutkan.",
-            "Your 2 free checks are used up. Please log in to continue."
+message: t(
+            "Cek gratis untuk tamu sudah dipakai 2x. Login untuk lanjut.",
+            "Both free guest checks are used up. Log in to continue."
           ),
         },
         { status: 403 },

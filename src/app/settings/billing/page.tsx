@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { PackageCard } from "@/components/checkout/PackageCard";
 import { TestimonialRequest } from "@/components/billing/TestimonialRequest";
@@ -8,22 +8,32 @@ import { TestimonialRequest } from "@/components/billing/TestimonialRequest";
 import {
   useCatalogPrices,
   useCatalogPackages,
+  MARKETED_PACKAGE_KEYS,
+  describePackageKeys,
 } from "@/lib/pricing-catalog";
+import { currentEquivalentPackage } from "@/lib/package-catalog-static";
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/components/ui/toast";
 
-/** Parameter ?plan= dari landing dipetakan ke key paket di database. */
-const PLAN_QUERY_TO_PACKAGE_KEY: Record<string, string> = {
+/**
+ * Parameter `?plan=` dari landing atau tautan lama.
+ *
+ * Semua diarahkan ke paket yang masih dijual. Plan lama dipetakan lewat
+ * `currentEquivalentPackage`, jadi `?plan=cv-starter` tidak lagi membuka paket
+ * yang sudah dihapus, tapi paket termurah yang setara.
+ */
+const PLAN_QUERY_ALIASES: Record<string, string> = {
   single_cv: "single_cv",
-  "cv-starter": "cv_starter",
-  "cv-ai-generate": "cv_ai_generate",
-  "cv-analyzer": "cv_analyzer",
-  "portfolio-web": "portfolio_web",
-  "bundle-hemat": "bundle_hemat",
   pro: "pro_monthly",
-  premium_pass_30d: "premium_pass_30d",
   starter: "starter_monthly",
+  premium_pass_30d: "premium_pass_30d",
 };
+
+function packageKeyFromQuery(plan: string): string | undefined {
+  const key = PLAN_QUERY_ALIASES[plan] ?? plan;
+  const resolved = currentEquivalentPackage(key);
+  return MARKETED_PACKAGE_KEYS.includes(resolved) ? resolved : undefined;
+}
 
 interface FeatureLimits {
   ai_cv_generate: number | "unlimited" | false;
@@ -96,6 +106,11 @@ export default function SettingsBillingPage() {
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const catalogPrice = useCatalogPrices();
   const { packages: catalogPackages, loading: catalogLoading } = useCatalogPackages();
+  // Nama paket untuk riwayat: diambil dari katalog, bukan dari kunci mentah.
+  const packageNameByKey = useMemo(
+    () => Object.fromEntries(catalogPackages.map((p) => [p.key, p.name])),
+    [catalogPackages],
+  );
   const buySectionRef = useRef<HTMLDivElement | null>(null);
   const [highlightBuy, setHighlightBuy] = useState(false);
   const [topupDone, setTopupDone] = useState<{ packageType: string; amount: number } | null>(null);
@@ -155,11 +170,9 @@ export default function SettingsBillingPage() {
 
     // Plan dari landing: buka ringkasan dulu, jangan langsung buat QR.
     if (plan) {
-      const key = PLAN_QUERY_TO_PACKAGE_KEY[plan];
+      const key = packageKeyFromQuery(plan);
       if (key) {
         goToCheckout(key);
-      } else if (plan === "business") {
-        window.location.href = "mailto:hello@aicareerhub.com";
       }
       // Clean URL
       window.history.replaceState({}, "", "/settings/billing");
@@ -385,9 +398,11 @@ export default function SettingsBillingPage() {
                               : "-"}
                           </td>
                           <td className="py-3 px-2 font-label-bold text-on-surface">
-                            {tx.packageType === "premium_pass_30d"
-                              ? t("billing.plan-label")
-                              : t("billing.single-cv-label")}
+                            {describePackageKeys(
+                              tx.packageType,
+                              packageNameByKey,
+                              currentEquivalentPackage,
+                            )}
                           </td>
                           <td className="py-3 px-2 text-on-surface">
                             Rp {tx.amount.toLocaleString("id-ID")}

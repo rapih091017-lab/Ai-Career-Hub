@@ -1315,10 +1315,10 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                             </MagneticButton>
                             <p className="text-[11px] text-center text-on-surface-variant">
                               {quota && !quota.isUnlimited
-                                ? `Gratis ${quota.remaining}/${quota.limit} sisa bulan ini · Upgrade untuk unlimited`
+                                ? `Sisa ${quota.remaining}/${quota.limit} bulan ini`
                                 : quota && quota.isUnlimited
-                                  ? "Unlimited untuk Premium · Gratis 3x per bulan untuk akun free"
-                                  : "Gratis 3x per bulan · Unlimited untuk Premium"}
+                                  ? "Tanpa batas untuk Pro dan Max"
+                                  : "Gratis 1x per bulan"}
                             </p>
                           </motion.section>
                         </div>

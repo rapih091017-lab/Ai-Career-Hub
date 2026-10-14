@@ -3,6 +3,7 @@ import {
   mergeLimits,
   mergePackageSelection,
   suggestBundle,
+  applyBundle,
   PackageSelectionError,
 } from "@/lib/package-selection";
 /**
@@ -43,6 +44,32 @@ const catalog = {
     portfolio_web: "unlimited",
     cover_letter: "unlimited",
     pdf_export: "unlimited",
+  }),
+  // Paket yang dijual hari ini.
+  cek_cv: pkg("cek_cv", "Cek CV", 9000, 30, 0, {
+    cv_analyzer: 3,
+    cover_letter: false,
+    portfolio_web: false,
+  }),
+  bikin_cv: pkg("bikin_cv", "Bikin CV", 19000, 30, 0, {
+    ai_cv_generate: 3,
+    ai_revision: 5,
+    ai_suggestion: 5,
+    pdf_export: "unlimited",
+    portfolio_web: false,
+  }),
+  surat_lamaran: pkg("surat_lamaran", "Surat Lamaran", 9000, 30, 0, {
+    cover_letter: 2,
+    portfolio_web: false,
+  }),
+  paket_lamaran: pkg("paket_lamaran", "Paket Lengkap 1 Lamaran", 34000, 30, 0, {
+    ai_cv_generate: 3,
+    cv_analyzer: 3,
+    ai_revision: 5,
+    ai_suggestion: 5,
+    cover_letter: 2,
+    pdf_export: "unlimited",
+    portfolio_web: false,
   }),
 } as unknown as Record<string, never>;
 
@@ -104,16 +131,35 @@ describe("saran bundle", () => {
   it("tawarkan bundle saat paket terpilih belum mencakup semuanya", () => {
     const advice = suggestBundle(["cv_analyzer"], catalog);
     expect(advice).not.toBeNull();
-    expect(advice!.bundleKey).toBe("bundle_hemat");
+    expect(advice!.bundleKey).toBe("paket_lamaran");
     expect(advice!.missingCount).toBeGreaterThan(0);
   });
 
   it("diam saat paket terpilih sudah mencakup bundle", () => {
-    expect(suggestBundle(["bundle_hemat"], catalog)).toBeNull();
+    expect(suggestBundle(["paket_lamaran"], catalog)).toBeNull();
   });
 
   it("diam saat input tidak valid", () => {
     expect(suggestBundle(["ngawur"], catalog)).toBeNull();
     expect(suggestBundle([], catalog)).toBeNull();
+  });
+});
+
+describe("menerapkan paket gabungan", () => {
+  it("mengganti paket satuan yang haknya sudah tercakup", () => {
+    // Regression: tombol "pakai paket" dulu hanya menambah, jadi pengguna
+    // membayar dua kali untuk hak yang sama.
+    const next = applyBundle(["bikin_cv", "cek_cv", "surat_lamaran"], "paket_lamaran", catalog);
+    expect(next).toEqual(["paket_lamaran"]);
+  });
+
+  it("menyisakan paket yang tidak tercakup", () => {
+    const next = applyBundle(["paket_lamaran", "portfolio_web"], "paket_lamaran", catalog);
+    expect(next).toContain("paket_lamaran");
+    expect(next).toContain("portfolio_web");
+  });
+
+  it("tidak berubah kalau paketnya tidak ada di katalog", () => {
+    expect(applyBundle(["bikin_cv"], "tidak_ada", catalog)).toEqual(["bikin_cv"]);
   });
 });

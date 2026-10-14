@@ -85,23 +85,23 @@ const FAQ_GROUPS = [
     faqs: [
       {
         q: "Apa saja yang gratis?",
-        a: "Gratis mencakup 2 pembuatan CV dengan AI, 2 analisis kecocokan, 3 penulisan ulang, 3 surat lamaran, 2 ekspor PDF, dan 1 percobaan website portofolio dengan AI per bulan. Dokumen CV disimpan 30 hari.",
+        a: "Gratis mencakup 1 pembuatan CV dengan AI, 1 analisis kecocokan, 1 penulisan ulang, 1 surat lamaran, dan 1 ekspor PDF per bulan. Website portofolio dengan AI bisa dicoba gratis selama 2 hari sejak akun dibuat. Dokumen CV disimpan 30 hari.",
       },
       {
-        q: "Apa itu “Coba Pro 3 Hari”?",
-        a: "Akses Pro selama 3 hari seharga Rp7.000: 10 pembuatan CV dengan AI, 3 analisis kecocokan, penulisan ulang dan surat lamaran tanpa batas, serta ekspor PDF tanpa batas. Paket ini tidak menyertakan website portofolio.",
+        q: "Kenapa paket satuan lebih masuk akal daripada langsung langganan?",
+        a: "Kalau kamu hanya butuh satu hal, bayarseparuh. Cek CV Rp9.000 untuk 3x cek, Bikin CV Rp19.000 untuk 3x CV, Surat Lamaran Rp9.000 untuk 2x surat. Kalau rutin melamar, paket bulanan jauh lebih murah per hasilnya.",
       },
       {
-        q: "Berapa harga paket Portfolio Web?",
-        a: "Rp35.000 untuk 30 hari: website portofolio dengan AI tanpa batas, ekspor PDF tanpa batas, penulisan ulang tanpa batas, dan link publik yang bisa dipakai kirim ke recruiter.",
+        q: "Berapa harga paketnya?",
+        a: "Paket satuan: Cek CV Rp9.000, Bikin CV Rp19.000, Surat Lamaran Rp9.000, dan Paket Lengkap 1 Lamaran Rp34.000 (3x CV, 3x cek ATS, 2x surat, ekspor PDF tanpa batas). Paket bulanan 30 hari: Lite Rp19.000, Pro Rp39.000, Max Rp79.000. Semua dibayar sekali, tidak ada perpanjangan otomatis.",
       },
       {
-        q: "Kenapa ada paket satuan dan langganan?",
-        a: "Paket satuan untuk yang butuh sekali: satu CV, satu analisis, atau satu portofolio. Langganan untuk yang sedang aktif melamar dan butuh kuota berulang. Paket Lamaran menggabungkan ketiganya selama 60 hari.",
+        q: "Kenapa ada paket satuan dan bulanan?",
+        a: "Paket satuan untuk yang butuh sekali: satu cek CV, satu CV, atau satu surat lamaran. Paket bulanan untuk yang sedang aktif melamar dan butuh kuota berulang. Paket Lengkap 1 Lamaran menggabungkan ketiganya, berlaku 30 hari.",
       },
       {
         q: "Apakah kuota dihitung ulang tiap bulan?",
-        a: "Kuota paket berbayar berlaku selama masa paket. Paket satuan berlaku untuk dokumen yang kamu buat selama masa berlakunya.",
+        a: "Ya. Kuota dihitung per bulan kalender, jadi yang tidak terpakai tidak ikut dikumpulkan ke bulan berikutnya. Paket satuan juga berlaku 30 hari sejak dibayar.",
       },
     ],
   },
@@ -110,7 +110,7 @@ const FAQ_GROUPS = [
     faqs: [
       {
         q: "Metode pembayaran apa yang diterima?",
-        a: "QRIS, GoPay, OVO, Dana, ShopeePay, dan transfer bank. Semua diproses oleh Midtrans.",
+        a: "QRIS, jadi bisa dibayar dari aplikasi apa pun yang mendukung QRIS. Semua diproses oleh Kasera.",
       },
       {
         q: "Apakah bisa refund?",
@@ -127,7 +127,7 @@ const FAQ_GROUPS = [
       },
       {
         q: "Apakah data saya dijual?",
-        a: "Tidak. Data hanya dibagikan kepada penyedia yang diperlukan agar layanan berjalan: penyedia AI, penyedia hosting, Google untuk login, dan Midtrans untuk pembayaran.",
+        a: "Tidak. Data hanya dibagikan kepada penyedia yang diperlukan agar layanan berjalan: penyedia AI, penyedia hosting, Google untuk login, dan Kasera untuk pembayaran.",
       },
       {
         q: "Bisakah saya menghapus akun dan data saya?",

@@ -2,6 +2,7 @@ import { db } from "@/db";
 import { payments, packages as packagesTable } from "@/db/schema";
 import { eq, and, gte, asc } from "drizzle-orm";
 import { normalizePackageLimits } from "@/lib/package-limits";
+import { CURRENT_PACKAGES, UNMARKETED_PACKAGE_KEYS, FREE_LIMITS as STATIC_FREE_LIMITS, currentEquivalentPackage } from "@/lib/package-catalog-static";
 
 /* â”€â”€â”€ Feature Keys â”€â”€â”€ */
 export type Feature =
@@ -40,7 +41,7 @@ export const PACKAGES: Record<string, PackageDef> = {
   // ── SATUAN ──
   cek_cv: {
     id: "cek_cv", name: "Cek CV", price: 9000, periodDays: 30, maxActivePortfolios: 0,
-    limits: { ai_cv_generate: false, cv_analyzer: 1, ai_revision: false, ai_suggestion: false, cover_letter: false, portfolio_web: false, pdf_export: false, bulk_analyzer: false, white_label: false },
+    limits: { ai_cv_generate: false, cv_analyzer: 3, ai_revision: false, ai_suggestion: false, cover_letter: false, portfolio_web: false, pdf_export: false, bulk_analyzer: false, white_label: false },
   },
   bikin_cv: {
     id: "bikin_cv", name: "Bikin CV", price: 19000, periodDays: 30, maxActivePortfolios: 0,
@@ -48,11 +49,11 @@ export const PACKAGES: Record<string, PackageDef> = {
   },
   surat_lamaran: {
     id: "surat_lamaran", name: "Surat Lamaran", price: 9000, periodDays: 30, maxActivePortfolios: 0,
-    limits: { ai_cv_generate: false, cv_analyzer: false, ai_revision: false, ai_suggestion: false, cover_letter: 1, portfolio_web: false, pdf_export: false, bulk_analyzer: false, white_label: false },
+    limits: { ai_cv_generate: false, cv_analyzer: false, ai_revision: false, ai_suggestion: false, cover_letter: 2, portfolio_web: false, pdf_export: false, bulk_analyzer: false, white_label: false },
   },
   paket_lamaran: {
     id: "paket_lamaran", name: "Paket Lengkap 1 Lamaran", price: 34000, periodDays: 30, maxActivePortfolios: 0,
-    limits: { ai_cv_generate: 2, cv_analyzer: 1, ai_revision: 5, ai_suggestion: 5, cover_letter: 1, portfolio_web: false, pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
+    limits: { ai_cv_generate: 3, cv_analyzer: 3, ai_revision: 5, ai_suggestion: 5, cover_letter: 2, portfolio_web: false, pdf_export: "unlimited", bulk_analyzer: false, white_label: false },
   },
 
   // ── BULANAN (30 hari, dibayar sekali) ──
@@ -132,6 +133,21 @@ let packagesCache: Record<string, PackageDef> | null = null;
 let cacheTimestamp = 0;
 const CACHE_TTL_MS = 60_000; // 1 menit
 
+/**
+ * Katalog cadangan ketika database tidak bisa dibaca.
+ *
+ * Hanya paket yang memang dijual: paket lama yang sudah tidak dipasarkan
+ * tidak boleh muncul di halaman harga karena DB sempat kosong atau error.
+ */
+function sellableFallback(): Record<string, PackageDef> {
+  const out: Record<string, PackageDef> = {};
+  for (const key of Object.keys(CURRENT_PACKAGES)) {
+    if (UNMARKETED_PACKAGE_KEYS.includes(key)) continue;
+    if (PACKAGES[key]) out[key] = PACKAGES[key];
+  }
+  return out;
+}
+
 function dbRowToPackageDef(row: DbPackageRow): PackageDef {
   const hardcoded = PACKAGES[row.key];
   // Bentuk teks di database pernah terjadi. Kalau tidak diparsing, paket yang
@@ -173,7 +189,7 @@ export async function getPackagesDb(): Promise<Record<string, PackageDef>> {
 
     if (rows.length === 0) {
       // DB kosong, fallback ke hardcoded
-      packagesCache = { ...PACKAGES };
+      packagesCache = sellableFallback();
       cacheTimestamp = Date.now();
       return packagesCache;
     }
@@ -190,24 +206,25 @@ export async function getPackagesDb(): Promise<Record<string, PackageDef>> {
     return result;
   } catch (error) {
     console.error("Failed to fetch packages from DB, using hardcoded:", error);
-    packagesCache = { ...PACKAGES };
+    packagesCache = sellableFallback();
     cacheTimestamp = Date.now();
     return packagesCache;
   }
 }
 
 /* â”€â”€â”€ Default free limits â”€â”€â”€ */
-export const FREE_LIMITS: Record<Feature, number | "unlimited" | false> = {
-  ai_cv_generate: 2,
-  cv_analyzer: 2,
-  ai_revision: 3,
-  ai_suggestion: 3,
-  cover_letter: 3,
-  portfolio_web: 1, // cicip AI portfolio gratis: 1x generate/bulan (usage_logs)
-  pdf_export: 2,
-  bulk_analyzer: false,
-  white_label: false,
-};
+/**
+ * Jatah pengguna tanpa paket berbayar.
+ *
+ * Sumber tunggalnya ada di `package-catalog-static.ts` supaya komponen client
+ * (kartu harga di landing) dan server (penegakan kuota) memakai angka yang
+ * sama. Kalau bedanya, tabel perbandingan bisa saja menampilkan gratis
+ * lebih besar dari paket yang dijual.
+ */
+export const FREE_LIMITS = STATIC_FREE_LIMITS as Record<
+  Feature,
+  number | "unlimited" | false
+>;
 
 /* â”€â”€â”€ User Access Result â”€â”€â”€ */
 export interface UserAccess {
@@ -262,30 +279,50 @@ export async function getUserAccess(userId: string): Promise<UserAccess> {
   let maxActivePortfolios = 1;
 
   for (const payment of activePayments) {
-    const pkg = allPackages[payment.packageType] || PACKAGES[payment.packageType];
-    if (!pkg) continue;
-    activePackageIds.add(pkg.id);
-    if (pkg.maxActivePortfolios > 0) {
-      maxActivePortfolios = Math.max(maxActivePortfolios, pkg.maxActivePortfolios);
+    // Satu baris payment bisa memuat beberapa paket: checkout menggabungkan
+    // pilihan jadi `packageType` berformat "cek_cv+bikin_cv". Kalau string itu
+    // dicari apa adanya, tidak ada yang cocok dan pembeli sudah bayar tapi
+    // tidak dapat apa-apa. Jadi dipecah per paket.
+    const keys = (payment.packageType || "")
+      .split("+")
+      .map((k) => k.trim())
+      .filter(Boolean);
+    const pkgs = keys
+      .map((key) => allPackages[key] || PACKAGES[key])
+      .filter((p): p is PackageDef => Boolean(p));
+    if (pkgs.length === 0) continue;
+
+    for (const pkg of pkgs) {
+      // Identitasnya dipetakan ke paket yang sedang dijual supaya tier dan
+      // daftar paket aktif tidak menampilkan "Bundle Hemat" yang sudah dihapus.
+      // Hak itself tetap dari definisi lama atau snapshot, jadi tidak ada yang
+      // berkurang untuk pembeli lama.
+      activePackageIds.add(currentEquivalentPackage(pkg.id));
+      if (pkg.maxActivePortfolios > 0) {
+        maxActivePortfolios = Math.max(maxActivePortfolios, pkg.maxActivePortfolios);
+      }
     }
 
     // Snapshot limits diambil saat order dibuat, definisi fitur terkunci apa
     // adanya saat user bayar. Fallback ke katalog saat ini untuk order lama
-    // (sebelum fitur snapshot ada).
-    const effectiveLimits =
-      payment.limits && Object.keys(payment.limits).length > 0
-        ? payment.limits
-        : pkg.limits;
+    // (sebelum fitur snapshot ada). Untuk order gabungan, snapshot-nya sudah
+    // hasil gabungan jadi dipakai sekali, bukan digabung paket per paket.
+    const snapshot = payment.limits && Object.keys(payment.limits).length > 0
+      ? payment.limits
+      : null;
+    const limitSources = snapshot ? [snapshot] : pkgs.map((p) => p.limits);
 
-    for (const [feat, limit] of Object.entries(effectiveLimits) as [Feature, number | "unlimited" | false][]) {
-      for (const acc of [merged, purchased]) {
-        if (limit === "unlimited") {
-          acc[feat] = "unlimited";
-        } else if (limit !== false && acc[feat] !== "unlimited") {
-          if (typeof acc[feat] === "number") {
-            acc[feat] = Math.max(acc[feat] as number, limit);
-          } else {
-            acc[feat] = limit;
+    for (const source of limitSources) {
+      for (const [feat, limit] of Object.entries(source) as [Feature, number | "unlimited" | false][]) {
+        for (const acc of [merged, purchased]) {
+          if (limit === "unlimited") {
+            acc[feat] = "unlimited";
+          } else if (limit !== false && acc[feat] !== "unlimited") {
+            if (typeof acc[feat] === "number") {
+              acc[feat] = Math.max(acc[feat] as number, limit);
+            } else {
+              acc[feat] = limit;
+            }
           }
         }
       }
@@ -296,7 +333,28 @@ export async function getUserAccess(userId: string): Promise<UserAccess> {
   const isPremium = activePackages.length > 0;
 
   // Determine best tier name
-  const tierPriority = ["business_monthly", "pro_monthly", "premium_pass_30d", "starter_monthly", "bundle_hemat", "cv_ai_generate", "cv_starter", "single_cv", "cv_analyzer", "portfolio_web"];
+  // Urutan dari yang paling tinggi. Semua kunci paket yang dijual hari ini
+  // harus ada di sini: kalau tidak, `tierName` jatuh ke "Free" padahal
+  // `isPremium` true, jadi orang yang baru bayar membaca "Free" di header.
+  const tierPriority = [
+    "max_bulanan",
+    "business_monthly",
+    "pro_bulanan",
+    "premium_pass_30d",
+    "pro_monthly",
+    "lite_bulanan",
+    "starter_monthly",
+    "bundle_hemat",
+    "paket_lamaran",
+    "portfolio_web",
+    "bikin_cv",
+    "surat_lamaran",
+    "cek_cv",
+    "cv_ai_generate",
+    "cv_starter",
+    "single_cv",
+    "cv_analyzer",
+  ];
   let tierName = "Free";
   for (const id of tierPriority) {
     if (activePackageIds.has(id)) {

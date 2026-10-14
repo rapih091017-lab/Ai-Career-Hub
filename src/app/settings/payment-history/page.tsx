@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "@/lib/i18n";
+import { useCatalogPackages, describePackageKeys } from "@/lib/pricing-catalog";
+import { currentEquivalentPackage } from "@/lib/package-catalog-static";
 
 interface PaymentRecord {
   id: string;
@@ -21,6 +23,11 @@ interface PaymentHistoryData {
 
 export default function PaymentHistoryPage() {
   const { t } = useTranslation();
+  const { packages: catalogPackages } = useCatalogPackages();
+  const nameByKey = useMemo(
+    () => Object.fromEntries(catalogPackages.map((p) => [p.key, p.name])),
+    [catalogPackages],
+  );
   const [data, setData] = useState<PaymentHistoryData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -45,13 +52,10 @@ export default function PaymentHistoryPage() {
   };
 
   const getPackageLabel = (type: string) => {
-    switch (type) {
-      case "premium_pass_30d":                        return t("billing.plan-label");
-      case "single_cv":
-        return t("billing.single-cv-label");
-      default:
-        return type;
-    }
+    // Pembayaran lama dan order gabungan: nama paket diambil dari katalog
+    // lewat padanan paket termurah, jadi tidak pernah tampil mentah
+    // ("bundle_hemat") atau salah untuk order gabungan.
+    return describePackageKeys(type, nameByKey, currentEquivalentPackage);
   };
 
   const getStatusLabel = (status: string) => {
@@ -169,12 +173,17 @@ export default function PaymentHistoryPage() {
                               <div className="flex items-center gap-2">
                                 <span
                                   className={`material-symbols-outlined text-lg ${
-                                    tx.packageType === "premium_pass_30d"
+                                    catalogPackages.find(
+                                      (p) =>
+                                        p.key === currentEquivalentPackage(tx.packageType),
+                                    )?.monthly
                                       ? "text-primary"
                                       : "text-secondary"
                                   }`}
                                 >
-                                  {tx.packageType === "premium_pass_30d"
+                                  {catalogPackages.find(
+                                    (p) => p.key === currentEquivalentPackage(tx.packageType),
+                                  )?.monthly
                                     ? "workspace_premium"
                                     : "description"}
                                 </span>

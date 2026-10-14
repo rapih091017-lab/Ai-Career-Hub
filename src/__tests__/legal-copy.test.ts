@@ -61,9 +61,34 @@ describe("halaman legal & publik: sinkron dengan produk", () => {
   });
 
   it("faq memakai angka paket yang benar (bukan angka lama)", () => {
-    // Batas free & harga harus sama dengan src/lib/access.ts.
-    expect(faq).toContain("Coba Pro 3 Hari");
-    expect(faq).toContain("35.000");
-    expect(faq).not.toContain("3.000");
+    // Harga di sini harus sama dengan katalog yang dijual.
+    for (const price of ["Rp9.000", "Rp19.000", "Rp34.000", "Rp39.000", "Rp79.000"]) {
+      expect(faq).toContain(price);
+    }
+  });
+
+  it("tidak ada produk lama yang masih disebut di halaman publik", () => {
+    // Regression: FAQ pernah领导小组 memuat "Coba Pro 3 Hari" (Rp7.000, 3 hari),
+    // "Rp35.000" portfolio, "60 hari", dan Midtrans. Semua sudah tidak dijual.
+    const i18n = read("src/lib/i18n.tsx");
+    const publicFiles = [faq, i18n];
+    for (const src of publicFiles) {
+      expect(src).not.toContain("Coba Pro 3 Hari");
+      expect(src).not.toContain("60 hari");
+      expect(src).not.toContain("Rp35.000");
+      expect(src).not.toContain("Midtrans");
+      expect(src).not.toContain("Gratis 3x");
+      expect(src).not.toContain("Gratis 2x");
+    }
+  });
+
+  it("halaman harga tidak menjanjikan kuota gratis lebih besar dari paket satuan", () => {
+    // Free harus jadi cicipan. Kalau gratis lebih besar dari paket yang
+    // dijual, produk satuan jadi tidak punya alasan untuk dibeli.
+    // (Invariant-nya diuji sebagai angka di access-pricing.test.ts; di sini
+    // yang dijaga adalah kedua sumber memakai angka yang sama.)
+    const pricing = read("src/components/PricingSection.tsx");
+    expect(pricing).toContain("from \"@/lib/package-catalog-static\"");
+    expect(pricing).not.toMatch(/const FREE_LIMITS: Record<string, number/);
   });
 });

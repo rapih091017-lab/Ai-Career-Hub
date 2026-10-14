@@ -32,14 +32,12 @@ export const PLAN_ID_TO_PACKAGE_KEY: Record<string, string> = {
   "cv-starter": "bikin_cv",
   "cv-ai-generate": "bikin_cv",
   "cv-analyzer": "cek_cv",
-  "portfolio-web": "portfolio_web",
   starter: "lite_bulanan",
   pro: "pro_bulanan",
   business: "max_bulanan",
   bundle: "paket_lamaran",
   // Plan id yang sekarang sama dengan kunci paket.
   cek_cv: "cek_cv",
-  portfolio_web: "portfolio_web",
   bikin_cv: "bikin_cv",
   surat_lamaran: "surat_lamaran",
   paket_lamaran: "paket_lamaran",
@@ -49,15 +47,18 @@ export const PLAN_ID_TO_PACKAGE_KEY: Record<string, string> = {
 };
 
 /**
- * Paket yang memang dipasarkan di landing. Paket lain tetap bisa dibeli lewat
- * halaman tagihan, tapi tidak muncul di daftar utama supaya tidak terasa
- * tiba-tiba dan tidak butuh penjelasan.
+ * Paket yang memang dipasarkan di landing dan di checkout.
+ *
+ * `portfolio_web` sengaja tidak ada di sini. Sebagai produk satuan Rp29.000 ia
+ * terbaca seperti aset yang dibeli sekali, padahal yang sebenarnya adalah
+ * fitur di dalam paket bulanan: orang yang butuh portfolio serius akan ambil
+ * Pro atau Max, bukan membeli tautan sekali pakai. Portofolio gratis tetap
+ * ada sebagai percobaan 2 hari.
  */
 export const MARKETED_PACKAGE_KEYS: readonly string[] = [
   "cek_cv",
   "bikin_cv",
   "surat_lamaran",
-  "portfolio_web",
   "paket_lamaran",
   "lite_bulanan",
   "pro_bulanan",
@@ -140,6 +141,30 @@ export function periodLabel(pkg: CatalogPackage, t: (key: string) => string): st
   if (pkg.monthly) return t("billing.period.monthly");
   if (pkg.periodDays >= 365) return t("billing.period.year");
   return `${pkg.periodDays} ${t("billing.period.days")}`;
+}
+
+/**
+ * Nama paket yang ditampilkan untuk satu baris pembayaran.
+ *
+ * Satu order bisa memuat beberapa paket ("cek_cv+bikin_cv"), dan pembayaran
+ * lama bisa memuat paket yang sudah tidak dijual. Kuncinya dipetakan ke paket
+ * yang sedang aktif dulu, lalu namanya diambil dari katalog, supaya riwayat
+ * tidak pernah menampilkan `bundle_hemat` atau `pro_monthly` mentah ke user.
+ */
+export function describePackageKeys(
+  type: string,
+  nameByKey: Record<string, string>,
+  equivalent: (key: string) => string = (key) => key,
+): string {
+  const names = type
+    .split("+")
+    .map((raw) => raw.trim())
+    .filter(Boolean)
+    .map((key) => {
+      const resolved = equivalent(key);
+      return nameByKey[resolved] ?? resolved;
+    });
+  return names.length > 0 ? names.join(" + ") : type;
 }
 
 /**

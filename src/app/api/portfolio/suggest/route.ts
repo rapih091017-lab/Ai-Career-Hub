@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { masterProfiles, usageLogs } from "@/db/schema";
-import { eq, and, count, gte } from "drizzle-orm";
+import { masterProfiles, usageLogs, users } from "@/db/schema";
+import { eq, and, count, gte, asc } from "drizzle-orm";
 import { callAI, MODELS, buildUserContext } from "@/lib/ai/adapter";
 import { PORTFOLIO_PROMPT_V1 } from "@/lib/ai/prompts/portfolio-v1";
 import { getUserAccess } from "@/lib/access";
+import { PORTFOLIO_TRIAL_DAYS } from "@/lib/package-catalog-static";
 
 interface SuggestResponse {
   hero: {
@@ -82,7 +83,8 @@ export async function POST(request: NextRequest) {
 
   // ── Cek kuota ──
   // Pakai limit dari sistem akses (getUserAccess), konsisten dengan fitur lain.
-  // FREE_LIMITS.portfolio_web = false → user free tidak bisa; paket portfolio_web/pro/business/premium membuka kuotanya.
+  // Paket free punya jatah percobaan 2 hari (lihat PORTFOLIO_TRIAL_DAYS), jadi
+// nilai di sini selalu angka, tidak pernah `false`.
   const access = await getUserAccess(session.user.id);
   const portfolioLimit = access.limits.portfolio_web;
 
@@ -90,13 +92,51 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error: "FEATURE_NOT_AVAILABLE",
-        message: "Portfolio AI tidak tersedia di paket kamu. Upgrade untuk mengakses.",
+        message: "Portfolio AI tidak tersedia di paket kamu. Paket Pro dan Max sudah memuatnya.",
       },
       { status: 403 }
     );
   }
 
   if (portfolioLimit !== "unlimited") {
+    // Free user gets a two-day trial, not a monthly allowance. Trial starts at
+    // their first portfolio ever (or account creation), and users who already
+    // generated one keep the old monthly allowance so nobody loses access.
+    const isPaidPortfolio = Boolean(access.purchasedFeatures.portfolio_web);
+    if (!isPaidPortfolio) {
+      const [firstEver] = await db
+        .select({ createdAt: usageLogs.createdAt })
+        .from(usageLogs)
+        .where(
+          and(
+            eq(usageLogs.userId, session.user.id),
+            eq(usageLogs.actionType, "portfolio_generate"),
+          ),
+        )
+        .orderBy(asc(usageLogs.createdAt))
+        .limit(1);
+
+      if (!firstEver) {
+        const [account] = await db
+          .select({ createdAt: users.createdAt })
+          .from(users)
+          .where(eq(users.id, session.user.id))
+          .limit(1);
+        const trialEnd = new Date(
+          (account?.createdAt ?? new Date()).getTime() + PORTFOLIO_TRIAL_DAYS * 86_400_000,
+        );
+        if (new Date() > trialEnd) {
+          return NextResponse.json(
+            {
+              error: "PORTFOLIO_TRIAL_EXPIRED",
+              message: `Percobaan portfolio ${PORTFOLIO_TRIAL_DAYS} hari sudah habis. Portfolio web tersedia di paket Pro dan Max.`,
+            },
+            { status: 403 },
+          );
+        }
+      }
+    }
+
     // Hitung pemakaian bulan berjalan, konsisten dengan checkQuota di fitur lain
     const firstOfMonth = new Date();
     firstOfMonth.setDate(1);
@@ -117,7 +157,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: "QUOTA_EXCEEDED",
-          message: `Batas generate portfolio sudah terpakai (${portfolioLimit}/${portfolioLimit}). Upgrade ke Premium untuk unlimited.`,
+          message: `Batas generate portfolio sudah terpakai (${portfolioLimit}/${portfolioLimit}). Paket Pro memberi portfolio untuk 30 hari penuh.`,
         },
         { status: 403 }
       );

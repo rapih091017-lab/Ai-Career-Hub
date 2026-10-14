@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useTranslation } from "@/lib/i18n";
+import { useCatalogPackages, describePackageKeys } from "@/lib/pricing-catalog";
+import { currentEquivalentPackage } from "@/lib/package-catalog-static";
 
 interface PaymentRecord {
   id: string;
@@ -17,10 +19,11 @@ interface PaymentRecord {
 
 export default function CheckoutHistoryPage() {
   const { t, lang } = useTranslation();
+  const { packages: catalogPackages } = useCatalogPackages();
   const [payments, setPayments] = useState<PaymentRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<"all" | "single_cv" | "premium_pass_30d">("single_cv");
+  const [filter, setFilter] = useState<"all" | "single" | "monthly">("all");
 
   useEffect(() => {
     fetch("/api/usage")
@@ -33,11 +36,22 @@ export default function CheckoutHistoryPage() {
       .finally(() => setIsLoading(false));
   }, []);
 
-  const filtered = payments.filter(
-    (p) => filter === "all" || p.packageType === filter,
+  const nameByKey = useMemo(
+    () => Object.fromEntries(catalogPackages.map((p) => [p.key, p.name])),
+    [catalogPackages],
   );
-  const singleCvPayments = payments.filter((p) => p.packageType === "single_cv");
-  const activeSingleCv = singleCvPayments.filter((p) => p.paymentStatus === "success");
+  // Transaksi bisa memuat beberapa paket ("cek_cv+bikin_cv"), jadi dicek per
+  // paket, bukan dengan membandingkan string utuh.
+  const isMonthlyType = (type: string) =>
+    type.split("+").some((key) => {
+      const resolved = currentEquivalentPackage(key.trim());
+      return catalogPackages.find((p) => p.key === resolved)?.monthly;
+    });
+  const filtered = payments.filter((p) => {
+    if (filter === "all") return true;
+    return filter === "monthly" ? isMonthlyType(p.packageType) : !isMonthlyType(p.packageType);
+  });
+  const successfulPayments = payments.filter((p) => p.paymentStatus === "success");
 
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return "-";
@@ -87,32 +101,31 @@ export default function CheckoutHistoryPage() {
             {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="p-5 rounded-xl bg-surface-container-low border border-outline-variant/30">
-                <p className="text-label-sm text-on-surface-variant">{t("billing.single-cv-total")}</p>
-                <p className="text-headline-md text-secondary mt-1">{singleCvPayments.length}</p>
+                <p className="text-label-sm text-on-surface-variant">{t("billing.checkout-history")}</p>
+                <p className="text-headline-md text-secondary mt-1">{payments.length}</p>
                 <p className="text-label-sm text-on-surface-variant mt-1">{t("billing.all-time")}</p>
               </div>
               <div className="p-5 rounded-xl bg-surface-container-low border border-outline-variant/30">
-                <p className="text-label-sm text-on-surface-variant">{t("billing.active")}</p>
-                <p className="text-headline-md text-green-600 mt-1">{activeSingleCv.length}</p>
+                <p className="text-label-sm text-on-surface-variant">{t("billing.paid-label")}</p>
+                <p className="text-headline-md text-green-600 mt-1">{successfulPayments.length}</p>
                 <p className="text-label-sm text-on-surface-variant mt-1">{t("billing.valid-period")}</p>
               </div>
               <div className="p-5 rounded-xl bg-surface-container-low border border-outline-variant/30">
                 <p className="text-label-sm text-on-surface-variant">{t("billing.total-spent")}</p>
                 <p className="text-headline-md text-on-surface mt-1">
-                  Rp {singleCvPayments
-                    .filter((p) => p.paymentStatus === "success")
+                  Rp {successfulPayments
                     .reduce((sum, p) => sum + p.amount, 0)
                     .toLocaleString(lang === "en" ? "en-US" : "id-ID")}
                 </p>
                 <p className="text-label-sm text-on-surface-variant mt-1">
-                  {t("billing.active-cvs").replace("{n}", String(activeSingleCv.length))}
+                  {t("billing.active-cvs").replace("{n}", String(successfulPayments.length))}
                 </p>
               </div>
             </div>
 
             {/* Filter */}
             <div className="flex items-center gap-2">
-              {(["all", "single_cv", "premium_pass_30d"] as const).map((f) => (
+              {(["all", "single", "monthly"] as const).map((f) => (
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
@@ -124,9 +137,9 @@ export default function CheckoutHistoryPage() {
                 >
                   {f === "all"
                     ? t("dashboard.all")
-                    : f === "single_cv"
-                      ? "Single CV"
-                      : "Premium Pass"}
+                    : f === "single"
+                      ? t("billing.group.single")
+                      : t("billing.group.monthly")}
                 </button>
               ))}
             </div>
@@ -138,14 +151,9 @@ export default function CheckoutHistoryPage() {
                   shopping_cart
                 </span>
                 <p className="font-label-bold text-on-surface-variant">
-                  {filter === "single_cv"
-                    ? t("billing.no-single-cv-purchase")
-                    : t("billing.no-transactions")}
+                  {t("billing.no-transactions")}
                 </p>
-                <p className="text-label-sm text-on-surface-variant mt-1">
-                  {filter === "single_cv" &&
-                    t("billing.pick-cv-from-dashboard")}
-                </p>
+
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -163,7 +171,7 @@ export default function CheckoutHistoryPage() {
                   <tbody>
                     {filtered.map((tx) => {
                       const statusInfo = getStatus(tx.paymentStatus);
-                      const isSingleCv = tx.packageType === "single_cv";
+                      const isMonthly = isMonthlyType(tx.packageType);
                       return (
                         <tr
                           key={tx.id}
@@ -176,13 +184,13 @@ export default function CheckoutHistoryPage() {
                             <div className="flex items-center gap-2">
                               <span
                                 className={`material-symbols-outlined text-lg ${
-                                  isSingleCv ? "text-secondary" : "text-primary"
+                                  isMonthly ? "text-primary" : "text-secondary"
                                 }`}
                               >
-                                {isSingleCv ? "description" : "workspace_premium"}
+                                {isMonthly ? "workspace_premium" : "description"}
                               </span>
                               <span className="font-label-bold text-sm text-on-surface">
-                                {isSingleCv ? t("billing.single-cv-title") : t("billing.premium-30d")}
+                                {describePackageKeys(tx.packageType, nameByKey, currentEquivalentPackage)}
                               </span>
                             </div>
                           </td>

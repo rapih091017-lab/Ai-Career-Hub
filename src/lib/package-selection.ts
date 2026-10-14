@@ -41,6 +41,26 @@ export function mergeLimits(a: FeatureLimits, b: FeatureLimits): FeatureLimits {
   return out;
 }
 
+/**
+ * Apakah seluruh hak `child` sudah tercakup oleh `parent`.
+ *
+ * `false` pada `child` berarti fitur itu tidak termasuk di paket anak, jadi
+ * tidak ada yang perlu dicakup dan ikut diabaikan. Kalau ikut dihitung, satu
+ * paket gabungan akan selalu terbaca "tidak mencakup" paket satuan karena
+ * keduanya sama-sama tidak punya fitur portfolio.
+ */
+export function limitsCover(parent: FeatureLimits, child: FeatureLimits): boolean {
+  return Object.entries(child).every(([feature, value]) => {
+    if (value === false) return true;
+    const current = parent[feature];
+    if (current === "unlimited") return true;
+    if (typeof value === "number") {
+      return typeof current === "number" && current >= value;
+    }
+    return typeof current === "number";
+  });
+}
+
 export class PackageSelectionError extends Error {
   constructor(
     message: string,
@@ -93,22 +113,13 @@ export function mergePackageSelection(
 
   // Bundle dan paket penyusunnya tidak boleh dibeli bareng: haknya sama,
   // jadi pengguna akan membayar dua kali untuk kemampuan yang sama.
-  const contains = (bundle: PackageDef, other: PackageDef) => {
-    const b = bundle.limits as FeatureLimits;
-    const o = other.limits as FeatureLimits;
-    return Object.entries(o).every(([feature, value]) => {
-      const current = b[feature];
-      if (current === "unlimited") return true;
-      if (typeof value === "number") {
-        return typeof current === "number" && current >= value;
-      }
-      return typeof current === "number";
-    });
-  };
   for (const a of picked) {
     for (const b of picked) {
       if (a.id === b.id) continue;
-      if (contains(a, b) && a.periodDays > b.periodDays) {
+      if (
+        limitsCover(a.limits as FeatureLimits, b.limits as FeatureLimits) &&
+        a.periodDays > b.periodDays
+      ) {
         throw new PackageSelectionError(
           `"${a.name}" sudah mencakup "${b.name}", tidak perlu dibeli dua kali`,
           "OVERLAPPING_BUNDLE",
@@ -133,13 +144,17 @@ export function mergePackageSelection(
 
 /**
  * Saran bundle: kalau dari paket terpilih masih ada hak yang belum terjangkau
- * oleh `bundle_hemat`, tawarkan bundle itu karena lebih murah daripada
- * membeli sisanya satu per satu.
+ * oleh paket gabungan, tawarkan paket itu karena lebih murah daripada membeli
+ * sisanya satu per satu.
+ *
+ * Kunci default adalah paket gabungan yang memang dijual sekarang. Sebelumnya
+ * `bundle_hemat` yang sudah tidak aktif: karena tidak dikirim `/api/packages`,
+ * sarannya tidak pernah muncul sama sekali.
  */
 export function suggestBundle(
   selectedKeys: string[],
   catalog: Record<string, PackageDef>,
-  bundleKey = "bundle_hemat",
+  bundleKey = "paket_lamaran",
 ): { bundleKey: string; missingCount: number; price: number; cheaper: boolean } | null {
   const bundle = catalog[bundleKey];
   if (!bundle) return null;
@@ -177,4 +192,31 @@ export function suggestBundle(
     price: bundle.price,
     cheaper: bundle.price < missingPrice,
   };
+}
+
+/**
+ * Terapkan paket gabungan: buang paket satuan yang haknya sudah tercakup, lalu
+ * masukkan paketnya.
+ *
+ * Tanpa ini, menekan "pakai paket gabungan" hanya menambahkan paket di samping
+ * pilihan yang ada, sehingga pengguna membayar dua kali untuk kemampuan yang
+ * sama (misal tiga paket satuan Rp37.000 plus paket gabungan Rp34.000).
+ */
+export function applyBundle(
+  selectedKeys: string[],
+  bundleKey: string,
+  catalog: Record<string, PackageDef>,
+): string[] {
+  const bundle = catalog[bundleKey];
+  if (!bundle) return selectedKeys;
+
+  const bundleLimits = bundle.limits as FeatureLimits;
+  const kept = selectedKeys.filter((key) => {
+    if (key === bundleKey) return false;
+    const pkg = catalog[key];
+    if (!pkg) return true;
+    return !limitsCover(bundleLimits, pkg.limits as FeatureLimits);
+  });
+
+  return [bundleKey, ...kept];
 }

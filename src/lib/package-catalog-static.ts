@@ -36,13 +36,13 @@ const limits = (over: Record<string, FeatureValue> = {}) => ({
 
 /** Paket yang dijual saat ini. */
 export const CURRENT_PACKAGES: Record<string, StaticPackage> = {
-  cek_cv: {
+cek_cv: {
     id: "cek_cv",
     name: "Cek CV",
     price: 9000,
     periodDays: 30,
     maxActivePortfolios: 0,
-    limits: limits({ cv_analyzer: 1 }),
+    limits: limits({ cv_analyzer: 3 }),
   },
   bikin_cv: {
     id: "bikin_cv",
@@ -52,20 +52,23 @@ export const CURRENT_PACKAGES: Record<string, StaticPackage> = {
     maxActivePortfolios: 0,
     limits: limits({ ai_cv_generate: 3, ai_revision: 5, ai_suggestion: 5, pdf_export: "unlimited" }),
   },
-  surat_lamaran: {
+surat_lamaran: {
     id: "surat_lamaran",
     name: "Surat Lamaran",
     price: 9000,
     periodDays: 30,
     maxActivePortfolios: 0,
-    limits: limits({ cover_letter: 1 }),
+    limits: limits({ cover_letter: 2 }),
   },
-  portfolio_web: {
+portfolio_web: {
     id: "portfolio_web",
     name: "Portfolio Web",
     price: 29000,
     periodDays: 30,
     maxActivePortfolios: 1,
+    // Tidak dijual terpisah lagi (lihat `UNMARKETED_PACKAGE_KEYS`). Definisi
+    // ini tetap disimpan karena portfolio_web masih jadi hak di dalam Pro/Max,
+    // dan pembayaran lama masih memakainya.
     limits: limits({
       portfolio_web: 1,
       pdf_export: "unlimited",
@@ -78,13 +81,13 @@ export const CURRENT_PACKAGES: Record<string, StaticPackage> = {
     name: "Paket Lengkap 1 Lamaran",
     price: 34000,
     periodDays: 30,
-    maxActivePortfolios: 0,
+maxActivePortfolios: 0,
     limits: limits({
-      ai_cv_generate: 2,
-      cv_analyzer: 1,
+      ai_cv_generate: 3,
+      cv_analyzer: 3,
       ai_revision: 5,
       ai_suggestion: 5,
-      cover_letter: 1,
+      cover_letter: 2,
       pdf_export: "unlimited",
     }),
   },
@@ -138,6 +141,48 @@ export const CURRENT_PACKAGES: Record<string, StaticPackage> = {
       pdf_export: "unlimited",
     }),
   },
+};
+
+/**
+ * Paket yang tidak lagi dipasarkan sebagai produk berdiri sendiri.
+ *
+ * `portfolio_web` keluar dari daftar harga: sebagai produk satuan Rp29.000
+ * ia terlihat seperti aset yang dibeli sekali, padahal yang sebenarnya adalah
+ * komponen di dalam paket bulanan. Definisi paketnya tetap disimpan supaya
+ * pembeli lama tidak kehilangan hak.
+ */
+export const UNMARKETED_PACKAGE_KEYS: readonly string[] = ["portfolio_web"];
+
+/**
+ * Masa percobaan portfolio web untuk pengguna tanpa paket berbayar.
+ *
+ * Dua hari, bukan kuota bulanan: portfolio dipakai untuk menunjukkan kerja ke
+ * perekrut, jadi cukup waktu untuk mencoba. Pengguna yang sudah pernah membuat
+ * portfolio sebelum aturan ini berlaku tetap punya jatah lamanya (lihat route
+ * portfolio suggest).
+ */
+export const PORTFOLIO_TRIAL_DAYS = 2;
+
+/**
+ * Jatah pengguna tanpa paket berbayar, per bulan kalender.
+ *
+ * Sengaja 1 per fitur. Dulu 2-3, dan itu membuat produk satuan tidak punya
+ * alasan untuk dibeli: Cek CV dijual Rp9.000 untuk 1x cek padahal gratis sudah
+ * memberi 2x. Sekarang setiap paket satuan memberi minimal 2-3x dari apa yang
+ * dijualnya, jadi gratis benar-benar cicipan, bukan pengganti.
+ *
+ * `portfolio_web` bukan kuota bulanan: masa percobaannya diatur terpisah.
+ */
+export const FREE_LIMITS: Record<string, number | "unlimited" | false> = {
+  ai_cv_generate: 1,
+  cv_analyzer: 1,
+  ai_revision: 1,
+  ai_suggestion: 1,
+  cover_letter: 1,
+  portfolio_web: 1,
+  pdf_export: 1,
+  bulk_analyzer: false,
+  white_label: false,
 };
 
 /**
@@ -287,3 +332,38 @@ export const PRO_CHECK_FAIR_USE = {
 } as const;
 
 export type ProCheckTier = keyof typeof PRO_CHECK_FAIR_USE;
+
+/**
+ * Paket lama dipetakan ke paket termurah yang masih memberi haknya.
+ *
+ * Pembeli lama tidak kehilangan apa pun (haknya tetap dari snapshot pembayaran),
+ * tapi nama paketnya tidak lagi jadi "pro_monthly" atau "Bundle Hemat" yang
+ * sudah tidak dijual. Yang tampil selalu paket yang sedang aktif, supaya riwayat
+ * dan tier keduanya masuk akal.
+ *
+ * Dipilih paket termurah yang kuotanya masih menutupi paket lama, bukan paket
+ * termurah tanpa syarat: `bundle_hemat` pernah memberi portfolio tanpa batas,
+ * jadi padanannya Max, bukan Paket Lengkap.
+ */
+export const LEGACY_EQUIVALENTS: Record<string, string> = {
+  cv_starter: "lite_bulanan",
+  cv_ai_generate: "pro_bulanan",
+  cv_analyzer: "cek_cv",
+  single_cv: "lite_bulanan",
+  starter_monthly: "lite_bulanan",
+  pro_monthly: "pro_bulanan",
+  business_monthly: "max_bulanan",
+  premium_pass_30d: "max_bulanan",
+  bundle_hemat: "max_bulanan",
+  portfolio_web: "pro_bulanan",
+};
+
+/**
+ * Kunci paket yang harus dipakai untuk ditampilkan.
+ *
+ * Paket yang masih dijual apa adanya dikembalikan apa adanya, jadi pemetaan ini
+ * tidak merusak paket baru.
+ */
+export function currentEquivalentPackage(key: string): string {
+  return LEGACY_EQUIVALENTS[key] ?? key;
+}

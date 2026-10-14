@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import {
   mergePackageSelection,
   suggestBundle,
+  applyBundle,
   PackageSelectionError,
 } from "@/lib/package-selection";
 import { activePaymentProvider, checkoutDestination, type CreateOrderResponse } from "@/lib/payment-client";
@@ -44,7 +45,7 @@ export default function CheckoutPage({
   const [catalog, setCatalog] = useState<Record<string, CatalogPackage> | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
   const [cvId, setCvId] = useState<string | undefined>();
-  const [submitting, setSubmitting] = useState(false);
+const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const chooserRef = useRef<HTMLDivElement | null>(null);
 
@@ -97,14 +98,32 @@ export default function CheckoutPage({
     writeStoredCart({ keys: selected, cvId });
   }, [selected, cvId, catalog]);
 
-  const selection = useMemo(() => {
-    if (!catalog || selected.length === 0) return null;
+/**
+   * Hasil penggabungan pilihan paket.
+   *
+   * Kalau Throw, errornya ikut dibawa supaya keranjang bisa menyebut paket mana
+   * yang bermasalah, bukan hanya "kombinasi ini tidak bisa dibeli". Tidak ada
+   * setState di sini: state di dalam useMemo bisa membuat render berulang.
+   */
+  const selectionResult = useMemo(() => {
+    if (!catalog || selected.length === 0) {
+      return { selection: null, error: null } as const;
+    }
     try {
-      return mergePackageSelection(selected, catalog as unknown as Record<string, PackageDef>);
-    } catch {
-      return null;
+      return {
+        selection: mergePackageSelection(selected, catalog as unknown as Record<string, PackageDef>),
+        error: null,
+      } as const;
+    } catch (err) {
+      return {
+        selection: null,
+        error: err instanceof PackageSelectionError ? err.message : "Kombinasi paket ini tidak bisa dibeli.",
+      } as const;
     }
   }, [catalog, selected]);
+
+  const selection = selectionResult.selection;
+  const selectionError = selectionResult.error;
 
   // Niat checkout: dicatat saat ada isi keranjang, ditutup saat dikosongkan.
   useCheckoutIntent(selected, selection?.total, cvId, !!catalog);
@@ -141,9 +160,22 @@ const options = useMemo(() => {
     return selected.reduce((sum, key) => sum + (catalog[key]?.price ?? 0), 0);
   }, [catalog, selected, selection]);
 
-  const toggle = (key: string) => {
+const toggle = (key: string) => {
     setError(null);
     setSelected((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
+  };
+
+  /**
+   * Paket gabungan menggantikan paket satuan yang haknya sudah tercakup.
+   * Dulu hanya ditambahkan, jadi pengguna membayar dua kali (Rp37.000 +
+   * Rp34.000) untuk hak yang sama.
+   */
+  const useBundle = () => {
+    if (!bundleAdvice || !catalog) return;
+    setError(null);
+    setSelected(
+      applyBundle(selected, bundleAdvice.bundleKey, catalog as unknown as Record<string, PackageDef>),
+    );
   };
 
   const pay = async () => {
@@ -336,21 +368,21 @@ return (
               </div>
             ) : null}
 
-            {bundleAdvice ? (
+{bundleAdvice ? (
               <div className="rounded-xl border border-secondary/30 bg-secondary/5 p-3">
                 <p className="text-sm text-on-surface">
                   <span className="font-semibold">Catatan:</span> {bundleAdvice.missingCount} hak belum
-                  terakup paket pilihanmu. Paket Lamaran bisa lebih murah (
-                  {formatRupiah(bundleAdvice.price)}).
+                  terakup paket pilihanmu.{" "}
+                  {catalog[bundleAdvice.bundleKey]?.name} (
+                  {formatRupiah(bundleAdvice.price)}){" "}
+                  {bundleAdvice.cheaper ? "lebih murah daripada sisanya." : "menambah hak yang belum kamu punya."}
                 </p>
                 <button
                   type="button"
-                  onClick={() => toggle(bundleAdvice.bundleKey)}
+                  onClick={useBundle}
                   className="mt-2 text-sm font-semibold text-primary hover:underline"
                 >
-                  {selected.includes(bundleAdvice.bundleKey)
-                    ? "Lepas Paket Lamaran"
-                    : `Pakai Paket Lamaran (${formatRupiah(bundleAdvice.price)})`}
+                  Pakai {catalog[bundleAdvice.bundleKey]?.name} ({formatRupiah(bundleAdvice.price)})
                 </button>
               </div>
             ) : null}
@@ -358,7 +390,7 @@ return (
             {error ? <p className="text-sm text-error">{error}</p> : null}
             {selection === null && selected.length > 0 ? (
               <p className="text-sm text-error">
-                Kombinasi paket ini tidak bisa dibeli. Coba pilih satu paket saja.
+                {selectionError ?? "Kombinasi paket ini tidak bisa dibeli. Coba pilih satu paket saja."}
               </p>
             ) : null}
 

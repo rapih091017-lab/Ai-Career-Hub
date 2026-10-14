@@ -7,6 +7,7 @@ import { useTranslation } from "@/lib/i18n";
 import TiltCard from "@/components/TiltCard";
 import MagneticButton from "@/components/MagneticButton";
 import { useCatalogPackages, formatRupiah, packageBenefits } from "@/lib/pricing-catalog";
+import { FREE_LIMITS } from "@/lib/package-catalog-static";
 
 /* â”€â”€â”€ Types â”€â”€â”€ */
 
@@ -17,7 +18,7 @@ export type BillingMode = "satuan" | "langganan";
  * paket (tidak dibeli).
  */
 export type PlanId =
-  | "cek_cv" | "bikin_cv" | "surat_lamaran" | "portfolio_web" | "paket_lamaran"
+  | "cek_cv" | "bikin_cv" | "surat_lamaran" | "paket_lamaran"
   | "free" | "lite_bulanan" | "pro_bulanan" | "max_bulanan";
 
 interface Feature {
@@ -76,15 +77,7 @@ const SATUAN_PLAN_DATA: LandingPlan[] = [
     icon: "mail",
     ctaStyle: "outline",
   },
-  {
-    key: "portfolio_web",
-    nameKey: "pricing.plan.portfolio-web.name",
-    descKey: "pricing.plan.portfolio-web.desc",
-    unitKey: "pricing.unit.one-portfolio",
-    icon: "language",
-    ctaStyle: "outline",
-  },
-  {
+{
     key: "paket_lamaran",
     nameKey: "pricing.plan.paket-lamaran.name",
     descKey: "pricing.plan.paket-lamaran.desc",
@@ -157,17 +150,6 @@ const FAQ_KEYS = [0, 1, 2, 3, 4, 5, 6];
 
 /* â”€â”€â”€ Component â”€â”€â”€ */
 
-/** Kuota paket gratis. Tidak ada paket untuk dibaca, jadi ditulis di sini. */
-const FREE_LIMITS: Record<string, number | "unlimited" | false> = {
-  ai_cv_generate: 2,
-  cv_analyzer: 2,
-  ai_revision: 3,
-  ai_suggestion: 3,
-  cover_letter: 3,
-  portfolio_web: 1,
-  pdf_export: 2,
-};
-
 /** Satu sel tabel perbandingan, nilainya dari kuota paket di katalog. */
 function limitCell(
   packages: { key: string; limits?: Record<string, number | "unlimited" | false> }[],
@@ -185,6 +167,9 @@ function limitCell(
 function freeCell(featureKey: string, t: (key: string) => string): string {
   const value = FREE_LIMITS[featureKey];
   if (value === false) return "—";
+  // Portfolio bukan kuota bulanan: ia percobaan berbatas waktu, jadi ditulis
+  // apa adanya supaya tidak terbaca seperti jatah yang datang tiap bulan.
+  if (featureKey === "portfolio_web") return t("pricing.table.portfolio-trial");
   if (value === "unlimited") return t("pricing.table.unlimited");
   return `${value}x`;
 }
@@ -311,7 +296,11 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
                   <span className="font-bold tabular-nums text-[32px] leading-none text-primary">
                     {formatRupiah(packages.find((p) => p.key === "paket_lamaran")?.price ?? 0)}
                   </span>
-                  <span className="text-xs text-on-surface-variant">/ 60 hari, sekali bayar</span>
+                  {/* Masa validity dibaca dari katalog, bukan diketik tangan:
+                      dulu di sini tertulis 60 hari padahal paketnya 30. */}
+                  <span className="text-xs text-on-surface-variant">
+                    / {packages.find((p) => p.key === "paket_lamaran")?.periodDays ?? 30} hari, sekali bayar
+                  </span>
                 </div>
                 <p className="text-sm text-on-surface-variant max-w-2xl">{t("pricing.bundle.desc")}</p>
               </div>
