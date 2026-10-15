@@ -1,0 +1,65 @@
+name: Database Backup
+
+# Cadangan harian.
+#
+# Database production adalah satu-satunya tempat data pengguna berada. Kalau
+# tidak dicadangkan, satu perintah yang salah bisa menghapus semua isi.
+# Backup disimpan sebagai artifact GitHub, jadi tidak perlu storage tambahan.
+#
+# Pulihkan dengan: gunzip -c backup.sql.gz | psql "$DATABASE_URL"
+
+on:
+  schedule:
+    # 02:17 UTC = 09:17 WIB. Angka menitnya bukan 00 supaya tidak menumpuk
+    # dengan job terjadwal lain yang biasanya jalannya menit 0.
+    - cron: "17 2 * * *"
+  # Backup bisa juga dijalankan manual dari tab Actions.
+  workflow_dispatch:
+
+concurrency:
+  group: db-backup
+  cancel-in-progress: false
+
+jobs:
+  dump:
+    name: Dump database
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      # ubuntu-latest sudah membawa postgresql-client, jadi pg_dump tersedia.
+      - name: Pastikan pg_dump ada
+        run: pg_dump --version
+
+      - name: Dump database
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: node scripts/backup-database.mjs "${{ runner.temp }}/backups"
+
+      - name: Pastikan file backup tidak kosong
+        run: |
+          set -euo pipefail
+          count=$(find "${{ runner.temp }}/backups" -name '*.sql.gz' | wc -l)
+          if [ "$count" -eq 0 ]; then
+            echo "::error::Tidak ada file backup yang dihasilkan"
+            exit 1
+          fi
+          find "${{ runner.temp }}/backups" -name '*.sql.gz' -exec ls -lh {} \;
+
+      - name: Simpan sebagai artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup-${{ github.run_number }}
+          path: ${{ runner.temp }}/backups/*.sql.gz
+          retention-days: 14
+          if-no-files-found: error

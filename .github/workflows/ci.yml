@@ -1,0 +1,63 @@
+name: CI
+
+# Menahan kode yang rusak sampai ke production.
+#
+# Sebelumnya repo hanya menjalankan pemindai secret, jadi test yang pecah tetap
+# bisa lolos ke deploy. Job di sini menjalankan pemeriksaan yang sama dengan
+# yang dijalankan lokal: type check, test, lint, dan build.
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+# Cancel run lama kalau commit baru sudah masuk: tidak perlu hijau untuk kode
+# yang sudah digantikan.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Type check, test, lint, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      # Build hanya butuh nilai yang valid secara format, bukan nilai asli.
+      # Koneksi database terjadi saat runtime, bukan saat compile, jadi tidak
+      # ada secret sungguhan yang dipakai di sini.
+      DATABASE_URL: postgresql://user:pass@localhost:5432/ci
+      AUTH_SECRET: ci-only-not-a-real-secret-000000000000
+      AUTH_GOOGLE_ID: ci-google-id
+      AUTH_GOOGLE_SECRET: ci-google-secret
+      DEEPSEEK_API_KEY: ci-not-a-real-key
+      NEXT_PUBLIC_SENTRY_DSN: ""
+      SENTRY_DSN: ""
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Unit test
+        run: npx vitest run --reporter=dot
+
+      - name: Lint
+        run: npx eslint src --ext .ts,.tsx
+
+      - name: Build
+        run: npm run build
+
+      - name: Pastikan migrasi database ada semua
+        run: node scripts/audit-migrations.mjs --check-files

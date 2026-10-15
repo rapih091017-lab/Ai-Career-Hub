@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs/config";
 
 let nextConfig: NextConfig = {
   serverExternalPackages: [
@@ -50,4 +51,8 @@ if (process.env.ANALYZE === "true") {
   nextConfig = withBundleAnalyzer(nextConfig);
 }
 
-export default nextConfig;
+// Sentry membungkus konfigurasi supaya source map otomatis terunggah, jadi stack
+// trace di Sentry menunjuk ke baris kode asli, bukan hasil minifikasi.
+const withSentry = withSentryConfig(nextConfig);
+
+export default withSentry;

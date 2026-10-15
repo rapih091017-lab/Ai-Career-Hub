@@ -1,5 +1,15 @@
 "use client";
 
+import { useEffect } from "react";
+
+/**
+ * Layar error terakhir.
+ *
+ * Halaman ini hanya muncul kalau error такое sehingga tidak tertangani oleh
+ * boundary di bawahnya. Dua tugasnya: memberi tahu pengguna dengan cara yang
+ * tidak blamed, dan mengirim error ke Sentry supaya kita tahu tanpa harus
+ * menunggu laporan dari pengguna.
+ */
 export default function GlobalError({
   error,
   reset,
@@ -7,8 +17,27 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    // Impor dinamis supaya Sentry tidak masuk ke bundel kalau DSN belum diisi.
+    if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
+      import("@sentry/nextjs")
+        .then((Sentry) => {
+          Sentry.captureException(error, {
+            tags: { surface: "global-error" },
+          });
+        })
+        .catch(() => {
+          // Pelaporan gagal bukan alasan untuk membuat halaman error error lagi.
+        });
+    } else {
+      // Tanpa Sentry, setidaknya error masuk ke log server supaya bisa dicari
+      // lewat `vercel logs`.
+      console.error("[global-error]", error);
+    }
+  }, [error]);
+
   return (
-    <html>
+    <html lang="id">
       <head>
         <title>Terjadi Kesalahan | AI Career Hub</title>
         <meta name="description" content="Maaf, terjadi kesalahan yang tidak terduga. Silakan coba lagi." />
@@ -30,6 +59,11 @@ export default function GlobalError({
             >
               Coba Lagi
             </button>
+            {error.digest && (
+              <p className="text-[11px] text-[#8a8296]">
+                Kode rujukan: {error.digest}
+              </p>
+            )}
           </div>
         </div>
       </body>

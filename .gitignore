@@ -79,3 +79,6 @@ scratch/
 .superpowers/sdd/*-review-package.md
 dev-pid.txt
 dev-log.txt
+
+# Cadangan database lokal (jangan pernah di-commit: berisi data pengguna)
+backups/
