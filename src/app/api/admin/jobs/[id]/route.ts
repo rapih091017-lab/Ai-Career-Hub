@@ -27,6 +27,9 @@ export const PATCH = apiHandler(async (request: NextRequest, { params }: Params)
   if (data.description !== undefined) updates.description = data.description || null;
   if (data.applyUrl !== undefined) updates.applyUrl = data.applyUrl;
   if (data.imageUrl !== undefined) updates.imageUrl = data.imageUrl || null;
+  if (data.jobType !== undefined) updates.jobType = data.jobType || null;
+  if (data.employmentType !== undefined) updates.employmentType = data.employmentType || null;
+  if (data.deadline !== undefined) updates.deadline = data.deadline ? new Date(data.deadline) : null;
   if (data.isPublished !== undefined) updates.isPublished = data.isPublished;
 
   const [job] = await db.update(jobPosts).set(updates).where(eq(jobPosts.id, id)).returning();

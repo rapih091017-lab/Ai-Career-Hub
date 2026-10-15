@@ -2,6 +2,22 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import SiteHeader from "@/components/nav/SiteHeader";
+import AppFooter from "@/components/AppFooter";
+import {
+  EMPLOYMENT_TYPES,
+  EMPLOYMENT_TYPE_LABELS,
+  JOB_SORTS,
+  JOB_SORT_LABELS,
+  JOB_TYPES,
+  JOB_TYPE_BADGE_CLASS,
+  JOB_TYPE_LABELS,
+  deadlineStatus,
+  isJobSort,
+  isJobType,
+  isEmploymentType,
+  type JobSort,
+} from "@/lib/job-classification";
 import { useTranslation } from "@/lib/i18n";
 
 const EXTERNAL_PORTALS = [
@@ -69,38 +85,61 @@ interface JobPost {
   description: string | null;
   applyUrl: string;
   imageUrl: string | null;
+  jobType: string | null;
+  employmentType: string | null;
+  deadline: string | null;
   createdAt: string | null;
 }
 
 export default function KarirPage() {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const [jobs, setJobs] = useState<JobPost[]>([]);
   const [jobsLoaded, setJobsLoaded] = useState(false);
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("");
+  const [employment, setEmployment] = useState("");
+  const [sort, setSort] = useState<JobSort>("newest");
+  const [loadingList, setLoadingList] = useState(false);
 
+  // Dicari di server, jadi daftar yang tampil benar-benar
+  // sudah tersaring di database, bukan hanya dipotong 60 baris lalu disaring.
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
+      setLoadingList(true);
+      const params = new URLSearchParams();
+      if (query.trim()) params.set("q", query.trim());
+      if (category) params.set("category", category);
+      if (employment) params.set("employment", employment);
+      params.set("sort", sort);
       try {
-        const response = await fetch("/api/jobs");
+        const response = await fetch(`/api/jobs?${params.toString()}`, {
+          signal: controller.signal,
+          cache: "no-store",
+        });
         if (response.ok) {
           const data = await response.json();
-          if (!cancelled) setJobs(Array.isArray(data.jobs) ? data.jobs : []);
+          setJobs(Array.isArray(data.jobs) ? data.jobs : []);
         }
       } catch {
-        // Diamkan: halaman tetap tampil dengan portal eksternal.
+        // Diamkan: daftar lama tetap tampil.
       } finally {
-        if (!cancelled) setJobsLoaded(true);
+        setJobsLoaded(true);
+        setLoadingList(false);
       }
-    })();
+    }, 250);
     return () => {
-      cancelled = true;
+      clearTimeout(timer);
+      controller.abort();
     };
-  }, []);
+  }, [query, category, employment, sort]);
 
   const hasJobs = jobs.length > 0;
 
   return (
-    <main className="min-h-screen bg-background">
+    <div className="flex min-h-screen flex-col bg-background text-on-background">
+      <SiteHeader variant="pill" />
+      <main className="flex-1">
       {/* ── Hero ── */}
       <div className="bg-gradient-to-br from-primary via-primary to-secondary text-white">
         <div className="max-w-3xl mx-auto px-6 py-20 md:py-24">
@@ -147,11 +186,129 @@ export default function KarirPage() {
               <p className="text-body-md text-on-surface-variant">{t("karir.jobs-desc")}</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {jobs.map((job) => (
+            {/* Filter: kategori, tipe kerja, pencarian, dan urutan. Semua ikut
+                dikirim ke server supaya tidak ada lowongan yang terpotong. */}
+            <div className="mb-6 space-y-3 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-4">
+              <div className="flex flex-col gap-3 md:flex-row md:items-center">
+                <label className="relative flex-1">
+                  <span className="sr-only">{t("karir.search-label")}</span>
+                  <span className="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" aria-hidden="true">
+                    search
+                  </span>
+                  <input
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder={t("karir.search-placeholder")}
+                    className="w-full rounded-xl border border-outline-variant/40 bg-surface-container-lowest py-2.5 pl-10 pr-3 text-sm text-on-surface placeholder:text-on-surface-variant focus:border-primary focus:outline-none"
+                  />
+                </label>
+
+                <label className="flex items-center gap-2">
+                  <span className="sr-only">{t("karir.sort-label")}</span>
+                  <span className="text-xs font-bold text-on-surface-variant">{t("karir.sort-label")}</span>
+                  <select
+                    value={sort}
+                    onChange={(event) => {
+                      const next = event.target.value;
+                      if (isJobSort(next)) setSort(next);
+                    }}
+                    className="rounded-xl border border-outline-variant/40 bg-surface-container-lowest px-3 py-2.5 text-sm font-bold text-on-surface focus:border-primary focus:outline-none"
+                  >
+                    {JOB_SORTS.map((option) => (
+                      <option key={option} value={option}>
+                        {lang === "en" ? JOB_SORT_LABELS[option].en : JOB_SORT_LABELS[option].id}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  onClick={() => setCategory("")}
+                  aria-pressed={category === ""}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-bold transition-colors ${
+                    category === ""
+                      ? "border-primary bg-primary text-on-primary"
+                      : "border-outline-variant/40 text-on-surface-variant hover:bg-surface-container"
+                  }`}
+                >
+                  {t("karir.filter-all")}
+                </button>
+                {JOB_TYPES.map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => setCategory(category === type ? "" : type)}
+                    aria-pressed={category === type}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-bold transition-colors ${
+                      category === type
+                        ? "border-primary bg-primary text-on-primary"
+                        : "border-outline-variant/40 text-on-surface-variant hover:bg-surface-container"
+                    }`}
+                  >
+                    {lang === "en" ? JOB_TYPE_LABELS[type].en : JOB_TYPE_LABELS[type].id}
+                  </button>
+                ))}
+
+                <span className="mx-1 hidden h-5 w-px bg-outline-variant/40 sm:block" aria-hidden="true" />
+
+                {EMPLOYMENT_TYPES.map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => setEmployment(employment === type ? "" : type)}
+                    aria-pressed={employment === type}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-bold transition-colors ${
+                      employment === type
+                        ? "border-primary bg-primary text-on-primary"
+                        : "border-outline-variant/40 text-on-surface-variant hover:bg-surface-container"
+                    }`}
+                  >
+                    {lang === "en" ? EMPLOYMENT_TYPE_LABELS[type].en : EMPLOYMENT_TYPE_LABELS[type].id}
+                  </button>
+                ))}
+              </div>
+
+              {jobsLoaded && !loadingList && jobs.length > 0 && (
+                <p className="text-xs text-on-surface-variant">{t("karir.result-count").replace("{n}", String(jobs.length))}</p>
+              )}
+            </div>
+
+            {/* Ajakan layanan: ruang kosong di atas daftar dipakai untuk membuat
+                CV, bukan menambah halaman baru. */}
+            <div className="mb-6 flex flex-col gap-4 rounded-2xl border border-primary/20 bg-primary/5 p-5 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="font-label-bold text-on-surface">{t("karir.promo-title")}</h3>
+                <p className="mt-1 text-sm text-on-surface-variant">{t("karir.promo-desc")}</p>
+              </div>
+              <div className="flex shrink-0 flex-wrap gap-2">
+                <Link
+                  href="/builder/new"
+                  className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-on-primary transition-all hover:brightness-110 active:scale-[0.98]"
+                >
+                  <span className="material-symbols-outlined text-base" aria-hidden="true">auto_awesome</span>
+                  {t("karir.promo-cta-cv")}
+                </Link>
+                <Link
+                  href="/checker"
+                  className="inline-flex items-center gap-2 rounded-xl border border-primary/30 bg-surface-container-lowest px-4 py-2.5 text-sm font-bold text-primary transition-colors hover:bg-primary/5"
+                >
+                  <span className="material-symbols-outlined text-base" aria-hidden="true">fact_check</span>
+                  {t("karir.promo-cta-check")}
+                </Link>
+              </div>
+            </div>
+
+            <div className={`grid grid-cols-1 gap-4 md:grid-cols-2 ${loadingList ? "opacity-60" : ""}`}>
+              {jobs.map((job) => {
+                const jobType = job.jobType && isJobType(job.jobType) ? job.jobType : null;
+                const employmentType =
+                  job.employmentType && isEmploymentType(job.employmentType) ? job.employmentType : null;
+                const deadline = deadlineStatus(job.deadline);
+                const closed = deadline.state === "closed";
+                return (
                 <article
                   key={job.id}
-                  className="flex flex-col gap-3 rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+                  className="flex flex-col gap-3 rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
                 >
                   <div className="flex items-start gap-4">
                     {job.imageUrl ? (
@@ -171,6 +328,31 @@ export default function KarirPage() {
                       <p className="mt-0.5 text-xs text-on-surface-variant truncate">
                         {[job.company, job.location].filter(Boolean).join(" · ")}
                       </p>
+                      <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                        {jobType && (
+                          <span className={`rounded-full border px-2 py-0.5 text-[11px] font-bold ${JOB_TYPE_BADGE_CLASS[jobType]}`}>
+                            {lang === "en" ? JOB_TYPE_LABELS[jobType].en : JOB_TYPE_LABELS[jobType].id}
+                          </span>
+                        )}
+                        {employmentType && (
+                          <span className="rounded-full border border-outline-variant/40 px-2 py-0.5 text-[11px] font-bold text-on-surface-variant">
+                            {lang === "en" ? EMPLOYMENT_TYPE_LABELS[employmentType].en : EMPLOYMENT_TYPE_LABELS[employmentType].id}
+                          </span>
+                        )}
+                        {deadline.state !== "none" && (
+                          <span
+                            className={`rounded-full border px-2 py-0.5 text-[11px] font-bold ${
+                              closed
+                                ? "border-red-200 bg-red-100 text-red-700"
+                                : deadline.state === "closing"
+                                  ? "border-amber-200 bg-amber-100 text-amber-700"
+                                  : "border-outline-variant/40 text-on-surface-variant"
+                            }`}
+                          >
+                            {t(deadline.labelId).replace("{n}", String(deadline.days ?? 0))}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -180,17 +362,25 @@ export default function KarirPage() {
                     </p>
                   ) : null}
 
-                  <a
-                    href={job.applyUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-auto inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-on-primary hover:brightness-110 active:scale-[0.98] transition-all"
-                  >
-                    <span className="material-symbols-outlined text-base">open_in_new</span>
-                    {t("karir.apply")}
-                  </a>
+                  {closed ? (
+                    <span className="mt-auto inline-flex items-center justify-center gap-2 rounded-xl border border-outline-variant/40 px-5 py-2.5 text-sm font-bold text-on-surface-variant">
+                      <span className="material-symbols-outlined text-base" aria-hidden="true">lock</span>
+                      {t("karir.closed-cta")}
+                    </span>
+                  ) : (
+                    <a
+                      href={job.applyUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-auto inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-on-primary transition-all hover:brightness-110 active:scale-[0.98]"
+                    >
+                      <span className="material-symbols-outlined text-base" aria-hidden="true">open_in_new</span>
+                      {t("karir.apply")}
+                    </a>
+                  )}
                 </article>
-              ))}
+                );
+              })}
             </div>
           </section>
         ) : jobsLoaded ? (
@@ -283,6 +473,8 @@ export default function KarirPage() {
           </div>
         </section>
       </div>
-    </main>
+      </main>
+      <AppFooter bordered />
+    </div>
   );
 }

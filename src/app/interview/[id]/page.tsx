@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion } from "motion/react";
-import AppHeader from "@/components/AppHeader";
+import SiteHeader from "@/components/nav/SiteHeader";
 import AppFooter from "@/components/AppFooter";
 import AuthGuard from "@/components/AuthGuard";
 import { useBookmarks } from "@/hooks/useBookmarks";
@@ -68,7 +68,7 @@ export default function PositionDetailPage() {
   return (
     <AuthGuard>
       <div className="min-h-screen flex flex-col bg-background text-on-background">
-        <AppHeader />
+        <SiteHeader variant="pill" />
 
         <main className="flex-1 pt-24 pb-20 px-margin-mobile md:px-gutter">
           <div className="max-w-[700px] mx-auto">

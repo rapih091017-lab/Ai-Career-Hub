@@ -35,6 +35,9 @@ export const POST = apiHandler(async (request: NextRequest) => {
       description: data.description ?? null,
       applyUrl: data.applyUrl,
       imageUrl: data.imageUrl ?? null,
+      jobType: data.jobType ?? null,
+      employmentType: data.employmentType ?? null,
+      deadline: data.deadline ? new Date(data.deadline) : null,
       isPublished: data.isPublished ?? false,
       createdBy: auth.userId,
     })

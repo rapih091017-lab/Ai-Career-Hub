@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import AppHeader from "@/components/AppHeader";
+import SiteHeader from "@/components/nav/SiteHeader";
 import AppFooter from "@/components/AppFooter";
 import { CV_EXAMPLES_EN, getCvExampleEn } from "@/data/cv-examples-en";
 import { SITE_URL } from "@/lib/site-url";
@@ -48,7 +48,7 @@ export default async function CvExampleEnDetailPage({
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-on-background">
-      <AppHeader />
+      <SiteHeader variant="pill" />
 
       <main className="flex-1 px-margin-mobile pb-16 pt-24 md:px-gutter">
         <div className="mx-auto max-w-[820px]">

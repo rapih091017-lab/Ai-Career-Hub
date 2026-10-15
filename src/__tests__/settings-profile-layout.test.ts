@@ -6,7 +6,7 @@ const layoutSrc = readFileSync(join(process.cwd(), "src/app/settings/layout.tsx"
 const profilePageSrc = readFileSync(join(process.cwd(), "src/app/settings/profile/page.tsx"), "utf8");
 const oldProfileSrc = readFileSync(join(process.cwd(), "src/app/profile/page.tsx"), "utf8");
 const sitemapSrc = readFileSync(join(process.cwd(), "src/app/sitemap.ts"), "utf8");
-const accountMenuSrc = readFileSync(join(process.cwd(), "src/components/AccountMenu.tsx"), "utf8");
+const navItemsSrc = readFileSync(join(process.cwd(), "src/lib/nav-items.ts"), "utf8");
 
 /**
  * Sidebar "Pengaturan" hilang saat mengisi profil karena halaman profil berada
@@ -35,8 +35,8 @@ describe("halaman profil tetap di dalam layout Pengaturan", () => {
   });
 
   it("menu akun dan halaman lain memakai jalur baru", () => {
-    expect(accountMenuSrc).toContain('href: "/settings/profile"');
-    expect(accountMenuSrc).not.toContain('href: "/profile"');
+    expect(navItemsSrc).toContain('href: "/settings/profile"');
+    expect(navItemsSrc).not.toContain('href: "/profile"');
   });
 
   it("halaman privat tidak masuk sitemap", () => {

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import AdminField from "@/components/admin/AdminField";
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
+import ListAutoTextarea from "@/components/admin/ListAutoTextarea";
 import {
   adminBtnDanger,
   adminBtnPrimary,
@@ -16,6 +17,14 @@ import Modal from "@/components/Modal";
 import PhotoUpload from "@/components/portfolio/PhotoUpload";
 import { ConfirmModal, type ConfirmAction } from "@/components/ui/confirm-modal";
 import { useToast } from "@/components/ui/toast";
+import {
+  EMPLOYMENT_TYPES,
+  EMPLOYMENT_TYPE_LABELS,
+  JOB_TYPES,
+  JOB_TYPE_LABELS,
+  isEmploymentType,
+  isJobType,
+} from "@/lib/job-classification";
 
 interface Job {
   id: string;
@@ -25,6 +34,9 @@ interface Job {
   description: string | null;
   applyUrl: string;
   imageUrl: string | null;
+  jobType: string | null;
+  employmentType: string | null;
+  deadline: string | null;
   isPublished: boolean;
   createdAt: string | null;
 }
@@ -36,6 +48,9 @@ interface JobForm {
   applyUrl: string;
   description: string;
   imageUrl: string;
+  jobType: string;
+  employmentType: string;
+  deadline: string;
   isPublished: boolean;
 }
 
@@ -46,6 +61,9 @@ const EMPTY_FORM: JobForm = {
   applyUrl: "",
   description: "",
   imageUrl: "",
+  jobType: "",
+  employmentType: "",
+  deadline: "",
   isPublished: false,
 };
 
@@ -102,6 +120,11 @@ export default function AdminJobsPage() {
       applyUrl: job.applyUrl,
       description: job.description ?? "",
       imageUrl: job.imageUrl ?? "",
+      jobType: job.jobType ?? "",
+      employmentType: job.employmentType ?? "",
+      // `datetime-local` butuh format "YYYY-MM-DDTHH:mm", sedangkan API
+      // mengirim ISO penuh, jadi potong bagian waktu dan detiknya.
+      deadline: job.deadline ? job.deadline.slice(0, 16) : "",
       isPublished: job.isPublished,
     });
     setFormError(null);
@@ -133,6 +156,9 @@ export default function AdminJobsPage() {
           applyUrl,
           description: form.description,
           imageUrl: form.imageUrl || null,
+          jobType: isJobType(form.jobType) ? form.jobType : null,
+          employmentType: isEmploymentType(form.employmentType) ? form.employmentType : null,
+          deadline: form.deadline ? new Date(form.deadline).toISOString() : null,
           isPublished: form.isPublished,
         }),
       });
@@ -320,11 +346,61 @@ export default function AdminJobsPage() {
               />
             </AdminField>
 
-            <AdminField label="Deskripsi / requirement" hint="Satu poin per baris lebih mudah dibaca pelamar.">
-              <textarea
+            <div className="grid gap-4 sm:grid-cols-2">
+              <AdminField
+                label="Kategori rekrutmen"
+                hint="Staff, MT (management trainee), atau ODP. Dipakai pengunjung untuk menyaring lowongan."
+              >
+                <select
+                  className={adminInputClass}
+                  value={form.jobType}
+                  onChange={(event) => setForm({ ...form, jobType: event.target.value })}
+                >
+                  <option value="">Belum ditentukan</option>
+                  {JOB_TYPES.map((type) => (
+                    <option key={type} value={type}>
+                      {JOB_TYPE_LABELS[type].id}
+                    </option>
+                  ))}
+                </select>
+              </AdminField>
+
+              <AdminField label="Tipe pekerjaan" hint="Kosongkan kalau tidak relevan.">
+                <select
+                  className={adminInputClass}
+                  value={form.employmentType}
+                  onChange={(event) => setForm({ ...form, employmentType: event.target.value })}
+                >
+                  <option value="">Belum ditentukan</option>
+                  {EMPLOYMENT_TYPES.map((type) => (
+                    <option key={type} value={type}>
+                      {EMPLOYMENT_TYPE_LABELS[type].id}
+                    </option>
+                  ))}
+                </select>
+              </AdminField>
+            </div>
+
+            <AdminField
+              label="Batas akhir lamaran"
+              hint="Setelah lewat tanggal ini, lowongan tampil sebagai sudah ditutup."
+            >
+              <input
+                type="datetime-local"
+                className={adminInputClass}
+                value={form.deadline}
+                onChange={(event) => setForm({ ...form, deadline: event.target.value })}
+              />
+            </AdminField>
+
+            <AdminField
+              label="Deskripsi / requirement"
+              hint="Ketik “1.” lalu Enter untuk membuat daftar bernomor otomatis."
+            >
+              <ListAutoTextarea
                 className={`${adminTextareaClass} min-h-[140px]`}
                 value={form.description}
-                onChange={(event) => setForm({ ...form, description: event.target.value })}
+                onChange={(value) => setForm({ ...form, description: value })}
                 rows={5}
                 maxLength={10000}
               />

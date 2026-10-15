@@ -8,11 +8,11 @@ import AppFooter from "@/components/AppFooter";
 import Logos3 from "@/components/blocks/logos3";
 import PricingSection from "@/components/PricingSection";
 import ScrollProgress from "@/components/ScrollProgress";
-import { AccountMenu } from "@/components/AccountMenu";
 import CountUp from "@/components/CountUp";
 import MouseGlow from "@/components/MouseGlow";
 import TiltCard from "@/components/TiltCard";
 import ScrollSectionIndicator from "@/components/ScrollSectionIndicator";
+import SiteHeader from "@/components/nav/SiteHeader";
 import StickyMobileCTA from "@/components/StickyMobileCTA";
 import MagneticButton from "@/components/MagneticButton";
 import { AnimatedButton } from "@/components/ui/AnimatedButton";
@@ -27,8 +27,6 @@ import {
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/lib/i18n";
 import { INTERVIEW_POSITION_COUNT, INTERVIEW_QUESTION_COUNT } from "@/lib/interview-stats";
-import NavDropdown from "@/components/NavDropdown";
-import NavMobileDropdown from "@/components/NavMobileDropdown";
 import HeroCvDemo from "@/components/HeroCvDemo";
 import TestimonialMarquee from "@/components/TestimonialMarquee";
 import PortfolioSpotlight from "@/components/PortfolioSpotlight";
@@ -49,7 +47,6 @@ export default function Home() {
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0.3]);
 
   // Mobile hamburger menu
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Real platform stats (from /api/public/stats), no fabricated numbers
   const [stats, setStats] = useState<{ totalCvs: number; totalUsers: number; totalAnalyses: number; avgAtsScore: number } | null>(null);
@@ -62,131 +59,17 @@ export default function Home() {
     return () => { active = false; };
   }, []);
 
-  // Hydration-safe mount flag, prevents session-based SSR mismatch
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
-
-  // Close mobile menu on route change
-  useEffect(() => {
-    const handleRoute = () => setMobileMenuOpen(false);
-    window.addEventListener("popstate", handleRoute);
-    return () => window.removeEventListener("popstate", handleRoute);
-  }, []);
-
   return (
     <>
       <ScrollProgress />
       <ScrollSectionIndicator />
 
-      {/* ── Navigation (Floating) ── */}
-      <nav className="fixed top-0 md:top-4 left-0 md:left-1/2 right-0 md:-translate-x-1/2 z-50 bg-surface-container-lowest/80 backdrop-blur-lg shadow-sm md:shadow-lg border-b md:border border-outline-variant/10 md:rounded-2xl md:max-w-7xl md:w-[calc(100%-32px)] transition-all">
-        <div className="max-w-7xl mx-auto px-margin-mobile md:px-gutter py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white">
-              <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
-            </div>
-            <span className="font-headline-md text-[18px] font-bold text-primary tracking-tight cursor-pointer">AI Career Hub</span>
-          </Link>
-          <div className="hidden md:flex items-center gap-2">
-            <NavDropdown label={t("nav.features")} items={[
-              { title: t("nav.dropdown.builder.title"), description: t("nav.dropdown.builder.desc"), icon: "edit_note", href: "/builder/new" },
-              { title: t("nav.dropdown.checker.title"), description: t("nav.dropdown.checker.desc"), icon: "fact_check", href: "/checker" },
-              { title: t("nav.dropdown.portfolio.title"), description: t("nav.dropdown.portfolio.desc"), icon: "grid_view", href: "/portfolio" },
-              { title: t("nav.dropdown.cover-letter.title"), description: t("nav.dropdown.cover-letter.desc"), icon: "mail", href: "/surat-lamaran" },
-            ]} />
-            <a className="flex min-h-11 items-center rounded-lg px-3 text-label-bold text-on-surface-variant hover:bg-surface-container hover:text-primary focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2" href="#pricing">{t("nav.pricing")}</a>
-            <Link className="flex min-h-11 items-center rounded-lg px-3 text-label-bold text-on-surface-variant hover:bg-surface-container hover:text-primary focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2" href="/checkout">{t("nav.checkout")}</Link>
-            <NavDropdown label={t("nav.resources")} items={[
-              { title: t("nav.dropdown.hub.title"), description: t("nav.dropdown.hub.desc"), icon: "auto_stories", href: "/career-hub" },
-              { title: t("nav.dropdown.career-path.title"), description: t("nav.dropdown.career-path.desc"), icon: "route", href: "/career-path" },
-              { title: t("nav.dropdown.jobs.title"), description: t("nav.dropdown.jobs.desc"), icon: "work", href: "/karir" },
-              { title: t("nav.dropdown.cv-examples.title"), description: t("nav.dropdown.cv-examples.desc"), icon: "description", href: lang === "en" ? "/cv-examples" : "/contoh-cv" },
-              { title: t("nav.dropdown.interview.title"), description: t("nav.dropdown.interview.desc"), icon: "record_voice_over", href: "/interview/practice" },
-              { title: t("nav.dropdown.job-tracker.title"), description: t("nav.dropdown.job-tracker.desc"), icon: "view_kanban", href: "/tracker" },
-            ]} />
-          </div>
-          <div className="flex items-center gap-3">
-            <button onClick={toggleLang}
-              className="w-11 h-11 rounded-lg border border-outline-variant/40 text-xs font-bold uppercase tracking-wider hover:bg-surface-container transition-colors"
-              title="Switch language">{lang === "id" ? "EN" : "ID"}</button>
+      {/* Navbar: komponen yang sama dengan halaman dashboard, hanya bentuknya
+          yang melayang. Tidak ada lagi nav khusus landing yang bisa melenceng
+          dari navbar aplikasi. */}
+      <SiteHeader variant="pill" showAnnouncement />
 
-            {/* Mobile Hamburger, md:hidden */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden w-10 h-10 rounded-xl border border-outline-variant/30 flex items-center justify-center hover:bg-surface-container transition-colors"
-              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-            >
-              <span className="material-symbols-outlined text-xl">{mobileMenuOpen ? "close" : "menu"}</span>
-            </button>
-
-            {!mounted ? (
-              /* ── Skeleton same on server & client, prevents hydration mismatch ── */
-              <div className="hidden md:flex items-center gap-3">
-                <div className="w-[88px] h-[38px] bg-surface-container-high rounded-lg animate-pulse" />
-                <div className="w-11 h-11 rounded-full bg-surface-container-high animate-pulse" />
-              </div>
-            ) : session ? (
-              <div className="hidden md:flex items-center gap-3">
-                <MagneticButton>
-                  <Link href="/dashboard" className="bg-primary text-on-primary px-5 py-2.5 rounded-lg font-label-bold hover:opacity-90 active:scale-95 transition-all shadow-sm cursor-pointer block">{t("nav.dashboard")}</Link>
-                </MagneticButton>
-                <AccountMenu />
-              </div>
-            ) : (
-              <>
-                <Link href="/login" className="hidden md:inline text-on-surface-variant hover:text-primary font-label-bold transition-colors cursor-pointer">{t("nav.login")}</Link>
-                <MagneticButton>
-                  <Link href="/login" className="hidden md:block bg-on-background text-white px-6 py-2.5 rounded-lg font-label-bold hover:opacity-90 active:scale-95 transition-all shadow-sm cursor-pointer">{t("nav.try-free")}</Link>
-                </MagneticButton>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Mobile Menu Overlay */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.2, ease: "easeInOut" }}
-              className="md:hidden overflow-hidden bg-surface-container-lowest/95 backdrop-blur-lg border-t border-outline-variant/10"
-            >
-              <div className="px-margin-mobile py-4 flex flex-col gap-2">
-                <NavMobileDropdown label={t("nav.features")} onItemClick={() => setMobileMenuOpen(false)} items={[
-                  { title: t("nav.dropdown.builder.title"), description: t("nav.dropdown.builder.desc"), icon: "edit_note", href: "/builder/new" },
-                  { title: t("nav.dropdown.checker.title"), description: t("nav.dropdown.checker.desc"), icon: "fact_check", href: "/checker" },
-                  { title: t("nav.dropdown.portfolio.title"), description: t("nav.dropdown.portfolio.desc"), icon: "grid_view", href: "/portfolio" },
-                  { title: t("nav.dropdown.cover-letter.title"), description: t("nav.dropdown.cover-letter.desc"), icon: "mail", href: "/surat-lamaran" },
-                ]} />
-              <a onClick={() => setMobileMenuOpen(false)} className="w-full min-h-12 px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all text-left" href="#pricing">{t("nav.pricing")}</a>
-                <Link onClick={() => setMobileMenuOpen(false)} className="w-full min-h-12 px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all text-left" href="/checkout">{t("nav.checkout")}</Link>
-                <NavMobileDropdown label={t("nav.resources")} onItemClick={() => setMobileMenuOpen(false)} items={[
-                  { title: t("nav.dropdown.hub.title"), description: t("nav.dropdown.hub.desc"), icon: "auto_stories", href: "/career-hub" },
-                  { title: t("nav.dropdown.career-path.title"), description: t("nav.dropdown.career-path.desc"), icon: "route", href: "/career-path" },
-                  { title: t("nav.dropdown.jobs.title"), description: t("nav.dropdown.jobs.desc"), icon: "work", href: "/karir" },
-                  { title: t("nav.dropdown.cv-examples.title"), description: t("nav.dropdown.cv-examples.desc"), icon: "description", href: lang === "en" ? "/cv-examples" : "/contoh-cv" },
-                  { title: t("nav.dropdown.interview.title"), description: t("nav.dropdown.interview.desc"), icon: "record_voice_over", href: "/interview/practice" },
-                  { title: t("nav.dropdown.job-tracker.title"), description: t("nav.dropdown.job-tracker.desc"), icon: "view_kanban", href: "/tracker" },
-                ]} />
-                <a onClick={() => setMobileMenuOpen(false)} className="w-full min-h-12 px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all text-left" href="/karir">{t("nav.karir")}</a>
-                <hr className="border-outline-variant/20 my-2" />
-                {!mounted ? null : session ? (
-                  <Link onClick={() => setMobileMenuOpen(false)} href="/settings/profile" className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-label-bold text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all">
-                    <span className="material-symbols-outlined text-lg">person</span>
-                    Profile
-                  </Link>
-                ) : (
-                  <Link onClick={() => setMobileMenuOpen(false)} href="/login" className="w-full px-4 py-3 bg-primary text-on-primary rounded-xl font-label-bold text-center block">
-                    {t("nav.try-free")}
-                  </Link>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </nav>
+      {/* ── Hero ── */}
 
       {/* ── Hero ── */}
       <header id="hero" ref={heroRef} className="relative min-h-[90vh] md:min-h-[95vh] flex items-center overflow-hidden bg-gradient-to-b from-white via-primary/[0.02] to-white pt-24 md:pt-32 pb-16 md:pb-24">

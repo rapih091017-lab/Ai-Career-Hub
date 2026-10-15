@@ -441,6 +441,15 @@ export const jobPosts = pgTable("job_posts", {
   applyUrl: text("apply_url").notNull(),
   /** Foto/logo: data URL hasil /api/upload atau URL eksternal. */
   imageUrl: text("image_url"),
+  /**
+   * Kategori rekrutmen, dipilih admin. Mengikuti kebiasaan pasar kerja
+   * Indonesia: Staff, MT (management trainee), dan ODP.
+   */
+  jobType: varchar("job_type", { length: 12 }),
+  /** Full time / part time / internship. */
+  employmentType: varchar("employment_type", { length: 20 }),
+  /** Batas akhir pendaftaran. Setelah lewat, lowongan tampil sebagai ditutup. */
+  deadline: timestamp("deadline", { mode: "date" }),
   isPublished: boolean("is_published").notNull().default(false),
   createdBy: uuid("created_by").references(() => users.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),

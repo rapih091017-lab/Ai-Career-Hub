@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useRouter } from "next/navigation";
-import AppHeader from "@/components/AppHeader";
+import SiteHeader from "@/components/nav/SiteHeader";
 import AppFooter from "@/components/AppFooter";
 import AuthGuard from "@/components/AuthGuard";
 import { AnimatedButton } from "@/components/ui/AnimatedButton";
@@ -48,7 +48,7 @@ export default function InterviewPage() {
   return (
     <AuthGuard>
       <div className="min-h-screen flex flex-col bg-background text-on-background">
-        <AppHeader />
+        <SiteHeader variant="pill" />
 
         <main className="flex-1 pt-24 pb-20 px-margin-mobile md:px-gutter">
           <div className="max-w-[1000px] mx-auto">

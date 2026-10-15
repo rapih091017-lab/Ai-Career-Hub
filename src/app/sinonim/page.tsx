@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import AppHeader from "@/components/AppHeader";
+import SiteHeader from "@/components/nav/SiteHeader";
 import AppFooter from "@/components/AppFooter";
 import { useToast } from "@/components/ui/toast";
 import { useTranslation } from "@/lib/i18n";
@@ -41,7 +41,7 @@ export default function SinonimPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-on-background">
-      <AppHeader />
+      <SiteHeader variant="pill" />
 
       <main className="flex-1 px-margin-mobile pb-16 pt-24 md:px-gutter">
         <div className="mx-auto max-w-[900px]">

@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
-import AppHeader from "@/components/AppHeader";
+import SiteHeader from "@/components/nav/SiteHeader";
 import AppFooter from "@/components/AppFooter";
 import { useTranslation } from "@/lib/i18n";
 import MagneticButton from "@/components/MagneticButton";
@@ -433,7 +433,7 @@ export default function CheckerPage() {
     if (loading) {
       return (
         <div className="min-h-screen flex flex-col bg-background text-on-background">
-          <AppHeader />
+          <SiteHeader variant="pill" />
           <main className="flex-1 w-full max-w-[640px] mx-auto px-5 md:px-6 pt-20 pb-12 space-y-10">
             <div className="animate-pulse space-y-10">
               <div className="flex flex-col items-center">
@@ -464,7 +464,7 @@ export default function CheckerPage() {
     // ── Normal input form ──
     return (
       <div className="min-h-screen flex flex-col bg-background text-on-background">
-        <AppHeader />
+        <SiteHeader variant="pill" />
 
         <main className="flex-1 flex items-center justify-center py-20 px-5">
           <div className="w-full max-w-[600px] flex flex-col gap-8">
@@ -735,7 +735,7 @@ export default function CheckerPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-surface-container-low/50 text-on-background">
-      <AppHeader />
+      <SiteHeader variant="pill" />
 
       <main className="flex-1 w-full max-w-[640px] mx-auto px-5 md:px-6 pt-20 pb-12 space-y-10">
         {/* ── Top Bar: Back + Share + Download ── */}

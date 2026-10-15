@@ -7,7 +7,7 @@ const billingSrc = readFileSync(join(process.cwd(), "src/app/settings/billing/pa
 const checkoutSrc = readFileSync(join(process.cwd(), "src/app/checkout/page.tsx"), "utf8");
 const landingSrc = readFileSync(join(process.cwd(), "src/app/page.tsx"), "utf8");
 const i18nSrc = readFileSync(join(process.cwd(), "src/lib/i18n.tsx"), "utf8");
-const accountMenuSrc = readFileSync(join(process.cwd(), "src/components/AccountMenu.tsx"), "utf8");
+const navItemsSrc = readFileSync(join(process.cwd(), "src/lib/nav-items.ts"), "utf8");
 
 describe("daftar paket dikelompokkan", () => {
   it("paket bulanan dan satuan terpisah", () => {
@@ -71,17 +71,24 @@ describe("konfirmasi top-up sukses", () => {
 });
 
 describe("menu akun di landing", () => {
-  it("landing memakai dropdown yang sama dengan dashboard", () => {
-    expect(landingSrc).toContain("<AccountMenu />");
-    // Avatar versi lama yang langsung melempar ke /profile harus hilang.
-    expect(landingSrc).not.toContain('aria-label={t("nav.profile")}');
+  it("landing memakai navbar yang sama dengan dashboard", () => {
+    // Dulu landing punya nav sendiri plus AccountMenu terpisah. Sekarang
+    // keduanya memakai satu komponen, jadi tidak bisa melenceng lagi.
+    expect(landingSrc).toContain('<SiteHeader variant="pill"');
+    expect(landingSrc).not.toContain("<AccountMenu />");
+    expect(landingSrc).not.toContain("NavDropdown");
   });
 
-  it("dropdown punya pilihan profil, pengaturan, afiliasi, dan keluar", () => {
-    expect(accountMenuSrc).toContain('href: "/settings/profile"');
-    expect(accountMenuSrc).toContain('href: "/dashboard"');
-    expect(accountMenuSrc).toContain('href: "/settings/security"');
-    expect(accountMenuSrc).toContain('href: "/affiliate"');
-    expect(accountMenuSrc).toContain("signOut");
+  it("dropdown akun punya profil, pengaturan, afiliasi, dan keluar", () => {
+    const headerSrc = readFileSync(
+      join(process.cwd(), "src/components/nav/SiteHeader.tsx"),
+      "utf8",
+    );
+    // Profil, keamanan, dan afiliasi kini jadi item grup "Akun".
+    expect(navItemsSrc).toContain('href: "/settings/profile"');
+    expect(navItemsSrc).toContain('href: "/settings/security"');
+    expect(navItemsSrc).toContain('href: "/affiliate"');
+    expect(headerSrc).toContain("LogoutConfirmModal");
+    expect(headerSrc).toContain("AdminMenuItem");
   });
 });

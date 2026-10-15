@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const checkoutSrc = readFileSync(join(process.cwd(), "src/app/checkout/page.tsx"), "utf8");
-const headerSrc = readFileSync(join(process.cwd(), "src/components/AppHeader.tsx"), "utf8");
+const navItemsSrc = readFileSync(join(process.cwd(), "src/lib/nav-items.ts"), "utf8");
 const landingSrc = readFileSync(join(process.cwd(), "src/app/page.tsx"), "utf8");
 const pricingSrc = readFileSync(join(process.cwd(), "src/components/PricingSection.tsx"), "utf8");
 
@@ -29,9 +29,14 @@ describe("checkout adalah satu halaman untuk pembelian", () => {
     expect(checkoutSrc).toContain("selected={selected.includes(pkg.key)}");
   });
 
-  it("header aplikasi punya tautan Checkout", () => {
-    expect(headerSrc).toContain('{ label: "Checkout", href: "/checkout" }');
-    expect(landingSrc).toContain('href="/checkout">{t("nav.checkout")}');
+  it("Checkout ada di grup Akun, bukan di navbar landing", () => {
+    // Navbar satu sumber untuk landing dan dashboard (src/lib/nav-items.ts).
+    expect(navItemsSrc).toContain('href: "/checkout"');
+    // Dari halaman depan orang belum punya alasan untuk langsung membayar,
+    // jadi navbar mengarah ke section landing, bukan ke /checkout.
+    expect(navItemsSrc).toContain('href: "/#pricing"');
+    expect(navItemsSrc).toContain('href: "/#journey"');
+    expect(landingSrc).not.toContain('href="/checkout"');
   });
 
   it("tombol Beli di landing langsung ke checkout, tidak lewat halaman tagihan", () => {

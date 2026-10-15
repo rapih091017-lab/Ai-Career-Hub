@@ -8,14 +8,15 @@ interface LangContextType {
   lang: Lang;
   setLang: (l: Lang) => void;
   toggleLang: () => void;
-  t: (key: string) => string;
+  /** `fallback` dipakai kalau kuncinya belum ada di kamus, mis. label navbar. */
+  t: (key: string, fallback?: string) => string;
 }
 
 const LangContext = createContext<LangContextType>({
   lang: "id",
   setLang: () => {},
   toggleLang: () => {},
-  t: (key: string) => key,
+  t: (key: string, fallback?: string) => fallback ?? key,
 });
 
 /* Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Dictionary Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
@@ -30,6 +31,42 @@ const DICT: Record<string, { id: string; en: string }> = {
   "nav.try-free": { id: "Coba Gratis", en: "Try Free" },
   "nav.karir": { id: "Info Karir", en: "Careers" },
   "nav.profile": { id: "Profil Saya", en: "My Profile" },
+
+  /* Navbar tunggal (src/lib/nav-items.ts). Satu grup = satu fungsi. */
+  "nav.menu-label": { id: "Menu navigasi", en: "Navigation menu" },
+  "nav.akun-saya": { id: "Akun saya", en: "My account" },
+  "nav.cara-kerja": { id: "Cara Kerja", en: "How It Works" },
+  "nav.announce": { id: "Lowongan MT & Staff baru tiap minggu", en: "Fresh MT & Staff jobs every week" },
+
+  "nav.group.lamaran": { id: "Buat Lamaran", en: "Build Application" },
+  "nav.group.portofolio": { id: "Portofolio", en: "Portfolio" },
+  "nav.group.karir": { id: "Cari Kerja", en: "Find Work" },
+  "nav.group.career-hub": { id: "Career Hub", en: "Career Hub" },
+  "nav.group.akun": { id: "Akun", en: "Account" },
+
+  "nav.item.dashboard": { id: "Dashboard", en: "Dashboard" },
+  "nav.item.bikin-cv": { id: "Bikin CV", en: "CV Builder" },
+  "nav.item.my-resumes": { id: "CV Saya", en: "My Resumes" },
+  "nav.item.surat": { id: "Surat Lamaran", en: "Cover Letter" },
+  "nav.item.checker": { id: "Checker CV (ATS)", en: "ATS Checker" },
+  "nav.item.interview": { id: "Latihan Interview", en: "Interview Practice" },
+  "nav.item.portofolio-saya": { id: "Portofolio Saya", en: "My Portfolio" },
+  "nav.item.portofolio-build": { id: "Kelola Site", en: "Manage Site" },
+  "nav.item.portofolio-preview": { id: "Preview Publik", en: "Public Preview" },
+  "nav.item.karir": { id: "Info Karir", en: "Careers" },
+  "nav.item.tracker": { id: "Tracker Lamaran", en: "Application Tracker" },
+  "nav.item.career-path": { id: "Jalur Karier", en: "Career Path" },
+  "nav.item.career-hub": { id: "Career Hub", en: "Career Hub" },
+  "nav.item.blog": { id: "Blog", en: "Blog" },
+  "nav.item.contoh-cv": { id: "Contoh CV", en: "CV Examples" },
+  "nav.item.sinonim": { id: "Sinonim Kata", en: "Synonyms" },
+  "nav.item.faq": { id: "FAQ", en: "FAQ" },
+  "nav.item.checkout": { id: "Checkout", en: "Checkout" },
+  "nav.item.billing": { id: "Tagihan", en: "Billing" },
+  "nav.item.payment-history": { id: "Riwayat Bayar", en: "Payment History" },
+  "nav.item.profile": { id: "Profil", en: "Profile" },
+  "nav.item.security": { id: "Keamanan", en: "Security" },
+  "nav.item.affiliate": { id: "Afiliasi", en: "Affiliate" },
 
   "nav.dropdown.builder.title": { id: "CV Builder", en: "CV Builder" },
   "nav.dropdown.builder.desc": { id: "Buat CV ATS-friendly dengan AI", en: "Build ATS-friendly CV with AI" },
@@ -1632,6 +1669,20 @@ const DICT: Record<string, { id: string; en: string }> = {
   "karir.jobs-desc": { id: "Lowongan terkurasi dari tim kami. Klik Lamar untuk membuka halaman pendaftaran perusahaan.", en: "Curated openings from our team. Click Apply to open the company's application page." },
   "karir.jobs-empty": { id: "Belum ada loker baru saat ini. Cek lagi nanti atau telusuri portal di bawah.", en: "No new openings right now. Check back later or browse the portals below." },
   "karir.apply": { id: "Lamar", en: "Apply" },
+  "karir.search-label": { id: "Cari lowongan", en: "Search jobs" },
+  "karir.search-placeholder": { id: "Cari judul, perusahaan, atau kota", en: "Search title, company, or city" },
+  "karir.sort-label": { id: "Urutkan", en: "Sort" },
+  "karir.filter-all": { id: "Semua kategori", en: "All categories" },
+  "karir.result-count": { id: "{n} lowongan cocok", en: "{n} jobs match" },
+  "karir.deadline-closed": { id: "Sudah ditutup", en: "Closed" },
+  "karir.deadline-closing": { id: "Tutup {n} hari lagi", en: "{n} days left" },
+  "karir.deadline-open": { id: "Deadline {n} hari lagi", en: "{n} days left" },
+  "karir.deadline-none": { id: "Tanpa batas", en: "No deadline" },
+  "karir.closed-cta": { id: "Pendaftaran sudah ditutup", en: "Applications closed" },
+  "karir.promo-title": { id: "Belum punya CV yang siap dilamar?", en: "Don't have an application-ready CV yet?" },
+  "karir.promo-desc": { id: "Buat CV ATS dulu, atau cek CV yang sekarang dalam hitungan detik.", en: "Build an ATS-ready CV first, or check the one you have in seconds." },
+  "karir.promo-cta-cv": { id: "Bikin CV", en: "Build CV" },
+  "karir.promo-cta-check": { id: "Cek CV dulu", en: "Check my CV" },
 
   /* Ã¢â€â‚¬Ã¢â€â‚¬ Karir Page Ã¢â€â‚¬Ã¢â€â‚¬ */
   "karir.meta-title": { id: "Info Karir | AI Career Hub", en: "Careers | AI Career Hub" },
@@ -1749,9 +1800,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const t = useCallback((key: string): string => {
+  const t = useCallback((key: string, fallback?: string): string => {
     const entry = DICT[key];
-    if (!entry) return key;
+    if (!entry) return fallback ?? key;
     return entry[lang];
   }, [lang]);
 
