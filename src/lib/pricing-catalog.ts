@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { CURRENT_PACKAGES } from "@/lib/package-catalog-static";
 
 /**
  * Katalog paket milik server.
@@ -168,11 +169,39 @@ export function describePackageKeys(
 }
 
 /**
+ * Bentuk katalog dari definisi statis di `package-catalog-static`.
+ *
+ * Dipakai sebagai data awal sebelum jawaban dari /api/packages datang. Tanpa ini,
+ * render pertama tabel perbandingan mengisi semua kolom berbayar dengan "—",
+ * dan kalau JavaScript gagal atau lambat, pengunjung tidak melihat harga
+ * paket mana pun sama sekali.
+ *
+ * Hanya paket yang memang dijual. Sumber kebenaran tetap tabel `packages`;
+ * begitu jawabannya sampai, nilainya diganti dengan yang dari database.
+ */
+function staticCatalogPackages(): CatalogPackage[] {
+  return MARKETED_PACKAGE_KEYS.map((key) => {
+    const pkg = CURRENT_PACKAGES[key];
+    return {
+      key,
+      name: pkg.name,
+      price: pkg.price,
+      periodDays: pkg.periodDays,
+      monthly: Boolean(pkg.monthly),
+      maxActivePortfolios: pkg.maxActivePortfolios,
+      limits: pkg.limits,
+    };
+  });
+}
+
+/**
  * Harga satu paket dari katalog, atau `undefined` kalau belum termuat.
  * `fallback` dipakai sampai katalog tiba.
  */
 export function useCatalogPrices(): (key: string, fallback: number) => number {
-  const [prices, setPrices] = useState<Record<string, number>>({});
+  const [prices, setPrices] = useState<Record<string, number>>(() =>
+    Object.fromEntries(MARKETED_PACKAGE_KEYS.map((key) => [key, CURRENT_PACKAGES[key].price])),
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -199,7 +228,7 @@ export function useCatalogPrices(): (key: string, fallback: number) => number {
  * berbeda satu per satu.
  */
 export function useCatalogPackages(): { packages: CatalogPackage[]; loading: boolean } {
-  const [packages, setPackages] = useState<CatalogPackage[]>([]);
+  const [packages, setPackages] = useState<CatalogPackage[]>(staticCatalogPackages);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
