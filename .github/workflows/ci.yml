@@ -59,5 +59,8 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Pastikan migrasi database ada semua
+      - name: Kunci i18n yang dipakai harus ada semua
+        run: node scripts/find-missing-i18n.mjs
+
+      - name: Migrasi baru harus aman dijalankan ulang
         run: node scripts/audit-migrations.mjs --check-files

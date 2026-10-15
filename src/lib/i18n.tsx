@@ -1747,6 +1747,25 @@ const DICT: Record<string, { id: string; en: string }> = {
   "builder.pdf-quota": { id: "Kuota PDF habis Â· Upgrade untuk unlimited", en: "PDF quota exhausted Â· Upgrade for unlimited" },
   "builder.pdf-export-failed": { id: "Gagal mengekspor PDF", en: "Failed to export PDF" },
   "builder.pdf-export-success": { id: "PDF berhasil diunduh", en: "PDF downloaded" },
+
+  /* Kunci yang hilang saat kamus diedit, ditemukan oleh scripts/find-missing-i18n.mjs.
+     Tanpa ini, teks mentah seperti `pricing.table.unlimited` tampil di halaman. */
+  "pricing.table.unlimited": { id: "Tanpa batas", en: "Unlimited" },
+  "billing.checkout-history": { id: "Riwayat Checkout", en: "Checkout History" },
+  "pdfbtn.fallback-title": { id: "Simpan sebagai PDF", en: "Save as PDF" },
+  "pdfbtn.dl-title": { id: "Unduh PDF", en: "Download PDF" },
+  "pdfbtn.downloading": { id: "Mengunduh...", en: "Downloading..." },
+  "pdfbtn.export-failed-title": { id: "Gagal mengekspor PDF", en: "PDF export failed" },
+  "pdfbtn.failed-msg": {
+    id: "PDF tidak bisa dibuat. Coba sekali lagi, atau gunakan Cetak ke PDF dari peramban.",
+    en: "The PDF could not be created. Try again, or use the browser's Print to PDF.",
+  },
+  "pdfbtn.close": { id: "Tutup", en: "Close" },
+  "upload.processing": { id: "Memproses...", en: "Processing..." },
+  "upload.size-error": {
+    id: "Ukuran file terlalu besar. Maksimal 5MB.",
+    en: "File is too large. Maximum 5MB.",
+  },
   "builder.pdf-export-error": { id: "Gagal mengekspor PDF. Silakan coba lagi.", en: "Failed to export PDF. Please try again." },
   "builder.save-success": { id: "CV berhasil disimpan!", en: "CV saved successfully!" },
   "builder.save-failed": { id: "Gagal menyimpan", en: "Failed to save" },
