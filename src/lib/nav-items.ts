@@ -107,13 +107,40 @@ export const NAV_GROUPS: NavGroup[] = [
       { labelKey: "nav.item.faq", label: "FAQ", href: "/faq", icon: "help" },
     ],
   },
+];
+
+/**
+ * Bagian menu akun, di dalam menu avatar.
+ *
+ * Dulu jadi grup "Akun" di navbar. Empat dari lima isinya jarang dibuka, jadi
+ * lebih hemat ruang di navbar kalau disembunyikan sampai orang memang menekan
+ * avatarnya. Checkout ikut ke sini karena halaman itu selalu butuh sesi:
+ * /api/payments/* membalas 401 untuk tamu, jadi tidak ada yang bisa dibeli tanpa
+ * masuk lebih dulu.
+ *
+ * Tagihan diletakkan paling atas supaya jalur perpanjangan paket tidak ikut
+ * tenggelam bersama menu profil.
+ */
+export interface NavSection {
+  /** Judul bagian, dipakai sebagai pemisah di menu avatar. */
+  labelKey?: string;
+  label?: string;
+  items: NavItem[];
+}
+
+export const ACCOUNT_MENU: NavSection[] = [
   {
-    labelKey: "nav.group.akun",
-    label: "Akun",
-    icon: "account_circle",
     items: [
-      { labelKey: "nav.item.checkout", label: "Checkout", href: "/checkout", icon: "shopping_cart" },
-      { labelKey: "nav.item.billing", label: "Tagihan", href: "/settings/billing", icon: "receipt_long", requiresAuth: true },
+      { labelKey: "nav.item.profile", label: "Profil", href: "/settings/profile", icon: "person", requiresAuth: true },
+      { labelKey: "nav.item.security", label: "Keamanan", href: "/settings/security", icon: "lock", requiresAuth: true },
+    ],
+  },
+  {
+    labelKey: "nav.section.tagihan",
+    label: "Tagihan",
+    items: [
+      { labelKey: "nav.item.checkout", label: "Checkout & Top Up", href: "/checkout", icon: "shopping_cart", requiresAuth: true },
+      { labelKey: "nav.item.billing", label: "Tagihan & Paket", href: "/settings/billing", icon: "receipt_long", requiresAuth: true },
       {
         labelKey: "nav.item.payment-history",
         label: "Riwayat Bayar",
@@ -121,9 +148,13 @@ export const NAV_GROUPS: NavGroup[] = [
         icon: "history",
         requiresAuth: true,
       },
-      { labelKey: "nav.item.profile", label: "Profil", href: "/settings/profile", icon: "person", requiresAuth: true },
-      { labelKey: "nav.item.security", label: "Keamanan", href: "/settings/security", icon: "lock", requiresAuth: true },
-      { labelKey: "nav.item.affiliate", label: "Afiliasi", href: "/affiliate", icon: "redeem", requiresAuth: true },
+    ],
+  },
+  {
+    labelKey: "nav.section.affiliate",
+    label: "Afiliasi",
+    items: [
+      { labelKey: "nav.item.affiliate", label: "Referral & Afiliasi", href: "/affiliate", icon: "redeem", requiresAuth: true },
     ],
   },
 ];
@@ -148,9 +179,9 @@ export const ANNOUNCEMENT = {
   href: "/karir",
 } as const;
 
-/** Semua item datar dari seluruh group — dipakai test dan pencarian. */
+/** Semua item dari grup navbar dan menu akun — dipakai test dan pencarian. */
 export function allNavItems(): NavItem[] {
-  return NAV_GROUPS.flatMap((group) => group.items);
+  return [...NAV_GROUPS.flatMap((group) => group.items), ...ACCOUNT_MENU.flatMap((s) => s.items)];
 }
 
 /**

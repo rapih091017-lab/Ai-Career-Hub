@@ -23,16 +23,24 @@ import { useTranslation } from "@/lib/i18n";
 import LogoutConfirmModal from "@/components/ui/LogoutConfirmModal";
 import { AdminMenuItem } from "@/components/AdminMenuItem";
 import NavGroupMenu from "@/components/nav/NavGroupMenu";
-import { ANNOUNCEMENT, LANDING_LINKS, NAV_GROUPS } from "@/lib/nav-items";
+import { ACCOUNT_MENU, ANNOUNCEMENT, LANDING_LINKS, NAV_GROUPS, isNavActive, type NavItem } from "@/lib/nav-items";
 
 interface Props {
   /**
    * `pill` = nav melayang dengan sudut membulat (landing, halaman publik).
-   * `bar`   = navtempel penuh selebar layar (dashboard, halaman aplikasi).
+   * `bar`   = nav menempel penuh selebar layar (dashboard, halaman aplikasi).
    */
   variant?: "pill" | "bar";
   /** Bar pengumuman di bawah nav, dipakai di halaman publik saja. */
   showAnnouncement?: boolean;
+}
+
+/** Item yang butuh sesi ikut membawa tujuannya ke halaman login. */
+function itemHref(item: NavItem, isLoggedIn: boolean): string {
+  if (item.requiresAuth && !isLoggedIn) {
+    return `/login?next=${encodeURIComponent(item.href)}`;
+  }
+  return item.href;
 }
 
 export default function SiteHeader({ variant = "bar", showAnnouncement = false }: Props) {
@@ -147,22 +155,55 @@ export default function SiteHeader({ variant = "bar", showAnnouncement = false }
                 </button>
 
                 {accountOpen && (
-                  <div className="absolute right-0 top-full z-[60] mt-2 w-56 rounded-2xl border border-outline-variant/20 bg-surface-container-lowest py-2 shadow-xl">
+                  <div className="absolute right-0 top-full z-[60] mt-2 max-h-[80vh] w-64 overflow-y-auto rounded-2xl border border-outline-variant/20 bg-surface-container-lowest py-2 shadow-xl">
                     {session?.user?.email && (
                       <p className="mb-1 border-b border-outline-variant/20 px-4 py-2 text-xs text-on-surface-variant">
                         {session.user.email}
                       </p>
                     )}
-                    <AdminMenuItem onNavigate={() => setAccountOpen(false)} />
-                    <button
-                      onClick={() => setShowLogoutConfirm(true)}
-                      className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-error transition-colors hover:bg-error-container/30"
-                    >
-                      <span className="material-symbols-outlined text-lg" aria-hidden="true">
-                        logout
-                      </span>
-                      {t("header.logout")}
-                    </button>
+                    {ACCOUNT_MENU.map((section, sectionIndex) => (
+                      <div key={section.labelKey ?? `account-${sectionIndex}`} className="py-1">
+                        {section.labelKey && (
+                          <p className="px-4 pb-1 text-[11px] font-bold uppercase tracking-wide text-on-surface-variant">
+                            {t(section.labelKey, section.label)}
+                          </p>
+                        )}
+                        {section.items.map((item) => {
+                          const active = isNavActive(item, pathname);
+                          return (
+                            <Link
+                              key={item.href}
+                              href={itemHref(item, isLoggedIn)}
+                              onClick={() => setAccountOpen(false)}
+                              className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
+                                active
+                                  ? "bg-primary/10 font-label-bold text-primary"
+                                  : "text-on-surface hover:bg-surface-container"
+                              }`}
+                            >
+                              <span className="material-symbols-outlined text-lg" aria-hidden="true">
+                                {item.icon}
+                              </span>
+                              {t(item.labelKey, item.label)}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    ))}
+                    <div className="border-t border-outline-variant/20 py-1">
+                      <AdminMenuItem onNavigate={() => setAccountOpen(false)} />
+                    </div>
+                    <div className="border-t border-outline-variant/20 pt-1">
+                      <button
+                        onClick={() => setShowLogoutConfirm(true)}
+                        className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-error transition-colors hover:bg-error-container/30"
+                      >
+                        <span className="material-symbols-outlined text-lg" aria-hidden="true">
+                          logout
+                        </span>
+                        {t("header.logout")}
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -213,6 +254,42 @@ export default function SiteHeader({ variant = "bar", showAnnouncement = false }
                     </Link>
                   ))}
                 </div>
+                {isLoggedIn && (
+                  <div className="mt-3 border-t border-outline-variant/20 pt-2">
+                    <p className="px-3 pb-1 text-[11px] font-bold uppercase tracking-wide text-on-surface-variant">
+                      {t("nav.group.akun")}
+                    </p>
+                    {ACCOUNT_MENU.flatMap((section) => section.items).map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setMobileOpen(false)}
+                        className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
+                          isNavActive(item, pathname)
+                            ? "bg-primary/10 font-label-bold text-primary"
+                            : "text-on-surface-variant hover:bg-surface-container"
+                        }`}
+                      >
+                        <span className="material-symbols-outlined text-lg" aria-hidden="true">
+                          {item.icon}
+                        </span>
+                        {t(item.labelKey, item.label)}
+                      </Link>
+                    ))}
+                    <button
+                      onClick={() => {
+                        setMobileOpen(false);
+                        setShowLogoutConfirm(true);
+                      }}
+                      className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-error transition-colors hover:bg-error-container/30"
+                    >
+                      <span className="material-symbols-outlined text-lg" aria-hidden="true">
+                        logout
+                      </span>
+                      {t("header.logout")}
+                    </button>
+                  </div>
+                )}
                 {!isLoggedIn && (
                   <Link
                     href="/login"

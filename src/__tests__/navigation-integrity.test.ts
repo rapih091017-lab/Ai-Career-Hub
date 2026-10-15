@@ -3,6 +3,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import {
   NAV_GROUPS,
+  ACCOUNT_MENU,
   LANDING_LINKS,
   allNavItems,
   isNavActive,
@@ -116,11 +117,40 @@ describe("isi navigasi", () => {
     }
   });
 
-  it("grup tidak kosong dan tidak terlalu besar", () => {
+  it("grup navbar tidak kosong dan tidak terlalu besar", () => {
     for (const group of NAV_GROUPS) {
       expect(group.items.length, `grup ${group.label} kosong`).toBeGreaterThan(0);
       expect(group.items.length, `grup ${group.label} terlalu padat`).toBeLessThanOrEqual(8);
     }
+  });
+
+  it("akun disembunyikan di menu avatar, bukan di navbar", () => {
+    // Navbar harus tetap lapang: profil, tagihan, dan afiliasi jarang dibuka,
+    // jadi tidak perlu menempati satu grup tersendiri.
+    const groupHrefs = new Set(NAV_GROUPS.flatMap((g) => g.items.map((i) => i.href)));
+    for (const item of ACCOUNT_MENU.flatMap((s) => s.items)) {
+      expect(groupHrefs, `${item.href} masih di navbar`).not.toContain(item.href);
+    }
+    // Tapi tetap harus lengkap: semua akun ada di menu avatar.
+    const accountHrefs = new Set(ACCOUNT_MENU.flatMap((s) => s.items.map((i) => i.href)));
+    for (const href of [
+      "/checkout",
+      "/settings/billing",
+      "/settings/payment-history",
+      "/settings/profile",
+      "/settings/security",
+      "/affiliate",
+    ]) {
+      expect(accountHrefs, `menu akun kehilangan ${href}`).toContain(href);
+    }
+  });
+
+  it("menu akun punya pemisah bagian", () => {
+    const sections = ACCOUNT_MENU.map((s) => s.items.length);
+    expect(sections.every((n) => n > 0)).toBe(true);
+    // Tagihan diletakkan lebih dulu supaya jalur perpanjangan paket mudah
+    // dijangkau, dan setelah bagian profil yang paling sering dibuka.
+    expect(ACCOUNT_MENU[1].labelKey).toBe("nav.section.tagihan");
   });
 });
 
