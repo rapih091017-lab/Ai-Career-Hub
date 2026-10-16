@@ -59,6 +59,9 @@ export default function ArticleContent({ content }: { content: string }) {
           return (
             <ListTag
               key={key}
+              // `start` menjaga penomoran sesuai yang diketik penulis. Tanpa
+              // ini, daftar yang dimulai dari "3." akan tampil lagi dari 1.
+              start={ordered && block.start && block.start > 1 ? block.start : undefined}
               className={`space-y-2 pl-6 marker:text-primary ${ordered ? "list-decimal" : "list-disc"}`}
             >
               {block.items.map((item, itemIndex) => (

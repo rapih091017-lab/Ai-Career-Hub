@@ -15,11 +15,14 @@ const base = {
 };
 
 describe("penanda format artikel", () => {
-  it("paragraf biasa jadi satu blok", () => {
-    const blocks = parseArticleBlocks("Paragraf pertama.\nBaris kedua.\n\nParagraf kedua.");
-    expect(blocks).toHaveLength(2);
-    expect(blocks[0].kind).toBe("paragraph");
-    expect(blocks[0].text).toBe("Paragraf pertama. Baris kedua.");
+  it("setiap baris jadi blok sendiri", () => {
+    // Editor memakai Enter untuk baris baru, jadi dua baris berurutan adalah
+    // dua paragraf, bukan satu.
+    const blocks = parseArticleBlocks("Paragraf pertama.\nBaris kedua.\n\nParagraf ketiga.");
+    expect(blocks).toHaveLength(3);
+    expect(blocks[0].text).toBe("Paragraf pertama.");
+    expect(blocks[1].text).toBe("Baris kedua.");
+    expect(blocks[2].text).toBe("Paragraf ketiga.");
   });
 
   it("judul dibaca sebagai judul, bukan paragraf", () => {

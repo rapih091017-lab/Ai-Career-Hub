@@ -4,16 +4,20 @@
  * Isi disimpan sebagai teks biasa dengan penanda sederhana, bukan HTML.
  * Alasannya: HTML yang disimpan berarti setiap baris baru harus disanitasi saat
  * ditampilkan, dan satu kesalahan penyanitasi jadi celah XSS. Dengan penanda
- * teks,risiko itu nol, artikel tetap bisa disalin ke editor lain, dan artikel
+ * teks, risiko itu nol, artikel tetap bisa disalin ke editor lain, dan artikel
  * lama yang tidak memakai penanda baru tetap tampil seperti sebelumnya.
  *
  * Didukung:
- * - `## Judul` dan `# Judul` → judul
+ * - `# ` / `## ` / `### ` → judul
  * - `**tebal**` → tebal
- * - `1. ` / `2. ` berurutan → daftar bernomor
- * - `- ` atau `* ` → daftar bullet
+ * - `1. ` atau `1) ` → daftar bernomor (dimulai dari angka yang diketik)
+ * - `- ` / `* ` / `• ` → daftar bullet
  * - `@center ` / `@right ` → paragraf rata tengah atau kanan
  * - `> ` → kutipan
+ *
+ * Setiap baris adalah satu blok. Editor memakai Enter untuk baris baru, dan
+ * penomoran otomatis juga memakai Enter — bukan baris kosong. Kalau artikel
+ * hanya dipecah berdasarkan baris kosong, seluruh isi menyatu jadi satu paragraf.
  */
 
 export type BlockKind = "heading" | "paragraph" | "quote" | "list";
@@ -33,6 +37,8 @@ export interface ArticleBlock {
   align?: "left" | "center" | "right";
   /** Isi daftar bernomor/bullet. */
   items?: ListItem[];
+  /** Angka awal daftar bernomor, mis. daftar yang dimulai dari "3." */
+  start?: number;
 }
 
 const ALIGN_PREFIX: Record<string, ArticleBlock["align"]> = {
@@ -74,86 +80,67 @@ export function parseInline(text: string): InlineToken[] {
   return tokens;
 }
 
+/** Ambil penanda rata di awal baris, lalu buang dari teksnya. */
+function takeAlignment(text: string): { text: string; align?: ArticleBlock["align"] } {
+  const lower = text.toLowerCase();
+  for (const [prefix, value] of Object.entries(ALIGN_PREFIX)) {
+    if (lower.startsWith(prefix)) {
+      return { text: text.slice(prefix.length).trim(), align: value };
+    }
+  }
+  return { text };
+}
+
 /**
  * Pecah isi artikel menjadi blok.
  *
- * Baris kosong memisahkan paragraf. Baris berurutan yang diawali `1.` atau
- * `-` dikumpulkan menjadi satu blok daftar, jadi mengetik Enter di tengah
- * daftar tidak memecahnya.
+ * Satu baris = satu blok, kecuali baris-baris daftar yang berurutan yang
+ * dikumpulkan jadi satu blok daftar supaya mengetik Enter di tengah daftar
+ * tidak memecahnya.
  */
 export function parseArticleBlocks(content: string): ArticleBlock[] {
   const blocks: ArticleBlock[] = [];
-  const paragraphs = content.split(/\n\s*\n/);
+  const lines = content.split("\n");
 
-  for (const paragraph of paragraphs) {
-    const rawLines = paragraph.split("\n").map((line) => line.trim()).filter(Boolean);
-    if (rawLines.length === 0) continue;
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (!line) continue;
 
-    // Kumpulkan daftar bernomor/bullet yang berurutan.
-    const items: ListItem[] = [];
-    let remaining: string[] = [];
-    let listKind: ListItem["kind"] | null = null;
+    const ordered = line.match(ORDERED_ITEM_RE);
+    const bullet = line.match(BULLET_ITEM_RE);
 
-    for (const line of rawLines) {
-      const ordered = line.match(ORDERED_ITEM_RE);
-      const bullet = line.match(BULLET_ITEM_RE);
-      if (ordered) {
-        if (listKind && listKind !== "ordered") {
-          blocks.push({ kind: "list", items });
-          items.length = 0;
-        }
-        listKind = "ordered";
-        items.push({ kind: "ordered", text: ordered[3] });
+    if (ordered || bullet) {
+      const last = blocks[blocks.length - 1];
+      const kind: ListItem["kind"] = ordered ? "ordered" : "bullet";
+      const text = (ordered ? ordered[3] : bullet![3]).trim();
+      // Baris daftar yang berurutan melanjutkan daftar sebelumnya. Kalau tidak,
+      // mengetik Enter di tengah daftar akan memecahnya jadi beberapa daftar.
+      if (last?.kind === "list" && last.items?.[0]?.kind === kind) {
+        last.items.push({ kind, text });
         continue;
       }
-      if (bullet) {
-        if (listKind && listKind !== "bullet") {
-          blocks.push({ kind: "list", items });
-          items.length = 0;
-        }
-        listKind = "bullet";
-        items.push({ kind: "bullet", text: bullet[3] });
-        continue;
-      }
-      // Baris biasa: tutup daftar yang sedang berjalan.
-      if (items.length > 0) {
-        blocks.push({ kind: "list", items });
-        items.length = 0;
-        listKind = null;
-      }
-      remaining.push(line);
-    }
-    if (items.length > 0) blocks.push({ kind: "list", items });
-
-    // Sisa baris diperlakukan sebagai satu blok (judul / kutipan / paragraf).
-    if (remaining.length === 0) continue;
-    const first = remaining[0];
-    const heading = first.match(HEADING_RE);
-    const quote = first.match(QUOTE_RE);
-
-    let text = remaining.join(" ");
-    let align: ArticleBlock["align"] | undefined;
-    // Rata paragraf ditulis sebagai penanda di awal baris pertama.
-    for (const [prefix, value] of Object.entries(ALIGN_PREFIX)) {
-      if (text.toLowerCase().startsWith(prefix)) {
-        align = value;
-        text = text.slice(prefix.length).trim();
-        break;
-      }
+      const block: ArticleBlock = { kind: "list", items: [{ kind, text }] };
+      if (ordered) block.start = Number(ordered[2]);
+      blocks.push(block);
+      continue;
     }
 
+    const quote = line.match(QUOTE_RE);
+    if (quote) {
+      const { text, align } = takeAlignment(quote[1]);
+      blocks.push({ kind: "quote", text, align });
+      continue;
+    }
+
+    const heading = line.match(HEADING_RE);
     if (heading) {
-      blocks.push({
-        kind: "heading",
-        text: heading[2].trim(),
-        level: heading[1].length as 1 | 2 | 3,
-        align,
-      });
-    } else if (quote) {
-      blocks.push({ kind: "quote", text: quote[1].trim(), align });
-    } else {
-      blocks.push({ kind: "paragraph", text, align });
+      const { text, align } = takeAlignment(heading[2].trim());
+      blocks.push({ kind: "heading", text, level: heading[1].length as 1 | 2 | 3, align });
+      continue;
     }
+
+    const { text, align } = takeAlignment(line);
+    blocks.push({ kind: "paragraph", text, align });
   }
 
   return blocks;

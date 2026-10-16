@@ -36,10 +36,24 @@ type ToolbarAction =
 export default function ArticleEditor({ value, onChange, className, rows = 16, maxLength }: Props) {
   const ref = useRef<HTMLTextAreaElement>(null);
   const [hint, setHint] = useState<string | null>(null);
+  // Posisi kursor yang harus dikembalikan setelah React menggambar ulang.
+  // Tanpa ini, setiap kali nilai berubah React memindahkan kursor ke akhir,
+  // sehingga teks terasa melompat ke bawah dan选 pilihan hilang saat toolbar
+  // dipakai.
+  const pendingCaret = useRef<{ start: number; end: number } | null>(null);
 
   const showHint = (message: string) => {
     setHint(message);
     window.setTimeout(() => setHint(null), 2600);
+  };
+
+  /** Terapkan posisi kursor yang tersimpan, tepat setelah React selesai render. */
+  const applyPendingCaret = () => {
+    const target = pendingCaret.current;
+    if (!target || !ref.current) return;
+    pendingCaret.current = null;
+    ref.current.focus();
+    ref.current.setSelectionRange(target.start, target.end);
   };
 
   /** Bungkus pilihan saat ini dengan penanda, atau sisipkan penanda. */
@@ -55,10 +69,8 @@ export default function ArticleEditor({ value, onChange, className, rows = 16, m
     onChange(next);
     // Kursor diletakkan di dalam penanda supaya bisa langsung mengetik.
     const caret = selected ? start + before.length + selected.length + after.length : start + before.length;
-    requestAnimationFrame(() => {
-      el.focus();
-      el.selectionStart = el.selectionEnd = caret;
-    });
+    pendingCaret.current = { start: caret, end: caret };
+    applyPendingCaret();
   };
 
   /** Ubah penanda awal baris saat ini, mis."Rrata tengah". */
@@ -77,10 +89,8 @@ export default function ArticleEditor({ value, onChange, className, rows = 16, m
     const next = value.slice(0, lineStart) + nextLine + value.slice(lineEnd);
     onChange(next);
     const caretOffset = nextLine.length - line.length;
-    requestAnimationFrame(() => {
-      el.focus();
-      el.selectionStart = el.selectionEnd = caret + caretOffset;
-    });
+    pendingCaret.current = { start: caret + caretOffset, end: caret + caretOffset };
+    applyPendingCaret();
     showHint(`${label} untuk baris ini`);
   };
 
@@ -99,10 +109,9 @@ export default function ArticleEditor({ value, onChange, className, rows = 16, m
     });
     const next = value.slice(0, lineStart) + marked.join("\n") + value.slice(lineEnd);
     onChange(next);
-    requestAnimationFrame(() => {
-      el.focus();
-      el.selectionStart = el.selectionEnd = lineStart + marked.join("\n").length;
-    });
+    const endOfList = lineStart + marked.join("\n").length;
+    pendingCaret.current = { start: endOfList, end: endOfList };
+    applyPendingCaret();
     showHint(kind === "ordered" ? "Daftar bernomor dimulai" : "Daftar bullet dimulai");
   };
 
@@ -119,9 +128,8 @@ export default function ArticleEditor({ value, onChange, className, rows = 16, m
         const indent = (before.slice(lineStart).match(/^\s*/) ?? [""])[0];
         const next = before + (indent ? `\n${indent}` : "\n");
         onChange(next);
-        requestAnimationFrame(() => {
-          el.selectionStart = el.selectionEnd = next.length;
-        });
+        pendingCaret.current = { start: next.length, end: next.length };
+        applyPendingCaret();
         return;
       }
       if (result.insert) {
@@ -129,9 +137,8 @@ export default function ArticleEditor({ value, onChange, className, rows = 16, m
         const next = before + result.insert + value.slice(caret);
         onChange(next);
         const nextCaret = caret + result.insert.length + result.caretOffset;
-        requestAnimationFrame(() => {
-          el.selectionStart = el.selectionEnd = nextCaret;
-        });
+        pendingCaret.current = { start: nextCaret, end: nextCaret };
+        applyPendingCaret();
       }
       return;
     }
@@ -142,9 +149,8 @@ export default function ArticleEditor({ value, onChange, className, rows = 16, m
         event.preventDefault();
         const next = value.slice(0, lineStart) + value.slice(caret);
         onChange(next);
-        requestAnimationFrame(() => {
-          el.selectionStart = el.selectionEnd = lineStart;
-        });
+        pendingCaret.current = { start: lineStart, end: lineStart };
+        applyPendingCaret();
       }
     }
   };
