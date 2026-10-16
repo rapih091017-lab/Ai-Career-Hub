@@ -12,7 +12,7 @@
  * mengetik `1.` lalu Enter langsung melanjutkan ke `2.`.
  */
 
-import { useRef, useState, type KeyboardEvent } from "react";
+import { useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
 import { backspaceClearsListMarker, listContinuation } from "@/lib/list-continuation";
 
 interface Props {
@@ -47,14 +47,20 @@ export default function ArticleEditor({ value, onChange, className, rows = 16, m
     window.setTimeout(() => setHint(null), 2600);
   };
 
-  /** Terapkan posisi kursor yang tersimpan, tepat setelah React selesai render. */
-  const applyPendingCaret = () => {
+  /**
+   * Terapkan posisi kursor yang tersimpan.
+   *
+   * Harus lewat useLayoutEffect, bukan langsung setelah onChange: saat itu
+   * textarea masih berisi teks lama, jadi penanda dan nomor ditulis ke posisi
+   * yang salah. Efeknya kursor melompat dan penomoran terasa rusak.
+   */
+  useLayoutEffect(() => {
     const target = pendingCaret.current;
     if (!target || !ref.current) return;
     pendingCaret.current = null;
     ref.current.focus();
     ref.current.setSelectionRange(target.start, target.end);
-  };
+  }, [value]);
 
   /** Bungkus pilihan saat ini dengan penanda, atau sisipkan penanda. */
   const wrap = (before: string, after: string, placeholder: string) => {
@@ -70,7 +76,6 @@ export default function ArticleEditor({ value, onChange, className, rows = 16, m
     // Kursor diletakkan di dalam penanda supaya bisa langsung mengetik.
     const caret = selected ? start + before.length + selected.length + after.length : start + before.length;
     pendingCaret.current = { start: caret, end: caret };
-    applyPendingCaret();
   };
 
   /** Ubah penanda awal baris saat ini, mis."Rrata tengah". */
@@ -90,7 +95,6 @@ export default function ArticleEditor({ value, onChange, className, rows = 16, m
     onChange(next);
     const caretOffset = nextLine.length - line.length;
     pendingCaret.current = { start: caret + caretOffset, end: caret + caretOffset };
-    applyPendingCaret();
     showHint(`${label} untuk baris ini`);
   };
 
@@ -111,7 +115,6 @@ export default function ArticleEditor({ value, onChange, className, rows = 16, m
     onChange(next);
     const endOfList = lineStart + marked.join("\n").length;
     pendingCaret.current = { start: endOfList, end: endOfList };
-    applyPendingCaret();
     showHint(kind === "ordered" ? "Daftar bernomor dimulai" : "Daftar bullet dimulai");
   };
 
@@ -129,7 +132,6 @@ export default function ArticleEditor({ value, onChange, className, rows = 16, m
         const next = before + (indent ? `\n${indent}` : "\n");
         onChange(next);
         pendingCaret.current = { start: next.length, end: next.length };
-        applyPendingCaret();
         return;
       }
       if (result.insert) {
@@ -138,7 +140,6 @@ export default function ArticleEditor({ value, onChange, className, rows = 16, m
         onChange(next);
         const nextCaret = caret + result.insert.length + result.caretOffset;
         pendingCaret.current = { start: nextCaret, end: nextCaret };
-        applyPendingCaret();
       }
       return;
     }
@@ -150,7 +151,6 @@ export default function ArticleEditor({ value, onChange, className, rows = 16, m
         const next = value.slice(0, lineStart) + value.slice(caret);
         onChange(next);
         pendingCaret.current = { start: lineStart, end: lineStart };
-        applyPendingCaret();
       }
     }
   };

@@ -1,16 +1,30 @@
 import { parseArticleBlocks, parseInline } from "@/lib/article-format";
 
-/** Potongan teks dalam satu blok; yang tebal dibungkus <strong>. */
+/** Potongan teks dalam satu blok; yang tebal dan bertautan dibungkus. */
 function inline(text: string, keyPrefix: string) {
-  return parseInline(text).map((token, index) =>
-    token.bold ? (
-      <strong key={`${keyPrefix}-${index}`} className="font-bold text-on-background">
+  return parseInline(text).map((token, index) => {
+    const key = `${keyPrefix}-${index}`;
+    if (token.href) {
+      return (
+        <a
+          key={key}
+          href={token.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-medium text-primary underline underline-offset-2 hover:opacity-80"
+        >
+          {token.value}
+        </a>
+      );
+    }
+    return token.bold ? (
+      <strong key={key} className="font-bold text-on-background">
         {token.value}
       </strong>
     ) : (
-      <span key={`${keyPrefix}-${index}`}>{token.value}</span>
-    ),
-  );
+      <span key={key}>{token.value}</span>
+    );
+  });
 }
 
 /**

@@ -54,16 +54,34 @@ const HEADING_RE = /^(#{1,3})\s+(.*)$/;
 export interface InlineToken {
   bold: boolean;
   value: string;
+  /** Alamat tujuan kalau potongan ini berasal dari `[teks](url)`. */
+  href?: string;
 }
 
 /**
- * Pecah `**teks tebal**` jadi potongan biasa dan potongan tebal.
+ * Hanya http dan https yang boleh jadi tautan.
+ *
+ * Isi artikel ditulis orang, dan penanda disimpan apa adanya. Tanpa penyaringan
+ * ini, `[teks](javascript:...)` akan jadi tautan yang bisa menjalankan skrip
+ * saat artikel dibuka.
+ */
+export function safeHref(url: string): string | undefined {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "http:" || parsed.protocol === "https:" ? url : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Pecah penanda sebaris jadi potongan biasa, tebal, dan tautan.
  *
  * Sengaja tanpa JSX supaya modul ini murni dan bisa diuji tanpa React.
  */
 export function parseInline(text: string): InlineToken[] {
   const tokens: InlineToken[] = [];
-  const pattern = /\*\*(.+?)\*\*/g;
+  const pattern = /\*\*(.+?)\*\*|\[([^\]\n]+)\]\(([^)\s]+)\)/g;
   let lastIndex = 0;
   let match: RegExpExecArray | null;
 
@@ -71,7 +89,20 @@ export function parseInline(text: string): InlineToken[] {
     if (match.index > lastIndex) {
       tokens.push({ bold: false, value: text.slice(lastIndex, match.index) });
     }
-    tokens.push({ bold: true, value: match[1] });
+    if (match[1] !== undefined) {
+      // Isi tebal diurai lagi supaya tautan di dalamnya tetap jadi tautan.
+      for (const inner of parseInline(match[1])) {
+        tokens.push({ ...inner, bold: true });
+      }
+    } else {
+      const href = safeHref(match[3]);
+      // Tautan yang tidak aman ditampilkan sebagai teks biasa, bukan tautan.
+      if (href) {
+        tokens.push({ bold: false, value: match[2], href });
+      } else {
+        tokens.push({ bold: false, value: match[0] });
+      }
+    }
     lastIndex = match.index + match[0].length;
   }
   if (lastIndex < text.length) {
