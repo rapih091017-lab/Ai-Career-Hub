@@ -40,15 +40,18 @@ describe("Career Hub schemas", () => {
     expect(result.success).toBe(false);
   });
 
-  it("rejects duplicate tags ignoring letter case", () => {
+  it("membuang tag duplikat yang hanya berbeda huruf besar", () => {
+    // Dulu "ATS" dan "ats" membuat seluruh artikel ditolak dengan pesan
+    // "Invalid input", padahal maksud admin cuma ingin satu tag saja.
     const result = careerHubPostCreateSchema.safeParse({
       title: "Panduan CV",
       excerpt: "Ringkasan",
       content: "Isi artikel",
       category: "cv-ats",
-      tags: ["ATS", "ats"],
+      tags: ["ATS", "ats", "cv"],
     });
-    expect(result.success).toBe(false);
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.tags).toEqual(["ATS", "cv"]);
   });
 
   it("allows partial edits but rejects an empty edit", () => {

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { apiHandler } from "@/lib/api-utils";
 import { db } from "@/db";
 import { jobPosts } from "@/db/schema";
-import { and, asc, desc, eq, ilike, or, type SQL } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, or, type SQL } from "drizzle-orm";
 import {
   JOB_TYPE_LABELS,
   EMPLOYMENT_TYPE_LABELS,
@@ -78,8 +78,16 @@ export const GET = apiHandler(async (request: NextRequest) => {
     .orderBy(...orderBy)
     .limit(60);
 
+  // Total tanpa filter: dipakai untuk membedakan "lowongannya sudah habis
+  // dengan filter kamu" dari "memang belum ada lowongan sama sekali".
+  const [{ total }] = await db
+    .select({ total: count() })
+    .from(jobPosts)
+    .where(eq(jobPosts.isPublished, true));
+
   return NextResponse.json({
     jobs,
+    total: Number(total),
     // Label dikirim dari server supaya halaman tidak perlu kamus terpisah
     // dan tidak bisa menampilkan kategori yang tidak dikenal.
     labels: { jobType: JOB_TYPE_LABELS, employmentType: EMPLOYMENT_TYPE_LABELS },

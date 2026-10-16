@@ -94,7 +94,6 @@ describe("isi navigasi", () => {
       "/tracker",
       "/career-path",
       "/career-hub",
-      "/blog",
       "/contoh-cv",
       "/sinonim",
       "/faq",

@@ -1667,6 +1667,10 @@ const DICT: Record<string, { id: string; en: string }> = {
 
   /* Ã¢â€â‚¬Ã¢â€â‚¬ Karir: loker Ã¢â€â‚¬Ã¢â€â‚¬ */
   "karir.badge-open": { id: "Loker Tersedia", en: "Jobs Available" },
+  "karir.badge-loading": { id: "Memuat lowongan...", en: "Loading jobs..." },
+  "karir.no-match-title": { id: "Tidak ada lowongan yang cocok", en: "No matching jobs" },
+  "karir.no-match-desc": { id: "Coba ubah kata kunci, kategori, atau tipe pekerjaannya. Ada {n} lowongan lain yang tersedia.", en: "Try another keyword, category, or job type. There are {n} other jobs available." },
+  "karir.reset-filter": { id: "Tampilkan semua lowongan", en: "Show all jobs" },
   "karir.jobs-title": { id: "Loker Pilihan", en: "Featured Jobs" },
   "karir.jobs-desc": { id: "Lowongan terkurasi dari tim kami. Klik Lamar untuk membuka halaman pendaftaran perusahaan.", en: "Curated openings from our team. Click Apply to open the company's application page." },
   "karir.jobs-empty": { id: "Belum ada loker baru saat ini. Cek lagi nanti atau telusuri portal di bawah.", en: "No new openings right now. Check back later or browse the portals below." },

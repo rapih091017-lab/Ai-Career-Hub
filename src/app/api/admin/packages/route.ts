@@ -3,7 +3,7 @@ import { db } from "@/db";
 import { packages } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { PACKAGES } from "@/lib/access";
-import { withAdmin, apiHandler, staleWhileRevalidate } from "@/lib/api-utils";
+import { withAdmin, apiHandler, noCache } from "@/lib/api-utils";
 
 /* ─── GET, List All Packages ─── */
 export const GET = apiHandler(async () => {
@@ -17,7 +17,9 @@ export const GET = apiHandler(async () => {
 
   return NextResponse.json(allPackages, {
     status: 200,
-    headers: staleWhileRevalidate(60),
+    // Bukan cache: daftar ini dipakai admin yang sedang mengubah harga, dan
+    // respons yang basi selama 60 detik membuatnya yakin simpanannya gagal.
+    headers: noCache(),
   });
 });
 

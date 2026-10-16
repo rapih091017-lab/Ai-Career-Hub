@@ -97,6 +97,10 @@ export default function AdminPackagesPage() {
   const handleSave = async (pkg: PackageItem) => {
     const value = editValues[pkg.key];
     if (!value) return;
+    if (!Number.isInteger(value.price) || value.price < 1) {
+      addToast({ type: "error", message: "Harga harus angka bulat lebih dari 0." });
+      return;
+    }
     setSavingId(pkg.key);
     try {
       const response = await fetch("/api/admin/packages", {
@@ -287,15 +291,19 @@ export default function AdminPackagesPage() {
                               min={0}
                               step={1000}
                               value={value?.price ?? pkg.price}
-                              onChange={(event) =>
+                              onChange={(event) => {
+                                // "45.000" harus jadi 45000. parseInt biasa
+                                // berhenti di titik dan menghasilkan 45,
+                                // jadi harga tersimpan jadi salah diam-diam.
+                                const digits = event.target.value.replace(/[^\d]/g, "");
                                 setEditValues((prev) => ({
                                   ...prev,
                                   [pkg.key]: {
                                     ...prev[pkg.key],
-                                    price: parseInt(event.target.value, 10) || 0,
+                                    price: digits ? parseInt(digits, 10) : 0,
                                   },
-                                }))
-                              }
+                                }));
+                              }}
                               className={`${adminInputClass} min-w-[130px] border-outline-variant/60 py-2 text-right font-semibold`}
                             />
                           </div>

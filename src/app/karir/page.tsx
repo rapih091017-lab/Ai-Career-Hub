@@ -95,11 +95,18 @@ export default function KarirPage() {
   const { t, lang } = useTranslation();
   const [jobs, setJobs] = useState<JobPost[]>([]);
   const [jobsLoaded, setJobsLoaded] = useState(false);
+  // null = belum tahu (belum selesai memuat). Mencegah lencana "segera hadir"
+  // berkedip sebelum daftar pertama datang.
+  const [totalJobs, setTotalJobs] = useState<number | null>(null);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
   const [employment, setEmployment] = useState("");
   const [sort, setSort] = useState<JobSort>("newest");
   const [loadingList, setLoadingList] = useState(false);
+
+  // Ada filter yang sedang aktif. Saat ini true, hasil kosong berarti
+  // "tidak ada yang cocok", bukan "lowongannya belum ada".
+  const hasFilters = Boolean(query.trim() || category || employment);
 
   // Dicari di server, jadi daftar yang tampil benar-benar
   // sudah tersaring di database, bukan hanya dipotong 60 baris lalu disaring.
@@ -120,6 +127,7 @@ export default function KarirPage() {
         if (response.ok) {
           const data = await response.json();
           setJobs(Array.isArray(data.jobs) ? data.jobs : []);
+          setTotalJobs(typeof data.total === "number" ? data.total : 0);
         }
       } catch {
         // Diamkan: daftar lama tetap tampil.
@@ -148,8 +156,12 @@ export default function KarirPage() {
             {t("karir.back-home")}
           </Link>
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-surface-container-lowest/15 rounded-full text-xs font-bold tracking-wider mb-6">
-            <span className={`w-2 h-2 rounded-full ${hasJobs ? "bg-emerald-400" : "bg-emerald-400 animate-pulse"}`} />
-            {hasJobs ? t("karir.badge-open") : t("karir.soon")}
+            <span className={`w-2 h-2 rounded-full ${totalJobs ? "bg-emerald-400" : "bg-emerald-400 animate-pulse"}`} />
+            {totalJobs === null
+              ? t("karir.badge-loading")
+              : totalJobs > 0
+                ? t("karir.badge-open")
+                : t("karir.soon")}
           </div>
           <h1 className="font-headline-lg text-3xl md:text-4xl font-bold mb-3">{t("karir.title")}</h1>
           <p className="text-white/80 text-lg max-w-xl">
@@ -381,6 +393,30 @@ export default function KarirPage() {
                 </article>
                 );
               })}
+            </div>
+          </section>
+        ) : jobsLoaded && hasFilters ? (
+          <section className="mb-16">
+            <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-low p-8 text-center">
+              <span className="material-symbols-outlined mb-4 text-5xl text-primary/40" aria-hidden="true">
+                search_off
+              </span>
+              <h2 className="mb-2 font-headline-md text-xl text-on-surface">{t("karir.no-match-title")}</h2>
+              <p className="mx-auto mb-5 max-w-md text-body-md text-on-surface-variant">
+                {t("karir.no-match-desc").replace("{n}", String(totalJobs ?? 0))}
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setQuery("");
+                  setCategory("");
+                  setEmployment("");
+                }}
+                className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-on-primary transition-all hover:brightness-110 active:scale-[0.98]"
+              >
+                <span className="material-symbols-outlined text-base" aria-hidden="true">restart_alt</span>
+                {t("karir.reset-filter")}
+              </button>
             </div>
           </section>
         ) : jobsLoaded ? (

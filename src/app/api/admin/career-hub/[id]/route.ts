@@ -29,6 +29,20 @@ export const PATCH = apiHandler(async (request: NextRequest, { params }: Params)
   }
   if (data.coverImageUrl !== undefined) updates.coverImageUrl = data.coverImageUrl;
   if (data.status !== undefined && data.status !== existing.status) {
+    // Terbitkan hanya kalau isinya benar-benar ada. Dulu status bisa diubah
+    // dari daftar admin tanpa cek isi, sehingga artikel dengan ringkasan atau
+    // body kosong ikut tayang ke pembaca.
+    if (data.status === "published") {
+      const nextExcerpt = data.excerpt ?? existing.excerpt;
+      const nextContent = data.content ?? existing.content;
+      if (!nextExcerpt.trim() || !nextContent.trim()) {
+        return errorResponse(
+          "INVALID_INPUT",
+          "Isi dan ringkasan harus diisi sebelum artikel diterbitkan.",
+          400,
+        );
+      }
+    }
     updates.status = data.status;
     updates.publishedAt = data.status === "published" ? new Date() : null;
   }

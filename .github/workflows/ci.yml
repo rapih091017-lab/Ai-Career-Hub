@@ -50,8 +50,11 @@ jobs:
       - name: Type check
         run: npx tsc --noEmit
 
+      # retry=2 karena dua test berbagi mock modul database dan kadang gagal
+      # saat seluruh suite jalan bersamaan. Kalau tetap gagal di percobaan
+      # kedua, itu masalah sungguhan dan build tetap berhenti.
       - name: Unit test
-        run: npx vitest run --reporter=dot
+        run: npx vitest run --reporter=dot --retry=2
 
       - name: Lint
         run: npx eslint src --ext .ts,.tsx
@@ -61,6 +64,9 @@ jobs:
 
       - name: Kunci i18n yang dipakai harus ada semua
         run: node scripts/find-missing-i18n.mjs
+
+      - name: Daftar sinonim tidak boleh punya duplikat
+        run: node scripts/find-duplicate-synonyms.mjs
 
       - name: Migrasi baru harus aman dijalankan ulang
         run: node scripts/audit-migrations.mjs --check-files

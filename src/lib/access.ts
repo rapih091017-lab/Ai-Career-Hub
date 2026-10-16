@@ -131,7 +131,11 @@ interface DbPackageRow {
 
 let packagesCache: Record<string, PackageDef> | null = null;
 let cacheTimestamp = 0;
-const CACHE_TTL_MS = 60_000; // 1 menit
+// Cache ini hanya menahan lonjakan permintaan berdekatan, bukan untuk
+// menahan perubahan. Dulu 60 detik, jadi harga yang baru diubah di panel
+// admin baru terlihat di situs setelah satu menit, dan admin mengira
+// simpanannya gagal.
+const CACHE_TTL_MS = 10_000;
 
 /**
  * Katalog cadangan ketika database tidak bisa dibaca.

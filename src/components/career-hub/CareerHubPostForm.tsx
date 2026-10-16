@@ -8,6 +8,7 @@ import AdminField from "@/components/admin/AdminField";
 import { adminBtnPrimary, adminBtnSecondary, adminInputClass, adminTextareaClass } from "@/components/admin/ui";
 import { CAREER_HUB_CATEGORIES, slugifyCareerHubTitle } from "@/lib/career-hub-schemas";
 import ArticleContent from "./ArticleContent";
+import ArticleEditor from "./ArticleEditor";
 
 export interface CareerHubPostFormValue {
   id?: string; title: string; slug: string; excerpt: string; content: string; category: string;
@@ -38,7 +39,14 @@ export default function CareerHubPostForm({ postId }: { postId?: string }) {
   }, [postId]);
 
   const set = <K extends keyof CareerHubPostFormValue>(key: K, value: CareerHubPostFormValue[K]) => setForm((current) => ({ ...current, [key]: value }));
-  const addTag = () => { const value = tagInput.trim().replace(/^#/, ""); if (value && !form.tags.includes(value) && form.tags.length < 12) set("tags", [...form.tags, value]); setTagInput(""); };
+  const addTag = () => {
+    const value = tagInput.trim().replace(/^#/, "");
+    // Sama seperti 서버, perbandingan tidak membedakan huruf besar-kecil,
+    // supaya "CV" dan "cv" tidak menghasilkan tag ganda.
+    const exists = form.tags.some((tag) => tag.toLowerCase() === value.toLowerCase());
+    if (value && !exists && form.tags.length < 12) set("tags", [...form.tags, value]);
+    setTagInput("");
+  };
 
   const save = async (status: "draft" | "published") => {
     setSaving(true); setError("");
@@ -64,7 +72,9 @@ export default function CareerHubPostForm({ postId }: { postId?: string }) {
     <AdminField label="Slug" required hint="Dipakai pada alamat artikel."><input className={adminInputClass} maxLength={180} value={form.slug} onChange={(event) => { setSlugEdited(true); set("slug", slugifyCareerHubTitle(event.target.value)); }} /></AdminField>
     <AdminField label="Ringkasan" required><textarea className={`${adminTextareaClass} min-h-[88px]`} maxLength={500} value={form.excerpt} onChange={(event) => set("excerpt", event.target.value)} /></AdminField>
     <AdminField label="Kategori" required><select className={adminInputClass} value={form.category} onChange={(event) => set("category", event.target.value)}>{CAREER_HUB_CATEGORIES.map((category) => <option key={category.key} value={category.key}>{category.id}</option>)}</select></AdminField>
-    <AdminField label="Isi artikel" required hint="Teks biasa. Pisahkan paragraf dengan baris kosong. Baris yang diawali # atau ## menjadi judul."><textarea className={`${adminTextareaClass} min-h-[320px]`} maxLength={50000} value={form.content} onChange={(event) => set("content", event.target.value)} /></AdminField>
+    <AdminField label="Isi artikel" required hint="Pakai toolbar di atas kolom ini untuk tebal, judul, daftar, dan rata paragraf.">
+      <ArticleEditor className={`${adminTextareaClass} min-h-[320px] font-mono text-sm`} value={form.content} onChange={(value) => set("content", value)} rows={16} maxLength={50000} />
+    </AdminField>
     <AdminField label="Tag" hint="Tekan Enter untuk menambahkan tag, maksimal 12."><div className="flex gap-2"><input className={adminInputClass} value={tagInput} onChange={(event) => setTagInput(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); addTag(); } }} /><button type="button" onClick={addTag} className={adminBtnSecondary}>Tambah</button></div><div className="mt-2 flex flex-wrap gap-2">{form.tags.map((tag) => <button type="button" key={tag} onClick={() => set("tags", form.tags.filter((item) => item !== tag))} className="rounded-md bg-surface-container px-2 py-1 text-label-sm">#{tag} ×</button>)}</div></AdminField>
     <PhotoUpload value={form.coverImageUrl ?? ""} onChange={(url) => set("coverImageUrl", url || null)} label="Gambar sampul (opsional)" />
     {error ? <p role="alert" className="rounded-xl bg-error-container px-4 py-3 text-label-bold text-on-error-container">{error}</p> : null}

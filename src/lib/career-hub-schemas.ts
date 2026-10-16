@@ -13,28 +13,93 @@ export function careerHubCategoryLabel(key: string): string {
   return CAREER_HUB_CATEGORIES.find((category) => category.key === key)?.id ?? key;
 }
 
-const slugSchema = z.string().trim().min(1).max(180).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
+/**
+ * Slug kosong diabaikan supaya server bisa membuatnya sendiri dari judul.
+ * Dulu `""` langsung ditolak dan admin mendapat "Invalid input" tanpa tahu
+ * apa yang salah, padahal form memang mengirim string kosong saat slug
+ * dibiarkan kosong.
+ */
+const optionalSlugSchema = z
+  .string()
+  .trim()
+  .transform((value) => value.toLowerCase())
+  .refine((value) => value === "" || /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value), {
+    message: "Slug hanya boleh huruf kecil, angka, dan tanda hubung.",
+  })
+  .transform((value) => (value === "" ? undefined : value))
+  .optional();
+
 const categorySchema = z.enum(CAREER_HUB_CATEGORIES.map((category) => category.key) as [string, ...string[]]);
-const tagsSchema = z.array(z.string().trim().min(1).max(40)).max(12).refine(
-  (tags) => new Set(tags.map((tag) => tag.toLocaleLowerCase())).size === tags.length,
-  "Tag tidak boleh duplikat.",
-);
+const tagsSchema = z
+  .array(z.string().trim().min(1).max(40))
+  .max(12)
+  .transform((tags) => {
+    // Buang duplikat yang hanya berbeda huruf besar/kecil supaya "CV" dan "cv"
+    // tidak membuat seluruh artikel ditolak.
+    const seen = new Set<string>();
+    return tags.filter((tag) => {
+      const key = tag.toLocaleLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  });
+
+/**
+ * Gambar sampul opsional.
+ *
+ * String kosong diperlakukan sama dengan tidak diisi. Form mengirim `null`
+ * saat kosong, tapi `PhotoUpload` juga pernah mengirim `""`, dan `z.string().url()`
+ * menolak string kosong sebagai "Invalid URL" — pesan yang tidak membantu.
+ */
+const optionalUrlSchema = z
+  .union([z.string().trim().max(2048).url(), z.literal("")])
+  .nullable()
+  .optional()
+  .transform((value) => (value === "" ? null : value));
 
 const careerHubPostFieldsSchema = z.object({
   title: z.string().trim().min(3, "Judul minimal 3 karakter.").max(180),
-  slug: slugSchema.optional(),
-  excerpt: z.string().trim().min(1, "Ringkasan wajib diisi.").max(500),
-  content: z.string().trim().min(1, "Isi artikel wajib diisi.").max(50000),
-  coverImageUrl: z.string().trim().max(2048).url().nullable().optional(),
+  slug: optionalSlugSchema,
+  // Ringkasan dan isi boleh kosong selagi artikel masih draf. Divalidasi
+  // terpisah di bawah supaya "Simpan draf" tidak ditolak dengan pesan
+  // "Isi artikel wajib diisi" di tengah menulis.
+  excerpt: z.string().trim().max(500, "Ringkasan maksimal 500 karakter."),
+  content: z.string().trim().max(50000, "Isi artikel maksimal 50.000 karakter."),
+  coverImageUrl: optionalUrlSchema,
   category: categorySchema,
   tags: tagsSchema,
   status: z.enum(["draft", "published"]).optional(),
 });
 
-export const careerHubPostCreateSchema = careerHubPostFieldsSchema.extend({
-  tags: tagsSchema.default([]),
-  status: z.enum(["draft", "published"]).default("draft"),
-});
+/** Syarat yang hanya berlaku saat artikel benar-benar diterbitkan. */
+function requirePublishFields(
+  data: { excerpt?: string; content?: string; status?: string },
+  ctx: z.RefinementCtx,
+): void {
+  if (data.status !== "published") return;
+  if (!data.excerpt) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["excerpt"],
+      message: "Ringkasan wajib diisi sebelum artikel diterbitkan.",
+    });
+  }
+  if (!data.content) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["content"],
+      message: "Isi artikel wajib diisi sebelum artikel diterbitkan.",
+    });
+  }
+}
+
+export const careerHubPostCreateSchema = careerHubPostFieldsSchema
+  .extend({
+    tags: tagsSchema.default([]),
+    status: z.enum(["draft", "published"]).default("draft"),
+  })
+  .superRefine(requirePublishFields);
 
 export const careerHubAdminListQuerySchema = z.object({
   q: z.string().trim().max(120).optional(),
@@ -43,10 +108,10 @@ export const careerHubAdminListQuerySchema = z.object({
 
 export const careerHubPostUpdateSchema = z.object({
   title: careerHubPostFieldsSchema.shape.title.optional(),
-  slug: slugSchema.optional(),
+  slug: optionalSlugSchema,
   excerpt: careerHubPostFieldsSchema.shape.excerpt.optional(),
   content: careerHubPostFieldsSchema.shape.content.optional(),
-  coverImageUrl: z.string().trim().max(2048).url().nullable().optional(),
+  coverImageUrl: optionalUrlSchema,
   category: careerHubPostFieldsSchema.shape.category.optional(),
   tags: tagsSchema.optional(),
   status: careerHubPostFieldsSchema.shape.status,
