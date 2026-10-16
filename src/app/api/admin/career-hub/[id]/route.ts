@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { withAdmin, apiHandler, errorResponse, noCache } from "@/lib/api-utils";
 import { db } from "@/db";
 import { careerHubPosts } from "@/db/schema";
-import { careerHubPostUpdateSchema, slugifyCareerHubTitle } from "@/lib/career-hub-schemas";
+import { careerHubPostUpdateSchema, describeFirstIssue, slugifyCareerHubTitle } from "@/lib/career-hub-schemas";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -14,7 +14,7 @@ export const PATCH = apiHandler(async (request: NextRequest, { params }: Params)
   const body = await request.json().catch(() => null);
   const parsed = careerHubPostUpdateSchema.safeParse(body);
   if (!parsed.success) {
-    return errorResponse("INVALID_INPUT", parsed.error.issues[0]?.message ?? "Data artikel tidak valid.", 400);
+    return errorResponse("INVALID_INPUT", describeFirstIssue(parsed.error), 400);
   }
   const [existing] = await db.select().from(careerHubPosts).where(eq(careerHubPosts.id, id)).limit(1);
   if (!existing) return errorResponse("NOT_FOUND", "Artikel tidak ditemukan.", 404);

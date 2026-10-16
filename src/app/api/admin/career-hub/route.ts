@@ -3,7 +3,7 @@ import { and, desc, eq, ilike } from "drizzle-orm";
 import { withAdmin, apiHandler, errorResponse, noCache } from "@/lib/api-utils";
 import { db } from "@/db";
 import { careerHubPosts } from "@/db/schema";
-import { careerHubAdminListQuerySchema, careerHubPostCreateSchema, slugifyCareerHubTitle } from "@/lib/career-hub-schemas";
+import { careerHubAdminListQuerySchema, careerHubPostCreateSchema, describeFirstIssue, slugifyCareerHubTitle } from "@/lib/career-hub-schemas";
 
 export const GET = apiHandler(async (request: NextRequest) => {
   const auth = await withAdmin();
@@ -26,7 +26,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
   const body = await request.json().catch(() => null);
   const parsed = careerHubPostCreateSchema.safeParse(body);
   if (!parsed.success) {
-    return errorResponse("INVALID_INPUT", parsed.error.issues[0]?.message ?? "Data artikel tidak valid.", 400);
+    return errorResponse("INVALID_INPUT", describeFirstIssue(parsed.error), 400);
   }
   const data = parsed.data;
   const slug = data.slug || slugifyCareerHubTitle(data.title);

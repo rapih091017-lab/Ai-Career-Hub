@@ -76,10 +76,14 @@ describe("form admin bisa menyimpan artikel", () => {
 
   it("form memotong tag lebih dari 40 karakter sebelum dikirim", () => {
     // Kalau form tidak memotong, server menolak dengan pesan yang tidak
-    // menjelaskan apa yang salah.
-    const source = readFileSync("src/components/career-hub/CareerHubPostForm.tsx", "utf8");
-    expect(source).toContain("slice(0, 40)");
-    expect(source).toContain("maxLength={40}");
+    // menjelaskan apa yang salah. Pemotongan sekarang ada di modul tag.
+    const source = readFileSync("src/lib/career-hub-tags.ts", "utf8");
+    expect(source).toContain("slice(0, MAX_TAG_LENGTH)");
+    // Kolom input boleh lebih panjang dari 40 karakter karena isinya bisa
+    // berupa daftar tag yang dipisah koma.
+    const form = readFileSync("src/components/career-hub/CareerHubPostForm.tsx", "utf8");
+    expect(form).toContain("maxLength={200}");
+    expect(form).not.toContain("maxLength={40}");
   });
 
   it("form memberi batas panjang yang sama dengan server", () => {
