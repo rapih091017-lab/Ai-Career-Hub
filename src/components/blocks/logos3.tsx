@@ -152,13 +152,22 @@ export default function Logos3({
       </div>
 
       {/* Auto-scroll Carousel, Trust Badges (no numbers) */}
-      <div className="pt-2 md:pt-4">
+      <div className="py-10 md:py-12">
         <div className="relative mx-auto flex items-center justify-center lg:max-w-5xl">
           {/* Carousel, z-[1] so it sits above fade edges */}
           <div className="relative z-[1] w-full">
             <Carousel
               opts={{ loop: true, dragFree: true }}
-              plugins={[AutoScroll({ playOnInit: true, speed: 0.5, stopOnInteraction: true, stopOnMouseEnter: true })]}
+              plugins={[
+                AutoScroll({
+                  playOnInit: true,
+                  speed: 0.8,
+                  // Berhenti saat kursor mendekati yang membuat orang mengira
+                  // carousel-nya rusak. Dilanjutkan lagi saat kursor pergi.
+                  stopOnInteraction: false,
+                  stopOnMouseEnter: false,
+                }),
+              ]}
             >
               <CarouselContent className="ml-0">
                 {trustBadges.map((badge, idx) => (                    <CarouselItem
@@ -175,7 +184,7 @@ export default function Logos3({
                       <div className="group relative w-[140px] sm:w-[160px] md:w-[180px] rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-3 md:p-4 text-center cursor-default
                         shadow-[0_2px_8px_-2px_rgba(0,0,0,0.06),0_6px_16px_-4px_rgba(0,0,0,0.08),0_12px_24px_-6px_rgba(0,0,0,0.04)]
                         hover:shadow-[0_4px_12px_-2px_rgba(0,0,0,0.1),0_12px_28px_-4px_rgba(0,0,0,0.12),0_20px_40px_-8px_rgba(0,0,0,0.06)]
-                        [transform-style:preserve-3d] hover:[transform:perspective(600px)_rotateX(2deg)_rotateY(-1deg)_translateY(-8px)_scale(1.02)]
+                        [transform-style:preserve-3d] hover:[transform:perspective(600px)_rotateX(2deg)_rotateY(-1deg)_translateY(-4px)_scale(1.02)]
                         transition-[transform,box-shadow] duration-500 ease-out">
                         {/* 3D depth shadow layers */}
                         <div className="absolute -bottom-2 left-[10%] right-[10%] h-4 bg-black/[0.04] rounded-full blur-md group-hover:bg-black/[0.06] group-hover:blur-lg transition-all duration-500" />

@@ -23,7 +23,7 @@ import { useTranslation } from "@/lib/i18n";
 import LogoutConfirmModal from "@/components/ui/LogoutConfirmModal";
 import { AdminMenuItem } from "@/components/AdminMenuItem";
 import NavGroupMenu from "@/components/nav/NavGroupMenu";
-import { ACCOUNT_MENU, ANNOUNCEMENT, LANDING_LINKS, NAV_GROUPS, isNavActive, type NavItem } from "@/lib/nav-items";
+import { ACCOUNT_MENU, LANDING_LINKS, NAV_GROUPS, isNavActive, type NavItem } from "@/lib/nav-items";
 
 interface Props {
   /**
@@ -31,8 +31,6 @@ interface Props {
    * `bar`   = nav menempel penuh selebar layar (dashboard, halaman aplikasi).
    */
   variant?: "pill" | "bar";
-  /** Bar pengumuman di bawah nav, dipakai di halaman publik saja. */
-  showAnnouncement?: boolean;
 }
 
 /** Item yang butuh sesi ikut membawa tujuannya ke halaman login. */
@@ -43,7 +41,7 @@ function itemHref(item: NavItem, isLoggedIn: boolean): string {
   return item.href;
 }
 
-export default function SiteHeader({ variant = "bar", showAnnouncement = false }: Props) {
+export default function SiteHeader({ variant = "bar" }: Props) {
   const isPill = variant === "pill";
   const { data: session } = useSession();
   const isLoggedIn = Boolean(session?.user);
@@ -304,25 +302,6 @@ export default function SiteHeader({ variant = "bar", showAnnouncement = false }
           )}
         </AnimatePresence>
       </header>
-
-      {showAnnouncement && (
-        <div className="fixed left-0 right-0 top-[72px] z-40 hidden md:block">
-          <div className="mx-auto w-[calc(100%-32px)] max-w-7xl">
-            <Link
-              href={ANNOUNCEMENT.href}
-              className="flex items-center justify-center gap-2 rounded-xl border border-primary/20 bg-primary/10 px-4 py-2 text-sm font-bold text-primary transition-colors hover:bg-primary/15"
-            >
-              <span className="material-symbols-outlined text-lg" aria-hidden="true">
-                campaign
-              </span>
-              {t(ANNOUNCEMENT.textKey, ANNOUNCEMENT.text)}
-              <span className="material-symbols-outlined text-lg" aria-hidden="true">
-                arrow_forward
-              </span>
-            </Link>
-          </div>
-        </div>
-      )}
     </>
   );
 }

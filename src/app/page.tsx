@@ -13,6 +13,7 @@ import MouseGlow from "@/components/MouseGlow";
 import TiltCard from "@/components/TiltCard";
 import ScrollSectionIndicator from "@/components/ScrollSectionIndicator";
 import SiteHeader from "@/components/nav/SiteHeader";
+import { ANNOUNCEMENT } from "@/lib/nav-items";
 import StickyMobileCTA from "@/components/StickyMobileCTA";
 import MagneticButton from "@/components/MagneticButton";
 import { AnimatedButton } from "@/components/ui/AnimatedButton";
@@ -67,12 +68,23 @@ export default function Home() {
       {/* Navbar: komponen yang sama dengan halaman dashboard, hanya bentuknya
           yang melayang. Tidak ada lagi nav khusus landing yang bisa melenceng
           dari navbar aplikasi. */}
-      <SiteHeader variant="pill" showAnnouncement />
+      <SiteHeader variant="pill" />
 
       {/* ── Hero ── */}
 
       {/* ── Hero ── */}
       <header id="hero" ref={heroRef} className="relative min-h-[90vh] md:min-h-[95vh] flex items-center overflow-hidden bg-gradient-to-b from-white via-primary/[0.02] to-white pt-24 md:pt-32 pb-16 md:pb-24">
+        {/* Pengumuman lowongan:Taruh di dalam halaman, bukan melayang di atas
+            navbar. Sebagai elemen fixed sebelumnya menutupi bagian atas hero
+            dan ikut terpotong saat halaman digulir. */}
+        <Link
+          href={ANNOUNCEMENT.href}
+          className="absolute inset-x-0 top-24 z-10 mx-auto flex w-fit items-center gap-2 rounded-full border border-primary/25 bg-surface-container-lowest px-4 py-1.5 text-xs font-bold text-primary shadow-sm transition-colors hover:border-primary/50 sm:top-28"
+        >
+          <span className="material-symbols-outlined text-base" aria-hidden="true">campaign</span>
+          {t(ANNOUNCEMENT.textKey, ANNOUNCEMENT.text)}
+          <span className="material-symbols-outlined text-base" aria-hidden="true">arrow_forward</span>
+        </Link>
         {/* One soft ambient orb, subtle depth, static (R-01: purpose = soften the plain white canvas) */}
         {/* Latar hero berlapis. Alasan tiap lapis (antislop purpose test):
             kanvas putih polos terasa mati, sedangkan gerakan sangat lambat
