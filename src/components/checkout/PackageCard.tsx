@@ -30,7 +30,7 @@ export function PackageCard({
       className={`relative p-5 rounded-xl transition-all overflow-hidden ${
         highlighted
           ? "border-2 border-primary/30 bg-primary-fixed/5 group hover:border-primary/60"
-          : "border border-outline-variant/30 hover:border-secondary/40 group"
+          : "border border-outline-variant/50 hover:border-secondary/40 group"
       }`}
     >
       {highlighted && (

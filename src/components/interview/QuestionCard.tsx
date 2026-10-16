@@ -144,7 +144,7 @@ export function QuestionCard({
       className={`bg-surface-container-lowest rounded-xl border overflow-hidden transition-colors ${
         isBookmarked
           ? "border-amber-300 shadow-premium-sm"
-          : "border-outline-variant/30 shadow-premium-sm"
+          : "border-outline-variant/50 shadow-premium-sm"
       }`}
     >
       <div className="flex items-start">
@@ -206,7 +206,7 @@ export function QuestionCard({
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="overflow-hidden"
           >
-            <div className="px-4 pb-4 pt-0 space-y-3 border-t border-outline-variant/20">
+            <div className="px-4 pb-4 pt-0 space-y-3 border-t border-outline-variant/40">
               {/* Answer */}
               <div className="mt-3 p-3 bg-surface-container-low rounded-lg border-l-2 border-primary">
                 <p className="text-xs text-on-surface leading-relaxed whitespace-pre-line">

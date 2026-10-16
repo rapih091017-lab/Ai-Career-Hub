@@ -408,7 +408,7 @@ const handleImported = (imported: ImportedProfile, mode: MergeMode) => {
             </div>
 
         {/* Sticky Save */}
-        <footer className="fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest shadow-lg border-t border-outline-variant/10">
+        <footer className="fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest shadow-lg border-t border-outline-variant/40">
           <div className="max-w-[1200px] mx-auto px-5 md:px-10 h-20 flex items-center justify-between">
             <div className="flex items-center gap-2 text-on-surface-variant">
               <span className="material-symbols-outlined text-primary text-xl select-none">save</span>

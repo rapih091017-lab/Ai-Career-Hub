@@ -284,7 +284,7 @@ return (
           </div>
 
           {/* Keranjang: ringkasan singkat yang selalu terlihat */}
-          <aside className="lg:sticky lg:top-8 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-5 space-y-4">
+          <aside className="lg:sticky lg:top-8 rounded-2xl border border-outline-variant/50 bg-surface-container-lowest p-5 space-y-4">
             <h2 className="font-headline-lg text-base font-bold text-on-surface">
               Keranjang
               {selected.length > 0 ? (
@@ -306,7 +306,7 @@ return (
                   return (
                     <li
                       key={key}
-                      className="flex items-start justify-between gap-3 p-3 rounded-xl border border-outline-variant/30"
+                      className="flex items-start justify-between gap-3 p-3 rounded-xl border border-outline-variant/50"
                     >
                       <span>
                         <span className="block text-sm font-semibold text-on-surface">{pkg.name}</span>
@@ -360,7 +360,7 @@ return (
             ) : null}
 
             {selection ? (
-              <div className="flex items-center justify-between pt-2 border-t border-outline-variant/30">
+              <div className="flex items-center justify-between pt-2 border-t border-outline-variant/50">
                 <span className="font-semibold text-on-surface">Total</span>
                 <span className="font-headline-lg text-lg font-bold text-primary">
                   {formatRupiah(selection.total)}
@@ -417,7 +417,7 @@ return (
 
             {/* Tiga hal yang paling sering ditanyakan sebelum bayar. Semuanya
                 bisa diperiksa sendiri, jadi ditulis apa adanya. */}
-            <ul className="space-y-1.5 border-t border-outline-variant/30 pt-3">
+            <ul className="space-y-1.5 border-t border-outline-variant/50 pt-3">
               <li className="flex items-start gap-2 text-xs text-on-surface-variant">
                 <span className="material-symbols-outlined text-[14px] text-primary shrink-0">
                   picture_as_pdf

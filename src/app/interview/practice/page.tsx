@@ -144,7 +144,7 @@ function SetupScreen({
             const catSelected = positions.every((p) => selectedPositions.has(p.id));
 
             return (
-              <div key={cat.slug} className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-premium-sm overflow-hidden">
+              <div key={cat.slug} className="bg-surface-container-lowest rounded-xl border border-outline-variant/50 shadow-premium-sm overflow-hidden">
                 <button
                   onClick={() => {
                     // Toggle all positions in this category
@@ -435,7 +435,7 @@ function RunningScreen({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -20, scale: 0.98 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
-          className="bg-surface-container-lowest rounded-2xl border border-outline-variant/30 shadow-premium-md overflow-hidden"
+          className="bg-surface-container-lowest rounded-2xl border border-outline-variant/50 shadow-premium-md overflow-hidden"
         >
           {/* Position badge + difficulty */}
           <div className="px-5 pt-4 pb-2 flex items-center gap-2 flex-wrap">
@@ -478,7 +478,7 @@ function RunningScreen({
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: "auto", opacity: 1 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="overflow-hidden border-t border-outline-variant/20"
+                className="overflow-hidden border-t border-outline-variant/40"
               >
                 <div className="px-5 py-4 space-y-3">
                   <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wider flex items-center gap-1">
@@ -521,7 +521,7 @@ function RunningScreen({
                   )}
 
                   {/* ── Self Rating ── */}
-                  <div className="pt-2 border-t border-outline-variant/20">
+                  <div className="pt-2 border-t border-outline-variant/40">
                     <p className="text-[10px] font-bold text-on-surface-variant mb-2 text-center">
                       {lang === "en" ? "How was your answer?" : "Bagaimana jawabanmu?"}
                     </p>
@@ -703,15 +703,15 @@ function FinishedScreen({
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3 mb-8">
-        <div className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/30 shadow-premium-sm">
+        <div className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 shadow-premium-sm">
           <p className="text-xl font-bold text-on-surface">{totalQuestions}</p>
           <p className="text-[9px] text-on-surface-variant mt-0.5">{lang === "en" ? "Total Questions" : "Total Pertanyaan"}</p>
         </div>
-        <div className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/30 shadow-premium-sm">
+        <div className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 shadow-premium-sm">
           <p className="text-xl font-bold text-on-surface">{answered}</p>
           <p className="text-[9px] text-on-surface-variant mt-0.5">{lang === "en" ? "Answers Shown" : "Lihat Jawaban"}</p>
         </div>
-        <div className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/30 shadow-premium-sm">
+        <div className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 shadow-premium-sm">
           <p className="text-xl font-bold text-on-surface">{formatTime(totalTime)}</p>
           <p className="text-[9px] text-on-surface-variant mt-0.5">{lang === "en" ? "Total Time" : "Total Waktu"}</p>
         </div>
@@ -719,7 +719,7 @@ function FinishedScreen({
 
       {/* Self Rating Summary */}
       {rated > 0 && (
-        <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-premium-sm p-4 mb-8 text-left">
+        <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/50 shadow-premium-sm p-4 mb-8 text-left">
           <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-3">
             {lang === "en" ? `Self Evaluation (${rated} rated)` : `Evaluasi Diri (${rated} dinilai)`}
           </p>
@@ -753,8 +753,8 @@ function FinishedScreen({
       )}
 
       {/* Question history, klik untuk review jawaban */}
-      <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-premium-sm mb-6 text-left">
-        <div className="px-4 py-3 border-b border-outline-variant/20 flex items-center justify-between">
+      <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/50 shadow-premium-sm mb-6 text-left">
+        <div className="px-4 py-3 border-b border-outline-variant/40 flex items-center justify-between">
           <p className="text-xs font-bold text-on-surface">{lang === "en" ? "Question History" : "Riwayat Pertanyaan"}</p>
           <span className="text-[9px] text-on-surface-variant">{lang === "en" ? "Click to view answer" : "Klik untuk lihat jawaban"}</span>
         </div>

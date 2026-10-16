@@ -111,7 +111,7 @@ export default function LogoutConfirmModal({ open, onClose }: LogoutConfirmModal
             role="alertdialog"
             aria-labelledby="logout-title"
             aria-describedby="logout-description"
-            className="relative w-full max-w-sm bg-surface-container-lowest rounded-3xl shadow-2xl border border-outline-variant/30 overflow-hidden"
+            className="relative w-full max-w-sm bg-surface-container-lowest rounded-3xl shadow-2xl border border-outline-variant/50 overflow-hidden"
           >
             {/* Top gradient accent */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-400 via-red-500 to-red-600" />
@@ -156,7 +156,7 @@ export default function LogoutConfirmModal({ open, onClose }: LogoutConfirmModal
 
               {/* User session info */}
               <motion.div
-                className="mt-5 p-3 rounded-2xl bg-surface-container border border-outline-variant/20 flex items-center gap-3"
+                className="mt-5 p-3 rounded-2xl bg-surface-container border border-outline-variant/40 flex items-center gap-3"
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.25 }}

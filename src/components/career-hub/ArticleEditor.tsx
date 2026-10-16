@@ -183,7 +183,7 @@ export default function ArticleEditor({ value, onChange, className, rows = 16, m
 
   return (
     <div className="space-y-2">
-      <div className="flex flex-wrap items-center gap-1 rounded-xl border border-outline-variant/30 bg-surface-container-low p-1">
+      <div className="flex flex-wrap items-center gap-1 rounded-xl border border-outline-variant/50 bg-surface-container-low p-1">
         {buttons.map((button) => (
           <button
             key={button.action}

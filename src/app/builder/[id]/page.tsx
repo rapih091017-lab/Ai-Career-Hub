@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
@@ -42,7 +42,7 @@ const STEP_KEYS = [
   "builder.step-review",
 ];
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ component â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ───────── component ───────── */
 
 export default function BuilderPage() {
   const params = useParams();
@@ -56,16 +56,16 @@ export default function BuilderPage() {
   const [collapsedWorkIds, setCollapsedWorkIds] = useState<Set<string>>(new Set());
   const { addToast } = useToast();
 
-  /* â”€â”€ Data Fetch â”€â”€ */
+  /* ── Data Fetch ── */
   const { cvData, isLoading, fetchError, selectedTemplateId, setCvData, setSelectedTemplateId } = useFetchCvData(cvId);
 
-  /* â”€â”€ Auto-Save â”€â”€ */
+  /* ── Auto-Save ── */
   const { saveStatus, lastSaved } = useAutoSave(cvId, cvData);
 
-  /* â”€â”€ Format Settings Hook â”€â”€ */
+  /* ── Format Settings Hook ── */
   const format = useBuilderFormat({ cvId });
 
-  /* â”€â”€ Compute margin & page dimensions â”€â”€ */
+  /* ── Compute margin & page dimensions ── */
   const contentRef = useRef<HTMLDivElement>(null);
   const [allPageCount, setAllPageCount] = useState(1);
   const previewRef = useRef<HTMLDivElement>(null);
@@ -106,10 +106,10 @@ export default function BuilderPage() {
     };
   });
 
-  /* â”€â”€ AI & Scoring Hook â”€â”€ */
+  /* ── AI & Scoring Hook ── */
   const ai = useBuilderAI({ cvData, setCvData, cvId, activeStep, setActiveStep, addToast });
 
-  /* â”€â”€ CRUD Helpers Hook â”€â”€ */
+  /* ── CRUD Helpers Hook ── */
   const helpers = useBuilderHelpers({ setCvData, setCustomSections: format.setCustomSections, setSectionOrder: format.setSectionOrder });
 
   const {
@@ -140,7 +140,7 @@ export default function BuilderPage() {
 
 
 
-  /* â”€â”€ PDF Export â”€â”€ */
+  /* ── PDF Export ── */
 
   const handleExportPdf = async () => {
     setIsPdfExporting(true);
@@ -175,7 +175,7 @@ export default function BuilderPage() {
 
 
 
-  /* â”€â”€ save â”€â”€ */
+  /* ── save ── */
 
   const handleSave = useCallback(async () => {
     setIsSaving(true);
@@ -194,7 +194,7 @@ export default function BuilderPage() {
     }
   }, [cvId, cvData, addToast, t]);
 
-  /* â”€â”€ section title helper â”€â”€ */
+  /* ── section title helper ── */
 
   const sectionMeta = [
     { title: t("builder.step-personal"), desc: t("builder.desc-personal"), icon: "person" },
@@ -210,7 +210,7 @@ export default function BuilderPage() {
 
 
 
-  /* â”€â”€ Keyboard Shortcuts â”€â”€ */
+  /* ── Keyboard Shortcuts ── */
   const handleSaveRef = useRef(handleSave);
   handleSaveRef.current = handleSave;
   const isSavingRef = useRef(isSaving);
@@ -218,7 +218,7 @@ export default function BuilderPage() {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      // Ctrl+Enter â†’ Save (with guard against double-save)
+      // Ctrl+Enter → Save (with guard against double-save)
       if (e.ctrlKey && e.key === 'Enter') {
         e.preventDefault();
         if (!isSavingRef.current) {
@@ -238,12 +238,12 @@ export default function BuilderPage() {
           target.isContentEditable);
       if (typing) return;
 
-      // Ctrl+ArrowLeft â†’ Previous step
+      // Ctrl+ArrowLeft → Previous step
       if (e.ctrlKey && e.key === 'ArrowLeft') {
         e.preventDefault();
         setActiveStep((s) => Math.max(0, s - 1));
       }
-      // Ctrl+ArrowRight â†’ Next step
+      // Ctrl+ArrowRight → Next step
       if (e.ctrlKey && e.key === 'ArrowRight') {
         e.preventDefault();
         setActiveStep((s) => Math.min(6, s + 1));
@@ -253,27 +253,27 @@ export default function BuilderPage() {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
-  /* â”€â”€ loading / error â”€â”€ */
+  /* ── loading / error ── */
 
   if (isLoading) return <BuilderLoadingSkeleton />;
   if (fetchError) return <BuilderErrorState message={fetchError} />;
 
-  /* â”€â”€ main render â”€â”€ */
+  /* ── main render ── */
 
   return (
     <AuthGuard>
       <div className="h-[100dvh] flex flex-col bg-background">
         <AppHeader />
 
-        {/* â”€â”€ STEPPER (connector lines style) â”€â”€ */}
-        <div className="w-full bg-surface-container-lowest border-b border-outline-variant/30 py-4 md:py-5 px-3 md:px-8 overflow-x-auto shrink-0">
+        {/* ── STEPPER (connector lines style) ── */}
+        <div className="w-full bg-surface-container-lowest border-b border-outline-variant/50 py-4 md:py-5 px-3 md:px-8 overflow-x-auto shrink-0">
           <StepperSteps steps={steps} activeStep={activeStep} setActiveStep={setActiveStep} sectionCompletion={sectionCompletion} sectionMeta={sectionMeta} />
         </div>
 
-        {/* â”€â”€ WORKSPACE LAYOUT â”€â”€ */}
+        {/* ── WORKSPACE LAYOUT ── */}
         <div className="flex-1 flex flex-col lg:flex-row overflow-hidden h-auto lg:h-[calc(100vh-64px-80px)]">
-          {/* â”€â”€ LEFT PANEL â”€â”€ */}
-          <div className="w-full lg:w-1/2 bg-background border-b lg:border-b-0 lg:border-r border-outline-variant/30 overflow-y-auto custom-scrollbar">
+          {/* ── LEFT PANEL ── */}
+          <div className="w-full lg:w-1/2 bg-background border-b lg:border-b-0 lg:border-r border-outline-variant/50 overflow-y-auto custom-scrollbar">
             <div className="px-6 pt-8 pb-4 flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                 <span className="material-symbols-outlined text-primary text-xl" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">{sectionMeta[activeStep].icon}</span>
@@ -287,7 +287,7 @@ export default function BuilderPage() {
                 </p>
               </div>
             </div>
-            {/* â”€â”€ AI Keyword Suggestions Banner â”€â”€ */}
+            {/* ── AI Keyword Suggestions Banner ── */}
             {aiJdKeywords && aiJdKeywords.length > 0 && activeStep !== 1 && activeStep !== 6 && (
               <div className="flex flex-wrap items-center gap-2 px-1 py-2 mb-2 bg-primary/5 border border-primary/10 rounded-xl">
                 <div className="flex items-center gap-1.5 text-[11px] font-semibold text-primary shrink-0">
@@ -516,9 +516,9 @@ export default function BuilderPage() {
             </AnimatePresence>
           </div>
 
-          {/* â”€â”€ RIGHT PANEL â”€â”€ */}
+          {/* ── RIGHT PANEL ── */}
           <div className="w-full lg:w-1/2 flex flex-col bg-surface-dim/20 relative overflow-hidden h-full">
-            {/* â”€â”€ FORMATTING TOOLBAR â”€â”€ */}
+            {/* ── FORMATTING TOOLBAR ── */}
             <FormatToolbar
               cvCompleteness={cvCompleteness}
               saveStatus={saveStatus}
@@ -540,12 +540,12 @@ export default function BuilderPage() {
               onExportPdf={handleExportPdf}
             />
 
-            {/* â”€â”€ PREVIEW AREA, scrollable continuous with page break indicators â”€â”€ */}
+            {/* ── PREVIEW AREA, scrollable continuous with page break indicators ── */}
             <div className="flex-1 flex flex-col items-center bg-surface-dim/20 custom-scrollbar" style={{ minHeight: 0, overflowY: 'auto' }}>
               <div className="w-full max-w-[210mm] px-[15mm] py-4 md:py-6">
                 {/* Page count badge */}
                 {allPageCount > 1 && (
-                  <div className="mb-3 flex items-center gap-2 text-[11px] font-medium text-on-surface-variant bg-surface-container-lowest/80 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-outline-variant/20 shadow-sm w-fit">
+                  <div className="mb-3 flex items-center gap-2 text-[11px] font-medium text-on-surface-variant bg-surface-container-lowest/80 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-outline-variant/40 shadow-sm w-fit">
                     <span className="material-symbols-outlined text-sm">description</span>
                     {t("builder.page-badge").replace("{pages}", String(allPageCount)).replace("{margin}", marginMode === "tight" ? "10" : marginMode === "normal" ? "20" : "30")}
                   </div>
@@ -652,7 +652,7 @@ export default function BuilderPage() {
           </div>
         </div>
 
-        {/* â”€â”€ AI PROPOSAL MODAL â”€â”€ */}
+        {/* ── AI PROPOSAL MODAL ── */}
         <AIProposalModal
           open={aiModal.open}
           onClose={() => setAiModal((prev) => ({ ...prev, open: false }))}
@@ -666,7 +666,7 @@ export default function BuilderPage() {
           onAccept={aiModal.onAccept}
         />
 
-        {/* â”€â”€ SECTION ORDER MODAL â”€â”€ */}
+        {/* ── SECTION ORDER MODAL ── */}
         <SectionOrderModal
           open={showSectionOrderModal}
           onClose={() => setShowSectionOrderModal(false)}
@@ -677,7 +677,7 @@ export default function BuilderPage() {
           onMoveDown={moveSectionDown}
         />
 
-        {/* â”€â”€ DISPLAY SETTINGS MODAL â”€â”€ */}
+        {/* ── DISPLAY SETTINGS MODAL ── */}
         <DisplaySettingsModal
           open={showDisplaySettings}
           customPrimaryColor={customPrimaryColor}
@@ -695,7 +695,7 @@ export default function BuilderPage() {
           }
         />
 
-        {/* â”€â”€ BOTTOM NAV â”€â”€ */}
+        {/* ── BOTTOM NAV ── */}
         <BottomNav steps={steps} activeStep={activeStep} setActiveStep={setActiveStep} sectionCompletion={sectionCompletion} sectionMeta={sectionMeta} handleSave={handleSave} isSaving={isSaving} />
       </div>
     </AuthGuard>

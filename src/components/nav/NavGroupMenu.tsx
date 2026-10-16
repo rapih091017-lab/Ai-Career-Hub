@@ -63,7 +63,7 @@ export default function NavGroupMenu({ group, isLoggedIn, variant }: Props) {
 
   if (variant === "mobile") {
     return (
-      <div className="border-b border-outline-variant/20 pb-2">
+      <div className="border-b border-outline-variant/40 pb-2">
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
@@ -123,7 +123,7 @@ export default function NavGroupMenu({ group, isLoggedIn, variant }: Props) {
       </button>
 
       {open && (
-        <div className="absolute left-0 top-full z-[60] min-w-[232px] rounded-2xl border border-outline-variant/20 bg-surface-container-lowest py-2 shadow-xl">
+        <div className="absolute left-0 top-full z-[60] min-w-[232px] rounded-2xl border border-outline-variant/40 bg-surface-container-lowest py-2 shadow-xl">
           {group.items.map((item) => {
             const active = isNavActive(item, pathname);
             return (

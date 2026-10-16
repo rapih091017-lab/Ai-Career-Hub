@@ -49,7 +49,7 @@ export function FormatToolbar({
 }: FormatToolbarProps) {
   const { t } = useTranslation();
   return (
-    <div className="h-auto px-3 md:px-4 py-2 border-b border-outline-variant/30 flex flex-wrap items-center gap-2 bg-surface-container-lowest shadow-sm z-20 shrink-0">
+    <div className="h-auto px-3 md:px-4 py-2 border-b border-outline-variant/50 flex flex-wrap items-center gap-2 bg-surface-container-lowest shadow-sm z-20 shrink-0">
       {/* CV Completeness Bar */}
       <div className="flex items-center gap-1.5 shrink-0" title={`CV ${cvCompleteness}% ${t("builder.complete")}`}>
         <div className="w-12 h-1.5 bg-outline-variant/30 rounded-full overflow-hidden">
@@ -97,7 +97,7 @@ export function FormatToolbar({
 
       {/* Font family */}
       <select value={fontFamily} onChange={(e) => onFontFamilyChange(e.target.value)}
-        className="bg-surface-container-low border border-outline-variant/30 rounded-lg text-xs px-2 py-1.5 focus:ring-1 focus:ring-primary max-w-[120px]"
+        className="bg-surface-container-low border border-outline-variant/50 rounded-lg text-xs px-2 py-1.5 focus:ring-1 focus:ring-primary max-w-[120px]"
       >
         <option value="'Inter', sans-serif">Inter</option>
         <option value="'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans</option>

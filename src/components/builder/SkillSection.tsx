@@ -67,7 +67,7 @@ export function SkillSection({
               <select
                 value={skill.category || "technical"}
                 onChange={(e) => onSkillChange(i, "category", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary text-xs min-w-[120px]"
+                className="bg-surface-container-lowest border border-outline-variant/50 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary text-xs min-w-[120px]"
               >
                 {CATEGORY_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -76,7 +76,7 @@ export function SkillSection({
               <select
                 value={skill.level}
                 onChange={(e) => onSkillChange(i, "level", e.target.value as SkillEntry["level"])}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary text-xs min-w-[100px]"
+                className="bg-surface-container-lowest border border-outline-variant/50 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary text-xs min-w-[100px]"
               >
                 <option value="beginner">Beginner</option>
                 <option value="intermediate">Intermediate</option>

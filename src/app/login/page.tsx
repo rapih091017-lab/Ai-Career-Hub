@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
@@ -62,7 +62,7 @@ export default function LoginPage() {
   return (
     <>
       {/* Navbar, logo klik = kembali ke beranda */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest shadow-sm border-b border-outline-variant/10 px-margin-mobile md:px-gutter py-4 flex justify-center md:justify-start">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest shadow-sm border-b border-outline-variant/40 px-margin-mobile md:px-gutter py-4 flex justify-center md:justify-start">
         <Link href="/" className="flex items-center gap-2 group">
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white group-hover:brightness-110 transition-all">
             <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
@@ -141,12 +141,12 @@ export default function LoginPage() {
               {/* Trust indicators */}
               <div className="flex items-center justify-center gap-2 text-xs text-on-surface-variant">
                 <span className="material-symbols-outlined text-sm">verified_user</span>
-                Aman & terenkripsi Â· Tidak perlu daftar manual
+                Aman & terenkripsi · Tidak perlu daftar manual
               </div>
             </motion.div>
 
             {/* Footer Links */}
-            <div className="mt-10 pt-6 border-t border-outline-variant/30 flex flex-wrap justify-center gap-x-4 gap-y-2">
+            <div className="mt-10 pt-6 border-t border-outline-variant/50 flex flex-wrap justify-center gap-x-4 gap-y-2">
               <Link href="/privacy" className="text-xs text-outline hover:text-primary transition-colors cursor-pointer">Kebijakan Privasi</Link>
               <Link href="/terms" className="text-xs text-outline hover:text-primary transition-colors cursor-pointer">Syarat & Ketentuan</Link>
               <Link href="/contact" className="text-xs text-outline hover:text-primary transition-colors cursor-pointer">Bantuan</Link>

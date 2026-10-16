@@ -141,7 +141,7 @@ export default function PrivacyPage() {
           ))}
         </div>
 
-        <div className="mt-12 pt-8 border-t border-outline-variant/30">
+        <div className="mt-12 pt-8 border-t border-outline-variant/50">
           <p className="text-body-md text-on-surface-variant leading-relaxed">
             Masih ada pertanyaan? Lihat <Link href="/faq" className="text-primary hover:underline">FAQ</Link> atau hubungi
             kami lewat halaman <Link href="/contact" className="text-primary hover:underline">Kontak</Link>.

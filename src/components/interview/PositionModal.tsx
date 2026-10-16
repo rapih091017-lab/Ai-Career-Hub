@@ -77,7 +77,7 @@ export function PositionModal({
           className="w-full max-w-[700px] bg-background rounded-2xl shadow-premium-xl border border-outline-variant/50 overflow-hidden"
         >
           {/* Header */}
-          <div className="sticky top-0 bg-surface-container-lowest border-b border-outline-variant/30 z-10">
+          <div className="sticky top-0 bg-surface-container-lowest border-b border-outline-variant/50 z-10">
             <div className="flex items-center justify-between p-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-primary-fixed flex items-center justify-center">
@@ -170,7 +170,7 @@ export function PositionModal({
           </div>
 
           {/* Footer, buka dedicated page + close */}
-          <div className="sticky bottom-0 bg-surface-container-lowest border-t border-outline-variant/30 p-3 flex items-center justify-between gap-2">
+          <div className="sticky bottom-0 bg-surface-container-lowest border-t border-outline-variant/50 p-3 flex items-center justify-between gap-2">
             <div />
 
             <div className="flex items-center gap-2">

@@ -117,7 +117,7 @@ export default function Home() {
         {/* Enlarged Mockup, desktop only */}
         <motion.div className="absolute right-[3%] top-1/4 hidden lg:block pointer-events-none" style={{ y: mockupY }}
           initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.3 }}>
-          <div className="w-[380px] bg-surface-container-lowest rounded-2xl shadow-2xl border border-outline-variant/20 overflow-hidden rotate-[3deg]">
+          <div className="w-[380px] bg-surface-container-lowest rounded-2xl shadow-2xl border border-outline-variant/40 overflow-hidden rotate-[3deg]">
             <div className="h-3 bg-primary/10 flex items-center px-4 gap-1.5">
               <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
               <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
@@ -151,7 +151,7 @@ export default function Home() {
         {/* Template Preview Card, desktop only */}
         <motion.div className="absolute right-[5%] top-[12%] hidden lg:block pointer-events-none z-[5]" style={{ y: templateY }}
           initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.5 }}>
-          <div className="w-[200px] bg-surface-container-lowest rounded-xl shadow-lg border border-outline-variant/20 overflow-hidden rotate-[6deg]">
+          <div className="w-[200px] bg-surface-container-lowest rounded-xl shadow-lg border border-outline-variant/40 overflow-hidden rotate-[6deg]">
             <div className="p-3">
               {/* Template header */}
               <div className="flex items-center gap-2 mb-2">
@@ -180,7 +180,7 @@ export default function Home() {
         {/* Enlarged ATS Score Card */}
         <motion.div className="absolute right-[8%] top-[58%] hidden lg:block z-10" style={{ y: cardY }}
           initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.7 }}>
-          <Link href="/checker" className="block w-[260px] bg-surface-container-lowest rounded-xl shadow-lg border border-outline-variant/20 overflow-hidden -rotate-[2deg] hover:-rotate-1 hover:shadow-xl hover:scale-105 transition-[transform,box-shadow] duration-300 cursor-pointer">
+          <Link href="/checker" className="block w-[260px] bg-surface-container-lowest rounded-xl shadow-lg border border-outline-variant/40 overflow-hidden -rotate-[2deg] hover:-rotate-1 hover:shadow-xl hover:scale-105 transition-[transform,box-shadow] duration-300 cursor-pointer">
             <div className="p-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="h-2.5 w-20 bg-secondary/30 rounded" />
@@ -326,7 +326,7 @@ export default function Home() {
               </Link>
             </motion.div>
             <motion.div variants={staggerItemUp}>
-              <Link href="/checker" className="block bg-surface-container-lowest rounded-2xl p-5 border border-outline-variant/30 shadow-premium-md hover:shadow-premium-lg hover:-translate-y-0.5 transition-all duration-300 group text-left">
+              <Link href="/checker" className="block bg-surface-container-lowest rounded-2xl p-5 border border-outline-variant/50 shadow-premium-md hover:shadow-premium-lg hover:-translate-y-0.5 transition-all duration-300 group text-left">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>fact_check</span>
@@ -337,7 +337,7 @@ export default function Home() {
               </Link>
             </motion.div>
             <motion.div variants={staggerItemUp}>
-              <Link href="/portfolio" className="block bg-surface-container-lowest rounded-2xl p-5 border border-outline-variant/30 shadow-premium-md hover:shadow-premium-lg hover:-translate-y-0.5 transition-all duration-300 group text-left">
+              <Link href="/portfolio" className="block bg-surface-container-lowest rounded-2xl p-5 border border-outline-variant/50 shadow-premium-md hover:shadow-premium-lg hover:-translate-y-0.5 transition-all duration-300 group text-left">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>grid_view</span>
@@ -348,7 +348,7 @@ export default function Home() {
               </Link>
             </motion.div>
             <motion.div variants={staggerItemUp}>
-              <Link href="/interview" className="block bg-surface-container-lowest rounded-2xl p-5 border border-outline-variant/30 shadow-premium-md hover:shadow-premium-lg hover:-translate-y-0.5 transition-all duration-300 group text-left relative">
+              <Link href="/interview" className="block bg-surface-container-lowest rounded-2xl p-5 border border-outline-variant/50 shadow-premium-md hover:shadow-premium-lg hover:-translate-y-0.5 transition-all duration-300 group text-left relative">
                 {/* Gratis badge, fungsional (fitur memang gratis) */}
                 <span className="absolute -top-2 -right-2 px-2 py-0.5 rounded-full bg-emerald-500 text-white text-xs font-bold uppercase tracking-wider shadow-premium-sm">
                   {t("tool.free-badge")}
@@ -469,7 +469,7 @@ export default function Home() {
       {/* ── AI Insight ── */}
       <motion.section className="py-20 md:py-28 px-margin-mobile md:px-gutter overflow-hidden bg-surface-container-low" id="how-it-works"
         initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.6 }}>
-        <div className="max-w-7xl mx-auto bg-surface-container-lowest rounded-2xl p-8 md:p-20 relative ambient-card-shadow border border-outline-variant/30">
+        <div className="max-w-7xl mx-auto bg-surface-container-lowest rounded-2xl p-8 md:p-20 relative ambient-card-shadow border border-outline-variant/50">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="relative">
               <div className="bg-surface-container-low p-8 rounded-2xl ai-border ambient-card-shadow">
@@ -692,7 +692,7 @@ export default function Home() {
               { icon: "fact_check", title: t("journey.step2.title"), text: t("journey.step2.desc"), href: "/checker" },
               { icon: "mail", title: t("journey.step3.title"), text: t("journey.step3.desc"), href: "/surat-lamaran" },
               { icon: "event_available", title: t("journey.step4.title"), text: t("journey.step4.desc"), href: "/tracker" },
-            ].map((step, index) => <motion.div key={step.title} variants={staggerItemUp}><Link href={step.href} className="group block h-full rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-premium-md transition-all hover:-translate-y-1 hover:shadow-premium-lg"><div className="mb-5 flex items-center justify-between"><span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary"><span className="material-symbols-outlined">{step.icon}</span></span><span className="text-label-sm text-on-surface-variant">0{index + 1}</span></div><h3 className="font-label-bold text-on-surface group-hover:text-primary">{step.title}</h3><p className="mt-2 text-body-md leading-relaxed text-on-surface-variant">{step.text}</p></Link></motion.div>)}
+            ].map((step, index) => <motion.div key={step.title} variants={staggerItemUp}><Link href={step.href} className="group block h-full rounded-2xl border border-outline-variant/50 bg-surface-container-lowest p-6 shadow-premium-md transition-all hover:-translate-y-1 hover:shadow-premium-lg"><div className="mb-5 flex items-center justify-between"><span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary"><span className="material-symbols-outlined">{step.icon}</span></span><span className="text-label-sm text-on-surface-variant">0{index + 1}</span></div><h3 className="font-label-bold text-on-surface group-hover:text-primary">{step.title}</h3><p className="mt-2 text-body-md leading-relaxed text-on-surface-variant">{step.text}</p></Link></motion.div>)}
           </motion.div>
         </div>
       </section>

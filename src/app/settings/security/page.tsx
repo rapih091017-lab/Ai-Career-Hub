@@ -9,8 +9,8 @@ export default function SettingsSecurityPage() {
   return (
     <div className="flex flex-col gap-8">
       {/* Section: Keamanan Akun */}
-      <section className="bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/30 overflow-hidden">
-        <div className="px-6 py-5 border-b border-outline-variant/30 flex items-center gap-4">
+      <section className="bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/50 overflow-hidden">
+        <div className="px-6 py-5 border-b border-outline-variant/50 flex items-center gap-4">
           <div className="w-10 h-10 rounded-xl bg-primary-fixed flex items-center justify-center text-primary">
             <span className="material-symbols-outlined">lock</span>
           </div>
@@ -38,7 +38,7 @@ export default function SettingsSecurityPage() {
           </div>
 
           {/* Keluar dari semua perangkat */}
-          <div className="pt-4 border-t border-outline-variant/30">
+          <div className="pt-4 border-t border-outline-variant/50">
             <button
               onClick={() => signOut({ callbackUrl: "/login" })}
               className="px-4 py-2 rounded-lg border border-error/30 text-error text-label-bold hover:bg-error/5 transition-colors"

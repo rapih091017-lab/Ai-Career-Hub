@@ -31,7 +31,7 @@ const variantStyles: Record<ButtonVariant, string> = {
   emerald:
     "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-premium-md hover:shadow-premium-lg",
   ghost:
-    "bg-surface-container-lowest text-on-surface border border-outline-variant/30 shadow-premium-sm hover:shadow-premium-md hover:-translate-y-0.5",
+    "bg-surface-container-lowest text-on-surface border border-outline-variant/50 shadow-premium-sm hover:shadow-premium-md hover:-translate-y-0.5",
   secondary:
     "bg-on-background text-white shadow-premium-md hover:shadow-premium-lg",
 };

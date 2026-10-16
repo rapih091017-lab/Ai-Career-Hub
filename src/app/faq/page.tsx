@@ -159,7 +159,7 @@ export default function FaqPage() {
               {group.faqs.map((faq) => (
                 <details
                   key={faq.q}
-                  className="group bg-surface-container-lowest rounded-2xl border border-outline-variant/30 overflow-hidden"
+                  className="group bg-surface-container-lowest rounded-2xl border border-outline-variant/50 overflow-hidden"
                 >
                   <summary className="px-6 py-4 font-label-bold text-on-surface cursor-pointer hover:bg-surface-container-low transition-colors list-none flex items-center justify-between gap-4">
                     {faq.q}
@@ -176,7 +176,7 @@ export default function FaqPage() {
           </section>
         ))}
 
-        <section className="pt-8 border-t border-outline-variant/30">
+        <section className="pt-8 border-t border-outline-variant/50">
           <p className="text-body-md text-on-surface-variant leading-relaxed">
             Jawaban untuk pertanyaan tentang data ada di{" "}
             <Link href="/privacy" className="text-primary hover:underline">

@@ -867,7 +867,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
 
                               {/* Daftar CV */}
                               {sourceMode === "cv" && (
-                                <div className="mt-4 pt-4 border-t border-outline-variant/30">
+                                <div className="mt-4 pt-4 border-t border-outline-variant/50">
                                   <p className="text-xs font-semibold text-on-surface-variant mb-2">
                                     Pilih CV (surat dibuat dari datanya):
                                   </p>
@@ -1533,8 +1533,8 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                   {/* Preview A4, mirip preview builder CV: kertas mengambang di atas
                    * permukaan dim (bukan di dalam kartu berbingkai tebal), dengan
                    * header ramping ala FormatToolbar di builder. */}
-                  <div className="rounded-2xl overflow-hidden bg-surface-dim/20 border border-outline-variant/30">
-                    <div className="flex items-center justify-between gap-2 px-4 py-2.5 bg-surface-container-lowest/80 backdrop-blur-sm border-b border-outline-variant/20">
+                  <div className="rounded-2xl overflow-hidden bg-surface-dim/20 border border-outline-variant/50">
+                    <div className="flex items-center justify-between gap-2 px-4 py-2.5 bg-surface-container-lowest/80 backdrop-blur-sm border-b border-outline-variant/40">
                       <span className="text-xs font-semibold text-on-surface-variant flex items-center gap-1.5">
                         <span className="material-symbols-outlined text-sm text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>visibility</span>
                         Preview A4 · {template.label}

@@ -82,7 +82,7 @@ export function ImpactForecastCard({ forecast }: { forecast: ImpactForecast }) {
           <div
             key={s.label}
             className={`rounded-xl border px-3 py-2 text-center ${
-              s.active ? "border-outline-variant/40 bg-surface-container-low" : "border-outline-variant/20 opacity-70"
+              s.active ? "border-outline-variant/40 bg-surface-container-low" : "border-outline-variant/40 opacity-70"
             }`}
           >
             <p className="text-[10px] font-semibold text-on-surface-variant uppercase tracking-wide truncate">{s.label}</p>

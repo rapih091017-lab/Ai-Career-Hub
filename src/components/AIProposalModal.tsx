@@ -138,7 +138,7 @@ export default function AIProposalModal({
                       "w-full text-left flex gap-3 p-3.5 rounded-xl border transition-all duration-200 " +
                       (isSelected
                         ? "bg-primary/5 border-primary/50 shadow-sm"
-                        : "bg-surface-container-low border-outline-variant/30 hover:border-primary/30") +
+                        : "bg-surface-container-low border-outline-variant/50 hover:border-primary/30") +
                       " " + (isSelectable ? "cursor-pointer" : "cursor-default")
                     }
                   >
@@ -192,7 +192,7 @@ export default function AIProposalModal({
                   <span className="material-symbols-outlined text-sm group-open:rotate-90 transition-transform">chevron_right</span>
                   Teks Asli
                 </summary>
-                <div className="mt-2 p-3 rounded-xl bg-surface-container-low border border-outline-variant/30">
+                <div className="mt-2 p-3 rounded-xl bg-surface-container-low border border-outline-variant/50">
                   <p className="text-sm text-on-surface-variant italic leading-relaxed">{original}</p>
                 </div>
               </details>
@@ -214,7 +214,7 @@ export default function AIProposalModal({
                       "text-left p-4 rounded-xl border-2 transition-all duration-200 " +
                       (isSelected
                         ? item.color + " border-current shadow-sm"
-                        : "border-outline-variant/30 bg-surface-container-lowest hover:border-primary/40 hover:shadow-sm hover:bg-primary/[0.02]")
+                        : "border-outline-variant/50 bg-surface-container-lowest hover:border-primary/40 hover:shadow-sm hover:bg-primary/[0.02]")
                     }
                   >
                     <div className="flex items-center justify-between mb-2">
@@ -265,7 +265,7 @@ export default function AIProposalModal({
         )}
 
         {/* ── Action Buttons ── */}
-        <div className="flex gap-3 pt-3 border-t border-outline-variant/20">
+        <div className="flex gap-3 pt-3 border-t border-outline-variant/40">
           <button
             onClick={handleClose}
             className="flex-1 py-2.5 rounded-xl border border-outline-variant text-sm font-medium text-on-surface hover:bg-surface-container transition-all active:scale-[0.98]"

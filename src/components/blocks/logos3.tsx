@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useReducedMotion } from "motion/react";
 import AutoScroll from "embla-carousel-auto-scroll";
 import {
@@ -116,20 +116,35 @@ export default function Logos3({
   const sectionRef = useRef<HTMLElement>(null);
   const inView = useInView(sectionRef, { once: true, margin: "-80px" });
 
-  const resolvedHeading =
-    heading || t("logos.heading");
+  const resolvedHeading = heading || t("logos.heading");
+
+  // Pengaman: konten tidak boleh bergantung pada IntersectionObserver. Kalau
+  // observer gagal atau section tidak pernah terpantau (mis. pengguna membuka
+  // halaman dengan anchor, atau animasi dimatikan), teks tetap harus tampil.
+  // Dulu animasi hanya selesai saat inView menyala, sehingga judul dan seluruh
+  // carousel bisa tertahan di opacity 0.
+  const [revealed, setRevealed] = useState(false);
+  useEffect(() => {
+    if (inView) setRevealed(true);
+  }, [inView]);
+  useEffect(() => {
+    const timer = setTimeout(() => setRevealed(true), 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const visible = reduce || revealed;
 
   return (
     <section
       ref={sectionRef}
-      className="py-16 bg-surface-container-low border-y border-outline-variant/10 overflow-hidden"
+      className="py-16 bg-surface-container-low border-y border-outline-variant/40 overflow-hidden"
     >
       <div className="max-w-7xl mx-auto px-margin-mobile md:px-gutter flex flex-col items-center text-center">
         {/* Heading */}
         <motion.p
           className="mb-10 text-center font-display text-xl font-extrabold tracking-tight text-on-background md:text-2xl"
           initial={reduce ? false : { opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
+          animate={visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
           {resolvedHeading}
@@ -143,7 +158,7 @@ export default function Logos3({
           <div className="relative z-[1] w-full">
             <Carousel
               opts={{ loop: true, dragFree: true }}
-              plugins={[AutoScroll({ playOnInit: inView, speed: 0.5, stopOnInteraction: true, stopOnMouseEnter: true })]}
+              plugins={[AutoScroll({ playOnInit: true, speed: 0.5, stopOnInteraction: true, stopOnMouseEnter: true })]}
             >
               <CarouselContent className="ml-0">
                 {trustBadges.map((badge, idx) => (                    <CarouselItem
@@ -154,10 +169,10 @@ export default function Logos3({
                       custom={idx}
                       variants={staggerVariants}
                       initial="hidden"
-                      animate={inView ? "visible" : "hidden"}
+                      animate={visible ? "visible" : "hidden"}
                       className="mx-2 md:mx-4"
                     >
-                      <div className="group relative w-[140px] sm:w-[160px] md:w-[180px] rounded-2xl border border-outline-variant/20 bg-surface-container-lowest p-3 md:p-4 text-center cursor-default
+                      <div className="group relative w-[140px] sm:w-[160px] md:w-[180px] rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-3 md:p-4 text-center cursor-default
                         shadow-[0_2px_8px_-2px_rgba(0,0,0,0.06),0_6px_16px_-4px_rgba(0,0,0,0.08),0_12px_24px_-6px_rgba(0,0,0,0.04)]
                         hover:shadow-[0_4px_12px_-2px_rgba(0,0,0,0.1),0_12px_28px_-4px_rgba(0,0,0,0.12),0_20px_40px_-8px_rgba(0,0,0,0.06)]
                         [transform-style:preserve-3d] hover:[transform:perspective(600px)_rotateX(2deg)_rotateY(-1deg)_translateY(-8px)_scale(1.02)]

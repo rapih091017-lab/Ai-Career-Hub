@@ -176,13 +176,13 @@ export default function MyResumesPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder={t("dashboard.search-cv")}
-                    className="w-36 md:w-48 pl-7 pr-2 py-1.5 rounded-lg bg-surface-container-lowest border border-outline-variant/30 text-xs shadow-premium-sm focus:ring-1 focus:ring-primary outline-none"
+                    className="w-36 md:w-48 pl-7 pr-2 py-1.5 rounded-lg bg-surface-container-lowest border border-outline-variant/50 text-xs shadow-premium-sm focus:ring-1 focus:ring-primary outline-none"
                   />
                 </div>
                 <select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value as "all" | "has-title" | "no-title")}
-                  className="bg-surface-container-lowest border border-outline-variant/30 rounded-lg text-xs px-2 py-1.5 shadow-premium-sm focus:ring-1 focus:ring-primary"
+                  className="bg-surface-container-lowest border border-outline-variant/50 rounded-lg text-xs px-2 py-1.5 shadow-premium-sm focus:ring-1 focus:ring-primary"
                 >
                   <option value="all">{t("dashboard.all")}</option>
                   <option value="has-title">{t("dashboard.has-title")}</option>
@@ -191,7 +191,7 @@ export default function MyResumesPage() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as "newest" | "oldest" | "name-asc" | "name-desc")}
-                  className="bg-surface-container-lowest border border-outline-variant/30 rounded-lg text-xs px-2 py-1.5 shadow-premium-sm focus:ring-1 focus:ring-primary"
+                  className="bg-surface-container-lowest border border-outline-variant/50 rounded-lg text-xs px-2 py-1.5 shadow-premium-sm focus:ring-1 focus:ring-primary"
                   title={t("dashboard.sort")}
                 >
                   <option value="newest">{t("dashboard.newest")}</option>

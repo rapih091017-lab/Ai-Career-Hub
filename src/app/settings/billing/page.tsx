@@ -243,8 +243,8 @@ export default function SettingsBillingPage() {
   return (
     <div className="flex flex-col gap-8">
       {/* Section: Langganan & Penagihan */}
-      <section className="bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/30 overflow-hidden">
-        <div className="px-6 py-5 border-b border-outline-variant/30 flex items-center gap-4">
+      <section className="bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/50 overflow-hidden">
+        <div className="px-6 py-5 border-b border-outline-variant/50 flex items-center gap-4">
           <div className="w-10 h-10 rounded-xl bg-primary-fixed flex items-center justify-center text-primary">
             <span className="material-symbols-outlined">credit_card</span>
           </div>
@@ -282,7 +282,7 @@ export default function SettingsBillingPage() {
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/30">
+                <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/50">
                   <p className="text-label-sm text-on-surface-variant">
                     {data?.premium.isPremium ? t("billing.days-remaining") : t("billing.status")}
                   </p>
@@ -293,14 +293,14 @@ export default function SettingsBillingPage() {
                     {data?.premium.isPremium ? t("billing.from-30-days") : t("billing.activate")}
                   </p>
                 </div>
-                <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/30">
+                <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/50">
                   <p className="text-label-sm text-on-surface-variant">{t("billing.total-cvs")}</p>
                   <p className="font-label-bold text-on-surface mt-1">
                     {data?.usage.cvBuilds ?? 0}
                   </p>
                   <p className="text-label-sm text-on-surface-variant">{t("billing.this-month")}</p>
                 </div>
-                <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/30">
+                <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/50">
                   <p className="text-label-sm text-on-surface-variant">{t("billing.total-spent")}</p>
                   <p className="font-label-bold text-on-surface mt-1">
                     Rp {(data?.payments.totalSpent ?? 0).toLocaleString("id-ID")}
@@ -348,7 +348,7 @@ export default function SettingsBillingPage() {
             </div>
 
 {/* Buy Package */}
-            <div id="beli-paket" ref={buySectionRef} className={`pt-6 border-t scroll-mt-24 ${highlightBuy ? "ring-2 ring-primary/50 rounded-2xl bg-primary/[0.03] px-4 py-4 -mx-4 transition-shadow" : "border-outline-variant/30"}`}>
+            <div id="beli-paket" ref={buySectionRef} className={`pt-6 border-t scroll-mt-24 ${highlightBuy ? "ring-2 ring-primary/50 rounded-2xl bg-primary/[0.03] px-4 py-4 -mx-4 transition-shadow" : "border-outline-variant/50"}`}>
               <h3 className="font-label-bold text-on-surface mb-1">{t("billing.buy-package")}</h3>
               <p className="text-sm text-on-surface-variant mb-4">{t("billing.buy-package-hint")}</p>
 
@@ -373,12 +373,12 @@ export default function SettingsBillingPage() {
 
 {/* Billing History */}
             {data?.payments.history && data.payments.history.length > 0 && (
-              <div className="pt-6 border-t border-outline-variant/30">
+              <div className="pt-6 border-t border-outline-variant/50">
                 <h3 className="font-label-bold text-on-surface mb-4">{t("billing.billing-history")}</h3>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
                     <thead>
-                      <tr className="text-label-sm text-on-surface-variant border-b border-outline-variant/30">
+                      <tr className="text-label-sm text-on-surface-variant border-b border-outline-variant/50">
                         <th className="pb-3 font-bold px-2">{t("billing.date")}</th>
                         <th className="pb-3 font-bold px-2">{t("billing.description")}</th>
                         <th className="pb-3 font-bold px-2">{t("billing.amount")}</th>
@@ -387,7 +387,7 @@ export default function SettingsBillingPage() {
                     </thead>
                     <tbody className="text-body-md">
                       {data.payments.history.map((tx) => (
-                        <tr key={tx.id} className="border-b border-outline-variant/20">
+                        <tr key={tx.id} className="border-b border-outline-variant/40">
                           <td className="py-3 px-2 text-on-surface-variant">
                             {tx.paidAt
                               ? new Date(tx.paidAt).toLocaleDateString("id-ID", {
@@ -427,7 +427,7 @@ export default function SettingsBillingPage() {
       {showCvPicker && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onClick={(e) => { if (e.target === e.currentTarget) setShowCvPicker(false); }}>
           <div className="bg-surface-container-lowest rounded-2xl shadow-xl w-full max-w-md overflow-hidden" onClick={(e) => e.stopPropagation()}>
-            <div className="px-6 py-5 border-b border-outline-variant/30 flex items-center gap-3">
+            <div className="px-6 py-5 border-b border-outline-variant/50 flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-secondary-container/50 flex items-center justify-center text-secondary">
                 <span className="material-symbols-outlined">description</span>
               </div>
@@ -474,7 +474,7 @@ export default function SettingsBillingPage() {
                 ))
               )}
             </div>
-            <div className="px-4 py-3 border-t border-outline-variant/30 flex gap-3">
+            <div className="px-4 py-3 border-t border-outline-variant/50 flex gap-3">
               <button
                 onClick={() => setShowCvPicker(false)}
                 className="flex-1 py-2.5 rounded-xl border border-outline-variant text-sm font-medium text-on-surface hover:bg-surface-container transition-all"
@@ -507,7 +507,7 @@ onClick={() => {
           onClick={() => setTopupDone(null)}
         >
           <div
-            className="w-full max-w-sm rounded-2xl bg-surface-container-lowest border border-outline-variant/30 shadow-soft p-6"
+            className="w-full max-w-sm rounded-2xl bg-surface-container-lowest border border-outline-variant/50 shadow-soft p-6"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="w-12 h-12 rounded-xl bg-green-600/10 text-green-600 flex items-center justify-center mb-4">
@@ -534,12 +534,12 @@ onClick={() => {
 
       {/* Minta testimoni setelah pembayaran masuk. Testimoni masuk antrean admin,
           jadi tidak ada yang bisa terbit sendiri tanpa ditinjau. */}
-      <section className="bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/30 p-6">
+      <section className="bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/50 p-6">
         <TestimonialRequest />
       </section>
 
       {/* How to Pay Info */}
-      <section className="bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/30 p-6">
+      <section className="bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/50 p-6">
         <div className="flex items-start gap-4">
           <div className="w-10 h-10 rounded-xl bg-secondary-container/50 flex items-center justify-center text-secondary shrink-0">
             <span className="material-symbols-outlined">info</span>

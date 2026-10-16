@@ -81,8 +81,8 @@ export default function PaymentHistoryPage() {
   return (
     <div className="flex flex-col gap-8">
       {/* Section: Riwayat Transaksi */}
-      <section className="bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/30 overflow-hidden">
-        <div className="px-6 py-5 border-b border-outline-variant/30 flex items-center gap-4">
+      <section className="bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/50 overflow-hidden">
+        <div className="px-6 py-5 border-b border-outline-variant/50 flex items-center gap-4">
           <div className="w-10 h-10 rounded-xl bg-primary-fixed flex items-center justify-center text-primary">
             <span className="material-symbols-outlined">receipt_long</span>
           </div>
@@ -102,7 +102,7 @@ export default function PaymentHistoryPage() {
           <div className="p-6 space-y-6">
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-5 rounded-xl bg-surface-container-low border border-outline-variant/30">
+              <div className="p-5 rounded-xl bg-surface-container-low border border-outline-variant/50">
                 <p className="text-label-sm text-on-surface-variant">{t("payment.total-spent")}</p>
                 <p className="text-headline-md text-primary mt-1">
                   Rp {totalSpent.toLocaleString("id-ID")}
@@ -113,7 +113,7 @@ export default function PaymentHistoryPage() {
                     : t("payment.no-transactions")}
                 </p>
               </div>
-              <div className="p-5 rounded-xl bg-surface-container-low border border-outline-variant/30">
+              <div className="p-5 rounded-xl bg-surface-container-low border border-outline-variant/50">
                 <p className="text-label-sm text-on-surface-variant">{t("payment.this-month")}</p>
                 <p className="text-headline-md text-on-surface mt-1">
                   {allTransactions.filter((t) => {
@@ -124,7 +124,7 @@ export default function PaymentHistoryPage() {
                 </p>
                 <p className="text-label-sm text-on-surface-variant mt-1">{t("payment.all-transactions")}</p>
               </div>
-              <div className="p-5 rounded-xl bg-surface-container-low border border-outline-variant/30">
+              <div className="p-5 rounded-xl bg-surface-container-low border border-outline-variant/50">
                 <p className="text-label-sm text-on-surface-variant">{t("payment.total-transactions")}</p>
                 <p className="text-headline-md text-on-surface mt-1">{totalTransactions}</p>
                 <p className="text-label-sm text-on-surface-variant mt-1">
@@ -150,7 +150,7 @@ export default function PaymentHistoryPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
                     <thead>
-                      <tr className="text-label-sm text-on-surface-variant border-b border-outline-variant/30">
+                      <tr className="text-label-sm text-on-surface-variant border-b border-outline-variant/50">
                         <th className="pb-3 font-bold px-2">{t("billing.date")}</th>
                         <th className="pb-3 font-bold px-2">{t("billing.description")}</th>
                         <th className="pb-3 font-bold px-2">{t("billing.amount")}</th>
@@ -164,7 +164,7 @@ export default function PaymentHistoryPage() {
                         return (
                           <tr
                             key={tx.id}
-                            className="border-b border-outline-variant/20 hover:bg-surface-container-low transition-colors"
+                            className="border-b border-outline-variant/40 hover:bg-surface-container-low transition-colors"
                           >
                             <td className="py-3 px-2 text-label-sm text-on-surface-variant">
                               {formatDate(tx.paidAt || tx.createdAt)}

@@ -243,7 +243,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
 
         {/* â”€â”€â”€ TOGGLE â”€â”€â”€ */}
         <div className="flex justify-center mb-10">
-          <motion.div className="inline-flex bg-surface-container-lowest dark:bg-[#1F1F2E] rounded-2xl p-1.5 shadow-premium-md border border-outline-variant/30 dark:border-gray-700"
+          <motion.div className="inline-flex bg-surface-container-lowest dark:bg-[#1F1F2E] rounded-2xl p-1.5 shadow-premium-md border border-outline-variant/50 dark:border-gray-700"
             initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.1 }}>
             {(["satuan", "langganan"] as const).map((m) => (
               <button key={m} onClick={() => setMode(m)}
@@ -385,11 +385,11 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
             {showComparison && (
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: "easeInOut" }} className="overflow-hidden">
-                <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/30 overflow-hidden shadow-premium-sm mt-2">
+                <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/50 overflow-hidden shadow-premium-sm mt-2">
                   <div className="overflow-x-auto">
                     <table className="w-full text-left">
                       <thead>
-                        <tr className="bg-surface-container-low border-b border-outline-variant/30">
+                        <tr className="bg-surface-container-low border-b border-outline-variant/50">
                           <th className="p-4 text-label-sm font-bold text-on-surface-variant">{t("pricing.comparison-header")}</th>
                           <th className="p-4 text-label-sm font-bold text-on-surface-variant">Free</th>
                           <th className="p-4 text-label-sm font-bold text-on-surface-variant">Lite</th>
@@ -399,7 +399,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
                       </thead>
                       <tbody>
                         {COMPARISON_ROWS.map((row, i) => (
-                          <tr key={row.labelKey} className={`border-b border-outline-variant/10 ${i % 2 === 0 ? "bg-surface-container-lowest" : "bg-surface-container-low/50"}`}>
+                          <tr key={row.labelKey} className={`border-b border-outline-variant/40 ${i % 2 === 0 ? "bg-surface-container-lowest" : "bg-surface-container-low/50"}`}>
                             <td className="p-4 text-sm font-medium text-on-surface">{t(row.labelKey)}</td>
                             <td className="p-4 text-sm text-on-surface-variant">{freeCell(row.key, t)}</td>
                             <td className="p-4 text-sm text-on-surface-variant">{limitCell(packages, "lite_bulanan", row.key, t)}</td>
@@ -488,7 +488,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
         <motion.div className="mt-16"
           initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.1 }}>
           <h3 className="font-headline-md text-center text-on-surface dark:text-white mb-8">{t("pricing.faq-title")}</h3>
-          <div className="max-w-2xl mx-auto divide-y divide-outline-variant/20 dark:divide-gray-700 bg-surface-container-lowest dark:bg-[#1A1A2E] rounded-2xl border border-outline-variant/30 dark:border-gray-700 shadow-premium-sm overflow-hidden">
+          <div className="max-w-2xl mx-auto divide-y divide-outline-variant/20 dark:divide-gray-700 bg-surface-container-lowest dark:bg-[#1A1A2E] rounded-2xl border border-outline-variant/50 dark:border-gray-700 shadow-premium-sm overflow-hidden">
             {FAQ_KEYS.map((idx) => (
               <div key={idx}>
                 <button onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
@@ -583,7 +583,7 @@ function PricingCard({ plan, delay, onSelectPlan, mode, tFn, catalogLoading }: {
       {/* Badge */}
       {plan.badgeKey && (
         <div className={"absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold whitespace-nowrap shadow-md " + (
-          plan.featured ? "bg-primary text-on-primary" : "bg-surface-container text-on-surface-variant border border-outline-variant/30"
+          plan.featured ? "bg-primary text-on-primary" : "bg-surface-container text-on-surface-variant border border-outline-variant/50"
         )}>
           {t(plan.badgeKey)}
         </div>

@@ -42,7 +42,7 @@ export default function HeroCvDemo() {
   };
 
   return (
-    <div className="max-w-md rounded-2xl border border-outline-variant/30 bg-surface-container-lowest/90 p-4 shadow-premium-sm backdrop-blur-sm">
+    <div className="max-w-md rounded-2xl border border-outline-variant/50 bg-surface-container-lowest/90 p-4 shadow-premium-sm backdrop-blur-sm">
       <div className="mb-3 flex items-center gap-2">
         <span className="material-symbols-outlined text-lg text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>
           search_insights
@@ -87,7 +87,7 @@ export default function HeroCvDemo() {
             transition={{ duration: reduce ? 0 : 0.3 }}
             className="overflow-hidden"
           >
-            <div className="mt-4 border-t border-outline-variant/30 pt-4">
+            <div className="mt-4 border-t border-outline-variant/50 pt-4">
               <div className="mb-1.5 flex items-center justify-between text-xs">
                 <span className="text-on-surface-variant">{t("hero.demo.estimate-label")}</span>
                 <motion.span

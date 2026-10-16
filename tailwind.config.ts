@@ -10,7 +10,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#f4fafb",
+        background: "#eef3f4",
         "surface-variant": "#e0e7e7",
         "inverse-primary": "#a0e0de",
         "surface-tint": "#0d7377",

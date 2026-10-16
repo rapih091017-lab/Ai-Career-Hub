@@ -224,7 +224,7 @@ export default function AdminPackagesPage() {
                     return (
                       <tr
                         key={pkg.id}
-                        className={`border-b border-outline-variant/30 transition-colors last:border-b-0 ${
+                        className={`border-b border-outline-variant/50 transition-colors last:border-b-0 ${
                           dirty ? "bg-amber-500/5" : "hover:bg-surface-container-low/60"
                         }`}
                       >

@@ -576,7 +576,7 @@ export default function AdminDashboardPage() {
                     {stats.recentUsers.map((user) => (
                       <tr
                         key={user.id}
-                        className="border-b border-outline-variant/30 transition-colors duration-200 last:border-b-0 hover:bg-surface-container-low/60"
+                        className="border-b border-outline-variant/50 transition-colors duration-200 last:border-b-0 hover:bg-surface-container-low/60"
                       >
                         <td className="px-2 py-3 text-body-md font-semibold text-on-surface">{user.name || "-"}</td>
                         <td className="px-2 py-3 text-body-md text-on-surface-variant">{user.email}</td>

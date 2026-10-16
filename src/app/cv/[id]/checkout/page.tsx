@@ -137,7 +137,7 @@ export default function CheckoutPage() {
         <main className="pt-24 pb-20 px-margin-mobile md:px-gutter flex justify-center">
           <div className="w-full max-w-lg flex flex-col gap-6">
             {/* Header */}
-            <section className="bg-surface-container-lowest rounded-2xl p-6 shadow-premium-sm border border-outline-variant/30">
+            <section className="bg-surface-container-lowest rounded-2xl p-6 shadow-premium-sm border border-outline-variant/50">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-xl bg-secondary-container/50 flex items-center justify-center text-secondary shrink-0">
                   <span className="material-symbols-outlined text-2xl">shopping_cart_checkout</span>
@@ -157,7 +157,7 @@ export default function CheckoutPage() {
                 <div className="animate-spin h-8 w-8 border-4 border-primary/30 border-t-primary rounded-full" />
               </div>
             ) : error && !cvData ? (
-              <div className="bg-surface-container-lowest rounded-2xl p-8 text-center shadow-premium-sm border border-outline-variant/30">
+              <div className="bg-surface-container-lowest rounded-2xl p-8 text-center shadow-premium-sm border border-outline-variant/50">
                 <span className="material-symbols-outlined text-3xl text-error mb-2">error</span>
                 <p className="font-label-bold text-error">{error}</p>
                 <button onClick={() => router.push("/dashboard")} className="mt-4 text-primary font-label-bold underline">
@@ -167,21 +167,21 @@ export default function CheckoutPage() {
             ) : cvData ? (
               <>
                 {/* CV Details Card */}
-                <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-premium-sm border border-outline-variant/30 space-y-4">
+                <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-premium-sm border border-outline-variant/50 space-y-4">
                   <h3 className="font-label-bold text-on-surface flex items-center gap-2">
                     <span className="material-symbols-outlined text-secondary">description</span>
                     Detail CV
                   </h3>
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between py-2 border-b border-outline-variant/20">
+                    <div className="flex items-center justify-between py-2 border-b border-outline-variant/40">
                       <span className="text-sm text-on-surface-variant">Judul Posisi</span>
                       <span className="font-label-bold text-sm text-on-surface">{cvData.jobTitle || "-"}</span>
                     </div>
-                    <div className="flex items-center justify-between py-2 border-b border-outline-variant/20">
+                    <div className="flex items-center justify-between py-2 border-b border-outline-variant/40">
                       <span className="text-sm text-on-surface-variant">Template</span>
                       <span className="font-label-bold text-sm text-on-surface capitalize">{cvData.templateId?.replace(/-/g, " ") || "Standar"}</span>
                     </div>
-                    <div className="flex items-center justify-between py-2 border-b border-outline-variant/20">
+                    <div className="flex items-center justify-between py-2 border-b border-outline-variant/40">
                       <span className="text-sm text-on-surface-variant">Dibuat</span>
                       <span className="font-label-bold text-sm text-on-surface">{formatDate(cvData.createdAt)}</span>
                     </div>
@@ -205,7 +205,7 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
-                  <div className="border-t border-outline-variant/20 pt-4 space-y-2">
+                  <div className="border-t border-outline-variant/40 pt-4 space-y-2">
                     <h4 className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Yang kamu dapatkan:</h4>
                     <ul className="space-y-2">
                       {[
@@ -270,7 +270,7 @@ export default function CheckoutPage() {
                 </div>
 
                 {/* Payment Info */}
-                <div className="flex items-start gap-3 p-4 rounded-xl bg-surface-container border border-outline-variant/30">
+                <div className="flex items-start gap-3 p-4 rounded-xl bg-surface-container border border-outline-variant/50">
                   <span className="material-symbols-outlined text-outline text-lg shrink-0">info</span>
                   <div className="text-xs text-on-surface-variant leading-relaxed">
                     <p className="font-medium text-on-surface mb-1">Metode Pembayaran</p>

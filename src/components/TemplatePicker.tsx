@@ -53,7 +53,7 @@ export default function TemplatePicker({
         onClick={handleBackdropClick}
       >
         <div className="bg-surface-container-lowest rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-          <div className="flex items-center justify-between p-6 border-b border-outline-variant/30">
+          <div className="flex items-center justify-between p-6 border-b border-outline-variant/50">
             <h2 className="font-headline-md text-on-surface">Ganti Template CV</h2>
             <button
               onClick={handleClose}
@@ -109,7 +109,7 @@ export default function TemplatePicker({
       onClick={handleBackdropClick}
     >
       <div className="bg-surface-container-lowest rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-6 border-b border-outline-variant/30">
+        <div className="flex items-center justify-between p-6 border-b border-outline-variant/50">
           <h2 className="font-headline-md text-on-surface">Buat CV Baru</h2>
           <button
             onClick={handleClose}
@@ -191,7 +191,7 @@ function TemplateOption({ template, selected, onSelect }: {
         <CvTemplatePreview templateId={template.id} />
       </div>
       {/* Info */}
-      <div className="p-3 bg-surface-container-lowest border-t border-outline-variant/20">
+      <div className="p-3 bg-surface-container-lowest border-t border-outline-variant/40">
         <div className="flex items-center justify-between">
           <span className="font-label-bold text-sm text-on-surface">{template.name}</span>
           {selected && (

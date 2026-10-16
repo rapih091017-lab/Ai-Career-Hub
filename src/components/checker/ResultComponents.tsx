@@ -182,7 +182,7 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
                 {/* Sebelum */}
                 <div>
                   <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">{t("checker.detail.before")}</p>
-                  <div className="bg-surface-container-low rounded-lg p-3 border border-outline-variant/30">
+                  <div className="bg-surface-container-low rounded-lg p-3 border border-outline-variant/50">
                     <p className="text-sm text-on-surface">{item.original_text}</p>
                   </div>
                 </div>

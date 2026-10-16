@@ -90,7 +90,7 @@ export function StarPracticeBox({
   };
 
   return (
-    <div className="border-t border-outline-variant/20">
+    <div className="border-t border-outline-variant/40">
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}

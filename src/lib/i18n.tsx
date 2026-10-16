@@ -1380,7 +1380,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "portfolio.spot.sample-note": { id: "Contoh ilustrasi tata letak. Isi akhirmu sepenuhnya dari datamu.", en: "Illustrative layout sample. Your final content comes from your own data." },
 
   /* Ã¢â€â‚¬Ã¢â€â‚¬ Logos / Social Proof Stats Ã¢â€â‚¬Ã¢â€â‚¬ */
-  "logos.heading": { id: "Mulai perjalanan kariermu bersama", en: "Start your career journey with" },
+  "logos.heading": { id: "Semua yang kamu butuhkan untuk lamaran yang lebih rapi", en: "Everything you need for a sharper application" },
   "logos.badge-ats-title": { id: "CV ATS-Friendly", en: "ATS-Friendly CV" },
   "logos.badge-ats-desc": { id: "Format siap lolos seleksi ATS", en: "Format ready to pass ATS screening" },
   "logos.badge-ai-title": { id: "Ditenagai AI", en: "AI-assisted" },

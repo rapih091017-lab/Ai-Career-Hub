@@ -1269,7 +1269,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
             {/* Panel Tampilan: urutan & visibilitas section, ukuran teks, perataan */}
             <section
               data-testid="appearance-panel"
-              className="bg-surface-container-lowest rounded-2xl p-6 shadow-soft border border-outline-variant/30 space-y-5"
+              className="bg-surface-container-lowest rounded-2xl p-6 shadow-soft border border-outline-variant/50 space-y-5"
             >
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-primary" aria-hidden="true">tune</span>
@@ -1435,7 +1435,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
         <footer className="fixed bottom-0 left-0 w-full z-50 bg-surface-container-highest shadow-[0_-8px_24px_rgba(0,0,0,0.06)] py-4 px-margin-mobile md:px-margin-desktop">
           <div className="max-w-[800px] mx-auto flex justify-between items-center">
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1 border-r border-outline-variant/30 pr-3">
+              <div className="flex items-center gap-1 border-r border-outline-variant/50 pr-3">
                 <button
                   onClick={undo}
                   disabled={!canUndo}
@@ -1712,7 +1712,7 @@ function AccordionItem({ id, icon, title, isOpen, onToggle, children }: {
   id: AccordionKey; icon: string; title: string; isOpen: boolean; onToggle: (id: AccordionKey) => void; children: React.ReactNode;
 }) {
   return (
-    <div className={`bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/30 overflow-hidden transition-all`}>
+    <div className={`bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/50 overflow-hidden transition-all`}>
       <button
         className="w-full px-6 py-5 flex items-center justify-between text-left focus:bg-surface-container"
         onClick={() => onToggle(id)}

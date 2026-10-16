@@ -109,7 +109,7 @@ export default function PortfolioPage() {
             </div>
 
             {/* Live URL + Quick Actions */}
-            <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-soft border border-outline-variant/30">
+            <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-soft border border-outline-variant/50">
               <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
                 <div className="flex-1 min-w-0">
                   <label className="text-label-bold text-on-surface-variant block mb-1.5">{t("portfolio.url-label")}</label>
@@ -185,7 +185,7 @@ export default function PortfolioPage() {
                         className={`w-full rounded-2xl border-2 overflow-hidden text-left transition-[transform,border-color] theme-card-hover active:scale-[0.98] ${
                           selectedTheme === theme.id
                             ? "border-primary bg-primary-fixed/10"
-                            : "border-outline-variant/30 bg-surface-container-lowest hover:border-primary/50"
+                            : "border-outline-variant/50 bg-surface-container-lowest hover:border-primary/50"
                         }`}
                       >
                         {/* Thumbnail: render asli per tema — beda struktur, bukan beda warna.
@@ -248,7 +248,7 @@ export default function PortfolioPage() {
               ].map((s, i) => (
                 <motion.div
                   key={s.icon}
-                  className="bg-surface-container-lowest rounded-2xl p-6 shadow-soft border border-outline-variant/30 hover:shadow-md hover:-translate-y-0.5 transition-[transform,box-shadow] duration-200"
+                  className="bg-surface-container-lowest rounded-2xl p-6 shadow-soft border border-outline-variant/50 hover:shadow-md hover:-translate-y-0.5 transition-[transform,box-shadow] duration-200"
                   initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -264,7 +264,7 @@ export default function PortfolioPage() {
             </motion.section>
 
             {/* CTA, konek ke profile */}
-            <section className="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/30 flex flex-col md:flex-row items-center justify-between gap-4">
+            <section className="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/50 flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <span className={`material-symbols-outlined text-2xl ${profileData ? "text-green-600" : "text-primary"}`} aria-hidden="true">{profileData ? "check_circle" : "info"}</span>
                 <p className="text-body-md text-on-surface-variant">{profileData ? t("portfolio.profile-filled") + " " + (stats.name !== "-" ? stats.name.toLowerCase() : t("portfolio.existing-data")) + "." : t("portfolio.profile-empty")}</p>

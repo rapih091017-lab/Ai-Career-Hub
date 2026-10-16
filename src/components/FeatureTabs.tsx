@@ -140,7 +140,7 @@ function AnalysisInteractive({ t }: { t: (key: string) => string }) {
       variants={containerStagger}
       initial="hidden"
       animate="visible"
-      className="relative rounded-xl border border-outline-variant/30 bg-surface-container-low/50 p-5 md:p-6 overflow-hidden"
+      className="relative rounded-xl border border-outline-variant/50 bg-surface-container-low/50 p-5 md:p-6 overflow-hidden"
     >
 
       <motion.div variants={cardReveal} className="relative z-10 flex flex-col md:flex-row gap-4">
@@ -196,7 +196,7 @@ function BuilderShowcase({ t, router }: { t: (key: string) => string; router: Re
       variants={containerStagger}
       initial="hidden"
       animate="visible"
-      className="relative rounded-xl border border-outline-variant/30 bg-surface-container-low/50 p-5 md:p-6 overflow-hidden"
+      className="relative rounded-xl border border-outline-variant/50 bg-surface-container-low/50 p-5 md:p-6 overflow-hidden"
     >
 
       <div className="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -216,7 +216,7 @@ function BuilderShowcase({ t, router }: { t: (key: string) => string; router: Re
           <TiltCard tiltOptions={{ maxAngle: 6, scale: 1.03, glare: true }}>
             <Link
               href="/builder/new"
-              className="block h-full min-h-[120px] rounded-2xl border-2 border-dashed border-outline-variant/30 bg-surface-container-lowest/50 flex flex-col items-center justify-center gap-2 p-4 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/[0.02] hover:shadow-md transition-all duration-300 group"
+              className="block h-full min-h-[120px] rounded-2xl border-2 border-dashed border-outline-variant/50 bg-surface-container-lowest/50 flex flex-col items-center justify-center gap-2 p-4 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/[0.02] hover:shadow-md transition-all duration-300 group"
             >
               <span className="material-symbols-outlined text-outline-variant text-2xl group-hover:text-primary transition-colors">add_circle</span>
               <p className="text-xs text-on-surface-variant leading-relaxed group-hover:text-on-surface transition-colors">
@@ -228,7 +228,7 @@ function BuilderShowcase({ t, router }: { t: (key: string) => string; router: Re
       </div>
 
       {/* Feature comparison mini */}
-      <motion.div variants={cardReveal} className="relative z-10 mt-4 pt-3 border-t border-outline-variant/20 flex items-center justify-between">
+      <motion.div variants={cardReveal} className="relative z-10 mt-4 pt-3 border-t border-outline-variant/40 flex items-center justify-between">
         <div className="flex items-center gap-3 text-xs text-on-surface-variant">
           <span className="flex items-center gap-1">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -254,7 +254,7 @@ function PortfolioShowcase({ t }: { t: (key: string) => string }) {
       variants={containerStagger}
       initial="hidden"
       animate="visible"
-      className="relative rounded-xl border border-outline-variant/30 bg-surface-container-low/50 p-5 md:p-6 overflow-hidden"
+      className="relative rounded-xl border border-outline-variant/50 bg-surface-container-low/50 p-5 md:p-6 overflow-hidden"
     >
 
       <div className="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -263,7 +263,7 @@ function PortfolioShowcase({ t }: { t: (key: string) => string }) {
             <TiltCard tiltOptions={{ maxAngle: 6, scale: 1.03, glare: true }}>
               <Link
                 href="/portfolio"
-                className="block rounded-2xl border border-outline-variant/30 bg-surface-container-lowest overflow-hidden group hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 cursor-pointer"
+                className="block rounded-2xl border border-outline-variant/50 bg-surface-container-lowest overflow-hidden group hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 cursor-pointer"
               >
                 {/* Color swatch strip with overlay glow on hover */}
                 <div className="h-20 relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${theme.primary}, ${theme.accent})` }}>
@@ -313,7 +313,7 @@ function LetterShowcase({ t }: { t: (key: string) => string }) {
       variants={containerStagger}
       initial="hidden"
       animate="visible"
-      className="relative rounded-xl border border-outline-variant/30 bg-surface-container-low/50 p-5 md:p-6 overflow-hidden"
+      className="relative rounded-xl border border-outline-variant/50 bg-surface-container-low/50 p-5 md:p-6 overflow-hidden"
     >
 
       <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -321,9 +321,9 @@ function LetterShowcase({ t }: { t: (key: string) => string }) {
         <motion.div variants={cardReveal}>
           <Link
             href="/surat-lamaran?style=formal"
-            className="block bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/20 hover:-translate-y-1 hover:shadow-lg hover:border-emerald-300/40 transition-all duration-300 cursor-pointer group"
+            className="block bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/40 hover:-translate-y-1 hover:shadow-lg hover:border-emerald-300/40 transition-all duration-300 cursor-pointer group"
           >
-            <div className="px-4 pt-4 pb-3 border-b border-outline-variant/10 flex items-center gap-2">
+            <div className="px-4 pt-4 pb-3 border-b border-outline-variant/40 flex items-center gap-2">
               <span className="w-6 h-6 rounded-lg bg-emerald-50 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <span className="material-symbols-outlined text-emerald-600 text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>business_center</span>
               </span>
@@ -346,9 +346,9 @@ function LetterShowcase({ t }: { t: (key: string) => string }) {
         <motion.div variants={cardReveal}>
           <Link
             href="/surat-lamaran?style=ats"
-            className="block bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/20 hover:-translate-y-1 hover:shadow-lg hover:border-blue-300/40 transition-all duration-300 cursor-pointer group"
+            className="block bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/40 hover:-translate-y-1 hover:shadow-lg hover:border-blue-300/40 transition-all duration-300 cursor-pointer group"
           >
-            <div className="px-4 pt-4 pb-3 border-b border-outline-variant/10 flex items-center gap-2">
+            <div className="px-4 pt-4 pb-3 border-b border-outline-variant/40 flex items-center gap-2">
               <span className="w-6 h-6 rounded-lg bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <span className="material-symbols-outlined text-blue-600 text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
               </span>
@@ -370,9 +370,9 @@ function LetterShowcase({ t }: { t: (key: string) => string }) {
         <motion.div variants={cardReveal}>
           <Link
             href="/surat-lamaran?style=motivation"
-            className="block bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/20 hover:-translate-y-1 hover:shadow-lg hover:border-amber-300/40 transition-all duration-300 cursor-pointer group"
+            className="block bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/40 hover:-translate-y-1 hover:shadow-lg hover:border-amber-300/40 transition-all duration-300 cursor-pointer group"
           >
-            <div className="px-4 pt-4 pb-3 border-b border-outline-variant/10 flex items-center gap-2">
+            <div className="px-4 pt-4 pb-3 border-b border-outline-variant/40 flex items-center gap-2">
               <span className="w-6 h-6 rounded-lg bg-amber-50 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <span className="material-symbols-outlined text-amber-600 text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>emoji_events</span>
               </span>
@@ -392,7 +392,7 @@ function LetterShowcase({ t }: { t: (key: string) => string }) {
       </div>
 
       {/* Feature comparison mini */}
-      <motion.div variants={cardReveal} className="relative z-10 mt-4 pt-3 border-t border-outline-variant/20 flex items-center justify-between">
+      <motion.div variants={cardReveal} className="relative z-10 mt-4 pt-3 border-t border-outline-variant/40 flex items-center justify-between">
         <div className="flex items-center gap-3 text-xs text-on-surface-variant">
           <span className="flex items-center gap-1">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -418,7 +418,7 @@ function CheckerScoreMockup({ t }: { t: (key: string) => string }) {
       variants={containerStagger}
       initial="hidden"
       animate="visible"
-      className="relative rounded-xl border border-outline-variant/30 bg-surface-container-low/50 p-5 md:p-6 overflow-hidden"
+      className="relative rounded-xl border border-outline-variant/50 bg-surface-container-low/50 p-5 md:p-6 overflow-hidden"
     >
 
       <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -426,7 +426,7 @@ function CheckerScoreMockup({ t }: { t: (key: string) => string }) {
         <motion.div variants={cardReveal}>
           <Link
             href="/checker"
-            className="block bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/20 text-center hover:-translate-y-1 hover:shadow-lg hover:border-primary/30 transition-all duration-300 cursor-pointer group"
+            className="block bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/40 text-center hover:-translate-y-1 hover:shadow-lg hover:border-primary/30 transition-all duration-300 cursor-pointer group"
           >
             <div className="text-xs text-on-surface-variant font-medium mb-1 group-hover:text-primary transition-colors">{t("checker.score-label")}</div>
             <p className="text-xs font-semibold text-primary/70 mb-1">Hasil analisis kamu tampil di sini</p>
@@ -440,7 +440,7 @@ function CheckerScoreMockup({ t }: { t: (key: string) => string }) {
         <motion.div variants={cardReveal}>
           <Link
             href="/checker"
-            className="block bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/20 hover:-translate-y-1 hover:shadow-lg hover:border-amber-300/40 transition-all duration-300 cursor-pointer group"
+            className="block bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/40 hover:-translate-y-1 hover:shadow-lg hover:border-amber-300/40 transition-all duration-300 cursor-pointer group"
           >
             <div className="text-xs text-on-surface-variant font-medium mb-2 group-hover:text-primary transition-colors">{t("checker.keyword-gap")}</div>
             <div className="flex flex-wrap gap-1.5" aria-hidden="true">
@@ -475,7 +475,7 @@ function CheckerScoreMockup({ t }: { t: (key: string) => string }) {
         <motion.div variants={cardReveal}>
           <Link
             href="/checker"
-            className="block bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/20 flex flex-col items-center justify-center hover:-translate-y-1 hover:shadow-lg hover:border-green-300/40 transition-all duration-300 cursor-pointer group"
+            className="block bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/40 flex flex-col items-center justify-center hover:-translate-y-1 hover:shadow-lg hover:border-green-300/40 transition-all duration-300 cursor-pointer group"
           >
             <motion.div
               className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center mb-1.5 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-green-200/50 transition-all duration-300"
@@ -504,7 +504,7 @@ export default function FeatureTabs() {
     <div className="max-w-4xl mx-auto">
       {/* Tab Bar */}
       <div className="flex justify-center mb-10">
-        <div className="inline-flex flex-wrap justify-center bg-surface-container-lowest rounded-2xl p-1.5 shadow-premium-sm border border-outline-variant/30 max-w-full">
+        <div className="inline-flex flex-wrap justify-center bg-surface-container-lowest rounded-2xl p-1.5 shadow-premium-sm border border-outline-variant/50 max-w-full">
           {TABS.map((tab) => (
             <button
               key={tab.id}
@@ -590,7 +590,7 @@ export default function FeatureTabs() {
               </div>
 
               {/* Right visual indicator */}
-              <div className="hidden md:flex flex-col items-center justify-center px-10 bg-surface-container-low/50 border-l border-outline-variant/20">
+              <div className="hidden md:flex flex-col items-center justify-center px-10 bg-surface-container-low/50 border-l border-outline-variant/40">
                 <div className={`w-16 h-16 ${activeData.bgColor}/10 rounded-3xl flex items-center justify-center`}>
                   <span className={`material-symbols-outlined text-[36px] ${activeData.color}`} style={{ fontVariationSettings: "'FILL' 1" }}>{activeData.icon}</span>
                 </div>

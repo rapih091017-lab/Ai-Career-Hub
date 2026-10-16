@@ -200,7 +200,7 @@ export default function KarirPage() {
 
             {/* Filter: kategori, tipe kerja, pencarian, dan urutan. Semua ikut
                 dikirim ke server supaya tidak ada lowongan yang terpotong. */}
-            <div className="mb-6 space-y-3 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-4">
+            <div className="mb-6 space-y-3 rounded-2xl border border-outline-variant/50 bg-surface-container-lowest p-4">
               <div className="flex flex-col gap-3 md:flex-row md:items-center">
                 <label className="relative flex-1">
                   <span className="sr-only">{t("karir.search-label")}</span>
@@ -397,7 +397,7 @@ export default function KarirPage() {
           </section>
         ) : jobsLoaded && hasFilters ? (
           <section className="mb-16">
-            <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-low p-8 text-center">
+            <div className="rounded-2xl border border-outline-variant/50 bg-surface-container-low p-8 text-center">
               <span className="material-symbols-outlined mb-4 text-5xl text-primary/40" aria-hidden="true">
                 search_off
               </span>
@@ -422,7 +422,7 @@ export default function KarirPage() {
         ) : jobsLoaded ? (
           /* ── Coming soon (hanya saat belum ada loker) ── */
           <section className="mb-16">
-            <div className="bg-surface-container-low rounded-2xl p-8 border border-outline-variant/30">
+            <div className="bg-surface-container-low rounded-2xl p-8 border border-outline-variant/50">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>construction</span>

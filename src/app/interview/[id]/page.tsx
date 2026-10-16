@@ -236,7 +236,7 @@ export default function PositionDetailPage() {
               {prevPosition ? (
                 <motion.button
                   onClick={() => router.push(`/interview/${prevPosition.id}`)}
-                  className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/30 shadow-premium-sm hover:shadow-premium-md hover:-translate-y-0.5 transition-all text-left group focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                  className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 shadow-premium-sm hover:shadow-premium-md hover:-translate-y-0.5 transition-all text-left group focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -255,7 +255,7 @@ export default function PositionDetailPage() {
               {nextPosition ? (
                 <motion.button
                   onClick={() => router.push(`/interview/${nextPosition.id}`)}
-                  className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/30 shadow-premium-sm hover:shadow-premium-md hover:-translate-y-0.5 transition-all text-right group focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                  className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 shadow-premium-sm hover:shadow-premium-md hover:-translate-y-0.5 transition-all text-right group focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -273,7 +273,7 @@ export default function PositionDetailPage() {
             </section>
 
             {/* ── Bottom info ── */}
-            <section className="mt-8 bg-surface-container-lowest rounded-2xl p-5 border border-outline-variant/30 shadow-premium-sm">
+            <section className="mt-8 bg-surface-container-lowest rounded-2xl p-5 border border-outline-variant/50 shadow-premium-sm">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-xl bg-secondary-container/50 flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-secondary">lightbulb</span>

@@ -117,7 +117,7 @@ export default function AboutPage() {
           </p>
         </section>
 
-        <section className="pt-8 border-t border-outline-variant/30">
+        <section className="pt-8 border-t border-outline-variant/50">
           <h2 className="font-headline-md text-xl text-on-surface mb-3">Ada yang perlu dijelaskan?</h2>
           <p className="text-body-md text-on-surface-variant leading-relaxed">
             Data yang kami simpan dijelaskan di{" "}

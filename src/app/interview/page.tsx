@@ -209,7 +209,7 @@ export default function InterviewPage() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: i * 0.03 }}
                       onClick={() => setSelectedPosition(pos)}
-                      className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/30 shadow-premium-sm hover:shadow-premium-md hover:-translate-y-0.5 hover:border-primary/30 active:scale-[0.98] transition-all text-left group focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                      className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 shadow-premium-sm hover:shadow-premium-md hover:-translate-y-0.5 hover:border-primary/30 active:scale-[0.98] transition-all text-left group focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                     >
                       <div className="flex items-start gap-3 mb-2">
                         <div className="w-9 h-9 rounded-lg bg-primary-fixed flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
@@ -259,7 +259,7 @@ export default function InterviewPage() {
             )}
 
             {/* ── Bottom info ── */}
-            <section className="mt-10 bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30 shadow-premium-sm">
+            <section className="mt-10 bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/50 shadow-premium-sm">
               <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
                 <div className="w-12 h-12 rounded-xl bg-secondary-container/50 flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-secondary">lightbulb</span>

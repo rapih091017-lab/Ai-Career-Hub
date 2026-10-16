@@ -416,7 +416,7 @@ export default function DashboardPage() {
                 <h2 className="font-headline-md text-on-surface mb-3">{t("dashboard.checker-history")}</h2>
                 <div className="space-y-2">
                   {[1,2,3].map((i) => (
-                    <div key={i} className="bg-surface-container-lowest rounded-xl p-4 shadow-premium-sm border border-outline-variant/30 flex items-center gap-4 animate-pulse">
+                    <div key={i} className="bg-surface-container-lowest rounded-xl p-4 shadow-premium-sm border border-outline-variant/50 flex items-center gap-4 animate-pulse">
                       <div className="w-14 h-14 rounded-full bg-surface-container-high shrink-0" />
                       <div className="flex-1 space-y-2">
                         <div className="h-3 bg-surface-container-high rounded w-3/4" />
@@ -440,7 +440,7 @@ export default function DashboardPage() {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.25, delay: i * 0.03 }}
-                        className="bg-surface-container-lowest rounded-xl p-4 shadow-premium-sm border border-outline-variant/30 hover:shadow-premium-md hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-4 cursor-pointer"
+                        className="bg-surface-container-lowest rounded-xl p-4 shadow-premium-sm border border-outline-variant/50 hover:shadow-premium-md hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-4 cursor-pointer"
                         onClick={() => router.push(`/checker/${item.id}`)}
                       >
                         {/* Score ring, pakai threshold yang sama dengan ScoreDonut */}
@@ -492,7 +492,7 @@ export default function DashboardPage() {
               {lettersLoading ? (
                 <div className="space-y-2">
                   {[1, 2].map((i) => (
-                    <div key={i} className="bg-surface-container-lowest rounded-xl p-4 shadow-premium-sm border border-outline-variant/30 flex items-center gap-4 animate-pulse">
+                    <div key={i} className="bg-surface-container-lowest rounded-xl p-4 shadow-premium-sm border border-outline-variant/50 flex items-center gap-4 animate-pulse">
                       <div className="w-10 h-10 rounded-xl bg-surface-container-high shrink-0" />
                       <div className="flex-1 space-y-2">
                         <div className="h-3 bg-surface-container-high rounded w-2/3" />
@@ -534,7 +534,7 @@ export default function DashboardPage() {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.25, delay: i * 0.03 }}
-                        className="bg-surface-container-lowest rounded-xl p-4 shadow-premium-sm border border-outline-variant/30 hover:shadow-premium-md hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-4 cursor-pointer"
+                        className="bg-surface-container-lowest rounded-xl p-4 shadow-premium-sm border border-outline-variant/50 hover:shadow-premium-md hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-4 cursor-pointer"
                         onClick={() => router.push(letter.cvId ? `/surat-lamaran/${letter.cvId}?letter=${letter.id}` : `/surat-lamaran?letter=${letter.id}`)}
                       >
                         <div className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center ${isMotivation ? "bg-amber-50" : "bg-violet-50"}`}>

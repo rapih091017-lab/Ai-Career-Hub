@@ -83,13 +83,13 @@ export default async function ContactPage() {
           </div>
 
           {/* Info Card */}
-          <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/30 p-8 shadow-soft">
+          <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/50 p-8 shadow-soft">
             <h2 className="font-headline-md text-xl text-on-surface mb-4">Respon Cepat</h2>
             <p className="text-body-md text-on-surface-variant mb-6 leading-relaxed">
               Kami berkomitmen untuk merespon setiap pertanyaan dalam waktu 1x24 jam pada hari kerja.
               Untuk pertanyaan mendesak, silakan hubungi kami melalui email langsung.
             </p>
-            <div className="p-4 rounded-xl bg-surface-container border border-outline-variant/20">
+            <div className="p-4 rounded-xl bg-surface-container border border-outline-variant/40">
               <p className="text-label-sm text-on-surface-variant flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary text-lg">info</span>
                 Untuk pertanyaan terkait akun, login, atau pembayaran, sertakan detail akun Anda agar kami dapat membantu lebih cepat.

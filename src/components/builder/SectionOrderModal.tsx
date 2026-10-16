@@ -35,8 +35,8 @@ export function SectionOrderModal({
               key={key}
               className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border transition-all ${
                 visible
-                  ? "bg-surface-container-lowest border-outline-variant/30"
-                  : "bg-surface-dim/30 border-dashed border-outline-variant/20 opacity-50"
+                  ? "bg-surface-container-lowest border-outline-variant/50"
+                  : "bg-surface-dim/30 border-dashed border-outline-variant/40 opacity-50"
               }`}
             >
               <span className="material-symbols-outlined text-outline-variant text-base shrink-0" aria-hidden="true">

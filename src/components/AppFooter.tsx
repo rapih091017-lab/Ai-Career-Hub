@@ -79,7 +79,7 @@ export default function AppFooter({ variant = "simple", bordered = false }: AppF
               </ul>
             </div>
           </div>
-          <div className="pt-8 border-t border-outline-variant/30 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="pt-8 border-t border-outline-variant/50 flex flex-col md:flex-row justify-between items-center gap-6">
             <p className="text-label-sm text-surface-variant/60">{t("footer.copyright")}</p>
             <div className="flex gap-6">
               <Link className="text-surface-variant/60 hover:text-primary transition-all" href="/contact"><span className="material-symbols-outlined">public</span></Link>
@@ -100,7 +100,7 @@ export default function AppFooter({ variant = "simple", bordered = false }: AppF
   return (
     <footer
       className={`flex flex-col items-center gap-4 w-full max-w-[600px] mx-auto px-5 md:px-10 py-12 pb-24 md:pb-12 text-sm ${
-        bordered ? "bg-background mt-12 border-t border-outline-variant/30" : ""
+        bordered ? "bg-background mt-12 border-t border-outline-variant/50" : ""
       }`}
     >
       <div className="text-primary font-bold font-headline-md text-lg">AI Career Hub</div>

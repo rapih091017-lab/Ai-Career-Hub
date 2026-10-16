@@ -22,7 +22,7 @@ export function TargetPekerjaanSection({
 }: TargetPekerjaanSectionProps) {
   return (
     <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-5">
-      <div className="flex items-start gap-3 pb-5 border-b border-outline-variant/20">
+      <div className="flex items-start gap-3 pb-5 border-b border-outline-variant/40">
         <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
           <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>work_history</span>
         </div>
