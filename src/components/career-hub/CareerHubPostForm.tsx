@@ -39,9 +39,11 @@ export default function CareerHubPostForm({ postId }: { postId?: string }) {
   }, [postId]);
 
   const set = <K extends keyof CareerHubPostFormValue>(key: K, value: CareerHubPostFormValue[K]) => setForm((current) => ({ ...current, [key]: value }));
-  const addTag = () => {
-    const value = tagInput.trim().replace(/^#/, "");
-    // Sama seperti 서버, perbandingan tidak membedakan huruf besar-kecil,
+const addTag = () => {
+    // Dibatasi 40 karakter karena itu batas server. Tanpa ini, tag yang
+    // kepanjangan ditolak saat disimpan dengan pesan yang tidak menjelaskan.
+    const value = tagInput.trim().replace(/^#/, "").slice(0, 40);
+    // Sama seperti server, perbandingan tidak membedakan huruf besar-kecil,
     // supaya "CV" dan "cv" tidak menghasilkan tag ganda.
     const exists = form.tags.some((tag) => tag.toLowerCase() === value.toLowerCase());
     if (value && !exists && form.tags.length < 12) set("tags", [...form.tags, value]);
@@ -75,7 +77,7 @@ export default function CareerHubPostForm({ postId }: { postId?: string }) {
     <AdminField label="Isi artikel" required hint="Pakai toolbar di atas kolom ini untuk tebal, judul, daftar, dan rata paragraf.">
       <ArticleEditor className={`${adminTextareaClass} min-h-[320px] font-mono text-sm`} value={form.content} onChange={(value) => set("content", value)} rows={16} maxLength={50000} />
     </AdminField>
-    <AdminField label="Tag" hint="Tekan Enter untuk menambahkan tag, maksimal 12."><div className="flex gap-2"><input className={adminInputClass} value={tagInput} onChange={(event) => setTagInput(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); addTag(); } }} /><button type="button" onClick={addTag} className={adminBtnSecondary}>Tambah</button></div><div className="mt-2 flex flex-wrap gap-2">{form.tags.map((tag) => <button type="button" key={tag} onClick={() => set("tags", form.tags.filter((item) => item !== tag))} className="rounded-md bg-surface-container px-2 py-1 text-label-sm">#{tag} ×</button>)}</div></AdminField>
+    <AdminField label="Tag" hint="Tekan Enter untuk menambahkan tag, maksimal 12."><div className="flex gap-2"><input className={adminInputClass} value={tagInput} maxLength={40} onChange={(event) => setTagInput(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); addTag(); } }} /><button type="button" onClick={addTag} className={adminBtnSecondary}>Tambah</button></div><div className="mt-2 flex flex-wrap gap-2">{form.tags.map((tag) => <button type="button" key={tag} onClick={() => set("tags", form.tags.filter((item) => item !== tag))} className="rounded-md bg-surface-container px-2 py-1 text-label-sm">#{tag} ×</button>)}</div></AdminField>
     <PhotoUpload value={form.coverImageUrl ?? ""} onChange={(url) => set("coverImageUrl", url || null)} label="Gambar sampul (opsional)" />
     {error ? <p role="alert" className="rounded-xl bg-error-container px-4 py-3 text-label-bold text-on-error-container">{error}</p> : null}
     <div className="flex flex-wrap justify-end gap-2 border-t border-outline-variant/50 pt-4"><button type="button" disabled={saving} onClick={() => save("draft")} className={adminBtnSecondary}>Simpan draf</button><button type="button" disabled={saving} onClick={() => save("published")} className={adminBtnPrimary}>{saving ? "Menyimpan..." : "Terbitkan"}</button></div>

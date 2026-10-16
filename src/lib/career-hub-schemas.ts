@@ -48,12 +48,21 @@ const tagsSchema = z
 /**
  * Gambar sampul opsional.
  *
- * String kosong diperlakukan sama dengan tidak diisi. Form mengirim `null`
- * saat kosong, tapi `PhotoUpload` juga pernah mengirim `""`, dan `z.string().url()`
- * menolak string kosong sebagai "Invalid URL" — pesan yang tidak membantu.
+ * Dua bentuk yang sah: URL http(s), atau data URL hasil unggahan langsung.
+ * PhotoUpload menyimpan gambar sebagai data URL base64, dan data URL 200 KB
+ * sudah millions of karakter — dulu batasnya 2048 sehingga artikel yang
+ * gambarnya sudah diunggah selalu ditolak dengan "Invalid input".
+ * Batas 8 MB mengikuti pola yang sudah dipakai gambar lowongan dan portofolio.
  */
+const MAX_IMAGE_URL_LENGTH = 8_000_000;
+
 const optionalUrlSchema = z
-  .union([z.string().trim().max(2048).url(), z.literal("")])
+  .string()
+  .trim()
+  .max(MAX_IMAGE_URL_LENGTH, "Gambar terlalu besar. Maksimal sekitar 5 MB.")
+  .refine((value) => value === "" || value.startsWith("data:image/") || /^https?:\/\//i.test(value), {
+    message: "Gambar harus berupa tautan http(s) atau hasil unggahan.",
+  })
   .nullable()
   .optional()
   .transform((value) => (value === "" ? null : value));
