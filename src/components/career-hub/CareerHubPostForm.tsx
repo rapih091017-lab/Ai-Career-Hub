@@ -8,6 +8,13 @@ import AdminField from "@/components/admin/AdminField";
 import { adminBtnPrimary, adminBtnSecondary, adminInputClass, adminTextareaClass } from "@/components/admin/ui";
 import { CAREER_HUB_CATEGORIES, slugifyCareerHubTitle } from "@/lib/career-hub-schemas";
 import { mergeTags } from "@/lib/career-hub-tags";
+import {
+  articleFingerprint,
+  describeSavedToast,
+  describeSaveState,
+  type SaveState,
+} from "@/lib/career-hub-form-state";
+import { useToast } from "@/components/ui/toast";
 import ArticleContent from "./ArticleContent";
 import ArticleEditor from "./ArticleEditor";
 
@@ -18,6 +25,26 @@ export interface CareerHubPostFormValue {
 
 const EMPTY: CareerHubPostFormValue = { title: "", slug: "", excerpt: "", content: "", category: "cv-ats", tags: [], coverImageUrl: null, status: "draft" };
 
+/**
+ * Status simpan yang selalu terlihat, bukan hanya sesaat.
+ *
+ * Toast hilang dalam beberapa detik, lalu keraguan kembali. Baris ini
+ * menjawabnya sepanjang form terbuka, dan memakai ikon plus teks supaya tidak
+ * bergantung pada warna saja.
+ */
+function SaveStatus({ state }: { state: SaveState }) {
+  return (
+    <p
+      role="status"
+      aria-live="polite"
+      className={`flex items-center gap-2 text-label-bold ${state.dirty ? "text-on-surface-variant" : "text-primary"}`}
+    >
+      <span aria-hidden="true" className="inline-block h-2 w-2 rounded-full bg-current" />
+      {state.message}
+    </p>
+  );
+}
+
 export default function CareerHubPostForm({ postId }: { postId?: string }) {
   const router = useRouter();
   const [form, setForm] = useState(EMPTY);
@@ -27,6 +54,10 @@ export default function CareerHubPostForm({ postId }: { postId?: string }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [preview, setPreview] = useState(false);
+  // Isian terakhir yang benar-benar diterima server. Selama form terbuka,
+  // ini yang menjawab pertanyaan admin: article ini sudah aman atau belum.
+  const [savedFingerprint, setSavedFingerprint] = useState<string | null>(null);
+  const { addToast } = useToast();
 
   useEffect(() => {
     if (!postId) return;
@@ -35,12 +66,15 @@ export default function CareerHubPostForm({ postId }: { postId?: string }) {
       const data = await response.json();
       const post = (data.posts ?? []).find((row: CareerHubPostFormValue) => row.id === postId);
       if (!post) throw new Error("Artikel tidak ditemukan.");
-      setForm(post); setSlugEdited(true);
+      setForm(post); setSlugEdited(true); setSavedFingerprint(articleFingerprint(post));
     }).catch((err) => setError(err.message)).finally(() => setLoading(false));
   }, [postId]);
 
   const set = <K extends keyof CareerHubPostFormValue>(key: K, value: CareerHubPostFormValue[K]) => setForm((current) => ({ ...current, [key]: value }));
-const addTag = () => {
+
+  const saveState = describeSaveState(savedFingerprint, articleFingerprint(form), form.status);
+
+  const addTag = () => {
     // Input dipecah berdasarkan koma dan baris baru. Dulu input dipakai
     // apa adanya, jadi "lowongan palsu, penipuan kerja, tips aman" tersimpan
     // sebagai satu tag berisi koma dan halaman tag publik memakai nama aneh.
@@ -60,8 +94,15 @@ const addTag = () => {
       });
       const data = await response.json().catch(() => null);
       if (!response.ok) throw new Error(data?.message || "Artikel gagal disimpan.");
+      setForm(data.post);
+      setSavedFingerprint(articleFingerprint(data.post));
+      // Status di database dibaca sebelum ditulis, jadi toast bisa membedakan
+      // artikel yang baru tayang dari artikel yang sudah tayang lalu diedit.
+      const wasPublished = form.status === "published";
+      addToast({ type: "success", message: describeSavedToast(status, wasPublished) });
+      // Artikel baru langsung dibuka halaman editnya supaya penyimpanan
+      // berikutnya jadi pembaruan, bukan membuat artikel kedua.
       if (!postId) router.push(`/admin/career-hub/${data.post.id}`);
-      else setForm(data.post);
     } catch (err) { setError(err instanceof Error ? err.message : "Artikel gagal disimpan."); }
     finally { setSaving(false); }
   };
@@ -81,6 +122,7 @@ const addTag = () => {
     <AdminField label="Tag" hint="Tekan Enter untuk menambahkan tag, maksimal 12."><div className="flex gap-2"><input className={adminInputClass} value={tagInput} maxLength={200} onChange={(event) => setTagInput(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); addTag(); } }} /><button type="button" onClick={addTag} className={adminBtnSecondary}>Tambah</button></div><div className="mt-2 flex flex-wrap gap-2">{form.tags.map((tag) => <button type="button" key={tag} onClick={() => set("tags", form.tags.filter((item) => item !== tag))} className="rounded-md bg-surface-container px-2 py-1 text-label-sm">#{tag} ×</button>)}</div></AdminField>
     <PhotoUpload value={form.coverImageUrl ?? ""} onChange={(url) => set("coverImageUrl", url || null)} label="Gambar sampul (opsional)" />
     {error ? <p role="alert" className="rounded-xl bg-error-container px-4 py-3 text-label-bold text-on-error-container">{error}</p> : null}
+    <SaveStatus state={saveState} />
     <div className="flex flex-wrap justify-end gap-2 border-t border-outline-variant/50 pt-4"><button type="button" disabled={saving} onClick={() => save("draft")} className={adminBtnSecondary}>Simpan draf</button><button type="button" disabled={saving} onClick={() => save("published")} className={adminBtnPrimary}>{saving ? "Menyimpan..." : "Terbitkan"}</button></div>
   </div>;
 }
