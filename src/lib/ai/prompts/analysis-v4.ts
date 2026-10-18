@@ -49,8 +49,9 @@ ${DELIM.SECTION}
    - 50-69: C
    - 0-49: D
    Tidak boleh menebak angka lain, dan tidak boleh memberi grade di luar A/B/C/D.
-6. source_excerpt yang tidak null WAJIB substring PERSIS (verbatim, termasuk typo)
-   dari {{CV_TEXT}}, maksimal 15 kata. Tidak yakin → null, jangan menebak.
+6. source_excerpt pada risk_factors, strengths, dan issues: yang tidak null WAJIB
+   substring PERSIS (verbatim, termasuk typo) dari {{CV_TEXT}}, maksimal 15 kata.
+   Tidak yakin → null, jangan menebak.
 7. bullet_review maksimal {{BULLET_MAX}} item. Pilih yang PALING BERDAMPAK, bukan
    sekadar prioritas High: prioritasnya adalah (a) bullet dengan CARI terendah /
    potensi perbaikan terbesar, (b) relevan dengan JD / role target, (c) mewakili
@@ -241,7 +242,7 @@ ${DELIM.SECTION}
     "result": "Likely Pass" | "Borderline" | "Likely Fail",
     "match_confidence": number,
     "risk_factors": [{ "text": string, "severity": "critical" | "high" | "medium" | "low", "source_excerpt": string | null }],
-    "strengths": string[]
+    "strengths": [{ "text": string, "source_excerpt": string | null }]
   },
   "breakdown": {
     "summary":    { "score": 0-100, "issues": [{ "text": string, "severity": "critical"|"high"|"medium"|"low", "source_excerpt": string|null }], "suggestions": string[] },
@@ -310,7 +311,7 @@ ${DELIM.SECTION}
       { "text": "TypeScript tidak ada, muncul 6x di JD sebagai hard requirement", "severity": "critical", "source_excerpt": "JavaScript, React, CSS" },
       { "text": "Terindikasi tabel di section Pendidikan, reading order bisa rusak", "severity": "high", "source_excerpt": null }
     ],
-    "strengths": ["Career velocity positif: Junior → Mid dalam 2 tahun", "React + Node.js relevan dengan stack JD"]
+    "strengths": [ { "text": "Career velocity positif: Junior → Mid dalam 2 tahun", "source_excerpt": null }, { "text": "React + Node.js relevan dengan stack JD", "source_excerpt": "Membangun fitur login menggunakan React dan Node.js" } ]
   },
   "breakdown": {
     "summary": { "score": 55, "issues": [{ "text": "Summary tidak menyebut TypeScript, keyword kritis JD", "severity": "high", "source_excerpt": "Frontend Developer dengan 4 tahun pengalaman" }], "suggestions": ["Tambahkan TypeScript di kalimat pertama"] },
