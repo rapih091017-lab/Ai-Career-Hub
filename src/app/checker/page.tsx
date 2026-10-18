@@ -850,7 +850,10 @@ export default function CheckerPage() {
         {/* ============================================================ */}
         {/*  2. PER-SECTION BREAKDOWN                                     */}
         {/* ============================================================ */}
-        {breakdown && (
+        {/* Penjaga sama persis dengan /checker/[id]: kartu hanya dirender
+            untuk section yang benar-benar ada, supaya hasil segar dan hasil
+            tersimpan terbaca identik — termasuk saat breakdown kosong total. */}
+        {breakdown && Object.keys(breakdown).length > 0 && (
           <motion.section
             className="space-y-3"
             initial={{ opacity: 0, y: 20 }}
@@ -858,11 +861,23 @@ export default function CheckerPage() {
             transition={{ duration: 0.4, delay: 0.15 }}
           >
             <h2 className="text-xl font-bold text-on-surface px-1">{t("checker.sec-title")}</h2>
-            <SectionScoreCard title={t("checker.sec-summary")} score={breakdown.summary.score} issues={breakdown.summary.issues} suggestions={breakdown.summary.suggestions} delay={0.2} />
-            <SectionScoreCard title={t("checker.sec-experience")} score={breakdown.experience.score} issues={breakdown.experience.issues} suggestions={breakdown.experience.suggestions} delay={0.25} statChip={quantChip} />
-            <SectionScoreCard title={t("checker.sec-skills")} score={breakdown.skills.score} issues={(breakdown.skills as SkillsSection).missing_skills} suggestions={(breakdown.skills as SkillsSection).recommendations} delay={0.3} />
-            <SectionScoreCard title={t("checker.sec-education")} score={breakdown.education.score} issues={[breakdown.education.relevance]} suggestions={breakdown.education.suggestions} delay={0.35} />
-            <SectionScoreCard title={t("checker.sec-format")} score={breakdown.format_ats.score} issues={breakdown.format_ats.issues} suggestions={breakdown.format_ats.tips} delay={0.4} />
+            {breakdown.summary && (
+              <SectionScoreCard title={t("checker.sec-summary")} score={breakdown.summary.score} issues={breakdown.summary.issues} suggestions={breakdown.summary.suggestions} delay={0.2} />
+            )}
+            {breakdown.experience && (
+              <SectionScoreCard title={t("checker.sec-experience")} score={breakdown.experience.score} issues={breakdown.experience.issues} suggestions={breakdown.experience.suggestions} delay={0.25} statChip={quantChip} />
+            )}
+            {breakdown.skills && (
+              <SectionScoreCard title={t("checker.sec-skills")} score={breakdown.skills.score} issues={(breakdown.skills as SkillsSection).missing_skills} suggestions={(breakdown.skills as SkillsSection).recommendations} delay={0.3} />
+            )}
+            {breakdown.education && (
+              // relevance bisa kosong di baris lama; tanpa penjaga, SectionScoreCard
+              // menampilkan bullet ISSUES tanpa teks apa pun.
+              <SectionScoreCard title={t("checker.sec-education")} score={breakdown.education.score} issues={breakdown.education.relevance ? [breakdown.education.relevance] : []} suggestions={breakdown.education.suggestions} delay={0.35} />
+            )}
+            {breakdown.format_ats && (
+              <SectionScoreCard title={t("checker.sec-format")} score={breakdown.format_ats.score} issues={breakdown.format_ats.issues} suggestions={breakdown.format_ats.tips} delay={0.4} />
+            )}
           </motion.section>
         )}
 
