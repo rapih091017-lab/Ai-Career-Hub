@@ -113,13 +113,17 @@ export function splitCvJd(data: string): { cv: string; jd: string } {
   // Marker ikut dibuang, konsisten dengan perilaku sebelum refactor ini.
   const jdText = sanitizeText(cut === -1 ? "" : data.slice(cut + marker.length).trim());
 
-  // Buang penanda dan baris kategori posisi, supaya yang masuk ke {{CV_TEXT}}
-  // benar-benar isi CV saja.
-  const cvOnly = cvText
-    .replace(/^=== ROLE CATEGORY:[^\n]*\n+/, "")
-    .split(PROMPT_MARKERS.cv)
-    .pop()!
-    .trim();
+  // Buang baris kategori posisi supaya yang masuk ke {{CV_TEXT}} benar-benar
+  // isi CV saja.
+  let body = cvText.replace(/^=== ROLE CATEGORY:[^\n]*\n+/, "");
+  // Penanda CV hanya dibuang kalau dia benar-benar header blok, yaitu berada
+  // di baris paling awal. Kandidat yang menyalin prompt lama ke kolom CV punya
+  // penanda yang sama di tengah teksnya; memotong dari penanda terakhir akan
+  // membuang isi CV tanpa jejak, jadi teks setelah header dibiarkan utuh.
+  if (body.startsWith(PROMPT_MARKERS.cv)) {
+    body = body.slice(PROMPT_MARKERS.cv.length);
+  }
+  const cvOnly = body.trim();
 
   return { cv: cvOnly, jd: jdText };
 }

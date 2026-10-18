@@ -65,4 +65,43 @@ describe("pemisahan CV dan JD di prompt", () => {
     expect(cv).toBe("hanya teks bebas");
     expect(jd).toBe("");
   });
+
+  it("CV yang memuat penanda di tengah teks tidak ikut terpotong", () => {
+    // Kandidat sering menyalin prompt sebelumnya ke kolom CV. Penanda yang
+    // muncul di tengah teksnya bukan header blok, jadi seluruh isi CV
+    // termasuk bagian sebelum penanda itu harus tetap masuk.
+    const data = [
+      "=== ROLE CATEGORY: tech ===",
+      "",
+      PROMPT_MARKERS.cv,
+      "Riwayat: pernah pakai prompt lama",
+      PROMPT_MARKERS.cv,
+      "Python, SQL, 3 tahun",
+      "",
+      PROMPT_MARKERS.jd,
+      "Butuh AWS",
+    ].join("\n");
+    const { cv, jd } = splitCvJd(data);
+    expect(cv).toBe(
+      ["Riwayat: pernah pakai prompt lama", PROMPT_MARKERS.cv, "Python, SQL, 3 tahun"].join("\n"),
+    );
+    expect(jd).toBe("Butuh AWS");
+  });
+
+  it("penanda JD yang muncul paling awal dipakai sebagai batas", () => {
+    const legacyFirst = ["Python, SQL", "", "=== JOB DESCRIPTION ===", "Butuh GCP", "", PROMPT_MARKERS.jd, "Butuh AWS"].join("\n");
+    expect(splitCvJd(legacyFirst).jd).toBe(["Butuh GCP", "", PROMPT_MARKERS.jd, "Butuh AWS"].join("\n"));
+
+    const currentFirst = ["Python, SQL", "", PROMPT_MARKERS.jd, "Butuh AWS", "", "=== JOB DESCRIPTION ===", "Butuh GCP"].join("\n");
+    expect(splitCvJd(currentFirst).jd).toBe(["Butuh AWS", "", "=== JOB DESCRIPTION ===", "Butuh GCP"].join("\n"));
+
+    // Yang diuji di sini adalah batas potongnya: isi CV tetap utuh di kedua
+    // urutan, jadi penanda yang lain tidak ikut terpotong.
+    expect(splitCvJd(legacyFirst).cv).toBe("Python, SQL");
+    expect(splitCvJd(currentFirst).cv).toBe("Python, SQL");
+  });
+
+  it("data kosong menghasilkan kedua bagian kosong", () => {
+    expect(splitCvJd("")).toEqual({ cv: "", jd: "" });
+  });
 });
