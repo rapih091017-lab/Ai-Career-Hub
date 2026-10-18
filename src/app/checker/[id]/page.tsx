@@ -14,6 +14,7 @@ import { scoreColor, gradeColor, atsBadgeColor, type AnalysisResult, type Experi
 import MagneticButton from "@/components/MagneticButton";
 import Link from "next/link";
 import { useTranslation } from "@/lib/i18n";
+import { analysisFromFullResult } from "@/lib/checker/analysis-from-full-result";
 
 function timeAgo(date: Date, t: (key: string) => string): string {
   const now = new Date();
@@ -59,35 +60,13 @@ export default function CheckerDetailPage() {
         setFullResult(full);
         setCreatedAt(data.createdAt);
 
-        const scores = data.scores;
-        const aiFeedback = data.aiFeedback;
-
-        setResult({
-          id: data.id,
-          scores: {
-            overall: scores?.overall ?? 0,
-            keywordGap: scores?.keywordGap ?? 0,
-            contextRelevance: scores?.contextRelevance ?? 0,
-            atsRules: scores?.atsRules ?? 0,
-          },
-          aiFeedback: {
-            keywordGap: aiFeedback?.keywordGap ?? "",
-            contextRelevance: aiFeedback?.contextRelevance ?? "",
-            atsRules: aiFeedback?.atsRules ?? "",
-            summary: aiFeedback?.summary ?? "",
-          },
-          summary: aiFeedback?.summary ?? "",
-          grade: (full?.grade as any) ?? null,
-          atsPrediction: (full?.atsPrediction as any) ?? null,
-          fitLabel: (full?.breakdown as any)?.overall ? ("Good" as const) : undefined,
-          breakdown: (full?.breakdown as any) ?? null,
-          keywordAnalysis: (full?.keywordAnalysis as any) ?? null,
-          narrativeFeedback: (full?.narrativeFeedback as any) ?? null,
-          actionPlan: (full?.actionPlan as any) ?? null,
-          bulletReview: (full?.bulletReview as any) ?? [],
-          missingSections: (full?.missingSections as any) ?? [],
-          impactForecast: (full?.impactForecast as any) ?? null,
-        });
+        setResult(
+          analysisFromFullResult(data.id, {
+            scores: data.scores,
+            aiFeedback: data.aiFeedback,
+            fullResult: data.fullResult,
+          }),
+        );
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));

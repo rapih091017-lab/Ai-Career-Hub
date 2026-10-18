@@ -282,6 +282,8 @@ message: t(
     breakdown: aiAnalysis?.breakdown ?? null,
     keywordAnalysis: aiAnalysis?.keyword_analysis ?? null,
     narrativeFeedback: aiAnalysis?.narrative_feedback ?? null,
+    // meta belum pernah diteruskan; detected_seniority di dalamnya dibutuhkan panel sisi HR.
+    meta: aiAnalysis?.meta ?? null,
     careerVelocity: aiAnalysis?.career_velocity ?? null,
     actionPlan: aiAnalysis?.action_plan ?? null,
     bulletReview: aiAnalysis?.bullet_review ?? [],

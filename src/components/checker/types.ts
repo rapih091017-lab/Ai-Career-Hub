@@ -178,6 +178,34 @@ export interface AnalysisResult {
   impactForecast?: ImpactForecast | null;
   /** Model AI yang dipakai analisis: "V4 Pro" (deepseek-v4-pro, premium) atau "V4 Flash" (deepseek-v4-flash) */
   aiModel?: "V4 Pro" | "V4 Flash";
+  /** Konteks yang dikembalikan AI, dipakai panel sisi HR */
+  meta?: {
+    role_category?: string;
+    detected_seniority?: "entry" | "mid" | "senior" | "lead";
+    cv_word_count?: number;
+    jd_present?: boolean;
+    analysis_confidence?: number;
+  } | null;
+  /** Bacaan lintasan karier; belum ditampilkan sebelum panel sisi HR */
+  careerVelocity?: {
+    time_in_role_analysis?: string;
+    title_progression?: "Strong Upward" | "Upward" | "Stable" | "Sideways" | "Declining";
+    responsibility_arc?: string;
+    growth_rate?: "Fast" | "Normal" | "Slow";
+    red_flags?: string[];
+    recommendations?: string[];
+  } | null;
+  /** Detail prediksi ATS: risk factor dan strength lengkap dengan kutipan CV */
+  atsPredictionDetail?: {
+    result?: "Likely Pass" | "Borderline" | "Likely Fail";
+    match_confidence?: number;
+    risk_factors?: {
+      text: string;
+      severity?: "critical" | "high" | "medium" | "low";
+      source_excerpt?: string | null;
+    }[];
+    strengths?: (string | { text: string; source_excerpt?: string | null })[];
+  } | null;
 }
 
 /* ── Helpers ── */
