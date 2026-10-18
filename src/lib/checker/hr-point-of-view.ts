@@ -38,12 +38,35 @@ function oneOf<T extends string>(value: unknown, allowed: T[]): T | null {
 }
 
 /**
+ * Ubah butir narrative_feedback jadi temuan panel.
+ *
+ * narrative_feedback berbentuk string polos: tidak ada severity dan tidak ada
+ * kutipan, jadi keduanya null — panel tetap bisa merender tanpa berpura-pura
+ * ada bukti verbatim yang memang tidak dikirim model.
+ */
+function fromNarrative(list: unknown): HrFinding[] {
+  if (!Array.isArray(list)) return [];
+  return list
+    .map((item): HrFinding | null => {
+      const text = clean(item);
+      return text ? { text, severity: null, quote: null } : null;
+    })
+    .filter((item): item is HrFinding => item !== null);
+}
+
+/**
  * Rakit pandangan sisi HR dari data yang sudah dikembalikan AI.
  *
  * Tidak memanggil AI dan tidak menyentuh jaringan: ini hanya menata data yang
  * sudah ada supaya komponen tidak perlu bercabang pada berbagai bentuk data.
  * `risk_factors` dan `strengths` datang dalam dua bentuk — string biasa atau
  * objek dengan source_excerpt — dan keduanya dinormalisasi di sini.
+ *
+ * narrative_feedback bukan duplikat ats_prediction: prompt bahkan punya contoh
+ * yang menulis kelemahan hanya ke areas_for_improvement. Karena itu daftar
+ * narrative dipakai sebagai cadangan tiap sisi yang kosong di ats_prediction —
+ * bukan digabung — supaya kutipan asli tetap menang saat tersedia dan tidak
+ * muncul duplikat.
  *
  * Ketat pada data: kolom jsonb diteruskan apa adanya tanpa validasi, jadi
  * entri bukan array, nilai enum asing, dan string kosong semuanya dibuang
@@ -81,12 +104,21 @@ export function buildHrPointOfView(result: AnalysisResult | null | undefined): H
     })
     .filter((item): item is HrFinding => item !== null);
 
+  // Sisi yang kosong di ats_prediction dibaca dari narrative_feedback. Banyak
+  // CV hanya punya kelemahan di areas_for_improvement, jadi tanpa cadangan ini
+  // datanya tersimpan di database tapi tidak pernah terlihat pengguna.
+  const stoppingFinal = stopping.length > 0 ? stopping : fromNarrative(result?.narrativeFeedback?.areas_for_improvement);
+  const continuingFinal = continuing.length > 0 ? continuing : fromNarrative(result?.narrativeFeedback?.strengths);
+
   return {
     seniority: oneOf(meta?.detected_seniority, SENIORITIES),
-    stopping,
-    continuing,
+    stopping: stoppingFinal,
+    continuing: continuingFinal,
     progression: oneOf(velocity?.title_progression, PROGRESSIONS),
     growthRate: oneOf(velocity?.growth_rate, GROWTH_RATES),
-    isEmpty: stopping.length === 0 && continuing.length === 0,
+    // isEmpty dihitung dari hasil akhir: panel yang terisi lewat cadangan
+    // bukan panel kosong, dan pemanggil tidak boleh menampilkan status jujur
+    // yang menyesatkan.
+    isEmpty: stoppingFinal.length === 0 && continuingFinal.length === 0,
   };
 }

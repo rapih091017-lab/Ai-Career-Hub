@@ -129,6 +129,155 @@ describe("pandangan sisi HR dari data analisis", () => {
     }
   });
 
+  it("sisi yang tidak ada di ats_prediction dipakai dari narrative_feedback", () => {
+    // Dua kolom narrative_feedback ini bukan duplikat dari risk_factors:
+    // bentuknya string polos tanpa severity dan tanpa kutipan, dan beberapa CV
+    // hanya punya kelemahan di sana. Kalau tidak jadi sumber cadangan, isinya
+    // tidak pernah sampai ke layar.
+    const view = buildHrPointOfView({
+      atsPredictionDetail: { risk_factors: [], strengths: [] },
+      narrativeFeedback: {
+        strengths: ["Growth positif", "Stack relevan"],
+        areas_for_improvement: ["Kuantifikasi rendah"],
+      },
+    } as any);
+
+    expect(view.stopping).toEqual([{ text: "Kuantifikasi rendah", severity: null, quote: null }]);
+    expect(view.continuing).toEqual([
+      { text: "Growth positif", severity: null, quote: null },
+      { text: "Stack relevan", severity: null, quote: null },
+    ]);
+    expect(view.isEmpty).toBe(false);
+  });
+
+  it("fallback dipakai hanya di sisi yang kosong", () => {
+    // Sisi berhenti sudah punya kutipan asli, jadi narrative_feedback tidak
+    // boleh menambah duplikat di dalamnya. Sisi lanjut kosong, jadi boleh pakai
+    // cadangan.
+    const view = buildHrPointOfView({
+      atsPredictionDetail: {
+        risk_factors: [{ text: "TypeScript tidak ada", severity: "critical", source_excerpt: "JavaScript, React" }],
+        strengths: [],
+      },
+      narrativeFeedback: {
+        strengths: ["Growth positif"],
+        areas_for_improvement: ["Kuantifikasi rendah"],
+      },
+    } as any);
+
+    expect(view.stopping).toEqual([
+      { text: "TypeScript tidak ada", severity: "critical", quote: "JavaScript, React" },
+    ]);
+    expect(view.continuing).toEqual([{ text: "Growth positif", severity: null, quote: null }]);
+  });
+
+  it("risk_factors kosong jatuh ke narrative, strengths tetap pakai ats", () => {
+    // Kebalikan dari tes sebelumnya: sisi berhenti yang kosong harus jatuh ke
+    // narrative, sisi lanjut yang sudah terisi ats tidak boleh ikut terbawa.
+    const view = buildHrPointOfView({
+      atsPredictionDetail: {
+        risk_factors: [],
+        strengths: [{ text: "Stack relevan", source_excerpt: "React, TypeScript" }],
+      },
+      narrativeFeedback: {
+        strengths: ["Growth positif"],
+        areas_for_improvement: ["Kuantifikasi rendah"],
+      },
+    } as any);
+
+    expect(view.stopping).toEqual([{ text: "Kuantifikasi rendah", severity: null, quote: null }]);
+    expect(view.continuing).toEqual([
+      { text: "Stack relevan", severity: null, quote: "React, TypeScript" },
+    ]);
+  });
+
+  it("narrative kosong tidak menggantikan data ats yang sudah ada", () => {
+    const view = buildHrPointOfView({
+      atsPredictionDetail: {
+        risk_factors: [{ text: "TypeScript tidak ada", severity: "critical", source_excerpt: "JavaScript, React" }],
+        strengths: [{ text: "Metrik dampak jelas", source_excerpt: "Konversi naik 30%" }],
+      },
+      narrativeFeedback: { strengths: [], areas_for_improvement: [] },
+    } as any);
+
+    expect(view.stopping).toEqual([
+      { text: "TypeScript tidak ada", severity: "critical", quote: "JavaScript, React" },
+    ]);
+    expect(view.continuing).toEqual([
+      { text: "Metrik dampak jelas", severity: null, quote: "Konversi naik 30%" },
+    ]);
+  });
+
+  it("daftar ats non-kosong membuat narrative diabaikan sepenuhnya", () => {
+    const view = buildHrPointOfView({
+      atsPredictionDetail: {
+        risk_factors: [{ text: "Tabel pengalaman padat", severity: "medium", source_excerpt: "2019 – 2024" }],
+        strengths: [{ text: "Portofolio kuat", source_excerpt: "github.com/contoh" }],
+      },
+      narrativeFeedback: {
+        strengths: ["Growth positif"],
+        areas_for_improvement: ["Kuantifikasi rendah"],
+      },
+    } as any);
+
+    expect(view.stopping).toEqual([
+      { text: "Tabel pengalaman padat", severity: "medium", quote: "2019 – 2024" },
+    ]);
+    expect(view.continuing).toEqual([
+      { text: "Portofolio kuat", severity: null, quote: "github.com/contoh" },
+    ]);
+  });
+
+  it("ats_prediction sama sekali tidak ada, fallback tetap dipakai", () => {
+    const view = buildHrPointOfView({
+      narrativeFeedback: {
+        strengths: ["Stack relevan"],
+        areas_for_improvement: ["Kuantifikasi rendah"],
+      },
+    } as any);
+
+    expect(view.stopping).toHaveLength(1);
+    expect(view.continuing).toHaveLength(1);
+    expect(view.isEmpty).toBe(false);
+  });
+
+  it("cadangan yang isinya bukan teks tidak jadi baris kosong", () => {
+    const view = buildHrPointOfView({
+      atsPredictionDetail: { risk_factors: [], strengths: [] },
+      narrativeFeedback: {
+        strengths: ["  ", null, 7, "Stack relevan"],
+        areas_for_improvement: [{}, "Kuantifikasi rendah"],
+      },
+    } as any);
+
+    expect(view.stopping).toEqual([{ text: "Kuantifikasi rendah", severity: null, quote: null }]);
+    expect(view.continuing).toEqual([{ text: "Stack relevan", severity: null, quote: null }]);
+  });
+
+  it("keempat daftar kosong berarti panel kosong", () => {
+    const view = buildHrPointOfView({
+      atsPredictionDetail: { risk_factors: [], strengths: [] },
+      narrativeFeedback: { strengths: [], areas_for_improvement: [] },
+    } as any);
+
+    expect(view.isEmpty).toBe(true);
+    expect(view.stopping).toEqual([]);
+    expect(view.continuing).toEqual([]);
+  });
+
+  it("narrative_feedback null tidak menggagalkan sisi yang sudah ada", () => {
+    const view = buildHrPointOfView({
+      atsPredictionDetail: {
+        risk_factors: [{ text: "Ada tabel", severity: "high", source_excerpt: null }],
+        strengths: [],
+      },
+      narrativeFeedback: null,
+    } as any);
+
+    expect(view.stopping).toHaveLength(1);
+    expect(view.continuing).toEqual([]);
+  });
+
   it("butir tanpa teks diabaikan", () => {
     const view = buildHrPointOfView({
       atsPredictionDetail: {
