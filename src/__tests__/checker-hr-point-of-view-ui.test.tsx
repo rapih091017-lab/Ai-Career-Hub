@@ -158,6 +158,46 @@ describe("panel Sisi HR", () => {
     expect(pace).not.toHaveTextContent("Arah karier");
   });
 
+  it("meta null tidak mengarang baris level", () => {
+    renderPanel(parsedResult({ meta: null }));
+    expect(screen.queryByText(/dibaca sebagai level/i)).not.toBeInTheDocument();
+  });
+
+  it("meta tanpa seniority tidak mengarang baris level", () => {
+    renderPanel(parsedResult({ meta: { cv_word_count: 300 } }));
+    expect(screen.queryByText(/dibaca sebagai level/i)).not.toBeInTheDocument();
+  });
+
+  it("career_velocity tanpa arah dan laju tidak mengarang baris", () => {
+    renderPanel(
+      parsedResult({
+        career_velocity: {
+          time_in_role_analysis: "2 tahun di role yang sama",
+          responsibility_arc: "Eksekusi task → ownership fitur",
+          recommendations: [],
+        },
+      }),
+    );
+    expect(screen.queryByText(/arah karier/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/laju karier/i)).not.toBeInTheDocument();
+  });
+
+  it("hanya laju yang dikirim AI lewat schema, arahnya tidak ikut dikarang", () => {
+    renderPanel(
+      parsedResult({
+        career_velocity: {
+          time_in_role_analysis: "2 tahun di role yang sama",
+          responsibility_arc: "Eksekusi task → ownership fitur",
+          growth_rate: "Slow",
+          recommendations: [],
+        },
+      }),
+    );
+    const pace = screen.getByText(/laju karier/i);
+    expect(pace).toHaveTextContent("Laju karier: pelan");
+    expect(screen.queryByText(/arah karier/i)).not.toBeInTheDocument();
+  });
+
   it("pakai prefix kunci halaman hasil tersimpan", () => {
     // Kalau kunci `checker.detail.*` belum ada, t() mengembalikan kunci mentah
     // dan kalimat panel ini akan hilang.

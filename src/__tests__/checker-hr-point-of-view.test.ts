@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildHrPointOfView } from "@/lib/checker/hr-point-of-view";
+import { AnalysisResultSchema } from "@/lib/ai/prompts/schemas";
 
 describe("pandangan sisi HR dari data analisis", () => {
   it("temuan berhenti dibaca membawa severity dan kutipan", () => {
@@ -289,5 +290,31 @@ describe("pandangan sisi HR dari data analisis", () => {
     expect(view.stopping).toEqual([]);
     expect(view.continuing).toEqual([]);
     expect(view.isEmpty).toBe(true);
+  });
+
+  it("buildHrPointOfView menolak default schema yang bukan datang dari AI", () => {
+    // "mid", "Stable", dan "Normal" memang lolos allowlist di sini karena ketiga
+    // nilai itu sah saat benar-benar dikirim model. Yang jadi masalah: schema
+    // dulu menyuntik ketiganya lewat .catch(), jadi output parse selalu
+    // memaksa baris level dan arah tampil walau model tidak pernah mengirimnya.
+    // Tes ini menjembatani schema → panel: kalau schema kembali menyuntik
+    // default, ketiga assertion di bawah gugur.
+    const parsed = AnalysisResultSchema.parse({
+      meta: { role_category: "tech", cv_word_count: 380, jd_present: true, analysis_confidence: 75 },
+      career_velocity: {
+        time_in_role_analysis: "2 tahun di role yang sama",
+        responsibility_arc: "Eksekusi task → ownership fitur",
+        recommendations: ["Ambil proyek leadership"],
+      },
+    });
+
+    const view = buildHrPointOfView({
+      meta: parsed.meta,
+      careerVelocity: parsed.career_velocity,
+    } as any);
+
+    expect(view.seniority).toBeNull();
+    expect(view.progression).toBeNull();
+    expect(view.growthRate).toBeNull();
   });
 });

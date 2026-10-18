@@ -187,6 +187,30 @@ describe("AnalysisResultSchema", () => {
     expect(texts).toEqual(["React solid", "Metrik jelas"]);
   });
 
+  it("field yang tidak dikirim AI tidak diisi default schema", () => {
+    // Tiga field ini dulu punya .catch(): model yang tidak mengirimnya tetap
+    // menghasilkan "mid"/"Stable"/"Normal", lalu panel menampilkan nilai buatan
+    // itu sebagai bacaan soal kandidat. Yang tidak dikirim harus tetap kosong.
+    const parsed = AnalysisResultSchema.parse({
+      ...MINIMAL_ANALYSIS,
+      meta: { cv_word_count: 300 },
+      career_velocity: {
+        time_in_role_analysis: "2 tahun di role yang sama",
+        responsibility_arc: "Eksekusi task → ownership fitur",
+        recommendations: ["Ambil proyek leadership"],
+      },
+    });
+    expect(parsed.meta?.detected_seniority).toBeUndefined();
+    expect(parsed.career_velocity?.title_progression).toBeUndefined();
+    expect(parsed.career_velocity?.growth_rate).toBeUndefined();
+  });
+
+  it("meta null tidak menghidupkan kembali default level", () => {
+    // meta null dulu jatuh ke .catch() objek yang ikut menyuntik "mid".
+    const parsed = AnalysisResultSchema.parse({ ...MINIMAL_ANALYSIS, meta: null });
+    expect(parsed.meta?.detected_seniority).toBeUndefined();
+  });
+
 });
 
 describe("RevisionResultSchema", () => {

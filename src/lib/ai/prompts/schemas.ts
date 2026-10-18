@@ -67,13 +67,15 @@ export const AnalysisResultSchema = z.object({
   // ── Meta (v4), konteks analisis untuk kalibrasi & debugging ──
   meta: z.object({
     role_category: z.enum(ROLE_CATEGORIES).catch("general"),
-    detected_seniority: z.enum(["entry", "mid", "senior", "lead"]).catch("mid"),
+    // .optional() tanpa .catch(): level yang tidak dikirim model harus tetap
+    // kosong sampai ke panel, bukan jadi "mid" yang lalu tampil sebagai bacaan
+    // soal kandidat. catch "mid" juga dilarang di .catch() objek di bawah.
+    detected_seniority: z.enum(["entry", "mid", "senior", "lead"]).optional(),
     cv_word_count: z.number().int().min(0).catch(0),
     jd_present: z.boolean().catch(false),
     analysis_confidence: z.number().int().min(0).max(100).catch(60),
   }).catch({
     role_category: "general",
-    detected_seniority: "mid",
     cv_word_count: 0,
     jd_present: false,
     analysis_confidence: 60,
@@ -128,16 +130,18 @@ export const AnalysisResultSchema = z.object({
   // ── Career velocity analysis (v3 new) ──
   career_velocity: z.object({
     time_in_role_analysis: StringField(),
-    title_progression: z.enum(["Strong Upward", "Upward", "Stable", "Sideways", "Declining"]).catch("Stable"),
+    // Kedua field ini .optional() tanpa .catch(): arah dan laju yang tidak
+    // dikirim model harus hilang dari panel, bukan tampil sebagai
+    // "Stable"/"Normal" buatan. catch nilai itu juga dilarang di .catch()
+    // objek di bawah.
+    title_progression: z.enum(["Strong Upward", "Upward", "Stable", "Sideways", "Declining"]).optional(),
     responsibility_arc: StringField(),
-    growth_rate: z.enum(["Fast", "Normal", "Slow"]).catch("Normal"),
+    growth_rate: z.enum(["Fast", "Normal", "Slow"]).optional(),
     red_flags: StringArr().optional(),
     recommendations: StringArr(),
   }).catch({
     time_in_role_analysis: "",
-    title_progression: "Stable",
     responsibility_arc: "",
-    growth_rate: "Normal",
     recommendations: [],
   }).optional(),
 
