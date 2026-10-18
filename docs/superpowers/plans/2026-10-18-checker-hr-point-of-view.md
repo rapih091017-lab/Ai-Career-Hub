@@ -50,7 +50,9 @@
 
 **Interfaces:**
 - Consumes: tidak ada
-- Produces: `PROMPT_MARKERS: { cv: string; jd: string }` dari `@/lib/ai/prompts/shared`
+- Produces:
+  - `PROMPT_MARKERS: { cv: string; jd: string }` dari `@/lib/ai/prompts/shared`
+  - `splitCvJd(data: string): { cv: string; jd: string }` diekspor dari `@/lib/ai/adapter` supaya perilaku pemisahan bisa diuji langsung, bukan diuji lewat salinan logika di dalam test
 
 **Konteks.** `adapter.ts:96` mencari penanda `"=== JOB DESCRIPTION ==="`, sementara route menulis `"=== JOB DESCRIPTION TARGET ==="`. Karena `indexOf` mengembalikan `-1`, `{{CV_TEXT}}` diisi seluruh user prompt (termasuk isi JD) dan `{{JD_TEXT}}` kosong — padahal `analysis-v4.ts:344` minta keduanya terpisah.
 
@@ -64,6 +66,7 @@ Buat `src/__tests__/ai-prompt-markers.test.ts`:
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { PROMPT_MARKERS } from "@/lib/ai/prompts/shared";
+import { splitCvJd } from "@/lib/ai/adapter";
 
 describe("penanda blok CV dan JD", () => {
   it("adapter dan route memakai penanda yang sama", () => {
@@ -117,9 +120,16 @@ export const PROMPT_MARKERS = {
 Ganti blok `injectInputData` (sekitar baris 94-107) dengan:
 
 ```ts
-function injectInputData(prompt: string, data: string): string {
-  // Both markers are accepted so prompts written before this constant existed
-  // keep working; the correct one is whichever appears first in the data.
+/**
+ * Pisahkan CV dari deskripsi lowongan di user prompt.
+ *
+ * Dua penanda diterima supaya prompt yang ditulis sebelum konstanta ini ada
+ * tetap jalan. Yang dipakai adalah penanda yang muncul lebih dulu.
+ *
+ * Diekspor supaya pemisahan ini bisa diuji langsung, bukan lewat salinan
+ * logika di dalam file test.
+ */
+export function splitCvJd(data: string): { cv: string; jd: string } {
   const jdIndex = data.indexOf(PROMPT_MARKERS.jd);
   const legacyJdIndex = data.indexOf("=== JOB DESCRIPTION ===");
   const cut =
@@ -128,10 +138,24 @@ function injectInputData(prompt: string, data: string): string {
   const cvText = sanitizeText(cut === -1 ? data : data.slice(0, cut).trim());
   const jdText = sanitizeText(cut === -1 ? "" : data.slice(cut).trim());
 
+  // Buang penanda dan baris kategori posisi, supaya yang masuk ke {{CV_TEXT}}
+  // benar-benar isi CV saja.
+  const cvOnly = cvText
+    .replace(/^=== ROLE CATEGORY:[^\\n]*\\n+/, "")
+    .split(PROMPT_MARKERS.cv)
+    .pop()!
+    .trim();
+
+  return { cv: cvOnly, jd: jdText };
+}
+
+function injectInputData(prompt: string, data: string): string {
+  const { cv, jd } = splitCvJd(data);
+
   return prompt
     .replace("{{INPUT_DATA}}", data)
-    .replace("{{CV_TEXT}}", cvText)
-    .replace("{{JD_TEXT}}", jdText)
+    .replace("{{CV_TEXT}}", cv)
+    .replace("{{JD_TEXT}}", jd)
     .replace("{{PROFILE_DATA}}", data);
 }
 ```
@@ -162,19 +186,8 @@ Tambahkan ke `src/__tests__/ai-prompt-markers.test.ts`:
 
 ```ts
 describe("pemisahan CV dan JD di prompt", () => {
-  // Fungsi internal adapter tidak diekspor, jadiDecode logikanya di sini
-  // supaya kontrak yang diuji jelas: JD tidak boleh ikut masuk {{CV_TEXT}}.
-  function splitCvJd(data: string) {
-    const jdIndex = data.indexOf(PROMPT_MARKERS.jd);
-    return {
-      cv: (jdIndex === -1 ? data : data.slice(0, jdIndex).trim()).replace(
-        new RegExp(`^=== ROLE CATEGORY:[^\\n]*\\n\\n${PROMPT_MARKERS.cv}\\n`),
-        "",
-      ),
-      jd: jdIndex === -1 ? "" : data.slice(jdIndex + PROMPT_MARKERS.jd.length).trim(),
-    };
-  }
-
+  // Menguji kode asli, bukan salinan logika di dalam test. Kalau logikanya
+  // dicopy ke sini, testnya tetap hijau walau fungsi aslinya rusak.
   it("deskripsi lowongan tidak ikut masuk ke bagian CV", () => {
     const data = [
       "=== ROLE CATEGORY: tech ===",
@@ -189,13 +202,26 @@ describe("pemisahan CV dan JD di prompt", () => {
     expect(cv).toBe("Python, SQL, 3 tahun");
     expect(jd).toBe("Butuh engineer yang paham AWS");
   });
+
+  it("prompt lama dengan penanda lawas tetap terpisah", () => {
+    const data = ["Python, SQL", "", "=== JOB DESCRIPTION ===", "Butuh AWS"].join("\n");
+    const { cv, jd } = splitCvJd(data);
+    expect(cv).toBe("Python, SQL");
+    expect(jd).toBe("Butuh AWS");
+  });
+
+  it("data tanpa penanda apa pun tidak dihapus", () => {
+    const { cv, jd } = splitCvJd("hanya teks bebas");
+    expect(cv).toBe("hanya teks bebas");
+    expect(jd).toBe("");
+  });
 });
 ```
 
 - [ ] **Step 7: Jalankan test**
 
 Run: `npx vitest run src/__tests__/ai-prompt-markers.test.ts --reporter=dot`
-Expected: PASS (5 test).
+Expected: PASS (7 test).
 
 - [ ] **Step 8: Typecheck dan jalankan suite penuh**
 
@@ -1055,7 +1081,7 @@ export default function HrPointOfView({
 - [ ] **Step 5: Jalankan test**
 
 Run: `npx vitest run src/__tests__/checker-hr-point-of-view-ui.test.tsx --reporter=dot`
-Expected: PASS (5 test). Semua render dibungkus `LanguageProvider` karena `useTranslation` membaca context.
+Expected: PASS (7 test). Semua render dibungkus `LanguageProvider` karena `useTranslation` membaca context.
 
 - [ ] **Step 6: Typecheck dan suite penuh**
 
