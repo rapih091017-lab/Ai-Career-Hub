@@ -142,6 +142,51 @@ describe("AnalysisResultSchema", () => {
     const result = AnalysisResultSchema.safeParse({});
     expect(result.success).toBe(true);
   });
+
+  it("satu butir risk_factors rusak gugur sendiri, dua butir valid tetap ada", () => {
+    // Dulu satu severity salah kapital atau null nyasar bikin seluruh array
+    // jadi [], lalu panel sisi HR mengklaim analisis tidak punya temuan padahal
+    // model memang mengirim temuan. Array harus degradasi per butir.
+    const parsed = AnalysisResultSchema.parse({
+      ...MINIMAL_ANALYSIS,
+      ats_prediction: {
+        result: "Borderline",
+        match_confidence: 60,
+        risk_factors: [
+          { text: "TypeScript tidak ada", severity: "critical", source_excerpt: "JavaScript, React" },
+          { text: "Severity salah kapital", severity: "CRITICAL", source_excerpt: null },
+          "Belum ada metrik angka",
+          null,
+        ],
+        strengths: [],
+      },
+    });
+    const ats = parsed.ats_prediction;
+    expect(typeof ats).toBe("object");
+    if (typeof ats !== "object" || ats === null) throw new Error("ats_prediction harus objek agar tes ini berarti");
+    const texts = ats.risk_factors.map((item) => (typeof item === "string" ? item : item.text));
+    expect(texts).toEqual(["TypeScript tidak ada", "Belum ada metrik angka"]);
+  });
+
+  it("satu butir strengths rusak gugur sendiri, butir valid tetap ada", () => {
+    // Kebalikan risk_factors: satu butir rusak tidak boleh menghapus daftar
+    // "yang bikin lanjut baca" seluruhnya.
+    const parsed = AnalysisResultSchema.parse({
+      ...MINIMAL_ANALYSIS,
+      ats_prediction: {
+        result: "Likely Pass",
+        match_confidence: 80,
+        risk_factors: [],
+        strengths: ["React solid", 42, { text: "Metrik jelas", source_excerpt: null }, null],
+      },
+    });
+    const ats = parsed.ats_prediction;
+    expect(typeof ats).toBe("object");
+    if (typeof ats !== "object" || ats === null) throw new Error("ats_prediction harus objek agar tes ini berarti");
+    const texts = ats.strengths.map((item) => (typeof item === "string" ? item : item.text));
+    expect(texts).toEqual(["React solid", "Metrik jelas"]);
+  });
+
 });
 
 describe("RevisionResultSchema", () => {

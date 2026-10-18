@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import HrPointOfView from "@/components/checker/HrPointOfView";
 import { LanguageProvider } from "@/lib/i18n";
+import { AnalysisResultSchema } from "@/lib/ai/prompts/schemas";
 
 /** useTranslation membaca context, jadi komponen harus selalu dibungkus provider. */
 function renderPanel(result: unknown, keyPrefix?: string) {
@@ -10,6 +11,19 @@ function renderPanel(result: unknown, keyPrefix?: string) {
       <HrPointOfView result={result as any} keyPrefix={keyPrefix} />
     </LanguageProvider>,
   );
+}
+
+/** Panel produksi menerima hasil yang sudah lolos schema, bukan fixture mentah.
+ *  Parse dulu supaya tes membaca jalur yang sama dengan produksi — kalau tidak,
+ *  tes tidak akan pernah melihat nilai yang disuntik schema. */
+function parsedResult(raw: unknown) {
+  const result = AnalysisResultSchema.parse(raw);
+  return {
+    meta: result.meta ?? null,
+    careerVelocity: result.career_velocity ?? null,
+    atsPredictionDetail: typeof result.ats_prediction === "object" ? result.ats_prediction : null,
+    narrativeFeedback: result.narrative_feedback ?? null,
+  };
 }
 
 const RESULT = {
@@ -68,7 +82,7 @@ describe("panel Sisi HR", () => {
 
   it("saat kosong, jujur dan mengarahkan tanpa menyebut judul halaman lain", () => {
     renderPanel({ atsPredictionDetail: { risk_factors: [], strengths: [] } });
-    expect(screen.getByText(/tidak menghasilkan temuan sisi HR/i)).toBeInTheDocument();
+    expect(screen.getByText(/temuan sisi HR yang balik dari analisis ini/i)).toBeInTheDocument();
     // Petunjuk harus tetap berlaku di dua halaman yang punya judul berbeda,
     // jadi jangan menyebut nama judul section secara harfiah.
     expect(screen.getByText(/ada di bawah/i)).toBeInTheDocument();
@@ -79,7 +93,51 @@ describe("panel Sisi HR", () => {
 
   it("tidak error saat hasil kosong total", () => {
     renderPanel(null);
-    expect(screen.getByText(/tidak menghasilkan temuan sisi HR/i)).toBeInTheDocument();
+    expect(screen.getByText(/temuan sisi HR yang balik dari analisis ini/i)).toBeInTheDocument();
+  });
+
+  it("satu risk factor rusak tidak menghapus dua yang valid", () => {
+    // Sekarang item rusak dikirim langsung ke schema: satu severity salah
+    // kapital atau null nyasar dulu bikin seluruh array gugur, lalu panel
+    // mengklaim analisis tidak punya temuan.
+    renderPanel(
+      parsedResult({
+        ats_prediction: {
+          result: "Borderline",
+          match_confidence: 60,
+          risk_factors: [
+            { text: "TypeScript tidak ada", severity: "critical", source_excerpt: "JavaScript, React" },
+            { text: "Severity salah kapital", severity: "CRITICAL", source_excerpt: null },
+            "Belum ada metrik angka",
+            null,
+          ],
+          strengths: [],
+        },
+      }),
+    );
+    expect(screen.getByText("TypeScript tidak ada")).toBeInTheDocument();
+    expect(screen.getByText("Belum ada metrik angka")).toBeInTheDocument();
+    expect(screen.queryByText("Severity salah kapital")).not.toBeInTheDocument();
+  });
+
+  it("semua risk factor rusak: panel kosong dengan copy yang tidak mengklaim CV tanpa temuan", () => {
+    renderPanel(
+      parsedResult({
+        ats_prediction: {
+          result: "Borderline",
+          match_confidence: 60,
+          risk_factors: [{ text: "Severity salah kapital", severity: "CRITICAL", source_excerpt: null }, null, 42],
+          strengths: [42, null],
+        },
+      }),
+    );
+    // Kalimat kosong harus menyatakan apa yang kembali dari analisis ini,
+    // bukan mengklaim CV-nya tidak punya temuan.
+    expect(
+      screen.getByText("Nggak ada temuan sisi HR yang balik dari analisis ini. Catatan per bagian ada di bawah."),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/tidak menghasilkan temuan/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/cv[^.!?]*(tidak|nggak)\b[^.!?]*temuan/i)).not.toBeInTheDocument();
   });
 
   it("level dan arah karier tetap tampil walau daftar temuan kosong", () => {
@@ -88,7 +146,7 @@ describe("panel Sisi HR", () => {
       careerVelocity: { title_progression: "Declining", growth_rate: "Slow" },
       atsPredictionDetail: { risk_factors: [], strengths: [] },
     });
-    expect(screen.getByText(/tidak menghasilkan temuan sisi HR/i)).toBeInTheDocument();
+    expect(screen.getByText(/temuan sisi HR yang balik dari analisis ini/i)).toBeInTheDocument();
     expect(screen.getByText(/dibaca sebagai level/i)).toBeInTheDocument();
     expect(screen.getByText(/turun/i)).toBeInTheDocument();
   });
@@ -198,7 +256,7 @@ describe("panel Sisi HR", () => {
     expect(screen.queryByText("Nothing made me keep reading.")).not.toBeInTheDocument();
 
     renderPanel({ atsPredictionDetail: { risk_factors: [], strengths: [] }, meta: { detected_seniority: "senior" } });
-    expect(screen.getByText(/produced no HR-side findings/i)).toBeInTheDocument();
+    expect(screen.getByText(/no HR-side findings came back from this analysis/i)).toBeInTheDocument();
     expect(screen.getByText(/below/i)).toBeInTheDocument();
     expect(screen.queryByText(/Scores per Section/i)).not.toBeInTheDocument();
   });

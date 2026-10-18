@@ -21,7 +21,13 @@ const IssueOrString = () =>
       severity: z.enum(SEVERITIES).optional(),
     }),
   ]);
-const IssueArr = () => z.array(IssueOrString()).catch([]);
+/* .catch("") per butir: satu butir rusak (severity salah kapital, null nyasar,
+ * tipe tak terduga) gugur sendiri, bukan menghapus seluruh array. Tanpa ini satu
+ * butir membuat hasil parse [] dan panel sisi HR mengklaim analisis tidak punya
+ * temuan padahal model memang mengirim temuan. Filter buang penanda "" supaya
+ * yang rusak benar-benar hilang dari hasil parse, bukan jadi entri kosong. */
+const IssueArr = () =>
+  z.array(IssueOrString().catch("")).catch([]).transform((items) => items.filter((item) => item !== ""));
 
 /* Strength dengan excerpt anchoring opsional (v4), tetap string polos juga diterima. */
 const StrengthOrString = () =>
@@ -32,7 +38,10 @@ const StrengthOrString = () =>
       source_excerpt: z.string().nullable().catch(null),
     }),
   ]);
-const StrengthArr = () => z.array(StrengthOrString()).catch([]);
+/* Alasan sama dengan IssueArr: satu butir rusak tidak boleh menghapus seluruh
+ * daftar "yang bikin lanjut baca". */
+const StrengthArr = () =>
+  z.array(StrengthOrString().catch("")).catch([]).transform((items) => items.filter((item) => item !== ""));
 
 /** Bobot per-section (desimal 0-1, mis. 0.20) sesuai role category, 
  * dipakai transparansi skor di UI. BUKAN ScoreField karena bobot bukan integer. */
