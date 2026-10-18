@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import { PROMPT_MARKERS } from "@/lib/ai/prompts/shared";
-import { splitCvJd, injectInputData } from "@/lib/ai/adapter";
+import { splitCvJd, injectInputData, injectUserContext } from "@/lib/ai/adapter";
 
 // adapter membangun klien OpenAI saat modul diimpor dan SDK itu melempar
 // error kalau API key tidak ada di environment test. Test ini cuma memakai
@@ -128,5 +128,42 @@ describe("penyuntikan data ke prompt", () => {
     expect(injectInputData("{{INPUT_DATA}}", data)).toBe(data);
     expect(injectInputData("{{PROFILE_DATA}}", data)).toBe(data);
     expect(injectInputData("{{CV_TEXT}}", data)).toBe("$& seluruh data mentah");
+  });
+});
+
+describe("penyuntikan konteks pengguna ke system prompt", () => {
+  // Jalur yang sama dengan CV: targetRole di route checker disusun dari baris
+  // CV, dan ctx pun menerima judul_lowongan dari form. Kandidat yang menulis
+  // tentang regex atau shell akan punya "$&" di teksnya, dan itu isi biasa yang
+  // harus sampai ke model apa adanya.
+  it("targetRole yang memuat pola pengganti regex tetap utuh", () => {
+    const result = injectUserContext("{{USER_CONTEXT}}", { targetRole: "Backend Engineer $&, bukan $` atau $'" });
+
+    expect(result).toContain("Backend Engineer $&, bukan $` atau $'");
+    // Pola pengganti yang sudah rusak akan menyisipkan ulang {{USER_CONTEXT}}
+    // ke dalam isinya sendiri.
+    expect(result).not.toContain("{{USER_CONTEXT}}\n");
+  });
+
+  it("industri yang memuat pola pengganti juga tetap utuh", () => {
+    expect(injectUserContext("{{USER_CONTEXT}}", { industry: "Fintech $&" })).toContain("Fintech $&");
+  });
+
+  it("konteks tetap disisipkan tanpa mengubah perilaku lainnya", () => {
+    const ctx = { targetRole: "Data Analyst", industry: "E-commerce", experienceLevel: "mid" as const, cvLang: "en" as const };
+
+    const result = injectUserContext("SYSTEM\n{{USER_CONTEXT}}\nEND", ctx);
+
+    expect(result).not.toContain("{{USER_CONTEXT}}");
+    expect(result).toContain("Posisi Target: Data Analyst");
+    expect(result).toContain("Industri: E-commerce");
+    expect(result).toContain("Tingkat Pengalaman: mid");
+    expect(result).toContain("Bahasa CV: English");
+    expect(result.startsWith("SYSTEM\n")).toBe(true);
+    expect(result.endsWith("END")).toBe(true);
+  });
+
+  it("tanpa konteks, prompt dikembalikan apa adanya", () => {
+    expect(injectUserContext("SYSTEM {{USER_CONTEXT}}")).toBe("SYSTEM {{USER_CONTEXT}}");
   });
 });

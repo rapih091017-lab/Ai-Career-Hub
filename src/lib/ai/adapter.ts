@@ -71,7 +71,13 @@ const MODEL_MAP: Record<string, string> = {
 };
 
 /* ─── Inject user context into prompt ───────────────────── */
-function injectUserContext(prompt: string, ctx?: UserContext): string {
+/**
+ * Sisipkan konteks pengguna ke placeholder {{USER_CONTEXT}}.
+ *
+ * Diekspor supaya penyisipannya bisa diuji langsung, dengan alasan yang sama
+ * seperti splitCvJd: yang diuji harus kode aslinya, bukan salinan logikanya.
+ */
+export function injectUserContext(prompt: string, ctx?: UserContext): string {
   if (!ctx) return prompt;
 
   const contextStr = `
@@ -83,7 +89,12 @@ Bahasa CV: ${ctx.cvLang === "en" ? "English" : "Indonesia"}
 --- END CONTEXT ---
   `.trim();
 
-  return prompt.replace("{{USER_CONTEXT}}", contextStr);
+  // Bentuk fungsi dipakai, bukan string biasa: isi konteks berasal dari data
+  // pengguna (targetRole di route checker disusun dari baris CV), dan "$&" di
+  // sana adalah isi biasa — kandidat sering menulis tentang regex atau shell.
+  // Kalau string biasa, "$&" ditafsirkan sebagai pola pengganti dan prompt
+  // ikut rusak tanpa error.
+  return prompt.replace("{{USER_CONTEXT}}", () => contextStr);
 }
 
 /* ─── Strip lone surrogate characters that break JSON serialization ── */
