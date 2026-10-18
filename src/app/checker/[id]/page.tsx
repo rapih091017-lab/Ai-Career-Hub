@@ -65,6 +65,9 @@ export default function CheckerDetailPage() {
             scores: data.scores,
             aiFeedback: data.aiFeedback,
             fullResult: data.fullResult,
+            // Route history belum mengembalikan aiModel; diteruskan apa adanya
+            // supaya bentuk hasil sama dengan halaman /checker yang live.
+            aiModel: data.aiModel,
           }),
         );
       })

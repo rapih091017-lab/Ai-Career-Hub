@@ -195,16 +195,15 @@ export interface AnalysisResult {
     red_flags?: string[];
     recommendations?: string[];
   } | null;
-  /** Detail prediksi ATS: risk factor dan strength lengkap dengan kutipan CV */
+  /** Detail prediksi ATS: risk factor dan strength lengkap dengan kutipan CV.
+   *  Sesuai IssueArr()/StrengthArr() di schema, tiap entri bisa berupa string polos
+   *  (AI/hasil lama) maupun objek berteks; pakai toIssueItems() kalau mau selalu
+   *  bentuk objek. */
   atsPredictionDetail?: {
     result?: "Likely Pass" | "Borderline" | "Likely Fail";
     match_confidence?: number;
-    risk_factors?: {
-      text: string;
-      severity?: "critical" | "high" | "medium" | "low";
-      source_excerpt?: string | null;
-    }[];
-    strengths?: (string | { text: string; source_excerpt?: string | null })[];
+    risk_factors?: (string | IssueItem)[];
+    strengths?: (string | IssueItem)[];
   } | null;
 }
 
