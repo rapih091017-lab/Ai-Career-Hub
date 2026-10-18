@@ -1,4 +1,4 @@
-﻿# POV HR di Hasil Checker
+# POV HR di Hasil Checker
 
 Tanggal: 2026-10-18
 Status: disetujui, siap ditulis jadi rencana kerja
