@@ -200,11 +200,15 @@ message: t(
   let aiAnalysis: AnalysisResult | null = null;
   try {
     aiAnalysis = await callAI<AnalysisResult>({
-      systemPrompt: ANALYSIS_PROMPT_V4
-        .replace(/\{\{ROLE_CATEGORY\}\}/g, roleCat)
-        .replace(/\{\{OUTPUT_LANGUAGE\}\}/g, outputLang)
+systemPrompt: ANALYSIS_PROMPT_V4
+        // Bentuk fungsi dipakai, bukan string biasa: isinya berasal dari input
+        // pengguna (role dari form, isi dari kode), dan "$&" pada data itu akan
+        // ditafsirkan sebagai pola pengganti kalau dipakai string biasa. Prompt
+        // jadi rusak tanpa error, jadi bentuk fungsi dipakai sejak awal.
+        .replace(/\{\{ROLE_CATEGORY\}\}/g, () => roleCat)
+        .replace(/\{\{OUTPUT_LANGUAGE\}\}/g, () => outputLang)
         // Kedalaman bullet review mengikuti tier akses, hemat token untuk free/flash.
-        .replace(/\{\{BULLET_MAX\}\}/g, useReasoner ? "5" : "3"),
+        .replace(/\{\{BULLET_MAX\}\}/g, () => (useReasoner ? "5" : "3")),
       userPrompt: `=== ROLE CATEGORY: ${roleCat} ===\n\n${PROMPT_MARKERS.cv}\n${extractedText}\n\n${PROMPT_MARKERS.jd}\n${jd || (outputLang === "en" ? "No job description provided." : "Tidak ada deskripsi pekerjaan.")}`,
       temperature: 0.3,
       // Model: premium → deepseek-v4-pro (thinking) untuk analisis mendalam;
