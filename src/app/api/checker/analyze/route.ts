@@ -263,6 +263,11 @@ message: t(
 
   const normalizedAtsPrediction = normalizeAtsPrediction(aiAnalysis?.ats_prediction);
 
+  // Model yang dipakai, ditampilkan sebagai badge di UI hasil analisis. Hanya
+  // diisi kalau AI benar-benar berhasil, supaya badge tidak muncul pada analisis
+  // fallback yang tidak memakai AI sama sekali.
+  const aiModelLabel = aiAnalysis ? (useReasoner ? "V4 Pro" : "V4 Flash") : null;
+
   const aiFeedback = {
     keywordGap: aiAnalysis?.keyword_analysis
       ? t(
@@ -284,6 +289,10 @@ message: t(
     narrativeFeedback: aiAnalysis?.narrative_feedback ?? null,
     // meta belum pernah diteruskan; detected_seniority di dalamnya dibutuhkan panel sisi HR.
     meta: aiAnalysis?.meta ?? null,
+    // Model AI ikut tersimpan di sini: `/api/checker/history/[id]` tidak punya
+    // kolom terpisah untuk model, jadi tanpa ini badge model di halaman hasil
+    // tersimpan selalu kosong. Tidak perlu migrasi, ini kolom jsonb yang sama.
+    aiModel: aiModelLabel,
     careerVelocity: aiAnalysis?.career_velocity ?? null,
     actionPlan: aiAnalysis?.action_plan ?? null,
     bulletReview: aiAnalysis?.bullet_review ?? [],
@@ -346,10 +355,6 @@ message: t(
       scores,
       aiFeedback,
       summary: aiFeedback.summary,
-      // Model yang dipakai, ditampilkan sebagai badge di UI hasil analisis.
-      // Hanya dikirim jika AI benar-benar berhasil (aiAnalysis non-null),
-      // supaya badge tidak muncul di response fallback tanpa analisis AI.
-      aiModel: aiAnalysis ? (useReasoner ? "V4 Pro" : "V4 Flash") : undefined,
       // Diberi tahu kalau analisis ini memakai model ringan karena jatah
       // model mendalam bulan ini sudah habis. Analisis tetap jalan.
       fairUseNote: fairUseApplied
@@ -360,6 +365,10 @@ message: t(
           }
         : undefined,
       ...aiStructuredData,
+      // Ditulis ulang setelah spread: bentuk response tidak boleh berubah karena
+      // aiStructuredData ikut menyimpan aiModel. `undefined` membuat key hilang
+      // dari JSON, jadi badge tidak muncul saat analisis gagal.
+      aiModel: aiModelLabel ?? undefined,
     },
     { status: 200 },
   );

@@ -1,6 +1,8 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { analysisFromFullResult } from "@/lib/checker/analysis-from-full-result";
-import { toIssueItems, type AnalysisResult } from "@/components/checker/types";
+import { toIssueItems, type AnalysisResult, type StoredAnalysisResult } from "@/components/checker/types";
 
 const FULL = {
   grade: "B",
@@ -90,28 +92,26 @@ describe("risk_factors dan strengths bisa berupa string polos", () => {
   });
 });
 
-describe("baris lama / jsonb terpotong tidak boleh membuat halaman crash", () => {
+describe("section breakdown yang tidak tersimpan tidak boleh dibuat-buat", () => {
   /** Meniru semua akses nested yang dilakukan src/app/checker/[id]/page.tsx. */
-  function bacaSepertiHalaman(r: AnalysisResult) {
+  function bacaSepertiHalaman(r: StoredAnalysisResult) {
     const quantPct = (r.breakdown?.experience as { quantification_pct?: number } | undefined)?.quantification_pct;
-    if (r.breakdown) {
-      void r.breakdown.summary.score;
-      void r.breakdown.summary.issues.length;
-      void r.breakdown.summary.suggestions.length;
-      void r.breakdown.experience.score;
-      void r.breakdown.experience.issues.length;
-      void r.breakdown.experience.suggestions.length;
-      void r.breakdown.skills.score;
-      void r.breakdown.skills.missing_skills?.length;
-      void r.breakdown.skills.recommendations?.length;
-      void r.breakdown.education.score;
-      void r.breakdown.education.relevance;
-      void r.breakdown.education.suggestions.length;
-      void r.breakdown.format_ats.score;
-      void r.breakdown.format_ats.issues.length;
-      void r.breakdown.format_ats.tips.length;
-      void quantPct;
-    }
+    // Halaman hanya merender kartu untuk section yang benar-benar ada.
+    void r.breakdown?.summary?.score;
+    void r.breakdown?.summary?.issues.length;
+    void r.breakdown?.summary?.suggestions.length;
+    void r.breakdown?.experience?.score;
+    void r.breakdown?.experience?.issues.length;
+    void r.breakdown?.experience?.suggestions.length;
+    void r.breakdown?.skills?.score;
+    void r.breakdown?.skills?.missing_skills?.length;
+    void r.breakdown?.skills?.recommendations?.length;
+    void r.breakdown?.education?.score;
+    void r.breakdown?.education?.suggestions.length;
+    void r.breakdown?.format_ats?.score;
+    void r.breakdown?.format_ats?.issues.length;
+    void r.breakdown?.format_ats?.tips.length;
+    void quantPct;
     if (r.narrativeFeedback) {
       void r.narrativeFeedback.overall_assessment;
       void r.narrativeFeedback.strengths.length;
@@ -130,34 +130,44 @@ describe("baris lama / jsonb terpotong tidak boleh membuat halaman crash", () =>
     void r.actionPlan?.long_term?.length;
     void r.missingSections?.length;
     void r.bulletReview?.length;
-    if (r.impactForecast) {
-      void (r.impactForecast.current_score as number | undefined);
-      void (r.impactForecast.projected_after_all_fixes as number | undefined);
-    }
+    void r.impactForecast?.current_score;
+    void r.impactForecast?.projected_after_quick_wins;
+    void r.impactForecast?.projected_after_all_fixes;
   }
 
-  it("breakdown kosong menghasilkan lima section yang aman dibaca", () => {
-    const result = analysisFromFullResult("kosong-breakdown", {
+  it("breakdown tanpa section tidak menghasilkan satu pun kartu", () => {
+    // Objek kosong berarti tidak ada satu pun skor yang pernah dihitung.
+    const kosong = analysisFromFullResult("kosong-breakdown", {
       scores: {},
       aiFeedback: {},
       fullResult: { breakdown: {} },
     });
-    const b = result.breakdown;
-    expect(b).not.toBeNull();
-    expect(Object.keys(b!).sort()).toEqual(["education", "experience", "format_ats", "skills", "summary"]);
-    // Default mengikuti .catch() di AnalysisResultSchema agar bentuk hasil
-    // tersimpan sama dengan hasil langsung.
-    expect(b!.experience.score).toBe(50);
-    expect(b!.experience.issues).toEqual([]);
-    expect(b!.experience.suggestions).toEqual([]);
-    expect(b!.skills.missing_skills).toEqual([]);
-    expect(b!.skills.recommendations).toEqual([]);
-    expect(b!.education.relevance).toBe("");
-    expect(b!.format_ats.tips).toEqual([]);
+    expect(kosong.breakdown).toBeNull();
+    expect(() => bacaSepertiHalaman(kosong)).not.toThrow();
+
+    const bukanObjek = analysisFromFullResult("bukan-objek", {
+      scores: {},
+      aiFeedback: {},
+      fullResult: { breakdown: "bukan objek" },
+    });
+    expect(bukanObjek.breakdown).toBeNull();
+  });
+
+  it("section tanpa skor angka dianggap tidak ada, bukan diberi skor 50", () => {
+    // Skor 50 hasil .catch() schema akan tampil sebagai skor asli di kartu amber.
+    const result = analysisFromFullResult("tanpa-skor", {
+      scores: {},
+      aiFeedback: {},
+      fullResult: { breakdown: { summary: { score: "70" }, experience: { score: 80 }, skills: {} } },
+    });
+    expect(Object.keys(result.breakdown ?? {}).sort()).toEqual(["experience"]);
+    expect(result.breakdown?.summary).toBeUndefined();
+    expect(result.breakdown?.skills).toBeUndefined();
+    expect(result.breakdown?.experience?.score).toBe(80);
     expect(() => bacaSepertiHalaman(result)).not.toThrow();
   });
 
-  it("section yang ada tetap utuh, section yang hilang diisi default", () => {
+  it("section yang ada tetap utuh, section yang hilang tidak muncul", () => {
     const result = analysisFromFullResult("sebagian", {
       scores: {},
       aiFeedback: {},
@@ -169,12 +179,43 @@ describe("baris lama / jsonb terpotong tidak boleh membuat halaman crash", () =>
       },
     });
     const b = result.breakdown!;
-    expect(b.summary.score).toBe(70);
+    expect(b.summary?.score).toBe(70);
     // String polos pada issues harus ikut terbawa.
-    expect(b.summary.issues).toEqual(["Kurang metrik"]);
-    expect(b.experience.quantification_pct).toBe(40);
-    expect(b.skills.score).toBe(50);
+    expect(b.summary?.issues).toEqual(["Kurang metrik"]);
+    expect(b.experience?.quantification_pct).toBe(40);
+    // Section yang tidak ada tidak boleh muncul sebagai 50% palsu.
+    expect(b.education).toBeUndefined();
+    expect(b.format_ats).toBeUndefined();
     expect(() => bacaSepertiHalaman(result)).not.toThrow();
+  });
+
+  it("entri kosong dibuang dari daftar issue dan teks", () => {
+    const result = analysisFromFullResult("kosong-di-tengah", {
+      scores: {},
+      aiFeedback: {},
+      fullResult: {
+        breakdown: {
+          summary: {
+            score: 70,
+            issues: ["", "   ", "Kurang metrik", { text: "", source_excerpt: null }, { text: "Umum", source_excerpt: "x" }],
+            suggestions: ["", "  ", "Tambah angka"],
+          },
+        },
+      },
+    });
+    expect(result.breakdown?.summary?.issues).toEqual(["Kurang metrik", { text: "Umum", source_excerpt: "x" }]);
+    expect(result.breakdown?.summary?.suggestions).toEqual(["Tambah angka"]);
+  });
+
+  it("relevance kosong tidak menghasilkan bullet ISSUES kosong", () => {
+    const result = analysisFromFullResult("relevance-kosong", {
+      scores: {},
+      aiFeedback: {},
+      fullResult: { breakdown: { education: { score: 60, relevance: "", suggestions: ["Tambah rata-rata studi"] } } },
+    });
+    const relevance = result.breakdown?.education?.relevance ?? "";
+    // Ekspresi yang dipakai halaman untuk kartu education; bullet kosong jangan sampai muncul.
+    expect(toIssueItems(relevance ? [relevance] : [])).toEqual([]);
   });
 
   it("koleksi yang bukan array diabaikan, bukan dipakai apa adanya", () => {
@@ -182,7 +223,7 @@ describe("baris lama / jsonb terpotong tidak boleh membuat halaman crash", () =>
       scores: {},
       aiFeedback: {},
       fullResult: {
-        breakdown: { summary: "bukan objek" },
+        breakdown: { summary: "bukan objek", experience: { score: 75, issues: "bukan array" } },
         keywordAnalysis: { matched: "React", missing_critical: null },
         narrativeFeedback: { strengths: { bukan: "array" } },
         actionPlan: { quick_wins: "tambah metrik", short_term: 5 },
@@ -190,9 +231,9 @@ describe("baris lama / jsonb terpotong tidak boleh membuat halaman crash", () =>
         missingSections: "skills",
       },
     });
-    const b = result.breakdown!;
-    expect(b.summary.score).toBe(50);
-    expect(b.summary.issues).toEqual([]);
+    expect(result.breakdown?.summary).toBeUndefined();
+    expect(result.breakdown?.experience?.score).toBe(75);
+    expect(result.breakdown?.experience?.issues).toEqual([]);
     expect(result.keywordAnalysis?.matched).toEqual([]);
     expect(result.keywordAnalysis?.missing_critical).toEqual([]);
     expect(result.keywordAnalysis?.match_rate_pct).toBe(0);
@@ -205,7 +246,7 @@ describe("baris lama / jsonb terpotong tidak boleh membuat halaman crash", () =>
   });
 });
 
-describe("hasil tersimpan punya bentuk yang sama dengan hasil langsung", () => {
+describe("skor, umpan balik, bobot, dan proyeksi dinormalkan", () => {
   const WEIGHTS = {
     role_category: "tech",
     summary_weight: 0.2,
@@ -215,15 +256,99 @@ describe("hasil tersimpan punya bentuk yang sama dengan hasil langsung", () => {
     format_ats_weight: 0.1,
   };
 
-  it("weightsApplied dan aiModel diteruskan", () => {
-    const result = analysisFromFullResult("lengkap", {
+  it("scores dan aiFeedback tidak menerima nilai di luar tipenya", () => {
+    const result = analysisFromFullResult("tip-jahat", {
+      scores: { overall: "80", keywordGap: 12.5, contextRelevance: null },
+      aiFeedback: { keywordGap: 5, contextRelevance: null, atsRules: null, summary: "Cukup baik" },
+      fullResult: {},
+    });
+    expect(result.scores).toEqual({ overall: 0, keywordGap: 12.5, contextRelevance: 0, atsRules: 0 });
+    expect(result.aiFeedback).toEqual({ keywordGap: "", contextRelevance: "", atsRules: "", summary: "Cukup baik" });
+    expect(result.summary).toBe("Cukup baik");
+  });
+
+  it("bobot yang tidak lengkap dibuang, bukan diisi angka nol", () => {
+    // Bobot dipakai sebagai penjelasan skor; angka yang hilang berarti angka itu
+    // tidak pernah dihitung, jadi catatan bobotnya lebih baik tidak tampil.
+    const parsial = analysisFromFullResult("bobot-parsial", {
+      scores: {},
+      aiFeedback: {},
+      fullResult: { weightsApplied: { role_category: "tech", experience_weight: 0.35 } },
+    });
+    expect(parsial.weightsApplied).toBeNull();
+
+    const rusak = analysisFromFullResult("bobot-rusak", {
+      scores: {},
+      aiFeedback: {},
+      fullResult: { weightsApplied: { ...WEIGHTS, role_category: 7 } },
+    });
+    expect(rusak.weightsApplied).toBeNull();
+
+    const lengkap = analysisFromFullResult("bobot-lengkap", {
       scores: {},
       aiFeedback: {},
       fullResult: { weightsApplied: WEIGHTS },
-      aiModel: "V4 Pro",
     });
-    expect(result.weightsApplied).toEqual(WEIGHTS);
+    expect(lengkap.weightsApplied).toEqual(WEIGHTS);
+  });
+
+  it("proyeksi skor tanpa angka lengkap tidak diteruskan", () => {
+    const parsial = analysisFromFullResult("proyeksi-parsial", {
+      scores: {},
+      aiFeedback: {},
+      fullResult: { impactForecast: { current_score: 70, projected_after_all_fixes: 90 } },
+    });
+    expect(parsial.impactForecast).toBeNull();
+
+    const lengkap = analysisFromFullResult("proyeksi-lengkap", {
+      scores: {},
+      aiFeedback: {},
+      fullResult: { impactForecast: { current_score: 70, projected_after_quick_wins: 80, projected_after_all_fixes: 90 } },
+    });
+    expect(lengkap.impactForecast).toEqual({
+      current_score: 70,
+      projected_after_quick_wins: 80,
+      projected_after_all_fixes: 90,
+    });
+  });
+});
+
+describe("hasil tersimpan punya bentuk yang sama dengan hasil langsung", () => {
+  it("aiModel dibaca dari hasil tersimpan, bukan dari payload API", () => {
+    // aiModel tidak pernah jadi kolom sendiri; ia disimpan di dalam full_result
+    // oleh route analyze, jadi mapper membacanya dari sana.
+    const result = analysisFromFullResult("lengkap", {
+      scores: {},
+      aiFeedback: {},
+      fullResult: { aiModel: "V4 Pro" },
+    });
     expect(result.aiModel).toBe("V4 Pro");
+  });
+
+  it("baris lama tanpa aiModel jadi undefined, bukan error", () => {
+    const result = analysisFromFullResult("lama", {
+      scores: {},
+      aiFeedback: {},
+      fullResult: { grade: "C" },
+    });
+    expect(result.aiModel).toBeUndefined();
+  });
+
+  it("aiModel di luar daftar model yang dikenal diabaikan", () => {
+    const result = analysisFromFullResult("ngawur", {
+      scores: {},
+      aiFeedback: {},
+      fullResult: { aiModel: "GPT-9" },
+    });
+    expect(result.aiModel).toBeUndefined();
+  });
+
+  it("route analyze menyimpan aiModel di dalam full_result", () => {
+    const src = readFileSync(join(process.cwd(), "src/app/api/checker/analyze/route.ts"), "utf8");
+    const blok = src.slice(src.indexOf("const aiStructuredData = {"), src.indexOf("};", src.indexOf("const aiStructuredData = {")));
+    expect(blok).toMatch(/aiModel:/);
+    // Objek yang sama itulah yang disimpan sebagai kolom jsonb full_result.
+    expect(src).toContain("fullResult: aiStructuredData");
   });
 
   it("kunci hasil dipin agar field tidak hilang diam-diam", () => {

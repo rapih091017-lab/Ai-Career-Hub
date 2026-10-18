@@ -1,100 +1,134 @@
 import type {
   ActionPlan,
-  AnalysisResult,
   BulletItem,
   ImpactForecast,
   IssueItem,
   KeywordAnalysis,
   NarrativeFeedback,
+  StoredAnalysisResult,
+  StoredBreakdown,
+  WeightsApplied,
 } from "@/components/checker/types";
 
+/** Baris yang dikembalikan `/api/checker/history/[id]`. `aiModel` sengaja tidak
+ *  ada di sini: route itu tidak pernah mengirimkannya, dan field tersebut
+ *  disimpan di dalam `fullResult` — bukan sebagai kolom sendiri. */
 interface StoredResult {
   scores?: unknown;
   aiFeedback?: unknown;
   fullResult?: unknown;
-  /** Model AI, field yang sama dengan response route analyze; diteruskan apa adanya. */
-  aiModel?: AnalysisResult["aiModel"];
 }
 
 type AnyRecord = Record<string, any>;
 
-/** Skor default untuk section yang tidak tersimpan. Nilainya sama dengan
- *  .catch() di `AnalysisResultSchema`, supaya hasil tersimpan punya bentuk yang
- *  sama dengan hasil langsung (yang selalu lengkap karena lewat zod). */
-const SKOR_DEFAULT = 50;
-
 /** Objek atau apa pun yang tidak bisa dibaca property-nya (string, null, array). */
 function asRecord(v: unknown): AnyRecord {
-  return v && typeof v === "object" && !Array.isArray(v) ? (v as AnyRecord) : {};
+  return isRecord(v) ? v : {};
 }
 
 function isRecord(v: unknown): v is AnyRecord {
   return !!v && typeof v === "object" && !Array.isArray(v);
 }
 
-/** Kolom jsonb bisa berisi null/kode/string karena baris rusak atau jsonb terpotong.
- *  Default-nya mengikuti .catch() di schema: 50 untuk score section, 0 untuk match_rate_pct. */
-function toScore(v: unknown, fallback = SKOR_DEFAULT): number {
-  return typeof v === "number" && Number.isFinite(v) ? v : fallback;
+/** Angka finite atau null. Kolom jsonb bisa berisi string/null karena baris rusak
+ *  atau terpotong, dan angka pengganti selalu jadi klaim yang tidak berdasar. */
+function toNumber(v: unknown): number | null {
+  return typeof v === "number" && Number.isFinite(v) ? v : null;
+}
+
+/** Angka finite, atau default kalau memang tidak ada. Dipakai untuk field yang
+ *  nolnya berarti "tidak ada", bukan "salah": `scores` dan `match_rate_pct` sudah
+ *  calculado sendiri di route analyze dan selalu tersimpan. */
+function toScore(v: unknown, fallback: number): number {
+  return toNumber(v) ?? fallback;
 }
 
 function toText(v: unknown): string {
   return typeof v === "string" ? v : "";
 }
 
+/** Teks yang isinya cuma spasi dianggap tidak ada — entri seperti itu hanya jadi
+ *  bullet kosong di UI. */
 function toTextList(v: unknown): string[] {
-  return Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
+  if (!Array.isArray(v)) return [];
+  return v.filter((x): x is string => typeof x === "string" && x.trim().length > 0);
 }
 
 /** Issue boleh string polos (hasil lama) maupun objek { text, severity, source_excerpt }.
- *  Entri string tidak boleh dibuang, karena UI membacanya lewat toIssueItems(). */
+ *  Entri string tidak boleh dibuang, karena UI membacanya lewat toIssueItems();
+ *  yang dibuang hanya entri tanpa teks, karena jadi bullet kosong. */
 function toIssueList(v: unknown): (string | IssueItem)[] {
   if (!Array.isArray(v)) return [];
-  return v.filter((x) => typeof x === "string" || (isRecord(x) && typeof x.text === "string"));
+  return v.filter((x) => {
+    if (typeof x === "string") return x.trim().length > 0;
+    return isRecord(x) && typeof x.text === "string" && x.text.trim().length > 0;
+  });
 }
 
-/** Lima section breakdown selalu dikembalikan lengkap supaya halaman detail tidak
- *  pernah membaca `breakdown.experience.score` pada baris yang section-nya hilang. */
-function toBreakdown(v: unknown): AnalysisResult["breakdown"] {
+/** Skor sebuah section, atau null kalau tidak pernah dihitung. Section tanpa skor
+ *  tidak boleh dibuat-buat: kartu SectionScoreCard selalu menampilkan persentase,
+ *  jadi skor 50 hasil `.catch()` schema akan terbaca sebagai skor asli. */
+function toSectionScore(v: unknown): number | null {
+  return isRecord(v) ? toNumber(v.score) : null;
+}
+
+/** Hanya section yang punya skor yang diteruskan. Baris lama yang `breakdown`-nya
+ *  terpotong jadi tampil sebagian, bukan lima kartu dengan angka tebakan. */
+function toBreakdown(v: unknown): StoredBreakdown | null {
   if (!isRecord(v)) return null;
-  const summary = asRecord(v.summary);
-  const experience = asRecord(v.experience);
-  const skills = asRecord(v.skills);
-  const education = asRecord(v.education);
-  const formatAts = asRecord(v.format_ats);
-  return {
-    summary: {
-      score: toScore(summary.score),
-      issues: toIssueList(summary.issues),
-      suggestions: toTextList(summary.suggestions),
-    },
-    experience: {
-      score: toScore(experience.score),
-      issues: toIssueList(experience.issues),
-      suggestions: toTextList(experience.suggestions),
+  const out: StoredBreakdown = {};
+
+  const summaryScore = toSectionScore(v.summary);
+  if (summaryScore !== null) {
+    out.summary = {
+      score: summaryScore,
+      issues: toIssueList(v.summary.issues),
+      suggestions: toTextList(v.summary.suggestions),
+    };
+  }
+
+  const experienceScore = toSectionScore(v.experience);
+  if (experienceScore !== null) {
+    const quantification = toNumber(v.experience.quantification_pct);
+    out.experience = {
+      score: experienceScore,
+      issues: toIssueList(v.experience.issues),
+      suggestions: toTextList(v.experience.suggestions),
       // Hanya isi kalau AI mengirimnya; undefined berarti chip kuantifikasi tidak tampil.
-      ...(typeof experience.quantification_pct === "number"
-        ? { quantification_pct: experience.quantification_pct }
-        : {}),
-    },
-    skills: {
-      score: toScore(skills.score),
-      issues: toIssueList(skills.issues),
-      suggestions: toTextList(skills.suggestions),
-      missing_skills: toTextList(skills.missing_skills),
-      recommendations: toTextList(skills.recommendations),
-    },
-    education: {
-      score: toScore(education.score),
-      relevance: toText(education.relevance),
-      suggestions: toTextList(education.suggestions),
-    },
-    format_ats: {
-      score: toScore(formatAts.score),
-      issues: toIssueList(formatAts.issues),
-      tips: toTextList(formatAts.tips),
-    },
-  };
+      ...(quantification !== null ? { quantification_pct: quantification } : {}),
+    };
+  }
+
+  const skillsScore = toSectionScore(v.skills);
+  if (skillsScore !== null) {
+    out.skills = {
+      score: skillsScore,
+      issues: toIssueList(v.skills.issues),
+      suggestions: toTextList(v.skills.suggestions),
+      missing_skills: toTextList(v.skills.missing_skills),
+      recommendations: toTextList(v.skills.recommendations),
+    };
+  }
+
+  const educationScore = toSectionScore(v.education);
+  if (educationScore !== null) {
+    out.education = {
+      score: educationScore,
+      relevance: toText(v.education.relevance),
+      suggestions: toTextList(v.education.suggestions),
+    };
+  }
+
+  const formatAtsScore = toSectionScore(v.format_ats);
+  if (formatAtsScore !== null) {
+    out.format_ats = {
+      score: formatAtsScore,
+      issues: toIssueList(v.format_ats.issues),
+      tips: toTextList(v.format_ats.tips),
+    };
+  }
+
+  return Object.keys(out).length > 0 ? out : null;
 }
 
 function toKeywordAnalysis(v: unknown): KeywordAnalysis | null {
@@ -132,32 +166,88 @@ function toActionPlan(v: unknown): ActionPlan | null {
  *  bukan objek dibuang, field yang hilang diisi default yang sama dengan schema. */
 function toBulletReview(v: unknown): BulletItem[] {
   if (!Array.isArray(v)) return [];
-  return v.filter(isRecord).map((item) => ({
-    section: toText(item.section),
-    original_text: toText(item.original_text),
-    issues: toIssueList(item.issues),
-    suggested_rewrite: toText(item.suggested_rewrite),
-    priority:
-      item.priority === "High" || item.priority === "Medium" || item.priority === "Low" ? item.priority : "Medium",
-    ...(typeof item.cari_score === "number" ? { cari_score: item.cari_score } : {}),
-  }));
+  return v.filter(isRecord).map((item) => {
+    const cari = toNumber(item.cari_score);
+    return {
+      section: toText(item.section),
+      original_text: toText(item.original_text),
+      issues: toIssueList(item.issues),
+      suggested_rewrite: toText(item.suggested_rewrite),
+      priority:
+        item.priority === "High" || item.priority === "Medium" || item.priority === "Low" ? item.priority : "Medium",
+      ...(cari !== null ? { cari_score: cari } : {}),
+    };
+  });
+}
+
+/** Bobot dipakai sebagai penjelasan skor ("35% experience"), jadi bobot yang
+ *  hilang berarti angka itu tidak pernah ada. Lebih jujur catatan bobotnya
+ *  disembunyikan daripada menampilkan 0% yang mengarang. */
+function toWeightsApplied(v: unknown): WeightsApplied | null {
+  if (!isRecord(v) || typeof v.role_category !== "string") return null;
+  const summary = toNumber(v.summary_weight);
+  const experience = toNumber(v.experience_weight);
+  const skills = toNumber(v.skills_weight);
+  const education = toNumber(v.education_weight);
+  const formatAts = toNumber(v.format_ats_weight);
+  if (summary === null || experience === null || skills === null || education === null || formatAts === null) {
+    return null;
+  }
+  return {
+    role_category: v.role_category,
+    summary_weight: summary,
+    experience_weight: experience,
+    skills_weight: skills,
+    education_weight: education,
+    format_ats_weight: formatAts,
+  };
+}
+
+/** Proyeksi skor adalah angka yang ditampilkan sebagai janji hasil, jadi hanya
+ *  diteruskan kalau ketiganya benar-benar ada; kalau tidak, kartu disembunyikan
+ *  oleh ImpactForecastCard yang memeriksa sendiri. */
+function toImpactForecast(v: unknown): ImpactForecast | null {
+  if (!isRecord(v)) return null;
+  const current = toNumber(v.current_score);
+  const quickWins = toNumber(v.projected_after_quick_wins);
+  const allFixes = toNumber(v.projected_after_all_fixes);
+  if (current === null || quickWins === null || allFixes === null) return null;
+  return {
+    current_score: current,
+    projected_after_quick_wins: quickWins,
+    projected_after_all_fixes: allFixes,
+  };
+}
+
+/** Grade dan prediksi ATS punya daftar nilai tertutup; jsonb bisa berisi apa saja,
+ *  sedangkan UI mewarnainya berdasarkan daftar itu. */
+function toGrade(v: unknown): "A" | "B" | "C" | "D" | null {
+  return v === "A" || v === "B" || v === "C" || v === "D" ? v : null;
+}
+
+function toAtsPrediction(v: unknown): "Likely Pass" | "Borderline" | "Likely Fail" | null {
+  return v === "Likely Pass" || v === "Borderline" || v === "Likely Fail" ? v : null;
+}
+
+/** Badge model hanya boleh menampilkan model yang benar-benar dipakai; nilai
+ *  di luar daftar itu (atau baris lama yang belum menyimpannya) jadi undefined. */
+function toAiModel(v: unknown): "V4 Pro" | "V4 Flash" | undefined {
+  return v === "V4 Pro" || v === "V4 Flash" ? v : undefined;
 }
 
 /**
- * Bentukkan AnalysisResult dari baris yang tersimpan di `checker_results`.
+ * Bentukkan hasil analisis dari baris yang tersimpan di `checker_results`.
  *
- * Dipisah dari komponen supaya bisa diuji dan supaya hasil tersimpan punya
- * bentuk yang sama persis dengan hasil langsung. Field yang tidak ada pada
- * baris lama menjadi null/kosong, bukan error: kolom jsonb tidak dijamin
- * lengkap, jadi setiap section/koleksi dinormalisasi di sini, bukan hanya
- * diasumsikan benar lewat cast.
+ * Dipisah dari komponen supaya bisa diuji dan supaya kolom jsonb yang tidak
+ * lengkap tidak dipercaya begitu saja. Aturannya satu: apa yang tidak ada di
+ * baris tidak dimunculkan sebagai angka — section breakdown, bobot, dan proyeksi
+ * skor hilang kalau tidak lengkap, bukan diisi default yang terlihat meyakinkan.
  *
- * `impactForecast`, `meta`, `careerVelocity`, `atsPredictionDetail`, dan
- * `weightsApplied` diteruskan apa adanya: seluruh field di dalamnya opsional di
- * sisi Client, dan ImpactForecastCard sudah memeriksa sendiri bahwa skor ada
- * (src/components/checker/ImpactForecastCard.tsx) sebelum merender.
+ * `meta`, `careerVelocity`, dan `atsPredictionDetail` diteruskan apa adanya:
+ * seluruh field di dalamnya opsional di sisi Client, jadi panel sisi HR bisa
+ * menampilkan fallback sendiri tanpa angka yang mengarang.
  */
-export function analysisFromFullResult(id: string, data: StoredResult): AnalysisResult {
+export function analysisFromFullResult(id: string, data: StoredResult): StoredAnalysisResult {
   const scores = asRecord(data.scores);
   const feedback = asRecord(data.aiFeedback);
   const full = asRecord(data.fullResult);
@@ -165,31 +255,32 @@ export function analysisFromFullResult(id: string, data: StoredResult): Analysis
   return {
     id,
     scores: {
-      overall: scores.overall ?? 0,
-      keywordGap: scores.keywordGap ?? 0,
-      contextRelevance: scores.contextRelevance ?? 0,
-      atsRules: scores.atsRules ?? 0,
+      overall: toScore(scores.overall, 0),
+      keywordGap: toScore(scores.keywordGap, 0),
+      contextRelevance: toScore(scores.contextRelevance, 0),
+      atsRules: toScore(scores.atsRules, 0),
     },
     aiFeedback: {
-      keywordGap: feedback.keywordGap ?? "",
-      contextRelevance: feedback.contextRelevance ?? "",
-      atsRules: feedback.atsRules ?? "",
-      summary: feedback.summary ?? "",
+      keywordGap: toText(feedback.keywordGap),
+      contextRelevance: toText(feedback.contextRelevance),
+      atsRules: toText(feedback.atsRules),
+      summary: toText(feedback.summary),
     },
-    summary: feedback.summary ?? "",
-    grade: full.grade ?? null,
-    atsPrediction: full.atsPrediction ?? null,
+    summary: toText(feedback.summary),
+    grade: toGrade(full.grade),
+    atsPrediction: toAtsPrediction(full.atsPrediction),
     breakdown: toBreakdown(full.breakdown),
     keywordAnalysis: toKeywordAnalysis(full.keywordAnalysis),
     narrativeFeedback: toNarrativeFeedback(full.narrativeFeedback),
     actionPlan: toActionPlan(full.actionPlan),
     bulletReview: toBulletReview(full.bulletReview),
     missingSections: toTextList(full.missingSections),
-    weightsApplied: (full.weightsApplied ?? null) as AnalysisResult["weightsApplied"],
-    impactForecast: (full.impactForecast ?? null) as ImpactForecast | null,
+    weightsApplied: toWeightsApplied(full.weightsApplied),
+    impactForecast: toImpactForecast(full.impactForecast),
     meta: full.meta ?? null,
     careerVelocity: full.careerVelocity ?? null,
     atsPredictionDetail: full.atsPredictionDetail ?? null,
-    aiModel: data.aiModel,
+    // Disimpan route analyze di dalam full_result, bukan jadi kolom sendiri.
+    aiModel: toAiModel(full.aiModel),
   };
 }

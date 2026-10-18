@@ -1,6 +1,6 @@
 "use client";
 
-/* ── Types ── */
+/* â”€â”€ Types â”€â”€ */
 
 /** Issue dengan bukti kutipan verbatim dari CV (excerpt anchoring).
  *  AI baru mengirim { text, source_excerpt, severity }; hasil lama string polos / tanpa severity. */
@@ -34,7 +34,7 @@ export function toIssueItems(v: unknown): IssueItem[] {
     .filter((x): x is IssueItem => x !== null);
 }
 
-/* ── Severity badge (v4), warna & label netral bahasa (label via i18n) ── */
+/* â”€â”€ Severity badge (v4), warna & label netral bahasa (label via i18n) â”€â”€ */
 export function severityMeta(sev?: IssueItem["severity"], tFn?: (k: string) => string) {
   const t2 = tFn || ((k: string) => k);
   switch (sev) {
@@ -207,7 +207,24 @@ export interface AnalysisResult {
   } | null;
 }
 
-/* ── Helpers ── */
+/* Hasil tersimpan di `checker_results` */
+
+/** Breakdown dari kolom jsonb: hanya section yang benar-benar ada yang muncul.
+ *  Section tanpa skor tidak boleh dibuat-buat — kartu SectionScoreCard selalu
+ *  menampilkan persentase, jadi skor 50 hasil `.catch()` schema akan tampil
+ *  seolah-olah dihitung padahal tidak pernah. */
+export type StoredBreakdown = Partial<NonNullable<AnalysisResult["breakdown"]>>;
+
+/** Bentuk AnalysisResult untuk halaman hasil tersimpan (`/checker/[id]`).
+ *  Sama dengan AnalysisResult, kecuali breakdown boleh terpotong.
+ *  Sengaja tipe terpisah dan bukan `AnalysisResult["breakdown"]` yang di-partial-kan:
+ *  hasil live di `/checker/page.tsx` selalu lengkap (lewat zod) dan file itu
+ *  membaca kelima section tanpa penjaga, jadi melonggarkan sana jadi error. */
+export type StoredAnalysisResult = Omit<AnalysisResult, "breakdown"> & {
+  breakdown?: StoredBreakdown | null;
+};
+
+/* â”€â”€ Helpers â”€â”€ */
 
 export function scoreColor(score: number) {
   if (score > 70) return "#22c55e";
