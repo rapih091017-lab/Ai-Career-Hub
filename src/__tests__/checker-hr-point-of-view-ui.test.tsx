@@ -164,7 +164,7 @@ describe("panel Sisi HR", () => {
       },
     });
     // "Ringan" itu pinjaman arti, bukan padanan "Low".
-    const critical = screen.getByText("Berat banget");
+    const critical = screen.getByText("Kritis");
     const low = screen.getByText("Rendah");
     // Kalau keduanya kelasnya sama persis, yang berat sama saja kelihatan
     // dengan yang ringan. Warna boleh beda, tapi kata wajib beda juga.
@@ -181,7 +181,7 @@ describe("panel Sisi HR", () => {
     expect(screen.getByText(/This CV reads as level/i)).toBeInTheDocument();
     expect(screen.getByText(/Career trajectory/i)).toBeInTheDocument();
     expect(screen.getByText(/Career pace/i)).toBeInTheDocument();
-    expect(screen.getByText("Very serious")).toBeInTheDocument();
+    expect(screen.getByText("Critical")).toBeInTheDocument();
     // Kalau satu kunci Inggris salah ketik, t() mengembalikan kunci mentahnya.
     expect(screen.queryByText(/hrview-/)).not.toBeInTheDocument();
   });

@@ -10,17 +10,20 @@ type Bilingual = { id: string; en: string };
 type Severity = NonNullable<HrFinding["severity"]>;
 
 // Keempat label severity sengaja satu bentuk: kata sifat yang naik-turun
-// gradasi, dari "Rendah" sampai "Berat banget". Kalau cuma satu yang berupa
+// gradasi, dari "Rendah" sampai "Kritis". Kalau cuma satu yang berupa
 // klausa, tingkat lain terdengar seperti kategori sedangkan yang pertama
 // terdengar seperti catatan pribadi.
+// Istilah severity standar. "Berat banget" terdengar seperti
+// bahasa sehari-hari; di sini yang ditanyakan adalah seberapa serius
+// temuannya, jadi dipakai istilah yang sudah dikenal orang.
 const SEVERITY_LABEL: Record<Severity, Bilingual> = {
-  critical: { id: "Berat banget", en: "Very serious" },
+  critical: { id: "Kritis", en: "Critical" },
   high: { id: "Tinggi", en: "High" },
   medium: { id: "Sedang", en: "Medium" },
   low: { id: "Rendah", en: "Low" },
 };
 
-// Severity juga dibedakan secara visual supaya yang "Berat banget" kelihatan
+// Severity juga dibedakan secara visual supaya yang "Kritis" kelihatan
 // sekilas. Pembedaan memakai token ukuran dan warna yang sudah membawa weight
 // sendiri, bukan utilitas font-weight yang bisa kalah urutan dari token teks.
 // Kata severity tetap ada di semua tingkat: orang yang tidak membedakan warna
