@@ -1,8 +1,8 @@
-ï»¿# POV HR di Hasil Checker â€” Implementation Plan
+# POV HR di Hasil Checker — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Tampilkan panel "Sisi HR" di paling atas hasil checker â€” temuan yang bikin HR berhenti baca, temuan yang bikin dia lanjut, dan kutipan asli dari CV â€” memakai data yang sudah dikembalikan AI dan belum pernah dirender.
+**Goal:** Tampilkan panel "Sisi HR" di paling atas hasil checker — temuan yang bikin HR berhenti baca, temuan yang bikin dia lanjut, dan kutipan asli dari CV — memakai data yang sudah dikembalikan AI dan belum pernah dirender.
 
 **Architecture:** Satu fungsi murni `buildHrPointOfView` merangkai data analisis yang sudah ada (`ats_prediction.risk_factors`, `.strengths`, `meta.detected_seniority`, `career_velocity`) menjadi satu view model. Satu komponen presentasi `HrPointOfView` dipakai berdua oleh `/checker` dan `/checker/[id]`. Nol prompt baru, nol token baru, nol skema baru.
 
@@ -13,7 +13,7 @@
 - Bahasa teks di UI: **santai seperti HR ngobrol ke orang beneran**. Boleh: "Yang bikin saya berhenti". Dilarang: "Temuan negatif terdeteksi", angka tanpa bukti, kalimat berjamjam, kapital sebagai penekanan.
 - **Jangan pernah** menampilkan "CV-mu sudah bagus" saat panel kosong. Kita tidak bisa membedakan "memang tidak ada temuan" dari "AI tidak mengembalikan apa-apa". Status harus jujur + arahkan ke bagian lain.
 - Kutipan CV ditampilkan **penuh, tidak dipotong**. Kutipan kepotong = kutipan salah.
-- `source_excerpt` yang `null` â†’ kutipan tidak dirender sama sekali. Jangan render kotak kosong.
+- `source_excerpt` yang `null` ? kutipan tidak dirender sama sekali. Jangan render kotak kosong.
 - Tidak ada migrasi database di seluruh plan ini. Semua perubahan masuk ke kolom jsonb yang sudah ada.
 - Semua komponen dan teks baru wajib dua bahasa (id + en).
 - Setiap task diakhiri satu commit. Jalankan `npx vitest run` dan `npx tsc --noEmit -p tsconfig.json` sebelum commit.
@@ -25,13 +25,13 @@
 
 | File | Tanggung jawab | Task |
 | --- | --- | --- |
-| `src/lib/ai/prompts/shared.ts` (modify) | Ekspor `PROMPT_MARKERS` â€” satu sumber kebenaran penanda CV/JD | 1 |
+| `src/lib/ai/prompts/shared.ts` (modify) | Ekspor `PROMPT_MARKERS` — satu sumber kebenaran penanda CV/JD | 1 |
 | `src/lib/ai/adapter.ts` (modify) | `injectInputData` memakai `PROMPT_MARKERS` | 1 |
 | `src/app/api/checker/analyze/route.ts` (modify) | `userPrompt` memakai `PROMPT_MARKERS` | 1 |
 | `src/lib/ai/prompts/analysis-v4.ts` (modify) | Tabel GRADE yang hilang | 2 |
 | `src/app/api/checker/analyze/route.ts` (modify) | `meta` masuk `aiStructuredData` | 3 |
 | `src/components/checker/types.ts` (modify) | Tambah `meta`, `careerVelocity`, `atsPredictionDetail` ke `AnalysisResult` | 3 |
-| `src/lib/checker/analysis-from-full-result.ts` (create) | Mapping `fullResult` â†’ `AnalysisResult`, tanpa cast `any` | 3 |
+| `src/lib/checker/analysis-from-full-result.ts` (create) | Mapping `fullResult` ? `AnalysisResult`, tanpa cast `any` | 3 |
 | `src/lib/checker/hr-point-of-view.ts` (create) | Fungsi murni `buildHrPointOfView` | 4 |
 | `src/components/checker/HrPointOfView.tsx` (create) | Tampilan panel | 5 |
 | `src/lib/i18n.tsx` (modify) | Kunci `checker.hrview-*` dan `checker.detail.hrview-*` | 5 |
@@ -54,7 +54,7 @@
   - `PROMPT_MARKERS: { cv: string; jd: string }` dari `@/lib/ai/prompts/shared`
   - `splitCvJd(data: string): { cv: string; jd: string }` diekspor dari `@/lib/ai/adapter` supaya perilaku pemisahan bisa diuji langsung, bukan diuji lewat salinan logika di dalam test
 
-**Konteks.** `adapter.ts:96` mencari penanda `"=== JOB DESCRIPTION ==="`, sementara route menulis `"=== JOB DESCRIPTION TARGET ==="`. Karena `indexOf` mengembalikan `-1`, `{{CV_TEXT}}` diisi seluruh user prompt (termasuk isi JD) dan `{{JD_TEXT}}` kosong â€” padahal `analysis-v4.ts:344` minta keduanya terpisah.
+**Konteks.** `adapter.ts:96` mencari penanda `"=== JOB DESCRIPTION ==="`, sementara route menulis `"=== JOB DESCRIPTION TARGET ==="`. Karena `indexOf` mengembalikan `-1`, `{{CV_TEXT}}` diisi seluruh user prompt (termasuk isi JD) dan `{{JD_TEXT}}` kosong — padahal `analysis-v4.ts:344` minta keduanya terpisah.
 
 **Kenapa tidak langsung ganti konstantanya.** Adapter dipakai bersama banyak prompt. Kalau dipaksa cuma mengenali satu penanda, pemanggil lain ikut rusak. Jadi penandanya dipindah ke satu tempat dan adapter menerima keduanya.
 
@@ -95,7 +95,7 @@ describe("penanda blok CV dan JD", () => {
 - [ ] **Step 2: Jalankan test, pastikan gagal**
 
 Run: `npx vitest run src/__tests__/ai-prompt-markers.test.ts --reporter=dot`
-Expected: FAIL â€” `PROMPT_MARKERS` belum ada di `shared.ts`.
+Expected: FAIL — `PROMPT_MARKERS` belum ada di `shared.ts`.
 
 - [ ] **Step 3: Tambahkan `PROMPT_MARKERS` ke `shared.ts`**
 
@@ -240,7 +240,7 @@ git commit -m "fix(prompt): pisahkan CV dan deskripsi lowongan dengan benar
 injectInputData mencari penanda '=== JOB DESCRIPTION ===' sementara route
 menulis '=== JOB DESCRIPTION TARGET ==='. Karena indexOf mengembalikan -1,
 {{CV_TEXT}} diisi seluruh user prompt termasuk isi lowongan, dan {{JD_TEXT}}
-dikirim kosong â€” padahal prompt v4 minta keduanya terpisah.
+dikirim kosong — padahal prompt v4 minta keduanya terpisah.
 
 Penandanya dipindah ke satu tempat supaya tidak bisa lagi berbeda antara
 route dan adapter, dan adapter tetap menerima penanda lama supaya pemanggil
@@ -259,9 +259,9 @@ lain tidak ikut rusak."
 - Consumes: tidak ada
 - Produces: tidak ada (perilaku AI saja)
 
-**Konteks.** `analysis-v4.ts:45` menyuruh AI mengikuti "tabel GRADE", dan `:201` menyebutnya lagi â€” tapi tabel itu tidak pernah ada di file tersebut. Ambangnya hanya ada di `analysis-v3.ts` yang sudah tidak dipakai. Artinya grade yang tampil ke user sedang ditebak AI.
+**Konteks.** `analysis-v4.ts:45` menyuruh AI mengikuti "tabel GRADE", dan `:201` menyebutnya lagi — tapi tabel itu tidak pernah ada di file tersebut. Ambangnya hanya ada di `analysis-v3.ts` yang sudah tidak dipakai. Artinya grade yang tampil ke user sedang ditebak AI.
 
-Angka diambil dari v3 supaya hasil lama tidak berubah artinya: 85â€“100 A, 70â€“84 B, 50â€“69 C, 0â€“49 D.
+Angka diambil dari v3 supaya hasil lama tidak berubah artinya: 85–100 A, 70–84 B, 50–69 C, 0–49 D.
 
 - [ ] **Step 1: Tulis test yang gagal**
 
@@ -298,7 +298,7 @@ describe("tabel GRADE di prompt v4", () => {
 - [ ] **Step 2: Jalankan test, pastikan gagal**
 
 Run: `npx vitest run src/__tests__/checker-grade-prompt.test.ts --reporter=dot`
-Expected: FAIL â€” tabel GRADE tidak ada di prompt.
+Expected: FAIL — tabel GRADE tidak ada di prompt.
 
 - [ ] **Step 3: Tambahkan tabel GRADE**
 
@@ -326,8 +326,8 @@ Expected: PASS (3 test).
 
 - [ ] **Step 5: Typecheck dan suite penuh**
 
-Run: `npx tsc --noEmit -p tsconfig.json` â€” tidak ada output.
-Run: `npx vitest run --reporter=dot` â€” semua hijau.
+Run: `npx tsc --noEmit -p tsconfig.json` — tidak ada output.
+Run: `npx vitest run --reporter=dot` — semua hijau.
 
 - [ ] **Step 6: Commit**
 
@@ -355,7 +355,7 @@ tidak berubah artinya."
 - Test: `src/__tests__/checker-analysis-from-full-result.test.ts`
 
 **Interfaces:**
-- Consumes: `PROMPT_MARKERS` (Task 1) â€” tidak dipakai langsung
+- Consumes: `PROMPT_MARKERS` (Task 1) — tidak dipakai langsung
 - Produces:
   - `AnalysisResult` mendapat tiga field baru opsional: `meta`, `careerVelocity`, `atsPredictionDetail`
   - `analysisFromFullResult(id: string, data: { scores?: unknown; aiFeedback?: unknown; fullResult?: unknown }): AnalysisResult`
@@ -422,7 +422,7 @@ describe("mapping hasil tersimpan ke bentuk hasil analisis", () => {
 - [ ] **Step 2: Jalankan test, pastikan gagal**
 
 Run: `npx vitest run src/__tests__/checker-analysis-from-full-result.test.ts --reporter=dot`
-Expected: FAIL â€” modul `analysis-from-full-result` belum ada.
+Expected: FAIL — modul `analysis-from-full-result` belum ada.
 
 - [ ] **Step 3: Tambahkan tiga field ke `AnalysisResult`**
 
@@ -553,8 +553,8 @@ Expected: PASS (3 test).
 
 - [ ] **Step 8: Typecheck dan suite penuh**
 
-Run: `npx tsc --noEmit -p tsconfig.json` â€” tidak ada output.
-Run: `npx vitest run --reporter=dot` â€” semua hijau.
+Run: `npx tsc --noEmit -p tsconfig.json` — tidak ada output.
+Run: `npx vitest run --reporter=dot` — semua hijau.
 
 - [ ] **Step 9: Commit**
 
@@ -603,7 +603,7 @@ export interface HrPointOfView {
 export function buildHrPointOfView(result: AnalysisResult | null | undefined): HrPointOfView;
 ```
 
-**Konteks.** `strengths` di schema berbentuk campuran â€” bisa `string` biasa, bisa `{ text, source_excerpt }`. Fungsi ini merapikannya jadi satu bentuk supaya komponen tidak pernah bercabang. Tidak ada panggilan AI, tidak ada akses jaringan.
+**Konteks.** `strengths` di schema berbentuk campuran — bisa `string` biasa, bisa `{ text, source_excerpt }`. Fungsi ini merapikannya jadi satu bentuk supaya komponen tidak pernah bercabang. Tidak ada panggilan AI, tidak ada akses jaringan.
 
 - [ ] **Step 1: Tulis test yang gagal**
 
@@ -724,7 +724,7 @@ describe("pandangan sisi HR dari data analisis", () => {
 - [ ] **Step 2: Jalankan test, pastikan gagal**
 
 Run: `npx vitest run src/__tests__/checker-hr-point-of-view.test.ts --reporter=dot`
-Expected: FAIL â€” modul belum ada.
+Expected: FAIL — modul belum ada.
 
 - [ ] **Step 3: Implementasikan fungsi**
 
@@ -766,8 +766,8 @@ function clean(value: unknown): string {
  *
  * Tidak memanggil AI dan tidak menyentuh jaringan: ini hanya menata data yang
  * sudah ada supaya komponen tidak perlu bercabang pada berbagai bentuk data.
- * `strengths` datang dalam dua bentuk â€” string biasa atau objek dengan
- * source_excerpt â€” dan keduanya dinormalisasi di sini.
+ * `strengths` datang dalam dua bentuk — string biasa atau objek dengan
+ * source_excerpt — dan keduanya dinormalisasi di sini.
  */
 export function buildHrPointOfView(result: AnalysisResult | null | undefined): HrPointOfView {
   const detail = result?.atsPredictionDetail ?? null;
@@ -822,8 +822,8 @@ Expected: PASS (10 test).
 
 - [ ] **Step 5: Typecheck dan suite penuh**
 
-Run: `npx tsc --noEmit -p tsconfig.json` â€” tidak ada output.
-Run: `npx vitest run --reporter=dot` â€” semua hijau.
+Run: `npx tsc --noEmit -p tsconfig.json` — tidak ada output.
+Run: `npx vitest run --reporter=dot` — semua hijau.
 
 - [ ] **Step 6: Commit**
 
@@ -852,7 +852,7 @@ kotak kosong."
 
 **Interfaces:**
 - Consumes: `HrPointOfView`, `HrFinding`, `buildHrPointOfView` (Task 4), `AnalysisResult` (Task 3)
-- Produces: `export default function HrPointOfView({ result, keyPrefix }: { result: AnalysisResult | null; keyPrefix?: string })` â€” `keyPrefix` default `"checker."`, dipakai `"checker.detail."` di halaman hasil tersimpan
+- Produces: `export default function HrPointOfView({ result, keyPrefix }: { result: AnalysisResult | null; keyPrefix?: string })` — `keyPrefix` default `"checker."`, dipakai `"checker.detail."` di halaman hasil tersimpan
 
 - [ ] **Step 1: Tulis test render yang gagal**
 
@@ -926,7 +926,7 @@ describe("panel Sisi HR", () => {
 - [ ] **Step 2: Jalankan test, pastikan gagal**
 
 Run: `npx vitest run src/__tests__/checker-hr-point-of-view-ui.test.tsx --reporter=dot`
-Expected: FAIL â€” komponen belum ada.
+Expected: FAIL — komponen belum ada.
 
 - [ ] **Step 3: Tambahkan kunci i18n**
 
@@ -1068,8 +1068,8 @@ export default function HrPointOfView({
       {view.progression || view.growthRate ? (
         <p className="mt-4 border-t border-outline-variant/50 pt-3 text-label-sm text-on-surface-variant">
           {t(`${keyPrefix}hrview-journey`)}:{" "}
-          {view.progression ? pick(PROGRESSION_LABEL[view.progression]) : "â€”"}
-          {view.progression && view.growthRate ? " Â· " : ""}
+          {view.progression ? pick(PROGRESSION_LABEL[view.progression]) : "—"}
+          {view.progression && view.growthRate ? " · " : ""}
           {view.growthRate ? `laju ${pick(GROWTH_LABEL[view.growthRate])}` : ""}
         </p>
       ) : null}
@@ -1081,12 +1081,12 @@ export default function HrPointOfView({
 - [ ] **Step 5: Jalankan test**
 
 Run: `npx vitest run src/__tests__/checker-hr-point-of-view-ui.test.tsx --reporter=dot`
-Expected: PASS (7 test). Semua render dibungkus `LanguageProvider` karena `useTranslation` membaca context.
+Expected: PASS (5 test). Semua render dibungkus `LanguageProvider` karena `useTranslation` membaca context.
 
 - [ ] **Step 6: Typecheck dan suite penuh**
 
-Run: `npx tsc --noEmit -p tsconfig.json` â€” tidak ada output.
-Run: `npx vitest run --reporter=dot` â€” semua hijau.
+Run: `npx tsc --noEmit -p tsconfig.json` — tidak ada output.
+Run: `npx vitest run --reporter=dot` — semua hijau.
 
 - [ ] **Step 7: Commit**
 
@@ -1098,7 +1098,7 @@ Ditaruh paling atas hasil, sebelum angka, karena yang bikin orang buka
 halaman ini adalah pertanyaan kep-view bukan soal skor.
 
 Teksnya ngomong kayak HR yang jelasin ke temuannya. Saat panel kosong,
-panel jujur bilang tidak ada temuan dan arahkan ke Skor Per Section â€”
+panel jujur bilang tidak ada temuan dan arahkan ke Skor Per Section —
 bukan menjanjikan CV-nya bagus, karena kita tidak bisa membedakan
 memang tidak ada temuan dengan AI yang tidak mengembalikan apa-apa."
 ```
@@ -1155,7 +1155,7 @@ describe("panel sisi HR terpasang di kedua halaman hasil", () => {
 - [ ] **Step 2: Jalankan test, pastikan gagal**
 
 Run: `npx vitest run src/__tests__/checker-hrview-wiring.test.ts --reporter=dot`
-Expected: FAIL â€” `HrPointOfView` belum dirender di kedua halaman.
+Expected: FAIL — `HrPointOfView` belum dirender di kedua halaman.
 
 - [ ] **Step 3: Pasang panel di `/checker`**
 
@@ -1187,7 +1187,7 @@ Di `src/app/checker/page.tsx` sekitar baris 881-914, di dalam `motion.section` "
                   <ul className="space-y-1.5">
                     {narrativeFeedback.strengths.map((s, i) => (
                       <li key={i} className="text-xs text-green-800 flex items-start gap-2">
-                        <span className="text-green-500 mt-0.5 select-none">â€¢</span>
+                        <span className="text-green-500 mt-0.5 select-none">•</span>
                         {s}
                       </li>
                     ))}
@@ -1205,7 +1205,7 @@ Di `src/app/checker/page.tsx` sekitar baris 881-914, di dalam `motion.section` "
                   <ul className="space-y-1.5">
                     {narrativeFeedback.areas_for_improvement.map((a, i) => (
                       <li key={i} className="text-xs text-red-800 flex items-start gap-2">
-                        <span className="text-red-400 mt-0.5 select-none">â€¢</span>
+                        <span className="text-red-400 mt-0.5 select-none">•</span>
                         {a}
                       </li>
                     ))}
@@ -1215,7 +1215,7 @@ Di `src/app/checker/page.tsx` sekitar baris 881-914, di dalam `motion.section` "
             </div>
 ```
 
-Setelah dihapus, urutan di dalam `motion.section` jadi: `<h2>` "Review oleh AI" â†’ blok `overall_assessment` â†’ blok Rekomendasi ATS (`checker.ats-recs`). Ketiganya tidak boleh disentuh.
+Setelah dihapus, urutan di dalam `motion.section` jadi: `<h2>` "Review oleh AI" ? blok `overall_assessment` ? blok Rekomendasi ATS (`checker.ats-recs`). Ketiganya tidak boleh disentuh.
 
 - [ ] **Step 5: Pasang panel di `/checker/[id]`**
 
@@ -1243,7 +1243,7 @@ Prop `keyPrefix` sudah disiapkan di Task 5 Step 4, jadi tidak ada perubahan komp
 
 - [ ] **Step 6: Pangkas kolom duplikat di `/checker/[id]`**
 
-Di `src/app/checker/[id]/page.tsx` sekitar baris 255-283, hapus pembungkus `<div className="grid grid-cols-1 md:grid-cols-2 gap-4">` beserta dua anaknya â€” kolom `t("checker.detail.strengths")` dan kolom `t("checker.detail.improve")`. Struktur bloknya sama persis dengan di `/checker`, hanya nama kuncinya berbeda.
+Di `src/app/checker/[id]/page.tsx` sekitar baris 255-283, hapus pembungkus `<div className="grid grid-cols-1 md:grid-cols-2 gap-4">` beserta dua anaknya — kolom `t("checker.detail.strengths")` dan kolom `t("checker.detail.improve")`. Struktur bloknya sama persis dengan di `/checker`, hanya nama kuncinya berbeda.
 
 Yang tetap ada setelah penghapusan: judul bagian review, blok `checker.detail.overall-assessment`, dan blok rekomendasi ATS.
 
@@ -1254,9 +1254,9 @@ Expected: PASS (6 test).
 
 - [ ] **Step 8: Typecheck, suite penuh, dan build**
 
-Run: `npx tsc --noEmit -p tsconfig.json` â€” tidak ada output.
-Run: `npx vitest run --reporter=dot` â€” semua hijau.
-Run: `npm run build` â€” harus selesai dengan "Compiled successfully".
+Run: `npx tsc --noEmit -p tsconfig.json` — tidak ada output.
+Run: `npx vitest run --reporter=dot` — semua hijau.
+Run: `npm run build` — harus selesai dengan "Compiled successfully".
 
 - [ ] **Step 9: Commit**
 
@@ -1268,7 +1268,7 @@ Panelnya muncul paling atas di /checker dan /checker/[id] supaya hasil baru
 dan hasil tersimpan sama persis.
 
 Kolom Kelebihan dan Perlu Diperbaiki di Review oleh AI dihapus karena
-isinya sudah tampil di panel â€” kalau dibiarkan, kelemahan yang sama muncul
+isinya sudah tampil di panel — kalau dibiarkan, kelemahan yang sama muncul
 dua kali dalam satu halaman. Overall assessment dan rekomendasi ATS tetap
 ada, judul bagian tidak diubah."
 ```
@@ -1333,4 +1333,4 @@ Ditemukan saat menelusuri, sengaja tidak dikerjakan di sini. Dicatat supaya tida
 
 - Judul "Keyword Analysis" di hasil `/checker` masih hardcoded bahasa Inggris (`src/app/checker/page.tsx`), padahal judul-judul saudaranya sudah dua bahasa.
 - `fitLabel` di `/checker/[id]` selalu `undefined` karena membaca `breakdown.overall`, field yang tidak pernah ada. Sekalian hilang saat Task 3 memindahkan mapping.
-- Tombol unduh PDF untuk hasil checker. Infrastrukturnya sudah siap â€” ada `resultsRef`, `PdfExportButton`, dan `lib/pdf-export.ts` â€” tapi tombolnya belum pernah dirender.
+- Tombol unduh PDF untuk hasil checker. Infrastrukturnya sudah siap — ada `resultsRef`, `PdfExportButton`, dan `lib/pdf-export.ts` — tapi tombolnya belum pernah dirender.
