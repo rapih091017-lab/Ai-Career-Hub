@@ -11,6 +11,7 @@ import { UploadZone } from "@/components/checker/UploadZone";
 import { ScoreDonut } from "@/components/checker/ScoreDonut";
 import { SectionScoreCard } from "@/components/checker/SectionScoreCard";
 import { ImpactForecastCard } from "@/components/checker/ImpactForecastCard";
+import HrPointOfView from "@/components/checker/HrPointOfView";
 import { KeywordChip, BulletReviewCard } from "@/components/checker/ResultComponents";
 import { ImprovementChecklist } from "@/components/checker/ImprovementChecklist";
 import { scoreColor, gradeColor, atsBadgeColor, fitLabelMeta, ROLE_CATEGORY_OPTIONS, type AnalysisResult, type ExperienceSection, type SkillsSection } from "@/components/checker/types";
@@ -778,6 +779,12 @@ export default function CheckerPage() {
         <div ref={resultsRef} className="space-y-10">
 
         {/* ============================================================ */}
+        {/*  0. SISI HR, di atas skor. Orang yang membuka hasil baru tahu   */}
+        {/*     sudah dihentikan atau diteruskan baca; angkanya menyusul.  */}
+        {/* ============================================================ */}
+        <HrPointOfView result={result} />
+
+        {/* ============================================================ */}
         {/*  1. SCORE OVERVIEW                                            */}
         {/* ============================================================ */}
         <section className="flex flex-col items-center">
@@ -876,43 +883,10 @@ export default function CheckerPage() {
               <p className="text-sm text-on-surface leading-relaxed">{narrativeFeedback.overall_assessment}</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Strengths */}
-              {narrativeFeedback.strengths.length > 0 && (
-                <div className="bg-green-50 rounded-xl p-4 border border-green-200">
-                  <h3 className="text-xs font-bold text-green-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-sm select-none">check_circle</span>
-                    {t("checker.strengths")}
-                  </h3>
-                  <ul className="space-y-1.5">
-                    {narrativeFeedback.strengths.map((s, i) => (
-                      <li key={i} className="text-xs text-green-800 flex items-start gap-2">
-                        <span className="text-green-500 mt-0.5 select-none">✓</span>
-                        {s}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Areas for improvement */}
-              {narrativeFeedback.areas_for_improvement.length > 0 && (
-                <div className="bg-red-50 rounded-xl p-4 border border-red-200">
-                  <h3 className="text-xs font-bold text-red-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-sm select-none">warning</span>
-                    {t("checker.improvements")}
-                  </h3>
-                  <ul className="space-y-1.5">
-                    {narrativeFeedback.areas_for_improvement.map((a, i) => (
-                      <li key={i} className="text-xs text-red-800 flex items-start gap-2">
-                        <span className="text-red-400 mt-0.5 select-none">⚠</span>
-                        {a}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
+            {/* Kolom Kelebihan dan Perlu Diperbaiki dihapus: isinya sama
+                dengan panel Sisi HR di atas, jadi kalau dibiarkan kelemahannya
+                tampil dua kali dalam satu halaman. Panelnya juga membawa
+                kutipan asli CV, yang tidak pernah ada di sini. */}
 
             {/* ATS Recommendations */}
             {narrativeFeedback.ats_recommendations.length > 0 && (

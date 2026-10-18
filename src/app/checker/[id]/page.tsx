@@ -10,7 +10,8 @@ import { SectionScoreCard } from "@/components/checker/SectionScoreCard";
 import { KeywordChip, BulletReviewCard } from "@/components/checker/ResultComponents";
 import { ImprovementChecklist } from "@/components/checker/ImprovementChecklist";
 import { ImpactForecastCard } from "@/components/checker/ImpactForecastCard";
-import { scoreColor, gradeColor, atsBadgeColor, type StoredAnalysisResult, type ExperienceSection, type SkillsSection } from "@/components/checker/types";
+import HrPointOfView from "@/components/checker/HrPointOfView";
+import { scoreColor, gradeColor, atsBadgeColor, type AnalysisResult, type StoredAnalysisResult, type ExperienceSection, type SkillsSection } from "@/components/checker/types";
 import MagneticButton from "@/components/MagneticButton";
 import Link from "next/link";
 import { useTranslation } from "@/lib/i18n";
@@ -167,6 +168,15 @@ export default function CheckerDetailPage() {
         <div ref={resultsRef} className="space-y-10" id="checker-results-detail">
 
         {/* ============================================================ */}
+        {/*  0. SISI HR, di atas skor, sama seperti di /checker supaya     */}
+        {/*     hasil baru dan hasil tersimpan terbaca identik.           */}
+        {/* ============================================================ */}
+        {/* StoredAnalysisResult boleh punya breakdown terpotong, sedangkan
+            panel hanya membaca meta, careerVelocity, dan atsPredictionDetail.
+            Bentuk penuhnya sama persis di ketiga field itu. */}
+        <HrPointOfView result={result as AnalysisResult} keyPrefix="checker.detail." />
+
+        {/* ============================================================ */}
         {/*  1. SCORE OVERVIEW                                            */}
         {/* ============================================================ */}
         <section className="flex flex-col items-center">
@@ -246,32 +256,9 @@ export default function CheckerDetailPage() {
             <div className="bg-surface-container-low rounded-xl p-4 border-l-4 border-primary">
               <p className="text-sm text-on-surface leading-relaxed">{narrativeFeedback.overall_assessment}</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {narrativeFeedback.strengths.length > 0 && (
-                <div className="bg-green-50 rounded-xl p-4 border border-green-200">
-                  <h3 className="text-xs font-bold text-green-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-sm select-none">check_circle</span>{t("checker.detail.strengths")}
-                  </h3>
-                  <ul className="space-y-1.5">
-                    {narrativeFeedback.strengths.map((s, i) => (
-                      <li key={i} className="text-xs text-green-800 flex items-start gap-2"><span className="text-green-500 mt-0.5 select-none">✓</span>{s}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              {narrativeFeedback.areas_for_improvement.length > 0 && (
-                <div className="bg-red-50 rounded-xl p-4 border border-red-200">
-                  <h3 className="text-xs font-bold text-red-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-sm select-none">warning</span>{t("checker.detail.improve")}
-                  </h3>
-                  <ul className="space-y-1.5">
-                    {narrativeFeedback.areas_for_improvement.map((a, i) => (
-                      <li key={i} className="text-xs text-red-800 flex items-start gap-2"><span className="text-red-400 mt-0.5 select-none">⚠</span>{a}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
+            {/* Kolom Kelebihan dan Perlu Diperbaiki dihapus karena isinya
+                sudah tampil di panel Sisi HR di atas, lengkap dengan kutipan
+                CV; menyisakannya berarti kelemahan yang sama tampil dua kali. */}
             {narrativeFeedback.ats_recommendations.length > 0 && (
               <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
                 <h3 className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">                    <span className="material-symbols-outlined text-sm select-none">description</span>{t("checker.detail.ats-recs")}
