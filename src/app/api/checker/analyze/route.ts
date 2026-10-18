@@ -6,6 +6,8 @@ import { eq, and, sql, count } from "drizzle-orm";
 import { callAI, MODELS, buildUserContext } from "@/lib/ai/adapter";
 import { getUserAccess } from "@/lib/access";
 import { ANALYSIS_PROMPT_V4 } from "@/lib/ai/prompts/analysis-v4";
+import { PROMPT_MARKERS } from "@/lib/ai/prompts/shared";
+
 import type { AnalysisResult } from "@/lib/ai/prompts/schemas";
 import { apiHandler } from "@/lib/api-utils";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limiter";
@@ -203,7 +205,7 @@ message: t(
         .replace(/\{\{OUTPUT_LANGUAGE\}\}/g, outputLang)
         // Kedalaman bullet review mengikuti tier akses, hemat token untuk free/flash.
         .replace(/\{\{BULLET_MAX\}\}/g, useReasoner ? "5" : "3"),
-      userPrompt: `=== ROLE CATEGORY: ${roleCat} ===\n\n=== CV KANDIDAT ===\n${extractedText}\n\n=== JOB DESCRIPTION TARGET ===\n${jd || (outputLang === "en" ? "No job description provided." : "Tidak ada deskripsi pekerjaan.")}`,
+      userPrompt: `=== ROLE CATEGORY: ${roleCat} ===\n\n${PROMPT_MARKERS.cv}\n${extractedText}\n\n${PROMPT_MARKERS.jd}\n${jd || (outputLang === "en" ? "No job description provided." : "Tidak ada deskripsi pekerjaan.")}`,
       temperature: 0.3,
       // Model: premium → deepseek-v4-pro (thinking) untuk analisis mendalam;
       // free/anonymous → deepseek-v4-flash agar biaya terkontrol.

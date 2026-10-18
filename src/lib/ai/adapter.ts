@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import { ZodSchema, ZodError } from "zod";
 import { AI_SCHEMAS, AiTaskType } from "./prompts/schemas";
+import { PROMPT_MARKERS } from "@/lib/ai/prompts/shared";
 
 const client = new OpenAI({
   apiKey: process.env.DEEPSEEK_API_KEY,
@@ -90,18 +91,46 @@ function sanitizeText(text: string): string {
   return text.replace(/[\uD800-\uDFFF]/g, "");
 }
 
-/* ─── Inject input data into prompt ─────────────────────── */
+/**
+ * Pisahkan CV dari deskripsi lowongan di user prompt.
+ *
+ * Dua penanda diterima supaya prompt yang ditulis sebelum konstanta ini ada
+ * tetap jalan. Yang dipakai adalah penanda yang muncul lebih dulu.
+ *
+ * Diekspor supaya pemisahan ini bisa diuji langsung, bukan lewat salinan
+ * logika di dalam file test.
+ */
+export function splitCvJd(data: string): { cv: string; jd: string } {
+  const jdIndex = data.indexOf(PROMPT_MARKERS.jd);
+  const legacyJdIndex = data.indexOf(PROMPT_MARKERS.legacyJd);
+  // Kalau keduanya muncul, yang lebih dulu dipakai: marker JD selalu ditulis
+  // setelah seluruh isi CV, jadi posisi paling awal adalah batas yang benar.
+  const useLegacy = jdIndex === -1 ? legacyJdIndex !== -1 : legacyJdIndex !== -1 && legacyJdIndex < jdIndex;
+  const marker = useLegacy ? PROMPT_MARKERS.legacyJd : PROMPT_MARKERS.jd;
+  const cut = useLegacy ? legacyJdIndex : jdIndex;
+
+  const cvText = sanitizeText(cut === -1 ? data : data.slice(0, cut).trim());
+  // Marker ikut dibuang, konsisten dengan perilaku sebelum refactor ini.
+  const jdText = sanitizeText(cut === -1 ? "" : data.slice(cut + marker.length).trim());
+
+  // Buang penanda dan baris kategori posisi, supaya yang masuk ke {{CV_TEXT}}
+  // benar-benar isi CV saja.
+  const cvOnly = cvText
+    .replace(/^=== ROLE CATEGORY:[^\n]*\n+/, "")
+    .split(PROMPT_MARKERS.cv)
+    .pop()!
+    .trim();
+
+  return { cv: cvOnly, jd: jdText };
+}
+
 function injectInputData(prompt: string, data: string): string {
-  // Ekstrak CV dan JD dari data, pake indexOf biar toleran terhadap whitespace
-  const JD_MARKER = "=== JOB DESCRIPTION ===";
-  const jdIndex = data.indexOf(JD_MARKER);
-  const cvText = sanitizeText(jdIndex === -1 ? data : data.slice(0, jdIndex).trim());
-  const jdText = sanitizeText(jdIndex === -1 ? "" : data.slice(jdIndex + JD_MARKER.length).trim());
+  const { cv, jd } = splitCvJd(data);
 
   return prompt
     .replace("{{INPUT_DATA}}", data)
-    .replace("{{CV_TEXT}}", cvText)
-    .replace("{{JD_TEXT}}", jdText)
+    .replace("{{CV_TEXT}}", cv)
+    .replace("{{JD_TEXT}}", jd)
     .replace("{{PROFILE_DATA}}", data);
 }
 

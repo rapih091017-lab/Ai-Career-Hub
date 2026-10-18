@@ -3,6 +3,21 @@
  * Shared constants, security guards, and reusable templates.
  * ============================================================ */
 
+/**
+ * Penanda blok yang memisahkan CV dari deskripsi lowongan di user prompt.
+ *
+ * Dipakai oleh route penyusun prompt dan oleh adapter saat menyuntikkan data.
+ * Semula masing-masing menulis penanda sendiri dan tidak sama, sehingga
+ * {{CV_TEXT}} berisi seluruh prompt dan {{JD_TEXT}} kosong.
+ */
+export const PROMPT_MARKERS = {
+  cv: "=== CV KANDIDAT ===",
+  jd: "=== JOB DESCRIPTION TARGET ===",
+  /** Penanda versi lama. Tetap dikenali supaya prompt yang ditulis sebelum
+   *  jd ada tidak ikut rusak, tapi tidak boleh dipakai lagi saat menulis prompt. */
+  legacyJd: "=== JOB DESCRIPTION ===",
+} as const;
+
 /** ─── SECURITY GUARDRAIL ───────────────────────────────────
  *  Wajib disisipkan di SETIAP system prompt untuk mencegah
  *  prompt injection dari input user.
