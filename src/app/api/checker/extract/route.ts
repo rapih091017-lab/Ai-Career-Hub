@@ -1,4 +1,5 @@
 import { checkRateLimit, rateLimitResponse, clientIp } from "@/lib/rate-limiter";
+import { sanitizeExtractedText } from "@/lib/checker/extracted-text";
 
 import { ocrImage } from "@/lib/ocr";
 import { docToMarkdown } from "@/lib/doc-markdown";
@@ -329,7 +330,7 @@ export async function POST(request: Request) {
         }
 
         return Response.json({
-          extractedText: ocrText,
+          extractedText: sanitizeExtractedText(ocrText),
           fileName: file.name,
           format: "ocr_image",
         });
@@ -359,7 +360,7 @@ export async function POST(request: Request) {
         }
 
         return Response.json({
-          extractedText: textResult,
+          extractedText: sanitizeExtractedText(textResult),
           fileName: file.name,
           format: "docx",
         });
@@ -387,7 +388,7 @@ export async function POST(request: Request) {
       const anydocResult = await docToMarkdown(Buffer.from(rawArrayBuffer));
       if (anydocResult.ok && anydocResult.markdown.trim().length >= 50) {
         return Response.json({
-          extractedText: anydocResult.markdown.trim(),
+          extractedText: sanitizeExtractedText(anydocResult.markdown.trim()),
           fileName: file.name,
           format: "pdf",
           reader: "anydoc",
@@ -400,7 +401,7 @@ export async function POST(request: Request) {
       // Success!
       if (!result1.errorType && result1.text.length >= 50) {
         return Response.json({
-          extractedText: result1.text,
+          extractedText: sanitizeExtractedText(result1.text),
           fileName: file.name,
           format: "pdf",
         });
@@ -417,7 +418,7 @@ export async function POST(request: Request) {
           const fallbackText = (parsed.text ?? "").trim();
           if (fallbackText.length >= 50) {
             return Response.json({
-              extractedText: fallbackText,
+              extractedText: sanitizeExtractedText(fallbackText),
               fileName: file.name,
               format: "pdf",
             });

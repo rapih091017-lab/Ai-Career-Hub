@@ -7,6 +7,7 @@ import { callAI, MODELS, buildUserContext } from "@/lib/ai/adapter";
 import { getUserAccess } from "@/lib/access";
 import { ANALYSIS_PROMPT_V4 } from "@/lib/ai/prompts/analysis-v4";
 import { PROMPT_MARKERS } from "@/lib/ai/prompts/shared";
+import { sanitizeExtractedText } from "@/lib/checker/extracted-text";
 
 import type { AnalysisResult } from "@/lib/ai/prompts/schemas";
 import { apiHandler } from "@/lib/api-utils";
@@ -31,7 +32,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
   }
 
   const body = await request.json();
-  const { extractedText, jobDescription, roleCategory, lang, mode } = body;
+  const { extractedText: extractedTextRaw, jobDescription, roleCategory, lang, mode } = body;
 
   // Bahasa output analisis mengikuti bahasa UI user (id/en). Default "id" untuk
   // klien lama & backward-compat. Diteruskan ke prompt analysis-v3 {{OUTPUT_LANGUAGE}}.
@@ -45,16 +46,22 @@ export const POST = apiHandler(async (request: NextRequest) => {
   // ── 0.5 VALIDASI INPUT ───────────────────────────────────────────
   // Cegah payload tak lengkap (undefined/non-string/kosong) dari crash
   // toLowerCase, prompt AI berisi "undefined", atau insert DB gagal.
-  if (typeof extractedText !== "string" || !extractedText.trim()) {
+  if (typeof extractedTextRaw !== "string" || !extractedTextRaw.trim()) {
     return NextResponse.json(
       { error: "BAD_REQUEST", message: t("Teks CV wajib diisi.", "CV text is required.") },
       { status: 400 },
     );
   }
 
+  // Byte NUL dari ekstraksi PDF dibuang sebelum dipakai di dua tempat: prompt
+  // AI dan insert checker_results. Postgres menolak byte itu untuk kolom text
+  // dengan error 22021, sehingga insert gagal setelah AI selesai dan pengguna
+  // hanya melihat pesan kesalahan server yang generik.
+  const extractedText = sanitizeExtractedText(extractedTextRaw);
+
   // Job description opsional, normalisasi ke string kosong agar aman
   // untuk cleanWords, prompt AI, dan insert DB (kolom NOT NULL).
-  const jd = typeof jobDescription === "string" ? jobDescription : "";
+  const jd = sanitizeExtractedText(typeof jobDescription === "string" ? jobDescription : "");
 
   // ── 1. CEK SESSION DULU ──────────────────────────────────────────
   // Session dicek sebelum kuota anonim, supaya user yang sudah login
