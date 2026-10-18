@@ -1,6 +1,6 @@
 "use client";
 
-/* â”€â”€ Types â”€â”€ */
+/* ── Types ── */
 
 /** Issue dengan bukti kutipan verbatim dari CV (excerpt anchoring).
  *  AI baru mengirim { text, source_excerpt, severity }; hasil lama string polos / tanpa severity. */
@@ -34,7 +34,7 @@ export function toIssueItems(v: unknown): IssueItem[] {
     .filter((x): x is IssueItem => x !== null);
 }
 
-/* â”€â”€ Severity badge (v4), warna & label netral bahasa (label via i18n) â”€â”€ */
+/* ── Severity badge (v4), warna & label netral bahasa (label via i18n) ── */
 export function severityMeta(sev?: IssueItem["severity"], tFn?: (k: string) => string) {
   const t2 = tFn || ((k: string) => k);
   switch (sev) {
@@ -224,7 +224,7 @@ export type StoredAnalysisResult = Omit<AnalysisResult, "breakdown"> & {
   breakdown?: StoredBreakdown | null;
 };
 
-/* â”€â”€ Helpers â”€â”€ */
+/* ── Helpers ── */
 
 export function scoreColor(score: number) {
   if (score > 70) return "#22c55e";
