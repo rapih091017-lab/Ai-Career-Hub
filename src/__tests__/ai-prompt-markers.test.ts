@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import { PROMPT_MARKERS } from "@/lib/ai/prompts/shared";
-import { splitCvJd } from "@/lib/ai/adapter";
+import { splitCvJd, injectInputData } from "@/lib/ai/adapter";
 
 // adapter membangun klien OpenAI saat modul diimpor dan SDK itu melempar
 // error kalau API key tidak ada di environment test. Test ini cuma memakai
@@ -103,5 +103,30 @@ describe("pemisahan CV dan JD di prompt", () => {
 
   it("data kosong menghasilkan kedua bagian kosong", () => {
     expect(splitCvJd("")).toEqual({ cv: "", jd: "" });
+  });
+});
+
+describe("penyuntikan data ke prompt", () => {
+  // String.prototype.replace dengan string pengganti menafsirkan $&, $`, dan $'
+  // sebagai bagian dari pola. CV yang memuat "$&" — wajar terjadi pada teks
+  // tentang regex atau shell — akan merusak isi {{CV_TEXT}} di prompt.
+  it("CV yang memuat pola pengganti regex tetap masuk utuh", () => {
+    const cv = "Regex: ganti pakai $&, lalu $`, lalu $' sebelum koma";
+    const data = [PROMPT_MARKERS.cv, cv, "", PROMPT_MARKERS.jd, "Butuh AWS"].join("\n");
+
+    const prompt = injectInputData("CV:\n{{CV_TEXT}}\nJD:\n{{JD_TEXT}}", data);
+
+    expect(prompt).toBe(`CV:\n${cv}\nJD:\nButuh AWS`);
+  });
+
+  it("data mentah yang memuat pola pengganti juga tetap utuh", () => {
+    // Data mentah pun bisa memuat $&, jadi {{INPUT_DATA}} dan {{PROFILE_DATA}}
+    // perlu perlakuan yang sama. Placeholder ini menerima data apa adanya,
+    // termasuk penanda bloknya.
+    const data = ["$& seluruh data mentah", "", PROMPT_MARKERS.jd, "Butuh AWS"].join("\n");
+
+    expect(injectInputData("{{INPUT_DATA}}", data)).toBe(data);
+    expect(injectInputData("{{PROFILE_DATA}}", data)).toBe(data);
+    expect(injectInputData("{{CV_TEXT}}", data)).toBe("$& seluruh data mentah");
   });
 });

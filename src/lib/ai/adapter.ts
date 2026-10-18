@@ -128,14 +128,24 @@ export function splitCvJd(data: string): { cv: string; jd: string } {
   return { cv: cvOnly, jd: jdText };
 }
 
-function injectInputData(prompt: string, data: string): string {
+/**
+ * Sisipkan data mentah ke placeholder prompt.
+ *
+ * Diekspor supaya penyisipannya bisa diuji langsung: `replace` dengan string
+ * pengganti menafsirkan $&, $`, dan $' sebagai bagian dari pola, dan itu harus
+ * terlihat jelas di test.
+ */
+export function injectInputData(prompt: string, data: string): string {
   const { cv, jd } = splitCvJd(data);
 
+  // Bentuk fungsi dipakai, bukan string biasa: isi CV/JD adalah data pengguna
+  // yang tidak boleh diparse ulang sebagai pola pengganti (mis. "$&" pada
+  // teks tentang regex atau shell), kalau tidak isinya bisa rusak.
   return prompt
-    .replace("{{INPUT_DATA}}", data)
-    .replace("{{CV_TEXT}}", cv)
-    .replace("{{JD_TEXT}}", jd)
-    .replace("{{PROFILE_DATA}}", data);
+    .replace("{{INPUT_DATA}}", () => data)
+    .replace("{{CV_TEXT}}", () => cv)
+    .replace("{{JD_TEXT}}", () => jd)
+    .replace("{{PROFILE_DATA}}", () => data);
 }
 
 /* ─── Parse & validate JSON (single pass) ───────────────── */

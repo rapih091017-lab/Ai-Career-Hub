@@ -3,6 +3,7 @@ import {
   BOUNDARY,
   DELIM,
   OUTPUT_FORMAT_INSTRUCTION,
+  PROMPT_MARKERS,
 } from "./shared";
 
 /*
@@ -42,7 +43,12 @@ ${DELIM.SECTION}
    JSON (tanpa markdown fence, tanpa komentar, tanpa blok <think>).
 4. overall_score = ROUND(Σ section.score × weight dari tabel ROLE CATEGORY).
    Hitung eksak, bukan estimasi bebas.
-5. grade WAJIB mengikuti threshold overall_score (tabel GRADE di bawah).
+5. grade WAJIB mengikuti threshold overall_score di tabel GRADE ini, tanpa kecuali:
+   - 85-100: A
+   - 70-84: B
+   - 50-69: C
+   - 0-49: D
+   Tidak boleh menebak angka lain, dan tidak boleh memberi grade di luar A/B/C/D.
 6. source_excerpt yang tidak null WAJIB substring PERSIS (verbatim, termasuk typo)
    dari {{CV_TEXT}}, maksimal 15 kata. Tidak yakin → null, jangan menebak.
 7. bullet_review maksimal {{BULLET_MAX}} item. Pilih yang PALING BERDAMPAK, bukan
@@ -198,7 +204,7 @@ ${DELIM.SECTION}
 
 --- VERIFIKASI AKHIR (internal, sebelum output) ---
 (a) overall_score = ROUND(Σ score×weight) persis, bukan angka bebas
-(b) grade sesuai threshold tabel GRADE
+(b) grade WAJIB sama dengan hasil tabel GRADE di atas untuk overall_score yang kamu tulis. Kalau tidak cocok, angka itu salah.
 (c) impact_forecast monoton (aturan #8)
 (d) tidak ada field null/undefined
 (e) tiap source_excerpt (jika tidak null) adalah substring persis {{CV_TEXT}}
@@ -338,10 +344,10 @@ ${DELIM.CONTEXT_CLOSE}
 ${DELIM.INPUT_OPEN}
 === ROLE CATEGORY: {{ROLE_CATEGORY}} ===
 
-=== CV KANDIDAT ===
+${PROMPT_MARKERS.cv}
 {{CV_TEXT}}
 
-=== JOB DESCRIPTION TARGET ===
+${PROMPT_MARKERS.jd}
 {{JD_TEXT}}
 ${DELIM.INPUT_CLOSE}
 `;
