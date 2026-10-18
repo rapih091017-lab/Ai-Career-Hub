@@ -200,7 +200,7 @@ message: t(
   let aiAnalysis: AnalysisResult | null = null;
   try {
     aiAnalysis = await callAI<AnalysisResult>({
-systemPrompt: ANALYSIS_PROMPT_V4
+      systemPrompt: ANALYSIS_PROMPT_V4
         // Bentuk fungsi dipakai, bukan string biasa: isinya berasal dari input
         // pengguna (role dari form, isi dari kode), dan "$&" pada data itu akan
         // ditafsirkan sebagai pola pengganti kalau dipakai string biasa. Prompt

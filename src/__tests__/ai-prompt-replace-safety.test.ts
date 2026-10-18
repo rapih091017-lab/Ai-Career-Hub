@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
+import ts from "typescript";
 
 // Scan sumber, bukan runtime: bug ini tidak muncul saat route dipanggil, tapi
 // saat teks pengguna berisi "$&" tersisip ke prompt tanpa error. Penjaga paling
@@ -10,18 +11,32 @@ import { join } from "node:path";
 // harus memakai BENTUK FUNGSI (`() => nilai`) atau literal tanpa interpolasi
 // sebagai pengganti. String biasa sebagai argumen kedua membuat "$&", "$`", dan
 // "$'" pada teks pengguna ditafsirkan sebagai pola pengganti.
+//
+// Bentuk kodenya dibaca lewat AST TypeScript, bukan lewat tokenizer sendiri.
+// Parser mini pernah salah pada tiga kasus nyata: `.replace` di dalam template
+// literal multi-baris (backtick tidak melacak `${...}`), `.replaceAll` yang
+// punya semantik "$&" persis sama tapi tidak dikenali, dan argumen regex
+// diikuti akses properti (`/(X)/.source`) yang bikin parser berhenti sebelum
+// membaca argumen kedua. AST tidak punya heuristic apa pun untuk ketiganya.
 
 const PROMPT_SOURCE_FILES = ["src/lib/ai/adapter.ts", ...collectRouteFiles("src/app/api")];
 
 // Pengecualian yang masih terbuka: sudah diketahui, tapi perbaikannya di luar
-// lingkup file yang boleh disentuh pada putaran ini. Kalau sudah diperbaiki,
-// entri ini harus dihapus — test "tidak ada pengecualian yang basi" gagal
-// sampai dihapus, jadi daftar ini tidak bisa lapuk diam-diam.
-const KNOWN_UNFIXED: Record<string, number> = {
-  "src/app/api/cv-documents/create/route.ts": 2,
+// lingkup file yang boleh disentuh pada putaran ini. Kuncinya teks panggilan
+// yang tepat, bukan jumlah: kalau jumlah yang jadi kunci, memperbaiki satu
+// pelanggaran lama sambil menambah yang baru di file yang sama tetap hijau.
+// Test "daftar pengecualian yang basi langsung dibersihkan" gagal begitu
+// panggilan ini hilang, jadi daftar ini tidak bisa lapuk diam-diam.
+const KNOWN_UNFIXED: Record<string, string[]> = {
+  "src/app/api/cv-documents/create/route.ts": [
+    '.replace("{{CURRENT_DATE}}", todayDate)',
+    '.replace("{{TARGET_LANGUAGE}}", targetLang)',
+  ],
 };
 
 type Finding = { line: number; call: string };
+
+const CALL_TEXT_LIMIT = 120;
 
 function collectRouteFiles(dir: string): string[] {
   const out: string[] = [];
@@ -35,179 +50,54 @@ function collectRouteFiles(dir: string): string[] {
   return out;
 }
 
-function skipQuoted(src: string, start: number): number {
-  const quote = src[start];
-  let i = start + 1;
-  while (i < src.length) {
-    if (src[i] === "\\") {
-      i += 2;
-      continue;
-    }
-    if (src[i] === quote) return i + 1;
-    i++;
-  }
-  return src.length;
+// Bentuk pengganti yang tidak mungkin menafsirkan "$&" dari data pengguna:
+// fungsi, atau literal yang isinya sudah pasti sebelum runtime.
+function isSafeReplacement(node: ts.Expression): boolean {
+  if (ts.isArrowFunction(node) || ts.isFunctionExpression(node)) return true;
+  // Template literal dengan `${...}` sengaja tidak aman: isinya bisa berisi "$&".
+  if (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) return true;
+  if (ts.isNumericLiteral(node)) return true;
+  if (ts.isIdentifier(node) && ["true", "false", "null", "undefined"].includes(node.text)) return true;
+  return [
+    ts.SyntaxKind.TrueKeyword,
+    ts.SyntaxKind.FalseKeyword,
+    ts.SyntaxKind.NullKeyword,
+  ].includes(node.kind);
 }
 
-function skipRegex(src: string, start: number): number {
-  let i = start + 1;
-  let inClass = false;
-  while (i < src.length) {
-    const c = src[i];
-    if (c === "\\") {
-      i += 2;
-      continue;
-    }
-    if (inClass) {
-      if (c === "]") inClass = false;
-      i++;
-      continue;
-    }
-    if (c === "[") {
-      inClass = true;
-      i++;
-      continue;
-    }
-    if (c === "/") {
-      i++;
-      while (i < src.length && /[a-z]/.test(src[i])) i++;
-      return i;
-    }
-    if (c === "\n") return start + 1;
-    i++;
-  }
-  return src.length;
+function isReplaceCallee(expr: ts.Expression): boolean {
+  if (!ts.isPropertyAccessExpression(expr)) return false;
+  return expr.name.text === "replace" || expr.name.text === "replaceAll";
 }
 
-// Pembagian atau regex? Heuristik standa: `/` memulai regex kalau karakter
-// kode sebelumnya tidak bisa mengakhiri nilai.
-function isRegexStart(src: string, at: number): boolean {
-  for (let i = at - 1; i >= 0; i--) {
-    const c = src[i];
-    if (/\s/.test(c)) continue;
-    return "(,=:[!&|?{};+-*%<>~^".includes(c);
-  }
-  return true;
-}
-
-type Token = { raw: string; end: number };
-
-// Baca satu argumen: literal string, regex literal, atau ekspresi bebas
-// (identifier, operator, kurung). Berhenti di koma atau tutup kurung di level
-// atas. String di dalamnya dilewati utuh supaya `.replace(` di dalam literal
-// tidak ikut terhitung.
-function readArg(src: string, start: number): Token | null {
-  let i = start;
-  while (i < src.length && /\s/.test(src[i])) i++;
-  const first = src[i];
-
-  if (first === '"' || first === "'" || first === "`") {
-    const end = skipQuoted(src, i);
-    return { raw: src.slice(i, end), end };
-  }
-  if (first === "/" && isRegexStart(src, i)) {
-    const end = skipRegex(src, i);
-    return { raw: src.slice(i, end), end };
-  }
-
-  let depth = 0;
-  while (i < src.length) {
-    const c = src[i];
-    if (c === "(" || c === "[" || c === "{") {
-      depth++;
-      i++;
-      continue;
-    }
-    if (c === ")" || c === "]" || c === "}") {
-      // Kurung pembuka fungsi panah (`() => nilai`) belum selesai dibaca.
-      if (depth === 0) break;
-      depth--;
-      i++;
-      continue;
-    }
-    if (c === ";" || (c === "," && depth === 0)) break;
-    if (c === "\n" && depth === 0) {
-      // Baris lanjutan sah kalau baris berikutnya masih ekspresi, bukan
-      // pernyataan baru.
-      const rest = src.slice(i).trimStart();
-      if (!/^(?:\.|\?|:|\+|-|\*|%|&&|\|\||\?\?|\)|,|})/.test(rest)) break;
-    }
-    i++;
-  }
-  if (i === start) return null;
-  return { raw: src.slice(start, i).trim(), end: i };
-}
-
-function isSafeReplacement(raw: string): boolean {
-  const t = raw.trim();
-  if (!t) return false;
-  // Literal string apa adanya. Interpolasi template tetap-danger karena
-  // isinya bisa berisi "$&" dari pengguna.
-  if (/^(['"`])[\s\S]*\1$/.test(t) && !/\$\{/.test(t)) return true;
-  if (/^(?:function\b|\([^()]*\)\s*(?::[^=<>]*)?=>|\w+\s*=>|async\b)/.test(t)) return true;
-  return /^-?\d+(?:\.\d+)?$/.test(t) || /^(?:true|false|null|undefined)$/.test(t);
-}
-
-function scan(src: string): Finding[] {
+function scan(file: string, src: string): Finding[] {
+  const sf = ts.createSourceFile(file, src, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
   const findings: Finding[] = [];
-  let i = 0;
 
-  while (i < src.length) {
-    const c = src[i];
-
-    if (c === "/" && src[i + 1] === "/") {
-      const nl = src.indexOf("\n", i);
-      i = nl === -1 ? src.length : nl;
-      continue;
-    }
-    if (c === "/" && src[i + 1] === "*") {
-      const end = src.indexOf("*/", i + 2);
-      i = end === -1 ? src.length : end + 2;
-      continue;
-    }
-    if (c === '"' || c === "'" || c === "`") {
-      i = skipQuoted(src, i);
-      continue;
-    }
-    if (c === "/" && isRegexStart(src, i)) {
-      i = skipRegex(src, i);
-      continue;
-    }
-
-    if (src.startsWith(".replace(", i)) {
-      const open = i + ".replace(".length;
-      const first = readArg(src, open);
-      let cursor = open;
-      if (first) {
-        cursor = first.end;
-        while (cursor < src.length && /\s/.test(src[cursor])) cursor++;
-        if (src[cursor] === ",") {
-          const second = readArg(src, cursor + 1);
-          if (second) {
-            if (!isSafeReplacement(second.raw)) {
-              findings.push({
-                line: src.slice(0, i).split("\n").length,
-                call: src.slice(i, second.end + 1).replace(/\s+/g, " ").trim(),
-              });
-            }
-            cursor = Math.max(second.end, cursor + 1);
-          }
-        }
+  const visit = (node: ts.Node): void => {
+    if (ts.isCallExpression(node) && isReplaceCallee(node.expression)) {
+      const replacement = node.arguments[1];
+      if (replacement && !isSafeReplacement(replacement)) {
+        const call = node.getText(sf).replace(/\s+/g, " ").trim();
+        findings.push({
+          line: sf.getLineAndCharacterOfPosition(node.getStart(sf)).line + 1,
+          call: call.length > CALL_TEXT_LIMIT ? `${call.slice(0, CALL_TEXT_LIMIT)}…` : call,
+        });
       }
-      i = Math.max(cursor, i + 1);
-      continue;
     }
+    // Rekursif tanpa batas: `.replace` bersarang di dalam argumen atau di dalam
+    // `${...}` template literal tetap ikut ditemukan.
+    ts.forEachChild(node, visit);
+  };
 
-    i++;
-  }
-
+  visit(sf);
   return findings;
 }
 
 function scanAll(): Record<string, Finding[]> {
   const out: Record<string, Finding[]> = {};
   for (const file of PROMPT_SOURCE_FILES) {
-    const found = scan(readFileSync(file, "utf8"));
+    const found = scan(file, readFileSync(file, "utf8"));
     if (found.length > 0) out[file] = found;
   }
   return out;
@@ -227,15 +117,41 @@ describe("keamanan penyuntikan teks pengguna ke prompt AI", () => {
       "const f = tpl.replace(/[\\\\%_]/g, (ch) => '\\\\' + ch);",
     ].join("\n");
 
-    expect(scan(sample).map((f) => f.line)).toEqual([3, 4, 5]);
+    expect(scan("sample.ts", sample).map((f) => f.line)).toEqual([3, 4, 5]);
+  });
+
+  it("scanner menangkap kasus yang dulu lolos", () => {
+    // Tiga kasus yang lolos pada parser mini sebelumnya, plus satu
+    // kasus pembagian supaya tidak ada sisa heuristic regex-vs-bagian.
+    const sample = [
+      // 1. `.replace` di dalam template literal multi-baris: dulu tak terlihat
+      // karena backtick tidak melacak `${...}`.
+      "const tpl = `isi prompt ${base.replace('{{CV}}', cv)}`;",
+      // 2. `replaceAll` punya semantik "$&" yang sama, dulu tidak dikenali.
+      "const u = template.replaceAll('{{CV_TEXT}}', cv);",
+      // 3. Argumen regex yang diikuti akses properti: dulu parser berhenti
+      // sebelum membaca argumen kedua.
+      "const v = template.replace(/(X)/.source, userText);",
+      // 4. Pembagian, bukan regex: `/` di sini tidak boleh menggeser pembacaan
+      //    argumen. Argumen kedua tetap identifier, jadi tetap dilaporkan.
+      "const w = (total / 2).toString().replace('1', s);",
+      // Bentuk aman di template literal dan replaceAll tetap harus lolos.
+      "const x = `isi ${base.replaceAll('{{CV}}', () => cv)}`;",
+      "const y = template.replaceAll('{{CV_TEXT}}', 'literal polos');",
+    ].join("\n");
+
+    expect(scan("sample.ts", sample).map((f) => f.line)).toEqual([1, 2, 3, 4]);
   });
 
   it("tidak ada penyuntingan string biasa di file prompt AI", () => {
     const found = scanAll();
     const violations: string[] = [];
     for (const [file, items] of Object.entries(found)) {
-      const tolerated = KNOWN_UNFIXED[file] ?? 0;
-      items.slice(tolerated).forEach((f) => violations.push(`${file}:${f.line} → ${f.call}`));
+      const tolerated = KNOWN_UNFIXED[file] ?? [];
+      for (const f of items) {
+        if (tolerated.some((needle) => f.call.includes(needle))) continue;
+        violations.push(`${file}:${f.line} → ${f.call}`);
+      }
     }
 
     expect(violations).toEqual([]);
@@ -243,10 +159,20 @@ describe("keamanan penyuntikan teks pengguna ke prompt AI", () => {
 
   it("daftar pengecualian yang basi langsung dibersihkan", () => {
     const found = scanAll();
+    const stale: string[] = [];
 
-    const stale = Object.entries(KNOWN_UNFIXED)
-      .filter(([file, tolerated]) => (found[file]?.length ?? 0) !== tolerated)
-      .map(([file]) => file);
+    for (const [file, needles] of Object.entries(KNOWN_UNFIXED)) {
+      const calls = found[file]?.map((f) => f.call) ?? [];
+      // Set equality dua arah: tiap entri harus cocok dengan temuan nyata, dan
+      // tiap temuan yang ditoleransi harus punya entri — jadi memperbaiki satu
+      // pelanggaran lama sambil menambah yang baru di file yang sama tetap gagal.
+      for (const needle of needles) {
+        if (!calls.some((call) => call.includes(needle))) stale.push(`${file} → tak ada lagi: ${needle}`);
+      }
+      for (const call of calls) {
+        if (!needles.some((n) => call.includes(n))) stale.push(`${file} → tak tertoleransi: ${call}`);
+      }
+    }
 
     expect(stale).toEqual([]);
   });
