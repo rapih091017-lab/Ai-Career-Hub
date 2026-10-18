@@ -1,39 +1,16 @@
 "use client";
 
 import { useId } from "react";
-import { useTranslation, type Lang } from "@/lib/i18n";
+import { useTranslation } from "@/lib/i18n";
 import { buildHrPointOfView, type HrFinding } from "@/lib/checker/hr-point-of-view";
-import type { AnalysisResult } from "./types";
+import { severityMeta, type AnalysisResult } from "./types";
 
 type Bilingual = { id: string; en: string };
 
-type Severity = NonNullable<HrFinding["severity"]>;
-
-// Keempat label severity sengaja satu bentuk: kata sifat yang naik-turun
-// gradasi, dari "Rendah" sampai "Kritis". Kalau cuma satu yang berupa
-// klausa, tingkat lain terdengar seperti kategori sedangkan yang pertama
-// terdengar seperti catatan pribadi.
-// Istilah severity standar. "Berat banget" terdengar seperti
-// bahasa sehari-hari; di sini yang ditanyakan adalah seberapa serius
-// temuannya, jadi dipakai istilah yang sudah dikenal orang.
-const SEVERITY_LABEL: Record<Severity, Bilingual> = {
-  critical: { id: "Kritis", en: "Critical" },
-  high: { id: "Tinggi", en: "High" },
-  medium: { id: "Sedang", en: "Medium" },
-  low: { id: "Rendah", en: "Low" },
-};
-
-// Severity juga dibedakan secara visual supaya yang "Kritis" kelihatan
-// sekilas. Pembedaan memakai token ukuran dan warna yang sudah membawa weight
-// sendiri, bukan utilitas font-weight yang bisa kalah urutan dari token teks.
-// Kata severity tetap ada di semua tingkat: orang yang tidak membedakan warna
-// tetap membaca tingkatnya, bukan hanya warnanya.
-const SEVERITY_STYLE: Record<Severity, string> = {
-  critical: "text-label-bold text-error",
-  high: "text-label-sm text-on-background",
-  medium: "text-label-sm text-on-surface-variant",
-  low: "text-label-sm text-on-surface-variant",
-};
+// Label dan warna severity diambil dari severityMeta, satu-satunya sumber
+// yang sudah dipakai SectionScoreCard dan ResultComponents. Menulis ulang 4
+// kata dan 4 pasangan warna di sini berarti punya dua tempat untuk dijaga
+// berbeda, dan badge di halaman yang sama bisa berbeda isinya.
 
 const LEVEL_LABEL = {
   entry: { id: "entry", en: "entry" },
@@ -58,11 +35,12 @@ const GROWTH_LABEL = {
 
 function FindingList({
   findings,
-  lang,
+  t,
   emptyText,
 }: {
   findings: HrFinding[];
-  lang: Lang;
+  /** Label severity diambil lewat t supaya pakai kunci yang sama dengan kartu lain. */
+  t: (key: string) => string;
   /** Kalimat jujur untuk kolom yang memang kosong, bukan sekadar ruang kosong. */
   emptyText: string;
 }) {
@@ -74,23 +52,38 @@ function FindingList({
   }
   return (
     <ul className="mt-2 space-y-3">
-      {findings.map((finding, index) => (
-        <li key={`${finding.text}-${index}`} className="border-l-2 border-outline-variant/60 pl-3">
-          <p className="text-body-md text-on-background">{finding.text}</p>
-          {finding.severity ? (
-            <p className={`mt-1 ${SEVERITY_STYLE[finding.severity]}`}>
-              {SEVERITY_LABEL[finding.severity][lang]}
-            </p>
-          ) : null}
-          {finding.quote ? (
-            // Kutipan tidak boleh dipotong: setengah kutipan lebih buruk
-            // daripada tidak mengomentari, jadi biarkan saja membungkus.
-            <p className="mt-1.5 whitespace-pre-wrap break-words font-mono text-label-sm text-on-surface-variant">
-              {finding.quote}
-            </p>
-          ) : null}
-        </li>
-      ))}
+      {findings.map((finding, index) => {
+        // Lencana memakai severityMeta supaya warna dan labelnya sama persis
+        // dengan kartu Skor Per Section; kata severity tetap ada di lencana,
+        // jadi pembaca yang tidak membedakan warna tetap membaca tingkatnya.
+        const badge = severityMeta(finding.severity ?? undefined, t);
+        return (
+          <li key={`${finding.text}-${index}`} className="border-l-2 border-outline-variant/60 pl-3">
+            <p className="text-body-md text-on-background">{finding.text}</p>
+            {badge ? (
+              <span
+                className={`mt-1.5 inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide ${badge.cls}`}
+              >
+                <span className={`h-1.5 w-1.5 rounded-full ${badge.dot}`} aria-hidden="true" />
+                {badge.label}
+              </span>
+            ) : null}
+            {finding.quote ? (
+              // Kutipan tidak dipotong: setengah kutipan lebih buruk daripada
+              // tidak mengomentari sama sekali. Tanda kutip dibuka di sini
+              // karena tanpa ini teksnya cuma blok monospace abu-abu 12px -
+              // ukuran terkecil di halaman dan wajah yang salah untuk kalimat
+              // CV beberapa baris, sehingga bukti yang paling berharga itu
+              // terbaca seperti keluaran log dan terlewatkan pembaca.
+              <p className="mt-1.5 whitespace-pre-wrap break-words rounded-md bg-surface-container-low px-2 py-1 text-label-sm italic text-on-surface-variant">
+                {"\u201C"}
+                {finding.quote}
+                {"\u201D"}
+              </p>
+            ) : null}
+          </li>
+        );
+      })}
     </ul>
   );
 }
@@ -118,14 +111,28 @@ export default function HrPointOfView({
   const pick = (value: Bilingual) => (lang === "en" ? value.en : value.id);
   const view = buildHrPointOfView(result);
 
-  // Arah dan laju boleh salah satu saja. Tiap bagian dirakit sendiri-sendiri
-  // supaya bagian yang kosong hilang utuh, bukan menyisakan kata tanpa isi.
+  // Arah dan laju karier diletakkan bersama level, bukan di kaki panel. Dulu
+  // panel ditutup dengan "Arah karier: turun - pelan" tepat sebelum skor, jadi
+  // pembaca yang sedang menunggu hasil keluar di catatan paling rendah. Di
+  // posisi ini barisnya jadi konteks pembuka, dan panel berakhir di kolom
+  // "lanjut baca".
   const journey = [
     view.progression ? `${t(`${keyPrefix}hrview-journey`)}: ${pick(PROGRESSION_LABEL[view.progression])}` : null,
     view.growthRate ? `${t(`${keyPrefix}hrview-pace`)}: ${pick(GROWTH_LABEL[view.growthRate])}` : null,
   ]
     .filter((part): part is string => part !== null)
     .join(" · ");
+
+  // Panel dibuat untuk menjawab satu pertanyaan: apakah HR lanjut membaca.
+  // Tanpa kalimat ini pengguna hanya menerima dua daftar dan harus menebak
+  // sendiri kesimpulannya. Tiga kasus, dan tidak satu pun mengklaim CV-nya
+  // bagus - hanya menyatakan apa yang ada di layar.
+  const verdict =
+    view.stopping.length === 0
+      ? t(`${keyPrefix}hrview-verdict-clear`)
+      : view.continuing.length > 0
+        ? t(`${keyPrefix}hrview-verdict-mixed`)
+        : t(`${keyPrefix}hrview-verdict-stop`);
 
   return (
     <section aria-labelledby={titleId} className="rounded-2xl border border-outline-variant/60 bg-surface-container-lowest p-5">
@@ -146,6 +153,12 @@ export default function HrPointOfView({
         </p>
       ) : null}
 
+      {journey ? <p className="mt-1 text-body-md text-on-surface-variant">{journey}</p> : null}
+
+      {/* Kesimpulan didahulukan: pembaca yang cemas ingin jawabannya dulu,
+          baru buktinya. Panel kosong sudah punya kalimat sendiri. */}
+      {!view.isEmpty ? <p className="mt-3 text-body-md font-medium text-on-background">{verdict}</p> : null}
+
       {view.isEmpty ? (
         <p className="mt-4 text-body-md text-on-surface-variant">{t(`${keyPrefix}hrview-empty`)}</p>
       ) : (
@@ -154,7 +167,7 @@ export default function HrPointOfView({
             <h3 className="text-label-bold text-on-background">{t(`${keyPrefix}hrview-stopping`)}</h3>
             <FindingList
               findings={view.stopping}
-              lang={lang}
+              t={t}
               emptyText={t(`${keyPrefix}hrview-stopping-empty`)}
             />
           </div>
@@ -162,18 +175,12 @@ export default function HrPointOfView({
             <h3 className="text-label-bold text-on-background">{t(`${keyPrefix}hrview-continuing`)}</h3>
             <FindingList
               findings={view.continuing}
-              lang={lang}
+              t={t}
               emptyText={t(`${keyPrefix}hrview-continuing-empty`)}
             />
           </div>
         </div>
       )}
-
-      {journey ? (
-        <p className="mt-4 border-t border-outline-variant/50 pt-3 text-body-md text-on-surface-variant">
-          {journey}
-        </p>
-      ) : null}
     </section>
   );
 }

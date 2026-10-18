@@ -27,9 +27,12 @@ describe("pandangan sisi HR dari data analisis", () => {
       },
     } as any);
 
+    // Urutan berikut hasil pengurutan severity: butir "medium" mendahului
+    // butir tanpa severity. Yang dijaga test ini adalah string polos tidak
+    // hilang diam-diam, bukan urutan masuknya.
     expect(view.stopping).toEqual([
-      { text: "Kurang TypeScript", severity: null, quote: null },
       { text: "Tidak ada metrik", severity: "medium", quote: null },
+      { text: "Kurang TypeScript", severity: null, quote: null },
     ]);
   });
 
@@ -316,5 +319,45 @@ describe("pandangan sisi HR dari data analisis", () => {
     expect(view.seniority).toBeNull();
     expect(view.progression).toBeNull();
     expect(view.growthRate).toBeNull();
+  });
+});
+
+describe("urutan temuan yang bikin berhenti", () => {
+  it("diurutkan dari yang paling serius ke yang paling ringan", () => {
+    // Panel adalah triage. Urutan semula ikut apa adanya dari AI, sehingga
+    // "Rendah" bisa tampil di atas "Kritis" dan pembaca harus mengubek-ubek.
+    const view = buildHrPointOfView({
+      atsPredictionDetail: {
+        risk_factors: [
+          { text: "Format tanggal tidak konsisten", severity: "low", source_excerpt: null },
+          { text: "TypeScript tidak ada", severity: "critical", source_excerpt: "JavaScript, React" },
+          { text: "Tidak ada ringkasan", severity: "medium", source_excerpt: null },
+          { text: "Butir tanpa severity", source_excerpt: null },
+        ],
+        strengths: [],
+      },
+    } as any);
+
+    expect(view.stopping.map((finding) => finding.text)).toEqual([
+      "TypeScript tidak ada",
+      "Tidak ada ringkasan",
+      "Format tanggal tidak konsisten",
+      "Butir tanpa severity",
+    ]);
+  });
+
+  it("temuan yang sama tetap diurutkan meski masuk dalam urutan acak", () => {
+    const urut = (risks: unknown[]) =>
+      buildHrPointOfView({
+        atsPredictionDetail: { risk_factors: risks, strengths: [] },
+      } as any).stopping.map((finding) => finding.severity);
+
+    const kacau = [
+      { text: "satu", severity: "high" },
+      { text: "dua", severity: "critical" },
+      { text: "tiga", severity: "low" },
+    ];
+    expect(urut(kacau)).toEqual(["critical", "high", "low"]);
+    expect(urut([...kacau].reverse())).toEqual(["critical", "high", "low"]);
   });
 });

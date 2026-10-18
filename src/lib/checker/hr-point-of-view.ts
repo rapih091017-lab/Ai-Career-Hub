@@ -110,9 +110,19 @@ export function buildHrPointOfView(result: AnalysisResult | null | undefined): H
   const stoppingFinal = stopping.length > 0 ? stopping : fromNarrative(result?.narrativeFeedback?.areas_for_improvement);
   const continuingFinal = continuing.length > 0 ? continuing : fromNarrative(result?.narrativeFeedback?.strengths);
 
+  // Panel ini triage, bukan jurnal. Urutan semula ikut apa adanya dari model,
+  // sehingga "Rendah" bisa tampil di atas "Kritis" dan pembaca harus mengubek-ubek
+  // enam butir untuk menemukan yang paling menentukan. SEVERITIES sudah
+  // ditulis dari yang paling serius, jadi indeksnya langsung dipakai sebagai
+  // peringkat; butir tanpa severity didorong ke bawah karena tidak punya
+  // tingkat sama sekali. Sort stabil di JavaScript, jadi butir berperingkat
+  // sama tetap urut seperti aslinya.
+  const rank = (finding: HrFinding) => (finding.severity ? SEVERITIES.indexOf(finding.severity) : SEVERITIES.length);
+  const stoppingSorted = [...stoppingFinal].sort((a, b) => rank(a) - rank(b));
+
   return {
     seniority: oneOf(meta?.detected_seniority, SENIORITIES),
-    stopping: stoppingFinal,
+    stopping: stoppingSorted,
     continuing: continuingFinal,
     progression: oneOf(velocity?.title_progression, PROGRESSIONS),
     growthRate: oneOf(velocity?.growth_rate, GROWTH_RATES),

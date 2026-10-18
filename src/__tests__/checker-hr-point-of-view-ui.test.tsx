@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { readFileSync } from "node:fs";
 import { afterEach, describe, expect, it } from "vitest";
 import HrPointOfView from "@/components/checker/HrPointOfView";
 import { LanguageProvider } from "@/lib/i18n";
@@ -43,12 +44,14 @@ afterEach(() => {
 });
 
 describe("panel Sisi HR", () => {
-  it("menampilkan temuan berhenti dan lanjut beserta kutipannya", () => {
+it("menampilkan temuan berhenti dan lanjut beserta kutipannya", () => {
     renderPanel(RESULT);
-    expect(screen.getByText(/bikin saya berhenti/i)).toBeInTheDocument();
-    expect(screen.getByText(/bikin saya lanjut baca/i)).toBeInTheDocument();
-    expect(screen.getByText("JavaScript, React")).toBeInTheDocument();
-    expect(screen.getByText("Bangun dashboard untuk 40 user")).toBeInTheDocument();
+    // Dikunci ke heading kolom: sejak ada kalimat keputusan, frasa
+    // "bikin saya berhenti" juga muncul di kalimat itu.
+    expect(screen.getByRole("heading", { name: /Yang bikin saya berhenti/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Yang bikin saya lanjut baca/i })).toBeInTheDocument();
+    expect(screen.getByText(/JavaScript, React/)).toBeInTheDocument();
+    expect(screen.getByText(/Bangun dashboard untuk 40 user/)).toBeInTheDocument();
   });
 
   it("menampilkan level terbaca dan arah karier", () => {
@@ -264,10 +267,13 @@ describe("panel Sisi HR", () => {
     // "Ringan" itu pinjaman arti, bukan padanan "Low".
     const critical = screen.getByText("Kritis");
     const low = screen.getByText("Rendah");
-    // Kalau keduanya kelasnya sama persis, yang berat sama saja kelihatan
+// Kalau keduanya kelasnya sama persis, yang berat sama saja kelihatan
     // dengan yang ringan. Warna boleh beda, tapi kata wajib beda juga.
     expect(critical.className).not.toBe(low.className);
-    expect(critical.className).toContain("text-error");
+    // Warnanya sekarang datang dari severityMeta yang dipakai kartu lain,
+    // jadi yang dikunci adalah warna merah untuk kritis, bukan token lama.
+    expect(critical.className).toContain("bg-red-100");
+    expect(low.className).toContain("bg-blue-100");
   });
 
   it("menampilkan panel dalam bahasa Inggris", () => {
@@ -299,5 +305,81 @@ describe("panel Sisi HR", () => {
     expect(screen.getByText(/no HR-side findings came back from this analysis/i)).toBeInTheDocument();
     expect(screen.getByText(/below/i)).toBeInTheDocument();
     expect(screen.queryByText(/Scores per Section/i)).not.toBeInTheDocument();
+  });
+});
+
+describe("kalimat keputusan panel", () => {
+  it("menjawab ya saat tidak ada yang bikin berhenti", () => {
+    renderPanel(
+      parsedResult({
+        ats_prediction: {
+          result: "Likely Pass",
+          risk_factors: [],
+          strengths: [{ text: "Ada metrik dampak", source_excerpt: null }],
+        },
+      }),
+    );
+    expect(screen.getByText(/langsung lanjut baca/i)).toBeInTheDocument();
+  });
+
+  it("menjawab ya-tapi saat kedua sisi ada isinya", () => {
+    renderPanel(RESULT);
+    expect(screen.getByText(/tapi saya tetap lanjut baca/i)).toBeInTheDocument();
+  });
+
+  it("tidak menjanjikan kelanjutan saat hanya ada kabar buruk", () => {
+    renderPanel(
+      parsedResult({
+        ats_prediction: {
+          result: "Likely Fail",
+          risk_factors: [{ text: "TypeScript tidak ada", severity: "critical", source_excerpt: null }],
+          strengths: [],
+        },
+      }),
+    );
+    // Kolom kanan bilang tidak ada alasan lanjut, jadi keputusan tidak boleh
+    // bilang tetap lanjut baca - itu akan menyesuaikan diri dengan data.
+    expect(screen.queryByText(/tetap lanjut baca/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/bikin saya berhenti dulu/i)).toBeInTheDocument();
+  });
+});
+
+describe("urutan di layar", () => {
+  it("arah dan laju karier tampil sebelum daftar temuan, bukan di akhir panel", () => {
+    renderPanel(RESULT);
+const journey = screen.getByText(/Arah karier/i);
+    const kolomKiri = screen.getByRole("heading", { name: /Yang bikin saya berhenti/i });
+    const kolomKanan = screen.getByRole("heading", { name: /Yang bikin saya lanjut baca/i });
+// Urutan DOM = urutan baca. Dulu baris karier menutup panel dengan
+    // catatan terendah ("turun - pelan") tepat sebelum skor.
+    const posisiKiri = journey.compareDocumentPosition(kolomKiri);
+    const posisiKanan = journey.compareDocumentPosition(kolomKanan);
+    expect(posisiKiri & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(posisiKanan & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+});
+
+describe("presentasi kutipan dan severity", () => {
+  it("kutipan ditandai tanda kutip dan bukan monospace", () => {
+    renderPanel(RESULT);
+    const kutipan = screen.getByText(/JavaScript, React/);
+    expect(kutipan.textContent).toMatch(/^\u201c.*\u201d$/);
+    expect(kutipan.className).not.toContain("font-mono");
+    expect(kutipan.className).toContain("italic");
+  });
+
+  it("severity jadi lencana, bukan kata yatim", () => {
+    renderPanel(RESULT);
+    const lencana = screen.getByText("Kritis");
+    expect(lencana.className).toContain("inline-flex");
+    expect(lencana.parentElement).not.toBeNull();
+  });
+
+it("lencana memakai label dan warna yang sama dengan kartu lain", () => {
+    // severityMeta dipakai SectionScoreCard dan ResultComponents. Memakai
+    // fungsi yang sama mencegah dua sumber kebenaran untuk 4 kata severity.
+    const source = readFileSync("src/components/checker/HrPointOfView.tsx", "utf8");
+    expect(source).toContain("severityMeta");
+    expect(source).not.toContain("SEVERITY_LABEL");
   });
 });
