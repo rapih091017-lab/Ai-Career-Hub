@@ -8,9 +8,10 @@ import { getUserAccess } from "@/lib/access";
 import { ANALYSIS_PROMPT_V4 } from "@/lib/ai/prompts/analysis-v4";
 import { PROMPT_MARKERS } from "@/lib/ai/prompts/shared";
 import { sanitizeExtractedText } from "@/lib/checker/extracted-text";
+import { analyzeFailureMessage } from "@/lib/checker/analyze-failure";
 
 import type { AnalysisResult } from "@/lib/ai/prompts/schemas";
-import { apiHandler } from "@/lib/api-utils";
+import { apiHandler, errorResponse } from "@/lib/api-utils";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limiter";
 import { checkProCheckAllowance } from "@/lib/fair-use";
 
@@ -237,6 +238,16 @@ message: t(
     console.error("AI Analysis error:", error);
   }
 
+  // callAI sudah mencoba ulang sendiri, jadi null di sini berarti semua
+  // percobaan gagal. Dulu route tetap melanjutkan dan menyusun skor dari
+  // rumus cadangan (keyword match + 50/50/70/70), hasilnya disimpan, dan
+  // pengguna melihat angka yang bukan hasil AI dengan wajah hasil AI.
+  // Sekarang dihentikan di sini: tidak ada skor dikarang, tidak ada baris
+  // tersimpan, dan pesannya jujur tanpa meminta maaf berlebihan.
+  if (!aiAnalysis) {
+    return errorResponse("AI_ANALYSIS_FAILED", analyzeFailureMessage(outputLang), 503);
+  }
+
   // ── 6. NORMALIZE AI RESPONSE ──────────────────────────────────────
   // ats_prediction bisa berupa string ATAU object {result, match_confidence, ...}
   // Pastikan selalu string untuk menghindari React render error
@@ -250,22 +261,19 @@ message: t(
   };
 
   // ── 7. HITUNG SKOR AKHIR ─────────────────────────────────────────
-  // Bobot fallback konsisten dengan metodologi prompt analysis-v3:
-  // Summary 20% · Experience 35% · Skills 25% · Education 10% · Format ATS 10%
-  const overall = aiAnalysis?.overall_score ?? Math.round(
-    (aiAnalysis?.breakdown?.summary?.score ?? keywordMatchRate) * 0.2 +
-      (aiAnalysis?.breakdown?.experience?.score ?? 50) * 0.35 +
-      (aiAnalysis?.breakdown?.skills?.score ?? 50) * 0.25 +
-      (aiAnalysis?.breakdown?.education?.score ?? 70) * 0.1 +
-      (aiAnalysis?.breakdown?.format_ats?.score ?? 70) * 0.1
-  );
+  // Tidak ada lagi rumus cadangan. Di titik ini analisis dijamin berhasil,
+  // jadi setiap angka berasal dari AI. Angka tetap 50/70 yang dulu dipakai
+  // saat AI gagal dihapus, karena itu bukan hasil analisis sama sekali.
+  const overall = aiAnalysis.overall_score;
 
   // Backward-compat scores buat DB
   const scores = {
     overall,
-    keywordGap: aiAnalysis?.keyword_analysis?.match_rate_pct ?? keywordMatchRate,
-    contextRelevance: aiAnalysis?.breakdown?.experience?.score ?? 50,
-    atsRules: aiAnalysis?.breakdown?.format_ats?.score ?? 70,
+    // Keyword match dihitung nyata dari CV + JD di atas, jadi boleh dipakai
+    // sebagai cadangan kalau sub-field AI kosong: nilai terukur, bukan tebakan.
+    keywordGap: aiAnalysis.keyword_analysis?.match_rate_pct ?? keywordMatchRate,
+    contextRelevance: aiAnalysis.breakdown?.experience?.score ?? keywordMatchRate,
+    atsRules: aiAnalysis.breakdown?.format_ats?.score ?? keywordMatchRate,
   };
 
   const normalizedAtsPrediction = normalizeAtsPrediction(aiAnalysis?.ats_prediction);
