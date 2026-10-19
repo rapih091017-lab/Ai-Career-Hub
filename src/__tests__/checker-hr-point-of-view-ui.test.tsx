@@ -56,7 +56,7 @@ it("menampilkan temuan berhenti dan lanjut beserta kutipannya", () => {
 
   it("menampilkan level terbaca dan arah karier", () => {
     renderPanel(RESULT);
-    expect(screen.getByText(/dibaca sebagai level/i)).toBeInTheDocument();
+    expect(screen.getByText(/terbaca di level/i)).toBeInTheDocument();
     expect(screen.getByText(/naik/i)).toBeInTheDocument();
     expect(screen.getByText(/arah karier/i)).toBeInTheDocument();
   });
@@ -85,7 +85,7 @@ it("menampilkan temuan berhenti dan lanjut beserta kutipannya", () => {
 
   it("saat kosong, jujur dan mengarahkan tanpa menyebut judul halaman lain", () => {
     renderPanel({ atsPredictionDetail: { risk_factors: [], strengths: [] } });
-    expect(screen.getByText(/temuan sisi HR yang balik dari analisis ini/i)).toBeInTheDocument();
+    expect(screen.getByText(/catatan dari sisi HR/i)).toBeInTheDocument();
     // Petunjuk harus tetap berlaku di dua halaman yang punya judul berbeda,
     // jadi jangan menyebut nama judul section secara harfiah.
     expect(screen.getByText(/ada di bawah/i)).toBeInTheDocument();
@@ -96,7 +96,7 @@ it("menampilkan temuan berhenti dan lanjut beserta kutipannya", () => {
 
   it("tidak error saat hasil kosong total", () => {
     renderPanel(null);
-    expect(screen.getByText(/temuan sisi HR yang balik dari analisis ini/i)).toBeInTheDocument();
+    expect(screen.getByText(/catatan dari sisi HR/i)).toBeInTheDocument();
   });
 
   it("satu risk factor rusak tidak menghapus dua yang valid", () => {
@@ -137,7 +137,7 @@ it("menampilkan temuan berhenti dan lanjut beserta kutipannya", () => {
     // Kalimat kosong harus menyatakan apa yang kembali dari analisis ini,
     // bukan mengklaim CV-nya tidak punya temuan.
     expect(
-      screen.getByText("Nggak ada temuan sisi HR yang balik dari analisis ini. Catatan per bagian ada di bawah."),
+      screen.getByText("Belum ada catatan dari sisi HR. Catatan per bagian ada di bawah."),
     ).toBeInTheDocument();
     expect(screen.queryByText(/tidak menghasilkan temuan/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/cv[^.!?]*(tidak|nggak)\b[^.!?]*temuan/i)).not.toBeInTheDocument();
@@ -149,8 +149,8 @@ it("menampilkan temuan berhenti dan lanjut beserta kutipannya", () => {
       careerVelocity: { title_progression: "Declining", growth_rate: "Slow" },
       atsPredictionDetail: { risk_factors: [], strengths: [] },
     });
-    expect(screen.getByText(/temuan sisi HR yang balik dari analisis ini/i)).toBeInTheDocument();
-    expect(screen.getByText(/dibaca sebagai level/i)).toBeInTheDocument();
+    expect(screen.getByText(/catatan dari sisi HR/i)).toBeInTheDocument();
+    expect(screen.getByText(/terbaca di level/i)).toBeInTheDocument();
     expect(screen.getByText(/turun/i)).toBeInTheDocument();
   });
 
@@ -163,12 +163,12 @@ it("menampilkan temuan berhenti dan lanjut beserta kutipannya", () => {
 
   it("meta null tidak mengarang baris level", () => {
     renderPanel(parsedResult({ meta: null }));
-    expect(screen.queryByText(/dibaca sebagai level/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/terbaca di level/i)).not.toBeInTheDocument();
   });
 
   it("meta tanpa seniority tidak mengarang baris level", () => {
     renderPanel(parsedResult({ meta: { cv_word_count: 300 } }));
-    expect(screen.queryByText(/dibaca sebagai level/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/terbaca di level/i)).not.toBeInTheDocument();
   });
 
   it("career_velocity tanpa arah dan laju tidak mengarang baris", () => {
@@ -282,7 +282,7 @@ it("menampilkan temuan berhenti dan lanjut beserta kutipannya", () => {
     expect(screen.getByText("The HR View")).toBeInTheDocument();
     expect(screen.getByText("What made me stop")).toBeInTheDocument();
     expect(screen.getByText("What made me keep reading")).toBeInTheDocument();
-    expect(screen.getByText(/This CV reads as level/i)).toBeInTheDocument();
+    expect(screen.getByText(/This CV reads at level/i)).toBeInTheDocument();
     expect(screen.getByText(/Career trajectory/i)).toBeInTheDocument();
     expect(screen.getByText(/Career pace/i)).toBeInTheDocument();
     expect(screen.getByText("Critical")).toBeInTheDocument();
@@ -302,7 +302,7 @@ it("menampilkan temuan berhenti dan lanjut beserta kutipannya", () => {
     expect(screen.queryByText("Nothing made me keep reading.")).not.toBeInTheDocument();
 
     renderPanel({ atsPredictionDetail: { risk_factors: [], strengths: [] }, meta: { detected_seniority: "senior" } });
-    expect(screen.getByText(/no HR-side findings came back from this analysis/i)).toBeInTheDocument();
+    expect(screen.getByText(/No notes from the HR side yet/i)).toBeInTheDocument();
     expect(screen.getByText(/below/i)).toBeInTheDocument();
     expect(screen.queryByText(/Scores per Section/i)).not.toBeInTheDocument();
   });

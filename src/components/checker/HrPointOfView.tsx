@@ -23,13 +23,16 @@ const PROGRESSION_LABEL = {
   "Strong Upward": { id: "naik tajam", en: "rising sharply" },
   Upward: { id: "naik", en: "rising" },
   Stable: { id: "datar", en: "flat" },
-  Sideways: { id: "menyamping", en: "sideways" },
+  // "Menyamping" adalah translitliterasi "Sideways"; yang dimaksud memang
+  // berhenti bergerak ke atas.
+  Sideways: { id: "stagnan", en: "stagnant" },
   Declining: { id: "turun", en: "declining" },
 } as const satisfies Record<string, Bilingual>;
 
 const GROWTH_LABEL = {
   Fast: { id: "pesat", en: "fast" },
-  Normal: { id: "wajar", en: "steady" },
+  // "Wajar" berarti pantas atau masuk akal, bukan kecepatan yang biasa saja.
+  Normal: { id: "sedang", en: "steady" },
   Slow: { id: "pelan", en: "slow" },
 } as const satisfies Record<string, Bilingual>;
 
@@ -135,7 +138,14 @@ export default function HrPointOfView({
         : t(`${keyPrefix}hrview-verdict-stop`);
 
   return (
-    <section aria-labelledby={titleId} className="rounded-2xl border border-outline-variant/60 bg-surface-container-lowest p-5">
+    // Kelas kartu sama persis dengan kartu-kartu saudaranya di halaman yang sama
+    // (Potensi Peningkatan Skor, Review oleh AI). Tiga dialek kartu berbeda
+    // dalam satu halaman membuat panel yang paling penting terlihat paling
+    // kurang jadi.
+    <section
+      aria-labelledby={titleId}
+      className="rounded-2xl border border-surface-container-high bg-surface p-6 shadow-premium-md"
+    >
       {/* Headline-md, bukan token yang lebih kecil: preflight membuat heading
           mewarisi ukuran body, jadi kelas yang tidak ada di config membuat
           judul panel jadi lebih kecil dari judul kolom di bawahnya. */}
@@ -149,7 +159,9 @@ export default function HrPointOfView({
           informasi yang paling sering dibutuhkan pembaca. */}
       {view.seniority ? (
         <p className="mt-3 text-label-bold text-on-surface-variant">
-          {t(`${keyPrefix}hrview-level`)}: {pick(LEVEL_LABEL[view.seniority])}
+          {/* Tanpa titik-kolon: pemisah nilai begitu membaca seperti label
+              sistem, bukan seperti orang yang sedang menyebut posisi kandidat. */}
+          {t(`${keyPrefix}hrview-level`).replace("{level}", pick(LEVEL_LABEL[view.seniority]))}
         </p>
       ) : null}
 

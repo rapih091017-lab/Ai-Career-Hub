@@ -1,4 +1,4 @@
-# SDD Progress — Portfolio Trust & Persistence
+﻿# SDD Progress — Portfolio Trust & Persistence
 
 Plan: `docs/superpowers/plans/2026-10-10-portfolio-trust.md`
 Spec: `docs/superpowers/specs/2026-10-10-portfolio-trust-design.md`
@@ -181,3 +181,104 @@ Plan: docs/superpowers/plans/2026-10-12-portfolio-minimalist.md
 - Copy 3 -> 4 tema di pricing, landing, spotlight. Default tetap Glass, tanpa migrasi DB.
 - Test: 494 passed (1 skipped = harness QA), tsc 0, lint 0 error, build sukses.
 - Catatan QA: harness jsdom membuang nilai clamp() untuk semua tema, jadi skala tipografi harus diverifikasi di browser, bukan dari screenshot harness.
+
+---
+
+# SDD Progress - Spec 3: POV HR di Hasil Checker
+
+Plan: docs/superpowers/plans/2026-10-18-checker-hr-point-of-view.md
+Spec: docs/superpowers/specs/2026-10-18-checker-hr-point-of-view-design.md
+Branch: master (user menyetujui lanjut di master + push)
+Base commit: 3980140
+
+## Keputusan pre-flight
+
+- User memilih eksekusi di master, bukan branch/worktree (sesuai pola kerja sesi ini)
+- Plan Task 1 Step 6 menyalin logika ke dalam test -> diubah jadi menguji splitCvJd asli
+- Reviewer Task 1 menemukan PROMPT_MARKERS.legacyJd sebagai key ketiga; implementer menyimpang dari kontrak "Produces" brief. Disetujui: tanpa key itu, penanda lama harus ditulis literal di adapter dan grep anti-drift akan gagal.
+
+## Minor findings yang ditunda ke review akhir
+
+- T1: startsWith adalah cocok prefiks, bukan cocok baris; CV yang diawali === CV KANDIDAT ===X menyisakan X (regex baris akan lebih tepat)
+- T1: CRLF tidak ditangani di regex kategori posisi + startsWith; tidak terjangkau sekarang (template route pakai \n), degradasi senyap kalau format prompt berubah
+- T1: splitCvJd("") dan CV yang isinya hanya marker belum di-assert (perilaku sudah benar)
+- T1: satu test (penanda JD = inisialisasi konstantanya sendiri) nyaris tautologis; kerja grunt disimpan oleh assertion grep
+- T1: test eadFileSync bergantung cwd = root repo (cocok dengan konvensi plan lain)
+- T1: CV yang teksnya sendiri memuat penanda JD lawas masih memotong batas lebih awal. Disepakati sebagai limitasi, bukan bug yang bisa diperbaiki di sini: pemisahan berbasis konten dari teks tak tepercaya memang bisa dipalsukan. Perbaikan durables: berhenti data terstruktur lewat string, dan mengoper {cv, jd} ke callAI (perubahan interface, butuh task sendiri).
+- T1: nalysis-v4.ts masih menulis penanda sebagai literal di template sistem jadi sumber kebenaran kedua yang tidak dibaca grep anti-drift. Dibawa ke Task 2 (file itu sudah diubah di sana).
+
+## Progress
+
+Task 1: complete (commits 3980140..15c57cd, spec PASS, quality APPROVED setelah 1 fix wave, 842 test)
+Task 2: complete (commits 15c57cd..e93f4f0, spec PASS, quality APPROVED setelah 3 fix wave, 857 test)
+
+## Minor findings Task 2 yang ditunda ke review akhir
+
+- T2: nalysis-v4.ts dua versi prompt v3/v4 punya angka en-dash vs hyphen pada tabel GRADE; semantik sama
+- T2: test GRADE memakai regex readFileSync yang bergantung CWD (konvensi repo)
+- T2: cakupan penjaga penyuntikan hanya \dapter.ts\ + \src/app/api/**/route.ts\; \src/lib/pdf-export.ts\ di luar, bukan Assemble prompt
+- T2: aturan penjaga sengaja lebih luas dari "data pengguna" (semua argumen non-literal) demi kesederhanaan
+- T2: \checker-grade-prompt.test.ts\ tidak diakhiri newline
+- T2: file \cv-documents/create/route.ts\ masih punya 2 pelanggaran pola ganti-string yang tercatat di daftar pengecualian (tidak eksploitable sekarang: nilainya dari new Date() dan string tervalidasi)
+- T2: penyusun AST memakai heuristik regex-vs-pembagian sendiri di ambang parser; sementara, tapi dalam repo nyata nol positive palsu
+
+Task 3: complete (commits 10d8a49..7e6d7d7, spec PASS, quality APPROVED setelah 2 fix wave, 876 test)
+
+## Minor findings Task 3 yang ditunda ke review akhir
+
+- T3: type \AnalysisResult.breakdown\ tetap lima section wajib untuk halaman live; storagenya memakai tipe \StoredBreakdown\ terpisah yang boleh sebagian
+- T3: \meta\/\careerVelocity\/\tsPredictionDetail\ diteruskan tanpa validasi (tidak ada klaim angka) -> Task 4 wajib menormalkan bentuknya
+- T3: \weightsApplied\/\impactForecast\ jadi null kalau tidak lengkap, jadi catatan bobot dan kartu proyeksi hilang diam-diam pada baris rusak
+- T3: test route untuk aiModel berupa assertion teks sumber (ikut konvensi checker-read-speed.test.ts); false-positive kalau nama variabel diganti
+- T3: helper \acaSepertiHalaman\ di file test adalah snapshot akses halaman; akan lapuk diam-diam kalau halaman berubah (rekomendasi: render test dengan jsdom)
+- T3: \isk_factors\正确的 tipe union hanya dijaga tsc, bukan test runtime (runtime passthrough tidak berubah)
+
+Task 4: complete (commits 7e6d7d7..7c0b1d8, spec PASS, quality APPROVED, 889 test, 0 fix wave)
+
+## Minor findings Task 4 yang ditunda ke review akhir
+
+- T4: \isEmpty\ hanya soal daftar temuan, jadi hasil yang punya seniority/progression tapi nol temuan akan/isEmpty true -> Task 5 tidak boleh menyembunyikan seluruh isi panel hanya karena itu
+- T4: dua pemetaan item risk_factors dan strengths nyaris kembar; satu helper lokal akanvr现实中缩小 permukaan
+- T4: test "ats_prediction berupa string tidak bikin error" hampa secara函数 — fungsi memang tidak membaca field itu; diwarisi dari brief
+- T4: jalur tanpa test: meta bukan objek, item null di dalam array
+- T4: komentar field \quote\ bilang "kalimat asli dari CV" padahal nilainya sudah di-trim
+- T4: memotong kutipan aman untuk pencocokan teks (trim(x) ⊆ x), tapi hanya selama tidak ada yang membandingkan byte-equality
+
+Task 5: complete (commits 7c0b1d8..HEAD, spec PASS, quality APPROVED setelah 1 fix wave + 1 keputusan copy controller, 905 test)
+
+Catatan penting Task 5:
+- \	ext-headline-sm\ dan \	ext-body-sm\ bukan token di tailwind.config.ts. Karena preflight mewarisi ukuran body, judul panel h2 tampil 16px weight 400 dan hierarkinya terbalik terhadap h3 kolom. Sudah diganti token asli.
+- Judul kolom kanan diubah jadi "Yang bikin saya lanjut baca" (tanpa "baca" meanings-nya jadi setujui/lanjut, bukan lanjut membaca).
+- Trajectory "Perjalanan" -> "Arah karier" karena "Perjalanan" bukan padanan "Trajectory".
+- Kolom kosong dapat kalimat sendiri supaya tidak terlihat rusak.
+- Kunci i18n bertambah jadi 10 per prefix (punya hrview-pace + hrview-stopping-empty + hrview-continuing-empty).
+
+## Minor findings Task 5 yang ditunda ke review akhir
+
+- T5: dua set kunci \checker.hrview-*\ dan \checker.detail.hrview-*\ sengaja identik, jadi tidak ada test yang bisa membuktikan keyPrefix terpakai
+- T5: pembeda severity memakai ukuran + warna (token \	ext-label-bold text-error\ untuk Kritis), bukan \ont-bold\, karena dua utility satu layer diselesaikan urutan stylesheet
+- T5: \	ext-error\ dipakai bersama; perlu dicek tidak bentrok bila panel someday|nests di dalam kartu error
+- T5: dua test bahasa Inggris bergantung localStorage; jika provider nanti membaca preferensi dari tempat lain, test itu putus tanpa masalah copy
+- T5: \LEVEL_LABEL\ masih mix bahasa (entry/menengah/senior/lead)
+
+## Review akhir seluruh perubahan (final whole-branch)
+
+Verdict awal **JANGAN RILIS** dengan 3 Critical + 5 Important. Semua sudah diperbaiki:
+
+- C1: dua kolom yang saya instruksikan untuk dihapus ternyata BUKAN duplikat. Panel baca ats_prediction, kolom baca narrative_feedback — dua schema berbeda. areas_for_improvement kehilangan seluruh pembacanya. Diperbaiki: panel jadi satu sumber dengan fallback ke narrative_feedback. Komit 2d8fe81.
+- C2: IssueOrString tanpa .catch() membuat SATU item rusak menghapus SELURUH array, lalu panel mengklaim CV tanpa temuan. Diperbaiki per item + copy kosong diubah jadi pernyataan tentang analisis, bukan tentang CV. Komit 606908f.
+- C3: meta.detected_seniority/title_progression/growth_rate punya .catch() ke mid/Stable/Normal yang lolos allowlist, jadi panel menampilkan level dan arah karier yang tidak pernah dikirim AI. Diubah jadi .optional(). Komit fbce3c5.
+- I3: dua halaman hasil divergen. Penjaga diterapkan ke /checker. Komit 4c2357a.
+- I5: prompt masih mengetik strengths sebagai string[], jadi kutipan sisi positif biasanya kosong. Diubah jadi objek lengkap source_excerpt. Komit b55a155.
+- M10: karakter banner komentar types.ts dipulihkan. Komit fd4fb32.
+
+Total 935 test, tsc 0, build sukses.
+
+## Sisa yang TIDAK diperbaiki (sadar, tercatat)
+
+- I1: penanda JD di tengah CV masih memotong CV (pemisahan berbasis konten memang bisa dipalsukan dari sisi mana pun; perbaikan durables adalah berhenti meneruskan data terstruktur lewat string, yaitu perubahan interface callAI, butuh task tersendiri). Sudah terdokumentasi di Task 1.
+- I2 + test section score: .catch() schema menaruh 50 ke jsonb SEBELUM normaliser, jadi penjaga "jangan tampilkan skor karangan" tidak pernah aktif untuk baris normal. Test-nya memakai input yang tidak bisa dihasilkan schema.
+- M8: dua register di satu panel — kolom kosong casual, gabungan kosong formal.
+- M11: tiga skrip PowerShell satu-kali ter-commit ke scripts/ (sdd-task-brief.ps1, sdd-review-package.ps1, fix-plan-dashes.ps1). Bukan tools produk; skrip ke-2 menulis CRLF sementara repo memakai LF.
+- M14: "nol token baru" tidak persis — tabel GRADE menambah ~40 token per panggilan sistem.
+- M13 (pre-existing): grade/verdict/ats_prediction tetap punya .catch() yang mengarang nilai kalau model mengirim nilai di luar enum. Panel sekarang duduk tepat di atas ketiganya.
