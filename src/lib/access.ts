@@ -4,7 +4,7 @@ import { eq, and, gte, asc } from "drizzle-orm";
 import { normalizePackageLimits } from "@/lib/package-limits";
 import { CURRENT_PACKAGES, UNMARKETED_PACKAGE_KEYS, FREE_LIMITS as STATIC_FREE_LIMITS, currentEquivalentPackage } from "@/lib/package-catalog-static";
 
-/* â”€â”€â”€ Feature Keys â”€â”€â”€ */
+/* ─── Feature Keys ─── */
 export type Feature =
   | "ai_cv_generate"
   | "cv_analyzer"
@@ -16,7 +16,7 @@ export type Feature =
   | "bulk_analyzer"
   | "white_label";
 
-/* â”€â”€â”€ Package Definitions â”€â”€â”€ */
+/* ─── Package Definitions ─── */
 export interface PackageDef {
   id: string;
   name: string;
@@ -117,7 +117,7 @@ export const PACKAGES: Record<string, PackageDef> = {
   },
 };
 
-/* â”€â”€â”€ Get Packages from DB (with fallback to hardcoded) â”€â”€â”€ */
+/* ─── Get Packages from DB (with fallback to hardcoded) ─── */
 
 interface DbPackageRow {
   key: string;
@@ -216,7 +216,7 @@ export async function getPackagesDb(): Promise<Record<string, PackageDef>> {
   }
 }
 
-/* â”€â”€â”€ Default free limits â”€â”€â”€ */
+/* ─── Default free limits ─── */
 /**
  * Jatah pengguna tanpa paket berbayar.
  *
@@ -230,7 +230,7 @@ export const FREE_LIMITS = STATIC_FREE_LIMITS as Record<
   number | "unlimited" | false
 >;
 
-/* â”€â”€â”€ User Access Result â”€â”€â”€ */
+/* ─── User Access Result ─── */
 export interface UserAccess {
   /** Best-tier package name for display */
   tierName: string;

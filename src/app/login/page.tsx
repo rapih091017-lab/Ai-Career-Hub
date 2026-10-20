@@ -151,7 +151,7 @@ export default function LoginPage() {
               <Link href="/terms" className="text-xs text-outline hover:text-primary transition-colors cursor-pointer">Syarat & Ketentuan</Link>
               <Link href="/contact" className="text-xs text-outline hover:text-primary transition-colors cursor-pointer">Bantuan</Link>
             </div>
-            <p className="mt-4 text-center text-xs text-outline-variant">&copy; 2025 AI Career Hub. Hak Cipta Dilindungi.</p>
+            <p className="mt-4 text-center text-xs text-outline-variant">&copy; 2026 AI Career Hub. Hak Cipta Dilindungi.</p>
           </div>
         </section>
       </main>
