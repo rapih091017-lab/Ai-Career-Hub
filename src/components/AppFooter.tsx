@@ -12,6 +12,43 @@ interface AppFooterProps {
 /** Cache modul: diambil sekali per sesi browser, dipakai semua instance footer. */
 let publicSettingsCache: Record<string, string> | null = null;
 
+/**
+ * Saklar animasi. Selain prefers-reduced-motion di level sistem, pengguna
+ * juga bisa mematikan animasi lewat tombol ini. Statusnya disimpan di
+ * localStorage supaya pilihan bertahan setelah reload.
+ */
+function MotionToggle() {
+  const { t } = useTranslation();
+  const [motionOff, setMotionOff] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("motion") === "off";
+    setMotionOff(saved);
+    document.documentElement.dataset.motion = saved ? "off" : "on";
+  }, []);
+
+  const toggle = () => {
+    const next = !motionOff;
+    setMotionOff(next);
+    localStorage.setItem("motion", next ? "off" : "on");
+    document.documentElement.dataset.motion = next ? "off" : "on";
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      aria-pressed={motionOff}
+      className="inline-flex min-h-[40px] items-center gap-2 rounded-full border border-paper/25 px-3 text-[12px] font-bold text-paper/70 transition-colors hover:border-lime hover:text-lime"
+    >
+      <span aria-hidden="true" className="material-symbols-outlined text-[16px]">
+        {motionOff ? "motion_plays" : "motion_photos_off"}
+      </span>
+      {motionOff ? t("footer.motion-on") : t("footer.motion-off")}
+    </button>
+  );
+}
+
 export default function AppFooter({ variant = "simple", bordered = false }: AppFooterProps) {
   const { t, lang } = useTranslation();
   const [settings, setSettings] = useState<Record<string, string> | null>(publicSettingsCache);
@@ -35,61 +72,64 @@ export default function AppFooter({ variant = "simple", bordered = false }: AppF
   const contactEmail = settings?.contact_email || "support@aicareerhub.com";
   if (variant === "full") {
     return (
-      <footer className="bg-inverse-surface py-20 px-margin-mobile md:px-gutter">
+      <footer className="bg-inverse-surface py-16 px-margin-mobile md:px-gutter md:py-20">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-            <div className="col-span-1 md:col-span-1">
+          <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr_1fr_1fr] gap-12 mb-16">
+            <div>
               <div className="flex items-center gap-2 mb-6">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white">
+                <div className="w-8 h-8 rounded-[7px] border-2 border-ink bg-lime flex items-center justify-center text-ink">
                   <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
                 </div>
-                <span className="font-headline-md text-[20px] font-bold text-primary">AI Career Hub</span>
+                <span className="font-display text-[20px] font-bold tracking-[-0.02em] text-paper">AI Career Hub</span>
               </div>
-              <p className="text-body-md text-surface-variant/80">{t("footer.desc")}</p>
+              <p className="text-body-md text-paper/65">{t("footer.desc")}</p>
             </div>
             <div>
-              <h4 className="font-label-bold text-white mb-6">{t("footer.produk")}</h4>
-              <ul className="space-y-4">
-                <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/builder/new">{t("footer.cv-builder")}</Link></li>
-                <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/checker">{t("footer.resume-checker")}</Link></li>
-                <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/portfolio">{t("footer.portfolio")}</Link></li>
-                <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/interview">{t("footer.interview")}</Link></li>
-                <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/sinonim">{t("footer.sinonim")}</Link></li>
-                <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href={lang === "en" ? "/cv-examples" : "/contoh-cv"}>{t("footer.contoh-cv")}</Link></li>
-                <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/career-hub">{t("footer.career-hub")}</Link></li>
-                <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/career-path">{t("footer.career-paths")}</Link></li>
+              <h4 className="font-mono text-[11px] font-bold uppercase tracking-[0.06em] text-paper/85 mb-5">{t("footer.produk")}</h4>
+              <ul className="space-y-3">
+                <li><Link className="text-paper/70 hover:text-lime transition-colors" href="/builder/new">{t("footer.cv-builder")}</Link></li>
+                <li><Link className="text-paper/70 hover:text-lime transition-colors" href="/checker">{t("footer.resume-checker")}</Link></li>
+                <li><Link className="text-paper/70 hover:text-lime transition-colors" href="/portfolio">{t("footer.portfolio")}</Link></li>
+                <li><Link className="text-paper/70 hover:text-lime transition-colors" href="/interview">{t("footer.interview")}</Link></li>
+                <li><Link className="text-paper/70 hover:text-lime transition-colors" href="/sinonim">{t("footer.sinonim")}</Link></li>
+                <li><Link className="text-paper/70 hover:text-lime transition-colors" href={lang === "en" ? "/cv-examples" : "/contoh-cv"}>{t("footer.contoh-cv")}</Link></li>
+                <li><Link className="text-paper/70 hover:text-lime transition-colors" href="/career-hub">{t("footer.career-hub")}</Link></li>
+                <li><Link className="text-paper/70 hover:text-lime transition-colors" href="/career-path">{t("footer.career-paths")}</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-label-bold text-white mb-6">{t("footer.perusahaan")}</h4>
-              <ul className="space-y-4">
-                <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/about">{t("footer.tentang")}</Link></li>
-                <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/karir">{t("footer.karir")}</Link></li>
-                <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/affiliate">{t("footer.affiliate")}</Link></li>
-                <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/contact">{t("footer.kontak")}</Link></li>
+              <h4 className="font-mono text-[11px] font-bold uppercase tracking-[0.06em] text-paper/85 mb-5">{t("footer.perusahaan")}</h4>
+              <ul className="space-y-3">
+                <li><Link className="text-paper/70 hover:text-lime transition-colors" href="/about">{t("footer.tentang")}</Link></li>
+                <li><Link className="text-paper/70 hover:text-lime transition-colors" href="/karir">{t("footer.karir")}</Link></li>
+                <li><Link className="text-paper/70 hover:text-lime transition-colors" href="/affiliate">{t("footer.affiliate")}</Link></li>
+                <li><Link className="text-paper/70 hover:text-lime transition-colors" href="/contact">{t("footer.kontak")}</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-label-bold text-white mb-6">{t("footer.bantuan")}</h4>
-              <ul className="space-y-4">
-                <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/faq">{t("footer.faq")}</Link></li>
-                <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/contact">{t("footer.pusat-bantuan")}</Link></li>
-                <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/privacy">{t("footer.privasi")}</Link></li>
-                <li><Link className="text-surface-variant/70 hover:text-primary transition-colors" href="/terms">{t("footer.syarat")}</Link></li>
+              <h4 className="font-mono text-[11px] font-bold uppercase tracking-[0.06em] text-paper/85 mb-5">{t("footer.bantuan")}</h4>
+              <ul className="space-y-3">
+                <li><Link className="text-paper/70 hover:text-lime transition-colors" href="/faq">{t("footer.faq")}</Link></li>
+                <li><Link className="text-paper/70 hover:text-lime transition-colors" href="/contact">{t("footer.pusat-bantuan")}</Link></li>
+                <li><Link className="text-paper/70 hover:text-lime transition-colors" href="/privacy">{t("footer.privasi")}</Link></li>
+                <li><Link className="text-paper/70 hover:text-lime transition-colors" href="/terms">{t("footer.syarat")}</Link></li>
               </ul>
             </div>
           </div>
-          <div className="pt-8 border-t border-outline-variant/50 flex flex-col md:flex-row justify-between items-center gap-6">
-            <p className="text-label-sm text-surface-variant/60">{t("footer.copyright")}</p>
-            <div className="flex gap-6">
-              <Link className="text-surface-variant/60 hover:text-primary transition-all" href="/contact"><span className="material-symbols-outlined">public</span></Link>
-              <a className="text-surface-variant/60 hover:text-primary transition-all" href={`mailto:${contactEmail}`}><span className="material-symbols-outlined">alternate_email</span></a>
-              {settings?.social_instagram ? (
-                <a className="text-surface-variant/60 hover:text-primary transition-all" href={settings.social_instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram"><span className="material-symbols-outlined">photo_camera</span></a>
-              ) : null}
-              {settings?.social_linkedin ? (
-                <a className="text-surface-variant/60 hover:text-primary transition-all" href={settings.social_linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><span className="material-symbols-outlined">work</span></a>
-              ) : null}
+          <div className="pt-6 border-t border-paper/15 flex flex-col md:flex-row justify-between items-center gap-5">
+            <p className="text-label-sm text-paper/50">{t("footer.copyright")}</p>
+            <div className="flex items-center gap-5">
+              <MotionToggle />
+              <div className="flex gap-5">
+                <Link className="text-paper/50 hover:text-lime transition-colors" href="/contact" aria-label="Website"><span className="material-symbols-outlined">public</span></Link>
+                <a className="text-paper/50 hover:text-lime transition-colors" href={`mailto:${contactEmail}`} aria-label="Email"><span className="material-symbols-outlined">alternate_email</span></a>
+                {settings?.social_instagram ? (
+                  <a className="text-paper/50 hover:text-lime transition-colors" href={settings.social_instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram"><span className="material-symbols-outlined">photo_camera</span></a>
+                ) : null}
+                {settings?.social_linkedin ? (
+                  <a className="text-paper/50 hover:text-lime transition-colors" href={settings.social_linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><span className="material-symbols-outlined">work</span></a>
+                ) : null}
+              </div>
             </div>
           </div>
         </div>
@@ -103,11 +143,11 @@ export default function AppFooter({ variant = "simple", bordered = false }: AppF
         bordered ? "bg-background mt-12 border-t border-outline-variant/50" : ""
       }`}
     >
-      <div className="text-primary font-bold font-headline-md text-lg">AI Career Hub</div>
+      <div className="text-green-deep font-bold font-display text-lg">AI Career Hub</div>
       <div className="flex flex-wrap justify-center gap-6 text-on-surface-variant">
-        <Link className="hover:text-primary transition-colors" href="/about">{t("footer.tentang-simple")}</Link>
-        <Link className="hover:text-primary transition-colors" href="/privacy">{t("footer.privasi-simple")}</Link>
-        <Link className="hover:text-primary transition-colors" href="/terms">{t("footer.syarat-simple")}</Link>
+        <Link className="hover:text-green-deep transition-colors" href="/about">{t("footer.tentang-simple")}</Link>
+        <Link className="hover:text-green-deep transition-colors" href="/privacy">{t("footer.privasi-simple")}</Link>
+        <Link className="hover:text-green-deep transition-colors" href="/terms">{t("footer.syarat-simple")}</Link>
       </div>
       <p className="text-on-surface-variant text-center" dangerouslySetInnerHTML={{ __html: t("footer.copyright-simple") }} />
     </footer>

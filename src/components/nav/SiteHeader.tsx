@@ -6,7 +6,7 @@
  * Dua bentuk dari satu komponen, sesuai permintaan: bentuk `pill` dipakai
  * landing dan halaman publik (nav melayang dengan sudut membulat), bentuk
  * `bar` dipakai halaman aplikasi (nav menempel penuh). Isi, urutan, dan
- * perilakunya identik — yang berbeda hanya bentuknya, supaya halaman publik
+ * perilakunya identik â€” yang berbeda hanya bentuknya, supaya halaman publik
  * dan dashboard tidak terlihat seperti dua situs yang berbeda.
  *
  * Tinggi navigasi dikunci lewat token kelas di sini. Halaman memakai
@@ -68,8 +68,8 @@ export default function SiteHeader({ variant = "bar" }: Props) {
   }, [pathname]);
 
   const shell = isPill
-    ? "fixed top-0 md:top-4 left-0 md:left-1/2 right-0 md:-translate-x-1/2 z-50 w-full md:w-[calc(100%-32px)] md:max-w-7xl bg-surface-container-lowest/85 backdrop-blur-lg border-b md:border md:rounded-2xl md:shadow-lg border-outline-variant/40"
-    : "fixed top-0 left-0 right-0 z-50 w-full bg-surface-container-lowest border-b border-outline-variant/40 shadow-sm";
+    ? "fixed top-0 md:top-4 left-0 md:left-1/2 right-0 md:-translate-x-1/2 z-50 w-full md:w-[calc(100%-32px)] md:max-w-7xl bg-paper/90 backdrop-blur-lg border-b border-hairline md:border md:border-ink/15 md:rounded-2xl md:shadow-hard"
+    : "fixed top-0 left-0 right-0 z-50 w-full bg-paper border-b border-hairline";
 
   return (
     <>
@@ -82,7 +82,7 @@ export default function SiteHeader({ variant = "bar" }: Props) {
           }`}
         >
           <Link href="/" className="flex shrink-0 items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white">
+            <span className="flex h-8 w-8 items-center justify-center rounded-[7px] border-2 border-ink bg-evergreen text-lime">
               <span
                 className="material-symbols-outlined text-[20px]"
                 style={{ fontVariationSettings: "'FILL' 1" }}
@@ -91,7 +91,7 @@ export default function SiteHeader({ variant = "bar" }: Props) {
                 auto_awesome
               </span>
             </span>
-            <span className="font-headline-md text-[18px] font-bold tracking-tight text-primary">
+            <span className="font-display text-[18px] font-bold tracking-[-0.02em] text-ink">
               AI Career Hub
             </span>
           </Link>
@@ -104,7 +104,7 @@ export default function SiteHeader({ variant = "bar" }: Props) {
               <Link
                 key={item.href}
                 href={item.href}
-                className="rounded-lg px-3 py-2 font-label-bold text-on-surface-variant transition-colors hover:text-primary"
+                className="rounded-lg px-3 py-2 font-label-bold text-on-surface-variant underline decoration-transparent decoration-[3px] underline-offset-[5px] transition-colors hover:text-green-deep hover:decoration-lime"
               >
                 {t(item.labelKey, item.label)}
               </Link>
@@ -153,7 +153,7 @@ export default function SiteHeader({ variant = "bar" }: Props) {
                 </button>
 
                 {accountOpen && (
-                  <div className="absolute right-0 top-full z-[60] mt-2 max-h-[80vh] w-64 overflow-y-auto rounded-2xl border border-outline-variant/40 bg-surface-container-lowest py-2 shadow-xl">
+                  <div className="absolute right-0 top-full z-[60] mt-2 max-h-[80vh] w-64 overflow-y-auto rounded-2xl border border-hairline bg-paper py-2 shadow-xl">
                     {session?.user?.email && (
                       <p className="mb-1 border-b border-outline-variant/40 px-4 py-2 text-xs text-on-surface-variant">
                         {session.user.email}
@@ -208,7 +208,7 @@ export default function SiteHeader({ variant = "bar" }: Props) {
             ) : (
               <Link
                 href="/#pricing"
-                className="rounded-lg bg-primary px-4 py-2 font-label-bold text-on-primary transition-all hover:brightness-110 active:scale-95"
+                className="rounded-full bg-evergreen px-4 py-2 font-label-bold text-paper transition-colors hover:bg-green-deep active:scale-95"
               >
                 {t("nav.try-free")}
               </Link>
@@ -234,7 +234,7 @@ export default function SiteHeader({ variant = "bar" }: Props) {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.2, ease: "easeInOut" }}
-              className="overflow-hidden border-t border-outline-variant/40 bg-surface-container-lowest lg:hidden"
+              className="overflow-hidden border-t border-hairline bg-paper lg:hidden"
             >
               <div className="max-h-[70vh] space-y-1 overflow-y-auto px-margin-mobile py-3">
                 {NAV_GROUPS.map((group) => (

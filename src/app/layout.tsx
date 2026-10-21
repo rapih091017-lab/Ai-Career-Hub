@@ -59,7 +59,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className="light">
+    /* suppressHydrationWarning: skrip inline menambah class icons-pending
+       sebelum hydration supaya Material Symbols tidak tampil sebagai teks. */
+    <html lang="id" className="light" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -73,6 +75,16 @@ export default function RootLayout({
           gampang dibaca, dan mono sistem untuk label mikro.
         */}
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700&family=Caveat:wght@400;600;700&family=Inter:wght@400;500;600;700;800&family=Literata:wght@400;500;600;700&family=Stack+Sans+Headline:wght@400;500;600;700&display=swap" />
+        {/*
+          Ikon Material Symbols disembunyikan sampai font ikon siap, supaya
+          ligatur tidak sempat tampil sebagai teks mentah. Ada jaring
+          pengaman 2,5 detik kalau font gagal dimuat.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var d=document.documentElement;d.classList.add('icons-pending');function done(){d.classList.remove('icons-pending')}try{if(document.fonts&&document.fonts.load){document.fonts.load('16px "Material Symbols Outlined"').then(done).catch(done);setTimeout(done,2500)}else{done()}}catch(e){done()}})();`,
+          }}
+        />
         <script type="application/ld+json" dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",

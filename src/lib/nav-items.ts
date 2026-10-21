@@ -168,7 +168,7 @@ export const ACCOUNT_MENU: NavSection[] = [
  */
 export const LANDING_LINKS: NavItem[] = [
   { labelKey: "nav.pricing", label: "Harga", href: "/#pricing", icon: "sell" },
-  { labelKey: "nav.cara-kerja", label: "Cara Kerja", href: "/#journey", icon: "route" },
+  { labelKey: "nav.cara-kerja", label: "Cara Kerja", href: "/#cara-kerja", icon: "route" },
 ];
 
 /** Teks bar pengumuman di bawah navbar. */

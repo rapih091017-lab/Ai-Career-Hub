@@ -225,31 +225,31 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
   }, [packages]);
 
   return (
-    <section id="pricing" className="relative overflow-hidden bg-gradient-to-b from-white via-[#f0fafb] to-white dark:from-[#0F0F0F] dark:via-[#1A1A2E] dark:to-[#0F0F0F] py-24 md:py-32">
-      {/* Satu orb ambient statis, kedalaman halus tanpa loop (R-01/R-19) */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none dark:bg-primary/10" />
+    <section id="pricing" className="relative overflow-hidden bg-paper py-24 md:py-32">
+      {/* Sorot radial lime di belakang judul, satu-satunya efek lembut di sini */}
+      <div className="absolute top-0 left-1/3 w-[500px] h-[500px] bg-lime/30 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-margin-mobile md:px-gutter">
         {/* ─── HEADER ─── */}
         <motion.div className="text-center mb-12 md:mb-16"
           initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
-          <h2 className="font-display text-[36px] md:text-display text-on-background dark:text-white mb-4 leading-tight">
+          <h2 className="font-display text-[36px] md:text-display text-ink mb-4 leading-tight">
             {t("pricing.section-title")}
           </h2>
-          <p className="font-body-md text-on-surface-variant dark:text-gray-400 max-w-xl mx-auto text-[17px]">
+          <p className="text-body-md text-ink-soft max-w-xl mx-auto text-[17px]">
             {t("pricing.section-subtitle")}
           </p>
         </motion.div>
 
         {/* ─── TOGGLE ─── */}
         <div className="flex justify-center mb-10">
-          <motion.div className="inline-flex bg-surface-container-lowest dark:bg-[#1F1F2E] rounded-2xl p-1.5 shadow-premium-md border border-outline-variant/50 dark:border-gray-700"
+          <motion.div className="inline-flex bg-paper rounded-full p-1.5 shadow-hard-ink-sm border-[2.5px] border-ink"
             initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.1 }}>
             {(["satuan", "langganan"] as const).map((m) => (
               <button key={m} onClick={() => setMode(m)}
-                className={`relative px-6 md:px-8 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${mode === m ? "text-white" : "text-on-surface-variant hover:text-on-surface"}`}>
+                className={`relative px-6 md:px-8 py-3 rounded-full text-sm font-bold transition-all duration-200 ${mode === m ? "text-lime" : "text-on-surface-variant hover:text-on-surface"}`}>
                 {mode === m && (
-                  <motion.div layoutId="pricing-toggle-bg" className="absolute inset-0 bg-primary rounded-xl"
+                  <motion.div layoutId="pricing-toggle-bg" className="absolute inset-0 bg-ink rounded-full"
                     transition={{ type: "spring", stiffness: 500, damping: 35 }} />
                 )}
                 <span className="relative z-10">{m === "satuan" ? t("pricing.toggle-satuan") : t("pricing.toggle-langganan")}</span>
@@ -266,7 +266,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
 
         {/* ─── VALUE FRAMING per mode ─── */}
         <div className="mx-auto mb-8 max-w-xl text-center">
-          <p className="text-body-md text-on-surface-variant dark:text-gray-400">
+          <p className="text-body-md text-on-surface-variant">
             {mode === "satuan" ? t("pricing.value-satuan") : t("pricing.value-langganan")}
           </p>
         </div>
@@ -278,37 +278,37 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.45 }}
-            className="relative overflow-hidden mb-6 rounded-2xl border-2 border-primary bg-surface-container-lowest p-6 md:p-8 shadow-premium-md"
+            className="relative overflow-hidden mb-6 rounded-xl border-[2.5px] border-ink bg-lime/15 shadow-hard p-6 md:p-8"
           >
-            <span className="absolute top-0 right-6 inline-flex items-center gap-1.5 rounded-b-lg bg-primary px-3 py-1.5 text-xs font-bold text-on-primary">
+            <span className="absolute top-0 right-6 inline-flex items-center gap-1.5 rounded-b-lg bg-ink px-3 py-1.5 text-xs font-bold text-lime">
               <span className="material-symbols-outlined text-sm" aria-hidden="true">sell</span>
               {t("pricing.bundle.badge")}
             </span>
             <div className="flex flex-col md:flex-row md:items-center gap-5">
               <div className="flex-1 pr-16 md:pr-0">
                 <div className="flex items-center gap-2 mb-1.5">
-                  <span className="material-symbols-outlined text-primary" aria-hidden="true">workspace_premium</span>
-                  <h3 className="font-label-bold text-lg md:text-xl text-on-surface dark:text-white">
+                  <span className="material-symbols-outlined text-green-deep" aria-hidden="true">workspace_premium</span>
+                  <h3 className="font-display text-lg md:text-xl text-ink">
                     {t("pricing.bundle.title")}
                   </h3>
                 </div>
                 <div className="flex items-baseline gap-2 mb-2">
-                  <span className="font-bold tabular-nums text-[32px] leading-none text-primary">
+                  <span className="font-display font-bold tabular-nums text-[32px] leading-none text-ink">
                     {formatRupiah(packages.find((p) => p.key === "paket_lamaran")?.price ?? 0)}
                   </span>
                   {/* Masa validity dibaca dari katalog, bukan diketik tangan:
                       dulu di sini tertulis 60 hari padahal paketnya 30. */}
-                  <span className="text-xs text-on-surface-variant">
+                  <span className="text-xs text-ink-soft">
                     / {packages.find((p) => p.key === "paket_lamaran")?.periodDays ?? 30} hari, sekali bayar
                   </span>
                 </div>
-                <p className="text-sm text-on-surface-variant max-w-2xl">{t("pricing.bundle.desc")}</p>
+                <p className="text-sm text-ink-soft max-w-2xl">{t("pricing.bundle.desc")}</p>
               </div>
               <div className="shrink-0">
                 <MagneticButton>
                   <Link
                     href="/checkout?packages=paket_lamaran"
-                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary px-6 text-sm font-bold text-on-primary hover:brightness-110 active:scale-[0.98] transition-all"
+                    className="inline-flex min-h-[54px] items-center justify-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-6 font-display text-sm font-bold text-ink shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-[0.98] transition-all"
                   >
                     <span className="material-symbols-outlined text-lg" aria-hidden="true">rocket_launch</span>
                     {t("pricing.bundle.cta")}
@@ -337,39 +337,29 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
 
         {/* ─── FOOTNOTE (langganan mode) ─── */}
         {mode === "langganan" && (
-          <motion.div className="mt-8 text-center space-y-3"
+  <motion.div className="mb-8 text-center space-y-2"
             initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.3 }}>
-            <p className="text-sm text-on-surface-variant inline-flex items-center gap-1.5">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-              {t("pricing.footnote-payment")}
-            </p>
-            <p className="text-sm text-on-surface-variant inline-flex items-center gap-1.5">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                          {t("pricing.footnote-cancel")}
-            </p>
-            {/* Batas wajar ini ditulis apa adanya: yang tertulis di kartu sama
-                dengan yang terjadi di sistem. */}
-<p className="text-xs text-on-surface-variant max-w-2xl mx-auto">
-              {t("pricing.fair-use-note")}
-            </p>
+            <p className="text-sm text-on-surface-variant">{t("pricing.footnote-payment")}</p>
+            <p className="text-sm text-on-surface-variant">{t("pricing.footnote-cancel")}</p>
+            <p className="text-sm text-on-surface-variant max-w-2xl mx-auto">{t("pricing.fair-use-note")}</p>
             {/* Risk Reversal Badges */}
-            <div className="flex items-center justify-center gap-4 pt-2">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded-xl">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-600 shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <div className="flex items-center justify-center gap-4 pt-4">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-paper border-2 border-ink rounded-xl shadow-hard-ink-sm">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-deep shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 <div className="text-left">
-                  <p className="text-xs font-bold text-green-700">{t("pricing.garansi")}</p>
-                  <p className="text-xs text-green-600">{t("pricing.garansi-desc")}</p>
+                  <p className="text-xs font-bold text-ink">{t("pricing.garansi")}</p>
+                  <p className="text-xs text-ink-soft">{t("pricing.garansi-desc")}</p>
                 </div>
               </div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-xl">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600 shrink-0"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-paper border-2 border-ink rounded-xl shadow-hard-ink-sm">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-deep shrink-0"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                 <div className="text-left">
-                  <p className="text-xs font-bold text-blue-700">{t("pricing.no-contract")}</p>
-                  <p className="text-xs text-blue-600">{t("pricing.no-contract-desc")}</p>
+                  <p className="text-xs font-bold text-ink">{t("pricing.no-contract")}</p>
+                  <p className="text-xs text-ink-soft">{t("pricing.no-contract-desc")}</p>
                 </div>
               </div>
             </div>
-          </motion.div>
+  </motion.div>
         )}
 
         {/* ─── COMPARISON TABLE ─── */}
@@ -385,25 +375,25 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
             {showComparison && (
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: "easeInOut" }} className="overflow-hidden">
-                <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/50 overflow-hidden shadow-premium-sm mt-2">
+                <div className="bg-paper rounded-xl border-2 border-ink/20 overflow-hidden shadow-hard-sm mt-2">
                   <div className="overflow-x-auto">
                     <table className="w-full text-left">
                       <thead>
-                        <tr className="bg-surface-container-low border-b border-outline-variant/50">
+                        <tr className="bg-surface-container-low border-b border-hairline">
                           <th className="p-4 text-label-sm font-bold text-on-surface-variant">{t("pricing.comparison-header")}</th>
                           <th className="p-4 text-label-sm font-bold text-on-surface-variant">Free</th>
                           <th className="p-4 text-label-sm font-bold text-on-surface-variant">Lite</th>
-                          <th className="p-4 text-label-sm font-bold text-primary bg-primary/5">Pro</th>
+                          <th className="p-4 text-label-sm font-bold text-ink bg-lime/25">Pro</th>
                           <th className="p-4 text-label-sm font-bold text-on-surface-variant">Max</th>
                         </tr>
                       </thead>
                       <tbody>
                         {COMPARISON_ROWS.map((row, i) => (
-                          <tr key={row.labelKey} className={`border-b border-outline-variant/40 ${i % 2 === 0 ? "bg-surface-container-lowest" : "bg-surface-container-low/50"}`}>
+                          <tr key={row.labelKey} className={`border-b border-hairline ${i % 2 === 0 ? "bg-paper" : "bg-surface-container-low/50"}`}>
                             <td className="p-4 text-sm font-medium text-on-surface">{t(row.labelKey)}</td>
                             <td className="p-4 text-sm text-on-surface-variant">{freeCell(row.key, t)}</td>
                             <td className="p-4 text-sm text-on-surface-variant">{limitCell(packages, "lite_bulanan", row.key, t)}</td>
-                            <td className="p-4 text-sm font-semibold text-primary bg-primary/5">{limitCell(packages, "pro_bulanan", row.key, t)}</td>
+                            <td className="p-4 text-sm font-semibold text-ink bg-lime/25">{limitCell(packages, "pro_bulanan", row.key, t)}</td>
                             <td className="p-4 text-sm text-on-surface-variant">{limitCell(packages, "max_bulanan", row.key, t)}</td>
                           </tr>
                         ))}
@@ -420,28 +410,28 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
         {mode === "satuan" && (
           <motion.div className="mt-8"
             initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.3 }}>
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-2 border-primary/20 p-6 md:p-8">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
+            <div className="relative overflow-hidden rounded-xl bg-lime/15 border-[2.5px] border-ink shadow-hard p-6 md:p-8">
+              <div className="absolute top-0 right-0 w-40 h-40 bg-lime/40 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
               <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
                 <div className="text-center md:text-left">
                   <div className="flex items-center gap-2 mb-2">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-2xl shrink-0"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
-                    <h4 className="font-label-bold text-lg text-on-surface">{t("pricing.bundle-title")}</h4>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-2xl text-ink shrink-0"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
+                    <h4 className="font-display text-lg text-ink">{t("pricing.bundle-title")}</h4>
                   </div>
-                  <p className="text-sm text-on-surface-variant">{t("pricing.bundle-desc")}</p>
+                  <p className="text-sm text-ink-soft">{t("pricing.bundle-desc")}</p>
                 </div>
                 <div className="md:ml-auto flex items-center gap-4">
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-primary">
+                    <p className="font-display text-2xl font-bold text-ink">
                       {formatRupiah(packages.find((p) => p.key === "paket_lamaran")?.price ?? 0)}
                     </p>
-                    <p className="text-xs text-on-surface-variant dark:text-gray-400 line-through">
+                    <p className="text-xs text-ink-soft line-through">
                       {formatRupiah(bundleSeparateTotal)}
                     </p>
                   </div>
                   <MagneticButton>
                     <Link href="/checkout?packages=paket_lamaran"
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-on-primary rounded-xl font-label-bold hover:brightness-110 active:scale-[0.98] transition-all shadow-md whitespace-nowrap">
+                      className="inline-flex items-center gap-2 px-6 py-3 border-[2.5px] border-ink bg-lime text-ink rounded-full font-bold shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-[0.98] transition-all whitespace-nowrap">
                       {t("pricing.bundle-cta")}
                     </Link>
                   </MagneticButton>
@@ -455,24 +445,24 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
         {mode === "satuan" && (
           <motion.div className="mt-6"
             initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.15 }}>
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary/10 via-white to-primary/10 dark:from-[#0E2B2C] dark:via-[#1A1A2E] dark:to-[#0E2B2C] border-2 border-primary/20 dark:border-primary/40 p-6 md:p-8">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none dark:bg-primary/20" />
+            <div className="relative overflow-hidden rounded-xl bg-paper border-[2.5px] border-ink shadow-hard p-6 md:p-8">
+              <div className="absolute top-0 right-0 w-40 h-40 bg-lime/30 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
               <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
                 <div className="text-center md:text-left">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="material-symbols-outlined text-primary dark:text-primary text-2xl shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>mail</span>
-                    <h4 className="font-label-bold text-lg text-on-surface dark:text-white">{t("pricing.surat-banner.title")}</h4>
+                    <span className="material-symbols-outlined text-green-deep text-2xl shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>mail</span>
+                    <h4 className="font-display text-lg text-ink">{t("pricing.surat-banner.title")}</h4>
                   </div>
-                  <p className="text-sm text-on-surface-variant dark:text-gray-400 max-w-lg">{t("pricing.surat-banner.desc")}</p>
+                  <p className="text-sm text-ink-soft max-w-lg">{t("pricing.surat-banner.desc")}</p>
                 </div>
                 <div className="md:ml-auto flex flex-col sm:flex-row items-center gap-3">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary rounded-full text-xs font-bold whitespace-nowrap">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-lime/30 border border-ink/30 text-ink rounded-full text-xs font-bold whitespace-nowrap">
                     <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>redeem</span>
                     {t("pricing.surat-banner.free-note")}
                   </span>
                   <MagneticButton>
                     <Link href="/login"
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-label-bold hover:brightness-110 active:scale-[0.98] transition-all shadow-md whitespace-nowrap">
+                      className="inline-flex items-center gap-2 px-6 py-3 border-[2.5px] border-ink bg-lime text-ink rounded-full font-bold shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-[0.98] transition-all whitespace-nowrap">
                       <span className="material-symbols-outlined text-lg">auto_awesome</span>
                       {t("pricing.surat-banner.cta")}
                     </Link>
@@ -483,16 +473,15 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
           </motion.div>
         )}
 
-        {/* ─── 
-{/* ─── FAQ ─── */}
+        {/* ─── FAQ ─── */}
         <motion.div className="mt-16"
           initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.1 }}>
-          <h3 className="font-headline-md text-center text-on-surface dark:text-white mb-8">{t("pricing.faq-title")}</h3>
-          <div className="max-w-2xl mx-auto divide-y divide-outline-variant/20 dark:divide-gray-700 bg-surface-container-lowest dark:bg-[#1A1A2E] rounded-2xl border border-outline-variant/50 dark:border-gray-700 shadow-premium-sm overflow-hidden">
+          <h3 className="font-display text-center text-ink mb-8">{t("pricing.faq-title")}</h3>
+          <div className="max-w-2xl mx-auto divide-y divide-hairline bg-paper rounded-xl border-2 border-ink/15 shadow-hard-sm overflow-hidden">
             {FAQ_KEYS.map((idx) => (
               <div key={idx}>
                 <button onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                  className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors">
+                  className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left hover:bg-lime/15 transition-colors">
                   <span className="font-label-bold text-sm text-on-surface flex-1">{t("pricing.faq." + idx + ".q")}</span>
                   <motion.span animate={{ rotate: openFaq === idx ? 180 : 0 }} transition={{ duration: 0.2 }}
                     className="material-symbols-outlined text-on-surface-variant shrink-0">expand_more</motion.span>
@@ -557,14 +546,14 @@ function PricingCard({ plan, delay, onSelectPlan, mode, tFn, catalogLoading }: {
   const t = tFn;
 
   const btnClass = {
-    filled: "bg-primary text-on-primary hover:brightness-110 shadow-md font-bold",
-    outline: "border-2 border-primary/40 text-primary hover:bg-primary/5 font-bold",
-    muted: "border border-outline-variant text-on-surface-variant hover:bg-surface-container font-medium",
-    ghost: "border-2 border-outline-variant text-on-surface-variant hover:bg-surface-container font-medium",
+    filled: "border-[2.5px] border-ink bg-lime text-ink font-bold shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5",
+    outline: "border-[2.5px] border-ink/60 text-ink font-bold hover:border-ink hover:bg-lime/25",
+    muted: "border-2 border-hairline text-on-surface-variant hover:bg-surface-container font-medium",
+    ghost: "border-2 border-hairline text-on-surface-variant hover:bg-surface-container font-medium",
   };
 
   // Semua paket punya tujuannya sendiri: gratis ke /login,langsung ke checkout.
-  const buttonClasses = "w-full py-3.5 rounded-xl text-sm text-center transition-all active:scale-[0.97] " + btnClass[plan.ctaStyle];
+  const buttonClasses = "w-full py-3.5 rounded-full text-sm text-center transition-all active:scale-[0.97] " + btnClass[plan.ctaStyle];
 
   const handleClick = () => {
     if (onSelectPlan) onSelectPlan(plan.id, mode);
@@ -575,37 +564,37 @@ function PricingCard({ plan, delay, onSelectPlan, mode, tFn, catalogLoading }: {
       initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
       transition={{ duration: 0.4, delay }}
       onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}
-      className={"relative flex flex-col rounded-2xl transition-all duration-300 " + (
+      className={"relative flex flex-col rounded-[14px] transition-all duration-300 " + (
         plan.featured
-          ? "lg:scale-105 z-10 border-2 border-primary shadow-[0_8px_32px_rgba(13,115,119,0.15)] dark:shadow-[0_8px_32px_rgba(13,115,119,0.3)]"
-          : "border border-outline-variant/40 dark:border-gray-700 shadow-premium-sm hover:shadow-premium-md"
-      ) + " " + (isHovered ? "translate-y-[-4px]" : "") + " bg-surface-container-lowest dark:bg-[#1A1A2E] dark:text-white"}>
+          ? "lg:scale-105 z-10 border-[2.5px] border-ink bg-lime/15 shadow-hard"
+          : "border-2 border-ink/20 bg-paper shadow-hard-sm hover:shadow-hard"
+      ) + " " + (isHovered ? "translate-y-[-4px]" : "")}>
       {/* Badge */}
       {plan.badgeKey && (
-        <div className={"absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold whitespace-nowrap shadow-md " + (
-          plan.featured ? "bg-primary text-on-primary" : "bg-surface-container text-on-surface-variant border border-outline-variant/50"
+        <div className={"absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold whitespace-nowrap shadow-[2px_2px_0_rgb(var(--c-ink))] " + (
+          plan.featured ? "bg-ink text-lime border-2 border-ink" : "bg-paper text-ink-soft border-2 border-ink/25"
         )}>
           {t(plan.badgeKey)}
         </div>
       )}
       {!plan.badgeKey && plan.id === "free" && mode === "langganan" && (
-        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold whitespace-nowrap shadow-md bg-emerald-500 text-white">
+        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold whitespace-nowrap shadow-[2px_2px_0_rgb(var(--c-ink))] bg-ink text-lime border-2 border-ink">
           Gratis
         </div>
       )}
       <div className="p-6 md:p-8 flex flex-col flex-1">
         {/* Icon + Name */}
         <div className="mb-6">
-          <div className={"w-12 h-12 rounded-xl flex items-center justify-center mb-4 " + (
-            plan.featured ? "bg-primary text-on-primary" : "bg-primary/10 text-primary"
+          <div className={"w-12 h-12 rounded-[7px] border-2 border-ink flex items-center justify-center mb-4 " + (
+            plan.featured ? "bg-ink text-lime" : "bg-lime/40 text-ink"
           )}>
             <span className="material-symbols-outlined text-[24px]">{plan.icon}</span>
-          </div>                    <h3 className="font-label-bold text-on-surface text-lg dark:text-white">{t(plan.nameKey)}</h3>
-                    <p className="text-xs text-on-surface-variant mt-1 leading-relaxed dark:text-gray-400">{t(plan.descKey)}</p>
+          </div>                    <h3 className="font-display text-on-surface text-lg">{t(plan.nameKey)}</h3>
+                    <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">{t(plan.descKey)}</p>
                     {plan.id === "pro_bulanan" && (
-                      <div className="mt-3 inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 border border-amber-200 rounded-full">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500 shrink-0"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                        <span className="text-xs font-bold text-amber-700">{t("pricing.best-value")}</span>
+                      <div className="mt-3 inline-flex items-center gap-1 px-2.5 py-1 bg-lime/30 border border-ink/40 rounded-full">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-ink shrink-0"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        <span className="text-xs font-bold text-ink">{t("pricing.best-value")}</span>
                       </div>
                     )}
                   </div>
@@ -613,10 +602,10 @@ function PricingCard({ plan, delay, onSelectPlan, mode, tFn, catalogLoading }: {
         {/* Price */}
         <div className="mb-6">
           <div className="flex items-baseline gap-1">
-            <span className={"font-bold tracking-tight tabular-nums " + (plan.featured ? "text-[36px]" : "text-[30px]") + " text-on-surface dark:text-white"}>
+            <span className="font-display font-bold tracking-tight tabular-nums text-[36px] leading-none text-ink">
               {plan.price === 0 ? t("pricing.plan.free.name") : "Rp" + plan.price.toLocaleString("id-ID")}
             </span>
-            <span className="text-sm text-on-surface-variant dark:text-gray-400">{t(plan.unitKey)}</span>
+            <span className="text-sm text-ink-soft">{t(plan.unitKey)}</span>
           </div>
         </div>
 
@@ -626,12 +615,12 @@ function PricingCard({ plan, delay, onSelectPlan, mode, tFn, catalogLoading }: {
           {plan.features.map((feat) => (
             <div key={feat.key} className="flex items-start gap-2.5">
               {feat.included ? (
-                <span className="material-symbols-outlined text-[18px] text-green-600 shrink-0 mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                <span className="material-symbols-outlined text-[18px] text-green-deep shrink-0 mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
               ) : (
-                <span className="material-symbols-outlined text-[18px] text-outline-variant shrink-0 mt-0.5 dark:text-gray-600">cancel</span>
+                <span className="material-symbols-outlined text-[18px] text-ink/30 shrink-0 mt-0.5">cancel</span>
               )}
               <span className={"text-sm leading-relaxed " + (
-                feat.included ? "text-on-surface dark:text-gray-200" : "text-on-surface-variant line-through dark:text-gray-500"
+                feat.included ? "text-on-surface" : "text-on-surface-variant line-through"
               )}>{benefitText(feat.key, feat.value, t)}</span>
             </div>
           ))}
@@ -657,7 +646,7 @@ function PricingCard({ plan, delay, onSelectPlan, mode, tFn, catalogLoading }: {
         )}
 
         {plan.microcopyKey && (
-          <p className="text-center text-xs text-on-surface-variant mt-3 italic dark:text-gray-400">{t(plan.microcopyKey)}</p>
+          <p className="text-center text-xs text-on-surface-variant mt-3 italic">{t(plan.microcopyKey)}</p>
         )}
       </div>
     </motion.div>
