@@ -1,6 +1,4 @@
 ﻿import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
-import { GeistSans } from "geist/font/sans";
 import { SessionProvider } from "next-auth/react";
 import { Analytics } from "@vercel/analytics/react";
 import ScrollProgress from "@/components/ScrollProgress";
@@ -9,13 +7,6 @@ import { SITE_URL } from "@/lib/site-url";
 import { LanguageProvider } from "@/lib/i18n";
 import { ToastProvider } from "@/components/ui/toast";
 import "./globals.css";
-
-const plusJakartaSans = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-plus-jakarta",
-  display: "swap",
-});
 
 const siteUrl = SITE_URL;
 
@@ -75,6 +66,13 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" />
+        {/*
+          Enam family tema (Evergreen + Lime): Stack Sans Headline untuk
+          display, Inter untuk UI, Literata untuk bacaan panjang, Caveat
+          untuk kicker, Atkinson Hyperlegible Next untuk teks yang harus
+          gampang dibaca, dan mono sistem untuk label mikro.
+        */}
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700&family=Caveat:wght@400;600;700&family=Inter:wght@400;500;600;700;800&family=Literata:wght@400;500;600;700&family=Stack+Sans+Headline:wght@400;500;600;700&display=swap" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
@@ -147,9 +145,7 @@ export default function RootLayout({
           }),
         }} />
       </head>
-      <body
-        className={`${GeistSans.variable} ${plusJakartaSans.variable} bg-background text-on-background antialiased`}
-      >
+      <body className="bg-background text-on-background antialiased">
         <SessionProvider>
           <LanguageProvider>
             <ScrollProgress />

@@ -2,13 +2,237 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Fonts: Geist via geist/font/sans, Plus Jakarta Sans via next/font/google */
-/* Material Symbols CDN via <link> in layout.tsx (faster than CSS @import) */
+/* ============================================================
+   Tema Evergreen + Lime
+   Sumber nilai: D:\Desain Hasil Rea\index.html (blok :root).
+   Warna disimpan sebagai RGB channel supaya mode gelap hanya perlu
+   menimpa variable-nya. Nama token Tailwind tidak berubah, jadi
+   markup yang sudah ada tidak perlu disentuh.
+   ============================================================ */
+:root {
+  /* Permukaan */
+  --c-background: 243 246 242; /* desk #f3f6f2 */
+  --c-surface: 255 255 255; /* paper */
+  --c-surface-bright: 255 255 255;
+  --c-surface-container-lowest: 255 255 255;
+  --c-surface-container-low: 239 244 241;
+  --c-surface-container: 233 239 235;
+  --c-surface-container-high: 226 234 229;
+  --c-surface-container-highest: 218 228 222;
+  --c-surface-variant: 233 239 235;
+  --c-surface-dim: 221 230 224;
+  --c-surface-tint: 63 143 119;
+
+  /* Tinta */
+  --c-on-background: 10 15 13; /* ink #0a0f0d */
+  --c-on-surface: 10 15 13;
+  --c-on-surface-variant: 74 91 82; /* ink-soft #4a5b52 */
+
+  /* Aksen: hijau sebagai aksi, lime sebagai penanda */
+  --c-primary: 29 107 72; /* green-deep #1d6b48, kontras 5.93:1 */
+  --c-on-primary: 255 255 255;
+  --c-primary-container: 63 143 119; /* green #3f8f77 */
+  --c-on-primary-container: 255 255 255;
+  --c-primary-fixed: 216 237 227;
+  --c-primary-fixed-dim: 182 223 202;
+  --c-inverse-primary: 214 238 48; /* lime #d6ee30 */
+  --c-on-primary-fixed: 15 32 26;
+  --c-on-primary-fixed-variant: 29 107 72;
+
+  --c-secondary: 63 143 119;
+  --c-on-secondary: 255 255 255;
+  --c-secondary-container: 216 237 227;
+  --c-on-secondary-container: 29 107 72;
+  --c-secondary-fixed: 216 237 227;
+  --c-secondary-fixed-dim: 182 223 202;
+  --c-on-secondary-fixed: 15 32 26;
+  --c-on-secondary-fixed-variant: 29 107 72;
+
+  --c-tertiary: 92 107 31;
+  --c-on-tertiary: 15 32 26;
+  --c-tertiary-container: 234 246 180;
+  --c-on-tertiary-container: 63 74 18;
+  --c-tertiary-fixed: 214 238 48;
+  --c-tertiary-fixed-dim: 201 255 92;
+  --c-on-tertiary-fixed: 15 32 26;
+  --c-on-tertiary-fixed-variant: 63 74 18;
+
+  /* Garis & kebalikan */
+  --c-outline: 74 91 82;
+  --c-outline-variant: 201 211 205;
+  --c-inverse-surface: 18 41 34; /* evergreen #122922 */
+  --c-inverse-on-surface: 232 240 234;
+
+  /* Galat */
+  --c-error: 166 58 44;
+  --c-on-error: 255 255 255;
+  --c-error-container: 247 221 216;
+  --c-on-error-container: 92 26 18;
+
+  /* Nama palet */
+  --c-desk: 243 246 242;
+  --c-paper: 255 255 255;
+  --c-evergreen: 18 41 34;
+  --c-evergreen-deep: 15 32 26;
+  --c-green: 63 143 119;
+  --c-green-deep: 29 107 72;
+  --c-lime: 214 238 48;
+  --c-lime-bright: 201 255 92;
+  --c-ink: 10 15 13;
+  --c-ink-soft: 74 91 82;
+  --c-hairline: 201 211 205;
+  --c-rule: 213 222 216;
+
+  /* Motif */
+  --shadow-hard-color: #dde7de;
+  --hairline-color: #c9d3cd;
+  --rule-color: #d5ded8;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --header-h: 61px;
+  --font-display: "Stack Sans Headline", system-ui, sans-serif;
+  --font-sans: Inter, system-ui, sans-serif;
+  --font-serif: Literata, Georgia, "Times New Roman", serif;
+  --font-script: Caveat, cursive;
+  --font-reader: "Atkinson Hyperlegible Next", system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --c-background: 15 32 26; /* evergreen-deep */
+    --c-surface: 23 43 36;
+    --c-surface-bright: 28 50 42;
+    --c-surface-container-lowest: 20 38 31;
+    --c-surface-container-low: 23 43 36;
+    --c-surface-container: 27 48 41;
+    --c-surface-container-high: 33 56 47;
+    --c-surface-container-highest: 39 64 53;
+    --c-surface-variant: 27 48 41;
+    --c-surface-dim: 18 33 28;
+    --c-surface-tint: 127 192 168;
+
+    --c-on-background: 238 243 238;
+    --c-on-surface: 238 243 238;
+    --c-on-surface-variant: 168 189 177;
+
+    --c-primary: 214 238 48; /* lime jadi aksi utama di latar gelap */
+    --c-on-primary: 15 32 26;
+    --c-primary-container: 44 74 61;
+    --c-on-primary-container: 216 237 227;
+    --c-primary-fixed: 29 107 72;
+    --c-primary-fixed-dim: 24 88 60;
+    --c-inverse-primary: 29 107 72;
+    --c-on-primary-fixed: 232 240 234;
+    --c-on-primary-fixed-variant: 216 237 227;
+
+    --c-secondary: 127 192 168;
+    --c-on-secondary: 15 32 26;
+    --c-secondary-container: 29 55 45;
+    --c-on-secondary-container: 216 237 227;
+    --c-secondary-fixed: 29 55 45;
+    --c-secondary-fixed-dim: 24 46 38;
+    --c-on-secondary-fixed: 232 240 234;
+    --c-on-secondary-fixed-variant: 216 237 227;
+
+    --c-tertiary: 201 255 92;
+    --c-on-tertiary: 15 32 26;
+    --c-tertiary-container: 51 64 26;
+    --c-on-tertiary-container: 234 246 180;
+    --c-tertiary-fixed: 214 238 48;
+    --c-tertiary-fixed-dim: 201 255 92;
+    --c-on-tertiary-fixed: 15 32 26;
+    --c-on-tertiary-fixed-variant: 63 74 18;
+
+    --c-outline: 159 179 168;
+    --c-outline-variant: 43 63 54;
+    --c-inverse-surface: 10 21 17;
+    --c-inverse-on-surface: 232 240 234;
+
+    --c-error: 242 167 154;
+    --c-on-error: 59 17 9;
+    --c-error-container: 74 26 18;
+    --c-on-error-container: 247 221 216;
+
+    --c-desk: 18 33 28;
+    --c-paper: 27 48 41;
+    --c-evergreen: 13 28 23;
+    --c-evergreen-deep: 10 21 17;
+    --c-green: 127 192 168;
+    --c-green-deep: 168 217 194;
+    --c-lime: 214 238 48;
+    --c-lime-bright: 201 255 92;
+    --c-ink: 238 243 238;
+    --c-ink-soft: 168 189 177;
+    --c-hairline: 43 63 54;
+    --c-rule: 36 54 46;
+
+    --shadow-hard-color: #0a1512;
+    --hairline-color: #2b3f36;
+    --rule-color: #24362e;
+  }
+}
+
+/* --- Utilitas komponen tema --- */
+@layer components {
+  .shell {
+    width: min(100% - 48px, 1180px);
+    margin-inline: auto;
+  }
+
+  .section {
+    padding-block: clamp(76px, 9vw, 132px);
+  }
+
+  .section-rule {
+    border-top: 1px solid var(--hairline-color);
+  }
+
+  .card-hard {
+    border: 2px solid rgb(var(--c-ink));
+    border-radius: 14px;
+    box-shadow: 6px 6px 0 var(--shadow-hard-color);
+    transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  }
+
+  .card-hard:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0 var(--shadow-hard-color);
+  }
+
+  .kicker {
+    width: fit-content;
+    margin: 0 0 16px;
+    color: rgb(var(--c-green-deep));
+    font-family: var(--font-script);
+    font-size: clamp(22px, 2vw, 27px);
+    font-weight: 700;
+    line-height: 1.05;
+    transform: rotate(-1deg);
+    transform-origin: 0;
+  }
+
+  .link-underline {
+    text-decoration: underline;
+    text-decoration-color: rgb(var(--c-lime));
+    text-decoration-thickness: 3px;
+    text-underline-offset: 5px;
+  }
+}
+
+@media (max-width: 640px) {
+  .shell {
+    width: min(100% - 32px, 1180px);
+  }
+}
+
+/* Fonts: Stack Sans Headline, Inter, Literata, Caveat, Atkinson Hyperlegible
+   Next dimuat lewat <link> Google Fonts di layout.tsx. Material Symbols juga
+   lewat <link> supaya lebih cepat daripada CSS @import. */
 
 body {
-  font-family: "Geist", "Inter", sans-serif;
-  background-color: #eef3f4;
-  color: #1b1b1f;
+  font-family: "Inter", system-ui, sans-serif;
+  background-color: rgb(var(--c-background));
+  color: rgb(var(--c-on-background));
 }
 
 .material-symbols-outlined {
@@ -85,24 +309,35 @@ body {
 
 /* Focus styles */
 :root {
-  /* Brand palette - Committed strategy (Teal) */
-  --color-focus-ring: #0d7377;
-  --color-primary-deep: #085955;
-  --color-accent: #e85d75;
-  --color-accent-soft: #fef0f3;
-  --color-muted: #556361;
+  /* Palet tema: Evergreen + Lime */
+  --color-focus-ring: #1d6b48;
+  --color-primary-deep: #164a33;
+  --color-accent: #1d6b48;
+  --color-accent-soft: #e3f0e9;
+  --color-muted: #4a5b52;
   --color-surface-elevated: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-focus-ring: #c9ff5c;
+    --color-primary-deep: #8fcfb4;
+    --color-accent: #c9ff5c;
+    --color-accent-soft: #1a3129;
+    --color-muted: #a8bdb1;
+    --color-surface-elevated: #172b24;
+  }
 }
 
 /* Premium shadow tokens */
 .shadow-premium-sm {
-  box-shadow: 0 2px 8px rgba(13, 115, 119, 0.06), 0 1px 4px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 2px 8px rgba(18, 41, 34, 0.06), 0 1px 4px rgba(0, 0, 0, 0.03);
 }
 .shadow-premium-md {
-  box-shadow: 0 4px 16px rgba(13, 115, 119, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 16px rgba(18, 41, 34, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 .shadow-premium-lg {
-  box-shadow: 0 12px 32px -8px rgba(13, 115, 119, 0.12), 0 4px 16px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 12px 32px -8px rgba(18, 41, 34, 0.12), 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
 input:focus,
