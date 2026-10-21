@@ -27,13 +27,13 @@ interface AnimatedButtonProps {
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-primary text-on-primary shadow-premium-md hover:shadow-premium-lg",
+    "border-[2.5px] border-ink bg-lime text-ink shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5",
   emerald:
-    "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-premium-md hover:shadow-premium-lg",
+    "border-[2.5px] border-ink bg-green text-white shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5",
   ghost:
-    "bg-surface-container-lowest text-on-surface border border-outline-variant/50 shadow-premium-sm hover:shadow-premium-md hover:-translate-y-0.5",
+    "bg-paper text-ink border-2 border-ink/40 shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 hover:border-ink",
   secondary:
-    "bg-on-background text-white shadow-premium-md hover:shadow-premium-lg",
+    "border-[2.5px] border-ink bg-ink text-lime shadow-[0_4px_0_rgba(10,15,13,0.4)] hover:-translate-y-0.5",
 };
 
 /**
@@ -41,10 +41,10 @@ const variantStyles: Record<ButtonVariant, string> = {
  * shimmer overlay, icon pulse, and arrow bounce animations.
  *
  * Variants:
- * - primary  → solid primary bg
- * - emerald  → gradient emerald bg (for practice / free)
- * - ghost    → white card-style
- * - secondary → dark bg
+ * - primary   → lime pill, aksi utama
+ * - emerald   → hijau solid (untuk latihan / gratis)
+ * - ghost     → kartu putih dengan border tinta
+ * - secondary → kotak tinta dengan teks lime
  */
 export function AnimatedButton({
   children,
@@ -62,9 +62,9 @@ export function AnimatedButton({
   fullWidth = false,
 }: AnimatedButtonProps) {
   const baseClasses =
-    `relative overflow-hidden inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-label-bold active:scale-[0.97] transition-all ${
+    `relative overflow-hidden inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-display text-[15px] font-bold active:scale-[0.97] transition-all ${
       fullWidth ? "w-full" : ""
-    } ${variantStyles[variant]} ${disabled ? "opacity-60 pointer-events-none" : "hover:brightness-110"} ${className}`.trim();
+    } ${variantStyles[variant]} ${disabled ? "opacity-60 pointer-events-none" : ""} ${className}`.trim();
 
   const content = (
     <>

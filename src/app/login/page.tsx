@@ -62,33 +62,42 @@ export default function LoginPage() {
   return (
     <>
       {/* Navbar, logo klik = kembali ke beranda */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest shadow-sm border-b border-outline-variant/40 px-margin-mobile md:px-gutter py-4 flex justify-center md:justify-start">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-paper border-b border-hairline px-margin-mobile md:px-gutter py-4 flex justify-center md:justify-start">
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white group-hover:brightness-110 transition-all">
+          <div className="w-8 h-8 rounded-[7px] border-2 border-ink bg-evergreen flex items-center justify-center text-lime group-hover:bg-green-deep transition-all">
             <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
           </div>
-          <span className="font-headline-md text-[18px] font-bold text-primary tracking-tight group-hover:text-primary/80 transition-colors">AI Career Hub</span>
+          <span className="font-display text-[18px] font-bold text-ink tracking-[-0.02em]">AI Career Hub</span>
         </Link>
       </nav>
 
       {/* Main */}
       <main className="min-h-screen flex pt-16 bg-background">
-        {/* Left Side, Gradient Brand + Ripple Background */}
-        <section className="hidden lg:flex flex-col items-center justify-center w-1/2 relative overflow-hidden bg-gradient-to-br from-surface-container-low via-white to-surface-container-low">
+        {/* Left Side, panel evergreen + grid lime + Ripple */}
+        <section className="hidden lg:flex flex-col items-center justify-center w-1/2 relative overflow-hidden bg-evergreen">
           {/* Ripple, subtle background effect */}
           <div className="absolute inset-0 pointer-events-none z-0">
             <Ripple mainCircleSize={100} mainCircleOpacity={0.08} numCircles={8} />
           </div>
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 opacity-[0.07]"
+            style={{
+              backgroundImage:
+                "linear-gradient(#d6ee30 1px, transparent 1px), linear-gradient(90deg, #d6ee30 1px, transparent 1px)",
+              backgroundSize: "56px 56px",
+            }}
+          />
 
-          {/* Gradient Brand Text, centered, unobstructed */}
+          {/* Brand mark, centered */}
           <div className="relative z-10 flex flex-col items-center gap-4 px-12">
-            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center">
-              <span className="material-symbols-outlined text-4xl text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+            <div className="w-16 h-16 rounded-[14px] border-[2.5px] border-[#0a0f0d] bg-[#d6ee30] flex items-center justify-center shadow-[4px_4px_0_#0a0f0d]">
+              <span className="material-symbols-outlined text-4xl text-[#0a0f0d]" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
             </div>
-            <h1 className="text-5xl md:text-6xl font-extrabold text-center bg-gradient-to-b from-primary via-primary to-primary/30 bg-clip-text text-transparent leading-tight">
+            <h1 className="font-display text-5xl md:text-6xl font-bold text-center text-[#f3f6f2] leading-tight tracking-[-0.03em]">
               AI Career Hub
             </h1>
-            <p className="text-center text-body-md text-on-surface-variant max-w-sm">
+            <p className="text-center text-body-md text-[#a7c3b4] max-w-sm">
               Tingkatkan karir profesional Anda dengan kekuatan AI
             </p>
           </div>
@@ -96,7 +105,7 @@ export default function LoginPage() {
 
         {/* Right Side, Google Login */}
         <section className="w-full lg:w-1/2 flex flex-col justify-center items-center px-6 md:px-12 py-20">
-          <div className="w-full max-w-md">
+          <div className="w-full max-w-md card-hard bg-paper p-8">
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -104,7 +113,7 @@ export default function LoginPage() {
               className="space-y-6"
             >
               <div className="text-center">
-                <h1 className="font-headline-md text-on-surface mb-1">Selamat Datang</h1>
+                <h1 className="font-display text-on-surface mb-1">Selamat Datang</h1>
                 <p className="text-body-md text-on-surface-variant">
                   Masuk dengan akun Google Anda untuk mulai menggunakan AI Career Hub
                 </p>
@@ -126,7 +135,7 @@ export default function LoginPage() {
                 type="button"
                 onClick={handleGoogleLogin}
                 disabled={loading}
-                className="w-full py-3.5 rounded-xl border border-outline-variant text-on-surface font-label-bold hover:bg-surface-container-low active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-60"
+                className="w-full py-3.5 rounded-full border-[2.5px] border-ink bg-lime text-ink font-bold hover:-translate-y-0.5 shadow-[0_4px_0_rgb(var(--c-ink))] active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-60"
               >
                 {loading ? (
                   <><span className="material-symbols-outlined text-lg animate-spin">sync</span> Menghubungkan ke Google...</>
@@ -146,12 +155,12 @@ export default function LoginPage() {
             </motion.div>
 
             {/* Footer Links */}
-            <div className="mt-10 pt-6 border-t border-outline-variant/50 flex flex-wrap justify-center gap-x-4 gap-y-2">
-              <Link href="/privacy" className="text-xs text-outline hover:text-primary transition-colors cursor-pointer">Kebijakan Privasi</Link>
-              <Link href="/terms" className="text-xs text-outline hover:text-primary transition-colors cursor-pointer">Syarat & Ketentuan</Link>
-              <Link href="/contact" className="text-xs text-outline hover:text-primary transition-colors cursor-pointer">Bantuan</Link>
+            <div className="mt-10 pt-6 border-t border-hairline flex flex-wrap justify-center gap-x-4 gap-y-2">
+              <Link href="/privacy" className="text-xs text-ink-soft hover:text-green-deep transition-colors cursor-pointer">Kebijakan Privasi</Link>
+              <Link href="/terms" className="text-xs text-ink-soft hover:text-green-deep transition-colors cursor-pointer">Syarat & Ketentuan</Link>
+              <Link href="/contact" className="text-xs text-ink-soft hover:text-green-deep transition-colors cursor-pointer">Bantuan</Link>
             </div>
-            <p className="mt-4 text-center text-xs text-outline-variant">&copy; 2026 AI Career Hub. Hak Cipta Dilindungi.</p>
+            <p className="mt-4 text-center text-xs text-ink-soft/70">&copy; 2026 AI Career Hub. Hak Cipta Dilindungi.</p>
           </div>
         </section>
       </main>

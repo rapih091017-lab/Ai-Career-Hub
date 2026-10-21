@@ -140,35 +140,38 @@ const FAQ_GROUPS = [
 export default function FaqPage() {
   return (
     <main className="min-h-screen bg-background">
-      <div className="bg-gradient-to-br from-primary to-primary/80 text-white">
+      <div className="bg-evergreen text-paper">
         <div className="max-w-3xl mx-auto px-6 py-20">
-          <Link href="/" className="inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors mb-6 text-sm">
+          <Link href="/" className="inline-flex min-h-[44px] items-center gap-2 text-paper/70 hover:text-lime transition-colors mb-6 text-sm">
             <span className="material-symbols-outlined text-lg">arrow_back</span>
             Kembali ke Beranda
           </Link>
-          <h1 className="font-headline-lg text-3xl md:text-4xl font-bold mb-3">FAQ</h1>
-          <p className="text-white/80 text-lg">Pertanyaan yang sering diajukan</p>
+          <h1 className="font-display text-3xl md:text-4xl font-bold mb-3">FAQ</h1>
+          <p className="text-paper/70 text-lg">Pertanyaan yang sering diajukan</p>
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-6 py-12 space-y-12">
+      <div className="max-w-3xl mx-auto px-6 py-12 space-y-0">
         {FAQ_GROUPS.map((group) => (
-          <section key={group.category}>
-            <h2 className="font-headline-md text-lg text-on-surface mb-4">{group.category}</h2>
-            <div className="space-y-3">
+          <section key={group.category} className="py-8 first:pt-0 last:pb-0">
+            <h2 className="font-mono text-[11.5px] font-extrabold uppercase tracking-[0.06em] text-green-deep mb-2">{group.category}</h2>
+            <div>
               {group.faqs.map((faq) => (
                 <details
                   key={faq.q}
-                  className="group bg-surface-container-lowest rounded-2xl border border-outline-variant/50 overflow-hidden"
+                  className="group border-b border-hairline bg-paper"
                 >
-                  <summary className="px-6 py-4 font-label-bold text-on-surface cursor-pointer hover:bg-surface-container-low transition-colors list-none flex items-center justify-between gap-4">
+                  <summary className="flex min-h-[68px] cursor-pointer list-none items-center justify-between gap-4 py-4 text-[16px] font-bold text-ink hover:text-green-deep transition-colors">
                     {faq.q}
-                    <span className="material-symbols-outlined text-on-surface-variant group-open:rotate-180 transition-transform shrink-0">
-                      expand_more
+                    <span
+                      aria-hidden="true"
+                      className="flex h-[34px] w-[34px] flex-none items-center justify-center rounded-full bg-ink text-paper transition-transform group-open:rotate-45"
+                    >
+                      +
                     </span>
                   </summary>
-                  <div className="px-6 pb-4">
-                    <p className="text-body-md text-on-surface-variant leading-relaxed">{faq.a}</p>
+                  <div className="max-w-[62ch] pb-6">
+                    <p className="font-serif text-[15.5px] leading-[1.7] text-ink-soft">{faq.a}</p>
                   </div>
                 </details>
               ))}
@@ -176,14 +179,14 @@ export default function FaqPage() {
           </section>
         ))}
 
-        <section className="pt-8 border-t border-outline-variant/50">
-          <p className="text-body-md text-on-surface-variant leading-relaxed">
+        <section className="py-8 border-t border-hairline">
+          <p className="text-body-md text-ink-soft leading-relaxed">
             Jawaban untuk pertanyaan tentang data ada di{" "}
-            <Link href="/privacy" className="text-primary hover:underline">
+            <Link href="/privacy" className="font-bold text-green-deep underline decoration-lime decoration-[3px] underline-offset-4">
               Kebijakan Privasi
             </Link>
             . Kalau belum terjawab, tulis lewat halaman{" "}
-            <Link href="/contact" className="text-primary hover:underline">
+            <Link href="/contact" className="font-bold text-green-deep underline decoration-lime decoration-[3px] underline-offset-4">
               Kontak
             </Link>
             .

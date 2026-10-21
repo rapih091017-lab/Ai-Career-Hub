@@ -96,22 +96,22 @@ export default async function CareerPathPage() {
             </section>
           )}
 
-          <section className="mt-12 rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/5 to-secondary/5 p-8 text-center">
-            <h2 className="font-headline-md text-headline-md text-on-surface">Siap mulai dari posisi ini?</h2>
-            <p className="mx-auto mt-2 max-w-[520px] text-body-md text-on-surface-variant">
+          <section className="mt-12 rounded-[14px] border-[2.5px] border-ink bg-lime/15 shadow-hard p-8 text-center">
+            <h2 className="font-display text-headline-md text-ink">Siap mulai dari posisi ini?</h2>
+            <p className="mx-auto mt-2 max-w-[520px] text-body-md text-ink-soft">
               Bangun CV dengan kata kunci yang tepat, lalu cek skornya sebelum melamar.
             </p>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
               <Link
                 href="/builder/new"
-                className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-bold text-on-primary transition-all hover:brightness-110 active:scale-[0.97]"
+                className="inline-flex min-h-[54px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime text-ink px-6 py-3 font-bold shadow-[0_4px_0_rgb(var(--c-ink))] transition-all hover:-translate-y-0.5 active:scale-[0.97]"
               >
                 <span className="material-symbols-outlined text-lg">edit_note</span>
                 Buat CV
               </Link>
               <Link
                 href="/career-hub"
-                className="inline-flex items-center gap-2 rounded-xl border border-primary/30 bg-surface-container-lowest px-6 py-3 font-bold text-primary transition-all hover:bg-primary/5 active:scale-[0.97]"
+                className="inline-flex min-h-[54px] items-center gap-2 rounded-full border-2 border-ink/60 bg-paper px-6 py-3 font-bold text-ink transition-all hover:border-ink active:scale-[0.97]"
               >
                 <span className="material-symbols-outlined text-lg">hub</span>
                 Career Hub

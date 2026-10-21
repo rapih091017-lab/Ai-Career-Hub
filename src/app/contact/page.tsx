@@ -15,14 +15,14 @@ export default async function ContactPage() {
   const settings = await getSiteSettings();
   return (
     <main className="min-h-screen bg-background">
-      <div className="bg-gradient-to-br from-primary to-primary/80 text-white">
+      <div className="bg-evergreen text-paper">
         <div className="max-w-3xl mx-auto px-6 py-20">
-          <Link href="/" className="inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors mb-6 text-sm">
+          <Link href="/" className="inline-flex min-h-[44px] items-center gap-2 text-paper/70 hover:text-lime transition-colors mb-6 text-sm">
             <span className="material-symbols-outlined text-lg">arrow_back</span>
             Kembali ke Beranda
           </Link>
-          <h1 className="font-headline-lg text-3xl md:text-4xl font-bold mb-3">Hubungi Kami</h1>
-          <p className="text-white/80 text-lg">Tim kami siap membantu Anda</p>
+          <h1 className="font-display text-3xl md:text-4xl font-bold mb-3">Hubungi Kami</h1>
+          <p className="text-paper/70 text-lg">Tim kami siap membantu Anda</p>
         </div>
       </div>
 
@@ -31,29 +31,29 @@ export default async function ContactPage() {
           {/* Contact Info */}
           <div className="space-y-8">
             <div>
-              <h2 className="font-headline-md text-xl text-on-surface mb-4">Informasi Kontak</h2>
+              <h2 className="font-display text-xl text-ink mb-4">Informasi Kontak</h2>
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-primary-fixed flex items-center justify-center shrink-0">
-                    <span className="material-symbols-outlined text-primary">mail</span>
+                  <div className="w-10 h-10 rounded-[7px] border-2 border-ink bg-lime flex items-center justify-center shrink-0">
+                    <span className="material-symbols-outlined text-ink">mail</span>
                   </div>
                   <div>
-                    <p className="font-label-bold text-on-surface">Email</p>
-                    <a href={`mailto:${settings.contact_email}`} className="text-body-md text-primary hover:underline">{settings.contact_email}</a>
+                    <p className="font-label-bold text-ink">Email</p>
+                    <a href={`mailto:${settings.contact_email}`} className="text-body-md font-bold text-green-deep underline decoration-lime decoration-[3px] underline-offset-4">{settings.contact_email}</a>
                   </div>
                 </div>
                 {settings.contact_whatsapp ? (
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-primary-fixed flex items-center justify-center shrink-0">
-                      <span className="material-symbols-outlined text-primary">chat</span>
+                    <div className="w-10 h-10 rounded-[7px] border-2 border-ink bg-lime flex items-center justify-center shrink-0">
+                      <span className="material-symbols-outlined text-ink">chat</span>
                     </div>
                     <div>
-                      <p className="font-label-bold text-on-surface">WhatsApp</p>
+                      <p className="font-label-bold text-ink">WhatsApp</p>
                       <a
                         href={`https://wa.me/${settings.contact_whatsapp.replace(/[^0-9]/g, "").replace(/^0/, "62")}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-body-md text-primary hover:underline"
+                        className="text-body-md font-bold text-green-deep underline decoration-lime decoration-[3px] underline-offset-4"
                       >
                         {settings.contact_whatsapp}
                       </a>
@@ -61,21 +61,21 @@ export default async function ContactPage() {
                   </div>
                 ) : null}
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-primary-fixed flex items-center justify-center shrink-0">
-                    <span className="material-symbols-outlined text-primary">alternate_email</span>
+                  <div className="w-10 h-10 rounded-[7px] border-2 border-ink bg-lime flex items-center justify-center shrink-0">
+                    <span className="material-symbols-outlined text-ink">alternate_email</span>
                   </div>
                   <div>
-                    <p className="font-label-bold text-on-surface">Media Sosial</p>
-                    <p className="text-body-md text-on-surface-variant">{settings.social_handle}</p>
+                    <p className="font-label-bold text-ink">Media Sosial</p>
+                    <p className="text-body-md text-ink-soft">{settings.social_handle}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-primary-fixed flex items-center justify-center shrink-0">
-                    <span className="material-symbols-outlined text-primary">help</span>
+                  <div className="w-10 h-10 rounded-[7px] border-2 border-ink bg-lime flex items-center justify-center shrink-0">
+                    <span className="material-symbols-outlined text-ink">help</span>
                   </div>
                   <div>
-                    <p className="font-label-bold text-on-surface">Bantuan</p>
-                    <p className="text-body-md text-on-surface-variant">Kunjungi FAQ atau hubungi kami melalui email untuk respons tercepat.</p>
+                    <p className="font-label-bold text-ink">Bantuan</p>
+                    <p className="text-body-md text-ink-soft">Kunjungi FAQ atau hubungi kami melalui email untuk respons tercepat.</p>
                   </div>
                 </div>
               </div>
@@ -83,22 +83,22 @@ export default async function ContactPage() {
           </div>
 
           {/* Info Card */}
-          <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/50 p-8 shadow-soft">
-            <h2 className="font-headline-md text-xl text-on-surface mb-4">Respon Cepat</h2>
-            <p className="text-body-md text-on-surface-variant mb-6 leading-relaxed">
+          <div className="card-hard bg-paper p-8">
+            <h2 className="font-display text-xl text-ink mb-4">Respon Cepat</h2>
+            <p className="text-body-md text-ink-soft mb-6 leading-relaxed">
               Kami berkomitmen untuk merespon setiap pertanyaan dalam waktu 1x24 jam pada hari kerja.
               Untuk pertanyaan mendesak, silakan hubungi kami melalui email langsung.
             </p>
-            <div className="p-4 rounded-xl bg-surface-container border border-outline-variant/40">
-              <p className="text-label-sm text-on-surface-variant flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary text-lg">info</span>
+            <div className="p-4 rounded-xl border-2 border-ink/20 bg-lime/15">
+              <p className="text-label-sm text-ink-soft flex items-center gap-2">
+                <span className="material-symbols-outlined text-green-deep text-lg">info</span>
                 Untuk pertanyaan terkait akun, login, atau pembayaran, sertakan detail akun Anda agar kami dapat membantu lebih cepat.
               </p>
             </div>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link href="/privacy" className="text-sm text-primary hover:underline">Kebijakan Privasi</Link>
-              <span className="text-outline-variant">|</span>
-              <Link href="/terms" className="text-sm text-primary hover:underline">Syarat & Ketentuan</Link>
+              <Link href="/privacy" className="text-sm font-bold text-green-deep underline decoration-lime decoration-[3px] underline-offset-4">Kebijakan Privasi</Link>
+              <span className="text-hairline">|</span>
+              <Link href="/terms" className="text-sm font-bold text-green-deep underline decoration-lime decoration-[3px] underline-offset-4">Syarat & Ketentuan</Link>
             </div>
           </div>
         </div>

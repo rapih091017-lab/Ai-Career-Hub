@@ -54,11 +54,11 @@ export default function InterviewPage() {
           <div className="max-w-[1000px] mx-auto">
             {/* ── Hero ── */}
             <section className="mb-10 text-center">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-4">
+              <div className="inline-flex min-h-[44px] items-center gap-2 px-3 py-1.5 rounded-full border border-ink/25 bg-lime/25 text-ink text-xs font-bold mb-4">
                 <span className="material-symbols-outlined text-[14px]">auto_awesome</span>
                 {lang === "en" ? "Free · Ready-to-Use Templates" : "Gratis · Template Siap Pakai"}
               </div>
-              <h1 className="text-[32px] md:text-[40px] font-bold tracking-tight text-on-background mb-3">
+              <h1 className="font-display text-[32px] md:text-[40px] font-bold tracking-[-0.03em] text-ink mb-3">
                 {lang === "en" ? "Interview Prep" : "Persiapan Interview"}
               </h1>
               <p className="text-base md:text-lg text-on-surface-variant max-w-[550px] mx-auto mb-6">
@@ -118,10 +118,10 @@ export default function InterviewPage() {
                     setActiveCategory("all");
                     setSearch("");
                   }}
-                  className={`shrink-0 px-4 py-2 rounded-xl text-xs font-semibold transition-all border ${
+                  className={`shrink-0 min-h-[44px] px-4 py-2 rounded-full text-xs font-semibold transition-all border-2 ${
                     activeCategory === "all"
-                      ? "bg-primary text-on-primary border-primary shadow-premium-sm"
-                      : "bg-surface-container-lowest text-on-surface-variant border-outline-variant/40 hover:border-primary/30 hover:text-primary"
+                      ? "bg-ink text-lime border-ink shadow-[2px_2px_0_rgb(var(--c-ink))]"
+                      : "bg-paper text-ink-soft border-ink/25 hover:border-ink hover:text-ink"
                   }`}
                 >
                   {lang === "en" ? "All Positions" : "Semua Posisi"}
@@ -133,10 +133,10 @@ export default function InterviewPage() {
                       setActiveCategory(cat.slug);
                       setSearch("");
                     }}
-                    className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-all border ${
+                    className={`shrink-0 min-h-[44px] flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all border-2 ${
                       activeCategory === cat.slug
-                        ? "bg-primary text-on-primary border-primary shadow-premium-sm"
-                        : "bg-surface-container-lowest text-on-surface-variant border-outline-variant/40 hover:border-primary/30 hover:text-primary"
+                        ? "bg-ink text-lime border-ink shadow-[2px_2px_0_rgb(var(--c-ink))]"
+                        : "bg-paper text-ink-soft border-ink/25 hover:border-ink hover:text-ink"
                     }`}
                   >
                     <span className="material-symbols-outlined text-[14px]">{cat.icon}</span>
@@ -179,9 +179,9 @@ export default function InterviewPage() {
 
             {/* ── Position Grid ── */}
             {positions.length === 0 ? (
-              <div className="bg-surface-container-lowest rounded-2xl p-12 border border-dashed border-outline-variant text-center shadow-premium-sm">
-                <div className="w-14 h-14 rounded-full bg-primary-fixed flex items-center justify-center mx-auto mb-4">
-                  <span className="material-symbols-outlined text-primary text-2xl">
+              <div className="bg-paper rounded-[14px] p-12 border-2 border-dashed border-ink/30 text-center shadow-hard-sm">
+                <div className="w-14 h-14 rounded-[14px] border-2 border-ink bg-lime flex items-center justify-center mx-auto mb-4">
+                  <span className="material-symbols-outlined text-ink text-2xl">
                     {activeCategory === "saved" ? "bookmark_border" : "search_off"}
                   </span>
                 </div>
@@ -209,11 +209,11 @@ export default function InterviewPage() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: i * 0.03 }}
                       onClick={() => setSelectedPosition(pos)}
-                      className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 shadow-premium-sm hover:shadow-premium-md hover:-translate-y-0.5 hover:border-primary/30 active:scale-[0.98] transition-all text-left group focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                      className="bg-paper rounded-xl p-4 border-2 border-ink/15 shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 hover:border-ink/40 active:scale-[0.98] transition-all text-left group focus-visible:outline-2 focus-visible:outline-green-deep focus-visible:outline-offset-2"
                     >
                       <div className="flex items-start gap-3 mb-2">
-                        <div className="w-9 h-9 rounded-lg bg-primary-fixed flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                          <span className="material-symbols-outlined text-primary text-lg">
+                        <div className="w-9 h-9 rounded-[7px] border-2 border-ink bg-lime/40 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                          <span className="material-symbols-outlined text-ink text-lg">
                             {pos.icon}
                           </span>
                         </div>

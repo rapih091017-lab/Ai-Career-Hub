@@ -64,12 +64,12 @@ export default function SinonimPage() {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder={t("sinonim.search-placeholder")}
-              className="h-12 w-full rounded-xl border border-outline-variant bg-surface-container-lowest pl-10 pr-3 text-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="h-12 w-full rounded-xl border-2 border-ink/60 bg-paper pl-10 pr-3 text-body-md text-ink placeholder:text-ink-soft/70 focus:border-green-deep focus:outline-none focus:ring-2 focus:ring-green/40"
             />
           </div>
 
           {filtered.length === 0 ? (
-            <p className="rounded-2xl border border-dashed border-outline-variant px-4 py-10 text-center text-body-md text-on-surface-variant">
+            <p className="rounded-xl border-2 border-dashed border-ink/30 px-4 py-10 text-center text-body-md text-ink-soft">
               {t("sinonim.empty")}
             </p>
           ) : (
@@ -77,13 +77,13 @@ export default function SinonimPage() {
               {filtered.map((entry) => (
                 <li
                   key={entry.weak}
-                  className="rounded-2xl border border-outline-variant/70 bg-surface-container-lowest p-4"
+                  className="rounded-[14px] border-2 border-ink/15 bg-paper p-4 shadow-hard-sm"
                 >
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-                    <span className="text-label-bold text-on-surface-variant line-through decoration-error/50">
+                    <span className="text-label-bold text-ink-soft line-through decoration-error/50">
                       {entry.weak}
                     </span>
-                    <span className="material-symbols-outlined text-[18px] text-primary" aria-hidden>
+                    <span className="material-symbols-outlined text-[18px] text-green-deep" aria-hidden>
                       arrow_forward
                     </span>
                     <div className="flex flex-wrap gap-1.5">
@@ -93,7 +93,7 @@ export default function SinonimPage() {
                           type="button"
                           onClick={() => handleCopy(alt)}
                           title={t("sinonim.copy")}
-                          className="rounded-full border border-primary/25 bg-primary/5 px-3 py-1 text-label-bold text-primary transition-colors hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 active:scale-[0.98]"
+                          className="rounded-full min-h-[44px] border-2 border-ink/50 bg-lime/25 px-3 py-1 text-label-bold text-ink transition-colors hover:border-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40 active:scale-[0.98]"
                         >
                           {alt}
                         </button>
@@ -106,12 +106,12 @@ export default function SinonimPage() {
           )}
 
           <section className="mt-12">
-            <h2 className="mb-4 font-headline-md text-headline-md text-on-background">{t("sinonim.tips-title")}</h2>
+            <h2 className="mb-4 font-display text-headline-md text-ink">{t("sinonim.tips-title")}</h2>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
               {tips.map((tip, index) => (
                 <div
                   key={index}
-                  className="rounded-2xl border border-outline-variant/70 bg-surface-container-low p-4 text-body-md text-on-surface-variant"
+                  className="rounded-[14px] border-2 border-ink/15 bg-paper p-4 text-body-md text-ink-soft"
                 >
                   {tip}
                 </div>

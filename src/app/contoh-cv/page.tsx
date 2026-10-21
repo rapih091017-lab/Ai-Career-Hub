@@ -52,16 +52,16 @@ export default function ContohCvPage() {
               <Link
                 key={example.slug}
                 href={`/contoh-cv/${example.slug}`}
-                className="group flex flex-col rounded-2xl border border-outline-variant/50 bg-surface-container-lowest p-5 transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                className="group flex flex-col rounded-[14px] border-2 border-ink/15 bg-paper p-5 transition-all hover:-translate-y-0.5 hover:shadow-hard-sm"
               >
-                <span className="mb-2 w-fit rounded-full bg-primary/10 px-2.5 py-1 text-label-sm text-primary">
+                <span className="mb-2 w-fit rounded-full border border-ink/25 bg-lime/25 px-2.5 py-1 text-label-sm font-bold text-ink">
                   {example.category}
                 </span>
-                <h2 className="font-label-bold text-on-surface transition-colors group-hover:text-primary">
+                <h2 className="font-display text-ink transition-colors group-hover:text-green-deep">
                   {example.title}
                 </h2>
-                <p className="mt-1 flex-1 text-body-md text-on-surface-variant">{example.tagline}</p>
-                <span className="mt-3 inline-flex items-center gap-1 text-label-bold text-primary">
+                <p className="mt-1 flex-1 text-body-md text-ink-soft">{example.tagline}</p>
+                <span className="mt-3 inline-flex items-center gap-1 text-label-bold text-green-deep">
                   Lihat contoh
                   <span className="material-symbols-outlined text-[16px] transition-transform group-hover:translate-x-0.5">
                     arrow_forward
@@ -71,22 +71,22 @@ export default function ContohCvPage() {
             ))}
           </section>
 
-          <section className="mt-12 rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/5 to-secondary/5 p-8 text-center">
-            <h2 className="font-headline-md text-headline-md text-on-surface">Siap bikin CV-mu sendiri?</h2>
-            <p className="mx-auto mt-2 max-w-[520px] text-body-md text-on-surface-variant">
+          <section className="mt-12 rounded-[14px] border-[2.5px] border-ink bg-lime/15 shadow-hard p-8 text-center">
+            <h2 className="font-display text-headline-md text-ink">Siap bikin CV-mu sendiri?</h2>
+            <p className="mx-auto mt-2 max-w-[520px] text-body-md text-ink-soft">
               Pakai contoh ini sebagai acuan, lalu bangun CV ATS-friendly dengan AI dan cek skornya.
             </p>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
               <Link
                 href="/builder/new"
-                className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-bold text-on-primary transition-all hover:brightness-110 active:scale-[0.97]"
+                className="inline-flex min-h-[54px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-6 py-3 font-bold text-ink shadow-[0_4px_0_rgb(var(--c-ink))] transition-all hover:-translate-y-0.5 active:scale-[0.97]"
               >
                 <span className="material-symbols-outlined text-lg">edit_note</span>
                 Buat CV Sekarang
               </Link>
               <Link
                 href="/checker"
-                className="inline-flex items-center gap-2 rounded-xl border border-primary/30 bg-surface-container-lowest px-6 py-3 font-bold text-primary transition-all hover:bg-primary/5 active:scale-[0.97]"
+                className="inline-flex min-h-[54px] items-center gap-2 rounded-full border-2 border-ink/60 bg-paper px-6 py-3 font-bold text-ink transition-all hover:border-ink active:scale-[0.97]"
               >
                 <span className="material-symbols-outlined text-lg">analytics</span>
                 Cek Skor CV

@@ -1045,21 +1045,18 @@ export default function CheckerPage() {
             ? t("checker.cta-high-subtitle")
             : t("checker.cta-subtitle");
           const ctaBtn = isHighScore ? t("checker.cta-high-btn") : t("checker.cta-btn");
-          const gradientBg = isHighScore
-            ? "bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500"
-            : "bg-gradient-to-br from-primary via-primary-container to-primary-deep";
 
           return (
             <div
-              className={`relative overflow-hidden rounded-2xl p-8 md:p-10 shadow-premium-lg ${gradientBg}`}
+              className="relative overflow-hidden rounded-[18px] border-[2.5px] border-ink bg-evergreen p-8 md:p-10 shadow-hard"
             >
-              <div className="absolute -right-12 -top-12 w-64 h-64 bg-surface-container-lowest/10 rounded-full blur-3xl" />
+              <div className="absolute -right-12 -top-12 w-64 h-64 bg-lime/25 rounded-full blur-3xl" />
               <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
                 <div className="text-center md:text-left">
-                  <h2 className="text-[32px] leading-10 font-bold text-white mb-2">
+                  <h2 className="font-display text-[32px] leading-10 font-bold text-paper mb-2">
                     {ctaTitle}
                   </h2>
-                  <p className="text-base text-white/90 max-w-[320px]">{ctaSubtitle}</p>
+                  <p className="text-base text-paper/70 max-w-[320px]">{ctaSubtitle}</p>
                 </div>
                 <MagneticButton>
                   <button
@@ -1072,7 +1069,7 @@ export default function CheckerPage() {
                       } catch {}
                       router.push(targetRoute);
                     }}
-                    className="bg-surface-container-lowest text-primary px-8 py-4 rounded-full text-sm font-semibold shadow-premium-md hover:bg-gray-100 active:scale-95 transition-[transform,background-color] flex items-center gap-2"
+                    className="font-display inline-flex min-h-[54px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-8 py-4 text-sm font-bold text-ink shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-95 transition-all"
                   >
                     {ctaBtn}{" "}
                     <span className="material-symbols-outlined text-sm select-none">

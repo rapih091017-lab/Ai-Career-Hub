@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 const CAPABILITIES = [
   {
     title: "CV Builder",
-    body: "Enam template ATS-friendly. AI bisa menyusun kalimat dari catatan yang kamu ketik mentah, lalu kamu memeriksa dan mengubah setiap bagian sebelum diekspor ke PDF.",
+    body: "Lima template ATS-friendly. AI bisa menyusun kalimat dari catatan yang kamu ketik mentah, lalu kamu memeriksa dan mengubah setiap bagian sebelum diekspor ke PDF.",
   },
   {
     title: "CV Checker",
@@ -56,60 +56,61 @@ const PRINCIPLES = [
 export default function AboutPage() {
   return (
     <main className="min-h-screen bg-background">
-      <div className="bg-gradient-to-br from-primary to-primary/80 text-white">
+      <div className="bg-evergreen text-paper">
         <div className="max-w-3xl mx-auto px-6 py-20">
-          <Link href="/" className="inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors mb-6 text-sm">
+          <Link href="/" className="inline-flex min-h-[44px] items-center gap-2 text-paper/70 hover:text-lime transition-colors mb-6 text-sm">
             <span className="material-symbols-outlined text-lg">arrow_back</span>
             Kembali ke Beranda
           </Link>
-          <h1 className="font-headline-lg text-3xl md:text-4xl font-bold mb-3">Tentang AI Career Hub</h1>
-          <p className="text-white/80 text-lg">
+          <h1 className="font-display text-3xl md:text-4xl font-bold mb-3">Tentang AI Career Hub</h1>
+          <p className="text-paper/70 text-lg">
             Satu tempat untuk dokumen lamaran, portofolio, dan latihan interview
           </p>
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-6 py-12 space-y-12">
-        <section>
-          <h2 className="font-headline-md text-xl text-on-surface mb-3">Kenapa kami membuat ini</h2>
-          <p className="text-body-md text-on-surface-variant leading-relaxed">
+      <div className="max-w-3xl mx-auto px-6 py-12 space-y-0">
+        <section className="py-10 first:pt-0">
+          <p className="kicker">Kenapa kami membuat ini</p>
+          <h2 className="font-display text-xl text-ink">Satu profil, semua dokumen lamaran</h2>
+          <p className="mt-4 max-w-[62ch] font-serif text-[16.5px] leading-[1.7] text-ink-soft">
             Melamar kerja berarti banyak pekerjaan administratif yang berulang: menulis CV, menyesuaikan isi untuk tiap
             lowongan, membuat surat, menyusun portofolio, lalu berlatih interview. Sebagian besar pekerjaan itu bukan
             menulis, melainkan menyalin dan menyesuaikan.
           </p>
-          <p className="text-body-md text-on-surface-variant leading-relaxed mt-3">
+          <p className="max-w-[62ch] font-serif text-[16.5px] leading-[1.7] text-ink-soft mt-3">
             AI Career Hub mengurangi pekerjaan tersebut. Satu profil diisi sekali, lalu bantuan AI mengubahnya menjadi
             CV, surat lamaran, website portofolio, dan latihan yang spesifik untuk lowongan yang sedang kamu incar.
           </p>
         </section>
 
-        <section>
-          <h2 className="font-headline-md text-xl text-on-surface mb-4">Yang bisa kamu lakukan</h2>
-          <div className="space-y-6">
+        <section className="py-10 border-t border-hairline">
+          <p className="kicker">Yang bisa kamu lakukan</p>
+          <div className="grid gap-4 sm:grid-cols-2">
             {CAPABILITIES.map((item) => (
-              <div key={item.title}>
-                <h3 className="font-label-bold text-base text-on-surface mb-1">{item.title}</h3>
-                <p className="text-body-md text-on-surface-variant leading-relaxed">{item.body}</p>
+              <div key={item.title} className="card-hard bg-paper p-5">
+                <h3 className="font-display text-base text-ink mb-1">{item.title}</h3>
+                <p className="text-[14px] text-ink-soft leading-relaxed">{item.body}</p>
               </div>
             ))}
           </div>
         </section>
 
-        <section>
-          <h2 className="font-headline-md text-xl text-on-surface mb-4">Cara kami menjaga agar tidak berlebihan</h2>
-          <div className="space-y-6">
+        <section className="py-10 border-t border-hairline">
+          <p className="kicker">Cara kami menjaga agar tidak berlebihan</p>
+          <div className="grid gap-4 sm:grid-cols-2">
             {PRINCIPLES.map((item) => (
-              <div key={item.title}>
-                <h3 className="font-label-bold text-base text-on-surface mb-1">{item.title}</h3>
-                <p className="text-body-md text-on-surface-variant leading-relaxed">{item.body}</p>
+              <div key={item.title} className="card-hard bg-paper p-5">
+                <h3 className="font-display text-base text-ink mb-1">{item.title}</h3>
+                <p className="text-[14px] text-ink-soft leading-relaxed">{item.body}</p>
               </div>
             ))}
           </div>
         </section>
 
-        <section>
-          <h2 className="font-headline-md text-xl text-on-surface mb-3">Cara kami dibiayai</h2>
-          <p className="text-body-md text-on-surface-variant leading-relaxed">
+        <section className="py-10 border-t border-hairline">
+          <p className="kicker">Cara kami dibiayai</p>
+          <p className="max-w-[62ch] font-serif text-[16.5px] leading-[1.7] text-ink-soft">
             Fitur dasar tetap gratis: kamu bisa membuat CV dengan bantuan AI, mengecek kecocokan lowongan, menulis
             surat lamaran, dan mencoba satu website portofolio per bulan tanpa biaya. Paket berbayar tersedia sesuai
             kebutuhan, satu kali pakai untuk satu dokumen atau langganan dengan kuota lebih besar. Kami tidak menjual
@@ -117,19 +118,19 @@ export default function AboutPage() {
           </p>
         </section>
 
-        <section className="pt-8 border-t border-outline-variant/50">
-          <h2 className="font-headline-md text-xl text-on-surface mb-3">Ada yang perlu dijelaskan?</h2>
-          <p className="text-body-md text-on-surface-variant leading-relaxed">
+        <section className="py-10 border-t border-hairline">
+          <p className="kicker">Ada yang perlu dijelaskan?</p>
+          <p className="text-body-md text-ink-soft leading-relaxed">
             Data yang kami simpan dijelaskan di{" "}
-            <Link href="/privacy" className="text-primary hover:underline">
+            <Link href="/privacy" className="font-bold text-green-deep underline decoration-lime decoration-[3px] underline-offset-4">
               Kebijakan Privasi
             </Link>
             . Pertanyaan yang sering muncul ada di{" "}
-            <Link href="/faq" className="text-primary hover:underline">
+            <Link href="/faq" className="font-bold text-green-deep underline decoration-lime decoration-[3px] underline-offset-4">
               FAQ
             </Link>
             , atau bisa ditulis lewat halaman{" "}
-            <Link href="/contact" className="text-primary hover:underline">
+            <Link href="/contact" className="font-bold text-green-deep underline decoration-lime decoration-[3px] underline-offset-4">
               Kontak
             </Link>
             .

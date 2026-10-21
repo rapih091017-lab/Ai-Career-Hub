@@ -149,35 +149,35 @@ export default function KarirPage() {
       <SiteHeader variant="pill" />
       <main className="flex-1">
       {/* ── Hero ── */}
-      <div className="bg-gradient-to-br from-primary via-primary to-secondary text-white">
+      <div className="bg-evergreen text-paper">
         <div className="max-w-3xl mx-auto px-6 py-20 md:py-24">
-          <Link href="/" className="inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors mb-6 text-sm">
+          <Link href="/" className="inline-flex min-h-[44px] items-center gap-2 text-paper/70 hover:text-lime transition-colors mb-6 text-sm">
             <span className="material-symbols-outlined text-lg">arrow_back</span>
             {t("karir.back-home")}
           </Link>
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-surface-container-lowest/15 rounded-full text-xs font-bold tracking-wider mb-6">
-            <span className={`w-2 h-2 rounded-full ${totalJobs ? "bg-emerald-400" : "bg-emerald-400 animate-pulse"}`} />
+          <div className="inline-flex min-h-[44px] items-center gap-2 px-4 py-1.5 border border-lime/40 bg-evergreen rounded-full text-xs font-bold tracking-wider mb-6 text-lime">
+            <span className={`w-2 h-2 rounded-full ${totalJobs ? "bg-lime" : "bg-lime animate-pulse"}`} />
             {totalJobs === null
               ? t("karir.badge-loading")
               : totalJobs > 0
                 ? t("karir.badge-open")
                 : t("karir.soon")}
           </div>
-          <h1 className="font-headline-lg text-3xl md:text-4xl font-bold mb-3">{t("karir.title")}</h1>
-          <p className="text-white/80 text-lg max-w-xl">
+          <h1 className="font-display text-3xl md:text-4xl font-bold mb-3">{t("karir.title")}</h1>
+          <p className="text-paper/70 text-lg max-w-xl">
             {t("karir.subtitle")}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/builder/new"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-surface-container-lowest text-primary font-bold rounded-xl hover:bg-surface-container-lowest/90 active:scale-[0.97] transition-all shadow-lg"
+              className="inline-flex min-h-[54px] items-center gap-2 px-6 py-3 border-[2.5px] border-ink bg-lime text-ink font-bold rounded-full shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-[0.97] transition-all"
             >
               <span className="material-symbols-outlined text-lg">edit_note</span>
               {t("karir.prepare-cv")}
             </Link>
             <Link
               href="/interview"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-surface-container-lowest/15 text-white font-bold rounded-xl hover:bg-surface-container-lowest/25 active:scale-[0.97] transition-all border border-white/20"
+              className="inline-flex min-h-[54px] items-center gap-2 px-6 py-3 border border-paper/30 text-paper font-bold rounded-full hover:bg-paper/10 active:scale-[0.97] transition-all"
             >
               <span className="material-symbols-outlined text-lg">record_voice_over</span>
               {t("karir.interview-practice")}
@@ -287,22 +287,22 @@ export default function KarirPage() {
 
             {/* Ajakan layanan: ruang kosong di atas daftar dipakai untuk membuat
                 CV, bukan menambah halaman baru. */}
-            <div className="mb-6 flex flex-col gap-4 rounded-2xl border border-primary/20 bg-primary/5 p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="mb-6 flex flex-col gap-4 rounded-xl border-[2.5px] border-ink bg-lime/15 shadow-hard p-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h3 className="font-label-bold text-on-surface">{t("karir.promo-title")}</h3>
-                <p className="mt-1 text-sm text-on-surface-variant">{t("karir.promo-desc")}</p>
+                <h3 className="font-display text-ink">{t("karir.promo-title")}</h3>
+                <p className="mt-1 text-sm text-ink-soft">{t("karir.promo-desc")}</p>
               </div>
               <div className="flex shrink-0 flex-wrap gap-2">
                 <Link
                   href="/builder/new"
-                  className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-on-primary transition-all hover:brightness-110 active:scale-[0.98]"
+                  className="inline-flex min-h-[44px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-4 py-2.5 text-sm font-bold text-ink shadow-[0_3px_0_rgb(var(--c-ink))] transition-all hover:-translate-y-0.5 active:scale-[0.98]"
                 >
                   <span className="material-symbols-outlined text-base" aria-hidden="true">auto_awesome</span>
                   {t("karir.promo-cta-cv")}
                 </Link>
                 <Link
                   href="/checker"
-                  className="inline-flex items-center gap-2 rounded-xl border border-primary/30 bg-surface-container-lowest px-4 py-2.5 text-sm font-bold text-primary transition-colors hover:bg-primary/5"
+                  className="inline-flex min-h-[44px] items-center gap-2 rounded-full border-2 border-ink/60 bg-paper px-4 py-2.5 text-sm font-bold text-ink transition-colors hover:border-ink"
                 >
                   <span className="material-symbols-outlined text-base" aria-hidden="true">fact_check</span>
                   {t("karir.promo-cta-check")}
@@ -320,19 +320,19 @@ export default function KarirPage() {
                 return (
                 <article
                   key={job.id}
-                  className="flex flex-col gap-3 rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+                  className="flex flex-col gap-3 rounded-[14px] border-2 border-ink/15 bg-paper p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-hard-sm"
                 >
                   <div className="flex items-start gap-4">
                     {job.imageUrl ? (
                       <img
                         src={job.imageUrl}
                         alt=""
-                        className="h-14 w-14 shrink-0 rounded-xl border border-outline-variant/50 object-cover"
+                        className="h-14 w-14 shrink-0 rounded-xl border border-hairline object-cover"
                         loading="lazy"
                       />
                     ) : (
-                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-                        <span className="material-symbols-outlined text-primary">work</span>
+                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border-2 border-ink bg-lime/40">
+                        <span className="material-symbols-outlined text-ink">work</span>
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
@@ -375,7 +375,7 @@ export default function KarirPage() {
                   ) : null}
 
                   {closed ? (
-                    <span className="mt-auto inline-flex items-center justify-center gap-2 rounded-xl border border-outline-variant/40 px-5 py-2.5 text-sm font-bold text-on-surface-variant">
+                    <span className="mt-auto inline-flex items-center justify-center gap-2 rounded-full border-2 border-hairline px-5 py-2.5 text-sm font-bold text-on-surface-variant">
                       <span className="material-symbols-outlined text-base" aria-hidden="true">lock</span>
                       {t("karir.closed-cta")}
                     </span>
@@ -384,7 +384,7 @@ export default function KarirPage() {
                       href={job.applyUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-auto inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-on-primary transition-all hover:brightness-110 active:scale-[0.98]"
+                      className="mt-auto inline-flex items-center justify-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-5 py-2.5 text-sm font-bold text-ink shadow-[0_3px_0_rgb(var(--c-ink))] transition-all hover:-translate-y-0.5 active:scale-[0.98]"
                     >
                       <span className="material-symbols-outlined text-base" aria-hidden="true">open_in_new</span>
                       {t("karir.apply")}
@@ -397,12 +397,12 @@ export default function KarirPage() {
           </section>
         ) : jobsLoaded && hasFilters ? (
           <section className="mb-16">
-            <div className="rounded-2xl border border-outline-variant/50 bg-surface-container-low p-8 text-center">
-              <span className="material-symbols-outlined mb-4 text-5xl text-primary/40" aria-hidden="true">
+            <div className="rounded-[14px] border-2 border-ink/15 bg-paper p-8 text-center shadow-hard-sm">
+              <span className="material-symbols-outlined mb-4 text-5xl text-ink-soft/50" aria-hidden="true">
                 search_off
               </span>
-              <h2 className="mb-2 font-headline-md text-xl text-on-surface">{t("karir.no-match-title")}</h2>
-              <p className="mx-auto mb-5 max-w-md text-body-md text-on-surface-variant">
+              <h2 className="mb-2 font-display text-xl text-ink">{t("karir.no-match-title")}</h2>
+              <p className="mx-auto mb-5 max-w-md text-body-md text-ink-soft">
                 {t("karir.no-match-desc").replace("{n}", String(totalJobs ?? 0))}
               </p>
               <button
@@ -412,7 +412,7 @@ export default function KarirPage() {
                   setCategory("");
                   setEmployment("");
                 }}
-                className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-on-primary transition-all hover:brightness-110 active:scale-[0.98]"
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-5 py-2.5 text-sm font-bold text-ink shadow-[0_3px_0_rgb(var(--c-ink))] transition-all hover:-translate-y-0.5 active:scale-[0.98]"
               >
                 <span className="material-symbols-outlined text-base" aria-hidden="true">restart_alt</span>
                 {t("karir.reset-filter")}
@@ -422,14 +422,14 @@ export default function KarirPage() {
         ) : jobsLoaded ? (
           /* ── Coming soon (hanya saat belum ada loker) ── */
           <section className="mb-16">
-            <div className="bg-surface-container-low rounded-2xl p-8 border border-outline-variant/50">
+            <div className="card-hard bg-paper p-8">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>construction</span>
+                <div className="w-12 h-12 rounded-[7px] border-2 border-ink bg-lime flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-ink text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>construction</span>
                 </div>
                 <div>
-                  <h2 className="font-headline-md text-xl text-on-surface mb-2">{t("karir.coming-title")}</h2>
-                  <p className="text-body-md text-on-surface-variant leading-relaxed mb-4">
+                  <h2 className="font-display text-xl text-ink mb-2">{t("karir.coming-title")}</h2>
+                  <p className="text-body-md text-ink-soft leading-relaxed mb-4">
                     {t("karir.coming-desc")}
                   </p>
                   <ul className="space-y-3">
@@ -440,8 +440,8 @@ export default function KarirPage() {
                       { icon: "auto_awesome", text: t("karir.coming-4") },
                     ].map((item, i) => (
                       <li key={i} className="flex items-center gap-3">
-                        <span className="material-symbols-outlined text-primary text-lg">{item.icon}</span>
-                        <span className="text-sm text-on-surface">{item.text}</span>
+                        <span className="material-symbols-outlined text-green-deep text-lg">{item.icon}</span>
+                        <span className="text-sm text-ink">{item.text}</span>
                       </li>
                     ))}
                   </ul>
@@ -456,12 +456,12 @@ export default function KarirPage() {
         {/* ── External Job Portals ── */}
         <section className="mb-16">
           <div className="text-center mb-8">
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary/5 text-primary text-xs font-bold tracking-wider rounded-full mb-4">
+            <span className="inline-flex min-h-[44px] items-center gap-2 px-4 py-1.5 border border-ink/25 bg-lime/25 text-ink text-xs font-bold tracking-wider rounded-full mb-4">
               <span className="material-symbols-outlined text-sm">link</span>
               {t("karir.trusted-source")}
             </span>
-            <h2 className="font-headline-md text-xl text-on-surface mb-2">{t("karir.portals-title")}</h2>
-            <p className="text-body-md text-on-surface-variant">
+            <h2 className="font-display text-xl text-ink mb-2">{t("karir.portals-title")}</h2>
+            <p className="text-body-md text-ink-soft">
               {t("karir.portals-desc")}
             </p>
           </div>
@@ -473,14 +473,14 @@ export default function KarirPage() {
                 href={portal.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`rounded-2xl p-5 border ${portal.color} ${portal.textColor} hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 group`}
+                className="card-hard bg-paper p-5"
               >
                 <div className="flex items-center gap-3 mb-2">
                   <span className="text-xl">{portal.icon}</span>
-                  <h3 className="font-label-bold text-on-surface group-hover:text-primary transition-colors">{portal.name}</h3>
+                  <h3 className="font-display text-ink">{portal.name}</h3>
                 </div>
-                <p className="text-xs text-on-surface-variant leading-relaxed mb-3">{t(portal.descriptionKey)}</p>
-                <div className="flex items-center gap-1 text-[10px] font-medium">
+                <p className="text-xs text-ink-soft leading-relaxed mb-3">{t(portal.descriptionKey)}</p>
+                <div className="flex items-center gap-1 text-[10px] font-medium text-green-deep">
                   <span className="material-symbols-outlined text-xs">open_in_new</span>
                   {portal.label}
                 </div>
@@ -490,18 +490,18 @@ export default function KarirPage() {
         </section>
 
         {/* ── CTA ── */}
-        <section className="bg-gradient-to-br from-primary/5 via-primary/[0.02] to-secondary/5 rounded-2xl p-8 md:p-10 border border-primary/10 text-center">
+        <section className="card-hard bg-paper p-8 md:p-10 text-center">
           <div className="max-w-lg mx-auto">
-            <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-              <span className="material-symbols-outlined text-primary text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>description</span>
+            <div className="w-14 h-14 rounded-[14px] border-2 border-ink bg-lime flex items-center justify-center mx-auto mb-4">
+              <span className="material-symbols-outlined text-ink text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>description</span>
             </div>
-            <h2 className="font-headline-md text-xl text-on-surface mb-2">{t("karir.cta-title")}</h2>
-            <p className="text-body-md text-on-surface-variant mb-6">
+            <h2 className="font-display text-xl text-ink mb-2">{t("karir.cta-title")}</h2>
+            <p className="text-body-md text-ink-soft mb-6">
               {t("karir.cta-desc")}
             </p>
             <Link
               href="/builder/new"
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary text-on-primary font-bold rounded-xl hover:brightness-110 active:scale-[0.97] transition-all shadow-md"
+              className="inline-flex min-h-[54px] items-center gap-2 px-8 py-3.5 border-[2.5px] border-ink bg-lime text-ink font-bold rounded-full shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-[0.97] transition-all"
             >
               <span className="material-symbols-outlined text-lg">add</span>
               {t("karir.cta-btn")}
