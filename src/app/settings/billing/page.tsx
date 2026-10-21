@@ -348,7 +348,7 @@ export default function SettingsBillingPage() {
             </div>
 
 {/* Buy Package */}
-            <div id="beli-paket" ref={buySectionRef} className={`pt-6 border-t scroll-mt-24 ${highlightBuy ? "ring-2 ring-primary/50 rounded-2xl bg-primary/[0.03] px-4 py-4 -mx-4 transition-shadow" : "border-outline-variant/50"}`}>
+            <div id="beli-paket" ref={buySectionRef} className={`pt-6 border-t scroll-mt-24 ${highlightBuy ? "ring-2 ring-green/60 rounded-[14px] bg-lime/[0.12] px-4 py-4 -mx-4 transition-shadow" : "border-hairline"}`}>
               <h3 className="font-label-bold text-on-surface mb-1">{t("billing.buy-package")}</h3>
               <p className="text-sm text-on-surface-variant mb-4">{t("billing.buy-package-hint")}</p>
 

@@ -105,7 +105,7 @@ export default function QrisCheckoutPage({
       <main className="min-h-screen bg-background flex items-center justify-center px-6">
         <div className="text-center space-y-4">
           <p className="text-on-surface">{error}</p>
-          <Link href="/settings/billing" className="text-primary hover:underline">
+          <Link href="/settings/billing" className="font-bold text-green-deep underline decoration-lime decoration-[3px] underline-offset-4">
             Kembali ke tagihan
           </Link>
         </div>
@@ -162,9 +162,9 @@ export default function QrisCheckoutPage({
         ) : null}
 
         {poll === "success" ? (
-          <p className="text-sm text-primary">Pembayaran diterima. Mengalihkan…</p>
+          <p className="text-sm font-bold text-green-deep">Pembayaran diterima. Mengalihkan…</p>
         ) : (
-          <Link href="/settings/billing" className="text-primary hover:underline">
+          <Link href="/settings/billing" className="font-bold text-green-deep underline decoration-lime decoration-[3px] underline-offset-4">
             Saya sudah bayar / Kembali
           </Link>
         )}

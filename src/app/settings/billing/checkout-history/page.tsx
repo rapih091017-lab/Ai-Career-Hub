@@ -92,7 +92,7 @@ export default function CheckoutHistoryPage() {
 
         {isLoading ? (
           <div className="p-12 flex items-center justify-center">
-            <div className="animate-spin h-8 w-8 border-4 border-primary/30 border-t-primary rounded-full" />
+            <div className="animate-spin h-8 w-8 border-4 border-ink/20 border-t-green-deep rounded-full" />
           </div>
         ) : error ? (
           <div className="p-12 text-center text-error font-label-bold">{error}</div>
@@ -129,10 +129,10 @@ export default function CheckoutHistoryPage() {
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
-                  className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  className={`px-4 py-1.5 min-h-[44px] rounded-full text-xs font-bold transition-all border-2 ${
                     filter === f
-                      ? "bg-primary text-on-primary"
-                      : "bg-surface-container-low text-on-surface-variant hover:bg-surface-variant"
+                      ? "border-ink bg-lime text-ink shadow-[2px_2px_0_rgb(var(--c-ink))]"
+                      : "border-ink/25 bg-paper text-ink-soft hover:border-ink hover:text-ink"
                   }`}
                 >
                   {f === "all"

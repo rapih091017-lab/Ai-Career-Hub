@@ -29,7 +29,7 @@ const variantStyles: Record<ButtonVariant, string> = {
   primary:
     "border-[2.5px] border-ink bg-lime text-ink shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5",
   emerald:
-    "border-[2.5px] border-ink bg-green text-white shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5",
+    "border-[2.5px] border-ink bg-green text-ink shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5",
   ghost:
     "bg-paper text-ink border-2 border-ink/40 shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 hover:border-ink",
   secondary:

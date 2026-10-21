@@ -504,9 +504,9 @@ a:focus-visible {
   transition: all 0.2s;
 }
 .a4-preview-page-num.active {
-  color: #0d7377;
-  border-color: #0d7377;
-  background: rgba(13,115,119,0.08);
+  color: #1d6b48;
+  border-color: #1d6b48;
+  background: rgba(29,107,72,0.08);
 }
 
 /* Page navigation bar */
@@ -525,9 +525,9 @@ a:focus-visible {
   transition: all 0.2s;
 }
 .page-nav-btn:hover:not(:disabled) {
-  border-color: #0d7377;
-  color: #0d7377;
-  background: rgba(13,115,119,0.05);
+  border-color: #1d6b48;
+  color: #1d6b48;
+  background: rgba(29,107,72,0.05);
 }
 .page-nav-btn:disabled {
   opacity: 0.3;

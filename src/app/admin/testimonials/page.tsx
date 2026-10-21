@@ -251,7 +251,7 @@ export default function AdminTestimonialsPage() {
                 type="checkbox"
                 checked={form.isPublished}
                 onChange={(event) => setForm({ ...form, isPublished: event.target.checked })}
-                className="h-4 w-4 accent-[#0d7377]"
+                className="h-4 w-4 accent-green-deep"
               />
               <span className="text-label-bold text-on-surface">Tampilkan di landing</span>
             </label>

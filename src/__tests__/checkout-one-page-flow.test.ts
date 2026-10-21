@@ -35,7 +35,7 @@ describe("checkout adalah satu halaman untuk pembelian", () => {
     // Dari halaman depan orang belum punya alasan untuk langsung membayar,
     // jadi navbar mengarah ke section landing, bukan ke /checkout.
     expect(navItemsSrc).toContain('href: "/#pricing"');
-    expect(navItemsSrc).toContain('href: "/#journey"');
+    expect(navItemsSrc).toContain('href: "/#cara-kerja"');
     expect(landingSrc).not.toContain('href="/checkout"');
   });
 

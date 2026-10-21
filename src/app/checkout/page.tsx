@@ -362,14 +362,14 @@ return (
             {selection ? (
               <div className="flex items-center justify-between pt-2 border-t border-outline-variant/50">
                 <span className="font-semibold text-on-surface">Total</span>
-                <span className="font-headline-lg text-lg font-bold text-primary">
+                <span className="font-display text-lg font-bold text-green-deep">
                   {formatRupiah(selection.total)}
                 </span>
               </div>
             ) : null}
 
 {bundleAdvice ? (
-              <div className="rounded-xl border border-secondary/30 bg-secondary/5 p-3">
+              <div className="rounded-xl border-2 border-ink/20 bg-lime/15 p-3">
                 <p className="text-sm text-on-surface">
                   <span className="font-semibold">Catatan:</span> {bundleAdvice.missingCount} hak belum
                   terakup paket pilihanmu.{" "}
@@ -380,7 +380,7 @@ return (
                 <button
                   type="button"
                   onClick={useBundle}
-                  className="mt-2 text-sm font-semibold text-primary hover:underline"
+                  className="mt-2 text-sm font-bold text-green-deep underline decoration-lime decoration-[3px] underline-offset-4"
                 >
                   Pakai {catalog[bundleAdvice.bundleKey]?.name} ({formatRupiah(bundleAdvice.price)})
                 </button>
@@ -398,7 +398,7 @@ return (
               type="button"
               onClick={pay}
               disabled={!selection || submitting}
-              className="w-full py-3 rounded-xl bg-primary text-on-primary font-bold disabled:opacity-50"
+              className="w-full py-3 rounded-full border-[2.5px] border-ink bg-lime text-ink font-bold shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 disabled:opacity-50 disabled:shadow-none"
             >
               {submitting
                 ? "Menyiapkan pembayaran…"
@@ -409,7 +409,7 @@ return (
 
 <p className="text-xs text-on-surface-variant">
               Pembayaran hanya dibuat setelah kamu menekan tombol bayar. Butuh bantuan?{" "}
-              <Link href="/contact" className="text-primary hover:underline">
+              <Link href="/contact" className="font-bold text-green-deep underline decoration-lime decoration-[3px] underline-offset-4">
                 Hubungi kami
               </Link>
               .
@@ -419,19 +419,19 @@ return (
                 bisa diperiksa sendiri, jadi ditulis apa adanya. */}
             <ul className="space-y-1.5 border-t border-outline-variant/50 pt-3">
               <li className="flex items-start gap-2 text-xs text-on-surface-variant">
-                <span className="material-symbols-outlined text-[14px] text-primary shrink-0">
+                <span className="material-symbols-outlined text-[14px] text-green-deep shrink-0">
                   picture_as_pdf
                 </span>
                 PDF-nya berbasis teks, bukan gambar, jadi bisa dibaca mesin ATS.
               </li>
               <li className="flex items-start gap-2 text-xs text-on-surface-variant">
-                <span className="material-symbols-outlined text-[14px] text-primary shrink-0">
+                <span className="material-symbols-outlined text-[14px] text-green-deep shrink-0">
                   event_available
                 </span>
                 Sekali bayar. Masa berlaku tertera di tiap paket, tidak ada tagihan berikutnya.
               </li>
               <li className="flex items-start gap-2 text-xs text-on-surface-variant">
-                <span className="material-symbols-outlined text-[14px] text-primary shrink-0">
+                <span className="material-symbols-outlined text-[14px] text-green-deep shrink-0">
                   delete
                 </span>
                 Data CV-mu bisa kamu hapus sendiri kapan saja dari halaman Pengaturan.
@@ -439,7 +439,7 @@ return (
             </ul>
             <Link
               href="/terms"
-              className="text-xs text-on-surface-variant underline hover:text-primary"
+              className="text-xs text-ink-soft underline hover:text-green-deep"
             >
               Syarat &amp; Ketentuan
             </Link>

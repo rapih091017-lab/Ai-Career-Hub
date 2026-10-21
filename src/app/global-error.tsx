@@ -55,7 +55,7 @@ export default function GlobalError({
             </p>
             <button
               onClick={reset}
-              className="px-6 py-3 rounded-full bg-primary text-white font-semibold hover:opacity-90 transition-all active:scale-95"
+              className="px-6 py-3 rounded-full border-[2.5px] border-ink bg-lime text-ink font-bold shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 transition-all active:scale-95"
             >
               Coba Lagi
             </button>

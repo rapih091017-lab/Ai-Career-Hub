@@ -117,7 +117,7 @@ export default function CheckoutPage() {
               <div className="animate-pulse text-sm text-outline mb-4">Mengarahkan ke halaman builder...</div>
               <button
                 onClick={() => router.push(`/builder/${cvId}`)}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-on-primary font-label-bold rounded-xl hover:brightness-110 active:scale-[0.98] transition-all"
+                className="inline-flex min-h-[44px] items-center gap-2 px-6 py-3 border-[2.5px] border-ink bg-lime text-ink font-bold rounded-full shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-[0.98] transition-all"
               >
                 <span className="material-symbols-outlined text-lg">edit_document</span>
                 Lanjutkan ke Builder

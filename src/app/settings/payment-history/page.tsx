@@ -81,20 +81,20 @@ export default function PaymentHistoryPage() {
   return (
     <div className="flex flex-col gap-8">
       {/* Section: Riwayat Transaksi */}
-      <section className="bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/50 overflow-hidden">
-        <div className="px-6 py-5 border-b border-outline-variant/50 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-primary-fixed flex items-center justify-center text-primary">
+      <section className="bg-paper rounded-[14px] shadow-hard-sm border-2 border-ink/15 overflow-hidden">
+        <div className="px-6 py-5 border-b border-hairline flex items-center gap-4">
+          <div className="w-10 h-10 rounded-[7px] border-2 border-ink bg-lime flex items-center justify-center text-ink">
             <span className="material-symbols-outlined">receipt_long</span>
           </div>
           <div>
-            <h2 className="font-headline-md text-lg text-on-surface">{t("payment.title")}</h2>
+            <h2 className="font-display text-lg text-ink">{t("payment.title")}</h2>
             <p className="text-label-sm text-on-surface-variant">{t("payment.subtitle")}</p>
           </div>
         </div>
 
         {isLoading ? (
           <div className="p-12 flex items-center justify-center">
-            <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+            <div className="animate-spin h-8 w-8 border-4 border-ink/20 border-t-green-deep rounded-full" />
           </div>
         ) : error ? (
           <div className="p-12 text-center text-error font-label-bold">{error}</div>
@@ -102,9 +102,9 @@ export default function PaymentHistoryPage() {
           <div className="p-6 space-y-6">
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-5 rounded-xl bg-surface-container-low border border-outline-variant/50">
+              <div className="p-5 rounded-[14px] bg-surface-container-low border-2 border-ink/15">
                 <p className="text-label-sm text-on-surface-variant">{t("payment.total-spent")}</p>
-                <p className="text-headline-md text-primary mt-1">
+                <p className="font-display text-ink mt-1">
                   Rp {totalSpent.toLocaleString("id-ID")}
                 </p>
                 <p className="text-label-sm text-on-surface-variant mt-1">
@@ -113,9 +113,9 @@ export default function PaymentHistoryPage() {
                     : t("payment.no-transactions")}
                 </p>
               </div>
-              <div className="p-5 rounded-xl bg-surface-container-low border border-outline-variant/50">
+              <div className="p-5 rounded-[14px] bg-surface-container-low border-2 border-ink/15">
                 <p className="text-label-sm text-on-surface-variant">{t("payment.this-month")}</p>
-                <p className="text-headline-md text-on-surface mt-1">
+                <p className="font-display text-ink mt-1">
                   {allTransactions.filter((t) => {
                     const d = new Date(t.createdAt);
                     const now = new Date();
@@ -124,9 +124,9 @@ export default function PaymentHistoryPage() {
                 </p>
                 <p className="text-label-sm text-on-surface-variant mt-1">{t("payment.all-transactions")}</p>
               </div>
-              <div className="p-5 rounded-xl bg-surface-container-low border border-outline-variant/50">
+              <div className="p-5 rounded-[14px] bg-surface-container-low border-2 border-ink/15">
                 <p className="text-label-sm text-on-surface-variant">{t("payment.total-transactions")}</p>
-                <p className="text-headline-md text-on-surface mt-1">{totalTransactions}</p>
+                <p className="font-display text-ink mt-1">{totalTransactions}</p>
                 <p className="text-label-sm text-on-surface-variant mt-1">
                   {successTransactions.length === totalTransactions
                     ? t("payment.all-paid")
@@ -203,7 +203,7 @@ export default function PaymentHistoryPage() {
                               </span>
                             </td>
                             <td className="py-3 px-2">
-                              <button className="text-primary text-label-sm hover:underline">{t("payment.detail")}</button>
+                              <button className="font-bold text-green-deep text-label-sm underline decoration-lime decoration-[3px] underline-offset-4">{t("payment.detail")}</button>
                             </td>
                           </tr>
                         );
@@ -216,10 +216,10 @@ export default function PaymentHistoryPage() {
 
             {/* AI Expense Analysis */}
             {totalSpent > 0 && (
-              <div className="p-5 rounded-xl bg-surface-container border border-dashed border-primary/30 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16"></div>
+              <div className="p-5 rounded-[14px] bg-lime/15 border-2 border-dashed border-ink/40 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-lime/40 rounded-full -mr-16 -mt-16"></div>
                 <div className="flex gap-4 relative z-10">
-                  <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-[7px] border-2 border-ink bg-ink flex items-center justify-center shrink-0">
                     <span
                       className="material-symbols-outlined text-white"
                       style={{ fontVariationSettings: "'FILL' 1" }}
