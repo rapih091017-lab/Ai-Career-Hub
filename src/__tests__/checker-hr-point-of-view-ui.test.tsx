@@ -270,10 +270,11 @@ it("menampilkan temuan berhenti dan lanjut beserta kutipannya", () => {
 // Kalau keduanya kelasnya sama persis, yang berat sama saja kelihatan
     // dengan yang ringan. Warna boleh beda, tapi kata wajib beda juga.
     expect(critical.className).not.toBe(low.className);
-    // Warnanya sekarang datang dari severityMeta yang dipakai kartu lain,
-    // jadi yang dikunci adalah warna merah untuk kritis, bukan token lama.
-    expect(critical.className).toContain("bg-red-100");
-    expect(low.className).toContain("bg-blue-100");
+    // Warnanya datang dari severityMeta yang dipakai kartu lain. Token yang
+    // dikunci adalah token tema (error untuk kritis, netral untuk rendah),
+    // bukan palet Tailwind mentah yang tidak berbalik di mode gelap.
+    expect(critical.className).toContain("bg-error-container");
+    expect(low.className).toContain("bg-surface-container-low");
   });
 
   it("menampilkan panel dalam bahasa Inggris", () => {

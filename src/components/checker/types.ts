@@ -35,17 +35,21 @@ export function toIssueItems(v: unknown): IssueItem[] {
 }
 
 /* ── Severity badge (v4), warna & label netral bahasa (label via i18n) ── */
+/* Warna memakai token tema, bukan palet Tailwind mentah: latar pastel
+   `red-100`/`blue-100` tidak berbalik di mode gelap, jadi lencananya menyala
+   seperti berasal dari halaman lain. Urutan tingkat tetap terbaca: kritis
+   merah penuh, tinggi merah lembut, sedang kuning-lime, rendah netral. */
 export function severityMeta(sev?: IssueItem["severity"], tFn?: (k: string) => string) {
   const t2 = tFn || ((k: string) => k);
   switch (sev) {
     case "critical":
-      return { label: t2("checker.sev-critical"), cls: "bg-red-100 text-red-700 border-red-300", dot: "bg-red-500" };
+      return { label: t2("checker.sev-critical"), cls: "border-error/50 bg-error-container text-on-error-container", dot: "bg-error" };
     case "high":
-      return { label: t2("checker.sev-high"), cls: "bg-orange-100 text-orange-700 border-orange-300", dot: "bg-orange-500" };
+      return { label: t2("checker.sev-high"), cls: "border-error/30 bg-surface-container-low text-error", dot: "bg-error/60" };
     case "medium":
-      return { label: t2("checker.sev-medium"), cls: "bg-amber-100 text-amber-700 border-amber-300", dot: "bg-amber-500" };
+      return { label: t2("checker.sev-medium"), cls: "border-tertiary/50 bg-tertiary-container text-on-tertiary-container", dot: "bg-tertiary" };
     case "low":
-      return { label: t2("checker.sev-low"), cls: "bg-blue-100 text-blue-700 border-blue-300", dot: "bg-blue-500" };
+      return { label: t2("checker.sev-low"), cls: "border-ink/20 bg-surface-container-low text-ink-soft", dot: "bg-outline" };
     default:
       return null;
   }
@@ -226,54 +230,56 @@ export type StoredAnalysisResult = Omit<AnalysisResult, "breakdown"> & {
 
 /* ── Helpers ── */
 
+/** Warna cincin skor. Nilai berupa CSS var, bukan hex, supaya cincin ikut
+ *  berbalik saat tema gelap: hijau tua yang pekat hilang di atas kertas gelap. */
 export function scoreColor(score: number) {
-  if (score > 70) return "#22c55e";
-  if (score >= 40) return "#eab308";
-  return "#ef4444";
+  if (score > 70) return "rgb(var(--c-green-deep))";
+  if (score >= 40) return "rgb(var(--c-tertiary))";
+  return "rgb(var(--c-error))";
 }
 
 export function gradeColor(grade?: string | null) {
   switch (grade) {
-    case "A": return { bg: "bg-green-100", text: "text-green-700", border: "border-green-300" };
-    case "B": return { bg: "bg-blue-100", text: "text-blue-700", border: "border-blue-300" };
-    case "C": return { bg: "bg-yellow-100", text: "text-yellow-700", border: "border-yellow-300" };
-    case "D": return { bg: "bg-red-100", text: "text-red-700", border: "border-red-300" };
-    default: return { bg: "bg-gray-100", text: "text-gray-600", border: "border-gray-200" };
+    case "A": return { bg: "bg-primary-fixed", text: "text-on-primary-fixed", border: "border-green-deep/40" };
+    case "B": return { bg: "bg-surface-container-low", text: "text-ink", border: "border-ink/25" };
+    case "C": return { bg: "bg-tertiary-container", text: "text-on-tertiary-container", border: "border-tertiary/50" };
+    case "D": return { bg: "bg-error-container", text: "text-on-error-container", border: "border-error/50" };
+    default: return { bg: "bg-surface-container", text: "text-ink-soft", border: "border-outline/40" };
   }
 }
 
 export function atsBadgeColor(prediction?: string | null) {
   switch (prediction) {
-    case "Likely Pass": return { bg: "bg-green-50", text: "text-green-700", dot: "bg-green-500" };
-    case "Borderline": return { bg: "bg-yellow-50", text: "text-yellow-700", dot: "bg-yellow-500" };
-    case "Likely Fail": return { bg: "bg-red-50", text: "text-red-700", dot: "bg-red-500" };
-    default: return { bg: "bg-gray-50", text: "text-gray-600", dot: "bg-gray-400" };
+    case "Likely Pass": return { bg: "bg-primary-fixed", text: "text-on-primary-fixed", dot: "bg-green-deep" };
+    case "Borderline": return { bg: "bg-tertiary-container", text: "text-on-tertiary-container", dot: "bg-tertiary" };
+    case "Likely Fail": return { bg: "bg-error-container", text: "text-on-error-container", dot: "bg-error" };
+    default: return { bg: "bg-surface-container", text: "text-ink-soft", dot: "bg-outline" };
   }
 }
 
 export function fitLabelMeta(label?: string, tFn?: (key: string) => string) {
   const t2 = tFn || ((k: string) => k);
   switch (label) {
-    case "Excellent": return { color: "#22c55e", bg: "bg-green-100", text: "text-green-800", icon: "stars", desc: t2("checker.fit-excellent") };
-    case "Good": return { color: "#eab308", bg: "bg-yellow-100", text: "text-yellow-800", icon: "thumb_up", desc: t2("checker.fit-good") };
-    case "Fair": return { color: "#f97316", bg: "bg-orange-100", text: "text-orange-800", icon: "trending_up", desc: t2("checker.fit-fair") };
-    case "Poor": return { color: "#ef4444", bg: "bg-red-100", text: "text-red-800", icon: "warning", desc: t2("checker.fit-poor") };
-    default: return { color: "#1d6b48", bg: "bg-primary/10", text: "text-primary", icon: "info", desc: "" };
+    case "Excellent": return { color: "rgb(var(--c-green-deep))", bg: "bg-primary-fixed", text: "text-on-primary-fixed", icon: "stars", desc: t2("checker.fit-excellent") };
+    case "Good": return { color: "rgb(var(--c-tertiary))", bg: "bg-tertiary-container", text: "text-on-tertiary-container", icon: "thumb_up", desc: t2("checker.fit-good") };
+    case "Fair": return { color: "rgb(var(--c-tertiary))", bg: "bg-tertiary-container", text: "text-on-tertiary-container", icon: "trending_up", desc: t2("checker.fit-fair") };
+    case "Poor": return { color: "rgb(var(--c-error))", bg: "bg-error-container", text: "text-on-error-container", icon: "warning", desc: t2("checker.fit-poor") };
+    default: return { color: "rgb(var(--c-green-deep))", bg: "bg-surface-container-low", text: "text-ink", icon: "info", desc: "" };
   }
 }
 
 export function sectionScoreColor(score: number) {
-  if (score >= 80) return "bg-green-500";
-  if (score >= 60) return "bg-yellow-500";
-  if (score >= 40) return "bg-orange-500";
-  return "bg-red-500";
+  if (score >= 80) return "bg-green-deep";
+  if (score >= 60) return "bg-green";
+  if (score >= 40) return "bg-tertiary";
+  return "bg-error";
 }
 
 export function priorityBadge(p: string) {
   switch (p) {
-    case "High": return "bg-red-100 text-red-700";
-    case "Medium": return "bg-yellow-100 text-yellow-700";
-    case "Low": return "bg-blue-100 text-blue-700";
-    default: return "bg-gray-100 text-gray-600";
+    case "High": return "border-error/50 bg-error-container text-on-error-container";
+    case "Medium": return "border-tertiary/50 bg-tertiary-container text-on-tertiary-container";
+    case "Low": return "border-green-deep/40 bg-primary-fixed text-on-primary-fixed";
+    default: return "border-outline/40 bg-surface-container text-ink-soft";
   }
 }

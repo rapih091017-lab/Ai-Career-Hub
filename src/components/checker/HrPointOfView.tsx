@@ -51,7 +51,7 @@ function FindingList({
   // sendiri: tanpa kalimat, judul tebal di atas area hampa terbaca seperti
   // panel yang belum selesai dimuat.
   if (findings.length === 0) {
-    return <p className="mt-2 text-body-md text-on-surface-variant">{emptyText}</p>;
+    return <p className="mt-2 text-body-md text-ink-soft">{emptyText}</p>;
   }
   return (
     <ul className="mt-2 space-y-3">
@@ -61,8 +61,8 @@ function FindingList({
         // jadi pembaca yang tidak membedakan warna tetap membaca tingkatnya.
         const badge = severityMeta(finding.severity ?? undefined, t);
         return (
-          <li key={`${finding.text}-${index}`} className="border-l-2 border-outline-variant/60 pl-3">
-            <p className="text-body-md text-on-background">{finding.text}</p>
+          <li key={`${finding.text}-${index}`} className="border-l-2 border-ink/15 pl-3">
+            <p className="text-body-md text-ink">{finding.text}</p>
             {badge ? (
               <span
                 className={`mt-1.5 inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide ${badge.cls}`}
@@ -78,7 +78,7 @@ function FindingList({
               // ukuran terkecil di halaman dan wajah yang salah untuk kalimat
               // CV beberapa baris, sehingga bukti yang paling berharga itu
               // terbaca seperti keluaran log dan terlewatkan pembaca.
-              <p className="mt-1.5 whitespace-pre-wrap break-words rounded-md bg-surface-container-low px-2 py-1 text-label-sm italic text-on-surface-variant">
+              <p className="mt-1.5 whitespace-pre-wrap break-words rounded-md border-l-2 border-ink/15 bg-surface-container-low px-2 py-1 text-label-sm italic text-ink-soft">
                 {"\u201C"}
                 {finding.quote}
                 {"\u201D"}
@@ -144,39 +144,39 @@ export default function HrPointOfView({
     // kurang jadi.
     <section
       aria-labelledby={titleId}
-      className="rounded-2xl border border-surface-container-high bg-surface p-6 shadow-hard"
+      className="rounded-[18px] border-[2.5px] border-ink bg-paper p-6 shadow-hard"
     >
       {/* Headline-md, bukan token yang lebih kecil: preflight membuat heading
           mewarisi ukuran body, jadi kelas yang tidak ada di config membuat
           judul panel jadi lebih kecil dari judul kolom di bawahnya. */}
-      <h2 id={titleId} className="font-headline-md text-headline-md text-on-background">
+      <h2 id={titleId} className="font-headline-md text-headline-md text-ink">
         {t(`${keyPrefix}hrview-title`)}
       </h2>
-      <p className="mt-1 text-body-md text-on-surface-variant">{t(`${keyPrefix}hrview-subtitle`)}</p>
+      <p className="mt-1 text-body-md text-ink-soft">{t(`${keyPrefix}hrview-subtitle`)}</p>
 
       {/* Level dan arah karier bukan temuan, jadi tetap tampil walau daftar
           temuan kosong. Sembunyikan keduanya dan panel jadi kehilangan
           informasi yang paling sering dibutuhkan pembaca. */}
       {view.seniority ? (
-        <p className="mt-3 text-label-bold text-on-surface-variant">
+        <p className="mt-3 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-green-deep">
           {/* Tanpa titik-kolon: pemisah nilai begitu membaca seperti label
               sistem, bukan seperti orang yang sedang menyebut posisi kandidat. */}
           {t(`${keyPrefix}hrview-level`).replace("{level}", pick(LEVEL_LABEL[view.seniority]))}
         </p>
       ) : null}
 
-      {journey ? <p className="mt-1 text-body-md text-on-surface-variant">{journey}</p> : null}
+      {journey ? <p className="mt-1 text-body-md text-ink-soft">{journey}</p> : null}
 
       {/* Kesimpulan didahulukan: pembaca yang cemas ingin jawabannya dulu,
           baru buktinya. Panel kosong sudah punya kalimat sendiri. */}
-      {!view.isEmpty ? <p className="mt-3 text-body-md font-medium text-on-background">{verdict}</p> : null}
+      {!view.isEmpty ? <p className="mt-3 text-body-md font-semibold text-ink">{verdict}</p> : null}
 
       {view.isEmpty ? (
-        <p className="mt-4 text-body-md text-on-surface-variant">{t(`${keyPrefix}hrview-empty`)}</p>
+        <p className="mt-4 text-body-md text-ink-soft">{t(`${keyPrefix}hrview-empty`)}</p>
       ) : (
         <div className="mt-4 grid gap-5 sm:grid-cols-2">
           <div>
-            <h3 className="text-label-bold text-on-background">{t(`${keyPrefix}hrview-stopping`)}</h3>
+            <h3 className="text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-error">{t(`${keyPrefix}hrview-stopping`)}</h3>
             <FindingList
               findings={view.stopping}
               t={t}
@@ -184,7 +184,7 @@ export default function HrPointOfView({
             />
           </div>
           <div>
-            <h3 className="text-label-bold text-on-background">{t(`${keyPrefix}hrview-continuing`)}</h3>
+            <h3 className="text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-green-deep">{t(`${keyPrefix}hrview-continuing`)}</h3>
             <FindingList
               findings={view.continuing}
               t={t}

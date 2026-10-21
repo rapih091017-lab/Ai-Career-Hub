@@ -32,47 +32,44 @@ export function ImpactForecastCard({ forecast }: { forecast: ImpactForecast }) {
 
   return (
     <motion.section
-      className="bg-surface rounded-2xl border border-surface-container-high shadow-hard p-6"
+      className="rounded-[18px] border-[2.5px] border-ink bg-paper p-6 shadow-hard"
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: 0.12 }}
     >
-      <div className="flex items-start justify-between gap-3 mb-4 flex-wrap">
+      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-base font-bold text-on-surface flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-primary text-lg select-none" style={{ fontVariationSettings: "'FILL' 1" }}>
+          <h2 className="flex items-center gap-1.5 font-display text-[19px] font-bold text-ink">
+            <span className="material-symbols-outlined select-none text-lg text-green-deep" style={{ fontVariationSettings: "'FILL' 1" }}>
               trending_up
             </span>
             {t("checker.impact-title")}
           </h2>
-          <p className="text-xs text-on-surface-variant mt-0.5">{t("checker.impact-sub")}</p>
+          <p className="mt-1 text-xs text-ink-soft">{t("checker.impact-sub")}</p>
         </div>
         {gain > 0 && (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-green-50 border border-green-200 text-green-700 text-xs font-bold">
-            <span className="material-symbols-outlined text-sm select-none">add_chart</span>
+          <span className="inline-flex items-center gap-1 rounded-full border-[1.5px] border-ink/20 bg-primary-fixed px-2.5 py-1 text-xs font-bold text-on-primary-fixed">
+            <span className="material-symbols-outlined select-none text-sm">add_chart</span>
             +{gain}%
           </span>
         )}
       </div>
 
       {/* Track */}
-      <div className="relative h-2.5 bg-surface-container rounded-full overflow-hidden mb-5">
-        <div
-          className="h-full bg-surface-container-high rounded-full"
-          style={{ width: `${Math.max(4, now)}%` }}
-        />
+      <div className="relative mb-5 h-3 overflow-hidden rounded-full bg-ink/10">
+        <div className="h-full rounded-full bg-ink/15" style={{ width: `${Math.max(4, now)}%` }} />
         <motion.div
-          className="absolute top-0 h-full bg-gradient-to-r from-primary/70 to-primary rounded-full"
+          className="absolute top-0 h-full rounded-full"
+          style={{ background: "linear-gradient(90deg, rgb(var(--c-green)), rgb(var(--c-lime)))" }}
           initial={{ width: `${Math.max(4, now)}%` }}
           animate={{ width: `${Math.min(96, all)}%` }}
           transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
         />
         <motion.div
-          className="absolute top-0 h-full bg-gradient-to-r from-amber-400/80 to-green-500/80 rounded-full"
+          className="absolute top-0 h-full rounded-full bg-lime/80"
           initial={{ width: `${Math.max(4, now)}%` }}
           animate={{ width: `${Math.min(96, quick)}%` }}
           transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-          style={{ opacity: 0.85 }}
         />
       </div>
 
@@ -81,12 +78,12 @@ export function ImpactForecastCard({ forecast }: { forecast: ImpactForecast }) {
         {steps.map((s) => (
           <div
             key={s.label}
-            className={`rounded-xl border px-3 py-2 text-center ${
-              s.active ? "border-outline-variant/40 bg-surface-container-low" : "border-outline-variant/40 opacity-70"
+            className={`rounded-xl border-[1.5px] px-3 py-2 text-center ${
+              s.active ? "border-ink/15 bg-surface-container-low" : "border-ink/10 opacity-70"
             }`}
           >
-            <p className="text-[10px] font-semibold text-on-surface-variant uppercase tracking-wide truncate">{s.label}</p>
-            <p className="text-lg font-extrabold text-on-surface">{s.score}%</p>
+            <p className="truncate text-[10px] font-bold uppercase tracking-[0.06em] text-ink-soft">{s.label}</p>
+            <p className="font-display text-lg font-bold text-ink">{s.score}%</p>
           </div>
         ))}
       </div>

@@ -25,12 +25,14 @@ type ChecklistItem = {
   group: "quick" | "short" | "long" | "section" | "keyword";
 };
 
-const GROUP_KEYS: Record<ChecklistItem["group"], { label: string; short: string; color: string; icon: string }> = {
-  quick: { label: "checker.detail.group-quick", short: "checker.detail.group-quick-short", color: "bg-green-50 border-green-200", icon: "bolt" },
-  short: { label: "checker.detail.group-short", short: "checker.detail.group-short-short", color: "bg-blue-50 border-blue-200", icon: "schedule" },
-  long: { label: "checker.detail.group-long", short: "checker.detail.group-long-short", color: "bg-purple-50 border-purple-200", icon: "flag" },
-  section: { label: "checker.detail.group-section", short: "checker.detail.group-section-short", color: "bg-orange-50 border-orange-200", icon: "add_circle" },
-  keyword: { label: "checker.detail.group-keyword", short: "checker.detail.group-keyword-short", color: "bg-red-50 border-red-200", icon: "key" },
+// `chip` dipakai untuk lencana kelompok. Dulu isinya kelas latar yang dipotong
+// lalu dipasang sebagai warna teks, jadi judul kelompok tidak pernah berwarna.
+const GROUP_KEYS: Record<ChecklistItem["group"], { label: string; short: string; chip: string; icon: string }> = {
+  quick: { label: "checker.detail.group-quick", short: "checker.detail.group-quick-short", chip: "border-green-deep/40 bg-primary-fixed text-on-primary-fixed", icon: "bolt" },
+  short: { label: "checker.detail.group-short", short: "checker.detail.group-short-short", chip: "border-ink/20 bg-surface-container-low text-ink", icon: "schedule" },
+  long: { label: "checker.detail.group-long", short: "checker.detail.group-long-short", chip: "border-tertiary/50 bg-tertiary-container text-on-tertiary-container", icon: "flag" },
+  section: { label: "checker.detail.group-section", short: "checker.detail.group-section-short", chip: "border-ink/20 bg-surface-container text-ink", icon: "add_circle" },
+  keyword: { label: "checker.detail.group-keyword", short: "checker.detail.group-keyword-short", chip: "border-error/50 bg-error-container text-on-error-container", icon: "key" },
 };
 
 export function ImprovementChecklist({ actionPlan, missingSections, keywordAnalysis }: ImprovementChecklistProps) {
@@ -81,24 +83,24 @@ export function ImprovementChecklist({ actionPlan, missingSections, keywordAnaly
 
   return (
     <motion.section
-      className="bg-surface-container-lowest rounded-2xl border border-surface-container-high shadow-hard p-6 space-y-5"
+      className="space-y-5 rounded-[18px] border-[2.5px] border-ink bg-paper p-6 shadow-hard"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.42 }}
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold text-on-surface">{t("checker.detail.checklist-title")}</h2>
-          <p className="text-xs text-on-surface-variant mt-0.5">
+          <h2 className="font-display text-[19px] font-bold text-ink">{t("checker.detail.checklist-title")}</h2>
+          <p className="mt-1 text-xs text-ink-soft">
             {t("checker.detail.checklist-sub").replace("{done}", String(done)).replace("{total}", String(items.length))}
           </p>
         </div>
         <button
           onClick={copyAll}
-          className="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-outline-variant text-xs font-semibold text-on-surface-variant hover:text-primary hover:border-primary/40 transition-all active:scale-[0.97]"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border-[1.5px] border-ink/20 px-3 py-2 text-xs font-bold text-ink transition-all hover:border-ink hover:bg-surface-container-low active:scale-[0.97]"
           title={t("checker.detail.copy-plan")}
         >
-          <span className="material-symbols-outlined text-base select-none">
+          <span className="material-symbols-outlined select-none text-base">
             {copied ? "check" : "content_copy"}
           </span>
           {copied ? t("checker.detail.copied") : t("checker.detail.copy")}
@@ -106,9 +108,10 @@ export function ImprovementChecklist({ actionPlan, missingSections, keywordAnaly
       </div>
 
       {/* Progress bar */}
-      <div className="h-2 w-full bg-surface-container rounded-full overflow-hidden" role="progressbar" aria-valuenow={done} aria-valuemin={0} aria-valuemax={items.length} aria-label={t("checker.detail.checklist-progress").replace("{pct}", String(pct))}>
+      <div className="h-3 w-full overflow-hidden rounded-full bg-ink/10" role="progressbar" aria-valuenow={done} aria-valuemin={0} aria-valuemax={items.length} aria-label={t("checker.detail.checklist-progress").replace("{pct}", String(pct))}>
         <motion.div
-          className="h-full rounded-full bg-gradient-to-r from-green-400 to-primary"
+          className="h-full rounded-full"
+          style={{ background: "linear-gradient(90deg, rgb(var(--c-green)), rgb(var(--c-lime)))" }}
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
           transition={{ duration: 0.4, ease: "easeOut" }}
@@ -123,8 +126,8 @@ export function ImprovementChecklist({ actionPlan, missingSections, keywordAnaly
           const meta = { ...GROUP_KEYS[group], label: t(GROUP_KEYS[group].label) };
           return (
             <div key={group}>
-              <p className={`text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5 ${meta.color.split(" ")[0]} text-on-surface-variant px-2 py-1 rounded-lg`}>
-                <span className="material-symbols-outlined text-sm select-none">{meta.icon}</span>
+              <p className={`mb-2 inline-flex items-center gap-1.5 rounded-full border-[1.5px] px-2.5 py-1 text-[10.5px] font-extrabold uppercase tracking-[0.06em] ${meta.chip}`}>
+                <span className="material-symbols-outlined select-none text-sm">{meta.icon}</span>
                 {meta.label} ({groupItems.length})
               </p>
               <ul className="space-y-1.5">
@@ -136,17 +139,17 @@ export function ImprovementChecklist({ actionPlan, missingSections, keywordAnaly
                         onClick={() => toggle(item.id)}
                         role="checkbox"
                         aria-checked={isChecked}
-                        className={`w-full flex items-start gap-3 px-3 py-2.5 rounded-xl border text-left transition-all active:scale-[0.99] ${
+                        className={`flex w-full items-start gap-3 rounded-xl border-[1.5px] px-3 py-2.5 text-left transition-all active:scale-[0.99] ${
                           isChecked
-                            ? "bg-green-50/60 border-green-200"
-                            : "bg-surface-container-low/40 border-transparent hover:border-outline-variant/50 hover:bg-surface-container-low"
+                            ? "border-green-deep/40 bg-primary-fixed/50"
+                            : "border-transparent hover:border-ink/15 hover:bg-surface-container-low"
                         }`}
                       >
                         <span
-                          className={`shrink-0 w-5 h-5 mt-0.5 rounded-md border-2 flex items-center justify-center transition-all ${
+                          className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all ${
                             isChecked
-                              ? "bg-green-500 border-green-500 text-white"
-                              : "border-outline-variant bg-surface-container-lowest"
+                              ? "border-ink bg-lime text-on-light"
+                              : "border-ink/30 bg-paper"
                           }`}
                         >
                           {isChecked && (
@@ -157,7 +160,7 @@ export function ImprovementChecklist({ actionPlan, missingSections, keywordAnaly
                         </span>
                         <span
                           className={`text-sm leading-relaxed ${
-                            isChecked ? "text-on-surface-variant line-through" : "text-on-surface"
+                            isChecked ? "text-ink-soft line-through" : "text-ink"
                           }`}
                         >
                           {item.text}

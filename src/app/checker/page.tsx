@@ -433,17 +433,17 @@ export default function CheckerPage() {
     // ── Show skeleton while analyzing ──
     if (loading) {
       return (
-        <div className="min-h-screen flex flex-col bg-background text-on-background">
+        <div className="flex min-h-screen flex-col bg-desk text-ink">
           <SiteHeader variant="pill" />
-          <main className="flex-1 w-full max-w-[640px] mx-auto px-5 md:px-6 pt-20 pb-12 space-y-10">
+          <main className="mx-auto w-full max-w-[680px] space-y-10 px-5 pb-12 pt-24 md:px-6">
             <div className="animate-pulse space-y-10">
               <div className="flex flex-col items-center">
-                <div className="w-48 h-48 rounded-full bg-surface-container-high mb-4" />
-                <div className="h-8 w-64 bg-surface-container-high rounded-lg mb-2" />
-                <div className="h-4 w-48 bg-surface-container-high rounded-lg" />
+                <div className="mb-4 h-48 w-48 rounded-full bg-surface-container-high" />
+                <div className="mb-2 h-8 w-64 rounded-lg bg-surface-container-high" />
+                <div className="h-4 w-48 rounded-lg bg-surface-container-high" />
               </div>
               {[1,2,3,4,5].map((i) => (
-                <div key={i} className="bg-surface rounded-xl border border-surface-container-high p-4 space-y-2">
+                <div key={i} className="space-y-2 rounded-[18px] border-[2.5px] border-ink/15 bg-paper p-4">
                   <div className="flex justify-between">
                     <div className="h-5 w-32 bg-surface-container-high rounded" />
                     <div className="h-5 w-10 bg-surface-container-high rounded" />
@@ -452,8 +452,8 @@ export default function CheckerPage() {
                 </div>
               ))}
             </div>
-            <p className="text-center text-sm text-on-surface-variant">
-              <span className="material-symbols-outlined text-lg align-middle mr-1 animate-spin select-none">sync</span>
+            <p className="flex items-center justify-center gap-1 text-center text-sm text-ink-soft">
+              <span className="material-symbols-outlined select-none align-middle text-lg animate-spin">sync</span>
               {processNote || t("checker.analyzing-full")}
             </p>
           </main>
@@ -464,21 +464,21 @@ export default function CheckerPage() {
 
     // ── Normal input form ──
     return (
-      <div className="min-h-screen flex flex-col bg-background text-on-background">
+      <div className="flex min-h-screen flex-col bg-desk text-ink">
         <SiteHeader variant="pill" />
 
-        <main className="flex-1 flex items-center justify-center py-20 pt-28 px-5">
-          <div className="w-full max-w-[600px] flex flex-col gap-8">
-            <div className="text-center space-y-4">
-              <h1 className="text-[32px] leading-[40px] font-bold tracking-tight text-on-background">
+        <main className="flex-1 px-5 py-24">
+          <div className="mx-auto flex w-full max-w-[600px] flex-col gap-6">
+            <div>
+              <h1 className="max-w-[20ch] font-display text-headline-lg font-bold text-ink">
                 {t("checker.title")}
               </h1>
-              <p className="text-lg leading-7 text-on-surface-variant max-w-[500px] mx-auto">
+              <p className="mt-3 max-w-[48ch] text-body-md leading-relaxed text-ink-soft">
                 {t("checker.subtitle")}
               </p>
             </div>
 
-            <div className="bg-surface rounded-xl p-6 md:p-10 flex flex-col gap-8 border border-outline-variant/50 shadow-hard">
+            <div className="flex flex-col gap-7 rounded-[18px] border-[2.5px] border-ink bg-paper p-6 shadow-hard md:p-8">
               <UploadZone
                 file={file}
                 dragActive={dragActive}
@@ -491,11 +491,11 @@ export default function CheckerPage() {
               />
 
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-semibold text-on-surface-variant ml-1">
+                <label className="text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-ink-soft">
                   {t("checker.jd-label")}
                 </label>
                 <textarea
-                  className="w-full rounded-lg border border-outline bg-background p-4 text-base text-on-background focus:ring-2 focus:ring-primary focus:border-primary transition-[box-shadow,border-color] resize-none"
+                  className="w-full resize-none rounded-xl border-2 border-ink/20 bg-desk/60 p-4 text-base text-ink placeholder:text-ink-soft/80 transition-[border-color]"
                   rows={6}
                   placeholder={t("checker.jd-placeholder")}
                   value={jdText}
@@ -505,13 +505,13 @@ export default function CheckerPage() {
 
               {/* Kategori posisi → bobot penilaian per-section (transparansi skor) */}
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-semibold text-on-surface-variant ml-1">
+                <label className="text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-ink-soft">
                   {t("checker.role-label")}
                 </label>
                 <select
                   value={roleCategory}
                   onChange={(e) => setRoleCategory(e.target.value)}
-                  className="w-full rounded-lg border border-outline bg-background px-3 py-3 text-base text-on-background focus:ring-2 focus:ring-primary focus:border-primary transition-[box-shadow,border-color]"
+                  className="w-full rounded-xl border-2 border-ink/20 bg-desk/60 px-3 py-3 text-base text-ink transition-[border-color]"
                 >
                   {ROLE_CATEGORY_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
@@ -519,14 +519,14 @@ export default function CheckerPage() {
                     </option>
                   ))}
                 </select>
-                <p className="text-[11px] text-on-surface-variant ml-1">
+                <p className="text-[11px] text-ink-soft">
                   {t("checker.role-hint")}
                 </p>
               </div>
 
               {/* Kecepatan analisis: pilihan nyata, bukan janji kecepatan. */}
               <div className="flex flex-col gap-2">
-                <span className="text-sm font-semibold text-on-surface-variant ml-1">
+                <span className="text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-ink-soft">
                   {t("checker.mode-label")}
                 </span>
                 <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={t("checker.mode-label")}>
@@ -543,28 +543,31 @@ export default function CheckerPage() {
                       role="radio"
                       aria-checked={analyzeMode === option.value}
                       onClick={() => setAnalyzeMode(option.value)}
-                      className={`flex flex-col items-start gap-0.5 rounded-lg border px-3 py-2 text-left transition-colors ${
+                      className={`flex flex-col items-start gap-1 rounded-xl border-2 px-3 py-2.5 text-left transition-colors ${
                         analyzeMode === option.value
-                          ? "border-primary bg-primary/10"
-                          : "border-outline hover:border-primary/50"
+                          ? "border-ink bg-lime/25 shadow-[0_2px_0_rgb(var(--c-ink))]"
+                          : "border-ink/20 hover:border-ink/50"
                       }`}
                     >
-                      <span className="text-sm font-semibold text-on-surface">{option.label}</span>
-                      <span className="text-[11px] text-on-surface-variant">{option.hint}</span>
+                      <span className="text-sm font-bold text-ink">{option.label}</span>
+                      {/* Petunjuk di dalam pilihan aktif duduk di atas lime 25%:
+                          di mode gelap latarnya jadi olive, dan ink-soft hanya
+                          3,55:1 untuk teks 11px. Pakai tinta penuh di sana. */}
+                      <span className={`text-[11px] leading-snug ${analyzeMode === option.value ? "text-ink/80" : "text-ink-soft"}`}>{option.hint}</span>
                     </button>
                   ))}
                 </div>
               </div>
 
               {error && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-3">
-                  <span className="material-symbols-outlined text-red-500 text-sm mt-0.5 select-none">error</span>
+                <div className="flex items-start gap-3 rounded-xl border-2 border-error/50 bg-error-container p-3">
+                  <span className="material-symbols-outlined mt-0.5 select-none text-sm text-on-error-container">error</span>
                   <div className="flex-1">
-                    <p className="text-red-700 text-sm font-semibold">{error}</p>
+                    <p className="text-sm font-bold text-on-error-container">{error}</p>
                     {extractedTextRef.current && !showPasteFallback && (
                       <button
                         onClick={handleRetry}
-                        className="mt-1 text-xs text-red-600 underline hover:text-red-800"
+                        className="mt-1 text-xs font-semibold underline underline-offset-2 hover:opacity-80"
                       >
                         {t("checker.retry")}
                       </button>
@@ -575,19 +578,19 @@ export default function CheckerPage() {
 
               {/* ── OCR Button (when scanned PDF detected) ── */}
               {showOcrButton && !ocrLoading && (
-                <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 space-y-3">
+                <div className="space-y-3 rounded-xl border-2 border-dashed border-ink/25 bg-desk/60 p-4">
                   <div className="flex items-start gap-3">
-                    <span className="material-symbols-outlined text-primary text-sm mt-0.5 select-none">document_scanner</span>
+                    <span className="material-symbols-outlined mt-0.5 select-none text-sm text-green-deep">document_scanner</span>
                     <div>
-                      <p className="text-sm font-semibold text-primary">{t("checker.ocr.title")}</p>
-                      <p className="text-xs text-primary/80 mt-0.5">{t("checker.ocr.desc")}</p>
+                      <p className="text-sm font-bold text-ink">{t("checker.ocr.title")}</p>
+                      <p className="mt-0.5 text-xs leading-relaxed text-ink-soft">{t("checker.ocr.desc")}</p>
                     </div>
                   </div>
                   <button
                     onClick={handleBrowserOcr}
-                    className="w-full inline-flex items-center justify-center gap-2 bg-primary text-on-primary font-bold px-5 py-2.5 rounded-lg hover:bg-primary/90 active:scale-[0.97] transition-all text-sm"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-5 py-2.5 text-sm font-bold text-on-light shadow-[0_3px_0_rgb(var(--c-ink))] transition-transform hover:-translate-y-0.5 active:scale-[0.98]"
                   >
-                    <span className="material-symbols-outlined text-sm select-none">scan</span>
+                    <span className="material-symbols-outlined select-none text-sm">scan</span>
                     {t("checker.ocr.btn")}
                   </button>
                 </div>
@@ -595,32 +598,32 @@ export default function CheckerPage() {
 
               {/* ── OCR Loading State ── */}
               {ocrLoading && (
-                <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 space-y-3">
+                <div className="space-y-3 rounded-xl border-2 border-dashed border-ink/25 bg-desk/60 p-4">
                   <div className="flex items-center gap-3">
-                    <svg className="animate-spin h-5 w-5 text-primary" viewBox="0 0 24 24">
+                    <svg className="h-5 w-5 animate-spin text-green-deep" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
-                    <span className="text-sm font-medium text-primary">{ocrProgress || t("checker.ocr.processing")}</span>
+                    <span className="text-sm font-semibold text-ink">{ocrProgress || t("checker.ocr.processing")}</span>
                   </div>
-                  <div className="w-full bg-primary/15 rounded-full h-1.5">
-                    <div className="bg-primary h-1.5 rounded-full w-2/3" />
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-ink/10">
+                    <div className="h-2 w-2/3 rounded-full bg-lime" />
                   </div>
                 </div>
               )}
 
               {/* ── Paste text fallback (when PDF parsing fails) ── */}
               {showPasteFallback && (
-                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-3">
+                <div className="space-y-3 rounded-xl border-2 border-dashed border-ink/25 bg-desk/60 p-4">
                   <div className="flex items-start gap-3">
-                    <span className="material-symbols-outlined text-amber-600 text-sm mt-0.5 select-none">content_paste</span>
+                    <span className="material-symbols-outlined mt-0.5 select-none text-sm text-green-deep">content_paste</span>
                     <div>
-                      <p className="text-sm font-semibold text-amber-800">{t("checker.paste.title")}</p>
-                      <p className="text-xs text-amber-700 mt-0.5">{t("checker.paste.desc")}</p>
+                      <p className="text-sm font-bold text-ink">{t("checker.paste.title")}</p>
+                      <p className="mt-0.5 text-xs leading-relaxed text-ink-soft">{t("checker.paste.desc")}</p>
                     </div>
                   </div>
                   <textarea
-                    className="w-full rounded-lg border border-amber-300 bg-surface-container-lowest p-4 text-sm text-on-background focus:ring-2 focus:ring-primary focus:border-primary transition-[box-shadow,border-color] resize-none"
+                    className="w-full resize-none rounded-xl border-2 border-ink/20 bg-paper p-4 text-sm text-ink placeholder:text-ink-soft/80 transition-[border-color]"
                     rows={8}
                     placeholder={t("checker.paste.placeholder")}
                     value={pastedText}
@@ -630,7 +633,7 @@ export default function CheckerPage() {
                     <button
                       onClick={handlePasteAnalyze}
                       disabled={loading || !pastedText.trim()}
-                      className="inline-flex items-center gap-2 bg-primary text-on-primary font-bold px-5 py-2.5 rounded-lg hover:opacity-90 active:scale-[0.97] transition-all disabled:opacity-50 text-sm"
+                      className="inline-flex items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-5 py-2.5 text-sm font-bold text-on-light shadow-[0_3px_0_rgb(var(--c-ink))] transition-transform hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50 disabled:hover:translate-y-0"
                     >
                       {loading ? (
                         <>
@@ -654,13 +657,13 @@ export default function CheckerPage() {
               <div className="flex flex-col items-center gap-4">
                 <MagneticButton className="w-full">
                   <button
-                    className="w-full bg-primary text-on-primary font-bold py-4 rounded-lg hover:opacity-90 active:scale-[0.97] transition-[filter,transform,opacity] shadow-hard flex items-center justify-center gap-2 disabled:opacity-60"
+                    className="flex w-full items-center justify-center gap-2 rounded-full border-[2.5px] border-ink bg-lime py-4 text-[15px] font-bold text-on-light shadow-[0_4px_0_rgb(var(--c-ink))] transition-transform hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-60 disabled:hover:translate-y-0"
                     onClick={handleAnalyze}
                     disabled={loading}
                   >
                     {loading ? (
                       <>
-                        <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+                        <svg className="h-5 w-5 animate-spin text-on-light" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                         </svg>
@@ -674,18 +677,18 @@ export default function CheckerPage() {
                     )}
                   </button>
                 </MagneticButton>
-                <div className="flex items-center gap-2 text-on-surface-variant text-xs">
-                  <span className="material-symbols-outlined text-sm select-none" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                <div className="flex items-center gap-2 text-xs text-ink-soft">
+                  <span className="material-symbols-outlined select-none text-sm text-green-deep" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
                   <span>{t("checker.free-badge")}</span>
                 </div>
               </div>
             </div>
 
-            <div className="bg-surface-container-low border border-dashed border-outline p-4 rounded-xl flex items-start gap-4 opacity-80 select-none pointer-events-none">
-              <span className="material-symbols-outlined text-primary select-none">psychology</span>
+            <div className="pointer-events-none flex select-none items-start gap-4 rounded-[18px] border-2 border-dashed border-ink/20 p-4">
+              <span className="material-symbols-outlined select-none text-green-deep">psychology</span>
               <div>
-                <p className="text-sm font-semibold text-on-background">{t("checker.insight-title")}</p>
-                <p className="text-xs text-on-surface-variant">{t("checker.insight-desc")}</p>
+                <p className="text-sm font-bold text-ink">{t("checker.insight-title")}</p>
+                <p className="mt-0.5 text-xs leading-relaxed text-ink-soft">{t("checker.insight-desc")}</p>
               </div>
             </div>
           </div>
@@ -735,17 +738,17 @@ export default function CheckerPage() {
     : undefined;
 
   return (
-    <div className="min-h-screen flex flex-col bg-surface-container-low/50 text-on-background">
+    <div className="flex min-h-screen flex-col bg-desk text-ink">
       <SiteHeader variant="pill" />
 
-      <main className="flex-1 w-full max-w-[640px] mx-auto px-5 md:px-6 pt-20 pb-12 space-y-10">
+      <main className="mx-auto w-full max-w-[680px] space-y-10 px-5 pb-12 pt-24 md:px-6">
         {/* ── Top Bar: Back + Share + Download ── */}
         <div className="flex items-center justify-between gap-2">
           <button
-            className="flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary transition-colors active:scale-[0.97]"
+            className="flex items-center gap-1 text-sm font-semibold text-ink-soft transition-colors hover:text-green-deep active:scale-[0.97]"
             onClick={reset}
           >
-            <span className="material-symbols-outlined text-lg select-none">arrow_back</span>
+            <span className="material-symbols-outlined select-none text-lg">arrow_back</span>
             {t("checker.back-btn")}
           </button>
           <div className="flex items-center gap-2">
@@ -761,14 +764,14 @@ export default function CheckerPage() {
                     shareTimerRef.current = setTimeout(() => setShowShareToast(false), 2500);
                   } catch {}
                 }}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-outline-variant text-on-surface-variant text-sm font-medium hover:bg-surface-container-low hover:text-primary transition-all active:scale-[0.97]"
+                className="inline-flex items-center gap-1.5 rounded-full border-[1.5px] border-ink/20 px-3 py-2 text-sm font-semibold text-ink transition-all hover:border-ink hover:bg-surface-container-low active:scale-[0.97]"
                 title={t("checker.share-title")}
               >
-                <span className="material-symbols-outlined text-lg select-none">share</span>
+                <span className="material-symbols-outlined select-none text-lg">share</span>
                 <span className="hidden sm:inline">{t("checker.share")}</span>
               </button>
               {showShareToast && (
-                <div className="absolute top-full mt-2 right-0 bg-green-600 text-white text-xs rounded-lg px-3 py-2 shadow-hard whitespace-nowrap z-10">
+                <div className="absolute right-0 top-full z-10 mt-2 whitespace-nowrap rounded-full border-[1.5px] border-ink bg-evergreen px-3 py-2 text-xs font-semibold text-on-dark shadow-hard">
                   {t("checker.link-copied")}
                 </div>
               )}
@@ -792,8 +795,8 @@ export default function CheckerPage() {
             <ScoreDonut score={scores.overall} color={color} label={t("checker.score-label")} />
           </div>
 
-          <h1 className="text-[32px] leading-10 font-bold text-center mb-2">{t("checker.result-title")}</h1>
-          <p className="text-base text-on-surface-variant text-center mb-4">{summary || t("checker.result-subtitle")}</p>
+          <h1 className="mb-2 text-center font-display text-headline-lg font-bold text-ink">{t("checker.result-title")}</h1>
+          <p className="mb-5 max-w-[52ch] text-center text-body-md leading-relaxed text-ink-soft">{summary || t("checker.result-subtitle")}</p>
 
           {/* Grade + ATS Prediction + Fit Label */}
           <div className="flex flex-wrap items-center justify-center gap-3">
@@ -816,14 +819,14 @@ export default function CheckerPage() {
             )}
             {aiModel && (
               <div
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold border ${
+                className={`inline-flex items-center gap-1.5 rounded-full border-[1.5px] px-3 py-1.5 text-sm font-semibold ${
                   aiModel === "V4 Pro"
-                    ? "bg-primary/5 text-primary/80 border-primary/30"
-                    : "bg-blue-50 text-blue-700 border-blue-300"
+                    ? "border-green-deep/40 bg-primary-fixed text-on-primary-fixed"
+                    : "border-ink/20 bg-surface-container-low text-ink"
                 }`}
                 title={aiModel === "V4 Pro" ? t("checker.model-v4pro") : t("checker.model-v4flash")}
               >
-                <span className="material-symbols-outlined text-lg select-none">{aiModel === "V4 Pro" ? "auto_awesome" : "bolt"}</span>
+                <span className="material-symbols-outlined select-none text-lg">{aiModel === "V4 Pro" ? "auto_awesome" : "bolt"}</span>
                 {aiModel === "V4 Pro" ? "DeepSeek V4 Pro" : "DeepSeek V4 Flash"}
               </div>
             )}
@@ -831,8 +834,8 @@ export default function CheckerPage() {
 
           {/* Transparansi bobot penilaian (role category) */}
           {weightsApplied && weightsApplied.role_category !== "general" && (
-            <p className="text-[11px] text-on-surface-variant text-center mt-3 flex items-center justify-center gap-1 flex-wrap">
-              <span className="material-symbols-outlined text-[13px] select-none">tune</span>
+            <p className="mt-3 flex flex-wrap items-center justify-center gap-1 text-center text-[11px] text-ink-soft">
+              <span className="material-symbols-outlined select-none text-[13px]">tune</span>
               {t("checker.weights-note")
                 .replace("{cat}", weightsApplied.role_category.replace("_", " "))
                 .replace("{ex}", String(Math.round((weightsApplied.experience_weight || 0) * 100)))
@@ -860,7 +863,7 @@ export default function CheckerPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.15 }}
           >
-            <h2 className="text-xl font-bold text-on-surface px-1">{t("checker.sec-title")}</h2>
+            <h2 className="px-1 font-display text-headline-md font-bold text-ink">{t("checker.sec-title")}</h2>
             {breakdown.summary && (
               <SectionScoreCard title={t("checker.sec-summary")} score={breakdown.summary.score} issues={breakdown.summary.issues} suggestions={breakdown.summary.suggestions} delay={0.2} />
             )}
@@ -886,16 +889,16 @@ export default function CheckerPage() {
         {/* ============================================================ */}
         {narrativeFeedback && (
           <motion.section
-            className="bg-surface rounded-2xl border border-surface-container-high shadow-hard p-6 space-y-5"
+            className="space-y-5 rounded-[18px] border-[2.5px] border-ink bg-paper p-6 shadow-hard"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.3 }}
           >
-            <h2 className="text-xl font-bold text-on-surface">{t("checker.ai-review")}</h2>
+            <h2 className="font-display text-headline-md font-bold text-ink">{t("checker.ai-review")}</h2>
 
             {/* Overall assessment */}
-            <div className="bg-lime/15 rounded-xl p-4 border-[2.5px] border-ink">
-              <p className="text-sm text-on-surface leading-relaxed">{narrativeFeedback.overall_assessment}</p>
+            <div className="rounded-xl border-[2.5px] border-ink bg-lime/25 p-4">
+              <p className="text-sm leading-relaxed text-ink">{narrativeFeedback.overall_assessment}</p>
             </div>
 
             {/* Kolom Kelebihan dan Perlu Diperbaiki dihapus: isinya sama
@@ -905,15 +908,15 @@ export default function CheckerPage() {
 
             {/* ATS Recommendations */}
             {narrativeFeedback.ats_recommendations.length > 0 && (
-              <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                <h3 className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-sm select-none">description</span>
+              <div className="rounded-xl border-[1.5px] border-ink/15 bg-surface-container-low p-4">
+                <h3 className="mb-2 flex items-center gap-1.5 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-green-deep">
+                  <span className="material-symbols-outlined select-none text-sm">description</span>
                   {t("checker.ats-recs")}
                 </h3>
                 <ul className="space-y-1">
                   {narrativeFeedback.ats_recommendations.map((r, i) => (
-                    <li key={i} className="text-xs text-blue-800 flex items-start gap-2">
-                      <span className="text-blue-500 mt-0.5 select-none">→</span>
+                    <li key={i} className="flex items-start gap-2 text-xs leading-relaxed text-ink-soft">
+                      <span className="mt-0.5 select-none text-green-deep">→</span>
                       {r}
                     </li>
                   ))}
@@ -928,18 +931,19 @@ export default function CheckerPage() {
         {/* ============================================================ */}
         {keywordAnalysis && (
           <motion.section
-            className="bg-surface rounded-2xl border border-surface-container-high shadow-hard p-6 space-y-5"
+            className="space-y-5 rounded-[18px] border-[2.5px] border-ink bg-paper p-6 shadow-hard"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.35 }}
           >
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-on-surface">Keyword Analysis</h2>
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="font-display text-headline-md font-bold text-ink">Keyword Analysis</h2>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-on-surface">{keywordAnalysis.match_rate_pct}%</span>
-                <div className="w-16 h-2 bg-surface-container rounded-full overflow-hidden">
+                <span className="font-display text-sm font-bold text-ink">{keywordAnalysis.match_rate_pct}%</span>
+                <div className="h-2 w-16 overflow-hidden rounded-full bg-ink/10">
                   <motion.div
-                    className="h-full rounded-full bg-primary"
+                    className="h-full rounded-full"
+                    style={{ background: "linear-gradient(90deg, rgb(var(--c-green)), rgb(var(--c-lime)))" }}
                     initial={{ width: "0%" }}
                     animate={{ width: `${keywordAnalysis.match_rate_pct}%` }}
                     transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
@@ -952,7 +956,7 @@ export default function CheckerPage() {
               {/* Matched */}
               {keywordAnalysis.matched.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-green-700 uppercase tracking-wider mb-2">{t("checker.kw-found").replace("{n}", String(keywordAnalysis.matched.length))}</p>
+                  <p className="mb-2 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-green-deep">{t("checker.kw-found").replace("{n}", String(keywordAnalysis.matched.length))}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {keywordAnalysis.matched.map((kw, i) => (
                       <KeywordChip key={i} text={kw} variant="found" />
@@ -964,7 +968,7 @@ export default function CheckerPage() {
               {/* Missing critical */}
               {keywordAnalysis.missing_critical.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-red-700 uppercase tracking-wider mb-2">{t("checker.kw-critical").replace("{n}", String(keywordAnalysis.missing_critical.length))}</p>
+                  <p className="mb-2 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-error">{t("checker.kw-critical").replace("{n}", String(keywordAnalysis.missing_critical.length))}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {keywordAnalysis.missing_critical.map((kw, i) => (
                       <KeywordChip key={i} text={kw} variant="missing" />
@@ -976,7 +980,7 @@ export default function CheckerPage() {
               {/* Missing nice-to-have */}
               {keywordAnalysis.missing_nice_to_have.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-yellow-700 uppercase tracking-wider mb-2">{t("checker.kw-nice").replace("{n}", String(keywordAnalysis.missing_nice_to_have.length))}</p>
+                  <p className="mb-2 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-tertiary">{t("checker.kw-nice").replace("{n}", String(keywordAnalysis.missing_nice_to_have.length))}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {keywordAnalysis.missing_nice_to_have.map((kw, i) => (
                       <KeywordChip key={i} text={kw} variant="nice" />
@@ -987,12 +991,12 @@ export default function CheckerPage() {
 
               {/* Synonym suggestions */}
               {keywordAnalysis.synonym_suggestions.length > 0 && (
-                <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                  <p className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2">{t("checker.kw-synonym")}</p>
+                <div className="rounded-xl border-[1.5px] border-ink/15 bg-surface-container-low p-4">
+                  <p className="mb-2 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-ink-soft">{t("checker.kw-synonym")}</p>
                   <ul className="space-y-1">
                     {keywordAnalysis.synonym_suggestions.map((s, i) => (
-                      <li key={i} className="text-xs text-blue-800 flex items-start gap-2">
-                        <span className="text-blue-500 mt-0.5 select-none">→</span>
+                      <li key={i} className="flex items-start gap-2 text-xs leading-relaxed text-ink-soft">
+                        <span className="mt-0.5 select-none text-green-deep">→</span>
                         {s}
                       </li>
                     ))}
@@ -1022,7 +1026,7 @@ export default function CheckerPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.45 }}
           >
-            <h2 className="text-xl font-bold text-on-surface px-1">{t("checker.bullet-title").replace("{n}", String(bulletReview.length))}</h2>
+            <h2 className="px-1 font-display text-headline-md font-bold text-ink">{t("checker.bullet-title").replace("{n}", String(bulletReview.length))}</h2>
             <div className="space-y-2">
               {bulletReview.map((item, i) => (
                 <BulletReviewCard key={i} item={item} index={i} />
@@ -1048,15 +1052,15 @@ export default function CheckerPage() {
 
           return (
             <div
-              className="relative overflow-hidden rounded-[18px] border-[2.5px] border-ink bg-evergreen p-8 md:p-10 shadow-hard"
+              className="relative overflow-hidden rounded-[18px] border-[2.5px] border-ink bg-evergreen p-8 shadow-hard md:p-10"
             >
-              <div className="absolute -right-12 -top-12 w-64 h-64 bg-lime/25 rounded-full blur-3xl" />
-              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="absolute -right-12 -top-12 h-64 w-64 rounded-full bg-lime/20 blur-3xl" />
+              <div className="relative z-10 flex flex-col items-center justify-between gap-8 md:flex-row">
                 <div className="text-center md:text-left">
-                  <h2 className="font-display text-[32px] leading-10 font-bold text-on-dark mb-2">
+                  <h2 className="mb-2 font-display text-headline-md font-bold text-on-dark">
                     {ctaTitle}
                   </h2>
-                  <p className="text-base text-on-dark/70 max-w-[320px]">{ctaSubtitle}</p>
+                  <p className="max-w-[320px] text-body-md leading-relaxed text-mint">{ctaSubtitle}</p>
                 </div>
                 <MagneticButton>
                   <button
@@ -1069,10 +1073,10 @@ export default function CheckerPage() {
                       } catch {}
                       router.push(targetRoute);
                     }}
-                    className="font-display inline-flex min-h-[54px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-8 py-4 text-sm font-bold text-on-light shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-95 transition-all"
+                    className="inline-flex min-h-[54px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-8 py-4 font-display text-sm font-bold text-on-light shadow-[0_4px_0_rgb(var(--c-ink))] transition-all hover:-translate-y-0.5 active:scale-95"
                   >
                     {ctaBtn}{" "}
-                    <span className="material-symbols-outlined text-sm select-none">
+                    <span className="material-symbols-outlined select-none text-sm">
                       {isHighScore ? "work" : "arrow_forward"}
                     </span>
                   </button>

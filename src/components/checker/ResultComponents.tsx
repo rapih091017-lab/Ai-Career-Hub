@@ -8,13 +8,13 @@ import { useTranslation } from "@/lib/i18n";
 /** Keyword tag chip */
 export function KeywordChip({ text, variant }: { text: string; variant: "found" | "missing" | "nice" | "synonym" }) {
   const styles = {
-    found: "bg-green-100 text-green-700 border-green-200",
-    missing: "bg-red-100 text-red-700 border-red-200",
-    nice: "bg-yellow-100 text-yellow-700 border-yellow-200",
-    synonym: "bg-blue-100 text-blue-700 border-blue-200",
+    found: "border-green-deep/40 bg-primary-fixed text-on-primary-fixed",
+    missing: "border-error/50 bg-error-container text-on-error-container",
+    nice: "border-tertiary/50 bg-tertiary-container text-on-tertiary-container",
+    synonym: "border-ink/20 bg-surface-container-low text-ink",
   };
   return (
-    <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border ${styles[variant]}`}>
+    <span className={`inline-flex items-center rounded-full border-[1.5px] px-2.5 py-1 text-xs font-semibold ${styles[variant]}`}>
       {text}
     </span>
   );
@@ -22,9 +22,9 @@ export function KeywordChip({ text, variant }: { text: string; variant: "found" 
 
 /* ── CARI meter ─────────────────────────────────────────── */
 function cariColor(score: number) {
-  if (score >= 70) return { bar: "bg-green-500", text: "text-green-700", bg: "bg-green-50 border-green-200" };
-  if (score >= 40) return { bar: "bg-amber-500", text: "text-amber-700", bg: "bg-amber-50 border-amber-200" };
-  return { bar: "bg-red-500", text: "text-red-700", bg: "bg-red-50 border-red-200" };
+  if (score >= 70) return { bar: "bg-green-deep", text: "text-green-deep", bg: "bg-primary-fixed border-green-deep/40" };
+  if (score >= 40) return { bar: "bg-tertiary", text: "text-on-tertiary-container", bg: "bg-tertiary-container border-tertiary/50" };
+  return { bar: "bg-error", text: "text-error", bg: "bg-error-container border-error/50" };
 }
 
 function cariLabel(score: number, t: (key: string) => string) {
@@ -38,14 +38,14 @@ function CariMeter({ score }: { score: number }) {
   const { t } = useTranslation();
   const c = cariColor(score);
   return (
-    <div className={`flex items-center gap-3 px-3 py-2 rounded-lg border ${c.bg}`}>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between mb-1">
-          <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">{t("checker.detail.cari-score")}</span>
+    <div className={`flex items-center gap-3 rounded-xl border-[1.5px] px-3 py-2 ${c.bg}`}>
+      <div className="min-w-0 flex-1">
+        <div className="mb-1 flex items-center justify-between">
+          <span className="text-[10px] font-extrabold uppercase tracking-[0.06em] opacity-80">{t("checker.detail.cari-score")}</span>
           <span className={`text-[11px] font-bold ${c.text}`}>{score}/100 · {cariLabel(score, t)}</span>
         </div>
         <div
-          className="h-1.5 w-full bg-surface-container-lowest/70 rounded-full overflow-hidden"
+          className="h-2 w-full overflow-hidden rounded-full bg-ink/10"
           role="progressbar"
           aria-valuenow={score}
           aria-valuemin={0}
@@ -87,7 +87,7 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
 
   return (
     <motion.div
-      className="bg-surface-container-lowest rounded-xl border border-surface-container-high shadow-hard-sm overflow-hidden"
+      className="overflow-hidden rounded-[18px] border-[2.5px] border-ink bg-paper shadow-hard-sm"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, delay: index * 0.05 }}
@@ -96,16 +96,16 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
         onClick={() => setOpen(!open)}
         aria-expanded={open}
         aria-controls={`bullet-detail-${index}`}
-        className="w-full flex items-start gap-3 p-4 text-left hover:bg-surface-container-low transition-colors"
+        className="flex w-full items-start gap-3 p-4 text-left transition-colors hover:bg-surface-container-low"
       >
-        <div className="shrink-0 mt-0.5">
-          <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${priorityBadge(item.priority)}`}>
+        <div className="mt-0.5 shrink-0">
+          <span className={`inline-block rounded-full border-[1.5px] px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.06em] ${priorityBadge(item.priority)}`}>
             {item.priority}
           </span>
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-xs font-semibold text-primary mb-0.5">{item.section}</p>
-          <p className="text-sm text-on-surface line-clamp-2">{item.original_text}</p>
+        <div className="min-w-0 flex-1">
+          <p className="mb-0.5 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-green-deep">{item.section}</p>
+          <p className="line-clamp-2 text-sm text-ink">{item.original_text}</p>
           {/* Ringkasan skor CARI di header (kalau tersedia) */}
           {cari !== null && (
             <span className={`inline-flex items-center gap-1 mt-1.5 text-[10px] font-bold ${cariColor(cari).text}`}>
@@ -114,7 +114,7 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
             </span>
           )}
         </div>
-        <span className="material-symbols-outlined text-on-surface-variant select-none transition-transform duration-200 shrink-0"
+        <span className="material-symbols-outlined shrink-0 select-none text-ink-soft transition-transform duration-200"
           style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
         >
           expand_more
@@ -131,15 +131,15 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="px-4 pb-4 space-y-3 border-t border-surface-container-high pt-3">
+            <div className="space-y-3 border-t-[1.5px] border-hairline px-4 pb-4 pt-3">
               {/* CARI meter detail */}
               {cari !== null && (
                 <div>
-                  <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">
+                  <p className="mb-1.5 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-ink-soft">
                     {t("checker.detail.cari-strength-title")}
                   </p>
                   <CariMeter score={cari} />
-                  <p className="text-[10px] text-on-surface-variant mt-1.5 leading-relaxed">
+                  <p className="mt-1.5 text-[10px] leading-relaxed text-ink-soft">
                     {t("checker.detail.cari-desc")}
                   </p>
                 </div>
@@ -147,13 +147,13 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
 
               {issues.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-red-600 uppercase tracking-wider mb-1">{t("checker.detail.issues-found")}</p>
+                  <p className="mb-1 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-error">{t("checker.detail.issues-found")}</p>
                   <ul className="space-y-1">
                     {issues.map((iss, i) => {
                       const sev = severityMeta(iss.severity, t);
                       return (
-                        <li key={i} className="text-xs text-on-surface-variant flex items-start gap-1.5 bg-red-50/50 rounded-lg px-2.5 py-1.5">
-                          <span className="text-red-400 mt-0.5 select-none">⚠</span>
+                        <li key={i} className="flex items-start gap-1.5 rounded-lg bg-surface-container-low px-2.5 py-1.5 text-xs text-ink-soft">
+                          <span className="mt-0.5 select-none text-error/70">⚠</span>
                           <span className="min-w-0 flex-1">
                             <span className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
                               <span>{iss.text}</span>
@@ -165,7 +165,7 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
                               )}
                             </span>
                             {iss.source_excerpt && (
-                              <span className="block mt-1 text-[11px] italic text-on-surface-variant bg-surface-container-lowest rounded-md px-2 py-1 border-l-2 border-red-300">
+                              <span className="mt-1 block rounded-md border-l-2 border-error/40 bg-paper px-2 py-1 text-[11px] italic text-ink-soft">
                                 &ldquo;{iss.source_excerpt}&rdquo;
                               </span>
                             )}
@@ -181,29 +181,29 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Sebelum */}
                 <div>
-                  <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">{t("checker.detail.before")}</p>
-                  <div className="bg-surface-container-low rounded-lg p-3 border border-outline-variant/50">
-                    <p className="text-sm text-on-surface">{item.original_text}</p>
+                  <p className="mb-1 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-ink-soft">{t("checker.detail.before")}</p>
+                  <div className="rounded-xl border-[1.5px] border-ink/15 bg-surface-container-low p-3">
+                    <p className="text-sm text-ink">{item.original_text}</p>
                   </div>
                 </div>
                 {/* Sesudah */}
                 {item.suggested_rewrite && (
                   <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-xs font-bold text-green-600 uppercase tracking-wider">{t("checker.detail.after")}</p>
+                    <div className="mb-1 flex items-center justify-between gap-2">
+                      <p className="text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-green-deep">{t("checker.detail.after")}</p>
                       <button
                         onClick={copyRewrite}
-                        className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-semibold text-green-700 bg-green-100 hover:bg-green-200 transition-colors active:scale-[0.97]"
+                        className="inline-flex items-center gap-1 rounded-full border-[1.5px] border-ink/20 px-2 py-1 text-[10px] font-bold text-ink transition-colors hover:border-ink hover:bg-surface-container-low active:scale-[0.97]"
                         title={t("checker.detail.copy-fix")}
                       >
-                        <span className="material-symbols-outlined text-[13px] select-none">
+                        <span className="material-symbols-outlined select-none text-[13px]">
                           {copied ? "check" : "content_copy"}
                         </span>
                         {copied ? t("checker.detail.copied") : t("checker.detail.copy")}
                       </button>
                     </div>
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                      <p className="text-sm text-green-800">{item.suggested_rewrite}</p>
+                    <div className="rounded-xl border-[1.5px] border-green-deep/40 bg-primary-fixed p-3">
+                      <p className="text-sm text-on-primary-fixed">{item.suggested_rewrite}</p>
                     </div>
                   </div>
                 )}

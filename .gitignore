@@ -74,6 +74,9 @@ nul
 temp_*.json
 .tmp-*.mjs
 scratch/
+# Catatan isu lokal (.scratch/<fitur>) dan artefak audit memang kerja lokal,
+# bukan bagian repo — `scratch/` saja tidak menutup nama berpoin.
+.scratch/
 
 # artefak review subagent (snapshot diff besar, derived)
 .superpowers/sdd/*-review-package.md

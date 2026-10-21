@@ -83,30 +83,30 @@ export function UploadZone({ file, dragActive, onFileChange, onDragStateChange, 
         onChange={handleFileChange}
       />
       <div
-        className={`flex flex-col items-center justify-center border-2 border-dashed rounded-[16px] py-12 px-6 transition-colors duration-300 ${
+        className={`flex flex-col items-center justify-center rounded-[16px] border-2 border-dashed px-6 py-12 transition-colors duration-300 ${
           loading
-            ? "border-primary bg-primary-fixed/40 animate-pulse"
+            ? "border-ink bg-lime/20 animate-pulse"
             : error
-              ? "border-red-400 bg-red-50"
+              ? "border-error bg-error-container/60"
               : dragActive
-                ? "border-primary bg-primary-fixed/40"
-                : "border-primary/30 bg-primary-fixed/20 hover:border-primary/60 hover:bg-primary-fixed/40"
+                ? "border-ink bg-lime/25"
+                : "border-ink/30 bg-desk/60 hover:border-ink hover:bg-lime/10"
         }`}
       >
-        <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 transition-transform ${loading ? "bg-primary/20 animate-bounce" : "bg-primary/10 group-hover:scale-110 group-active:scale-95"}`}>
+        <div className={`mb-4 flex h-16 w-16 items-center justify-center rounded-full border-2 transition-transform ${loading ? "border-ink/20 bg-lime/50 animate-bounce" : "border-ink/15 bg-paper group-hover:scale-110 group-active:scale-95"}`}>
           {loading ? (
-            <svg className="animate-spin h-8 w-8 text-primary" viewBox="0 0 24 24">
+            <svg className="h-8 w-8 animate-spin text-green-deep" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
           ) : (
-            <span className="material-symbols-outlined text-primary text-4xl select-none">{file && !error ? "description" : "cloud_upload"}</span>
+            <span className="material-symbols-outlined select-none text-4xl text-green-deep">{file && !error ? "description" : "cloud_upload"}</span>
           )}
         </div>
-        <p className="text-sm font-semibold text-on-background text-center mb-1">
+        <p className="mb-1 max-w-full truncate text-center text-sm font-bold text-ink">
           {loading ? t("upload.processing") : file && !error ? file.name : label}
         </p>
-        <p className={`text-xs ${error ? "text-red-500" : "text-on-surface-variant"}`}>{error || hint}</p>
+        <p className={`text-center text-xs ${error ? "font-semibold text-error" : "text-ink-soft"}`}>{error || hint}</p>
       </div>
     </div>
   );

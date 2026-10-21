@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { sectionScoreColor, severityMeta, toIssueItems, type IssueItem } from "./types";
+import { scoreColor, sectionScoreColor, severityMeta, toIssueItems, type IssueItem } from "./types";
 import { useTranslation } from "@/lib/i18n";
 
 /** Section breakdown score bar with expandable issues/suggestions */
@@ -23,39 +23,40 @@ export function SectionScoreCard({ title, score, issues, suggestions, delay, sta
 
   return (
     <motion.div
-      className="bg-surface-container-lowest rounded-xl border border-surface-container-high shadow-hard-sm overflow-hidden"
+      className="overflow-hidden rounded-[18px] border-[2.5px] border-ink bg-paper shadow-hard-sm"
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay }}
     >
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors text-left"
+        className="flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-surface-container-low"
       >
-        <div className="flex-1 mr-4">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-sm font-semibold text-on-surface">{title}</span>
-            <span className="flex items-center gap-2 shrink-0 ml-2">
+        <div className="mr-4 flex-1">
+          <div className="mb-1.5 flex items-center justify-between">
+            <span className="text-sm font-bold text-ink">{title}</span>
+            <span className="ml-2 flex shrink-0 items-center gap-2">
               {statChip && (
                 <span
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold border"
+                  className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold ${
+                    statChip.tone === "green"
+                      ? "border-green-deep/40 bg-primary-fixed text-on-primary-fixed"
+                      : statChip.tone === "red"
+                        ? "border-error/50 bg-error-container text-on-error-container"
+                        : "border-tertiary/50 bg-tertiary-container text-on-tertiary-container"
+                  }`}
                   title={statChip.hint}
-                  style={{
-                    color: statChip.tone === "green" ? "#15803d" : statChip.tone === "red" ? "#b91c1c" : "#b45309",
-                    background: statChip.tone === "green" ? "#f0fdf4" : statChip.tone === "red" ? "#fef2f2" : "#fffbeb",
-                    borderColor: statChip.tone === "green" ? "#bbf7d0" : statChip.tone === "red" ? "#fecaca" : "#fde68a",
-                  }}
                 >
                   <span className="material-symbols-outlined text-[12px] select-none" style={{ fontVariationSettings: "'FILL' 1" }}>bar_chart</span>
                   {statChip.value}
                 </span>
               )}
-              <span className="text-sm font-bold" style={{ color: score >= 60 ? "#16a34a" : score >= 40 ? "#ca8a04" : "#dc2626" }}>
+              <span className="font-display text-base font-bold" style={{ color: scoreColor(score) }}>
                 {score}%
               </span>
             </span>
           </div>
-          <div className="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-ink/10">
             <motion.div
               className={`h-full rounded-full ${barColor}`}
               initial={{ width: "0%" }}
@@ -64,7 +65,7 @@ export function SectionScoreCard({ title, score, issues, suggestions, delay, sta
             />
           </div>
         </div>
-        <span className="material-symbols-outlined text-on-surface-variant select-none transition-transform duration-200"
+        <span className="material-symbols-outlined select-none text-ink-soft transition-transform duration-200"
           style={{ transform: expanded ? "rotate(180deg)" : "rotate(0deg)" }}
         >
           expand_more
@@ -80,16 +81,16 @@ export function SectionScoreCard({ title, score, issues, suggestions, delay, sta
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="px-4 pb-4 space-y-2 border-t border-surface-container-high pt-3">
+            <div className="space-y-2 border-t-[1.5px] border-hairline px-4 pb-4 pt-3">
               {issueItems.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-red-600 uppercase tracking-wider mb-1">{t("checker.detail.issues")}</p>
+                  <p className="mb-1 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-error">{t("checker.detail.issues")}</p>
                   <ul className="space-y-1">
                     {issueItems.map((iss, i) => {
                       const sev = severityMeta(iss.severity, t);
                       return (
-                        <li key={i} className="text-xs text-on-surface-variant flex items-start gap-1.5">
-                          <span className="text-red-400 mt-0.5 select-none">•</span>
+                        <li key={i} className="flex items-start gap-1.5 text-xs text-ink-soft">
+                          <span className="mt-0.5 select-none text-error/70">•</span>
                           <span className="min-w-0 flex-1">
                             <span className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
                               <span>{iss.text}</span>
@@ -101,7 +102,7 @@ export function SectionScoreCard({ title, score, issues, suggestions, delay, sta
                               )}
                             </span>
                             {iss.source_excerpt && (
-                              <span className="block mt-1 text-[11px] italic text-on-surface-variant bg-surface-container-low rounded-md px-2 py-1 border-l-2 border-red-300">
+                              <span className="mt-1 block rounded-md border-l-2 border-error/40 bg-surface-container-low px-2 py-1 text-[11px] italic text-ink-soft">
                                 &ldquo;{iss.source_excerpt}&rdquo;
                               </span>
                             )}
@@ -114,11 +115,11 @@ export function SectionScoreCard({ title, score, issues, suggestions, delay, sta
               )}
               {suggestions && suggestions.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">{t("checker.detail.suggestions")}</p>
+                  <p className="mb-1 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-green-deep">{t("checker.detail.suggestions")}</p>
                   <ul className="space-y-1">
                     {suggestions.map((sug, i) => (
-                      <li key={i} className="text-xs text-on-surface-variant flex items-start gap-1.5">
-                        <span className="text-primary mt-0.5 select-none">→</span>
+                      <li key={i} className="flex items-start gap-1.5 text-xs text-ink-soft">
+                        <span className="mt-0.5 select-none text-green-deep">→</span>
                         {sug}
                       </li>
                     ))}
@@ -126,7 +127,7 @@ export function SectionScoreCard({ title, score, issues, suggestions, delay, sta
                 </div>
               )}
               {issueItems.length === 0 && (!suggestions || suggestions.length === 0) && (
-                <p className="text-xs text-on-surface-variant italic">{t("checker.detail.no-notes")}</p>
+                <p className="text-xs italic text-ink-soft">{t("checker.detail.no-notes")}</p>
               )}
             </div>
           </motion.div>
