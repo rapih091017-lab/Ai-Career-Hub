@@ -23,6 +23,7 @@ import { useTranslation } from "@/lib/i18n";
 import LogoutConfirmModal from "@/components/ui/LogoutConfirmModal";
 import { AdminMenuItem } from "@/components/AdminMenuItem";
 import NavGroupMenu from "@/components/nav/NavGroupMenu";
+import ThemeToggle from "@/components/ThemeToggle";
 import { ACCOUNT_MENU, LANDING_LINKS, NAV_GROUPS, isNavActive, type NavItem } from "@/lib/nav-items";
 
 interface Props {
@@ -112,6 +113,7 @@ export default function SiteHeader({ variant = "bar" }: Props) {
           </nav>
 
           <div className="flex items-center gap-3">
+            <ThemeToggle variant="icon" />
             <button
               onClick={toggleLang}
               title={t("header.lang-toggle")}

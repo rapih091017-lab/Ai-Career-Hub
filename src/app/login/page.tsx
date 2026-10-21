@@ -6,6 +6,7 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { describeAuthError } from "@/lib/auth-errors";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const Ripple = dynamic(
   () => import("@/components/blocks/modern-animated-sign-in").then((m) => m.Ripple),
@@ -62,13 +63,22 @@ export default function LoginPage() {
   return (
     <>
       {/* Navbar, logo klik = kembali ke beranda */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-paper border-b border-hairline px-margin-mobile md:px-gutter py-4 flex justify-center md:justify-start">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-paper border-b border-hairline px-margin-mobile md:px-gutter py-4 flex justify-between items-center">
         <Link href="/" className="flex items-center gap-2 group">
           <div className="w-8 h-8 rounded-[7px] border-2 border-ink bg-brand-dark flex items-center justify-center text-lime group-hover:bg-brand-green transition-all">
             <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
           </div>
           <span className="font-display text-[18px] font-bold text-ink tracking-[-0.02em]">AI Career Hub</span>
         </Link>
+        <div className="flex items-center gap-3">
+          <ThemeToggle variant="icon" />
+          <Link
+            href="/"
+            className="text-xs font-bold text-on-surface-variant hover:text-green-deep transition-colors"
+          >
+            Kembali ke Beranda
+          </Link>
+        </div>
       </nav>
 
       {/* Main */}

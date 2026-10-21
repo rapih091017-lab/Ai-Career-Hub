@@ -25,7 +25,7 @@ function apply(choice: Choice) {
  * berubah saat OS berganti; `terang`/`gelap` memaksa satu tema dan disimpan
  * di localStorage supaya bertahan setelah reload.
  */
-export default function ThemeToggle() {
+export default function ThemeToggle({ variant = "group" }: { variant?: "group" | "icon" }) {
   const { t } = useTranslation();
   const [choice, setChoice] = useState<Choice>("system");
 
@@ -38,15 +38,47 @@ export default function ThemeToggle() {
     const onChange = () => {
       if ((localStorage.getItem("theme") ?? "system") === "system") apply("system");
     };
+    // Saklar lain (header/footer) memberi tahu instance ini supaya ikon dan
+    // label tidak berbeda dari tema yang sedang tampil.
+    const onChoice = (event: Event) => {
+      const detail = (event as CustomEvent<Choice>).detail;
+      if (detail === "light" || detail === "dark" || detail === "system") setChoice(detail);
+    };
     media.addEventListener("change", onChange);
-    return () => media.removeEventListener("change", onChange);
+    window.addEventListener("themechange", onChoice);
+    return () => {
+      media.removeEventListener("change", onChange);
+      window.removeEventListener("themechange", onChoice);
+    };
   }, []);
 
   const pick = (next: Choice) => {
     setChoice(next);
     localStorage.setItem("theme", next);
     apply(next);
+    window.dispatchEvent(new CustomEvent("themechange", { detail: next }));
   };
+
+  const current = OPTIONS.find((option) => option.value === choice) ?? OPTIONS[2];
+  const currentLabel = t(current.labelKey, current.fallback);
+
+  if (variant === "icon") {
+    // Tombol tunggal untuk header: klik bergiliran terang → gelap → sistem.
+    const nextOption = OPTIONS[(OPTIONS.indexOf(current) + 1) % OPTIONS.length];
+    return (
+      <button
+        type="button"
+        onClick={() => pick(nextOption.value)}
+        title={`${t("footer.theme-label", "Mode tampilan")}: ${currentLabel}`}
+        aria-label={`${t("footer.theme-label", "Mode tampilan")}: ${currentLabel}`}
+        className="flex h-8 w-8 items-center justify-center rounded-lg text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      >
+        <span aria-hidden="true" className="material-symbols-outlined text-[18px]">
+          {current.icon}
+        </span>
+      </button>
+    );
+  }
 
   return (
     <div
@@ -64,7 +96,7 @@ export default function ThemeToggle() {
             aria-pressed={active}
             title={t(option.labelKey, option.fallback)}
             className={[
-              "inline-flex min-h-[32px] items-center gap-1.5 overflow-hidden rounded-full px-2.5 text-[12px] font-bold transition-colors",
+              "inline-flex min-h-[32px] items-center gap-1.5 overflow-hidden rounded-full px-2.5 text-[12px] font-bold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime",
               active
                 ? "bg-lime text-on-light"
                 : "text-on-dark/70 hover:text-on-dark",
