@@ -81,7 +81,7 @@ export function ImprovementChecklist({ actionPlan, missingSections, keywordAnaly
 
   return (
     <motion.section
-      className="bg-surface-container-lowest rounded-2xl border border-surface-container-high shadow-premium-md p-6 space-y-5"
+      className="bg-surface-container-lowest rounded-2xl border border-surface-container-high shadow-hard p-6 space-y-5"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.42 }}

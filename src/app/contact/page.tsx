@@ -15,14 +15,14 @@ export default async function ContactPage() {
   const settings = await getSiteSettings();
   return (
     <main className="min-h-screen bg-background">
-      <div className="bg-evergreen text-paper">
+      <div className="bg-evergreen text-on-dark">
         <div className="max-w-3xl mx-auto px-6 py-20">
-          <Link href="/" className="inline-flex min-h-[44px] items-center gap-2 text-paper/70 hover:text-lime transition-colors mb-6 text-sm">
+          <Link href="/" className="inline-flex min-h-[44px] items-center gap-2 text-on-dark/70 hover:text-lime transition-colors mb-6 text-sm">
             <span className="material-symbols-outlined text-lg">arrow_back</span>
             Kembali ke Beranda
           </Link>
           <h1 className="font-display text-3xl md:text-4xl font-bold mb-3">Hubungi Kami</h1>
-          <p className="text-paper/70 text-lg">Tim kami siap membantu Anda</p>
+          <p className="text-on-dark/70 text-lg">Tim kami siap membantu Anda</p>
         </div>
       </div>
 
@@ -35,7 +35,7 @@ export default async function ContactPage() {
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-[7px] border-2 border-ink bg-lime flex items-center justify-center shrink-0">
-                    <span className="material-symbols-outlined text-ink">mail</span>
+                    <span className="material-symbols-outlined text-on-light">mail</span>
                   </div>
                   <div>
                     <p className="font-label-bold text-ink">Email</p>
@@ -45,7 +45,7 @@ export default async function ContactPage() {
                 {settings.contact_whatsapp ? (
                   <div className="flex items-start gap-4">
                     <div className="w-10 h-10 rounded-[7px] border-2 border-ink bg-lime flex items-center justify-center shrink-0">
-                      <span className="material-symbols-outlined text-ink">chat</span>
+                      <span className="material-symbols-outlined text-on-light">chat</span>
                     </div>
                     <div>
                       <p className="font-label-bold text-ink">WhatsApp</p>
@@ -62,7 +62,7 @@ export default async function ContactPage() {
                 ) : null}
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-[7px] border-2 border-ink bg-lime flex items-center justify-center shrink-0">
-                    <span className="material-symbols-outlined text-ink">alternate_email</span>
+                    <span className="material-symbols-outlined text-on-light">alternate_email</span>
                   </div>
                   <div>
                     <p className="font-label-bold text-ink">Media Sosial</p>
@@ -71,7 +71,7 @@ export default async function ContactPage() {
                 </div>
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-[7px] border-2 border-ink bg-lime flex items-center justify-center shrink-0">
-                    <span className="material-symbols-outlined text-ink">help</span>
+                    <span className="material-symbols-outlined text-on-light">help</span>
                   </div>
                   <div>
                     <p className="font-label-bold text-ink">Bantuan</p>
@@ -97,7 +97,7 @@ export default async function ContactPage() {
             </div>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link href="/privacy" className="text-sm font-bold text-green-deep underline decoration-lime decoration-[3px] underline-offset-4">Kebijakan Privasi</Link>
-              <span className="text-hairline">|</span>
+              <span className="text-ink-soft" aria-hidden="true">|</span>
               <Link href="/terms" className="text-sm font-bold text-green-deep underline decoration-lime decoration-[3px] underline-offset-4">Syarat & Ketentuan</Link>
             </div>
           </div>

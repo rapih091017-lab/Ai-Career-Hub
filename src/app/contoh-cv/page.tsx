@@ -79,7 +79,7 @@ export default function ContohCvPage() {
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
               <Link
                 href="/builder/new"
-                className="inline-flex min-h-[54px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-6 py-3 font-bold text-ink shadow-[0_4px_0_rgb(var(--c-ink))] transition-all hover:-translate-y-0.5 active:scale-[0.97]"
+                className="inline-flex min-h-[54px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-6 py-3 font-bold text-on-light shadow-[0_4px_0_rgb(var(--c-ink))] transition-all hover:-translate-y-0.5 active:scale-[0.97]"
               >
                 <span className="material-symbols-outlined text-lg">edit_note</span>
                 Buat CV Sekarang

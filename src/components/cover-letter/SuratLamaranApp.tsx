@@ -642,7 +642,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                 >
                   <span
                     className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
-                      activeStep === i ? "bg-primary text-white" : "bg-surface-container-high text-on-surface-variant"
+                      activeStep === i ? "bg-primary text-on-primary" : "bg-surface-container-high text-on-surface-variant"
                     }`}
                   >
                     {i + 1}
@@ -795,7 +795,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                           <MagneticButton className="w-full">
                             <button
                               onClick={() => setActiveStep(1)}
-                              className="w-full bg-primary text-white font-bold py-3.5 rounded-xl hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-premium-md"
+                              className="w-full bg-primary text-on-primary font-bold py-3.5 rounded-xl hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-premium-md"
                             >
                               Lanjut ke Data Surat
                               <span className="material-symbols-outlined text-lg">arrow_forward</span>
@@ -1293,7 +1293,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                               <button
                                 onClick={handleGenerate}
                                 disabled={generating || generateDisabled}
-                                className="w-full bg-primary text-white font-bold py-3.5 rounded-xl hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-60 flex items-center justify-center gap-2 shadow-premium-md"
+                                className="w-full bg-primary text-on-primary font-bold py-3.5 rounded-xl hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-60 flex items-center justify-center gap-2 shadow-premium-md"
                               >
                                 {generating ? (
                                   <>
@@ -1339,7 +1339,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                               <MagneticButton>
                                 <button
                                   onClick={() => setActiveStep(1)}
-                                  className="bg-primary text-white font-bold px-6 py-3 rounded-xl hover:opacity-90 active:scale-[0.98] transition-all inline-flex items-center gap-2"
+                                  className="bg-primary text-on-primary font-bold px-6 py-3 rounded-xl hover:opacity-90 active:scale-[0.98] transition-all inline-flex items-center gap-2"
                                 >
                                   <span className="material-symbols-outlined text-lg">arrow_back</span>
                                   Ke Data Surat

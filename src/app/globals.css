@@ -83,6 +83,15 @@
   --c-hairline: 201 211 205;
   --c-rule: 213 222 216;
 
+  /* Warna pasangan tetap: permukaan brand tidak ikut berbalik di mode
+     gelap, jadi teks di atasnya juga tidak boleh ikut berbalik. */
+  --c-on-dark: 243 246 242;
+  --c-on-light: 10 15 13;
+  --c-cream: 255 251 234; /* kertas krem pintu harga */
+  --c-footer: 6 35 25; /* dasar footer, lebih dalam dari evergreen */
+  --c-brand-dark: 18 41 34;
+  --c-brand-green: 29 107 72;
+
   /* Motif */
   --shadow-hard-color: #dde7de;
   --hairline-color: #c9d3cd;

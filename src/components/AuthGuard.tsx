@@ -46,7 +46,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
 
   if (status === "loading" || (!ready && status !== "unauthenticated")) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#fbf8fe]">
+      <div className="flex items-center justify-center min-h-screen bg-desk">
         <div className="flex flex-col items-center gap-3">
           <svg
             className="animate-spin h-8 w-8 text-[#6c45b2]"
@@ -63,7 +63,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
             />
           </svg>
-          <p className="text-sm text-[#4a4452]">Memuat...</p>
+          <p className="text-sm text-ink-soft">Memuat...</p>
         </div>
       </div>
     );

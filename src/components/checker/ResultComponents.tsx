@@ -87,7 +87,7 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
 
   return (
     <motion.div
-      className="bg-surface-container-lowest rounded-xl border border-surface-container-high shadow-premium-sm overflow-hidden"
+      className="bg-surface-container-lowest rounded-xl border border-surface-container-high shadow-hard-sm overflow-hidden"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, delay: index * 0.05 }}
@@ -139,7 +139,7 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
                     {t("checker.detail.cari-strength-title")}
                   </p>
                   <CariMeter score={cari} />
-                  <p className="text-[10px] text-on-surface-variant/70 mt-1.5 leading-relaxed">
+                  <p className="text-[10px] text-on-surface-variant mt-1.5 leading-relaxed">
                     {t("checker.detail.cari-desc")}
                   </p>
                 </div>
@@ -165,7 +165,7 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
                               )}
                             </span>
                             {iss.source_excerpt && (
-                              <span className="block mt-1 text-[11px] italic text-on-surface-variant/70 bg-surface-container-lowest rounded-md px-2 py-1 border-l-2 border-red-300">
+                              <span className="block mt-1 text-[11px] italic text-on-surface-variant bg-surface-container-lowest rounded-md px-2 py-1 border-l-2 border-red-300">
                                 &ldquo;{iss.source_excerpt}&rdquo;
                               </span>
                             )}

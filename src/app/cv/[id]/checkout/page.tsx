@@ -117,7 +117,7 @@ export default function CheckoutPage() {
               <div className="animate-pulse text-sm text-outline mb-4">Mengarahkan ke halaman builder...</div>
               <button
                 onClick={() => router.push(`/builder/${cvId}`)}
-                className="inline-flex min-h-[44px] items-center gap-2 px-6 py-3 border-[2.5px] border-ink bg-lime text-ink font-bold rounded-full shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-[0.98] transition-all"
+                className="inline-flex min-h-[44px] items-center gap-2 px-6 py-3 border-[2.5px] border-ink bg-lime text-on-light font-bold rounded-full shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-[0.98] transition-all"
               >
                 <span className="material-symbols-outlined text-lg">edit_document</span>
                 Lanjutkan ke Builder
@@ -137,7 +137,7 @@ export default function CheckoutPage() {
         <main className="pt-24 pb-20 px-margin-mobile md:px-gutter flex justify-center">
           <div className="w-full max-w-lg flex flex-col gap-6">
             {/* Header */}
-            <section className="bg-surface-container-lowest rounded-2xl p-6 shadow-premium-sm border border-outline-variant/50">
+            <section className="bg-surface-container-lowest rounded-2xl p-6 shadow-hard-sm border border-outline-variant/50">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-xl bg-secondary-container/50 flex items-center justify-center text-secondary shrink-0">
                   <span className="material-symbols-outlined text-2xl">shopping_cart_checkout</span>
@@ -157,7 +157,7 @@ export default function CheckoutPage() {
                 <div className="animate-spin h-8 w-8 border-4 border-primary/30 border-t-primary rounded-full" />
               </div>
             ) : error && !cvData ? (
-              <div className="bg-surface-container-lowest rounded-2xl p-8 text-center shadow-premium-sm border border-outline-variant/50">
+              <div className="bg-surface-container-lowest rounded-2xl p-8 text-center shadow-hard-sm border border-outline-variant/50">
                 <span className="material-symbols-outlined text-3xl text-error mb-2">error</span>
                 <p className="font-label-bold text-error">{error}</p>
                 <button onClick={() => router.push("/dashboard")} className="mt-4 text-primary font-label-bold underline">
@@ -167,7 +167,7 @@ export default function CheckoutPage() {
             ) : cvData ? (
               <>
                 {/* CV Details Card */}
-                <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-premium-sm border border-outline-variant/50 space-y-4">
+                <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-hard-sm border border-outline-variant/50 space-y-4">
                   <h3 className="font-label-bold text-on-surface flex items-center gap-2">
                     <span className="material-symbols-outlined text-secondary">description</span>
                     Detail CV
@@ -193,7 +193,7 @@ export default function CheckoutPage() {
                 </div>
 
                 {/* Package Details */}
-                <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-premium-sm border-2 border-secondary/20 space-y-4">
+                <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-hard-sm border-2 border-secondary/20 space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-label-bold text-lg text-on-surface">Single CV AI Revision</h3>
@@ -230,7 +230,7 @@ export default function CheckoutPage() {
                     <span className="material-symbols-outlined text-error shrink-0">error</span>
                     <div>
                       <p className="font-label-bold text-sm text-error">Pembayaran Gagal</p>
-                      <p className="text-xs text-error/80 mt-0.5">Silakan coba lagi. Jika masalah berlanjut, hubungi support.</p>
+                      <p className="text-xs text-error mt-0.5">Silakan coba lagi. Jika masalah berlanjut, hubungi support.</p>
                     </div>
                   </div>
                 )}
@@ -253,7 +253,7 @@ export default function CheckoutPage() {
                   <button
                     onClick={handleCheckout}
                     disabled={isProcessing}
-                    className="flex-1 py-3 rounded-xl bg-secondary text-on-secondary text-sm font-bold hover:brightness-110 transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="flex-1 py-3 rounded-xl bg-secondary text-on-secondary text-sm font-bold hover:-translate-y-0.5 transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {isProcessing ? (
                       <>

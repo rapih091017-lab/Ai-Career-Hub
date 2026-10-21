@@ -32,7 +32,7 @@ export function ImpactForecastCard({ forecast }: { forecast: ImpactForecast }) {
 
   return (
     <motion.section
-      className="bg-surface rounded-2xl border border-surface-container-high shadow-premium-md p-6"
+      className="bg-surface rounded-2xl border border-surface-container-high shadow-hard p-6"
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: 0.12 }}

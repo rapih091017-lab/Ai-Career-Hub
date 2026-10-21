@@ -120,7 +120,7 @@ export function JobCardContent({
             {...dragHandle.attributes}
             onKeyDown={dragHandle.onKeyDown}
             aria-label={t("tracker.card.drag")}
-            className="flex h-8 w-8 shrink-0 cursor-grab items-center justify-center rounded-lg text-on-surface-variant/70 hover:bg-surface-container hover:text-on-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 active:cursor-grabbing"
+            className="flex h-8 w-8 shrink-0 cursor-grab items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 active:cursor-grabbing"
           >
             <span className="material-symbols-outlined text-[18px]" aria-hidden>
               drag_indicator
@@ -134,7 +134,7 @@ export function JobCardContent({
             onClick={() => setMenuOpen((open) => !open)}
             aria-label={t("tracker.card.menu")}
             aria-expanded={menuOpen}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-on-surface-variant/70 hover:bg-surface-container hover:text-on-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
           >
             <span className="material-symbols-outlined text-[18px]" aria-hidden>
               more_vert
@@ -173,7 +173,7 @@ export function JobCardContent({
 
               {moveTargets.length > 0 ? (
                 <>
-                  <p className="px-3 pb-1 pt-2 text-label-sm font-semibold uppercase tracking-wide text-on-surface-variant/70">
+                  <p className="px-3 pb-1 pt-2 text-label-sm font-semibold uppercase tracking-wide text-on-surface-variant">
                     {t("tracker.card.move-to")}
                   </p>
                   <div className="max-h-40 overflow-y-auto">

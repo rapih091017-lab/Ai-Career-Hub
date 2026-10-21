@@ -258,7 +258,7 @@ export function fitLabelMeta(label?: string, tFn?: (key: string) => string) {
     case "Good": return { color: "#eab308", bg: "bg-yellow-100", text: "text-yellow-800", icon: "thumb_up", desc: t2("checker.fit-good") };
     case "Fair": return { color: "#f97316", bg: "bg-orange-100", text: "text-orange-800", icon: "trending_up", desc: t2("checker.fit-fair") };
     case "Poor": return { color: "#ef4444", bg: "bg-red-100", text: "text-red-800", icon: "warning", desc: t2("checker.fit-poor") };
-    default: return { color: "#0d7377", bg: "bg-primary/10", text: "text-primary", icon: "info", desc: "" };
+    default: return { color: "#1d6b48", bg: "bg-primary/10", text: "text-primary", icon: "info", desc: "" };
   }
 }
 

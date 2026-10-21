@@ -22,7 +22,7 @@ export default function NavDropdown({ label, items }: { label: string; items: Na
       {label}<span aria-hidden className="material-symbols-outlined text-[18px]">{open ? "expand_less" : "expand_more"}</span>
     </button>
     <AnimatePresence>
-      {open ? <motion.div initial={reduce ? false : { opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: reduce ? 0 : 0.14 }} className="absolute left-1/2 top-full z-50 mt-2 w-[min(360px,calc(100vw-32px))] -translate-x-1/2 rounded-xl border border-outline-variant/70 bg-surface-container-lowest p-2 shadow-premium-lg" role="menu" aria-label={label}>
+      {open ? <motion.div initial={reduce ? false : { opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: reduce ? 0 : 0.14 }} className="absolute left-1/2 top-full z-50 mt-2 w-[min(360px,calc(100vw-32px))] -translate-x-1/2 rounded-xl border border-outline-variant/70 bg-surface-container-lowest p-2 shadow-hard-lg" role="menu" aria-label={label}>
         {items.map((item) => <Link key={item.href} role="menuitem" href={item.href} onClick={() => setOpen(false)} className="group flex min-h-14 items-start gap-3 rounded-lg p-3 hover:bg-primary/5 focus-visible:outline-2 focus-visible:outline-primary">
           <span aria-hidden className="material-symbols-outlined mt-0.5 text-[20px] text-primary">{item.icon}</span><span className="min-w-0"><span className="block text-label-bold text-on-surface group-hover:text-primary">{item.title}</span><span className="mt-0.5 block text-label-sm text-on-surface-variant">{item.description}</span></span>
         </Link>)}

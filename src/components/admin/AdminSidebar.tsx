@@ -65,7 +65,7 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
       <nav aria-label="Navigasi panel admin" className="flex flex-col gap-5">
         {ADMIN_NAV.map((group) => (
           <div key={group.title}>
-            <p className="px-3 pb-2 text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant/70">
+            <p className="px-3 pb-2 text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
               {group.title}
             </p>
             <ul className="space-y-1">

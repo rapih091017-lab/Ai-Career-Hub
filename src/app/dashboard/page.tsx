@@ -354,7 +354,7 @@ export default function DashboardPage() {
                 href={nextAction.href}
                 className="flex items-center gap-4 rounded-[14px] border-2 border-ink/60 bg-lime/15 p-4 transition-colors hover:border-ink"
               >
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[7px] border-2 border-ink bg-lime text-ink">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[7px] border-2 border-ink bg-lime text-on-light">
                   <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden>
                     {nextAction.icon}
                   </span>
@@ -517,7 +517,7 @@ export default function DashboardPage() {
                   <MagneticButton>
                     <Link
                       href="/surat-lamaran"
-                      className="inline-flex min-h-[44px] items-center gap-2 px-5 py-2.5 border-[2.5px] border-ink bg-lime text-ink font-bold rounded-full shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-[0.98] transition-all"
+                      className="inline-flex min-h-[44px] items-center gap-2 px-5 py-2.5 border-[2.5px] border-ink bg-lime text-on-light font-bold rounded-full shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-[0.98] transition-all"
                     >
                       <span className="material-symbols-outlined text-base">add</span>
                       {t("dashboard.letter-new")}
@@ -604,7 +604,7 @@ export default function DashboardPage() {
                   <MagneticButton>
                     <button
                       onClick={() => setShowTemplatePicker(true)}
-                      className="inline-flex min-h-[44px] items-center gap-2 px-6 py-3 border-[2.5px] border-ink bg-lime text-ink font-bold rounded-full shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 transition-all"
+                      className="inline-flex min-h-[44px] items-center gap-2 px-6 py-3 border-[2.5px] border-ink bg-lime text-on-light font-bold rounded-full shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 transition-all"
                     >
                       <span className="material-symbols-outlined text-lg">add</span>
                       {t("dashboard.first-cv")}

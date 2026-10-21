@@ -144,7 +144,7 @@ export default function HrPointOfView({
     // kurang jadi.
     <section
       aria-labelledby={titleId}
-      className="rounded-2xl border border-surface-container-high bg-surface p-6 shadow-premium-md"
+      className="rounded-2xl border border-surface-container-high bg-surface p-6 shadow-hard"
     >
       {/* Headline-md, bukan token yang lebih kecil: preflight membuat heading
           mewarisi ukuran body, jadi kelas yang tidak ada di config membuat

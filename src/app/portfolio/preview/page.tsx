@@ -191,7 +191,7 @@ export default function PortfolioPreviewPage() {
             <span className="material-symbols-outlined text-6xl text-outline">description</span>
             <h1 className="font-headline-md text-on-surface">{t("preview.no-draft-title")}</h1>
             <p className="text-body-md text-on-surface-variant max-w-md">{t("preview.no-draft-desc")}</p>
-            <Link href="/portfolio/build" className="bg-primary text-on-primary font-label-bold rounded-xl px-8 py-3 hover:brightness-110 transition-all shadow-md">
+            <Link href="/portfolio/build" className="bg-primary text-on-primary font-label-bold rounded-xl px-8 py-3 hover:-translate-y-0.5 transition-all shadow-md">
               {t("preview.open-builder")}
             </Link>
           </main>

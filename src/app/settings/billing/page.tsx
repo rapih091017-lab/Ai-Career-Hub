@@ -245,7 +245,7 @@ export default function SettingsBillingPage() {
       {/* Section: Langganan & Penagihan */}
       <section className="bg-paper rounded-[14px] shadow-hard-sm border-2 border-ink/15 overflow-hidden">
         <div className="px-6 py-5 border-b border-outline-variant/50 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-[7px] border-2 border-ink bg-lime flex items-center justify-center text-ink">
+          <div className="w-10 h-10 rounded-[7px] border-2 border-ink bg-lime flex items-center justify-center text-on-light">
             <span className="material-symbols-outlined">credit_card</span>
           </div>
           <div>
@@ -273,7 +273,7 @@ export default function SettingsBillingPage() {
                   <span
                     className={`px-4 py-1.5 rounded-full text-label-sm font-bold ${
                       data?.premium.isPremium
-                        ? "border-[2.5px] border-ink bg-lime text-ink"
+                        ? "border-[2.5px] border-ink bg-lime text-on-light"
                         : "bg-surface-container-high text-ink-soft"
                     }`}
                   >
@@ -524,7 +524,7 @@ onClick={() => {
             <button
               type="button"
               onClick={() => setTopupDone(null)}
-              className="mt-4 w-full py-3 rounded-full border-[2.5px] border-ink bg-lime text-ink font-bold shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5"
+              className="mt-4 w-full py-3 rounded-full border-[2.5px] border-ink bg-lime text-on-light font-bold shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5"
             >
               {t("billing.continue")}
             </button>

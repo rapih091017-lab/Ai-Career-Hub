@@ -60,7 +60,7 @@ export default function ArticleContent({ content }: { content: string }) {
           return (
             <blockquote
               key={key}
-              className={`border-l-4 border-primary/40 bg-surface-container-low px-5 py-4 text-on-surface-variant ${alignClass}`}
+              className={`rounded-[10px] border-[2.5px] border-green-deep/30 bg-lime/10 px-5 py-4 text-on-surface-variant ${alignClass}`}
             >
               {block.text ? inline(block.text, key) : null}
             </blockquote>

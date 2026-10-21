@@ -135,7 +135,7 @@ export default function SiteHeader({ variant = "bar" }: Props) {
                   <span
                     className={`flex h-8 w-8 items-center justify-center rounded-full border border-primary/20 ${
                       session?.user?.name
-                        ? "bg-primary text-white"
+                        ? "bg-primary text-on-primary"
                         : "bg-surface-container text-on-surface-variant"
                     }`}
                   >
@@ -208,7 +208,7 @@ export default function SiteHeader({ variant = "bar" }: Props) {
             ) : (
               <Link
                 href="/#pricing"
-                className="rounded-full bg-evergreen px-4 py-2 font-label-bold text-paper transition-colors hover:bg-green-deep active:scale-95"
+                className="hidden items-center rounded-full border-2 border-brand-dark bg-brand-dark px-4 py-2 font-label-bold text-on-dark transition-colors hover:bg-brand-green active:scale-95 sm:inline-flex"
               >
                 {t("nav.try-free")}
               </Link>
@@ -289,13 +289,24 @@ export default function SiteHeader({ variant = "bar" }: Props) {
                   </div>
                 )}
                 {!isLoggedIn && (
-                  <Link
-                    href="/login"
-                    onClick={() => setMobileOpen(false)}
-                    className="block rounded-lg px-3 py-2.5 font-label-bold text-on-surface-variant"
-                  >
-                    {t("nav.login")}
-                  </Link>
+                  <>
+                    <Link
+                      href="/login"
+                      onClick={() => setMobileOpen(false)}
+                      className="block rounded-lg px-3 py-2.5 font-label-bold text-on-surface-variant"
+                    >
+                      {t("nav.login")}
+                    </Link>
+                    {/* Tombol ajakan yang sama dengan header desktop, dipindah ke
+                        sheet karena di 390px header tidak cukup lebar untuk keduanya. */}
+                    <Link
+                      href="/#pricing"
+                      onClick={() => setMobileOpen(false)}
+                      className="mt-2 mb-1 flex min-h-[48px] items-center justify-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-5 text-label-bold text-on-light shadow-[0_3px_0_rgb(var(--c-ink))]"
+                    >
+                      {t("nav.try-free")}
+                    </Link>
+                  </>
                 )}
               </div>
             </motion.div>

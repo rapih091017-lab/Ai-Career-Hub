@@ -86,7 +86,7 @@ export default function PositionDetailPage() {
             {/* ── Hero ── */}
             <section className="mb-8">
               <div className="flex items-start gap-4 mb-3">
-                <div className="w-14 h-14 rounded-2xl bg-primary-fixed flex items-center justify-center shadow-premium-sm shrink-0">
+                <div className="w-14 h-14 rounded-2xl bg-primary-fixed flex items-center justify-center shadow-hard-sm shrink-0">
                   <span className="material-symbols-outlined text-primary text-2xl">{position.icon}</span>
                 </div>
                 <div className="flex-1 min-w-0">
@@ -130,7 +130,7 @@ export default function PositionDetailPage() {
             <section className="mb-6">
               <motion.button
                 onClick={() => router.push(`/interview/practice?position=${position.id}`)}
-                className="w-full flex items-center justify-between gap-3 px-5 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-premium-md hover:shadow-premium-lg hover:-translate-y-0.5 active:scale-[0.98] transition-all group relative overflow-hidden"
+                className="w-full flex items-center justify-between gap-3 px-5 py-3.5 rounded-xl bg-green-deep text-white shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:scale-[0.98] transition-all group relative overflow-hidden"
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.97 }}
               >
@@ -211,7 +211,7 @@ export default function PositionDetailPage() {
 
             {/* ── Questions List ── */}
             {filteredQuestions.length === 0 ? (
-              <div className="bg-surface-container-lowest rounded-2xl py-12 border border-dashed border-outline-variant text-center shadow-premium-sm">
+              <div className="bg-surface-container-lowest rounded-2xl py-12 border border-dashed border-outline-variant text-center shadow-hard-sm">
                 <span className="material-symbols-outlined text-outline text-3xl mb-2 block">filter_none</span>
                 <p className="text-xs text-on-surface-variant">
                   {lang === "en" ? "No questions match this filter" : "Tidak ada pertanyaan dengan filter ini"}
@@ -236,7 +236,7 @@ export default function PositionDetailPage() {
               {prevPosition ? (
                 <motion.button
                   onClick={() => router.push(`/interview/${prevPosition.id}`)}
-                  className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 shadow-premium-sm hover:shadow-premium-md hover:-translate-y-0.5 transition-all text-left group focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                  className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 transition-all text-left group focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -255,7 +255,7 @@ export default function PositionDetailPage() {
               {nextPosition ? (
                 <motion.button
                   onClick={() => router.push(`/interview/${nextPosition.id}`)}
-                  className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 shadow-premium-sm hover:shadow-premium-md hover:-translate-y-0.5 transition-all text-right group focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                  className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 transition-all text-right group focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -273,7 +273,7 @@ export default function PositionDetailPage() {
             </section>
 
             {/* ── Bottom info ── */}
-            <section className="mt-8 bg-surface-container-lowest rounded-2xl p-5 border border-outline-variant/50 shadow-premium-sm">
+            <section className="mt-8 bg-surface-container-lowest rounded-2xl p-5 border border-outline-variant/50 shadow-hard-sm">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-xl bg-secondary-container/50 flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-secondary">lightbulb</span>

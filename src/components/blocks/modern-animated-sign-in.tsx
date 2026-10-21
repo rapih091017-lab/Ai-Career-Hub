@@ -517,7 +517,7 @@ const AnimatedForm = memo(function AnimatedForm({
           <button
             className="bg-gradient-to-br relative group/btn from-primary to-primary-container
             block w-full text-on-primary rounded-md h-10 font-medium shadow-md
-              outline-hidden hover:cursor-pointer hover:brightness-110 transition-all"
+              outline-hidden hover:cursor-pointer hover:-translate-y-0.5 transition-all"
             type="submit"
           >
             {submitButton} &rarr;

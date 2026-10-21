@@ -61,7 +61,7 @@ export default function CaraKerja() {
           {STEPS.map((step, index) => (
             <li key={step.title} className="card-hard flex flex-col bg-paper p-6 md:p-7">
               <div className="flex items-center gap-3">
-                <span className="rounded-full bg-ink px-3 py-1 font-mono text-[11.5px] font-extrabold uppercase tracking-[0.06em] text-lime">
+                <span className="rounded-full bg-brand-dark px-3 py-1 font-mono text-[11.5px] font-extrabold uppercase tracking-[0.06em] text-lime">
                   {t("lp.steps.side-title")} {index + 1}
                 </span>
                 <span aria-hidden="true" className="h-px flex-1 bg-hairline" />

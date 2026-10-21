@@ -131,7 +131,7 @@ export default function CheckoutHistoryPage() {
                   onClick={() => setFilter(f)}
                   className={`px-4 py-1.5 min-h-[44px] rounded-full text-xs font-bold transition-all border-2 ${
                     filter === f
-                      ? "border-ink bg-lime text-ink shadow-[2px_2px_0_rgb(var(--c-ink))]"
+                      ? "border-ink bg-lime text-on-light shadow-[2px_2px_0_rgb(var(--c-ink))]"
                       : "border-ink/25 bg-paper text-ink-soft hover:border-ink hover:text-ink"
                   }`}
                 >

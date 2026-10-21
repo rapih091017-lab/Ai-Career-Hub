@@ -4,9 +4,13 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
 import { useTranslation } from "@/lib/i18n";
-import TiltCard from "@/components/TiltCard";
 import MagneticButton from "@/components/MagneticButton";
-import { useCatalogPackages, formatRupiah, packageBenefits } from "@/lib/pricing-catalog";
+import {
+  useCatalogPackages,
+  formatRupiah,
+  packageBenefits,
+  benefitLabel,
+} from "@/lib/pricing-catalog";
 import { FREE_LIMITS } from "@/lib/package-catalog-static";
 
 /* ─── Types ─── */
@@ -20,11 +24,6 @@ export type BillingMode = "satuan" | "langganan";
 export type PlanId =
   | "cek_cv" | "bikin_cv" | "surat_lamaran" | "paket_lamaran"
   | "free" | "lite_bulanan" | "pro_bulanan" | "max_bulanan";
-
-interface Feature {
-  key: string;
-  included: boolean;
-}
 
 /**
  * Data paket untuk landing.
@@ -77,7 +76,7 @@ const SATUAN_PLAN_DATA: LandingPlan[] = [
     icon: "mail",
     ctaStyle: "outline",
   },
-{
+  {
     key: "paket_lamaran",
     nameKey: "pricing.plan.paket-lamaran.name",
     descKey: "pricing.plan.paket-lamaran.desc",
@@ -145,9 +144,6 @@ const COMPARISON_ROWS: { key: string; labelKey: string }[] = [
 
 const FAQ_KEYS = [0, 1, 2, 3, 4, 5, 6];
 
-
-
-
 /* ─── Component ─── */
 
 /** Satu sel tabel perbandingan, nilainya dari kuota paket di katalog. */
@@ -180,210 +176,340 @@ interface PricingSectionProps {
 
 export default function PricingSection({ defaultMode = "satuan", onSelectPlan }: PricingSectionProps) {
   const { t } = useTranslation();
-  const [mode, setMode] = useState<BillingMode>(defaultMode);
   const [showComparison, setShowComparison] = useState(true);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [activeSatuan, setActiveSatuan] = useState<PlanId>("bikin_cv");
 
   const { packages, loading: catalogLoading } = useCatalogPackages();
 
   /**
-   * Kartu dibangun dari katalog, bukan dari daftar yang ditulis manual.
+   * Isi pintu dibangun dari katalog, bukan dari daftar yang ditulis manual.
    * Harga, masa berlaku, dan daftar hak diambil apa adanya dari database,
    * sehingga yang tertulis di landing tidak mungkin berbeda dari yang
    * ditagih di checkout.
    */
-  const plans = useMemo(() => {
-    const raw = mode === "satuan" ? SATUAN_PLAN_DATA : LANGGANAN_PLAN_DATA;
-    return raw.map((plan) => {
-      const pkg = plan.isFree ? null : packages.find((p) => p.key === plan.key);
-      const benefits = pkg ? packageBenefits(pkg) : [];
-      return {
-        id: plan.key as PlanId,
-        nameKey: plan.nameKey,
-        descKey: plan.descKey,
-        ctaKey: plan.isFree ? "pricing.plan.free.cta" : "pricing.cta-buy",
-        unitKey: plan.unitKey,
-        icon: plan.icon,
-        ctaStyle: plan.ctaStyle,
-        featured: plan.featured,
-        badgeKey: plan.badgeKey,
-        microcopyKey: plan.microcopyKey,
-        price: plan.isFree ? 0 : (pkg?.price ?? 0),
-        periodDays: pkg?.periodDays ?? 30,
-        monthly: pkg?.monthly ?? false,
-        // benefits: teks fitur apa adanya dari kuota paket.
-        features: benefits.map((b) => ({ key: `benefit.${b.key}`, included: true, value: b.value })),
-      };
-    });
-  }, [mode, packages]);
+  const satuanPlans = useMemo(
+    () =>
+      SATUAN_PLAN_DATA.map((plan) => {
+        const pkg = packages.find((p) => p.key === plan.key);
+        return {
+          id: plan.key as PlanId,
+          nameKey: plan.nameKey,
+          descKey: plan.descKey,
+          price: pkg?.price ?? 0,
+          periodDays: pkg?.periodDays ?? 30,
+          benefits: pkg ? packageBenefits(pkg) : [],
+        };
+      }),
+    [packages],
+  );
 
-  // Harga paket lengkap dihitung dari paket satuan pembentuknya, supaya angka
-  // penghematan yang ditampilkan benar, bukan angka yang diketik tangan.
-  const bundleSeparateTotal = useMemo(() => {
-    const price = (key: string) => packages.find((p) => p.key === key)?.price ?? 0;
-    return price("bikin_cv") + price("cek_cv") + price("surat_lamaran");
-  }, [packages]);
+  const monthlyPlans = useMemo(
+    () =>
+      LANGGANAN_PLAN_DATA.map((plan) => {
+        const pkg = plan.isFree ? null : packages.find((p) => p.key === plan.key);
+        return {
+          id: plan.key as PlanId,
+          nameKey: plan.nameKey,
+          descKey: plan.descKey,
+          price: plan.isFree ? 0 : (pkg?.price ?? 0),
+          isFree: Boolean(plan.isFree),
+        };
+      }),
+    [packages],
+  );
+
+  const activePlan = satuanPlans.find((plan) => plan.id === activeSatuan) ?? satuanPlans[0];
+  const monthlyFrom = monthlyPlans.find((plan) => !plan.isFree)?.price ?? 0;
+  const monthlyOrder = defaultMode === "langganan" ? "order-first lg:order-last" : "";
 
   return (
-    <section id="pricing" className="relative overflow-hidden bg-paper py-24 md:py-32">
-      {/* Sorot radial lime di belakang judul, satu-satunya efek lembut di sini */}
-      <div className="absolute top-0 left-1/3 w-[500px] h-[500px] bg-lime/30 rounded-full blur-[120px] pointer-events-none" />
+    <section id="pricing" className="relative bg-desk py-24 md:py-32">
+      <div className="mx-auto w-full max-w-[1240px] px-5 md:px-10">
+        {/* ─── PRICE STAGE: dua pintu masuk ─── */}
+        <div className="relative isolate overflow-hidden rounded-[28px] border-[2.5px] border-ink bg-evergreen-deep p-6 text-on-dark shadow-[8px_8px_0_rgb(var(--c-ink))] sm:p-9 lg:p-12">
+          <span aria-hidden="true" className="absolute -top-[13px] left-1/2 h-6 w-[92px] -translate-x-1/2 rotate-3 bg-lime/85 shadow-[0_1px_0_rgba(0,0,0,0.18)]" />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 -z-10 [background-image:linear-gradient(rgba(214,238,48,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(214,238,48,0.07)_1px,transparent_1px)] [background-size:34px_34px] [mask-image:radial-gradient(at_70%_40%,black_18%,transparent_74%)]"
+          />
+          <div aria-hidden="true" className="pointer-events-none absolute -right-24 -top-24 -z-10 h-[55%] w-[55%] rounded-full bg-lime/25 blur-[60px]" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-margin-mobile md:px-gutter">
-        {/* ─── HEADER ─── */}
-        <motion.div className="text-center mb-12 md:mb-16"
-          initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
-          <h2 className="font-display text-[36px] md:text-display text-ink mb-4 leading-tight">
-            {t("pricing.section-title")}
-          </h2>
-          <p className="text-body-md text-ink-soft max-w-xl mx-auto text-[17px]">
-            {t("pricing.section-subtitle")}
-          </p>
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,420px)] lg:gap-x-16">
+            <div className="min-w-0 lg:col-span-2">
+              <p className="mb-3 w-fit -rotate-2 font-script text-[26px] font-bold leading-none text-lime">
+                {t("pricing.stage-kicker")}
+              </p>
+              <h2 className="max-w-[20ch] font-display text-[34px] leading-[1.04] tracking-[-0.03em] text-on-dark md:text-[52px]">
+                {t("pricing.section-title")}
+              </h2>
+              <p className="mt-4 max-w-[46ch] text-[16.5px] leading-relaxed text-[#b8cfc3]">
+                {t("pricing.value-satuan")}
+              </p>
+            </div>
+
+            {/* ─── PINTU 1: paket satuan ─── */}
+            <div className="min-w-0 lg:pt-10">
+              <div className="-rotate-1 rounded-[6px_6px_18px] border-[2.5px] border-ink bg-cream p-5 text-on-light shadow-[5px_5px_0_#0a0f0d] sm:p-6">
+                <p className="w-fit rounded-[6px] bg-brand-dark px-2.5 py-1 font-mono text-[11px] font-extrabold uppercase tracking-[0.06em] text-lime">
+                  {t("pricing.door1.step")}
+                </p>
+                <p className="mb-3.5 mt-3 text-[15px] font-extrabold tracking-[-0.01em] text-brand-green">
+                  {t("pricing.door1.title")}
+                </p>
+
+                <div className="grid grid-cols-2 gap-2">
+                  {satuanPlans.map((plan) => {
+                    const selected = plan.id === activePlan.id;
+                    return (
+                      <button
+                        key={plan.id}
+                        type="button"
+                        onClick={() => setActiveSatuan(plan.id)}
+                        aria-pressed={selected}
+                        className={`min-h-[52px] rounded-full border-2 border-ink px-2.5 py-1.5 transition-all ${
+                          selected
+                            ? "-translate-x-px -translate-y-px bg-brand-dark text-on-dark shadow-[3px_3px_0_#0a0f0d]"
+                            : "bg-cream text-on-light hover:bg-lime"
+                        }`}
+                      >
+                        <span className="block text-[13.5px] font-bold leading-tight">
+                          {t(plan.nameKey)}
+                        </span>
+                        <span
+                          className={`block font-mono text-[11px] font-bold ${
+                            selected ? "text-lime" : "text-on-light/70"
+                          }`}
+                        >
+                          {formatRupiah(plan.price)}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-4 border-t-2 border-dashed border-ink/25 pt-4">
+                  <p className="font-display text-[24px] font-bold leading-[1.08] tracking-[-0.03em] text-on-light">
+                    {t(activePlan.descKey)}
+                  </p>
+                  <ul className="mt-3 grid gap-2">
+                    {activePlan.benefits.map((benefit) => (
+                      <li
+                        key={benefit.key}
+                        className="flex items-start gap-2.5 text-sm font-bold leading-snug"
+                      >
+                        <span
+                          aria-hidden="true"
+                          className="mt-0.5 h-4 w-4 shrink-0 rounded-full border-[1.5px] border-ink bg-lime"
+                        />
+                        {benefitLabel(benefit, t)}
+                      </li>
+                    ))}
+                    {activePlan.benefits.length === 0 && !catalogLoading ? (
+                      <li className="text-sm font-bold text-on-light/70">
+                        {t("pricing.benefit-note")}
+                      </li>
+                    ) : null}
+                  </ul>
+                  <div className="mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <b className="font-display text-[38px] font-bold leading-none tracking-[-0.04em]">
+                      {formatRupiah(activePlan.price)}
+                    </b>
+                    <span className="text-[12.5px] font-extrabold text-on-light/70">
+                      {activePlan.periodDays} {t("billing.period.days")}
+                    </span>
+                  </div>
+
+                  {onSelectPlan ? (
+                    <button
+                      type="button"
+                      onClick={() => onSelectPlan(activePlan.id, "satuan")}
+                      className="mt-3 flex min-h-[54px] w-full items-center justify-center gap-2 rounded-[16px] border-[3px] border-ink bg-lime text-[16px] font-bold text-on-light shadow-[0_5px_0_#0a0f0d] transition-all hover:-translate-y-0.5 active:translate-y-1"
+                    >
+                      {t("pricing.cta-buy")}
+                      <span aria-hidden="true" className="material-symbols-outlined text-[18px]">
+                        arrow_forward
+                      </span>
+                    </button>
+                  ) : (
+                    <Link
+                      href={`/checkout?packages=${activePlan.id}`}
+                      className="mt-3 flex min-h-[54px] w-full items-center justify-center gap-2 rounded-[16px] border-[3px] border-ink bg-lime text-[16px] font-bold text-on-light shadow-[0_5px_0_#0a0f0d] transition-all hover:-translate-y-0.5 active:translate-y-1"
+                    >
+                      {t("pricing.cta-buy")}
+                      <span aria-hidden="true" className="material-symbols-outlined text-[18px]">
+                        arrow_forward
+                      </span>
+                    </Link>
+                  )}
+                </div>
+              </div>
+
+              <p className="mt-4 w-fit -rotate-2 font-script text-[23px] font-bold leading-tight text-lime">
+                {t("pricing.bridge")}
+              </p>
+              <Link
+                href="/checkout"
+                className="inline-flex min-h-[44px] w-fit items-center gap-2 text-[14.5px] font-extrabold text-on-dark underline decoration-lime decoration-[3px] underline-offset-4 hover:text-lime"
+              >
+                {t("pricing.see-all")}
+                <span aria-hidden="true" className="material-symbols-outlined text-[18px]">
+                  arrow_outward
+                </span>
+              </Link>
+            </div>
+
+            {/* ─── PINTU 2: pass bulanan ─── */}
+            <div className={`min-w-0 ${monthlyOrder}`}>
+              <div className="relative mx-auto max-w-[420px]">
+                <span
+                  aria-hidden="true"
+                  className="absolute -top-10 left-1/2 h-12 w-7 -translate-x-1/2 rounded-t-[6px] bg-[repeating-linear-gradient(#0a0f0d_0_10px,#2d5a48_10px_20px)]"
+                />
+                <div
+                  className="relative rotate-[1.6deg] overflow-hidden rounded-[24px] border-[3px] border-ink px-5 pb-5 pt-11 text-on-light shadow-[0_0_0_4px_rgba(214,238,48,0.24),0_24px_48px_rgba(0,0,0,0.45)] sm:px-7"
+                  style={{
+                    // Gradien tetap terang di kedua mode, jadi teks di atasnya
+                    // memakai `text-on-light`, bukan token yang berbalik.
+                    background:
+                      "conic-gradient(from 210deg at 35% 25%, rgb(var(--c-lime-bright)), rgb(var(--c-lime)) 32%, rgb(var(--c-lime-bright)) 58%, rgb(var(--c-lime)) 82%, rgb(var(--c-lime-bright)))",
+                  }}
+                >
+                  <span
+                    aria-hidden="true"
+                    className="absolute left-1/2 top-3.5 h-3.5 w-14 -translate-x-1/2 rounded-full border-2 border-ink bg-evergreen-deep"
+                  />
+                  <span className="absolute -right-12 top-[30px] w-[190px] rotate-45 bg-brand-dark py-1.5 text-center font-mono text-[11px] font-extrabold uppercase tracking-[0.12em] text-lime">
+                    {t("pricing.door2.ribbon")}
+                  </span>
+
+                  <p className="font-mono text-[11px] font-bold uppercase tracking-[0.04em]">
+                    {t("pricing.door2.meta")}
+                  </p>
+                  <h3 className="mt-1 font-display text-[34px] leading-none tracking-[-0.04em]">
+                    {t("pricing.door2.title")}
+                  </h3>
+                  <div className="mt-4 flex flex-wrap items-baseline gap-x-3">
+                    <b className="font-display text-[42px] font-bold leading-none tracking-[-0.05em]">
+                      {formatRupiah(monthlyFrom)}
+                    </b>
+                    <span className="text-[13px] font-extrabold text-brand-green">
+                      /bulan, {t("pricing.door2.from")}
+                    </span>
+                  </div>
+                  <p className="mt-2 w-fit rounded-full border-2 border-ink bg-brand-dark px-2.5 py-0.5 font-mono text-[11px] font-extrabold uppercase tracking-[0.08em] text-lime">
+                    {t("pricing.door2.stop")}
+                  </p>
+
+                  <span
+                    aria-hidden="true"
+                    className="relative my-5 block border-t-[2.5px] border-dashed border-ink/45"
+                  >
+                    <span className="absolute -top-[13px] left-4 h-5 w-5 rounded-full border-[3px] border-ink bg-evergreen-deep" />
+                    <span className="absolute -top-[13px] right-4 h-5 w-5 rounded-full border-[3px] border-ink bg-evergreen-deep" />
+                  </span>
+
+                  <ul className="grid gap-2">
+                    {monthlyPlans.map((plan) => (
+                      <li
+                        key={plan.id}
+                        className="flex items-start justify-between gap-3 rounded-[12px] border-2 border-ink bg-cream px-3 py-2"
+                      >
+                        <div>
+                          <b className="block font-display text-[15px] leading-tight">
+                            {t(plan.nameKey)}
+                          </b>
+                          <span className="block text-[11.5px] font-bold leading-snug">
+                            {t(plan.descKey)}
+                          </span>
+                        </div>
+                        <span className="shrink-0 font-mono text-[12px] font-extrabold">
+                          {plan.isFree ? t("pricing.plan.free.name") : formatRupiah(plan.price)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Link
+                    href="/checkout"
+                    className="mt-4 flex min-h-[52px] w-full items-center justify-center gap-2 rounded-[14px] border-[3px] border-ink bg-lime text-[15px] font-bold text-on-light transition-all hover:-translate-y-0.5 active:translate-y-0.5"
+                  >
+                    {t("pricing.door2.cta")}
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ─── FOOTNOTE ─── */}
+        <motion.div
+          className="mt-7 space-y-2 text-center"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.2 }}
+        >
+          <p className="text-sm text-ink-soft">{t("pricing.footnote-payment")}</p>
+          <p className="text-sm text-ink-soft">{t("pricing.footnote-cancel")}</p>
+          <p className="mx-auto max-w-2xl text-sm text-ink-soft">{t("pricing.fair-use-note")}</p>
+          <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
+            <div className="inline-flex items-center gap-2 rounded-xl border-2 border-ink bg-paper px-4 py-2 shadow-hard-ink-sm">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-green-deep"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <div className="text-left">
+                <p className="text-xs font-bold text-ink">{t("pricing.garansi")}</p>
+                <p className="text-xs text-ink-soft">{t("pricing.garansi-desc")}</p>
+              </div>
+            </div>
+            <div className="inline-flex items-center gap-2 rounded-xl border-2 border-ink bg-paper px-4 py-2 shadow-hard-ink-sm">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-green-deep"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              <div className="text-left">
+                <p className="text-xs font-bold text-ink">{t("pricing.no-contract")}</p>
+                <p className="text-xs text-ink-soft">{t("pricing.no-contract-desc")}</p>
+              </div>
+            </div>
+          </div>
         </motion.div>
 
-        {/* ─── TOGGLE ─── */}
-        <div className="flex justify-center mb-10">
-          <motion.div className="inline-flex bg-paper rounded-full p-1.5 shadow-hard-ink-sm border-[2.5px] border-ink"
-            initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.1 }}>
-            {(["satuan", "langganan"] as const).map((m) => (
-              <button key={m} onClick={() => setMode(m)}
-                className={`relative px-6 md:px-8 py-3 rounded-full text-sm font-bold transition-all duration-200 ${mode === m ? "text-lime" : "text-on-surface-variant hover:text-on-surface"}`}>
-                {mode === m && (
-                  <motion.div layoutId="pricing-toggle-bg" className="absolute inset-0 bg-ink rounded-full"
-                    transition={{ type: "spring", stiffness: 500, damping: 35 }} />
-                )}
-                <span className="relative z-10">{m === "satuan" ? t("pricing.toggle-satuan") : t("pricing.toggle-langganan")}</span>
-                {mode === "satuan" && m === "langganan" && (
-                  <span className="relative z-10 ml-2 inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-bold">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-                    {t("pricing.badge-hemat")}
-                  </span>
-                )}
-              </button>
-            ))}
-          </motion.div>
-        </div>
-
-        {/* ─── VALUE FRAMING per mode ─── */}
-        <div className="mx-auto mb-8 max-w-xl text-center">
-          <p className="text-body-md text-on-surface-variant">
-            {mode === "satuan" ? t("pricing.value-satuan") : t("pricing.value-langganan")}
-          </p>
-        </div>
-
-        {/* ─── BUNDLE HERO (mode langganan) ─── */}
-        {mode === "langganan" && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.45 }}
-            className="relative overflow-hidden mb-6 rounded-xl border-[2.5px] border-ink bg-lime/15 shadow-hard p-6 md:p-8"
-          >
-            <span className="absolute top-0 right-6 inline-flex items-center gap-1.5 rounded-b-lg bg-ink px-3 py-1.5 text-xs font-bold text-lime">
-              <span className="material-symbols-outlined text-sm" aria-hidden="true">sell</span>
-              {t("pricing.bundle.badge")}
-            </span>
-            <div className="flex flex-col md:flex-row md:items-center gap-5">
-              <div className="flex-1 pr-16 md:pr-0">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="material-symbols-outlined text-green-deep" aria-hidden="true">workspace_premium</span>
-                  <h3 className="font-display text-lg md:text-xl text-ink">
-                    {t("pricing.bundle.title")}
-                  </h3>
-                </div>
-                <div className="flex items-baseline gap-2 mb-2">
-                  <span className="font-display font-bold tabular-nums text-[32px] leading-none text-ink">
-                    {formatRupiah(packages.find((p) => p.key === "paket_lamaran")?.price ?? 0)}
-                  </span>
-                  {/* Masa validity dibaca dari katalog, bukan diketik tangan:
-                      dulu di sini tertulis 60 hari padahal paketnya 30. */}
-                  <span className="text-xs text-ink-soft">
-                    / {packages.find((p) => p.key === "paket_lamaran")?.periodDays ?? 30} hari, sekali bayar
-                  </span>
-                </div>
-                <p className="text-sm text-ink-soft max-w-2xl">{t("pricing.bundle.desc")}</p>
-              </div>
-              <div className="shrink-0">
-                <MagneticButton>
-                  <Link
-                    href="/checkout?packages=paket_lamaran"
-                    className="inline-flex min-h-[54px] items-center justify-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-6 font-display text-sm font-bold text-ink shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-[0.98] transition-all"
-                  >
-                    <span className="material-symbols-outlined text-lg" aria-hidden="true">rocket_launch</span>
-                    {t("pricing.bundle.cta")}
-                  </Link>
-                </MagneticButton>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {/* ─── PRICING CARDS ─── */}
-        <AnimatePresence mode="wait">
-          <motion.div key={mode}
-            initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {plans.map((plan, idx) => (
-              <div key={plan.id} className="[perspective:800px]">
-                <TiltCard tiltOptions={{ maxAngle: 5, scale: 1.01, glare: false }}>
-                  <PricingCard plan={plan} delay={idx * 0.06} mode={mode} onSelectPlan={onSelectPlan} tFn={t} catalogLoading={catalogLoading} />
-                </TiltCard>
-              </div>
-            ))}
-          </motion.div>
-        </AnimatePresence>
-
-        {/* ─── FOOTNOTE (langganan mode) ─── */}
-        {mode === "langganan" && (
-  <motion.div className="mb-8 text-center space-y-2"
-            initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.3 }}>
-            <p className="text-sm text-on-surface-variant">{t("pricing.footnote-payment")}</p>
-            <p className="text-sm text-on-surface-variant">{t("pricing.footnote-cancel")}</p>
-            <p className="text-sm text-on-surface-variant max-w-2xl mx-auto">{t("pricing.fair-use-note")}</p>
-            {/* Risk Reversal Badges */}
-            <div className="flex items-center justify-center gap-4 pt-4">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-paper border-2 border-ink rounded-xl shadow-hard-ink-sm">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-deep shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                <div className="text-left">
-                  <p className="text-xs font-bold text-ink">{t("pricing.garansi")}</p>
-                  <p className="text-xs text-ink-soft">{t("pricing.garansi-desc")}</p>
-                </div>
-              </div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-paper border-2 border-ink rounded-xl shadow-hard-ink-sm">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-deep shrink-0"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                <div className="text-left">
-                  <p className="text-xs font-bold text-ink">{t("pricing.no-contract")}</p>
-                  <p className="text-xs text-ink-soft">{t("pricing.no-contract-desc")}</p>
-                </div>
-              </div>
-            </div>
-  </motion.div>
-        )}
-
         {/* ─── COMPARISON TABLE ─── */}
-        <motion.div className="mt-16"
-          initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }}>
-          <button onClick={() => setShowComparison(!showComparison)}
-            className="flex items-center justify-center gap-2 w-full py-4 text-primary font-label-bold hover:bg-primary/5 rounded-xl transition-colors">
+        <motion.div
+          className="mt-14"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4 }}
+        >
+          <button
+            onClick={() => setShowComparison(!showComparison)}
+            className="flex w-full items-center justify-center gap-2 rounded-xl py-4 font-label-bold text-green-deep transition-colors hover:bg-lime/20"
+          >
             <span>{t("pricing.comparison-toggle")}</span>
-            <motion.span animate={{ rotate: showComparison ? 180 : 0 }} transition={{ duration: 0.2 }}
-              className="material-symbols-outlined text-lg">expand_more</motion.span>
+            <motion.span
+              animate={{ rotate: showComparison ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+              className="material-symbols-outlined text-lg"
+            >
+              expand_more
+            </motion.span>
           </button>
           <AnimatePresence>
             {showComparison && (
-              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: "easeInOut" }} className="overflow-hidden">
-                <div className="bg-paper rounded-xl border-2 border-ink/20 overflow-hidden shadow-hard-sm mt-2">
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.25, ease: "easeInOut" }}
+                className="overflow-hidden"
+              >
+                <div className="mt-2 overflow-hidden rounded-[14px] border-[2.5px] border-ink bg-paper shadow-hard-sm">
                   <div className="overflow-x-auto">
                     <table className="w-full text-left">
                       <thead>
-                        <tr className="bg-surface-container-low border-b border-hairline">
+                        <tr className="border-b border-hairline bg-surface-container-low">
                           <th className="p-4 text-label-sm font-bold text-on-surface-variant">{t("pricing.comparison-header")}</th>
                           <th className="p-4 text-label-sm font-bold text-on-surface-variant">Free</th>
                           <th className="p-4 text-label-sm font-bold text-on-surface-variant">Lite</th>
-                          <th className="p-4 text-label-sm font-bold text-ink bg-lime/25">Pro</th>
+                          <th className="bg-lime/25 p-4 text-label-sm font-bold text-ink">Pro</th>
                           <th className="p-4 text-label-sm font-bold text-on-surface-variant">Max</th>
                         </tr>
                       </thead>
@@ -393,7 +519,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
                             <td className="p-4 text-sm font-medium text-on-surface">{t(row.labelKey)}</td>
                             <td className="p-4 text-sm text-on-surface-variant">{freeCell(row.key, t)}</td>
                             <td className="p-4 text-sm text-on-surface-variant">{limitCell(packages, "lite_bulanan", row.key, t)}</td>
-                            <td className="p-4 text-sm font-semibold text-ink bg-lime/25">{limitCell(packages, "pro_bulanan", row.key, t)}</td>
+                            <td className="bg-lime/25 p-4 text-sm font-semibold text-ink">{limitCell(packages, "pro_bulanan", row.key, t)}</td>
                             <td className="p-4 text-sm text-on-surface-variant">{limitCell(packages, "max_bulanan", row.key, t)}</td>
                           </tr>
                         ))}
@@ -406,88 +532,41 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
           </AnimatePresence>
         </motion.div>
 
-        {/* ─── BUNDLE BOX (satuan mode only) ─── */}
-        {mode === "satuan" && (
-          <motion.div className="mt-8"
-            initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.3 }}>
-            <div className="relative overflow-hidden rounded-xl bg-lime/15 border-[2.5px] border-ink shadow-hard p-6 md:p-8">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-lime/40 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
-              <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
-                <div className="text-center md:text-left">
-                  <div className="flex items-center gap-2 mb-2">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-2xl text-ink shrink-0"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
-                    <h4 className="font-display text-lg text-ink">{t("pricing.bundle-title")}</h4>
-                  </div>
-                  <p className="text-sm text-ink-soft">{t("pricing.bundle-desc")}</p>
-                </div>
-                <div className="md:ml-auto flex items-center gap-4">
-                  <div className="text-right">
-                    <p className="font-display text-2xl font-bold text-ink">
-                      {formatRupiah(packages.find((p) => p.key === "paket_lamaran")?.price ?? 0)}
-                    </p>
-                    <p className="text-xs text-ink-soft line-through">
-                      {formatRupiah(bundleSeparateTotal)}
-                    </p>
-                  </div>
-                  <MagneticButton>
-                    <Link href="/checkout?packages=paket_lamaran"
-                      className="inline-flex items-center gap-2 px-6 py-3 border-[2.5px] border-ink bg-lime text-ink rounded-full font-bold shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-[0.98] transition-all whitespace-nowrap">
-                      {t("pricing.bundle-cta")}
-                    </Link>
-                  </MagneticButton>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {/* ─── SURAT LAMARAN BANNER (satuan mode only) ─── */}
-        {mode === "satuan" && (
-          <motion.div className="mt-6"
-            initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.15 }}>
-            <div className="relative overflow-hidden rounded-xl bg-paper border-[2.5px] border-ink shadow-hard p-6 md:p-8">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-lime/30 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
-              <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
-                <div className="text-center md:text-left">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="material-symbols-outlined text-green-deep text-2xl shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>mail</span>
-                    <h4 className="font-display text-lg text-ink">{t("pricing.surat-banner.title")}</h4>
-                  </div>
-                  <p className="text-sm text-ink-soft max-w-lg">{t("pricing.surat-banner.desc")}</p>
-                </div>
-                <div className="md:ml-auto flex flex-col sm:flex-row items-center gap-3">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-lime/30 border border-ink/30 text-ink rounded-full text-xs font-bold whitespace-nowrap">
-                    <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>redeem</span>
-                    {t("pricing.surat-banner.free-note")}
-                  </span>
-                  <MagneticButton>
-                    <Link href="/login"
-                      className="inline-flex items-center gap-2 px-6 py-3 border-[2.5px] border-ink bg-lime text-ink rounded-full font-bold shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-[0.98] transition-all whitespace-nowrap">
-                      <span className="material-symbols-outlined text-lg">auto_awesome</span>
-                      {t("pricing.surat-banner.cta")}
-                    </Link>
-                  </MagneticButton>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
         {/* ─── FAQ ─── */}
-        <motion.div className="mt-16"
-          initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.1 }}>
-          <h3 className="font-display text-center text-ink mb-8">{t("pricing.faq-title")}</h3>
-          <div className="max-w-2xl mx-auto divide-y divide-hairline bg-paper rounded-xl border-2 border-ink/15 shadow-hard-sm overflow-hidden">
+        <motion.div
+          className="mt-16"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+        >
+          <h3 className="mb-8 text-center font-display text-ink">{t("pricing.faq-title")}</h3>
+          <div className="mx-auto max-w-2xl divide-y divide-hairline overflow-hidden rounded-[14px] border-[2.5px] border-ink bg-paper shadow-hard-sm">
             {FAQ_KEYS.map((idx) => (
               <div key={idx}>
-                <button onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                  className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left hover:bg-lime/15 transition-colors">
-                  <span className="font-label-bold text-sm text-on-surface flex-1">{t("pricing.faq." + idx + ".q")}</span>
-                  <motion.span animate={{ rotate: openFaq === idx ? 180 : 0 }} transition={{ duration: 0.2 }}
-                    className="material-symbols-outlined text-on-surface-variant shrink-0">expand_more</motion.span>
+                <button
+                  onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+                  className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors hover:bg-lime/15"
+                >
+                  <span className="flex-1 font-label-bold text-sm text-on-surface">{t("pricing.faq." + idx + ".q")}</span>
+                  <motion.span
+                    animate={{ rotate: openFaq === idx ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="material-symbols-outlined shrink-0 text-on-surface-variant"
+                  >
+                    expand_more
+                  </motion.span>
                 </button>
-                <div className="accordion-content" style={{ maxHeight: openFaq === idx ? "900px" : "0px", paddingBottom: openFaq === idx ? "1.25rem" : "0px" }}>
-                  <p className="px-6 text-sm text-on-surface-variant leading-relaxed">{t("pricing.faq." + idx + ".a")}</p>
+                <div
+                  className="accordion-content"
+                  style={{
+                    maxHeight: openFaq === idx ? "900px" : "0px",
+                    paddingBottom: openFaq === idx ? "1.25rem" : "0px",
+                  }}
+                >
+                  <p className="px-6 text-sm leading-relaxed text-on-surface-variant">
+                    {t("pricing.faq." + idx + ".a")}
+                  </p>
                 </div>
               </div>
             ))}
@@ -495,160 +574,5 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
         </motion.div>
       </div>
     </section>
-  );
-}
-
-/** Kartu paket. Isi dan harga berasal dari katalog, bukan dari teks statis. */
-
-/**
- * Teks satu baris benefit, misalnya "3x AI CV Builder" atau
- * "Cover Letter tanpa batas". Diturunkan dari kuota paket supaya kartu dan
- * akun selalu sama.
- */
-function benefitText(
-  key: string,
-  value: number | "unlimited" | undefined,
-  t: (key: string) => string,
-): string {
-  const feature = key.replace("benefit.", "");
-  const name = t(`billing.limit.${feature}`);
-  if (value === undefined) return name;
-  if (value === "unlimited") return `${name} ${t("billing.limit.unlimited")}`;
-  return `${value}x ${name}`;
-}
-
-export interface PricingCardPlan {
-  id: PlanId;
-  nameKey: string;
-  descKey: string;
-  ctaKey: string;
-  unitKey: string;
-  icon: string;
-  ctaStyle: "filled" | "outline" | "ghost" | "muted";
-  featured?: boolean;
-  badgeKey?: string;
-  microcopyKey?: string;
-  price: number;
-  periodDays: number;
-  monthly: boolean;
-  features: { key: string; included: boolean; value: number | "unlimited" }[];
-}
-
-function PricingCard({ plan, delay, onSelectPlan, mode, tFn, catalogLoading }: {
-  plan: PricingCardPlan;
-  delay: number;
-  onSelectPlan?: (planId: PlanId, mode: BillingMode) => void;
-  mode: BillingMode;
-  tFn: (key: string) => string;
-  catalogLoading?: boolean;
-}) {
-  const [isHovered, setIsHovered] = useState(false);
-  const t = tFn;
-
-  const btnClass = {
-    filled: "border-[2.5px] border-ink bg-lime text-ink font-bold shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5",
-    outline: "border-[2.5px] border-ink/60 text-ink font-bold hover:border-ink hover:bg-lime/25",
-    muted: "border-2 border-hairline text-on-surface-variant hover:bg-surface-container font-medium",
-    ghost: "border-2 border-hairline text-on-surface-variant hover:bg-surface-container font-medium",
-  };
-
-  // Semua paket punya tujuannya sendiri: gratis ke /login,langsung ke checkout.
-  const buttonClasses = "w-full py-3.5 rounded-full text-sm text-center transition-all active:scale-[0.97] " + btnClass[plan.ctaStyle];
-
-  const handleClick = () => {
-    if (onSelectPlan) onSelectPlan(plan.id, mode);
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-      transition={{ duration: 0.4, delay }}
-      onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}
-      className={"relative flex flex-col rounded-[14px] transition-all duration-300 " + (
-        plan.featured
-          ? "lg:scale-105 z-10 border-[2.5px] border-ink bg-lime/15 shadow-hard"
-          : "border-2 border-ink/20 bg-paper shadow-hard-sm hover:shadow-hard"
-      ) + " " + (isHovered ? "translate-y-[-4px]" : "")}>
-      {/* Badge */}
-      {plan.badgeKey && (
-        <div className={"absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold whitespace-nowrap shadow-[2px_2px_0_rgb(var(--c-ink))] " + (
-          plan.featured ? "bg-ink text-lime border-2 border-ink" : "bg-paper text-ink-soft border-2 border-ink/25"
-        )}>
-          {t(plan.badgeKey)}
-        </div>
-      )}
-      {!plan.badgeKey && plan.id === "free" && mode === "langganan" && (
-        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold whitespace-nowrap shadow-[2px_2px_0_rgb(var(--c-ink))] bg-ink text-lime border-2 border-ink">
-          Gratis
-        </div>
-      )}
-      <div className="p-6 md:p-8 flex flex-col flex-1">
-        {/* Icon + Name */}
-        <div className="mb-6">
-          <div className={"w-12 h-12 rounded-[7px] border-2 border-ink flex items-center justify-center mb-4 " + (
-            plan.featured ? "bg-ink text-lime" : "bg-lime/40 text-ink"
-          )}>
-            <span className="material-symbols-outlined text-[24px]">{plan.icon}</span>
-          </div>                    <h3 className="font-display text-on-surface text-lg">{t(plan.nameKey)}</h3>
-                    <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">{t(plan.descKey)}</p>
-                    {plan.id === "pro_bulanan" && (
-                      <div className="mt-3 inline-flex items-center gap-1 px-2.5 py-1 bg-lime/30 border border-ink/40 rounded-full">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-ink shrink-0"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                        <span className="text-xs font-bold text-ink">{t("pricing.best-value")}</span>
-                      </div>
-                    )}
-                  </div>
-
-        {/* Price */}
-        <div className="mb-6">
-          <div className="flex items-baseline gap-1">
-            <span className="font-display font-bold tracking-tight tabular-nums text-[36px] leading-none text-ink">
-              {plan.price === 0 ? t("pricing.plan.free.name") : "Rp" + plan.price.toLocaleString("id-ID")}
-            </span>
-            <span className="text-sm text-ink-soft">{t(plan.unitKey)}</span>
-          </div>
-        </div>
-
-        {/* Benefits: dibaca dari kuota paket, jadi kartu tidak pernah
-            menjanjikan sesuatu yang tidak ada di akun. */}
-        <div className="flex-1 space-y-3 mb-8">
-          {plan.features.map((feat) => (
-            <div key={feat.key} className="flex items-start gap-2.5">
-              {feat.included ? (
-                <span className="material-symbols-outlined text-[18px] text-green-deep shrink-0 mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-              ) : (
-                <span className="material-symbols-outlined text-[18px] text-ink/30 shrink-0 mt-0.5">cancel</span>
-              )}
-              <span className={"text-sm leading-relaxed " + (
-                feat.included ? "text-on-surface" : "text-on-surface-variant line-through"
-              )}>{benefitText(feat.key, feat.value, t)}</span>
-            </div>
-          ))}
-          {plan.features.length === 0 && !catalogLoading ? (
-            <p className="text-sm text-on-surface-variant">{t("pricing.benefit-note")}</p>
-          ) : null}
-        </div>
-
-        {/* CTA */}
-        {onSelectPlan ? (
-          <MagneticButton className="w-full">
-            <button onClick={handleClick} className={buttonClasses}>{t(plan.ctaKey)}</button>
-          </MagneticButton>
-        ) : (
-          <MagneticButton className="w-full">
-            <Link
-              href={plan.id === "free" ? "/login" : `/checkout?packages=${plan.id}`}
-              className={buttonClasses + " block w-full"}
-            >
-              {t(plan.ctaKey)}
-            </Link>
-          </MagneticButton>
-        )}
-
-        {plan.microcopyKey && (
-          <p className="text-center text-xs text-on-surface-variant mt-3 italic">{t(plan.microcopyKey)}</p>
-        )}
-      </div>
-    </motion.div>
   );
 }

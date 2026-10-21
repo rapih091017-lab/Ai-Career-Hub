@@ -65,7 +65,7 @@ export function LinkedinImportGuide({ onPickFile }: { onPickFile: () => void }) 
             <button
               type="button"
               onClick={onPickFile}
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-primary px-4 text-label-bold text-on-primary hover:brightness-110"
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-primary px-4 text-label-bold text-on-primary hover:-translate-y-0.5"
             >
               <span className="material-symbols-outlined text-lg">upload_file</span>
               {t("linkedin.guide-upload")}

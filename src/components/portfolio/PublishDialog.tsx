@@ -289,7 +289,7 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
 
             <button
               onClick={() => { setUpdateMode((prev) => !prev); setError(null); if (!updateMode) setTimeout(() => slugInputRef.current?.focus(), 50); }}
-              className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary-fixed text-primary font-label-bold hover:brightness-95 active:scale-95 transition-all"
+              className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary-fixed text-primary font-label-bold hover:opacity-90 active:scale-95 transition-all"
             >
               <span className="material-symbols-outlined text-lg">{updateMode ? "close" : "edit"}</span>
               {updateMode ? t("publish.cancel-update") : t("publish.update-content")}

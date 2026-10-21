@@ -434,7 +434,7 @@ const handleImported = (imported: ImportedProfile, mode: MergeMode) => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 12, scale: 0.95 }}
               transition={{ type: "spring", stiffness: 300, damping: 22 }}
-              className="fixed bottom-24 right-6 z-[90] flex items-center gap-3 border-[2.5px] border-ink bg-lime text-ink pl-4 pr-6 py-3 rounded-[14px] shadow-hard"
+              className="fixed bottom-24 right-6 z-[90] flex items-center gap-3 border-[2.5px] border-ink bg-lime text-on-light pl-4 pr-6 py-3 rounded-[14px] shadow-hard"
               role="status"
               aria-live="polite"
             >

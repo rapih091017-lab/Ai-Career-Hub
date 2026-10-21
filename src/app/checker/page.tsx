@@ -478,7 +478,7 @@ export default function CheckerPage() {
               </p>
             </div>
 
-            <div className="bg-surface rounded-xl p-6 md:p-10 flex flex-col gap-8 border border-outline-variant/50 shadow-premium-md">
+            <div className="bg-surface rounded-xl p-6 md:p-10 flex flex-col gap-8 border border-outline-variant/50 shadow-hard">
               <UploadZone
                 file={file}
                 dragActive={dragActive}
@@ -585,7 +585,7 @@ export default function CheckerPage() {
                   </div>
                   <button
                     onClick={handleBrowserOcr}
-                    className="w-full inline-flex items-center justify-center gap-2 bg-primary text-white font-bold px-5 py-2.5 rounded-lg hover:bg-primary/90 active:scale-[0.97] transition-all text-sm"
+                    className="w-full inline-flex items-center justify-center gap-2 bg-primary text-on-primary font-bold px-5 py-2.5 rounded-lg hover:bg-primary/90 active:scale-[0.97] transition-all text-sm"
                   >
                     <span className="material-symbols-outlined text-sm select-none">scan</span>
                     {t("checker.ocr.btn")}
@@ -630,7 +630,7 @@ export default function CheckerPage() {
                     <button
                       onClick={handlePasteAnalyze}
                       disabled={loading || !pastedText.trim()}
-                      className="inline-flex items-center gap-2 bg-primary text-white font-bold px-5 py-2.5 rounded-lg hover:opacity-90 active:scale-[0.97] transition-all disabled:opacity-50 text-sm"
+                      className="inline-flex items-center gap-2 bg-primary text-on-primary font-bold px-5 py-2.5 rounded-lg hover:opacity-90 active:scale-[0.97] transition-all disabled:opacity-50 text-sm"
                     >
                       {loading ? (
                         <>
@@ -654,7 +654,7 @@ export default function CheckerPage() {
               <div className="flex flex-col items-center gap-4">
                 <MagneticButton className="w-full">
                   <button
-                    className="w-full bg-primary text-white font-bold py-4 rounded-lg hover:opacity-90 active:scale-[0.97] transition-[filter,transform,opacity] shadow-premium-md flex items-center justify-center gap-2 disabled:opacity-60"
+                    className="w-full bg-primary text-on-primary font-bold py-4 rounded-lg hover:opacity-90 active:scale-[0.97] transition-[filter,transform,opacity] shadow-hard flex items-center justify-center gap-2 disabled:opacity-60"
                     onClick={handleAnalyze}
                     disabled={loading}
                   >
@@ -768,7 +768,7 @@ export default function CheckerPage() {
                 <span className="hidden sm:inline">{t("checker.share")}</span>
               </button>
               {showShareToast && (
-                <div className="absolute top-full mt-2 right-0 bg-green-600 text-white text-xs rounded-lg px-3 py-2 shadow-premium-md whitespace-nowrap z-10">
+                <div className="absolute top-full mt-2 right-0 bg-green-600 text-white text-xs rounded-lg px-3 py-2 shadow-hard whitespace-nowrap z-10">
                   {t("checker.link-copied")}
                 </div>
               )}
@@ -831,7 +831,7 @@ export default function CheckerPage() {
 
           {/* Transparansi bobot penilaian (role category) */}
           {weightsApplied && weightsApplied.role_category !== "general" && (
-            <p className="text-[11px] text-on-surface-variant/70 text-center mt-3 flex items-center justify-center gap-1 flex-wrap">
+            <p className="text-[11px] text-on-surface-variant text-center mt-3 flex items-center justify-center gap-1 flex-wrap">
               <span className="material-symbols-outlined text-[13px] select-none">tune</span>
               {t("checker.weights-note")
                 .replace("{cat}", weightsApplied.role_category.replace("_", " "))
@@ -886,7 +886,7 @@ export default function CheckerPage() {
         {/* ============================================================ */}
         {narrativeFeedback && (
           <motion.section
-            className="bg-surface rounded-2xl border border-surface-container-high shadow-premium-md p-6 space-y-5"
+            className="bg-surface rounded-2xl border border-surface-container-high shadow-hard p-6 space-y-5"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.3 }}
@@ -894,7 +894,7 @@ export default function CheckerPage() {
             <h2 className="text-xl font-bold text-on-surface">{t("checker.ai-review")}</h2>
 
             {/* Overall assessment */}
-            <div className="bg-surface-container-low rounded-xl p-4 border-l-4 border-primary">
+            <div className="bg-lime/15 rounded-xl p-4 border-[2.5px] border-ink">
               <p className="text-sm text-on-surface leading-relaxed">{narrativeFeedback.overall_assessment}</p>
             </div>
 
@@ -928,7 +928,7 @@ export default function CheckerPage() {
         {/* ============================================================ */}
         {keywordAnalysis && (
           <motion.section
-            className="bg-surface rounded-2xl border border-surface-container-high shadow-premium-md p-6 space-y-5"
+            className="bg-surface rounded-2xl border border-surface-container-high shadow-hard p-6 space-y-5"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.35 }}
@@ -1053,10 +1053,10 @@ export default function CheckerPage() {
               <div className="absolute -right-12 -top-12 w-64 h-64 bg-lime/25 rounded-full blur-3xl" />
               <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
                 <div className="text-center md:text-left">
-                  <h2 className="font-display text-[32px] leading-10 font-bold text-paper mb-2">
+                  <h2 className="font-display text-[32px] leading-10 font-bold text-on-dark mb-2">
                     {ctaTitle}
                   </h2>
-                  <p className="text-base text-paper/70 max-w-[320px]">{ctaSubtitle}</p>
+                  <p className="text-base text-on-dark/70 max-w-[320px]">{ctaSubtitle}</p>
                 </div>
                 <MagneticButton>
                   <button
@@ -1069,7 +1069,7 @@ export default function CheckerPage() {
                       } catch {}
                       router.push(targetRoute);
                     }}
-                    className="font-display inline-flex min-h-[54px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-8 py-4 text-sm font-bold text-ink shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-95 transition-all"
+                    className="font-display inline-flex min-h-[54px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-8 py-4 text-sm font-bold text-on-light shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-95 transition-all"
                   >
                     {ctaBtn}{" "}
                     <span className="material-symbols-outlined text-sm select-none">

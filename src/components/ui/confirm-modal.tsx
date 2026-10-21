@@ -70,7 +70,7 @@ export function ConfirmModal({ confirm, onClose }: ConfirmModalProps) {
             role="alertdialog"
             aria-labelledby="confirm-title"
             aria-describedby="confirm-message"
-            className="relative bg-surface-container-lowest rounded-2xl shadow-premium-xl border border-outline-variant/50 p-6 w-[90vw] max-w-sm mx-4"
+            className="relative bg-surface-container-lowest rounded-2xl shadow-hard-lg border border-outline-variant/50 p-6 w-[90vw] max-w-sm mx-4"
           >
             {/* Icon */}
             <div
@@ -125,7 +125,7 @@ export function ConfirmModal({ confirm, onClose }: ConfirmModalProps) {
                   "flex-1 py-2.5 rounded-xl text-sm font-semibold text-white transition-all active:scale-[0.97]",
                   isDanger
                     ? "bg-red-600 hover:bg-red-700 shadow-sm"
-                    : "bg-primary hover:brightness-110 shadow-sm",
+                    : "bg-primary hover:-translate-y-0.5 shadow-sm",
                 )}
               >
                 {confirm.confirmLabel || (isDanger ? "Hapus" : "Ya")}

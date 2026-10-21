@@ -143,8 +143,8 @@ export function QuestionCard({
       layout
       className={`bg-surface-container-lowest rounded-xl border overflow-hidden transition-colors ${
         isBookmarked
-          ? "border-amber-300 shadow-premium-sm"
-          : "border-outline-variant/50 shadow-premium-sm"
+          ? "border-amber-300 shadow-hard-sm"
+          : "border-outline-variant/50 shadow-hard-sm"
       }`}
     >
       <div className="flex items-start">
@@ -223,7 +223,7 @@ export function QuestionCard({
                       {t("interview.star-title")}
                     </p>
                     {starBadge !== null ? (
-                      <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                      <span className="rounded-full bg-green/10 px-2 py-0.5 text-[10px] font-bold text-green-deep">
                         STAR {starScoreLabel(starBadge)}/5
                       </span>
                     ) : null}
@@ -283,29 +283,29 @@ export function QuestionCard({
                 {starError ? <p className="text-[11px] text-error">{starError}</p> : null}
 
                 {starResult ? (
-                  <div className="space-y-2 rounded-lg border border-emerald-500/25 bg-emerald-500/5 p-3">
+                  <div className="space-y-2 rounded-lg border border-green/30 bg-green/5 p-3">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-green-deep">
                         {t("interview.star-result")}
                       </p>
                       <button
                         type="button"
                         onClick={handleCopyStar}
-                        className="rounded-lg bg-emerald-500/10 px-2.5 py-1 text-[11px] font-bold text-emerald-700 transition-colors hover:bg-emerald-500/20"
+                        className="rounded-lg bg-green/10 px-2.5 py-1 text-[11px] font-bold text-green-deep transition-colors hover:bg-green/20"
                       >
                         {starCopied ? t("interview.star-copied") : t("interview.star-copy")}
                       </button>
                     </div>
                     {starSections.map(([letter, text]) => (
                       <div key={letter} className="flex gap-2">
-                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-[10px] font-bold text-white">
+                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-deep text-[10px] font-bold text-white">
                           {letter}
                         </span>
                         <p className="text-[11px] leading-relaxed text-on-surface">{text}</p>
                       </div>
                     ))}
                     {starResult.full ? (
-                      <p className="border-t border-emerald-500/20 pt-2 text-[11px] font-medium leading-relaxed text-on-surface">
+                      <p className="border-t border-green/25 pt-2 text-[11px] font-medium leading-relaxed text-on-surface">
                         {starResult.full}
                       </p>
                     ) : null}
@@ -323,7 +323,7 @@ export function QuestionCard({
                     placeholder={t("interview.star-answer-placeholder")}
                     rows={3}
                     maxLength={4000}
-                    className="w-full resize-y rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-[11px] leading-relaxed text-on-surface placeholder:text-on-surface-variant/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    className="w-full resize-y rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-[11px] leading-relaxed text-on-surface placeholder:text-on-surface-variant focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
                   />
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-[10px] text-on-surface-variant">{myAnswer.trim().length}/4000</p>

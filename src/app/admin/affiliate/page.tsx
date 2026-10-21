@@ -27,7 +27,7 @@ interface AffiliateRow {
 const formatIDR = (value: number) => "Rp " + value.toLocaleString("id-ID");
 
 const statusMeta = (status: string) => {
-  if (status === "approved") return { label: "Disetujui", className: "bg-emerald-500/10 text-emerald-700" };
+  if (status === "approved") return { label: "Disetujui", className: "bg-green/10 text-green-deep" };
   if (status === "rejected") return { label: "Ditolak", className: "bg-error-container/60 text-on-error-container" };
   return { label: "Menunggu review", className: "bg-amber-500/10 text-amber-700" };
 };
@@ -203,7 +203,7 @@ export default function AdminAffiliatePage() {
                     </div>
                     <div className="text-center">
                       <p className="text-label-sm text-on-surface-variant">Dibayar</p>
-                      <p className="text-body-md font-semibold text-emerald-700">{formatIDR(row.paidAmount)}</p>
+                      <p className="text-body-md font-semibold text-green-deep">{formatIDR(row.paidAmount)}</p>
                     </div>
 
                     {row.status === "pending" ? (

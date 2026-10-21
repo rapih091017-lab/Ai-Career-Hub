@@ -236,7 +236,7 @@ export function ImportResumeModal({ open, onClose, onImported }: ImportResumeMod
         <div className="space-y-1.5">
           <label className="text-label-bold text-on-surface">{t("profile.import.paste-label")}</label>
           <textarea
-            className="w-full resize-y rounded-lg border border-outline-variant bg-surface-container-lowest p-3 text-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+            className="w-full resize-y rounded-lg border border-outline-variant bg-surface-container-lowest p-3 text-body-md text-on-surface placeholder:text-on-surface-variant focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
             rows={6}
             value={text}
             onChange={(event) => setText(event.target.value)}

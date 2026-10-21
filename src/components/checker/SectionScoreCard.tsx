@@ -23,7 +23,7 @@ export function SectionScoreCard({ title, score, issues, suggestions, delay, sta
 
   return (
     <motion.div
-      className="bg-surface-container-lowest rounded-xl border border-surface-container-high shadow-premium-sm overflow-hidden"
+      className="bg-surface-container-lowest rounded-xl border border-surface-container-high shadow-hard-sm overflow-hidden"
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay }}
@@ -101,7 +101,7 @@ export function SectionScoreCard({ title, score, issues, suggestions, delay, sta
                               )}
                             </span>
                             {iss.source_excerpt && (
-                              <span className="block mt-1 text-[11px] italic text-on-surface-variant/70 bg-surface-container-low rounded-md px-2 py-1 border-l-2 border-red-300">
+                              <span className="block mt-1 text-[11px] italic text-on-surface-variant bg-surface-container-low rounded-md px-2 py-1 border-l-2 border-red-300">
                                 &ldquo;{iss.source_excerpt}&rdquo;
                               </span>
                             )}

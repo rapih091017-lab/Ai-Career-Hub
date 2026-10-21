@@ -96,7 +96,7 @@ const PAYMENT_LABELS: Record<string, string> = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  success: "bg-emerald-500/10 text-emerald-700",
+  success: "bg-green/10 text-green-deep",
   pending: "bg-amber-500/10 text-amber-700",
   failed: "bg-error-container/60 text-on-error-container",
   expired: "bg-surface-container text-on-surface-variant",
@@ -257,7 +257,7 @@ export default function AdminDashboardPage() {
               {exportOpen ? (
                 <div
                   role="menu"
-                  className="absolute right-0 top-full z-[70] mt-2 min-w-[210px] overflow-hidden rounded-xl border border-outline-variant/50 bg-surface-container-lowest shadow-premium-md"
+                  className="absolute right-0 top-full z-[70] mt-2 min-w-[210px] overflow-hidden rounded-xl border border-outline-variant/50 bg-surface-container-lowest shadow-hard"
                 >
                   {EXPORTS.map((item) => (
                     <button
@@ -339,8 +339,8 @@ export default function AdminDashboardPage() {
             />
             <StatCard
               icon="person_add"
-              iconBg="bg-emerald-500/10"
-              iconColor="text-emerald-700"
+              iconBg="bg-green/10"
+              iconColor="text-green-deep"
               label="Registrasi Baru"
               value={stats.today.newRegistrations}
               sub="Hari ini"
@@ -589,7 +589,7 @@ export default function AdminDashboardPage() {
                               Menunggu
                             </span>
                           ) : (
-                            <span className="inline-flex rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-label-sm font-semibold text-emerald-700">
+                            <span className="inline-flex rounded-full bg-green/10 px-2.5 py-0.5 text-label-sm font-semibold text-green-deep">
                               {user.status === "active" ? "Aktif" : user.status}
                             </span>
                           )}
@@ -602,7 +602,7 @@ export default function AdminDashboardPage() {
                             <button
                               type="button"
                               onClick={() => approveUser(user)}
-                              className="inline-flex h-10 cursor-pointer items-center gap-1.5 rounded-lg bg-primary px-3 text-label-bold text-on-primary transition-colors duration-200 hover:brightness-110"
+                              className="inline-flex h-10 cursor-pointer items-center gap-1.5 rounded-lg bg-primary px-3 text-label-bold text-on-primary transition-colors duration-200 hover:-translate-y-0.5"
                             >
                               <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
                                 check
@@ -610,7 +610,7 @@ export default function AdminDashboardPage() {
                               Approve
                             </button>
                           ) : (
-                            <span className="text-body-md text-on-surface-variant/60">—</span>
+                            <span className="text-body-md text-on-surface-variant">—</span>
                           )}
                         </td>
                       </tr>
@@ -644,7 +644,7 @@ function StatCard({
   sub: string;
 }) {
   return (
-    <div className={`${adminCardClass} transition-shadow duration-200 hover:shadow-premium-md`}>
+    <div className={`${adminCardClass} transition-shadow duration-200 hover:shadow-hard`}>
       <div className={`mb-3 flex h-9 w-9 items-center justify-center rounded-xl ${iconBg}`}>
         <span
           className={`material-symbols-outlined text-[20px] ${iconColor}`}
@@ -656,7 +656,7 @@ function StatCard({
       </div>
       <p className="mb-1 text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">{label}</p>
       <p className="mb-0.5 font-headline-md text-[22px] text-on-surface">{value}</p>
-      <p className="text-label-sm text-on-surface-variant/80">{sub}</p>
+      <p className="text-label-sm text-on-surface-variant">{sub}</p>
     </div>
   );
 }

@@ -174,8 +174,8 @@ export function SkillSection({
       {/* ── Self Evaluation / Evaluasi Diri ── */}
       <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
         <div className="flex items-center gap-3 pb-2">
-          <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
-            <span className="material-symbols-outlined text-emerald-600" style={{ fontVariationSettings: "'FILL' 1" }}>badge</span>
+          <div className="w-10 h-10 rounded-xl bg-green/10 flex items-center justify-center shrink-0">
+            <span className="material-symbols-outlined text-green" style={{ fontVariationSettings: "'FILL' 1" }}>badge</span>
           </div>
           <div>
             <h3 className="font-label-bold text-on-surface">Evaluasi Diri</h3>

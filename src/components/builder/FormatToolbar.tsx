@@ -55,7 +55,7 @@ export function FormatToolbar({
         <div className="w-12 h-1.5 bg-outline-variant/30 rounded-full overflow-hidden">
           <div
             className={`h-full rounded-full transition-[width,background-color] duration-500 ${
-              cvCompleteness >= 100 ? "bg-emerald-500" : cvCompleteness >= 50 ? "bg-primary" : "bg-amber-500"
+              cvCompleteness >= 100 ? "bg-green/100" : cvCompleteness >= 50 ? "bg-primary" : "bg-amber-500"
             }`}
             style={{ width: `${cvCompleteness}%` }}
           />
@@ -73,7 +73,7 @@ export function FormatToolbar({
             transition={{ type: "spring", stiffness: 400, damping: 25 }}
             className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[11px] font-semibold shrink-0 shadow-sm ${
               saveStatus === "saving" ? "text-amber-700 bg-amber-50 border border-amber-200" :
-              saveStatus === "saved" ? "text-emerald-700 bg-emerald-500/10 border border-emerald-500/20" :
+              saveStatus === "saved" ? "text-green-deep bg-green/10 border border-green/25" :
               "text-on-error-container bg-error-container border border-error/30 animate-[shake_0.3s_ease-in-out]"
             }`}
           >
@@ -170,8 +170,7 @@ export function FormatToolbar({
       {/* AI Revision, FAB Style */}
       <MagneticButton>
         <button onClick={onNavigateToCheckout}
-          className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow-md overflow-hidden"
-          style={{ background: "linear-gradient(135deg, #0d7377, #4fb5b5)" }}
+          className="relative flex min-h-[36px] items-center gap-1.5 px-3 py-1.5 rounded-full border-[2.5px] border-ink bg-lime text-xs font-bold text-on-light shadow-[0_2px_0_rgb(var(--c-ink))] overflow-hidden"
           title={t("builder.ai-opt-tip")}
         >
           <span className="material-symbols-outlined text-sm relative z-10" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>

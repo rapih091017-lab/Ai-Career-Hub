@@ -51,7 +51,7 @@ export default function PersonaTabs() {
                   className={[
                     "min-h-[44px] rounded-full border-2 border-ink px-4 text-[14.5px] font-bold transition-all",
                     active === index
-                      ? "-translate-x-0.5 -translate-y-0.5 bg-evergreen text-paper shadow-hard-ink-sm"
+                      ? "-translate-x-0.5 -translate-y-0.5 bg-evergreen text-on-dark shadow-hard-ink-sm"
                       : "bg-paper text-ink hover:-translate-x-0.5 hover:-translate-y-0.5",
                   ].join(" ")}
                 >
@@ -69,11 +69,11 @@ export default function PersonaTabs() {
             aria-labelledby={`persona-tab-${persona.key}`}
             className="overflow-hidden rounded-[22px] border-[2.5px] border-ink bg-paper shadow-hard"
           >
-            <div className="flex items-center gap-3 border-b-2 border-ink bg-evergreen px-4 py-3 text-paper">
-              <span aria-hidden="true" className="h-7 w-7 rounded-full border-2 border-paper bg-lime" />
+            <div className="flex items-center gap-3 border-b-2 border-ink bg-evergreen px-4 py-3 text-on-dark">
+              <span aria-hidden="true" className="h-7 w-7 rounded-full border-2 border-on-dark bg-lime" />
               <div>
                 <p className="text-[14px] font-bold">{t(persona.name)}</p>
-                <p className="text-[12px] text-paper/70">{t(persona.sub)}</p>
+                <p className="text-[12px] text-on-dark/70">{t(persona.sub)}</p>
               </div>
             </div>
 
@@ -95,7 +95,7 @@ export default function PersonaTabs() {
                 <p className="font-mono text-[11.5px] font-extrabold uppercase tracking-[0.06em] text-ink-soft">
                   SESUDAH
                 </p>
-                <p className="mt-2 max-w-[86%] rounded-2xl rounded-bl-sm border-[1.5px] border-ink bg-evergreen px-4 py-3 text-[15px] font-semibold leading-[1.45] text-paper">
+                <p className="mt-2 max-w-[86%] rounded-2xl rounded-bl-sm border-[1.5px] border-ink bg-evergreen px-4 py-3 text-[15px] font-semibold leading-[1.45] text-on-dark">
                   {t(persona.after)}
                 </p>
               </div>

@@ -158,7 +158,7 @@ export default function MyResumesPage() {
               <MagneticButton>
                 <button
                   onClick={() => setShowTemplatePicker(true)}
-                  className="inline-flex min-h-[44px] items-center gap-2 px-5 py-2.5 border-[2.5px] border-ink bg-lime text-ink font-bold rounded-full shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-[0.98] transition-all"
+                  className="inline-flex min-h-[44px] items-center gap-2 px-5 py-2.5 border-[2.5px] border-ink bg-lime text-on-light font-bold rounded-full shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-[0.98] transition-all"
                 >
                   <span className="material-symbols-outlined text-base select-none">add</span>
                   {t("dashboard.create-new")}
@@ -176,13 +176,13 @@ export default function MyResumesPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder={t("dashboard.search-cv")}
-                    className="w-36 md:w-48 pl-7 pr-2 py-1.5 rounded-lg bg-surface-container-lowest border border-outline-variant/50 text-xs shadow-premium-sm focus:ring-1 focus:ring-primary outline-none"
+                    className="w-36 md:w-48 pl-7 pr-2 py-1.5 rounded-lg bg-surface-container-lowest border border-outline-variant/50 text-xs shadow-hard-sm focus:ring-1 focus:ring-primary outline-none"
                   />
                 </div>
                 <select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value as "all" | "has-title" | "no-title")}
-                  className="bg-surface-container-lowest border border-outline-variant/50 rounded-lg text-xs px-2 py-1.5 shadow-premium-sm focus:ring-1 focus:ring-primary"
+                  className="bg-surface-container-lowest border border-outline-variant/50 rounded-lg text-xs px-2 py-1.5 shadow-hard-sm focus:ring-1 focus:ring-primary"
                 >
                   <option value="all">{t("dashboard.all")}</option>
                   <option value="has-title">{t("dashboard.has-title")}</option>
@@ -191,7 +191,7 @@ export default function MyResumesPage() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as "newest" | "oldest" | "name-asc" | "name-desc")}
-                  className="bg-surface-container-lowest border border-outline-variant/50 rounded-lg text-xs px-2 py-1.5 shadow-premium-sm focus:ring-1 focus:ring-primary"
+                  className="bg-surface-container-lowest border border-outline-variant/50 rounded-lg text-xs px-2 py-1.5 shadow-hard-sm focus:ring-1 focus:ring-primary"
                   title={t("dashboard.sort")}
                 >
                   <option value="newest">{t("dashboard.newest")}</option>
@@ -208,7 +208,7 @@ export default function MyResumesPage() {
             </section>
 
             {searchQuery && filteredCvList.length === 0 && (
-              <div className="bg-surface-container-lowest rounded-2xl p-8 border border-dashed border-outline-variant text-center shadow-premium-sm mb-4">
+              <div className="bg-surface-container-lowest rounded-2xl p-8 border border-dashed border-outline-variant text-center shadow-hard-sm mb-4">
                 <p className="text-sm text-on-surface-variant">{t("dashboard.no-search-result").replace("{q}", searchQuery)}</p>
               </div>
             )}
@@ -218,7 +218,7 @@ export default function MyResumesPage() {
                 {[1, 2, 3].map((i) => (
                   <div
                     key={i}
-                    className="bg-surface-container-lowest rounded-2xl p-5 shadow-premium-sm border border-outline-variant/50 flex items-center justify-between gap-4 animate-pulse"
+                    className="bg-surface-container-lowest rounded-2xl p-5 shadow-hard-sm border border-outline-variant/50 flex items-center justify-between gap-4 animate-pulse"
                   >
                     <div className="flex-1 space-y-2">
                       <div className="h-4 bg-surface-container-high rounded w-1/3" />
@@ -246,7 +246,7 @@ export default function MyResumesPage() {
                 <MagneticButton>
                   <button
                     onClick={() => setShowTemplatePicker(true)}
-                    className="inline-flex min-h-[44px] items-center gap-2 px-6 py-3 border-[2.5px] border-ink bg-lime text-ink font-bold rounded-full shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 transition-all"
+                    className="inline-flex min-h-[44px] items-center gap-2 px-6 py-3 border-[2.5px] border-ink bg-lime text-on-light font-bold rounded-full shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 transition-all"
                   >
                     <span className="material-symbols-outlined text-lg select-none">add</span>
                     {t("dashboard.first-cv")}
@@ -298,7 +298,7 @@ export default function MyResumesPage() {
                               exit={{ opacity: 0, y: -6, scale: 0.98 }}
                               transition={{ duration: 0.15 }}
                               role="menu"
-                              className="absolute right-0 top-full mt-1 z-30 w-60 bg-surface-container-lowest rounded-xl shadow-premium-lg border border-outline-variant/50 overflow-hidden py-1.5"
+                              className="absolute right-0 top-full mt-1 z-30 w-60 bg-surface-container-lowest rounded-xl shadow-hard-lg border border-outline-variant/50 overflow-hidden py-1.5"
                             >
                               <p className="px-4 pt-1 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">{t("dashboard.create-letter-from-cv")}</p>
                               <button

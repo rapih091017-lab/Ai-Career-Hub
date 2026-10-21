@@ -48,7 +48,7 @@ export default function SinonimPage() {
           <section className="mb-8 text-center">
             <h1 className="mb-2 font-headline-lg text-headline-lg text-on-background">{t("sinonim.title")}</h1>
             <p className="mx-auto max-w-[560px] text-body-md text-on-surface-variant">{t("sinonim.subtitle")}</p>
-            <p className="mt-2 text-label-sm text-on-surface-variant/80">
+            <p className="mt-2 text-label-sm text-on-surface-variant">
               {t("sinonim.count").replace("{n}", String(entries.length))}
             </p>
           </section>
@@ -64,7 +64,7 @@ export default function SinonimPage() {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder={t("sinonim.search-placeholder")}
-              className="h-12 w-full rounded-xl border-2 border-ink/60 bg-paper pl-10 pr-3 text-body-md text-ink placeholder:text-ink-soft/70 focus:border-green-deep focus:outline-none focus:ring-2 focus:ring-green/40"
+              className="h-12 w-full rounded-xl border-2 border-ink/60 bg-paper pl-10 pr-3 text-body-md text-ink placeholder:text-ink-soft focus:border-green-deep focus:outline-none focus:ring-2 focus:ring-green/40"
             />
           </div>
 

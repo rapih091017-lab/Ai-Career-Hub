@@ -8,8 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
       "Satu platform untuk membuat CV ATS-friendly, mengecek skor resume, dan membangun portofolio profesional secara instan.",
     start_url: "/",
     display: "standalone",
-    background_color: "#fbf8fe",
-    theme_color: "#0d7377",
+    background_color: "#f3f6f2",
+    theme_color: "#122922",
     orientation: "portrait-primary",
     icons: [
       {

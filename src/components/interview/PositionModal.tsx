@@ -74,7 +74,7 @@ export function PositionModal({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 40, scale: 0.95 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
-          className="w-full max-w-[700px] bg-background rounded-2xl shadow-premium-xl border border-outline-variant/50 overflow-hidden"
+          className="w-full max-w-[700px] bg-background rounded-2xl shadow-hard-lg border border-outline-variant/50 overflow-hidden"
         >
           {/* Header */}
           <div className="sticky top-0 bg-surface-container-lowest border-b border-outline-variant/50 z-10">
@@ -190,7 +190,7 @@ export function PositionModal({
               <MagneticButton>
                 <button
                   onClick={onClose}
-                  className="px-6 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:opacity-90 active:scale-[0.97] transition-all"
+                  className="px-6 py-2 rounded-xl bg-primary text-on-primary text-xs font-bold hover:opacity-90 active:scale-[0.97] transition-all"
                 >
                   {lang === "en" ? "Close" : "Tutup"}
                 </button>

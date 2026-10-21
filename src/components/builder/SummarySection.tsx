@@ -258,8 +258,8 @@ export function SummarySection({
                 whileTap={{ scale: aiReviseLoading ? 1 : 0.96 }}
                 className={`relative inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all duration-300 ${
                   aiReviseLoading
-                    ? "bg-primary/80 text-white cursor-wait animate-[pulse-ring_1.5s_ease-in-out_infinite]"
-                    : "bg-primary text-white shadow-sm hover:brightness-110 active:brightness-90"
+                    ? "bg-primary/80 text-on-primary cursor-wait animate-[pulse-ring_1.5s_ease-in-out_infinite]"
+                    : "bg-primary text-on-primary shadow-sm hover:-translate-y-0.5 active:translate-y-0"
                 } disabled:opacity-40`}
                 title="Optimalkan ringkasan dengan AI"
               >

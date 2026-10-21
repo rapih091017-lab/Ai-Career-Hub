@@ -64,7 +64,7 @@ export default function LoginPage() {
       {/* Navbar, logo klik = kembali ke beranda */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-paper border-b border-hairline px-margin-mobile md:px-gutter py-4 flex justify-center md:justify-start">
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-8 h-8 rounded-[7px] border-2 border-ink bg-evergreen flex items-center justify-center text-lime group-hover:bg-green-deep transition-all">
+          <div className="w-8 h-8 rounded-[7px] border-2 border-ink bg-brand-dark flex items-center justify-center text-lime group-hover:bg-brand-green transition-all">
             <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
           </div>
           <span className="font-display text-[18px] font-bold text-ink tracking-[-0.02em]">AI Career Hub</span>
@@ -135,7 +135,7 @@ export default function LoginPage() {
                 type="button"
                 onClick={handleGoogleLogin}
                 disabled={loading}
-                className="w-full py-3.5 rounded-full border-[2.5px] border-ink bg-lime text-ink font-bold hover:-translate-y-0.5 shadow-[0_4px_0_rgb(var(--c-ink))] active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-60"
+                className="w-full py-3.5 rounded-full border-[2.5px] border-ink bg-lime text-on-light font-bold hover:-translate-y-0.5 shadow-[0_4px_0_rgb(var(--c-ink))] active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-60"
               >
                 {loading ? (
                   <><span className="material-symbols-outlined text-lg animate-spin">sync</span> Menghubungkan ke Google...</>
@@ -160,7 +160,7 @@ export default function LoginPage() {
               <Link href="/terms" className="text-xs text-ink-soft hover:text-green-deep transition-colors cursor-pointer">Syarat & Ketentuan</Link>
               <Link href="/contact" className="text-xs text-ink-soft hover:text-green-deep transition-colors cursor-pointer">Bantuan</Link>
             </div>
-            <p className="mt-4 text-center text-xs text-ink-soft/70">&copy; 2026 AI Career Hub. Hak Cipta Dilindungi.</p>
+            <p className="mt-4 text-center text-xs text-ink-soft">&copy; 2026 AI Career Hub. Hak Cipta Dilindungi.</p>
           </div>
         </section>
       </main>

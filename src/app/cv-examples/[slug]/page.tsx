@@ -74,7 +74,7 @@ export default async function CvExampleEnDetailPage({
 
           <section className="mb-8">
             <h2 className="mb-3 font-headline-md text-headline-md text-on-surface">Professional Summary</h2>
-            <div className="rounded-2xl border-l-4 border-primary bg-surface-container-lowest p-5 shadow-sm">
+            <div className="rounded-[14px] border-[2.5px] border-ink bg-paper p-5 shadow-hard-sm">
               <p className="text-body-md leading-relaxed text-on-surface">{example.summaryExample}</p>
             </div>
             <p className="mt-2 text-label-sm text-on-surface-variant">
@@ -160,7 +160,7 @@ export default async function CvExampleEnDetailPage({
             </ul>
           </section>
 
-          <section className="mb-12 rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/5 to-secondary/5 p-8 text-center">
+          <section className="mb-12 rounded-[14px] border-[2.5px] border-ink bg-lime/15 p-8 text-center">
             <h2 className="font-headline-md text-headline-md text-on-surface">
               Apply this example to your CV
             </h2>
@@ -171,7 +171,7 @@ export default async function CvExampleEnDetailPage({
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
               <Link
                 href="/builder/new"
-                className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-bold text-on-primary transition-all hover:brightness-110 active:scale-[0.97]"
+                className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-bold text-on-primary transition-all hover:-translate-y-0.5 active:scale-[0.97]"
               >
                 <span className="material-symbols-outlined text-lg">edit_note</span>
                 Build a {example.title} CV

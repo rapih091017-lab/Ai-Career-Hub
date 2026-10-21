@@ -91,7 +91,7 @@ export default function TemplatePicker({
                   handleClose();
                 }}
                 disabled={isCreating}
-                className="flex-1 py-3 rounded-xl bg-primary text-on-primary font-label-bold hover:brightness-110 transition-all disabled:opacity-50"
+                className="flex-1 py-3 rounded-xl bg-primary text-on-primary font-label-bold hover:-translate-y-0.5 transition-all disabled:opacity-50"
               >
                 {isCreating ? "Menerapkan..." : "Gunakan"}
               </button>
@@ -157,7 +157,7 @@ export default function TemplatePicker({
           <button
             onClick={() => onSelect(selectedId, jobTitle.trim() || undefined)}
             disabled={isCreating}
-            className="w-full bg-primary text-on-primary font-label-bold py-3 rounded-xl hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+            className="w-full bg-primary text-on-primary font-label-bold py-3 rounded-xl hover:-translate-y-0.5 active:scale-[0.98] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
           >
             {isCreating ? (
               <><svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg> Membuat CV...</>

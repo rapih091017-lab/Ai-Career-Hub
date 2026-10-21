@@ -97,7 +97,7 @@ function BuilderNewFormContent() {
               try { sessionStorage.removeItem("checker_source"); } catch {}
               router.push(checkerSource);
             }}
-            className="inline-flex items-center gap-1.5 text-xs text-on-surface-variant hover:text-primary transition-colors group"
+            className="inline-flex items-center gap-1.5 text-xs text-on-surface-variant hover:text-green-deep transition-colors group"
           >
             <span className="material-symbols-outlined text-[14px] group-hover:-translate-x-0.5 transition-transform">
               arrow_back
@@ -117,9 +117,9 @@ function BuilderNewFormContent() {
 
       {/* Ambil pilihan lewat popup, konten halaman sebagai fallback */}
       <div className="flex justify-center pt-8">
-        <div className="bg-surface-container-lowest rounded-xl shadow-premium-md p-8 max-w-md w-full text-center border border-outline-variant/50 space-y-4">
+        <div className="bg-surface-container-lowest rounded-xl shadow-hard p-8 max-w-md w-full text-center border border-outline-variant/50 space-y-4">
           <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
-            <span className="material-symbols-outlined text-primary text-[32px]">description</span>
+            <span className="material-symbols-outlined text-green-deep text-[32px]">description</span>
           </div>
           <p className="text-sm text-on-surface-variant">
             {t("cv.new.popup-hint")}
@@ -127,7 +127,7 @@ function BuilderNewFormContent() {
           <MagneticButton>
             <button
               onClick={() => setShowPopup(true)}
-              className="bg-primary text-white font-semibold px-6 py-3 rounded-xl hover:opacity-90 active:scale-95 transition-all"
+              className="border-[2.5px] border-ink bg-lime text-on-light font-bold px-6 py-3 rounded-full shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-95 transition-all"
             >
               {t("cv.new.open-popup")}
             </button>

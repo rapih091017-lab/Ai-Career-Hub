@@ -36,7 +36,7 @@ export default function FaqSection() {
                 {t(item.q)}
                 <span
                   aria-hidden="true"
-                  className="flex h-[34px] w-[34px] flex-none items-center justify-center rounded-full bg-ink text-paper transition-transform group-open:rotate-45"
+                  className="flex h-[34px] w-[34px] flex-none items-center justify-center rounded-full bg-brand-dark text-on-dark transition-transform group-open:rotate-45"
                 >
                   +
                 </span>

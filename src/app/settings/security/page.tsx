@@ -11,7 +11,7 @@ export default function SettingsSecurityPage() {
       {/* Section: Keamanan Akun */}
       <section className="bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/50 overflow-hidden">
         <div className="px-6 py-5 border-b border-outline-variant/50 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-[7px] border-2 border-ink bg-lime flex items-center justify-center text-ink">
+          <div className="w-10 h-10 rounded-[7px] border-2 border-ink bg-lime flex items-center justify-center text-on-light">
             <span className="material-symbols-outlined">lock</span>
           </div>
           <div>

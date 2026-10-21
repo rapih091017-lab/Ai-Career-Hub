@@ -270,7 +270,7 @@ export default function AdminJobsPage() {
                 <div className="flex flex-wrap items-center gap-2">
                   <span
                     className={`rounded-full px-3 py-1 text-label-sm ${
-                      job.isPublished ? "bg-emerald-500/10 text-emerald-700" : "bg-surface-container text-on-surface-variant"
+                      job.isPublished ? "bg-green/10 text-green-deep" : "bg-surface-container text-on-surface-variant"
                     }`}
                   >
                     {job.isPublished ? "Terbit" : "Draf"}

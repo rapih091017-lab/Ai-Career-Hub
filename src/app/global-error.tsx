@@ -44,18 +44,18 @@ export default function GlobalError({
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
       </head>
       <body>
-        <div className="flex items-center justify-center min-h-screen bg-[#fbf8fe]">
+        <div className="flex items-center justify-center min-h-screen bg-desk">
           <div className="text-center space-y-6 max-w-md px-5">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto">
               <span className="material-symbols-outlined text-3xl text-red-500">error</span>
             </div>
-            <h1 className="text-2xl font-bold text-[#1b1b1f]">Terjadi Kesalahan</h1>
-            <p className="text-sm text-[#4a4452]">
+            <h1 className="text-2xl font-bold text-ink">Terjadi Kesalahan</h1>
+            <p className="text-sm text-ink-soft">
               Maaf, terjadi kesalahan yang tidak terduga. Silakan coba lagi.
             </p>
             <button
               onClick={reset}
-              className="px-6 py-3 rounded-full border-[2.5px] border-ink bg-lime text-ink font-bold shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 transition-all active:scale-95"
+              className="px-6 py-3 rounded-full border-[2.5px] border-ink bg-lime text-on-light font-bold shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 transition-all active:scale-95"
             >
               Coba Lagi
             </button>

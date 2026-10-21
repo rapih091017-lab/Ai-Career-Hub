@@ -117,25 +117,30 @@ export default function BentoFeatures() {
                 className={[
                   "grid content-start gap-3 rounded-xl border-[2.5px] border-ink p-6 transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5",
                   feature.span,
-                  dark ? "bg-evergreen text-paper shadow-hard-ink-sm" : "bg-paper shadow-hard",
+                  dark ? "bg-evergreen text-on-dark shadow-hard-ink-sm" : "bg-paper shadow-hard",
                   lime ? "bg-lime shadow-hard-ink-sm" : "",
                 ].join(" ")}
               >
                 <span
                   className={[
                     "w-fit -rotate-1 rounded-full px-3 py-1 text-[11.5px] font-bold",
-                    dark ? "bg-lime text-ink" : "bg-ink text-lime",
+                    dark ? "bg-lime text-on-light" : "bg-brand-dark text-lime",
                   ].join(" ")}
                 >
                   {t(feature.tag)}
                 </span>
-                <h3 className="font-display text-[clamp(1.25rem,1.9vw,1.625rem)] font-bold tracking-[-0.025em] text-ink">
+                <h3
+                  className={[
+                    "font-display text-[clamp(1.25rem,1.9vw,1.625rem)] font-bold tracking-[-0.025em]",
+                    dark ? "text-on-dark" : lime ? "text-on-light" : "text-ink",
+                  ].join(" ")}
+                >
                   {t(feature.title)}
                 </h3>
                 <p
                   className={[
                     "max-w-[42ch] text-[15px] leading-[1.55]",
-                    dark ? "text-paper/70" : "text-ink-soft",
+                    dark ? "text-on-dark/75" : "text-ink-soft",
                   ].join(" ")}
                 >
                   {t(feature.desc)}
@@ -146,14 +151,14 @@ export default function BentoFeatures() {
                       key={bullet}
                       className={[
                         "relative pl-5 text-[14px] font-semibold leading-[1.45]",
-                        dark ? "text-paper/70" : lime ? "text-ink/80" : "text-ink-soft",
+                        dark ? "text-on-dark/75" : lime ? "text-on-light/80" : "text-ink-soft",
                       ].join(" ")}
                     >
                       <span
                         aria-hidden="true"
                         className={[
                           "absolute left-0 top-1.5 h-2.5 w-2.5 rounded-[2px]",
-                          dark ? "bg-lime" : lime ? "bg-evergreen" : "bg-green",
+                          dark ? "bg-lime" : lime ? "bg-brand-dark" : "bg-green",
                         ].join(" ")}
                       />
                       {t(bullet)}
@@ -164,7 +169,7 @@ export default function BentoFeatures() {
                   href={feature.href}
                   className={[
                     "mt-1 inline-flex w-fit items-center gap-2 text-[14px] font-bold underline decoration-[3px] underline-offset-4 transition-colors",
-                    dark ? "text-lime decoration-lime hover:text-paper" : "text-green-deep decoration-green hover:text-ink",
+                    dark ? "text-lime decoration-lime hover:text-on-dark" : "text-green-deep decoration-green hover:text-ink",
                   ].join(" ")}
                 >
                   {t(feature.cta)}

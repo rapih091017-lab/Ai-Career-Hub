@@ -69,7 +69,7 @@ export function PdfExportButton({
       <button
         onClick={handleExport}
         disabled={loading}
-        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-on-primary text-sm font-semibold hover:brightness-110 active:scale-[0.97] transition-[filter,transform,opacity] disabled:opacity-60 shadow-premium-sm"
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-on-primary text-sm font-semibold hover:-translate-y-0.5 active:scale-[0.97] transition-[filter,transform,opacity] disabled:opacity-60 shadow-hard-sm"
         title={isFallback ? t("pdfbtn.fallback-title") : t("pdfbtn.dl-title")}
       >
         {loading ? (
@@ -83,7 +83,7 @@ export function PdfExportButton({
         {isFallback ? t("pdfbtn.downloading") : label}
       </button>
       {errorMsg && (
-        <div className="absolute top-full mt-2 right-0 bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg p-3 shadow-premium-md w-64 z-10">
+        <div className="absolute top-full mt-2 right-0 bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg p-3 shadow-hard w-64 z-10">
           <p className="font-semibold mb-1">{t("pdfbtn.export-failed-title")}</p>
           <p>{errorMsg}</p>
           <button

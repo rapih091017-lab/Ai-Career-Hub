@@ -40,7 +40,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
                         href={item.href}
                         className={`flex items-center gap-3 px-4 py-3 rounded-xl font-label-bold transition-all ${
                           isActive
-                            ? "border-2 border-ink bg-lime text-ink shadow-[2px_2px_0_rgb(var(--c-ink))]"
+                            ? "border-2 border-ink bg-lime text-on-light shadow-[2px_2px_0_rgb(var(--c-ink))]"
                             : "text-on-surface-variant hover:bg-surface-container hover:text-on-surface"
                         }`}
                       >

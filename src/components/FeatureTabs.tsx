@@ -175,7 +175,7 @@ function AnalysisInteractive({ t }: { t: (key: string) => string }) {
         <div className="flex flex-col items-center justify-center gap-3 min-w-[140px]">
           <Link
             href="/checker"
-            className="w-full px-5 py-3 bg-primary text-on-primary rounded-xl text-sm font-bold hover:brightness-110 transition-all shadow-sm flex items-center justify-center gap-2 group/btn"
+            className="w-full px-5 py-3 bg-primary text-on-primary rounded-xl text-sm font-bold hover:-translate-y-0.5 transition-all shadow-sm flex items-center justify-center gap-2 group/btn"
           >
             <span className="material-symbols-outlined text-lg">auto_awesome</span>
             {t("checker.analyze-btn")}
@@ -321,23 +321,23 @@ function LetterShowcase({ t }: { t: (key: string) => string }) {
         <motion.div variants={cardReveal}>
           <Link
             href="/surat-lamaran?style=formal"
-            className="block bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/40 hover:-translate-y-1 hover:shadow-lg hover:border-emerald-300/40 transition-all duration-300 cursor-pointer group"
+            className="block bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/40 hover:-translate-y-1 hover:shadow-lg hover:border-green/40/40 transition-all duration-300 cursor-pointer group"
           >
             <div className="px-4 pt-4 pb-3 border-b border-outline-variant/40 flex items-center gap-2">
-              <span className="w-6 h-6 rounded-lg bg-emerald-50 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <span className="material-symbols-outlined text-emerald-600 text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>business_center</span>
+              <span className="w-6 h-6 rounded-lg bg-green/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <span className="material-symbols-outlined text-green text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>business_center</span>
               </span>
-              <span className="text-xs font-bold text-on-surface group-hover:text-emerald-600 transition-colors">Surat Lamaran</span>
+              <span className="text-xs font-bold text-on-surface group-hover:text-green transition-colors">Surat Lamaran</span>
             </div>
             <div className="px-4 py-3 space-y-1.5">
-              <div className="h-2 w-2/3 bg-emerald-100 rounded" />
+              <div className="h-2 w-2/3 bg-green/15 rounded" />
               <div className="h-2 w-full bg-outline/10 rounded" />
               <div className="h-2 w-5/6 bg-outline/10 rounded" />
               <div className="h-2 w-4/6 bg-outline/10 rounded" />
               <div className="h-2 w-3/6 bg-outline/10 rounded" />
             </div>
             <div className="px-4 pb-3 flex justify-end">
-              <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Resmi · BUMN/Korporasi</span>
+              <span className="text-xs font-semibold text-green bg-green/10 px-2 py-0.5 rounded-full">Resmi · BUMN/Korporasi</span>
             </div>
           </Link>
         </motion.div>
@@ -577,7 +577,7 @@ export default function FeatureTabs() {
                     href={activeData.href}
                     className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-label-bold transition-all active:scale-[0.97] ${
                       activeTab === "checker" || activeTab === "letters"
-                        ? `${activeData.bgColor} text-on-primary hover:brightness-110 shadow-md`
+                        ? `${activeData.bgColor} text-on-primary hover:-translate-y-0.5 shadow-md`
                         : "border-2 border-primary/40 text-primary hover:bg-primary/5"
                     }`}
                   >

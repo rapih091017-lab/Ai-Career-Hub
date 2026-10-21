@@ -68,7 +68,7 @@ export default function HeroCvDemo() {
           type="button"
           onClick={run}
           disabled={text.trim().length < 20}
-          className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-xs font-bold text-on-primary shadow-sm transition-all hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-xs font-bold text-on-primary shadow-sm transition-all hover:-translate-y-0.5 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
         >
           <span className="material-symbols-outlined text-[16px]" aria-hidden>bolt</span>
           {t("hero.demo.run")}

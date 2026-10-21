@@ -14,7 +14,7 @@ export interface CareerHubPostSummary {
 
 export default function CareerHubPostCard({ post }: { post: CareerHubPostSummary }) {
   return (
-    <article className="group overflow-hidden rounded-2xl border border-outline-variant/60 bg-surface-container-lowest transition-shadow hover:shadow-premium-md">
+    <article className="group overflow-hidden rounded-2xl border border-outline-variant/60 bg-surface-container-lowest transition-shadow hover:shadow-hard">
       {post.coverImageUrl ? (
         <img src={post.coverImageUrl} alt="" className="h-44 w-full object-cover" />
       ) : (

@@ -96,7 +96,7 @@ export default function InterviewPage() {
                     if (e.target.value) setActiveCategory("all");
                   }}
                   placeholder={lang === "en" ? "Search positions or questions..." : "Cari posisi atau pertanyaan..."}
-                  className="w-full pl-10 pr-10 py-3 rounded-xl bg-surface-container-lowest border border-outline-variant/50 shadow-premium-sm text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-shadow"
+                  className="w-full pl-10 pr-10 py-3 rounded-xl bg-surface-container-lowest border border-outline-variant/50 shadow-hard-sm text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-shadow"
                 />
                 {search && (
                   <button
@@ -120,7 +120,7 @@ export default function InterviewPage() {
                   }}
                   className={`shrink-0 min-h-[44px] px-4 py-2 rounded-full text-xs font-semibold transition-all border-2 ${
                     activeCategory === "all"
-                      ? "bg-ink text-lime border-ink shadow-[2px_2px_0_rgb(var(--c-ink))]"
+                      ? "bg-brand-dark text-lime border-ink shadow-[2px_2px_0_rgb(var(--c-ink))]"
                       : "bg-paper text-ink-soft border-ink/25 hover:border-ink hover:text-ink"
                   }`}
                 >
@@ -135,7 +135,7 @@ export default function InterviewPage() {
                     }}
                     className={`shrink-0 min-h-[44px] flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all border-2 ${
                       activeCategory === cat.slug
-                        ? "bg-ink text-lime border-ink shadow-[2px_2px_0_rgb(var(--c-ink))]"
+                        ? "bg-brand-dark text-lime border-ink shadow-[2px_2px_0_rgb(var(--c-ink))]"
                         : "bg-paper text-ink-soft border-ink/25 hover:border-ink hover:text-ink"
                     }`}
                   >
@@ -151,7 +151,7 @@ export default function InterviewPage() {
                   }}
                   className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-all border ${
                     activeCategory === "saved"
-                      ? "bg-amber-500 text-white border-amber-500 shadow-premium-sm"
+                      ? "bg-amber-500 text-white border-amber-500 shadow-hard-sm"
                       : "bg-surface-container-lowest text-on-surface-variant border-outline-variant/40 hover:border-amber-400 hover:text-amber-600"
                   }`}
                 >
@@ -259,7 +259,7 @@ export default function InterviewPage() {
             )}
 
             {/* ── Bottom info ── */}
-            <section className="mt-10 bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/50 shadow-premium-sm">
+            <section className="mt-10 bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/50 shadow-hard-sm">
               <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
                 <div className="w-12 h-12 rounded-xl bg-secondary-container/50 flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-secondary">lightbulb</span>

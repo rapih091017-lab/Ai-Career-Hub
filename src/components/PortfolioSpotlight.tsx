@@ -61,7 +61,7 @@ export default function PortfolioSpotlight() {
           <div className="mt-10">
             <Link
               href="/portfolio/build"
-              className="inline-flex min-h-[54px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-7 font-display text-[15.5px] font-bold text-ink shadow-[0_4px_0_rgb(var(--c-ink))] transition-transform hover:-translate-y-0.5 active:scale-[0.98]"
+              className="inline-flex min-h-[54px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-7 font-display text-[15.5px] font-bold text-on-light shadow-[0_4px_0_rgb(var(--c-ink))] transition-transform hover:-translate-y-0.5 active:scale-[0.98]"
             >
               {t("portfolio.spot.cta")}
               <span className="material-symbols-outlined text-[18px]" aria-hidden>
@@ -84,13 +84,13 @@ export default function PortfolioSpotlight() {
               {t("portfolio.spot.preview-label")}
             </p>
             {/* Mini hero portfolio */}
-            <div className="rounded-xl border-2 border-ink bg-evergreen p-6 text-paper md:p-8">
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-paper/60">
+            <div className="rounded-xl border-2 border-ink bg-evergreen p-6 text-on-dark md:p-8">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-on-dark/60">
                 <span className="h-1.5 w-1.5 rounded-full bg-lime" aria-hidden />
                 Rizki Firmansyah
               </div>
               <p className="mt-3 font-display text-xl leading-tight md:text-2xl">{t("portfolio.spot.sample-title")}</p>
-              <p className="mt-2 text-xs text-paper/60">{t("portfolio.spot.sample-sub")}</p>
+              <p className="mt-2 text-xs text-on-dark/60">{t("portfolio.spot.sample-sub")}</p>
               <div className="mt-5 flex flex-wrap gap-2">
                 {["Projects", "Skills", "Contact"].map((chip) => (
                   <span

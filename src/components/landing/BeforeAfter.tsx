@@ -24,7 +24,7 @@ export default function BeforeAfter() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.3 }}
         >
-          <span className="mb-4 inline-flex items-center gap-2 rounded-full border-2 border-ink bg-lime px-4 py-1.5 text-[12px] font-bold tracking-wide text-ink">
+          <span className="mb-4 inline-flex items-center gap-2 rounded-full border-2 border-ink bg-lime px-4 py-1.5 text-[12px] font-bold tracking-wide text-on-light">
             {t("before-after.badge")}
           </span>
           <h2 className="font-display text-headline-lg font-bold text-ink">{t("before-after.title")}</h2>
@@ -52,7 +52,7 @@ export default function BeforeAfter() {
                       </div>
                       <div>
                         <span className="text-[14px] font-bold text-error">{t("before-after.before-label")}</span>
-                        <p className="text-[12px] font-medium text-error/80">{t("before-after.example")}</p>
+                        <p className="text-[12px] font-medium text-error">{t("before-after.example")}</p>
                       </div>
                     </div>
                     <span className="rounded-full border border-error/40 px-3 py-1 text-[12px] font-bold text-error">
@@ -116,7 +116,7 @@ export default function BeforeAfter() {
                       </div>
                       <div>
                         <span className="text-[14px] font-bold text-green-deep">{t("before-after.after-label")}</span>
-                        <p className="text-[12px] font-medium text-green-deep/80">{t("before-after.example")}</p>
+                        <p className="text-[12px] font-medium text-green-deep">{t("before-after.example")}</p>
                       </div>
                     </div>
                     <span className="rounded-full border border-green/50 px-3 py-1 text-[12px] font-bold text-green-deep">
@@ -205,7 +205,7 @@ export default function BeforeAfter() {
           <div className="mt-6">
             <Link
               href="/checker"
-              className="inline-flex min-h-[54px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-7 font-display text-[15.5px] font-bold text-ink shadow-hard-ink-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5"
+              className="inline-flex min-h-[54px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-7 font-display text-[15.5px] font-bold text-on-light shadow-hard-ink-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5"
             >
               {t("before-after.cta")}
               <span aria-hidden="true">&rarr;</span>

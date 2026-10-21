@@ -122,7 +122,7 @@ export default function PhotoUpload({ value, onChange, label = "Foto Profil" }: 
                 <span className="text-xs text-on-surface-variant font-medium">
                   Klik atau tarik foto ke sini
                 </span>
-                <span className="text-xs text-on-surface-variant/60">
+                <span className="text-xs text-on-surface-variant">
                   PNG, JPG, WebP. Maks 5MB
                 </span>
               </>

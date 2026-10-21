@@ -102,7 +102,7 @@ export function StarPracticeBox({
         </span>
         <span className="text-[11px] font-bold text-on-surface">{t("interview.star-practice-title")}</span>
         {savedScore !== null ? (
-          <span className="ml-auto rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+          <span className="ml-auto rounded-full bg-green/10 px-2 py-0.5 text-[10px] font-bold text-green-deep">
             STAR {starScoreLabel(savedScore)}/5
           </span>
         ) : null}
@@ -122,7 +122,7 @@ export function StarPracticeBox({
             placeholder={t("interview.star-answer-placeholder")}
             rows={3}
             maxLength={4000}
-            className="w-full resize-y rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-[11px] leading-relaxed text-on-surface placeholder:text-on-surface-variant/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+            className="w-full resize-y rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-[11px] leading-relaxed text-on-surface placeholder:text-on-surface-variant focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
           />
           <div className="flex items-center justify-between gap-2">
             <p className="text-[10px] text-on-surface-variant">{myAnswer.trim().length}/4000</p>

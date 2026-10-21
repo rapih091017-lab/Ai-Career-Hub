@@ -276,7 +276,7 @@ export default function BuilderPage() {
           <div className="w-full lg:w-1/2 bg-background border-b lg:border-b-0 lg:border-r border-outline-variant/50 overflow-y-auto custom-scrollbar">
             <div className="px-6 pt-8 pb-4 flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                <span className="material-symbols-outlined text-primary text-xl" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">{sectionMeta[activeStep].icon}</span>
+                <span className="material-symbols-outlined text-green-deep text-xl" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">{sectionMeta[activeStep].icon}</span>
               </div>
               <div>
                 <h2 className="font-headline-md text-on-surface">
@@ -290,12 +290,12 @@ export default function BuilderPage() {
             {/* ── AI Keyword Suggestions Banner ── */}
             {aiJdKeywords && aiJdKeywords.length > 0 && activeStep !== 1 && activeStep !== 6 && (
               <div className="flex flex-wrap items-center gap-2 px-1 py-2 mb-2 bg-primary/5 border border-primary/10 rounded-xl">
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-primary shrink-0">
+                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-green-deep shrink-0">
                   <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">travel_explore</span>
                   <span>{t("builder.keywords-label")}</span>
                 </div>
                 {aiJdKeywords.slice(0, 10).map((kw, i) => (
-                  <span key={i} className="px-2 py-0.5 bg-surface-container-lowest rounded-full text-[10px] font-medium text-primary border border-primary/20 cursor-default hover:bg-primary/10 transition-colors">
+                  <span key={i} className="px-2 py-0.5 bg-surface-container-lowest rounded-full text-[10px] font-medium text-green-deep border border-green-deep/20 cursor-default hover:bg-lime/25 transition-colors">
                     {kw}
                   </span>
                 ))}
@@ -418,7 +418,7 @@ export default function BuilderPage() {
                     />
                   ))}
                   <button type="button" onClick={addWork}
-                    className="w-full border-2 border-dashed border-outline/30 rounded-xl py-4 flex items-center justify-center gap-2 text-body-md text-on-surface-variant hover:border-primary/50 hover:text-primary transition-colors duration-200"
+                    className="w-full border-2 border-dashed border-outline/30 rounded-xl py-4 flex items-center justify-center gap-2 text-body-md text-on-surface-variant hover:border-green-deep hover:text-green-deep transition-colors duration-200"
                   >
                     <span className="material-symbols-outlined text-lg">add</span> {t("builder.add-experience")}
                   </button>
@@ -452,7 +452,7 @@ export default function BuilderPage() {
                     />
                   ))}
                   <button type="button" onClick={addEducation}
-                    className="w-full border-2 border-dashed border-outline/30 rounded-xl py-4 flex items-center justify-center gap-2 text-body-md text-on-surface-variant hover:border-primary/50 hover:text-primary transition-colors duration-200"
+                    className="w-full border-2 border-dashed border-outline/30 rounded-xl py-4 flex items-center justify-center gap-2 text-body-md text-on-surface-variant hover:border-green-deep hover:text-green-deep transition-colors duration-200"
                   >
                     <span className="material-symbols-outlined text-lg">add</span> {t("builder.add-education")}
                   </button>
@@ -484,7 +484,7 @@ export default function BuilderPage() {
                     />
                   ))}
                   <button type="button" onClick={addOrganization}
-                    className="w-full border-2 border-dashed border-outline/30 rounded-xl py-4 flex items-center justify-center gap-2 text-body-md text-on-surface-variant hover:border-primary/50 hover:text-primary transition-colors duration-200"
+                    className="w-full border-2 border-dashed border-outline/30 rounded-xl py-4 flex items-center justify-center gap-2 text-body-md text-on-surface-variant hover:border-green-deep hover:text-green-deep transition-colors duration-200"
                   >
                     <span className="material-symbols-outlined text-lg">add</span> {t("builder.add-org")}
                   </button>

@@ -128,7 +128,7 @@ describe("halaman harga memakai data katalog, bukan angka yang diketik tangan", 
 
   it("daftar isi kartu dibaca dari kuota paket", () => {
     expect(pricing).toContain("packageBenefits(pkg)");
-    expect(pricing).toContain("benefitText(");
+    expect(pricing).toContain("benefitLabel(");
   });
 
   it("semua paket yang ditampilkan ada di katalog", () => {

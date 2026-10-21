@@ -63,7 +63,7 @@ export default function HeroOrbit() {
   const { t } = useTranslation();
 
   return (
-    <header id="hero" className="relative overflow-hidden bg-evergreen text-paper">
+    <header id="hero" className="relative overflow-hidden bg-evergreen text-on-dark">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-[0.07]"
@@ -101,7 +101,7 @@ export default function HeroOrbit() {
             </p>
 
             <h1
-              className="mt-5 font-display font-bold text-paper"
+              className="mt-5 font-display font-bold text-on-dark"
               style={{ fontSize: "clamp(2.5rem, 4.6vw, 4rem)", lineHeight: 1.04, letterSpacing: "-0.03em" }}
             >
               <span className="block">{t("lp.hero.title-a")}</span>
@@ -111,28 +111,28 @@ export default function HeroOrbit() {
               <span className="block">{t("lp.hero.title-c")}</span>
             </h1>
 
-            <p className="mt-5 max-w-[50ch] text-[16.5px] leading-relaxed text-paper/70">
+            <p className="mt-5 max-w-[50ch] text-[16.5px] leading-relaxed text-on-dark/70">
               {t("lp.hero.intro")}
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-5">
               <Link
                 href="/builder/new"
-                className="inline-flex min-h-[54px] items-center justify-center gap-3 rounded-full border-[3px] border-ink bg-lime px-6 font-display text-[15.5px] font-bold text-ink shadow-[4px_4px_0_rgb(var(--c-ink))] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_rgb(var(--c-ink))]"
+                className="inline-flex min-h-[54px] items-center justify-center gap-3 rounded-full border-[3px] border-ink bg-lime px-6 font-display text-[15.5px] font-bold text-on-light shadow-[4px_4px_0_rgb(var(--c-ink))] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_rgb(var(--c-ink))]"
               >
                 {t("lp.hero.cta-primary")}
                 <span aria-hidden="true">&rarr;</span>
               </Link>
               <Link
                 href="/checker"
-                className="inline-flex min-h-[44px] items-center gap-2 text-[15px] font-bold text-paper underline decoration-lime decoration-[3px] underline-offset-[5px] transition-colors hover:text-lime"
+                className="inline-flex min-h-[44px] items-center gap-2 text-[15px] font-bold text-on-dark underline decoration-lime decoration-[3px] underline-offset-[5px] transition-colors hover:text-lime"
               >
                 {t("lp.hero.cta-secondary")}
                 <span aria-hidden="true">&rarr;</span>
               </Link>
             </div>
 
-            <p className="mt-5 text-[13px] font-semibold leading-relaxed text-paper/70">
+            <p className="mt-5 text-[13px] font-semibold leading-relaxed text-on-dark/70">
               {t("lp.hero.proof")} <span className="font-bold text-lime">{t("lp.hero.proof-strong")}</span>
             </p>
 
@@ -140,7 +140,7 @@ export default function HeroOrbit() {
               {["lp.hero.chip-1", "lp.hero.chip-2", "lp.hero.chip-3", "lp.hero.chip-4"].map((key) => (
                 <li
                   key={key}
-                  className="rounded-full border-[1.5px] border-dashed border-lime/60 px-3 py-1 font-script text-[17px] font-semibold text-paper/80"
+                  className="rounded-full border-[1.5px] border-dashed border-lime/60 px-3 py-1 font-script text-[17px] font-semibold text-on-dark/80"
                 >
                   {t(key)}
                 </li>
@@ -158,7 +158,7 @@ export default function HeroOrbit() {
                 ].join(" ")}
                 style={{ ["--node-rot" as string]: node.rot, animationDelay: node.delay }}
               >
-                <span className="mb-2 inline-block rounded-full bg-ink px-2 py-1 text-[11px] font-bold text-lime">
+                <span className="mb-2 inline-block rounded-full bg-brand-dark px-2 py-1 text-[11px] font-bold text-lime">
                   {t(node.tag)}
                 </span>
                 <h2 className="font-display text-[13px] font-bold leading-tight text-ink">{t(node.title)}</h2>
@@ -172,7 +172,7 @@ export default function HeroOrbit() {
                 </p>
                 <Link
                   href={node.href}
-                  className="mt-3 inline-flex items-center rounded-[6px] border-2 border-ink bg-ink px-2.5 py-1.5 text-[11px] font-bold text-lime shadow-[2px_2px_rgba(10,15,13,0.35)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5"
+                  className="mt-3 inline-flex items-center rounded-[6px] border-2 border-ink bg-brand-dark px-2.5 py-1.5 text-[11px] font-bold text-lime shadow-[2px_2px_rgba(10,15,13,0.35)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5"
                 >
                   {t(node.cta)}
                 </Link>

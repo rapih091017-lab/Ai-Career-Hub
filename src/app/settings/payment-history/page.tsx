@@ -83,7 +83,7 @@ export default function PaymentHistoryPage() {
       {/* Section: Riwayat Transaksi */}
       <section className="bg-paper rounded-[14px] shadow-hard-sm border-2 border-ink/15 overflow-hidden">
         <div className="px-6 py-5 border-b border-hairline flex items-center gap-4">
-          <div className="w-10 h-10 rounded-[7px] border-2 border-ink bg-lime flex items-center justify-center text-ink">
+          <div className="w-10 h-10 rounded-[7px] border-2 border-ink bg-lime flex items-center justify-center text-on-light">
             <span className="material-symbols-outlined">receipt_long</span>
           </div>
           <div>
@@ -219,7 +219,7 @@ export default function PaymentHistoryPage() {
               <div className="p-5 rounded-[14px] bg-lime/15 border-2 border-dashed border-ink/40 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-lime/40 rounded-full -mr-16 -mt-16"></div>
                 <div className="flex gap-4 relative z-10">
-                  <div className="w-10 h-10 rounded-[7px] border-2 border-ink bg-ink flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-[7px] border-2 border-ink bg-brand-dark flex items-center justify-center shrink-0">
                     <span
                       className="material-symbols-outlined text-white"
                       style={{ fontVariationSettings: "'FILL' 1" }}

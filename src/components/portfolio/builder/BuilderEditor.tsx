@@ -1420,7 +1420,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-500"></div>
               <div className="flex gap-4 relative z-10">
                 <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-white" style={{ fontVariationSettings: "'FILL' 1" }}>preview</span>
+                  <span className="material-symbols-outlined text-on-primary" style={{ fontVariationSettings: "'FILL' 1" }}>preview</span>
                 </div>
                 <div>
                   <h3 className="font-label-bold text-on-surface mb-1">{t("build.preview-hint-title")}</h3>
@@ -1530,7 +1530,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                   }
                 }}
                 disabled={saving}
-                className="bg-primary text-on-primary font-label-bold rounded-lg px-8 py-3 hover:brightness-110 active:scale-95 duration-200 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="bg-primary text-on-primary font-label-bold rounded-lg px-8 py-3 hover:-translate-y-0.5 active:scale-95 duration-200 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {saving ? (
                   <><span className="material-symbols-outlined text-lg animate-spin">sync</span> {t("build.saving")}</>
@@ -1695,7 +1695,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
             </button>
             <button
               onClick={applyAllAi}
-              className="flex-1 py-3 rounded-xl bg-primary text-on-primary font-label-bold hover:brightness-110 transition-all active:scale-[0.98]"
+              className="flex-1 py-3 rounded-xl bg-primary text-on-primary font-label-bold hover:-translate-y-0.5 transition-all active:scale-[0.98]"
             >
               Terapkan Semua
             </button>

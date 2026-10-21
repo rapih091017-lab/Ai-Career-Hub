@@ -97,11 +97,11 @@ export function BottomNav({
                 title={label}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${
                   isActive ? "bg-primary text-on-primary shadow-sm" :
-                  isFilled ? "bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/20" :
+                  isFilled ? "bg-green/10 text-green-deep hover:bg-green/20" :
                   "bg-surface-container-low text-on-surface-variant hover:bg-surface-container"
                 }`}
               >
-                <span className={`material-symbols-outlined text-[14px] ${isFilled && !isActive ? "text-emerald-600" : ""}`} style={{ fontVariationSettings: "'FILL' 1" }}>
+                <span className={`material-symbols-outlined text-[14px] ${isFilled && !isActive ? "text-green" : ""}`} style={{ fontVariationSettings: "'FILL' 1" }}>
                   {isFilled ? "check_circle" : iconNames[i]}
                 </span>
                 <span className="hidden md:inline">{label}</span>
@@ -119,7 +119,7 @@ export function BottomNav({
               >
                 <span className="material-symbols-outlined text-base">chevron_left</span>
                 <span className="hidden sm:inline">{t("builder.prev")}</span>
-                <kbd className="hidden md:inline-flex text-[8px] font-bold text-on-surface-variant/60 bg-outline-variant/20 px-1 py-0.5 rounded ml-1 border border-outline-variant/50">Ctrl+←</kbd>
+                <kbd className="hidden md:inline-flex text-[8px] font-bold text-on-surface-variant bg-outline-variant/20 px-1 py-0.5 rounded ml-1 border border-outline-variant/50">Ctrl+←</kbd>
               </button>
             )}
           </div>
@@ -130,7 +130,7 @@ export function BottomNav({
               <button key={i} onClick={() => setActiveStep(i)}
                 className={`w-6 h-6 rounded-full text-[10px] font-bold transition-all ${
                   i === activeStep ? "bg-primary text-on-primary scale-110" :
-                  sectionCompletion[i] ? "bg-emerald-500/15 text-emerald-700" :
+                  sectionCompletion[i] ? "bg-green/15 text-green-deep" :
                   "bg-surface-container-high text-on-surface-variant"
                 }`}
               >
@@ -142,19 +142,19 @@ export function BottomNav({
           <div>
             {activeStep < steps.length - 1 ? (
               <button type="button" onClick={() => setActiveStep(Math.min(steps.length - 1, activeStep + 1))}
-                className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-primary text-on-primary text-sm font-medium hover:brightness-110 transition-[filter,transform] active:scale-95"
+                className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-primary text-on-primary text-sm font-medium hover:-translate-y-0.5 transition-[filter,transform] active:scale-95"
               >
                 <span className="hidden sm:inline">{t("builder.next")}</span>
-                <kbd className="hidden md:inline-flex text-[8px] font-bold text-on-surface-variant/60 bg-outline-variant/20 px-1 py-0.5 rounded ml-1 border border-outline-variant/50">Ctrl+→</kbd>
+                <kbd className="hidden md:inline-flex text-[8px] font-bold text-on-surface-variant bg-outline-variant/20 px-1 py-0.5 rounded ml-1 border border-outline-variant/50">Ctrl+→</kbd>
                 <span className="material-symbols-outlined text-base">chevron_right</span>
               </button>
             ) : (
               <button type="button" onClick={handleSave} disabled={isSaving}
-                className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-primary text-on-primary text-sm font-medium hover:brightness-110 transition-[filter,transform,opacity] disabled:opacity-50 active:scale-95"
+                className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-primary text-on-primary text-sm font-medium hover:-translate-y-0.5 transition-[filter,transform,opacity] disabled:opacity-50 active:scale-95"
               >
                 <span className="material-symbols-outlined text-base">save</span>
                 {isSaving ? t("builder.saving") : t("builder.save")}
-                <kbd className="hidden md:inline-flex text-[8px] font-bold text-on-surface-variant/60 bg-outline-variant/20 px-1 py-0.5 rounded ml-1 border border-outline-variant/50">Ctrl+Enter</kbd>
+                <kbd className="hidden md:inline-flex text-[8px] font-bold text-on-surface-variant bg-outline-variant/20 px-1 py-0.5 rounded ml-1 border border-outline-variant/50">Ctrl+Enter</kbd>
               </button>
             )}
           </div>

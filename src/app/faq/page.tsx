@@ -140,14 +140,14 @@ const FAQ_GROUPS = [
 export default function FaqPage() {
   return (
     <main className="min-h-screen bg-background">
-      <div className="bg-evergreen text-paper">
+      <div className="bg-evergreen text-on-dark">
         <div className="max-w-3xl mx-auto px-6 py-20">
-          <Link href="/" className="inline-flex min-h-[44px] items-center gap-2 text-paper/70 hover:text-lime transition-colors mb-6 text-sm">
+          <Link href="/" className="inline-flex min-h-[44px] items-center gap-2 text-on-dark/70 hover:text-lime transition-colors mb-6 text-sm">
             <span className="material-symbols-outlined text-lg">arrow_back</span>
             Kembali ke Beranda
           </Link>
           <h1 className="font-display text-3xl md:text-4xl font-bold mb-3">FAQ</h1>
-          <p className="text-paper/70 text-lg">Pertanyaan yang sering diajukan</p>
+          <p className="text-on-dark/70 text-lg">Pertanyaan yang sering diajukan</p>
         </div>
       </div>
 
@@ -165,7 +165,7 @@ export default function FaqPage() {
                     {faq.q}
                     <span
                       aria-hidden="true"
-                      className="flex h-[34px] w-[34px] flex-none items-center justify-center rounded-full bg-ink text-paper transition-transform group-open:rotate-45"
+                      className="flex h-[34px] w-[34px] flex-none items-center justify-center rounded-full bg-brand-dark text-on-dark transition-transform group-open:rotate-45"
                     >
                       +
                     </span>

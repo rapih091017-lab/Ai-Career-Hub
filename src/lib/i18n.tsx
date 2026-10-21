@@ -1145,6 +1145,18 @@ const DICT: Record<string, { id: string; en: string }> = {
   "pricing.badge-terlaris": { id: "Terlaris", en: "Best Seller" },
   "pricing.badge-populer": { id: "Paling Populer", en: "Most Popular" },
   "pricing.badge-premium": { id: "Premium", en: "Premium" },
+  "pricing.stage-kicker": { id: "Bayar pas perlu", en: "Pay as you go" },
+  "pricing.door1.step": { id: "Pintu 1 · paket satuan", en: "Door 1 · one-time" },
+  "pricing.door1.title": { id: "Pilih satu, bayar sekali, langsung dipakai", en: "Pick one, pay once, use it right away" },
+  "pricing.door1.choose": { id: "Pilih paket", en: "Choose a plan" },
+  "pricing.door2.meta": { id: "Pintu 2 · paket bulanan", en: "Door 2 · monthly" },
+  "pricing.door2.title": { id: "Pass Bulanan", en: "Monthly Pass" },
+  "pricing.door2.from": { id: "mulai dari", en: "starting at" },
+  "pricing.door2.stop": { id: "Bisa berhenti kapan aja", en: "Cancel anytime" },
+  "pricing.door2.ribbon": { id: "Paling dipilih", en: "Most picked" },
+  "pricing.door2.cta": { id: "Ambil Paket Bulanan", en: "Get the Monthly Pass" },
+  "pricing.bridge": { id: "Atau langganan, biar nggak mikir tiap kirim", en: "Or subscribe so you don't think about every send" },
+  "pricing.see-all": { id: "Lihat detail semua paket", en: "See all plan details" },
 
   /* Paket satuan & bulanan (kunci katalog = kunci i18n) */
   "pricing.plan.cek-cv.name": { id: "Cek CV", en: "CV Check" },

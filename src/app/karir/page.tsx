@@ -71,8 +71,8 @@ const EXTERNAL_PORTALS = [
     url: "https://www.techinasia.com/jobs",
     descriptionKey: "karir.portal-techinasia",
     icon: "▲",
-    color: "bg-emerald-50 border-emerald-200",
-    textColor: "text-emerald-700",
+    color: "bg-green/10 border-green/25",
+    textColor: "text-green-deep",
     label: "techinasia.com/jobs",
   },
 ];
@@ -149,9 +149,9 @@ export default function KarirPage() {
       <SiteHeader variant="pill" />
       <main className="flex-1">
       {/* ── Hero ── */}
-      <div className="bg-evergreen text-paper">
+      <div className="bg-evergreen text-on-dark">
         <div className="max-w-3xl mx-auto px-6 py-20 md:py-24">
-          <Link href="/" className="inline-flex min-h-[44px] items-center gap-2 text-paper/70 hover:text-lime transition-colors mb-6 text-sm">
+          <Link href="/" className="inline-flex min-h-[44px] items-center gap-2 text-on-dark/75 hover:text-lime transition-colors mb-6 text-sm">
             <span className="material-symbols-outlined text-lg">arrow_back</span>
             {t("karir.back-home")}
           </Link>
@@ -164,20 +164,20 @@ export default function KarirPage() {
                 : t("karir.soon")}
           </div>
           <h1 className="font-display text-3xl md:text-4xl font-bold mb-3">{t("karir.title")}</h1>
-          <p className="text-paper/70 text-lg max-w-xl">
+          <p className="text-on-dark/75 text-lg max-w-xl">
             {t("karir.subtitle")}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/builder/new"
-              className="inline-flex min-h-[54px] items-center gap-2 px-6 py-3 border-[2.5px] border-ink bg-lime text-ink font-bold rounded-full shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-[0.97] transition-all"
+              className="inline-flex min-h-[54px] items-center gap-2 px-6 py-3 border-[2.5px] border-ink bg-lime text-on-light font-bold rounded-full shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-[0.97] transition-all"
             >
               <span className="material-symbols-outlined text-lg">edit_note</span>
               {t("karir.prepare-cv")}
             </Link>
             <Link
               href="/interview"
-              className="inline-flex min-h-[54px] items-center gap-2 px-6 py-3 border border-paper/30 text-paper font-bold rounded-full hover:bg-paper/10 active:scale-[0.97] transition-all"
+              className="inline-flex min-h-[54px] items-center gap-2 px-6 py-3 border border-on-dark/30 text-on-dark font-bold rounded-full hover:bg-paper/10 active:scale-[0.97] transition-all"
             >
               <span className="material-symbols-outlined text-lg">record_voice_over</span>
               {t("karir.interview-practice")}
@@ -295,7 +295,7 @@ export default function KarirPage() {
               <div className="flex shrink-0 flex-wrap gap-2">
                 <Link
                   href="/builder/new"
-                  className="inline-flex min-h-[44px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-4 py-2.5 text-sm font-bold text-ink shadow-[0_3px_0_rgb(var(--c-ink))] transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+                  className="inline-flex min-h-[44px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-4 py-2.5 text-sm font-bold text-on-light shadow-[0_3px_0_rgb(var(--c-ink))] transition-all hover:-translate-y-0.5 active:scale-[0.98]"
                 >
                   <span className="material-symbols-outlined text-base" aria-hidden="true">auto_awesome</span>
                   {t("karir.promo-cta-cv")}
@@ -384,7 +384,7 @@ export default function KarirPage() {
                       href={job.applyUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-auto inline-flex items-center justify-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-5 py-2.5 text-sm font-bold text-ink shadow-[0_3px_0_rgb(var(--c-ink))] transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+                      className="mt-auto inline-flex items-center justify-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-5 py-2.5 text-sm font-bold text-on-light shadow-[0_3px_0_rgb(var(--c-ink))] transition-all hover:-translate-y-0.5 active:scale-[0.98]"
                     >
                       <span className="material-symbols-outlined text-base" aria-hidden="true">open_in_new</span>
                       {t("karir.apply")}
@@ -398,7 +398,7 @@ export default function KarirPage() {
         ) : jobsLoaded && hasFilters ? (
           <section className="mb-16">
             <div className="rounded-[14px] border-2 border-ink/15 bg-paper p-8 text-center shadow-hard-sm">
-              <span className="material-symbols-outlined mb-4 text-5xl text-ink-soft/50" aria-hidden="true">
+              <span className="material-symbols-outlined mb-4 text-5xl text-ink-soft" aria-hidden="true">
                 search_off
               </span>
               <h2 className="mb-2 font-display text-xl text-ink">{t("karir.no-match-title")}</h2>
@@ -412,7 +412,7 @@ export default function KarirPage() {
                   setCategory("");
                   setEmployment("");
                 }}
-                className="inline-flex min-h-[44px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-5 py-2.5 text-sm font-bold text-ink shadow-[0_3px_0_rgb(var(--c-ink))] transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-5 py-2.5 text-sm font-bold text-on-light shadow-[0_3px_0_rgb(var(--c-ink))] transition-all hover:-translate-y-0.5 active:scale-[0.98]"
               >
                 <span className="material-symbols-outlined text-base" aria-hidden="true">restart_alt</span>
                 {t("karir.reset-filter")}
@@ -493,7 +493,7 @@ export default function KarirPage() {
         <section className="card-hard bg-paper p-8 md:p-10 text-center">
           <div className="max-w-lg mx-auto">
             <div className="w-14 h-14 rounded-[14px] border-2 border-ink bg-lime flex items-center justify-center mx-auto mb-4">
-              <span className="material-symbols-outlined text-ink text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>description</span>
+              <span className="material-symbols-outlined text-on-light text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>description</span>
             </div>
             <h2 className="font-display text-xl text-ink mb-2">{t("karir.cta-title")}</h2>
             <p className="text-body-md text-ink-soft mb-6">
@@ -501,7 +501,7 @@ export default function KarirPage() {
             </p>
             <Link
               href="/builder/new"
-              className="inline-flex min-h-[54px] items-center gap-2 px-8 py-3.5 border-[2.5px] border-ink bg-lime text-ink font-bold rounded-full shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-[0.97] transition-all"
+              className="inline-flex min-h-[54px] items-center gap-2 px-8 py-3.5 border-[2.5px] border-ink bg-lime text-on-light font-bold rounded-full shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-[0.97] transition-all"
             >
               <span className="material-symbols-outlined text-lg">add</span>
               {t("karir.cta-btn")}

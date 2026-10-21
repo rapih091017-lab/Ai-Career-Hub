@@ -103,7 +103,7 @@ export default async function CareerPathDetailPage({ params }: Props) {
                       <div className="flex flex-wrap items-center gap-2 text-label-sm text-on-surface-variant">
                         {level.years ? <span>{level.years}</span> : null}
                         {level.salaryRange ? (
-                          <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 font-bold text-emerald-700">
+                          <span className="rounded-full bg-green/10 px-2.5 py-0.5 font-bold text-green-deep">
                             {level.salaryRange}
                           </span>
                         ) : null}
@@ -165,7 +165,7 @@ export default async function CareerPathDetailPage({ params }: Props) {
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
               <Link
                 href="/builder/new"
-                className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-bold text-on-primary transition-all hover:brightness-110 active:scale-[0.97]"
+                className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-bold text-on-primary transition-all hover:-translate-y-0.5 active:scale-[0.97]"
               >
                 <span className="material-symbols-outlined text-lg">edit_note</span>
                 Buat CV

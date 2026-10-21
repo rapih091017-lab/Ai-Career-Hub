@@ -189,7 +189,7 @@ export default function LogoutConfirmModal({ open, onClose }: LogoutConfirmModal
                 <button
                   ref={confirmRef}
                   onClick={handleLogout}
-                  className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-red-500 to-red-600 text-sm font-semibold text-white shadow-lg shadow-red-500/25 hover:shadow-red-500/40 hover:brightness-110 transition-all duration-200 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-red-500 focus-visible:outline-offset-2 flex items-center justify-center gap-2"
+                  className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-red-500 to-red-600 text-sm font-semibold text-white shadow-lg shadow-red-500/25 hover:shadow-red-500/40 hover:-translate-y-0.5 transition-all duration-200 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-red-500 focus-visible:outline-offset-2 flex items-center justify-center gap-2"
                 >
                   <span className="material-symbols-outlined text-lg">logout</span>
                   Keluar

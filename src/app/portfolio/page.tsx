@@ -279,23 +279,23 @@ export default function PortfolioPage() {
             </section>
 
             {/* CTA, Generate & Deploy */}
-            <section className="relative overflow-hidden rounded-[18px] border-[2.5px] border-ink bg-evergreen p-8 md:p-12 text-paper text-center shadow-hard">
+            <section className="relative overflow-hidden rounded-[18px] border-[2.5px] border-ink bg-evergreen p-8 md:p-12 text-on-dark text-center shadow-hard">
               <div className="absolute top-0 right-0 w-64 h-64 bg-lime/25 rounded-full blur-3xl -mr-24 -mt-24 pointer-events-none"></div>
               <div className="absolute bottom-0 left-0 w-48 h-48 bg-lime/15 rounded-full blur-2xl -ml-16 -mb-16 pointer-events-none"></div>
               <div className="relative z-10">
                 <span className="material-symbols-outlined text-5xl mb-4 opacity-80" aria-hidden="true" style={{ fontVariationSettings: "'FILL' 1" }}>language</span>
-                <h2 className="font-display text-2xl mb-4 text-paper">{t("portfolio.deploy-title")}</h2>
-                <p className="font-body-md mb-8 opacity-80 max-w-lg mx-auto text-paper">{t("portfolio.deploy-desc")}</p>
+                <h2 className="font-display text-2xl mb-4 text-on-dark">{t("portfolio.deploy-title")}</h2>
+                <p className="font-body-md mb-8 opacity-80 max-w-lg mx-auto text-on-dark">{t("portfolio.deploy-desc")}</p>
                 {publishInfo?.published && (
-                  <div className="mb-8 mx-auto max-w-md bg-paper/10 backdrop-blur rounded-xl px-4 py-3 flex items-center gap-3 border border-paper/20">
+                  <div className="mb-8 mx-auto max-w-md bg-paper/10 backdrop-blur rounded-xl px-4 py-3 flex items-center gap-3 border border-on-dark/20">
                     <span className="material-symbols-outlined text-lime shrink-0" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">check_circle</span>
                     <div className="min-w-0 text-left">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-paper/80">{t("portfolio.publish-link-share")}</p>
+                      <p className="text-xs font-semibold uppercase tracking-wider text-on-dark/80">{t("portfolio.publish-link-share")}</p>
                       <a
                         href={publishInfo.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm font-bold text-paper hover:underline truncate block"
+                        className="text-sm font-bold text-on-dark hover:underline truncate block"
                       >
                         {publishInfo.url?.replace(/^https?:\/\//, "")}
                       </a>
@@ -316,14 +316,14 @@ export default function PortfolioPage() {
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link
                     href="/portfolio/build"
-                    className="inline-flex min-h-[54px] items-center justify-center gap-2 px-10 py-4 rounded-full border-[2.5px] border-ink bg-lime text-ink font-bold text-lg shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-[0.98] transition-all"
+                    className="inline-flex min-h-[54px] items-center justify-center gap-2 px-10 py-4 rounded-full border-[2.5px] border-ink bg-lime text-on-light font-bold text-lg shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-[0.98] transition-all"
                   >
                     <span className="material-symbols-outlined" aria-hidden="true">edit</span>
                     {t("portfolio.create-portfolio")}
                   </Link>
                   <Link
                     href={`/portfolio/preview?template=${selectedTheme}`}
-                    className="inline-flex min-h-[54px] items-center justify-center gap-2 px-10 py-4 rounded-full border-2 border-paper/30 text-paper font-bold text-lg hover:bg-paper/10 active:scale-[0.98] transition-all"
+                    className="inline-flex min-h-[54px] items-center justify-center gap-2 px-10 py-4 rounded-full border-2 border-on-dark/30 text-on-dark font-bold text-lg hover:bg-paper/10 active:scale-[0.98] transition-all"
                   >
                     <span className="material-symbols-outlined" aria-hidden="true">preview</span>
                     {t("portfolio.view-preview")}

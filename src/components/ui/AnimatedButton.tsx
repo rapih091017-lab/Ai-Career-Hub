@@ -27,13 +27,13 @@ interface AnimatedButtonProps {
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "border-[2.5px] border-ink bg-lime text-ink shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5",
+    "border-[2.5px] border-ink bg-lime text-on-light shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5",
   emerald:
     "border-[2.5px] border-ink bg-green text-ink shadow-[0_4px_0_rgb(var(--c-ink))] hover:-translate-y-0.5",
   ghost:
     "bg-paper text-ink border-2 border-ink/40 shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 hover:border-ink",
   secondary:
-    "border-[2.5px] border-ink bg-ink text-lime shadow-[0_4px_0_rgba(10,15,13,0.4)] hover:-translate-y-0.5",
+    "border-[2.5px] border-ink bg-brand-dark text-lime shadow-[0_4px_0_rgba(10,15,13,0.4)] hover:-translate-y-0.5",
 };
 
 /**

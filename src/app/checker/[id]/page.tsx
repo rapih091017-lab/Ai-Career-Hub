@@ -247,13 +247,13 @@ export default function CheckerDetailPage() {
         {/* ============================================================ */}
         {narrativeFeedback && (
           <motion.section
-            className="bg-surface rounded-2xl border border-surface-container-high shadow-premium-md p-6 space-y-5"
+            className="bg-paper rounded-[14px] border-[2.5px] border-ink shadow-hard p-6 space-y-5"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.3 }}
           >
             <h2 className="text-xl font-bold text-on-surface">{t("checker.detail.review-title")}</h2>
-            <div className="bg-surface-container-low rounded-xl p-4 border-l-4 border-primary">
+            <div className="bg-lime/15 rounded-xl p-4 border-[2.5px] border-ink">
               <p className="text-sm text-on-surface leading-relaxed">{narrativeFeedback.overall_assessment}</p>
             </div>
             {/* Kolom Kelebihan dan Perlu Diperbaiki dihapus karena isinya
@@ -278,7 +278,7 @@ export default function CheckerDetailPage() {
         {/* ============================================================ */}
         {keywordAnalysis && (
           <motion.section
-            className="bg-surface rounded-2xl border border-surface-container-high shadow-premium-md p-6 space-y-5"
+            className="bg-paper rounded-[14px] border-[2.5px] border-ink shadow-hard p-6 space-y-5"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.35 }}
@@ -289,7 +289,7 @@ export default function CheckerDetailPage() {
                 <span className="text-sm font-bold text-on-surface">{keywordAnalysis.match_rate_pct}%</span>
                 <div className="w-16 h-2 bg-surface-container rounded-full overflow-hidden">
                   <motion.div
-                    className="h-full rounded-full bg-primary"
+                    className="h-full rounded-full bg-green-deep"
                     initial={{ width: "0%" }}
                     animate={{ width: `${keywordAnalysis.match_rate_pct}%` }}
                     transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
@@ -374,7 +374,7 @@ export default function CheckerDetailPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Link
               href="/builder/new?next=surat-formal"
-              className="group flex items-center gap-3 bg-surface rounded-xl p-4 border border-outline-variant/50 hover:border-primary/40 hover:shadow-premium-md transition-all active:scale-[0.99]"
+              className="group flex items-center gap-3 bg-paper rounded-[14px] p-4 border-[1.5px] border-hairline hover:border-green-deep hover:shadow-hard transition-all active:scale-[0.99]"
             >
               <div className="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                 <span
@@ -398,7 +398,7 @@ export default function CheckerDetailPage() {
             </Link>
             <Link
               href="/builder/new?next=surat-motivation"
-              className="group flex items-center gap-3 bg-surface rounded-xl p-4 border border-outline-variant/50 hover:border-amber-400/60 hover:shadow-premium-md transition-all active:scale-[0.99]"
+              className="group flex items-center gap-3 bg-surface rounded-xl p-4 border border-outline-variant/50 hover:border-amber-400/60 hover:shadow-hard transition-all active:scale-[0.99]"
             >
               <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                 <span
@@ -426,7 +426,7 @@ export default function CheckerDetailPage() {
         {/* ============================================================ */}
         {/*  8. CTA, Analisis Ulang atau Buat CV                        */}
         {/* ============================================================ */}
-        <div className="relative overflow-hidden rounded-2xl p-8 md:p-10 shadow-premium-lg bg-gradient-to-br from-primary via-primary-container to-primary-deep">
+        <div className="relative overflow-hidden rounded-[24px] p-8 md:p-10 shadow-hard-lg bg-evergreen">
           <div className="absolute -right-12 -top-12 w-64 h-64 bg-surface-container-lowest/10 rounded-full blur-3xl" />
           <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="text-center md:text-left">
@@ -442,7 +442,7 @@ export default function CheckerDetailPage() {
             <MagneticButton>
               <button
                 onClick={() => router.push("/checker")}
-                className="bg-surface-container-lowest text-primary px-8 py-4 rounded-full text-sm font-semibold shadow-premium-md hover:bg-gray-100 active:scale-95 transition-[transform,background-color] flex items-center gap-2"
+                className="border-[2.5px] border-ink bg-lime text-on-light px-8 py-4 rounded-full text-sm font-bold shadow-hard-ink hover:-translate-y-0.5 active:scale-95 transition-[transform,background-color] flex items-center gap-2"
               >
                 {t("checker.detail.reanalyze")}
                 <span className="material-symbols-outlined text-sm select-none">refresh</span>

@@ -398,7 +398,7 @@ return (
               type="button"
               onClick={pay}
               disabled={!selection || submitting}
-              className="w-full py-3 rounded-full border-[2.5px] border-ink bg-lime text-ink font-bold shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 disabled:opacity-50 disabled:shadow-none"
+              className="w-full py-3 rounded-full border-[2.5px] border-ink bg-lime text-on-light font-bold shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 disabled:opacity-50 disabled:shadow-none"
             >
               {submitting
                 ? "Menyiapkan pembayaran…"

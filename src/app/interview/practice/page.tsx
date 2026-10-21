@@ -39,13 +39,13 @@ interface SessionResult {
 
 type RatingOption = "good" | "okay" | "weak";
 const RATING_OPTIONS: { value: RatingOption; labelId: string; labelEn: string; icon: string; color: string }[] = [
-  { value: "good", labelId: "Udah Bisa", labelEn: "Good", icon: "check_circle", color: "bg-emerald-100 text-emerald-700 border-emerald-300 hover:bg-emerald-200" },
+  { value: "good", labelId: "Udah Bisa", labelEn: "Good", icon: "check_circle", color: "bg-green/15 text-green-deep border-green/40 hover:bg-green/25" },
   { value: "okay", labelId: "Kurang", labelEn: "Fair", icon: "trending_flat", color: "bg-amber-100 text-amber-700 border-amber-300 hover:bg-amber-200" },
   { value: "weak", labelId: "Belum", labelEn: "Not Yet", icon: "highlight_off", color: "bg-red-100 text-red-700 border-red-300 hover:bg-red-200" },
 ];
 
 const DIFFICULTY_LABELS: Record<string, { labelId: string; labelEn: string; icon: string; color: string }> = {
-  easy: { labelId: "Mudah", labelEn: "Easy", icon: "signal_cellular_alt_1_bar", color: "bg-emerald-100 text-emerald-700" },
+  easy: { labelId: "Mudah", labelEn: "Easy", icon: "signal_cellular_alt_1_bar", color: "bg-green/15 text-green-deep" },
   medium: { labelId: "Sedang", labelEn: "Medium", icon: "signal_cellular_alt_2_bar", color: "bg-amber-100 text-amber-700" },
   hard: { labelId: "Sulit", labelEn: "Hard", icon: "signal_cellular_alt_3_bar", color: "bg-red-100 text-red-700" },
 };
@@ -102,7 +102,7 @@ function SetupScreen({
   return (
     <div className="max-w-[600px] mx-auto">
       <div className="text-center mb-10">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold mb-4 border border-emerald-200">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green/15 text-green-deep text-xs font-semibold mb-4 border border-green/25">
           <span className="material-symbols-outlined text-[14px]">play_circle</span>
           {lang === "en" ? "Interview Practice" : "Latihan Interview"}
         </div>
@@ -120,7 +120,7 @@ function SetupScreen({
       <section className="mb-8">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-bold text-on-surface flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center">1</span>
+            <span className="w-6 h-6 rounded-full bg-primary text-on-primary text-[10px] font-bold flex items-center justify-center">1</span>
             {lang === "en" ? "Choose Position" : "Pilih Posisi"}
             <span className="text-[10px] text-on-surface-variant font-normal">
               ({totalSelected} {lang === "en" ? "selected" : "dipilih"})
@@ -144,7 +144,7 @@ function SetupScreen({
             const catSelected = positions.every((p) => selectedPositions.has(p.id));
 
             return (
-              <div key={cat.slug} className="bg-surface-container-lowest rounded-xl border border-outline-variant/50 shadow-premium-sm overflow-hidden">
+              <div key={cat.slug} className="bg-surface-container-lowest rounded-xl border border-outline-variant/50 shadow-hard-sm overflow-hidden">
                 <button
                   onClick={() => {
                     // Toggle all positions in this category
@@ -205,7 +205,7 @@ function SetupScreen({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <section>
           <h2 className="text-sm font-bold text-on-surface mb-3 flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center">2</span>
+            <span className="w-6 h-6 rounded-full bg-primary text-on-primary text-[10px] font-bold flex items-center justify-center">2</span>
             {lang === "en" ? "Question Category" : "Kategori Pertanyaan"}
           </h2>
           <div className="flex flex-wrap gap-2">
@@ -227,7 +227,7 @@ function SetupScreen({
 
         <section>
           <h2 className="text-sm font-bold text-on-surface mb-3 flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center">3</span>
+            <span className="w-6 h-6 rounded-full bg-primary text-on-primary text-[10px] font-bold flex items-center justify-center">3</span>
             {lang === "en" ? "Difficulty" : "Tingkat Kesulitan"}
           </h2>
           <div className="flex flex-wrap gap-2">
@@ -257,7 +257,7 @@ function SetupScreen({
       {/* ── Step 4: Timer ── */}
       <section className="mb-6">
         <h2 className="text-sm font-bold text-on-surface mb-3 flex items-center gap-2">
-          <span className="w-6 h-6 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center">4</span>
+          <span className="w-6 h-6 rounded-full bg-primary text-on-primary text-[10px] font-bold flex items-center justify-center">4</span>
           {lang === "en" ? "Timer per Question" : "Timer per Pertanyaan"}
         </h2>
         <div className="flex gap-2">
@@ -267,7 +267,7 @@ function SetupScreen({
               onClick={() => onTimerChange(opt.value)}
               className={`flex-1 px-3 py-2.5 rounded-xl text-xs font-semibold border transition-all ${
                 timerDuration === opt.value
-                  ? "bg-primary text-on-primary border-primary shadow-premium-sm"
+                  ? "bg-primary text-on-primary border-primary shadow-hard-sm"
                   : "bg-surface-container-lowest text-on-surface-variant border-outline-variant/40 hover:border-primary/30"
               }`}
             >
@@ -292,7 +292,7 @@ function SetupScreen({
         <button
           onClick={onStart}
           disabled={totalSelected === 0 || totalQuestions === 0}
-          className="w-full py-3.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed bg-primary text-white hover:opacity-90 active:scale-[0.98] shadow-premium-md"
+          className="w-full py-3.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed bg-primary text-on-primary hover:opacity-90 active:scale-[0.98] shadow-hard"
         >
           <span className="material-symbols-outlined text-lg">play_arrow</span>
           {lang === "en" ? "Start Practice" : "Mulai Latihan"}
@@ -304,7 +304,7 @@ function SetupScreen({
         {/* Quick Start */}
         <button
           onClick={onQuickStart}
-          className="w-full py-3 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:opacity-90 active:scale-[0.98] shadow-premium-sm relative overflow-hidden group"
+          className="w-full py-3 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 bg-green-deep text-white hover:opacity-90 active:scale-[0.98] shadow-hard-sm relative overflow-hidden group"
         >
           <motion.div
             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none"
@@ -356,7 +356,7 @@ function RunningScreen({
   const timerPercent = (timerRemaining / timerDuration) * 100;
   const timerColor =
     timerPercent > 50
-      ? "bg-emerald-500"
+      ? "bg-green/100"
       : timerPercent > 25
         ? "bg-amber-500"
         : "bg-red-500";
@@ -435,7 +435,7 @@ function RunningScreen({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -20, scale: 0.98 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
-          className="bg-surface-container-lowest rounded-2xl border border-outline-variant/50 shadow-premium-md overflow-hidden"
+          className="bg-surface-container-lowest rounded-2xl border border-outline-variant/50 shadow-hard overflow-hidden"
         >
           {/* Position badge + difficulty */}
           <div className="px-5 pt-4 pb-2 flex items-center gap-2 flex-wrap">
@@ -534,7 +534,7 @@ function RunningScreen({
                             onClick={() => onRate(currentQuestion.question.id, opt.value)}
                             className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-[10px] font-semibold border transition-all ${
                               isActive
-                                ? opt.color + " border-current shadow-premium-sm"
+                                ? opt.color + " border-current shadow-hard-sm"
                                 : "bg-surface-container-lowest text-on-surface-variant border-outline-variant/40 hover:border-current"
                             }`}
                           >
@@ -689,8 +689,8 @@ function FinishedScreen({
 
   return (
     <div className="max-w-[500px] mx-auto text-center">
-      <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
-        <span className="material-symbols-outlined text-emerald-600 text-3xl">check_circle</span>
+      <div className="w-16 h-16 rounded-full bg-green/15 flex items-center justify-center mx-auto mb-4">
+        <span className="material-symbols-outlined text-green text-3xl">check_circle</span>
       </div>
       <h1 className="text-2xl font-bold text-on-background mb-2">
         {lang === "en" ? "Session Complete!" : "Sesi Selesai!"}
@@ -703,15 +703,15 @@ function FinishedScreen({
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3 mb-8">
-        <div className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 shadow-premium-sm">
+        <div className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 shadow-hard-sm">
           <p className="text-xl font-bold text-on-surface">{totalQuestions}</p>
           <p className="text-[9px] text-on-surface-variant mt-0.5">{lang === "en" ? "Total Questions" : "Total Pertanyaan"}</p>
         </div>
-        <div className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 shadow-premium-sm">
+        <div className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 shadow-hard-sm">
           <p className="text-xl font-bold text-on-surface">{answered}</p>
           <p className="text-[9px] text-on-surface-variant mt-0.5">{lang === "en" ? "Answers Shown" : "Lihat Jawaban"}</p>
         </div>
-        <div className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 shadow-premium-sm">
+        <div className="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 shadow-hard-sm">
           <p className="text-xl font-bold text-on-surface">{formatTime(totalTime)}</p>
           <p className="text-[9px] text-on-surface-variant mt-0.5">{lang === "en" ? "Total Time" : "Total Waktu"}</p>
         </div>
@@ -719,13 +719,13 @@ function FinishedScreen({
 
       {/* Self Rating Summary */}
       {rated > 0 && (
-        <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/50 shadow-premium-sm p-4 mb-8 text-left">
+        <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/50 shadow-hard-sm p-4 mb-8 text-left">
           <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-3">
             {lang === "en" ? `Self Evaluation (${rated} rated)` : `Evaluasi Diri (${rated} dinilai)`}
           </p>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+              <span className="w-2 h-2 rounded-full bg-green/100 shrink-0" />
               <span className="text-[11px] text-on-surface-variant flex-1">{lang === "en" ? "Good" : "Udah Bisa"}</span>
               <span className="text-xs font-bold text-on-surface tabular-nums">{good}</span>
               <span className="text-[10px] text-on-surface-variant tabular-nums">
@@ -753,7 +753,7 @@ function FinishedScreen({
       )}
 
       {/* Question history, klik untuk review jawaban */}
-      <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/50 shadow-premium-sm mb-6 text-left">
+      <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/50 shadow-hard-sm mb-6 text-left">
         <div className="px-4 py-3 border-b border-outline-variant/40 flex items-center justify-between">
           <p className="text-xs font-bold text-on-surface">{lang === "en" ? "Question History" : "Riwayat Pertanyaan"}</p>
           <span className="text-[9px] text-on-surface-variant">{lang === "en" ? "Click to view answer" : "Klik untuk lihat jawaban"}</span>
@@ -782,12 +782,12 @@ function FinishedScreen({
                       {r.revealedAnswer && (
                         <>
                           <span>·</span>
-                          <span className="text-emerald-600">Lihat jawaban</span>
+                          <span className="text-green">Lihat jawaban</span>
                         </>
                       )}
                       {r.rating && (
                         <span className={`text-[8px] font-semibold px-1.5 py-0.5 rounded-full ${
-                          r.rating === "good" ? "bg-emerald-100 text-emerald-700" :
+                          r.rating === "good" ? "bg-green/15 text-green-deep" :
                           r.rating === "okay" ? "bg-amber-100 text-amber-700" :
                           "bg-red-100 text-red-700"
                         }`}>
@@ -837,7 +837,7 @@ function FinishedScreen({
       {/* Share result */}
       <button
         onClick={handleShare}
-        className="w-full mb-3 py-3 rounded-xl text-xs font-bold bg-surface-container-lowest border border-emerald-500 text-emerald-600 hover:bg-emerald-50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-premium-sm"
+        className="w-full mb-3 py-3 rounded-xl text-xs font-bold bg-surface-container-lowest border border-green-deep text-green hover:bg-green/10 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-hard-sm"
       >
         <span className="material-symbols-outlined text-[16px]">{copied ? "check" : "share"}</span>
         {copied
@@ -846,7 +846,7 @@ function FinishedScreen({
       </button>
 
       {/* Cross-sell, CTA ke Checker CV */}
-      <div className="mb-6 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white p-5 text-left shadow-premium-md">
+      <div className="mb-6 rounded-xl bg-green-deep text-white p-5 text-left shadow-hard">
         <p className="text-[10px] font-bold uppercase tracking-wider text-white/80 mb-1 flex items-center gap-1.5">
           <span className="material-symbols-outlined text-[12px]">auto_awesome</span>
           {lang === "en" ? "Next Step" : "Langkah Berikutnya"}
@@ -861,7 +861,7 @@ function FinishedScreen({
         </p>
         <button
           onClick={() => router.push("/checker")}
-          className="w-full py-2.5 rounded-xl bg-surface-container-lowest text-emerald-600 text-xs font-bold hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
+          className="w-full py-2.5 rounded-xl bg-surface-container-lowest text-green text-xs font-bold hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
         >
           {lang === "en" ? "Check My CV Now" : "Cek CV Sekarang"}
           <span className="material-symbols-outlined text-[14px]">arrow_forward</span>

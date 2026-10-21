@@ -107,7 +107,7 @@ const SECTIONS = [
 export default function PrivacyPage() {
   return (
     <main className="min-h-screen bg-background">
-      <div className="bg-gradient-to-br from-primary to-primary/80 text-white">
+      <div className="bg-evergreen text-on-dark">
         <div className="max-w-3xl mx-auto px-6 py-20">
           <Link href="/" className="inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors mb-6 text-sm">
             <span className="material-symbols-outlined text-lg">arrow_back</span>

@@ -76,7 +76,7 @@ export default function CheckerTeaser() {
 
           <Link
             href="/checker"
-            className="mt-6 inline-flex min-h-[54px] w-full items-center justify-center gap-2 rounded-2xl border-[3px] border-ink bg-lime px-4 font-display text-[16px] font-bold text-ink shadow-[0_5px_#0a0f0d] transition-transform hover:-translate-y-0.5 hover:shadow-[0_7px_#0a0f0d]"
+            className="mt-6 inline-flex min-h-[54px] w-full items-center justify-center gap-2 rounded-2xl border-[3px] border-ink bg-lime px-4 font-display text-[16px] font-bold text-on-light shadow-[0_5px_#0a0f0d] transition-transform hover:-translate-y-0.5 hover:shadow-[0_7px_#0a0f0d]"
           >
             {t("lp.checker.cta")}
             <span aria-hidden="true">&rarr;</span>

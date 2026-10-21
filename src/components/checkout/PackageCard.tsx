@@ -74,7 +74,7 @@ export function PackageCard({
         <button
           onClick={onBuy}
           disabled={busy}
-          className={`w-full py-3 font-label-bold rounded-xl hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-60 flex items-center justify-center gap-2 ${
+          className={`w-full py-3 font-label-bold rounded-xl hover:-translate-y-0.5 active:scale-[0.98] transition-all disabled:opacity-60 flex items-center justify-center gap-2 ${
             selected
               ? "border border-primary/40 text-primary bg-primary/5"
               : highlighted

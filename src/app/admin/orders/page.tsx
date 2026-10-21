@@ -46,7 +46,7 @@ const STATUS_FILTERS = [
 ];
 
 const statusBadge = (status: string) => {
-  if (status === "success") return "bg-emerald-500/10 text-emerald-700";
+  if (status === "success") return "bg-green/10 text-green-deep";
   if (status === "pending") return "bg-amber-500/10 text-amber-700";
   return "bg-error-container/60 text-on-error-container";
 };
@@ -101,9 +101,9 @@ export default function AdminOrdersPage() {
       />
 
       <section className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <div className="rounded-2xl border border-emerald-500/25 bg-emerald-500/5 p-4">
+          <div className="rounded-2xl border border-green/30 bg-green/5 p-4">
             <p className="text-label-sm text-on-surface-variant">Sukses</p>
-            <p className="mt-1 text-title-lg font-semibold text-emerald-700">{formatIDR(successSummary?.amount ?? 0)}</p>
+            <p className="mt-1 text-title-lg font-semibold text-green-deep">{formatIDR(successSummary?.amount ?? 0)}</p>
             <p className="text-label-sm text-on-surface-variant">{successSummary?.total ?? 0} pesanan</p>
           </div>
           <div className="rounded-2xl border border-amber-500/25 bg-amber-500/5 p-4">

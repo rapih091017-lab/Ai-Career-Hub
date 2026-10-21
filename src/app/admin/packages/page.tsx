@@ -241,7 +241,7 @@ export default function AdminPackagesPage() {
                             }
                             className={`flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border transition-colors duration-200 ${
                               value?.active
-                                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/20"
+                                ? "border-green/40 bg-green/10 text-green-deep hover:bg-green/20"
                                 : "border-outline-variant bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
                             }`}
                           >
@@ -319,7 +319,7 @@ export default function AdminPackagesPage() {
                               {pkg.badge}
                             </span>
                           ) : (
-                            <span className="text-body-md text-on-surface-variant/60">—</span>
+                            <span className="text-body-md text-on-surface-variant">—</span>
                           )}
                         </td>
 
@@ -344,7 +344,7 @@ export default function AdminPackagesPage() {
                     <tr>
                       <td colSpan={7} className="px-4 py-14 text-center">
                         <div className="flex flex-col items-center gap-2">
-                          <span className="material-symbols-outlined text-[32px] text-on-surface-variant/60" aria-hidden="true">
+                          <span className="material-symbols-outlined text-[32px] text-on-surface-variant" aria-hidden="true">
                             inventory_2
                           </span>
                           <p className="text-body-md font-semibold text-on-surface">Belum ada data paket.</p>

@@ -128,7 +128,7 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Link
               href={`/surat-lamaran/${cvId}?style=formal`}
-              className="group flex items-center gap-3 bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 hover:border-primary/40 hover:shadow-premium-md transition-all active:scale-[0.99]"
+              className="group flex items-center gap-3 bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 hover:border-primary/40 hover:shadow-hard transition-all active:scale-[0.99]"
             >
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                 <span
@@ -152,7 +152,7 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
             </Link>
             <Link
               href={`/surat-lamaran/${cvId}?style=formal_lengkap`}
-              className="group flex items-center gap-3 bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 hover:border-primary/40 hover:shadow-premium-md transition-all active:scale-[0.99]"
+              className="group flex items-center gap-3 bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 hover:border-primary/40 hover:shadow-hard transition-all active:scale-[0.99]"
             >
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                 <span
@@ -176,11 +176,11 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
             </Link>
             <Link
               href={`/surat-lamaran/${cvId}?style=ats`}
-              className="group flex items-center gap-3 bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 hover:border-primary/40 hover:shadow-premium-md transition-all active:scale-[0.99]"
+              className="group flex items-center gap-3 bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 hover:border-primary/40 hover:shadow-hard transition-all active:scale-[0.99]"
             >
-              <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+              <div className="w-10 h-10 rounded-xl bg-green/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                 <span
-                  className="material-symbols-outlined text-teal-600"
+                  className="material-symbols-outlined text-green"
                   style={{ fontVariationSettings: "'FILL' 1" }}
                   aria-hidden="true"
                 >
@@ -200,7 +200,7 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
             </Link>
             <Link
               href={`/surat-lamaran/${cvId}?style=casual`}
-              className="group flex items-center gap-3 bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 hover:border-primary/40 hover:shadow-premium-md transition-all active:scale-[0.99]"
+              className="group flex items-center gap-3 bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 hover:border-primary/40 hover:shadow-hard transition-all active:scale-[0.99]"
             >
               <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                 <span
@@ -224,7 +224,7 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
             </Link>
             <Link
               href={`/surat-lamaran/${cvId}?style=motivation`}
-              className="group flex items-center gap-3 bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 hover:border-amber-400/60 hover:shadow-premium-md transition-all active:scale-[0.99] sm:col-span-2"
+              className="group flex items-center gap-3 bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/50 hover:border-amber-400/60 hover:shadow-hard transition-all active:scale-[0.99] sm:col-span-2"
             >
               <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                 <span

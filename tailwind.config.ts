@@ -81,6 +81,15 @@ const config: Config = {
         "ink-soft": tone("ink-soft"),
         hairline: tone("hairline"),
         rule: tone("rule"),
+        // Pasangan tetap untuk permukaan brand yang tidak berbalik di mode
+        // gelap. Pakai ini, bukan `paper`/`ink`, saat latarnya evergreen,
+        // ink, atau lime.
+        "on-dark": tone("on-dark"),
+        "on-light": tone("on-light"),
+        cream: tone("cream"),
+        footer: tone("footer"),
+        "brand-dark": tone("brand-dark"),
+        "brand-green": tone("brand-green"),
       },
       borderRadius: {
         DEFAULT: "0.25rem",

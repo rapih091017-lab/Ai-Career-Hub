@@ -51,7 +51,7 @@ function BankFields({
 }) {
   const { t } = useTranslation();
   const inputClass =
-    "w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30";
+    "w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-body-md text-on-surface placeholder:text-on-surface-variant focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30";
   const accountInvalid = value.bankAccountNumber.length > 0 && !isValidAccountNumber(value.bankAccountNumber);
   const holderInvalid = value.bankAccountHolder.length > 0 && !isValidAccountHolder(value.bankAccountHolder);
 
@@ -216,7 +216,7 @@ export default function AffiliatePage() {
                   placeholder={t("affiliate.apply-note-placeholder")}
                   rows={3}
                   maxLength={1000}
-                  className="w-full resize-y rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full resize-y rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-body-md text-on-surface placeholder:text-on-surface-variant focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </label>
               <BankFields value={bank} onChange={setBank} />
@@ -279,7 +279,7 @@ export default function AffiliatePage() {
               <section className="rounded-2xl border border-outline-variant/70 bg-surface-container-lowest p-5">
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-label-bold text-on-surface-variant">{t("affiliate.link-label")}</p>
-                  <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-label-sm text-emerald-700">
+                  <span className="rounded-full bg-green/10 px-3 py-1 text-label-sm text-green-deep">
                     {t("affiliate.status-active")}
                   </span>
                 </div>
@@ -330,7 +330,7 @@ export default function AffiliatePage() {
                         <span
                           className={`rounded-full px-3 py-1 text-label-sm ${
                             conversion.status === "paid"
-                              ? "bg-emerald-500/10 text-emerald-700"
+                              ? "bg-green/10 text-green-deep"
                               : "bg-amber-500/10 text-amber-700"
                           }`}
                         >
