@@ -87,7 +87,7 @@ export default function PersonaTabs() {
                 </p>
               </div>
               <div className="flex justify-end">
-                <p className="max-w-[86%] rounded-2xl rounded-br-sm border-[1.5px] border-ink bg-lime/60 px-4 py-3 text-[15px] font-semibold leading-[1.45] text-ink">
+                <p className="max-w-[86%] rounded-2xl rounded-br-sm border-[1.5px] border-ink bg-lime/60 px-4 py-3 text-[15px] font-semibold leading-[1.45] text-on-light">
                   {t(persona.ask)}
                 </p>
               </div>

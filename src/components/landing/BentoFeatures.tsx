@@ -117,8 +117,11 @@ export default function BentoFeatures() {
                 className={[
                   "grid content-start gap-3 rounded-xl border-[2.5px] border-ink p-6 transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5",
                   feature.span,
-                  dark ? "bg-evergreen text-on-dark shadow-hard-ink-sm" : "bg-paper shadow-hard",
-                  lime ? "bg-lime shadow-hard-ink-sm" : "",
+                  dark
+                    ? "bg-evergreen text-on-dark shadow-hard-ink-sm"
+                    : lime
+                      ? "bg-lime text-on-light shadow-hard-ink-sm"
+                      : "bg-paper shadow-hard",
                 ].join(" ")}
               >
                 <span
@@ -140,7 +143,7 @@ export default function BentoFeatures() {
                 <p
                   className={[
                     "max-w-[42ch] text-[15px] leading-[1.55]",
-                    dark ? "text-on-dark/75" : "text-ink-soft",
+                    dark ? "text-on-dark/75" : lime ? "text-on-light/80" : "text-ink-soft",
                   ].join(" ")}
                 >
                   {t(feature.desc)}
@@ -169,7 +172,11 @@ export default function BentoFeatures() {
                   href={feature.href}
                   className={[
                     "mt-1 inline-flex w-fit items-center gap-2 text-[14px] font-bold underline decoration-[3px] underline-offset-4 transition-colors",
-                    dark ? "text-lime decoration-lime hover:text-on-dark" : "text-green-deep decoration-green hover:text-ink",
+                    dark
+                      ? "text-lime decoration-lime hover:text-on-dark"
+                      : lime
+                        ? "text-on-light decoration-on-light hover:text-on-light/80"
+                        : "text-green-deep decoration-green hover:text-ink",
                   ].join(" ")}
                 >
                   {t(feature.cta)}

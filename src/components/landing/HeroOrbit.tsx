@@ -11,9 +11,8 @@ import { ANNOUNCEMENT } from "@/lib/nav-items";
  * (motif dokumen yang dipindai mesin). Kartu orbit miring sedikit supaya
  * halaman tidak terasa seperti grid yang terlalu rapi.
  *
- * Hero ini hidup di dalam area terkunci tema terang (lihat
- * .theme-light-lock), jadi token di sini selalu bernilai terang
- * walau OS memakai mode gelap.
+ * Hero memakai permukaan `bg-evergreen` bertema tetap, jadi teksnya
+ * memakai pasangan `on-dark` dan tetap terbaca di mode terang maupun gelap.
  */
 
 const NODES = [
@@ -161,11 +160,18 @@ export default function HeroOrbit() {
                 <span className="mb-2 inline-block rounded-full bg-brand-dark px-2 py-1 text-[11px] font-bold text-lime">
                   {t(node.tag)}
                 </span>
-                <h2 className="font-display text-[13px] font-bold leading-tight text-ink">{t(node.title)}</h2>
+                <h2
+                  className={[
+                    "font-display text-[13px] font-bold leading-tight",
+                    node.tone === "lime" ? "text-on-light" : "text-ink",
+                  ].join(" ")}
+                >
+                  {t(node.title)}
+                </h2>
                 <p
                   className={[
                     "mt-2 text-[11.5px] font-semibold leading-[1.45]",
-                    node.tone === "lime" ? "text-ink/80" : "text-ink-soft",
+                    node.tone === "lime" ? "text-on-light/80" : "text-ink-soft",
                   ].join(" ")}
                 >
                   {t(node.desc)}

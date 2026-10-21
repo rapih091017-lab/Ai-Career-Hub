@@ -50,7 +50,7 @@ export default function PortfolioSpotlight() {
                 className="flex items-start gap-3"
               >
                 <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[7px] border-2 border-ink bg-lime">
-                  <span className="material-symbols-outlined text-[18px] text-ink" aria-hidden>
+                  <span className="material-symbols-outlined text-[18px] text-on-light" aria-hidden>
                     {bullet.icon}
                   </span>
                 </span>

@@ -37,25 +37,30 @@ export default function LevelStrip() {
               <p
                 className={[
                   "font-mono text-[11.5px] font-extrabold uppercase tracking-[0.06em]",
-                  door.free ? "text-ink" : "text-green-deep",
+                  door.free ? "text-on-light" : "text-green-deep",
                 ].join(" ")}
               >
                 {t(door.tag)}
               </p>
-              <h3 className="font-display text-[18px] font-bold leading-[1.15] tracking-[-0.02em] text-ink">
+              <h3
+                className={[
+                  "font-display text-[18px] font-bold leading-[1.15] tracking-[-0.02em]",
+                  door.free ? "text-on-light" : "text-ink",
+                ].join(" ")}
+              >
                 {t(door.title)}
               </h3>
-              <p className={door.free ? "text-[14px] font-semibold text-ink" : "text-[14px] font-semibold text-ink-soft"}>
+              <p className={door.free ? "text-[14px] font-semibold text-on-light" : "text-[14px] font-semibold text-ink-soft"}>
                 {t(door.desc)}
               </p>
-              <small className={door.free ? "mt-1 text-[12px] font-bold text-ink" : "mt-1 text-[12px] font-bold text-ink-soft"}>
+              <small className={door.free ? "mt-1 text-[12px] font-bold text-on-light" : "mt-1 text-[12px] font-bold text-ink-soft"}>
                 {t(door.note)}
               </small>
               <Link
                 href={door.href}
                 className={[
                   "mt-2 inline-flex min-h-[44px] w-fit items-center gap-2 text-[14px] font-bold underline decoration-[3px] underline-offset-4 transition-colors",
-                  door.free ? "text-ink decoration-ink" : "text-ink decoration-green",
+                  door.free ? "text-on-light decoration-on-light" : "text-ink decoration-green",
                 ].join(" ")}
               >
                 {t(door.cta)}

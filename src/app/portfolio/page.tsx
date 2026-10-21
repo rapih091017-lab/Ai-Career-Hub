@@ -101,7 +101,7 @@ export default function PortfolioPage() {
               {/* Language toggle */}
               <button
                 onClick={toggleLang}
-                className="w-9 h-9 rounded-lg border border-outline-variant/40 text-xs font-bold uppercase tracking-wider hover:bg-surface-container transition-colors shrink-0"
+                className="h-9 w-9 shrink-0 rounded-[10px] border-2 border-ink/30 text-xs font-bold uppercase tracking-wider transition-colors hover:bg-lime/20"
                 title={lang === "id" ? "Switch to English" : "Ganti ke Indonesia"}
               >
                 {lang === "id" ? "EN" : "ID"}
@@ -109,15 +109,15 @@ export default function PortfolioPage() {
             </div>
 
             {/* Live URL + Quick Actions */}
-            <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-soft border border-outline-variant/50">
+            <div className="rounded-[18px] border-[2.5px] border-ink bg-paper p-6 shadow-hard">
               <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
                 <div className="flex-1 min-w-0">
                   <label className="text-label-bold text-on-surface-variant block mb-1.5">{t("portfolio.url-label")}</label>
                   {publishInfo?.published ? (
-                    <div className="flex items-center gap-2 bg-green-50 rounded-xl px-4 py-2.5 border border-green-200 min-w-0">
-                      <span className="material-symbols-outlined text-green-600 text-lg shrink-0" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">check_circle</span>
+                    <div className="flex min-w-0 items-center gap-2 rounded-xl border-2 border-green bg-lime/20 px-4 py-2.5">
+                      <span className="material-symbols-outlined shrink-0 text-lg text-green-deep" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">check_circle</span>
                       <div className="min-w-0">
-                        <p className="text-xs text-green-700 font-semibold uppercase tracking-wider">{t("portfolio.publish-status-live")}</p>
+                        <p className="text-xs font-semibold uppercase tracking-wider text-green-deep">{t("portfolio.publish-status-live")}</p>
                         <button
                           onClick={() => window.open(publishInfo.url, "_blank")}
                           className="text-sm font-bold text-primary hover:underline truncate block max-w-full"
@@ -128,7 +128,7 @@ export default function PortfolioPage() {
                         {publishInfo.plan && !publishInfo.plan.entitled && (
                           <a
                             href={publishInfo.plan.upgradeUrl || "/settings/billing?plan=portfolio-web"}
-                            className="text-xs font-semibold text-amber-700 hover:underline block mt-0.5"
+                            className="mt-0.5 block text-xs font-semibold text-brand-green underline-offset-2 hover:underline"
                           >
                             Trial 1x terpakai · perbarui konten butuh Portfolio Web &rarr;
                           </a>
@@ -136,7 +136,7 @@ export default function PortfolioPage() {
                       </div>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-2 bg-surface-container-low rounded-xl px-4 py-2.5 border border-outline-variant">
+                    <div className="flex items-center gap-2 rounded-xl border-2 border-ink/25 bg-desk px-4 py-2.5">
                       <span className="material-symbols-outlined text-outline text-lg shrink-0" aria-hidden="true">public</span>
                       <div>
                         <p className="text-sm text-on-surface-variant">{t("portfolio.publish-not-live")}</p>
@@ -150,11 +150,11 @@ export default function PortfolioPage() {
                   )}
                 </div>
                 <div className="flex gap-3 flex-wrap">
-                  <Link href="/portfolio/build" className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-on-primary font-label-bold hover:opacity-90 transition-opacity shadow-md">
+                  <Link href="/portfolio/build" className="flex min-h-[44px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-5 font-label-bold text-on-light shadow-[0_3px_0_rgb(var(--c-ink))] transition-all hover:-translate-y-0.5">
                     <span className="material-symbols-outlined text-lg">edit</span>
                     <span className="hidden sm:inline">Buat Portfolio</span>
                   </Link>
-                  <Link href={`/portfolio/preview?template=${selectedTheme}`} className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-outline-variant text-on-surface font-label-bold hover:bg-surface-container-low transition-colors">
+                  <Link href={`/portfolio/preview?template=${selectedTheme}`} className="flex min-h-[44px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-paper px-5 font-label-bold text-ink transition-colors hover:bg-lime/15">
                     <span className="material-symbols-outlined text-lg">preview</span>
                     <span className="hidden sm:inline">Preview</span>
                   </Link>
@@ -171,7 +171,7 @@ export default function PortfolioPage() {
             >
               <h2 className="font-headline-md text-on-surface mb-4">{t("portfolio.choose-theme")}</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {THEME_LIST.map((theme, i) => {
+                {THEME_LIST.map((theme, i) => {
                   return (
                     <motion.div
                       key={theme.id}
@@ -182,10 +182,10 @@ export default function PortfolioPage() {
                     >
                       <button
                         onClick={() => setSelectedTheme(theme.id)}
-                        className={`w-full rounded-2xl border-2 overflow-hidden text-left transition-[transform,border-color] theme-card-hover active:scale-[0.98] ${
+                        className={`w-full overflow-hidden rounded-[18px] border-[2.5px] text-left transition-[transform,border-color,box-shadow] theme-card-hover active:scale-[0.98] ${
                           selectedTheme === theme.id
-                            ? "border-primary bg-primary-fixed/10"
-                            : "border-outline-variant/50 bg-surface-container-lowest hover:border-primary/50"
+                            ? "border-brand-dark bg-lime/15 shadow-[4px_4px_0_rgb(var(--c-ink))]"
+                            : "border-ink/25 bg-paper shadow-hard hover:border-ink"
                         }`}
                       >
                         {/* Thumbnail: render asli per tema — beda struktur, bukan beda warna.
@@ -218,7 +218,7 @@ export default function PortfolioPage() {
                             <div className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: theme.colors.primary }}></div>
                             <h3 className="font-label-bold text-on-surface text-sm">{theme.name}</h3>
                             {theme.id === DEFAULT_THEME_ID && (
-                              <span className="ml-1 rounded bg-primary/10 px-1.5 py-0.5 text-xs font-semibold text-primary">
+                              <span className="ml-1 rounded-[6px] border border-ink bg-lime px-1.5 py-0.5 text-xs font-bold text-on-light">
                                 {t("portfolio.theme.default-badge")}
                               </span>
                             )}
@@ -241,20 +241,20 @@ export default function PortfolioPage() {
               transition={{ duration: 0.3 }}
             >
               {[
-                { icon: "badge", label: stats.name, sub: t("portfolio.stats-fullname"), color: "bg-primary-fixed", iconColor: "text-primary" },
-                { icon: "work", label: stats.workCount, sub: t("portfolio.stats-experience"), color: "bg-tertiary-container/30", iconColor: "text-tertiary" },
-                { icon: "school", label: stats.eduCount, sub: t("portfolio.stats-education"), color: "bg-secondary-container/50", iconColor: "text-secondary" },
-                { icon: "stars", label: stats.skillCount, sub: t("portfolio.stats-skill"), color: "bg-primary-fixed", iconColor: "text-primary" },
+                { icon: "badge", label: stats.name, sub: t("portfolio.stats-fullname"), color: "bg-lime", iconColor: "text-on-light" },
+                { icon: "work", label: stats.workCount, sub: t("portfolio.stats-experience"), color: "bg-lime", iconColor: "text-on-light" },
+                { icon: "school", label: stats.eduCount, sub: t("portfolio.stats-education"), color: "bg-lime", iconColor: "text-on-light" },
+                { icon: "stars", label: stats.skillCount, sub: t("portfolio.stats-skill"), color: "bg-lime", iconColor: "text-on-light" },
               ].map((s, i) => (
                 <motion.div
                   key={s.icon}
-                  className="bg-surface-container-lowest rounded-2xl p-6 shadow-soft border border-outline-variant/50 hover:shadow-md hover:-translate-y-0.5 transition-[transform,box-shadow] duration-200"
+                  className="rounded-[18px] border-[2.5px] border-ink bg-paper p-6 shadow-hard transition-transform duration-200 hover:-translate-y-0.5"
                   initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: 0.06 * i }}
                 >
-                  <div className={`w-10 h-10 rounded-xl ${s.color} flex items-center justify-center ${s.iconColor} mb-4`}>
+                  <div className={`mb-4 flex h-10 w-10 items-center justify-center rounded-[10px] border-2 border-ink ${s.color} ${s.iconColor}`}>
                     <span className="material-symbols-outlined" aria-hidden="true">{s.icon}</span>
                   </div>
                   <p className="text-headline-md text-on-surface">{s.label}</p>
@@ -264,14 +264,14 @@ export default function PortfolioPage() {
             </motion.section>
 
             {/* CTA, konek ke profile */}
-            <section className="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/50 flex flex-col md:flex-row items-center justify-between gap-4">
+            <section className="flex flex-col items-center justify-between gap-4 rounded-[18px] border-[2.5px] border-ink bg-paper p-6 shadow-hard md:flex-row">
               <div className="flex items-center gap-3">
-                <span className={`material-symbols-outlined text-2xl ${profileData ? "text-green-600" : "text-primary"}`} aria-hidden="true">{profileData ? "check_circle" : "info"}</span>
+                <span className={`material-symbols-outlined text-2xl ${profileData ? "text-green-deep" : "text-ink-soft"}`} aria-hidden="true">{profileData ? "check_circle" : "info"}</span>
                 <p className="text-body-md text-on-surface-variant">{profileData ? t("portfolio.profile-filled") + " " + (stats.name !== "-" ? stats.name.toLowerCase() : t("portfolio.existing-data")) + "." : t("portfolio.profile-empty")}</p>
               </div>
               <Link
                 href={profileData ? "/portfolio/build" : "/settings/profile"}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-on-primary font-label-bold hover:opacity-90 transition-opacity shadow-md whitespace-nowrap"
+                className="flex min-h-[48px] items-center gap-2 whitespace-nowrap rounded-full border-[2.5px] border-ink bg-lime px-6 font-label-bold text-on-light shadow-[0_3px_0_rgb(var(--c-ink))] transition-all hover:-translate-y-0.5"
               >
                 <span className="material-symbols-outlined text-lg" aria-hidden="true">{profileData ? "edit" : "person"}</span>
                 {profileData ? t("portfolio.create") : t("portfolio.complete-profile")}
@@ -287,7 +287,7 @@ export default function PortfolioPage() {
                 <h2 className="font-display text-2xl mb-4 text-on-dark">{t("portfolio.deploy-title")}</h2>
                 <p className="font-body-md mb-8 opacity-80 max-w-lg mx-auto text-on-dark">{t("portfolio.deploy-desc")}</p>
                 {publishInfo?.published && (
-                  <div className="mb-8 mx-auto max-w-md bg-paper/10 backdrop-blur rounded-xl px-4 py-3 flex items-center gap-3 border border-on-dark/20">
+                  <div className="mx-auto mb-8 flex max-w-md items-center gap-3 rounded-xl border border-on-dark/25 bg-on-dark/10 px-4 py-3">
                     <span className="material-symbols-outlined text-lime shrink-0" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">check_circle</span>
                     <div className="min-w-0 text-left">
                       <p className="text-xs font-semibold uppercase tracking-wider text-on-dark/80">{t("portfolio.publish-link-share")}</p>
@@ -307,7 +307,7 @@ export default function PortfolioPage() {
                           addToast({ type: "success", message: t("publish.copied") });
                         }
                       }}
-                      className="ml-auto shrink-0 px-3 py-1.5 min-h-[40px] rounded-lg bg-paper/20 hover:bg-paper/30 text-xs font-semibold transition-colors"
+                      className="ml-auto min-h-[40px] shrink-0 rounded-full border border-on-dark/30 px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-on-dark/15"
                     >
                       {t("publish.copy")}
                     </button>
@@ -323,7 +323,7 @@ export default function PortfolioPage() {
                   </Link>
                   <Link
                     href={`/portfolio/preview?template=${selectedTheme}`}
-                    className="inline-flex min-h-[54px] items-center justify-center gap-2 px-10 py-4 rounded-full border-2 border-on-dark/30 text-on-dark font-bold text-lg hover:bg-paper/10 active:scale-[0.98] transition-all"
+                    className="inline-flex min-h-[54px] items-center justify-center gap-2 rounded-full border-2 border-on-dark/30 px-10 py-4 text-lg font-bold text-on-dark transition-all hover:bg-on-dark/10 active:scale-[0.98]"
                   >
                     <span className="material-symbols-outlined" aria-hidden="true">preview</span>
                     {t("portfolio.view-preview")}

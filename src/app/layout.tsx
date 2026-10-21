@@ -61,7 +61,7 @@ export default function RootLayout({
   return (
     /* suppressHydrationWarning: skrip inline menambah class icons-pending
        sebelum hydration supaya Material Symbols tidak tampil sebagai teks. */
-    <html lang="id" className="light" suppressHydrationWarning>
+    <html lang="id" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -83,6 +83,16 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){var d=document.documentElement;d.classList.add('icons-pending');function done(){d.classList.remove('icons-pending')}try{if(document.fonts&&document.fonts.load){document.fonts.load('16px "Material Symbols Outlined"').then(done).catch(done);setTimeout(done,2500)}else{done()}}catch(e){done()}})();`,
+          }}
+        />
+        {/*
+          Tema dipasang sebelum cat pertama supaya tidak ada kedipan terang
+          saat pengguna memilih mode gelap. Pilihan disimpan di localStorage;
+          tanpa pilihan, tema mengikuti preferensi sistem.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var d=document.documentElement;try{var c=localStorage.getItem('theme');var m=window.matchMedia('(prefers-color-scheme: dark)').matches;var t=(c==='light'||c==='dark')?c:(m?'dark':'light');d.dataset.theme=t;d.dataset.themeChoice=(c==='light'||c==='dark')?c:'system';d.style.colorScheme=t}catch(e){d.dataset.theme='light';d.dataset.themeChoice='system'}})();`,
           }}
         />
         <script type="application/ld+json" dangerouslySetInnerHTML={{

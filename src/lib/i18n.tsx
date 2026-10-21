@@ -1843,6 +1843,10 @@ const DICT: Record<string, { id: string; en: string }> = {
      semua angka berasal dari src/lib dan src/data. */
   "footer.motion-off": { id: "Matikan animasi", en: "Turn off animations" },
   "footer.motion-on": { id: "Nyalakan animasi", en: "Turn on animations" },
+  "footer.theme-label": { id: "Mode tampilan", en: "Display mode" },
+  "footer.theme-light": { id: "Terang", en: "Light" },
+  "footer.theme-dark": { id: "Gelap", en: "Dark" },
+  "footer.theme-system": { id: "Sistem", en: "System" },
   "lp.hero.eyebrow": { id: "Bikin CV · Cek ATS · Surat Lamaran · Portofolio", en: "Build a CV · Check ATS · Cover Letter · Portfolio" },
   "lp.hero.title-a": { id: "CV yang lolos", en: "A CV that passes" },
   "lp.hero.title-b": { id: "layar ATS", en: "the ATS screen" },

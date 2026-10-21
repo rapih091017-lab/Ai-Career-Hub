@@ -90,6 +90,7 @@ const config: Config = {
         footer: tone("footer"),
         "brand-dark": tone("brand-dark"),
         "brand-green": tone("brand-green"),
+        mint: tone("mint"),
       },
       borderRadius: {
         DEFAULT: "0.25rem",

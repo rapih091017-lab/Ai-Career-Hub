@@ -36,7 +36,7 @@ export default function Home() {
 
       <SiteHeader variant="pill" />
 
-      <main id="isi" className="theme-light-lock">
+      <main id="isi">
         <HeroOrbit />
         <CheckerTeaser />
         <MomentBand />

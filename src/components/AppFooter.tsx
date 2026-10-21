@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTranslation } from "@/lib/i18n";
+import ThemeToggle from "@/components/ThemeToggle";
 
 interface AppFooterProps {
   variant?: "simple" | "full";
@@ -72,7 +73,7 @@ export default function AppFooter({ variant = "simple", bordered = false }: AppF
   const contactEmail = settings?.contact_email || "support@aicareerhub.com";
   if (variant === "full") {
     return (
-      <footer className="border-t-[2.5px] border-lime/30 bg-footer py-16 px-margin-mobile md:px-gutter md:py-20">
+      <footer className="border-t-[2.5px] border-lime/40 bg-footer py-16 px-margin-mobile md:px-gutter md:py-20">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr_1fr_1fr] gap-12 mb-16">
             <div>
@@ -82,52 +83,53 @@ export default function AppFooter({ variant = "simple", bordered = false }: AppF
                 </div>
                 <span className="font-display text-[20px] font-bold tracking-[-0.02em] text-on-dark">AI Career Hub</span>
               </div>
-              <p className="text-body-md text-on-dark/80">{t("footer.desc")}</p>
+              <p className="text-body-md text-on-dark/90">{t("footer.desc")}</p>
             </div>
             <div>
-              <h4 className="font-mono text-[11px] font-bold uppercase tracking-[0.06em] text-on-dark/70 mb-5">{t("footer.produk")}</h4>
+              <h4 className="font-mono text-[11px] font-bold uppercase tracking-[0.06em] text-mint mb-5">{t("footer.produk")}</h4>
               <ul className="space-y-3">
-                <li><Link className="text-on-dark/85 hover:text-lime transition-colors" href="/builder/new">{t("footer.cv-builder")}</Link></li>
-                <li><Link className="text-on-dark/85 hover:text-lime transition-colors" href="/checker">{t("footer.resume-checker")}</Link></li>
-                <li><Link className="text-on-dark/85 hover:text-lime transition-colors" href="/portfolio">{t("footer.portfolio")}</Link></li>
-                <li><Link className="text-on-dark/85 hover:text-lime transition-colors" href="/interview">{t("footer.interview")}</Link></li>
-                <li><Link className="text-on-dark/85 hover:text-lime transition-colors" href="/sinonim">{t("footer.sinonim")}</Link></li>
-                <li><Link className="text-on-dark/85 hover:text-lime transition-colors" href={lang === "en" ? "/cv-examples" : "/contoh-cv"}>{t("footer.contoh-cv")}</Link></li>
-                <li><Link className="text-on-dark/85 hover:text-lime transition-colors" href="/career-hub">{t("footer.career-hub")}</Link></li>
-                <li><Link className="text-on-dark/85 hover:text-lime transition-colors" href="/career-path">{t("footer.career-paths")}</Link></li>
+                <li><Link className="text-on-dark hover:text-lime transition-colors" href="/builder/new">{t("footer.cv-builder")}</Link></li>
+                <li><Link className="text-on-dark hover:text-lime transition-colors" href="/checker">{t("footer.resume-checker")}</Link></li>
+                <li><Link className="text-on-dark hover:text-lime transition-colors" href="/portfolio">{t("footer.portfolio")}</Link></li>
+                <li><Link className="text-on-dark hover:text-lime transition-colors" href="/interview">{t("footer.interview")}</Link></li>
+                <li><Link className="text-on-dark hover:text-lime transition-colors" href="/sinonim">{t("footer.sinonim")}</Link></li>
+                <li><Link className="text-on-dark hover:text-lime transition-colors" href={lang === "en" ? "/cv-examples" : "/contoh-cv"}>{t("footer.contoh-cv")}</Link></li>
+                <li><Link className="text-on-dark hover:text-lime transition-colors" href="/career-hub">{t("footer.career-hub")}</Link></li>
+                <li><Link className="text-on-dark hover:text-lime transition-colors" href="/career-path">{t("footer.career-paths")}</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-mono text-[11px] font-bold uppercase tracking-[0.06em] text-on-dark/70 mb-5">{t("footer.perusahaan")}</h4>
+              <h4 className="font-mono text-[11px] font-bold uppercase tracking-[0.06em] text-mint mb-5">{t("footer.perusahaan")}</h4>
               <ul className="space-y-3">
-                <li><Link className="text-on-dark/85 hover:text-lime transition-colors" href="/about">{t("footer.tentang")}</Link></li>
-                <li><Link className="text-on-dark/85 hover:text-lime transition-colors" href="/karir">{t("footer.karir")}</Link></li>
-                <li><Link className="text-on-dark/85 hover:text-lime transition-colors" href="/affiliate">{t("footer.affiliate")}</Link></li>
-                <li><Link className="text-on-dark/85 hover:text-lime transition-colors" href="/contact">{t("footer.kontak")}</Link></li>
+                <li><Link className="text-on-dark hover:text-lime transition-colors" href="/about">{t("footer.tentang")}</Link></li>
+                <li><Link className="text-on-dark hover:text-lime transition-colors" href="/karir">{t("footer.karir")}</Link></li>
+                <li><Link className="text-on-dark hover:text-lime transition-colors" href="/affiliate">{t("footer.affiliate")}</Link></li>
+                <li><Link className="text-on-dark hover:text-lime transition-colors" href="/contact">{t("footer.kontak")}</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-mono text-[11px] font-bold uppercase tracking-[0.06em] text-on-dark/70 mb-5">{t("footer.bantuan")}</h4>
+              <h4 className="font-mono text-[11px] font-bold uppercase tracking-[0.06em] text-mint mb-5">{t("footer.bantuan")}</h4>
               <ul className="space-y-3">
-                <li><Link className="text-on-dark/85 hover:text-lime transition-colors" href="/faq">{t("footer.faq")}</Link></li>
-                <li><Link className="text-on-dark/85 hover:text-lime transition-colors" href="/contact">{t("footer.pusat-bantuan")}</Link></li>
-                <li><Link className="text-on-dark/85 hover:text-lime transition-colors" href="/privacy">{t("footer.privasi")}</Link></li>
-                <li><Link className="text-on-dark/85 hover:text-lime transition-colors" href="/terms">{t("footer.syarat")}</Link></li>
+                <li><Link className="text-on-dark hover:text-lime transition-colors" href="/faq">{t("footer.faq")}</Link></li>
+                <li><Link className="text-on-dark hover:text-lime transition-colors" href="/contact">{t("footer.pusat-bantuan")}</Link></li>
+                <li><Link className="text-on-dark hover:text-lime transition-colors" href="/privacy">{t("footer.privasi")}</Link></li>
+                <li><Link className="text-on-dark hover:text-lime transition-colors" href="/terms">{t("footer.syarat")}</Link></li>
               </ul>
             </div>
           </div>
           <div className="pt-6 border-t border-on-dark/15 flex flex-col md:flex-row justify-between items-center gap-5">
-            <p className="text-label-sm text-on-dark/70">{t("footer.copyright")}</p>
-            <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-3">
+            <p className="text-label-sm text-on-dark/80">{t("footer.copyright")}</p>
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-3">
+              <ThemeToggle />
               <MotionToggle />
               <div className="flex gap-5">
-                <Link className="text-on-dark/70 hover:text-lime transition-colors" href="/contact" aria-label="Website"><span className="material-symbols-outlined">public</span></Link>
-                <a className="text-on-dark/70 hover:text-lime transition-colors" href={`mailto:${contactEmail}`} aria-label="Email"><span className="material-symbols-outlined">alternate_email</span></a>
+                <Link className="text-on-dark/80 hover:text-lime transition-colors" href="/contact" aria-label="Website"><span className="material-symbols-outlined">public</span></Link>
+                <a className="text-on-dark/80 hover:text-lime transition-colors" href={`mailto:${contactEmail}`} aria-label="Email"><span className="material-symbols-outlined">alternate_email</span></a>
                 {settings?.social_instagram ? (
-                  <a className="text-on-dark/70 hover:text-lime transition-colors" href={settings.social_instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram"><span className="material-symbols-outlined">photo_camera</span></a>
+                  <a className="text-on-dark/80 hover:text-lime transition-colors" href={settings.social_instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram"><span className="material-symbols-outlined">photo_camera</span></a>
                 ) : null}
                 {settings?.social_linkedin ? (
-                  <a className="text-on-dark/70 hover:text-lime transition-colors" href={settings.social_linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><span className="material-symbols-outlined">work</span></a>
+                  <a className="text-on-dark/80 hover:text-lime transition-colors" href={settings.social_linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><span className="material-symbols-outlined">work</span></a>
                 ) : null}
               </div>
             </div>

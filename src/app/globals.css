@@ -91,6 +91,7 @@
   --c-footer: 6 35 25; /* dasar footer, lebih dalam dari evergreen */
   --c-brand-dark: 18 41 34;
   --c-brand-green: 29 107 72;
+  --c-mint: 143 179 166; /* label sekunder di atas permukaan gelap tetap */
 
   /* Motif */
   --shadow-hard-color: #dde7de;
@@ -106,8 +107,11 @@
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
+/* Mode gelap dipilih lewat `data-theme` di <html>, bukan hanya media query,
+   supaya pengguna bisa memaksa terang/gelap dari tombol di footer. Skrip kecil
+   di layout.tsx sudah menetapkan atribut ini sebelum cat pertama.
+   Isi blok ini harus tetap sama dengan blok cadangan di bawah. */
+:root[data-theme="dark"] {
     --c-background: 15 32 26; /* evergreen-deep */
     --c-surface: 23 43 36;
     --c-surface-bright: 28 50 42;
@@ -178,6 +182,78 @@
     --shadow-hard-color: #0a1512;
     --hairline-color: #2b3f36;
     --rule-color: #24362e;
+
+    /* Footer dinaikkan satu tingkat dari latar halaman supaya pitanya
+       kelihatan; kalau sama, teks di dalamnya terlihat "nyaru". */
+    --c-footer: 22 49 40;
+}
+
+/* Cadangan sebelum skrip sempat jalan (misal JavaScript diblokir). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --c-background: 15 32 26;
+    --c-surface: 23 43 36;
+    --c-surface-bright: 28 50 42;
+    --c-surface-container-lowest: 20 38 31;
+    --c-surface-container-low: 23 43 36;
+    --c-surface-container: 27 48 41;
+    --c-surface-container-high: 33 56 47;
+    --c-surface-container-highest: 39 64 53;
+    --c-surface-variant: 27 48 41;
+    --c-surface-dim: 18 33 28;
+    --c-surface-tint: 127 192 168;
+    --c-on-background: 238 243 238;
+    --c-on-surface: 238 243 238;
+    --c-on-surface-variant: 168 189 177;
+    --c-primary: 214 238 48;
+    --c-on-primary: 15 32 26;
+    --c-primary-container: 44 74 61;
+    --c-on-primary-container: 216 237 227;
+    --c-primary-fixed: 29 107 72;
+    --c-primary-fixed-dim: 24 88 60;
+    --c-inverse-primary: 29 107 72;
+    --c-on-primary-fixed: 232 240 234;
+    --c-on-primary-fixed-variant: 216 237 227;
+    --c-secondary: 127 192 168;
+    --c-on-secondary: 15 32 26;
+    --c-secondary-container: 29 55 45;
+    --c-on-secondary-container: 216 237 227;
+    --c-secondary-fixed: 29 55 45;
+    --c-secondary-fixed-dim: 24 46 38;
+    --c-on-secondary-fixed: 232 240 234;
+    --c-on-secondary-fixed-variant: 216 237 227;
+    --c-tertiary: 201 255 92;
+    --c-on-tertiary: 15 32 26;
+    --c-tertiary-container: 51 64 26;
+    --c-on-tertiary-container: 234 246 180;
+    --c-tertiary-fixed: 214 238 48;
+    --c-tertiary-fixed-dim: 201 255 92;
+    --c-on-tertiary-fixed: 15 32 26;
+    --c-on-tertiary-fixed-variant: 63 74 18;
+    --c-outline: 159 179 168;
+    --c-outline-variant: 43 63 54;
+    --c-inverse-surface: 10 21 17;
+    --c-inverse-on-surface: 232 240 234;
+    --c-error: 242 167 154;
+    --c-on-error: 59 17 9;
+    --c-error-container: 74 26 18;
+    --c-on-error-container: 247 221 216;
+    --c-desk: 18 33 28;
+    --c-paper: 27 48 41;
+    --c-evergreen: 13 28 23;
+    --c-evergreen-deep: 10 21 17;
+    --c-green: 127 192 168;
+    --c-green-deep: 168 217 194;
+    --c-lime: 214 238 48;
+    --c-lime-bright: 201 255 92;
+    --c-ink: 238 243 238;
+    --c-ink-soft: 168 189 177;
+    --c-hairline: 43 63 54;
+    --c-rule: 36 54 46;
+    --shadow-hard-color: #0a1512;
+    --hairline-color: #2b3f36;
+    --rule-color: #24362e;
+    --c-footer: 22 49 40;
   }
 }
 
@@ -237,83 +313,6 @@
 /* Fonts: Stack Sans Headline, Inter, Literata, Caveat, Atkinson Hyperlegible
    Next dimuat lewat <link> Google Fonts di layout.tsx. Material Symbols juga
    lewat <link> supaya lebih cepat daripada CSS @import. */
-
-/* Kunci tema terang untuk permukaan marketing.
-   Halaman marketing mengikuti kanon yang didominasi latar terang, jadi
-   permukaannya dikunci ke nilai terang walau OS memakai mode gelap.
-   Mode gelap otomatis tetap hidup di halaman aplikasi dan chrome yang
-   tidak memakai kunci ini. */
-.theme-light-lock {
-  color-scheme: light;
-  --c-background: 243 246 242;
-  --c-surface: 255 255 255;
-  --c-surface-bright: 255 255 255;
-  --c-surface-container-lowest: 255 255 255;
-  --c-surface-container-low: 239 244 241;
-  --c-surface-container: 233 239 235;
-  --c-surface-container-high: 226 234 229;
-  --c-surface-container-highest: 218 228 222;
-  --c-surface-variant: 233 239 235;
-  --c-surface-dim: 221 230 224;
-  --c-surface-tint: 63 143 119;
-  --c-on-background: 10 15 13;
-  --c-on-surface: 10 15 13;
-  --c-on-surface-variant: 74 91 82;
-  --c-primary: 29 107 72;
-  --c-on-primary: 255 255 255;
-  --c-primary-container: 63 143 119;
-  --c-on-primary-container: 255 255 255;
-  --c-primary-fixed: 216 237 227;
-  --c-primary-fixed-dim: 182 223 202;
-  --c-inverse-primary: 214 238 48;
-  --c-on-primary-fixed: 15 32 26;
-  --c-on-primary-fixed-variant: 29 107 72;
-  --c-secondary: 63 143 119;
-  --c-on-secondary: 255 255 255;
-  --c-secondary-container: 216 237 227;
-  --c-on-secondary-container: 29 107 72;
-  --c-secondary-fixed: 216 237 227;
-  --c-secondary-fixed-dim: 182 223 202;
-  --c-on-secondary-fixed: 15 32 26;
-  --c-on-secondary-fixed-variant: 29 107 72;
-  --c-tertiary: 92 107 31;
-  --c-on-tertiary: 15 32 26;
-  --c-tertiary-container: 234 246 180;
-  --c-on-tertiary-container: 63 74 18;
-  --c-tertiary-fixed: 214 238 48;
-  --c-tertiary-fixed-dim: 201 255 92;
-  --c-on-tertiary-fixed: 15 32 26;
-  --c-on-tertiary-fixed-variant: 63 74 18;
-  --c-outline: 74 91 82;
-  --c-outline-variant: 201 211 205;
-  --c-inverse-surface: 18 41 34;
-  --c-inverse-on-surface: 232 240 234;
-  --c-error: 166 58 44;
-  --c-on-error: 255 255 255;
-  --c-error-container: 247 221 216;
-  --c-on-error-container: 92 26 18;
-  --c-desk: 243 246 242;
-  --c-paper: 255 255 255;
-  --c-evergreen: 18 41 34;
-  --c-evergreen-deep: 15 32 26;
-  --c-green: 63 143 119;
-  --c-green-deep: 29 107 72;
-  --c-lime: 214 238 48;
-  --c-lime-bright: 201 255 92;
-  --c-ink: 10 15 13;
-  --c-ink-soft: 74 91 82;
-  --c-hairline: 201 211 205;
-  --c-rule: 213 222 216;
-  --shadow-hard-color: #dde7de;
-  --hairline-color: #c9d3cd;
-  --rule-color: #d5ded8;
-  --color-focus-ring: #1d6b48;
-  --color-primary-deep: #164a33;
-  --color-accent: #1d6b48;
-  --color-accent-soft: #e3f0e9;
-  --color-muted: #4a5b52;
-  --color-surface-elevated: #ffffff;
-}
 
 /* Material Symbols: sembunyikan sampai font ikon siap, supaya ligatur
    tidak sempat tampil sebagai teks mentah (menu_book, help). */
@@ -420,15 +419,13 @@ body {
   --color-surface-elevated: #ffffff;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-focus-ring: #c9ff5c;
-    --color-primary-deep: #8fcfb4;
-    --color-accent: #c9ff5c;
-    --color-accent-soft: #1a3129;
-    --color-muted: #a8bdb1;
-    --color-surface-elevated: #172b24;
-  }
+:root[data-theme="dark"] {
+  --color-focus-ring: #c9ff5c;
+  --color-primary-deep: #8fcfb4;
+  --color-accent: #c9ff5c;
+  --color-accent-soft: #1a3129;
+  --color-muted: #a8bdb1;
+  --color-surface-elevated: #172b24;
 }
 
 /* Premium shadow tokens */
