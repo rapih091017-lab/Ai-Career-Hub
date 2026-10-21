@@ -480,7 +480,7 @@ export default function KarirPage() {
                   <h3 className="font-display text-ink">{portal.name}</h3>
                 </div>
                 <p className="text-xs text-ink-soft leading-relaxed mb-3">{t(portal.descriptionKey)}</p>
-                <div className="flex items-center gap-1 text-[10px] font-medium text-green-deep">
+                <div className="flex items-center gap-1 text-[11px] font-medium text-green-deep">
                   <span className="material-symbols-outlined text-xs">open_in_new</span>
                   {portal.label}
                 </div>

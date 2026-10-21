@@ -6,7 +6,7 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { describeAuthError } from "@/lib/auth-errors";
-import ThemeToggle from "@/components/ThemeToggle";
+import SkyToggle from "@/components/ui/SkyToggle";
 
 const Ripple = dynamic(
   () => import("@/components/blocks/modern-animated-sign-in").then((m) => m.Ripple),
@@ -71,7 +71,7 @@ export default function LoginPage() {
           <span className="font-display text-[18px] font-bold text-ink tracking-[-0.02em]">AI Career Hub</span>
         </Link>
         <div className="flex items-center gap-3">
-          <ThemeToggle variant="icon" />
+          <SkyToggle />
           <Link
             href="/"
             className="text-xs font-bold text-on-surface-variant hover:text-green-deep transition-colors"

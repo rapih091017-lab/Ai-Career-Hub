@@ -324,7 +324,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
                     <button
                       type="button"
                       onClick={() => onSelectPlan(activePlan.id, "satuan")}
-                      className="mt-3 flex min-h-[54px] w-full items-center justify-center gap-2 rounded-[16px] border-[3px] border-ink bg-lime text-[16px] font-bold text-on-light shadow-[0_5px_0_#0a0f0d] transition-all hover:-translate-y-0.5 active:translate-y-1"
+                      className="mt-3 flex min-h-[54px] w-full items-center justify-center gap-2 rounded-[18px] border-[3px] border-ink bg-lime text-[16px] font-bold text-on-light shadow-[0_5px_0_#0a0f0d] transition-all hover:-translate-y-0.5 active:translate-y-1"
                     >
                       {t("pricing.cta-buy")}
                       <span aria-hidden="true" className="material-symbols-outlined text-[18px]">
@@ -334,7 +334,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
                   ) : (
                     <Link
                       href={`/checkout?packages=${activePlan.id}`}
-                      className="mt-3 flex min-h-[54px] w-full items-center justify-center gap-2 rounded-[16px] border-[3px] border-ink bg-lime text-[16px] font-bold text-on-light shadow-[0_5px_0_#0a0f0d] transition-all hover:-translate-y-0.5 active:translate-y-1"
+                      className="mt-3 flex min-h-[54px] w-full items-center justify-center gap-2 rounded-[18px] border-[3px] border-ink bg-lime text-[16px] font-bold text-on-light shadow-[0_5px_0_#0a0f0d] transition-all hover:-translate-y-0.5 active:translate-y-1"
                     >
                       {t("pricing.cta-buy")}
                       <span aria-hidden="true" className="material-symbols-outlined text-[18px]">
@@ -413,7 +413,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
                     {monthlyPlans.map((plan) => (
                       <li
                         key={plan.id}
-                        className="flex items-start justify-between gap-3 rounded-[12px] border-2 border-ink bg-cream px-3 py-2"
+                        className="flex items-start justify-between gap-3 rounded-[10px] border-2 border-ink bg-cream px-3 py-2"
                       >
                         <div>
                           <b className="block font-display text-[15px] leading-tight">

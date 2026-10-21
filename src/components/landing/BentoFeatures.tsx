@@ -160,7 +160,9 @@ export default function BentoFeatures() {
                       <span
                         aria-hidden="true"
                         className={[
-                          "absolute left-0 top-1.5 h-2.5 w-2.5 rounded-[2px]",
+                          // Titik bullet memakai skala radius tema; versi 2px
+                          // membuat kotak setengah bulat yang tidak ada di skala.
+                          "absolute left-0 top-1.5 h-2.5 w-2.5 rounded-full",
                           dark ? "bg-lime" : lime ? "bg-brand-dark" : "bg-green",
                         ].join(" ")}
                       />

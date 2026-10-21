@@ -83,7 +83,7 @@ export function UploadZone({ file, dragActive, onFileChange, onDragStateChange, 
         onChange={handleFileChange}
       />
       <div
-        className={`flex flex-col items-center justify-center rounded-[16px] border-2 border-dashed px-6 py-12 transition-colors duration-300 ${
+        className={`flex flex-col items-center justify-center rounded-[18px] border-2 border-dashed px-6 py-12 transition-colors duration-300 ${
           loading
             ? "border-ink bg-lime/20 animate-pulse"
             : error

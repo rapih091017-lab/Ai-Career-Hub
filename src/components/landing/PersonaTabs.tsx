@@ -67,7 +67,7 @@ export default function PersonaTabs() {
             role="tabpanel"
             id={`persona-panel-${persona.key}`}
             aria-labelledby={`persona-tab-${persona.key}`}
-            className="overflow-hidden rounded-[22px] border-[2.5px] border-ink bg-paper shadow-hard"
+            className="overflow-hidden rounded-[24px] border-[2.5px] border-ink bg-paper shadow-hard"
           >
             <div className="flex items-center gap-3 border-b-2 border-ink bg-evergreen px-4 py-3 text-on-dark">
               <span aria-hidden="true" className="h-7 w-7 rounded-full border-2 border-on-dark bg-lime" />

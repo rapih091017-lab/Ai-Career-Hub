@@ -61,20 +61,20 @@ export default function BeforeAfter() {
                   </div>
 
                   <div className="space-y-3 opacity-70">
-                    <div className="h-5 w-3/4 rounded bg-ink/10" />
-                    <div className="h-3 w-full rounded bg-ink/5" />
-                    <div className="h-3 w-5/6 rounded bg-ink/5" />
-                    <div className="h-3 w-4/6 rounded bg-ink/5" />
+                    <div className="h-5 w-3/4 rounded-[6px] bg-ink/10" />
+                    <div className="h-3 w-full rounded-[6px] bg-ink/5" />
+                    <div className="h-3 w-5/6 rounded-[6px] bg-ink/5" />
+                    <div className="h-3 w-4/6 rounded-[6px] bg-ink/5" />
                     <div className="border-t border-ink/10 pt-3">
-                      <div className="mb-2 h-4 w-1/3 rounded bg-ink/10" />
-                      <div className="h-3 w-full rounded bg-ink/5" />
-                      <div className="h-3 w-3/4 rounded bg-ink/5" />
+                      <div className="mb-2 h-4 w-1/3 rounded-[6px] bg-ink/10" />
+                      <div className="h-3 w-full rounded-[6px] bg-ink/5" />
+                      <div className="h-3 w-3/4 rounded-[6px] bg-ink/5" />
                     </div>
                     <div className="border-t border-ink/10 pt-3">
-                      <div className="mb-2 h-4 w-1/4 rounded bg-ink/10" />
+                      <div className="mb-2 h-4 w-1/4 rounded-[6px] bg-ink/10" />
                       <div className="flex flex-wrap gap-1.5">
                         {["HTML", "CSS", "JS"].map((skill) => (
-                          <span key={skill} className="rounded bg-ink/5 px-2.5 py-1 text-[12px] font-medium text-ink-soft">
+                          <span key={skill} className="rounded-[6px] bg-ink/5 px-2.5 py-1 text-[12px] font-medium text-ink-soft">
                             {skill}
                           </span>
                         ))}
@@ -125,21 +125,21 @@ export default function BeforeAfter() {
                   </div>
 
                   <div className="space-y-3">
-                    <div className="h-5 w-3/4 rounded bg-green/20" />
-                    <div className="h-3 w-full rounded bg-green/10" />
-                    <div className="h-3 w-5/6 rounded bg-green/10" />
-                    <div className="h-3 w-4/6 rounded bg-green/10" />
+                    <div className="h-5 w-3/4 rounded-[6px] bg-green/20" />
+                    <div className="h-3 w-full rounded-[6px] bg-green/10" />
+                    <div className="h-3 w-5/6 rounded-[6px] bg-green/10" />
+                    <div className="h-3 w-4/6 rounded-[6px] bg-green/10" />
                     <div className="border-t border-green/25 pt-3">
-                      <div className="mb-2 h-4 w-1/3 rounded bg-green/20" />
-                      <div className="h-3 w-full rounded bg-green/10" />
-                      <div className="h-3 w-3/4 rounded bg-green/10" />
-                      <div className="h-3 w-5/6 rounded bg-green/10" />
+                      <div className="mb-2 h-4 w-1/3 rounded-[6px] bg-green/20" />
+                      <div className="h-3 w-full rounded-[6px] bg-green/10" />
+                      <div className="h-3 w-3/4 rounded-[6px] bg-green/10" />
+                      <div className="h-3 w-5/6 rounded-[6px] bg-green/10" />
                     </div>
                     <div className="border-t border-green/25 pt-3">
-                      <div className="mb-2 h-4 w-1/4 rounded bg-green/20" />
+                      <div className="mb-2 h-4 w-1/4 rounded-[6px] bg-green/20" />
                       <div className="flex flex-wrap gap-1.5">
                         {["React", "TypeScript", "Node.js", "PostgreSQL", "AWS", "Docker"].map((skill) => (
-                          <span key={skill} className="rounded bg-green/10 px-2.5 py-1 text-[12px] font-medium text-green-deep">
+                          <span key={skill} className="rounded-[6px] bg-green/10 px-2.5 py-1 text-[12px] font-medium text-green-deep">
                             {skill}
                           </span>
                         ))}
