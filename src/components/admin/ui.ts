@@ -45,4 +45,4 @@ export const adminBtnDanger = `${btnBase} h-10 rounded-lg px-3 text-error hover:
 export const adminIconButton = `${btnBase} h-11 w-11 rounded-xl border border-outline-variant text-on-surface-variant hover:bg-surface-container hover:text-on-surface`;
 
 export const adminCheckboxClass =
-  "h-5 w-5 shrink-0 cursor-pointer rounded-md border-outline-variant accent-[#0d7377]";
+  "h-5 w-5 shrink-0 cursor-pointer rounded-md border-outline-variant accent-green-deep";

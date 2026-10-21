@@ -434,7 +434,7 @@ const handleImported = (imported: ImportedProfile, mode: MergeMode) => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 12, scale: 0.95 }}
               transition={{ type: "spring", stiffness: 300, damping: 22 }}
-              className="fixed bottom-24 right-6 z-[90] flex items-center gap-3 bg-emerald-600 text-white pl-4 pr-6 py-3 rounded-2xl shadow-premium-lg"
+              className="fixed bottom-24 right-6 z-[90] flex items-center gap-3 border-[2.5px] border-ink bg-lime text-ink pl-4 pr-6 py-3 rounded-[14px] shadow-hard"
               role="status"
               aria-live="polite"
             >
@@ -449,7 +449,7 @@ const handleImported = (imported: ImportedProfile, mode: MergeMode) => {
               </motion.span>
               <div>
                 <p className="font-label-bold text-sm">{t("profile.saved-success-title")}</p>
-                <p className="text-[11px] text-emerald-100">{t("profile.saved-success-desc")}</p>
+                <p className="text-[11px] text-ink/80">{t("profile.saved-success-desc")}</p>
               </div>
             </motion.div>
           )}

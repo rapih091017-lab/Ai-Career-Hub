@@ -288,7 +288,7 @@ export default function TrackerPage() {
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                   placeholder={t("tracker.search-placeholder")}
-                  className="h-11 w-full rounded-xl border border-outline-variant bg-surface-container-lowest pl-10 pr-3 text-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 md:w-64"
+                  className="h-11 w-full rounded-[14px] border-2 border-ink/60 bg-paper pl-10 pr-3 text-body-md text-ink placeholder:text-ink-soft/70 focus:border-green-deep focus:outline-none focus:ring-2 focus:ring-green/40 md:w-64"
                 />
               </div>
               <button
@@ -301,7 +301,7 @@ export default function TrackerPage() {
               <button
                 type="button"
                 onClick={() => openAddJob()}
-                className="h-11 rounded-xl bg-primary px-4 text-label-bold text-on-primary transition-opacity hover:opacity-90"
+                className="h-11 rounded-full border-[2.5px] border-ink bg-lime px-4 text-label-bold text-ink shadow-[0_3px_0_rgb(var(--c-ink))] transition-all hover:-translate-y-0.5 active:scale-[0.98]"
               >
                 {t("tracker.add-job")}
               </button>
@@ -322,7 +322,7 @@ export default function TrackerPage() {
                   setIsLoading(true);
                   loadAll();
                 }}
-                className="mt-4 rounded-xl bg-primary px-4 py-2.5 text-label-bold text-on-primary hover:opacity-90"
+                className="mt-4 rounded-full border-[2.5px] border-ink bg-lime px-4 py-2.5 text-label-bold text-ink shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5"
               >
                 {t("tracker.retry")}
               </button>

@@ -252,7 +252,7 @@ export default function DashboardPage() {
                   <p className="font-body-md text-on-surface-variant">{t("dashboard.subtitle")}</p>
                 </div>
                 {profileData === null ? (
-                  <div className="shrink-0 bg-surface-container-lowest rounded-2xl p-4 shadow-premium-sm border border-outline-variant/50 min-w-[200px] animate-pulse">
+                  <div className="shrink-0 bg-paper rounded-[14px] p-4 shadow-hard-sm border-2 border-ink/15 min-w-[200px] animate-pulse">
                     <div className="flex items-center justify-between mb-2">
                       <div className="h-3 bg-surface-container-high rounded w-20" />
                       <div className="h-3 bg-surface-container-high rounded w-8" />
@@ -270,14 +270,14 @@ export default function DashboardPage() {
                 ) : profileData && (
                   <Link
                     href="/settings/profile"
-                    className="shrink-0 bg-surface-container-lowest rounded-2xl p-4 shadow-premium-sm border border-outline-variant/50 hover:shadow-premium-md hover:border-primary/30 transition-shadow group min-w-[200px]"
+                    className="shrink-0 bg-paper rounded-[14px] p-4 shadow-hard-sm border-2 border-ink/15 hover:shadow-hard transition-shadow group min-w-[200px]"
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-label-sm font-semibold text-on-surface-variant">
+                      <span className="text-label-sm font-semibold text-ink-soft">
                         {profileData.hasProfile ? t("dashboard.master-profile") : t("dashboard.complete-profile")}
                       </span>
                       {profileData.hasProfile ? (
-                        <span className="text-label-sm font-bold text-primary">{profileData.score}%</span>
+                        <span className="text-label-sm font-bold text-green-deep">{profileData.score}%</span>
                       ) : (
                         <span className="w-5 h-5 rounded-full bg-error-container/50 flex items-center justify-center">
                           <span className="material-symbols-outlined text-error text-sm">error_outline</span>
@@ -287,7 +287,7 @@ export default function DashboardPage() {
                     <div className="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden mb-2">
                       <div
                         className={`h-full rounded-full transition-[width,background-color] duration-500 ${
-                          profileData.score >= 80 ? "bg-green-500" : profileData.score >= 40 ? "bg-primary" : "bg-amber-500"
+                          profileData.score >= 80 ? "bg-green" : profileData.score >= 40 ? "bg-green-deep" : "bg-amber-500"
                         }`}
                         style={{ width: `${profileData.score}%` }}
                       />
@@ -315,18 +315,18 @@ export default function DashboardPage() {
             {/* Quick Actions, staggered entry */}
             <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
               {[
-                { icon: "edit_document", label: t("dashboard.new-cv"), desc: t("dashboard.new-cv-desc"), color: "bg-primary-fixed", iconColor: "text-primary", onClick: () => setShowTemplatePicker(true), href: undefined },
+                { icon: "edit_document", label: t("dashboard.new-cv"), desc: t("dashboard.new-cv-desc"), color: "bg-lime/40", iconColor: "text-ink", onClick: () => setShowTemplatePicker(true), href: undefined },
                 { icon: "search", label: t("dashboard.check-cv"), desc: t("dashboard.check-cv-desc"), color: "bg-secondary-container/50", iconColor: "text-secondary", onClick: undefined, href: "/checker" },
-                { icon: "grid_view", label: t("dashboard.portfolio"), desc: t("dashboard.portfolio-desc"), color: "bg-surface-container", iconColor: "text-primary", onClick: undefined, href: "/portfolio" },
-                { icon: "mail", label: t("dashboard.create-letter"), desc: t("dashboard.create-letter-desc"), color: "bg-primary/10", iconColor: "text-primary", onClick: undefined, href: "/surat-lamaran" },
+                { icon: "grid_view", label: t("dashboard.portfolio"), desc: t("dashboard.portfolio-desc"), color: "bg-surface-container", iconColor: "text-green-deep", onClick: undefined, href: "/portfolio" },
+                { icon: "mail", label: t("dashboard.create-letter"), desc: t("dashboard.create-letter-desc"), color: "bg-lime/25", iconColor: "text-ink", onClick: undefined, href: "/surat-lamaran" },
                 { icon: "record_voice_over", label: t("dashboard.interview-prep"), desc: t("dashboard.interview-desc"), color: "bg-amber-50", iconColor: "text-amber-600", onClick: undefined, href: "/interview" },
               ].map((card, i) => {
                 const content = (
-                  <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-premium-md border border-outline-variant/50 hover:shadow-premium-lg hover:-translate-y-0.5 transition-[transform,box-shadow] duration-300 group active:scale-[0.98]">
-                    <div className={`w-12 h-12 rounded-xl ${card.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                  <div className="bg-paper rounded-[14px] p-6 shadow-hard-sm border-2 border-ink/15 hover:shadow-hard hover:-translate-y-0.5 transition-[transform,box-shadow] duration-300 group active:scale-[0.98]">
+                    <div className={`w-12 h-12 rounded-[7px] border-2 border-ink ${card.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
                       <span className={`material-symbols-outlined ${card.iconColor} text-2xl`}>{card.icon}</span>
                     </div>
-                    <h3 className="font-label-bold text-on-surface mb-1">{card.label}</h3>
+                    <h3 className="font-display text-ink mb-1">{card.label}</h3>
                     <p className="text-body-md text-on-surface-variant">{card.desc}</p>
                   </div>
                 );
@@ -352,9 +352,9 @@ export default function DashboardPage() {
             <section className="mb-6">
               <Link
                 href={nextAction.href}
-                className="flex items-center gap-4 rounded-2xl border border-primary/25 bg-primary/5 p-4 transition-colors hover:bg-primary/10"
+                className="flex items-center gap-4 rounded-[14px] border-2 border-ink/60 bg-lime/15 p-4 transition-colors hover:border-ink"
               >
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[7px] border-2 border-ink bg-lime text-ink">
                   <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden>
                     {nextAction.icon}
                   </span>
@@ -363,7 +363,7 @@ export default function DashboardPage() {
                   <p className="text-label-sm text-on-surface-variant">{t("dashboard.next-title")}</p>
                   <p className="truncate text-body-md font-semibold text-on-surface">{nextAction.label}</p>
                 </div>
-                <span className="material-symbols-outlined text-primary" aria-hidden>
+                <span className="material-symbols-outlined text-green-deep" aria-hidden>
                   arrow_forward
                 </span>
               </Link>
@@ -378,7 +378,7 @@ export default function DashboardPage() {
             {recentActivity.length > 0 && (
               <section className="mb-8">
                 <h2 className="font-headline-md text-on-surface mb-3">{t("dashboard.recent-activity")}</h2>
-                <div className="bg-surface-container-lowest rounded-2xl p-4 shadow-premium-sm border border-outline-variant/50 space-y-2">
+                <div className="bg-paper rounded-[14px] p-4 shadow-hard-sm border-2 border-ink/15 space-y-2">
                   {recentActivity.map((cv, i) => (
                     <motion.div
                       key={cv.id}
@@ -387,8 +387,8 @@ export default function DashboardPage() {
                       transition={{ duration: 0.3, delay: i * 0.05 }}
                       className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-surface-container-low transition-colors"
                     >
-                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                        <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>description</span>
+                      <div className="w-8 h-8 rounded-[7px] border-2 border-ink bg-lime/40 flex items-center justify-center shrink-0">
+                        <span className="material-symbols-outlined text-ink text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>description</span>
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-semibold text-on-surface truncate">
@@ -400,7 +400,7 @@ export default function DashboardPage() {
                       </div>
                       <button
                         onClick={() => router.push(`/builder/${cv.id}`)}
-                        className="text-[10px] font-semibold text-primary hover:underline shrink-0"
+                        className="text-[10px] font-semibold text-green-deep hover:underline shrink-0"
                       >
                         {t("dashboard.open")}
                       </button>
@@ -416,7 +416,7 @@ export default function DashboardPage() {
                 <h2 className="font-headline-md text-on-surface mb-3">{t("dashboard.checker-history")}</h2>
                 <div className="space-y-2">
                   {[1,2,3].map((i) => (
-                    <div key={i} className="bg-surface-container-lowest rounded-xl p-4 shadow-premium-sm border border-outline-variant/50 flex items-center gap-4 animate-pulse">
+                    <div key={i} className="bg-paper rounded-[14px] p-4 shadow-hard-sm border-2 border-ink/15 flex items-center gap-4 animate-pulse">
                       <div className="w-14 h-14 rounded-full bg-surface-container-high shrink-0" />
                       <div className="flex-1 space-y-2">
                         <div className="h-3 bg-surface-container-high rounded w-3/4" />
@@ -440,7 +440,7 @@ export default function DashboardPage() {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.25, delay: i * 0.03 }}
-                        className="bg-surface-container-lowest rounded-xl p-4 shadow-premium-sm border border-outline-variant/50 hover:shadow-premium-md hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-4 cursor-pointer"
+                        className="bg-paper rounded-[14px] p-4 shadow-hard-sm border-2 border-ink/15 hover:shadow-hard hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-4 cursor-pointer"
                         onClick={() => router.push(`/checker/${item.id}`)}
                       >
                         {/* Score ring, pakai threshold yang sama dengan ScoreDonut */}
@@ -492,7 +492,7 @@ export default function DashboardPage() {
               {lettersLoading ? (
                 <div className="space-y-2">
                   {[1, 2].map((i) => (
-                    <div key={i} className="bg-surface-container-lowest rounded-xl p-4 shadow-premium-sm border border-outline-variant/50 flex items-center gap-4 animate-pulse">
+                    <div key={i} className="bg-paper rounded-[14px] p-4 shadow-hard-sm border-2 border-ink/15 flex items-center gap-4 animate-pulse">
                       <div className="w-10 h-10 rounded-xl bg-surface-container-high shrink-0" />
                       <div className="flex-1 space-y-2">
                         <div className="h-3 bg-surface-container-high rounded w-2/3" />
@@ -505,19 +505,19 @@ export default function DashboardPage() {
                 <motion.div
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-surface-container-lowest rounded-2xl p-8 border border-dashed border-outline-variant text-center shadow-premium-sm"
+                  className="bg-paper rounded-[14px] p-8 border-2 border-dashed border-ink/25 text-center shadow-hard-sm"
                 >
                   <div className="w-12 h-12 rounded-xl bg-violet-50 flex items-center justify-center mx-auto mb-3">
-                    <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>mail</span>
+                    <span className="material-symbols-outlined text-green-deep text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>mail</span>
                   </div>
-                  <h3 className="font-label-bold text-on-surface mb-1">{t("dashboard.no-letters")}</h3>
+                  <h3 className="font-display text-ink mb-1">{t("dashboard.no-letters")}</h3>
                   <p className="text-body-md text-on-surface-variant mb-4">
                     {t("dashboard.no-letters-desc")}
                   </p>
                   <MagneticButton>
                     <Link
                       href="/surat-lamaran"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white font-bold rounded-xl hover:opacity-90 active:scale-[0.98] transition-all"
+                      className="inline-flex min-h-[44px] items-center gap-2 px-5 py-2.5 border-[2.5px] border-ink bg-lime text-ink font-bold rounded-full shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-[0.98] transition-all"
                     >
                       <span className="material-symbols-outlined text-base">add</span>
                       {t("dashboard.letter-new")}
@@ -534,7 +534,7 @@ export default function DashboardPage() {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.25, delay: i * 0.03 }}
-                        className="bg-surface-container-lowest rounded-xl p-4 shadow-premium-sm border border-outline-variant/50 hover:shadow-premium-md hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-4 cursor-pointer"
+                        className="bg-paper rounded-[14px] p-4 shadow-hard-sm border-2 border-ink/15 hover:shadow-hard hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-4 cursor-pointer"
                         onClick={() => router.push(letter.cvId ? `/surat-lamaran/${letter.cvId}?letter=${letter.id}` : `/surat-lamaran?letter=${letter.id}`)}
                       >
                         <div className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center ${isMotivation ? "bg-amber-50" : "bg-violet-50"}`}>
@@ -564,7 +564,7 @@ export default function DashboardPage() {
                 <h2 className="font-headline-md text-on-surface">{t("dashboard.recent-cvs")}</h2>
                 <Link
                   href="/my-resumes"
-                  className="text-label-bold text-primary hover:underline flex items-center gap-1 text-xs"
+                  className="text-label-bold text-green-deep hover:underline flex items-center gap-1 text-xs"
                 >
                   {t("dashboard.view-all-cvs")}
                   <span className="material-symbols-outlined text-[14px] select-none">arrow_forward</span>
@@ -576,7 +576,7 @@ export default function DashboardPage() {
                   {[1, 2, 3].map((i) => (
                     <div
                       key={i}
-                      className="bg-surface-container-lowest rounded-2xl p-5 shadow-premium-sm border border-outline-variant/50 flex items-center justify-between gap-4 animate-pulse"
+                      className="bg-paper rounded-[14px] p-5 shadow-hard-sm border-2 border-ink/15 flex items-center justify-between gap-4 animate-pulse"
                     >
                       <div className="flex-1 space-y-2">
                         <div className="h-4 bg-surface-container-high rounded w-1/3" />
@@ -594,17 +594,17 @@ export default function DashboardPage() {
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: 0.2 }}
-                  className="bg-surface-container-lowest rounded-2xl p-12 border border-dashed border-outline-variant text-center shadow-premium-sm"
+                  className="bg-paper rounded-[14px] p-12 border-2 border-dashed border-ink/25 text-center shadow-hard-sm"
                 >
                   <div className="w-16 h-16 rounded-full bg-primary-fixed flex items-center justify-center mx-auto mb-4">
-                    <span className="material-symbols-outlined text-primary text-3xl">description</span>
+                    <span className="material-symbols-outlined text-green-deep text-3xl">description</span>
                   </div>
                   <h3 className="font-label-bold text-on-surface mb-2">{t("dashboard.no-cv-title")}</h3>
                   <p className="text-body-md text-on-surface-variant mb-6">{t("dashboard.no-cv-desc")}</p>
                   <MagneticButton>
                     <button
                       onClick={() => setShowTemplatePicker(true)}
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-on-primary font-label-bold rounded-xl hover:opacity-90 transition-opacity"
+                      className="inline-flex min-h-[44px] items-center gap-2 px-6 py-3 border-[2.5px] border-ink bg-lime text-ink font-bold rounded-full shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 transition-all"
                     >
                       <span className="material-symbols-outlined text-lg">add</span>
                       {t("dashboard.first-cv")}
@@ -616,7 +616,7 @@ export default function DashboardPage() {
                   {cvList.slice(0, 4).map((cv) => (
                     <div
                       key={cv.id}
-                      className="bg-surface-container-lowest rounded-2xl p-5 shadow-premium-sm border border-outline-variant/50 flex items-center justify-between gap-4 hover:shadow-premium-md hover:-translate-y-0.5 transition-[transform,box-shadow] duration-300 group"
+                      className="bg-paper rounded-[14px] p-5 shadow-hard-sm border-2 border-ink/15 flex items-center justify-between gap-4 hover:shadow-hard hover:-translate-y-0.5 transition-[transform,box-shadow] duration-300 group"
                     >
                       <div className="flex-1 min-w-0">
                         <h3 className="font-label-bold text-on-surface truncate">{cv.jobTitle || t("dashboard.untitled-cv")}</h3>
@@ -628,7 +628,7 @@ export default function DashboardPage() {
                     <MagneticButton>
                       <button
                         onClick={() => router.push(`/builder/${cv.id}`)}
-                        className="px-4 py-2 rounded-xl bg-primary/10 text-primary text-label-bold hover:bg-primary/20 active:scale-[0.97] transition-colors"
+                        className="px-4 py-2 rounded-full border-2 border-ink/50 bg-lime/25 text-ink text-label-bold hover:border-ink active:scale-[0.97] transition-colors"
                       >
                         {t("dashboard.edit")}
                       </button>
@@ -656,7 +656,7 @@ export default function DashboardPage() {
                             exit={{ opacity: 0, y: -6, scale: 0.98 }}
                             transition={{ duration: 0.15 }}
                             role="menu"
-                            className="absolute right-0 top-full mt-1 z-30 w-60 bg-surface-container-lowest rounded-xl shadow-premium-lg border border-outline-variant/50 overflow-hidden py-1.5"
+                            className="absolute right-0 top-full mt-1 z-30 w-60 bg-paper rounded-[14px] shadow-hard border-2 border-ink/15 overflow-hidden py-1.5"
                           >
                             <p className="px-4 pt-1 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">{t("dashboard.create-letter-from-cv")}</p>
                             <button

@@ -158,7 +158,7 @@ export default function MyResumesPage() {
               <MagneticButton>
                 <button
                   onClick={() => setShowTemplatePicker(true)}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white font-bold rounded-xl hover:opacity-90 active:scale-[0.98] transition-all"
+                  className="inline-flex min-h-[44px] items-center gap-2 px-5 py-2.5 border-[2.5px] border-ink bg-lime text-ink font-bold rounded-full shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-[0.98] transition-all"
                 >
                   <span className="material-symbols-outlined text-base select-none">add</span>
                   {t("dashboard.create-new")}
@@ -236,17 +236,17 @@ export default function MyResumesPage() {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.1 }}
-                className="bg-surface-container-lowest rounded-2xl p-12 border border-dashed border-outline-variant text-center shadow-premium-sm"
+                className="bg-paper rounded-[14px] p-12 border-2 border-dashed border-ink/25 text-center shadow-hard-sm"
               >
-                <div className="w-16 h-16 rounded-full bg-primary-fixed flex items-center justify-center mx-auto mb-4">
-                  <span className="material-symbols-outlined text-primary text-3xl select-none">description</span>
+                <div className="w-16 h-16 rounded-[14px] border-2 border-ink bg-lime flex items-center justify-center mx-auto mb-4">
+                  <span className="material-symbols-outlined text-ink text-3xl select-none">description</span>
                 </div>
-                <h3 className="font-label-bold text-on-surface mb-2">{t("dashboard.no-cv-title")}</h3>
-                <p className="text-body-md text-on-surface-variant mb-6">{t("dashboard.no-cv-desc")}</p>
+                <h3 className="font-display text-ink mb-2">{t("dashboard.no-cv-title")}</h3>
+                <p className="text-body-md text-ink-soft mb-6">{t("dashboard.no-cv-desc")}</p>
                 <MagneticButton>
                   <button
                     onClick={() => setShowTemplatePicker(true)}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-on-primary font-label-bold rounded-xl hover:opacity-90 transition-opacity"
+                    className="inline-flex min-h-[44px] items-center gap-2 px-6 py-3 border-[2.5px] border-ink bg-lime text-ink font-bold rounded-full shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 transition-all"
                   >
                     <span className="material-symbols-outlined text-lg select-none">add</span>
                     {t("dashboard.first-cv")}
@@ -258,11 +258,11 @@ export default function MyResumesPage() {
                 {filteredCvList.map((cv) => (
                   <div
                     key={cv.id}
-                    className="bg-surface-container-lowest rounded-2xl p-5 shadow-premium-sm border border-outline-variant/50 flex items-center justify-between gap-4 hover:shadow-premium-md hover:-translate-y-0.5 transition-[transform,box-shadow] duration-300 group"
+                    className="bg-paper rounded-[14px] p-5 shadow-hard-sm border-2 border-ink/15 flex items-center justify-between gap-4 hover:shadow-hard hover:-translate-y-0.5 transition-[transform,box-shadow] duration-300 group"
                   >
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-label-bold text-on-surface truncate">{cv.jobTitle || t("dashboard.untitled-cv")}</h3>
-                      <p className="text-label-sm text-on-surface-variant mt-0.5">
+                      <h3 className="font-display text-ink truncate">{cv.jobTitle || t("dashboard.untitled-cv")}</h3>
+                      <p className="text-label-sm text-ink-soft mt-0.5">
                         {CV_TEMPLATES.find((tmpl) => tmpl.id === cv.templateId)?.name || t("dashboard.template-default")} &middot; {new Date(cv.createdAt).toLocaleDateString(lang === "en" ? "en-US" : "id-ID")} &middot; {t("dashboard.updated-at").replace("{time}", timeAgo(new Date(cv.updatedAt), t, lang))}
                       </p>
                     </div>
@@ -270,7 +270,7 @@ export default function MyResumesPage() {
                       <MagneticButton>
                         <button
                           onClick={() => router.push(`/builder/${cv.id}`)}
-                          className="px-4 py-2 rounded-xl bg-primary/10 text-primary text-label-bold hover:bg-primary/20 active:scale-[0.97] transition-colors"
+                          className="px-4 py-2 rounded-full border-2 border-ink/50 bg-lime/25 text-ink text-label-bold hover:border-ink active:scale-[0.97] transition-colors"
                         >
                           {t("dashboard.edit")}
                         </button>

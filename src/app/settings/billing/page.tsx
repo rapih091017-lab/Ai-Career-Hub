@@ -243,20 +243,20 @@ export default function SettingsBillingPage() {
   return (
     <div className="flex flex-col gap-8">
       {/* Section: Langganan & Penagihan */}
-      <section className="bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/50 overflow-hidden">
+      <section className="bg-paper rounded-[14px] shadow-hard-sm border-2 border-ink/15 overflow-hidden">
         <div className="px-6 py-5 border-b border-outline-variant/50 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-primary-fixed flex items-center justify-center text-primary">
+          <div className="w-10 h-10 rounded-[7px] border-2 border-ink bg-lime flex items-center justify-center text-ink">
             <span className="material-symbols-outlined">credit_card</span>
           </div>
           <div>
-            <h2 className="font-headline-md text-lg text-on-surface">{t("billing.title")}</h2>
+            <h2 className="font-display text-lg text-ink">{t("billing.title")}</h2>
             <p className="text-label-sm text-on-surface-variant">{t("billing.subtitle")}</p>
           </div>
         </div>
 
         {isLoading ? (
           <div className="p-12 flex items-center justify-center">
-            <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+            <div className="animate-spin h-8 w-8 border-4 border-ink/30 border-t-green-deep rounded-full" />
           </div>
         ) : error ? (
           <div className="p-12 text-center text-error font-label-bold">{error}</div>
@@ -265,7 +265,7 @@ export default function SettingsBillingPage() {
             {/* Current Plan */}
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-label-bold text-on-surface">{t("billing.current-plan")}</h3>
+                <h3 className="font-display text-ink">{t("billing.current-plan")}</h3>
                 <div className="flex items-center gap-3">
                   {data?.premium.tierName && data?.premium.tierName !== "Free" && (
                     <span className="text-label-sm text-on-surface-variant">{data.premium.tierName}</span>
@@ -273,8 +273,8 @@ export default function SettingsBillingPage() {
                   <span
                     className={`px-4 py-1.5 rounded-full text-label-sm font-bold ${
                       data?.premium.isPremium
-                        ? "bg-primary text-on-primary"
-                        : "bg-surface-container-high text-outline"
+                        ? "border-[2.5px] border-ink bg-lime text-ink"
+                        : "bg-surface-container-high text-ink-soft"
                     }`}
                   >
                     {data?.premium.isPremium ? t("billing.premium") : t("billing.free")}
@@ -282,25 +282,25 @@ export default function SettingsBillingPage() {
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/50">
+                <div className="p-4 rounded-[14px] bg-surface-container-low border-2 border-ink/15">
                   <p className="text-label-sm text-on-surface-variant">
                     {data?.premium.isPremium ? t("billing.days-remaining") : t("billing.status")}
                   </p>
-                  <p className="text-headline-md text-primary mt-1">
+                  <p className="font-display text-ink mt-1">
                     {data?.premium.isPremium ? data?.premium.daysRemaining : "-"}
                   </p>
                   <p className="text-label-sm text-on-surface-variant">
                     {data?.premium.isPremium ? t("billing.from-30-days") : t("billing.activate")}
                   </p>
                 </div>
-                <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/50">
+                <div className="p-4 rounded-[14px] bg-surface-container-low border-2 border-ink/15">
                   <p className="text-label-sm text-on-surface-variant">{t("billing.total-cvs")}</p>
                   <p className="font-label-bold text-on-surface mt-1">
                     {data?.usage.cvBuilds ?? 0}
                   </p>
                   <p className="text-label-sm text-on-surface-variant">{t("billing.this-month")}</p>
                 </div>
-                <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/50">
+                <div className="p-4 rounded-[14px] bg-surface-container-low border-2 border-ink/15">
                   <p className="text-label-sm text-on-surface-variant">{t("billing.total-spent")}</p>
                   <p className="font-label-bold text-on-surface mt-1">
                     Rp {(data?.payments.totalSpent ?? 0).toLocaleString("id-ID")}
@@ -313,11 +313,11 @@ export default function SettingsBillingPage() {
             {/* Usage */}
             <div>
               <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-                <h3 className="font-label-bold text-on-surface">{t("billing.usage-title")}</h3>
+                <h3 className="font-display text-ink">{t("billing.usage-title")}</h3>
                 <button
                   type="button"
                   onClick={jumpToPackages}
-                  className="inline-flex min-h-11 items-center gap-2 px-4 rounded-xl border border-primary/40 text-sm font-semibold text-primary hover:bg-primary/5"
+                  className="inline-flex min-h-[44px] items-center gap-2 px-4 rounded-full border-2 border-ink/50 bg-lime/25 text-sm font-bold text-ink transition-all hover:border-ink"
                 >
                   <span className="material-symbols-outlined text-lg">shopping_bag</span>
                   {t("billing.jump-to-packages")}
@@ -432,14 +432,14 @@ export default function SettingsBillingPage() {
                 <span className="material-symbols-outlined">description</span>
               </div>
               <div>
-                <h3 className="font-label-bold text-on-surface">{t("billing.pick-cv")}</h3>
+                <h3 className="font-display text-ink">{t("billing.pick-cv")}</h3>
                 <p className="text-label-sm text-on-surface-variant">{t("billing.pick-cv-subtitle")}</p>
               </div>
             </div>
             <div className="p-4 max-h-[50vh] overflow-y-auto space-y-2">
               {cvListLoading ? (
                 <div className="flex items-center justify-center py-8">
-                  <div className="animate-spin h-6 w-6 border-3 border-primary border-t-transparent rounded-full" />
+                  <div className="animate-spin h-6 w-6 border-3 border-ink/30 border-t-green-deep rounded-full" />
                 </div>
               ) : cvList.length === 0 ? (
                 <div className="text-center py-8 text-on-surface-variant">
@@ -488,7 +488,7 @@ onClick={() => {
                   goToCheckout("single_cv");
                 }}
                 disabled={!selectedCvId}
-                className="flex-1 py-2.5 rounded-xl bg-secondary text-on-secondary text-sm font-medium hover:brightness-110 transition-all disabled:opacity-50"
+                className="flex-1 py-2.5 rounded-full border-2 border-ink/60 bg-paper text-ink text-sm font-bold transition-all hover:border-ink disabled:opacity-50"
               >
                 {t("billing.continue")}
               </button>
@@ -524,7 +524,7 @@ onClick={() => {
             <button
               type="button"
               onClick={() => setTopupDone(null)}
-              className="mt-4 w-full py-3 rounded-xl bg-primary text-on-primary font-bold"
+              className="mt-4 w-full py-3 rounded-full border-[2.5px] border-ink bg-lime text-ink font-bold shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5"
             >
               {t("billing.continue")}
             </button>
@@ -571,7 +571,7 @@ function UsageBar({
   return (
     <div>
       <div className="flex justify-between text-sm mb-1">
-        <span className="font-label-bold text-on-surface">{label}</span>
+        <span className="font-display text-ink">{label}</span>
         <span className="text-on-surface-variant">
           {isUnlimited ? `${used} / \u221E` : `${used}/${total}`}
         </span>
