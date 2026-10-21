@@ -1471,7 +1471,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                 </button>
                                 <button
                                   onClick={handleCopy}
-                                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-secondary/10 text-secondary text-sm font-semibold hover:bg-secondary/20 transition-colors"
+                                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-secondary/10 text-green-deep text-sm font-semibold hover:bg-secondary/20 transition-colors"
                                 >
                                   <span className="material-symbols-outlined text-base">content_copy</span>
                                   Salin Teks

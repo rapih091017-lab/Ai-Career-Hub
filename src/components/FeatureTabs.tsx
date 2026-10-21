@@ -42,7 +42,7 @@ const TABS: TabData[] = [
     bullets: ["features.portfolio-b1", "features.portfolio-b2", "features.portfolio-b3"],
     ctaKey: "features.portfolio-cta",
     href: "/portfolio",
-    color: "text-secondary",
+    color: "text-green-deep",
     bgColor: "bg-secondary",
   },
   {
@@ -75,7 +75,7 @@ const TABS: TabData[] = [
     bullets: ["features.letters-b1", "features.letters-b2", "features.letters-b3"],
     ctaKey: "features.letters-cta",
     href: "/surat-lamaran",
-    color: "text-secondary",
+    color: "text-green-deep",
     bgColor: "bg-secondary",
   },
 ];
@@ -403,7 +403,7 @@ function LetterShowcase({ t }: { t: (key: string) => string }) {
             {t("features.letters-pdf")}
           </span>
         </div>
-        <span className="text-xs text-secondary font-bold bg-secondary/10 px-2.5 py-1 rounded-full">
+        <span className="text-xs text-green-deep font-bold bg-secondary/10 px-2.5 py-1 rounded-full">
           {t("features.letters-free")}
         </span>
       </motion.div>

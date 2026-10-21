@@ -81,7 +81,7 @@ export default function PaymentHistoryPage() {
   return (
     <div className="flex flex-col gap-8">
       {/* Section: Riwayat Transaksi */}
-      <section className="bg-paper rounded-[14px] shadow-hard-sm border-2 border-ink/15 overflow-hidden">
+      <section className="bg-paper rounded-[14px] shadow-hard-sm border-2 border-ink overflow-hidden">
         <div className="px-6 py-5 border-b border-hairline flex items-center gap-4">
           <div className="w-10 h-10 rounded-[7px] border-2 border-ink bg-lime flex items-center justify-center text-on-light">
             <span className="material-symbols-outlined">receipt_long</span>
@@ -102,7 +102,7 @@ export default function PaymentHistoryPage() {
           <div className="p-6 space-y-6">
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-5 rounded-[14px] bg-surface-container-low border-2 border-ink/15">
+              <div className="p-5 rounded-[14px] bg-surface-container-low border-2 border-ink">
                 <p className="text-label-sm text-on-surface-variant">{t("payment.total-spent")}</p>
                 <p className="font-display text-ink mt-1">
                   Rp {totalSpent.toLocaleString("id-ID")}
@@ -113,7 +113,7 @@ export default function PaymentHistoryPage() {
                     : t("payment.no-transactions")}
                 </p>
               </div>
-              <div className="p-5 rounded-[14px] bg-surface-container-low border-2 border-ink/15">
+              <div className="p-5 rounded-[14px] bg-surface-container-low border-2 border-ink">
                 <p className="text-label-sm text-on-surface-variant">{t("payment.this-month")}</p>
                 <p className="font-display text-ink mt-1">
                   {allTransactions.filter((t) => {
@@ -124,7 +124,7 @@ export default function PaymentHistoryPage() {
                 </p>
                 <p className="text-label-sm text-on-surface-variant mt-1">{t("payment.all-transactions")}</p>
               </div>
-              <div className="p-5 rounded-[14px] bg-surface-container-low border-2 border-ink/15">
+              <div className="p-5 rounded-[14px] bg-surface-container-low border-2 border-ink">
                 <p className="text-label-sm text-on-surface-variant">{t("payment.total-transactions")}</p>
                 <p className="font-display text-ink mt-1">{totalTransactions}</p>
                 <p className="text-label-sm text-on-surface-variant mt-1">
@@ -178,7 +178,7 @@ export default function PaymentHistoryPage() {
                                         p.key === currentEquivalentPackage(tx.packageType),
                                     )?.monthly
                                       ? "text-primary"
-                                      : "text-secondary"
+                                      : "text-green-deep"
                                   }`}
                                 >
                                   {catalogPackages.find(

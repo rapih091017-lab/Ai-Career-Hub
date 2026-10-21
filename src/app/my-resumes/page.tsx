@@ -258,7 +258,7 @@ export default function MyResumesPage() {
                 {filteredCvList.map((cv) => (
                   <div
                     key={cv.id}
-                    className="bg-paper rounded-[14px] p-5 shadow-hard-sm border-2 border-ink/15 flex items-center justify-between gap-4 hover:shadow-hard hover:-translate-y-0.5 transition-[transform,box-shadow] duration-300 group"
+                    className="bg-paper rounded-[14px] p-5 shadow-hard-sm border-2 border-ink flex items-center justify-between gap-4 hover:shadow-hard hover:-translate-y-0.5 transition-[transform,box-shadow] duration-300 group"
                   >
                     <div className="flex-1 min-w-0">
                       <h3 className="font-display text-ink truncate">{cv.jobTitle || t("dashboard.untitled-cv")}</h3>
@@ -330,7 +330,7 @@ export default function MyResumesPage() {
                       <MagneticButton>
                         <button
                           onClick={() => router.push(`/cv/${cv.id}/checkout`)}
-                          className="px-3 py-2 rounded-xl bg-secondary/10 text-secondary text-label-bold hover:bg-secondary/20 active:scale-[0.97] transition-colors flex items-center gap-1"
+                          className="px-3 py-2 rounded-xl bg-secondary/10 text-green-deep text-label-bold hover:bg-secondary/20 active:scale-[0.97] transition-colors flex items-center gap-1"
                           title={t("dashboard.ai-rev-title")}
                         >
                           <span className="material-symbols-outlined text-sm select-none">auto_awesome</span>

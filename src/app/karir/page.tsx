@@ -320,7 +320,7 @@ export default function KarirPage() {
                 return (
                 <article
                   key={job.id}
-                  className="flex flex-col gap-3 rounded-[14px] border-2 border-ink/15 bg-paper p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-hard-sm"
+                  className="flex flex-col gap-3 rounded-[14px] border-2 border-ink bg-paper p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-hard-sm"
                 >
                   <div className="flex items-start gap-4">
                     {job.imageUrl ? (
@@ -397,7 +397,7 @@ export default function KarirPage() {
           </section>
         ) : jobsLoaded && hasFilters ? (
           <section className="mb-16">
-            <div className="rounded-[14px] border-2 border-ink/15 bg-paper p-8 text-center shadow-hard-sm">
+            <div className="rounded-[14px] border-2 border-ink bg-paper p-8 text-center shadow-hard-sm">
               <span className="material-symbols-outlined mb-4 text-5xl text-ink-soft" aria-hidden="true">
                 search_off
               </span>

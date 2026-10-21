@@ -243,7 +243,7 @@ export default function SettingsBillingPage() {
   return (
     <div className="flex flex-col gap-8">
       {/* Section: Langganan & Penagihan */}
-      <section className="bg-paper rounded-[14px] shadow-hard-sm border-2 border-ink/15 overflow-hidden">
+      <section className="bg-paper rounded-[14px] shadow-hard-sm border-2 border-ink overflow-hidden">
         <div className="px-6 py-5 border-b border-outline-variant/50 flex items-center gap-4">
           <div className="w-10 h-10 rounded-[7px] border-2 border-ink bg-lime flex items-center justify-center text-on-light">
             <span className="material-symbols-outlined">credit_card</span>
@@ -282,7 +282,7 @@ export default function SettingsBillingPage() {
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-4 rounded-[14px] bg-surface-container-low border-2 border-ink/15">
+                <div className="p-4 rounded-[14px] bg-surface-container-low border-2 border-ink">
                   <p className="text-label-sm text-on-surface-variant">
                     {data?.premium.isPremium ? t("billing.days-remaining") : t("billing.status")}
                   </p>
@@ -293,14 +293,14 @@ export default function SettingsBillingPage() {
                     {data?.premium.isPremium ? t("billing.from-30-days") : t("billing.activate")}
                   </p>
                 </div>
-                <div className="p-4 rounded-[14px] bg-surface-container-low border-2 border-ink/15">
+                <div className="p-4 rounded-[14px] bg-surface-container-low border-2 border-ink">
                   <p className="text-label-sm text-on-surface-variant">{t("billing.total-cvs")}</p>
                   <p className="font-label-bold text-on-surface mt-1">
                     {data?.usage.cvBuilds ?? 0}
                   </p>
                   <p className="text-label-sm text-on-surface-variant">{t("billing.this-month")}</p>
                 </div>
-                <div className="p-4 rounded-[14px] bg-surface-container-low border-2 border-ink/15">
+                <div className="p-4 rounded-[14px] bg-surface-container-low border-2 border-ink">
                   <p className="text-label-sm text-on-surface-variant">{t("billing.total-spent")}</p>
                   <p className="font-label-bold text-on-surface mt-1">
                     Rp {(data?.payments.totalSpent ?? 0).toLocaleString("id-ID")}
@@ -428,7 +428,7 @@ export default function SettingsBillingPage() {
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onClick={(e) => { if (e.target === e.currentTarget) setShowCvPicker(false); }}>
           <div className="bg-surface-container-lowest rounded-2xl shadow-xl w-full max-w-md overflow-hidden" onClick={(e) => e.stopPropagation()}>
             <div className="px-6 py-5 border-b border-outline-variant/50 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-secondary-container/50 flex items-center justify-center text-secondary">
+              <div className="w-10 h-10 rounded-xl bg-secondary-container/50 flex items-center justify-center text-green-deep">
                 <span className="material-symbols-outlined">description</span>
               </div>
               <div>
@@ -459,7 +459,7 @@ export default function SettingsBillingPage() {
                     }`}
                   >
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
-                      selectedCvId === cv.id ? "bg-secondary text-on-secondary" : "bg-surface-container-high text-outline"
+                      selectedCvId === cv.id ? "bg-primary text-on-primary" : "bg-surface-container-high text-outline"
                     }`}>
                       <span className="material-symbols-outlined text-lg">description</span>
                     </div>
@@ -468,7 +468,7 @@ export default function SettingsBillingPage() {
                       <p className="text-xs text-on-surface-variant">{new Date(cv.createdAt).toLocaleDateString("id-ID")}</p>
                     </div>
                     {selectedCvId === cv.id && (
-                      <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                      <span className="material-symbols-outlined text-green-deep" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
                     )}
                   </button>
                 ))
@@ -541,7 +541,7 @@ onClick={() => {
       {/* How to Pay Info */}
       <section className="bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/50 p-6">
         <div className="flex items-start gap-4">
-          <div className="w-10 h-10 rounded-xl bg-secondary-container/50 flex items-center justify-center text-secondary shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-secondary-container/50 flex items-center justify-center text-green-deep shrink-0">
             <span className="material-symbols-outlined">info</span>
           </div>
           <div>

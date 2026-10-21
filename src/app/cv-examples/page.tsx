@@ -58,7 +58,7 @@ export default function CvExamplesEnPage() {
               <Link
                 key={example.slug}
                 href={`/cv-examples/${example.slug}`}
-                className="group flex flex-col rounded-[14px] border-2 border-ink/15 bg-paper p-5 transition-all hover:-translate-y-0.5 hover:shadow-hard-sm"
+                className="group flex flex-col rounded-[14px] border-2 border-ink bg-paper p-5 transition-all hover:-translate-y-0.5 hover:shadow-hard-sm"
               >
                 <span className="mb-2 w-fit rounded-full border border-ink/25 bg-lime/25 px-2.5 py-1 text-label-sm font-bold text-ink">
                   {example.category}

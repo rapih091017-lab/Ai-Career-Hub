@@ -89,7 +89,7 @@ export default async function ContactPage() {
               Kami berkomitmen untuk merespon setiap pertanyaan dalam waktu 1x24 jam pada hari kerja.
               Untuk pertanyaan mendesak, silakan hubungi kami melalui email langsung.
             </p>
-            <div className="p-4 rounded-xl border-2 border-ink/20 bg-lime/15">
+            <div className="p-4 rounded-xl border-2 border-ink bg-lime/15">
               <p className="text-label-sm text-ink-soft flex items-center gap-2">
                 <span className="material-symbols-outlined text-green-deep text-lg">info</span>
                 Untuk pertanyaan terkait akun, login, atau pembayaran, sertakan detail akun Anda agar kami dapat membantu lebih cepat.

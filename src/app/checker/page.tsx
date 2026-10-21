@@ -467,7 +467,7 @@ export default function CheckerPage() {
       <div className="min-h-screen flex flex-col bg-background text-on-background">
         <SiteHeader variant="pill" />
 
-        <main className="flex-1 flex items-center justify-center py-20 px-5">
+        <main className="flex-1 flex items-center justify-center py-20 pt-28 px-5">
           <div className="w-full max-w-[600px] flex flex-col gap-8">
             <div className="text-center space-y-4">
               <h1 className="text-[32px] leading-[40px] font-bold tracking-tight text-on-background">

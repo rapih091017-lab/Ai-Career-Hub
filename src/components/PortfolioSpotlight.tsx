@@ -105,7 +105,7 @@ export default function PortfolioSpotlight() {
             {/* Tema */}
             <div className="mt-5 grid grid-cols-4 gap-3">
               {THEMES.map((theme) => (
-                <div key={theme.name} className="rounded-lg border-2 border-ink/20 bg-paper p-3 text-center">
+                <div key={theme.name} className="rounded-lg border-2 border-ink bg-paper p-3 text-center">
                   <span
                     className="mx-auto mb-2 block h-6 w-6 rounded-full border-2 border-ink"
                     style={{ backgroundColor: theme.swatch }}

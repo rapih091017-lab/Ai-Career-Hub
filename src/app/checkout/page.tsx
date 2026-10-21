@@ -284,7 +284,7 @@ return (
           </div>
 
           {/* Keranjang: ringkasan singkat yang selalu terlihat */}
-          <aside className="lg:sticky lg:top-8 rounded-2xl border border-outline-variant/50 bg-surface-container-lowest p-5 space-y-4">
+          <aside className="lg:sticky lg:top-8 rounded-[14px] border-2 border-ink bg-paper shadow-hard-sm p-5 space-y-4">
             <h2 className="font-headline-lg text-base font-bold text-on-surface">
               Keranjang
               {selected.length > 0 ? (
@@ -369,7 +369,7 @@ return (
             ) : null}
 
 {bundleAdvice ? (
-              <div className="rounded-xl border-2 border-ink/20 bg-lime/15 p-3">
+              <div className="rounded-xl border-2 border-ink bg-lime/15 p-3">
                 <p className="text-sm text-on-surface">
                   <span className="font-semibold">Catatan:</span> {bundleAdvice.missingCount} hak belum
                   terakup paket pilihanmu.{" "}

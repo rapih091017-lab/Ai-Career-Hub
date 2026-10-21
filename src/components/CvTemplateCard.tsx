@@ -25,7 +25,7 @@ export default function CvTemplateCard({ template, onClick, compact }: CvTemplat
         className={`
           relative overflow-hidden rounded-2xl border-2 border-outline-variant/40
           bg-surface-container-lowest transition-[transform,box-shadow,border-color] duration-300
-          ${onClick ? "cursor-pointer hover:-translate-y-1.5 hover:shadow-xl hover:border-gray-400" : ""}
+          ${onClick ? "cursor-pointer hover:-translate-y-1.5 hover:shadow-xl hover:border-outline" : ""}
           ${compact ? "p-2" : "p-3"}
         `}
       >
@@ -42,10 +42,10 @@ export default function CvTemplateCard({ template, onClick, compact }: CvTemplat
         {/* Template Info */}
         <div className="mt-2 sm:mt-3 px-0.5">
           <div className="flex items-center justify-between">
-            <h3 className="font-bold text-xs sm:text-sm tracking-tight text-gray-900">
+            <h3 className="font-bold text-xs sm:text-sm tracking-tight text-on-surface">
               {template.name}
             </h3>
-            <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full border-2 border-gray-800 bg-gray-800/20" />
+            <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full border-2 border-ink bg-ink/20" />
           </div>
           <p className="text-[10px] sm:text-xs text-on-surface-variant mt-0.5 line-clamp-1">
             {template.description}

@@ -145,21 +145,21 @@ export function GrammarCheckDrawer({
     <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 backdrop-blur-sm">
       <div className="bg-surface-container-lowest h-full w-full max-w-md shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b">
+        <div className="flex items-center justify-between p-4 border-b border-outline-variant/60">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <span className="material-symbols-outlined text-blue-600 text-xl">spellcheck</span>
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <span className="material-symbols-outlined text-primary text-xl">spellcheck</span>
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">Grammar Check</h2>
-              <p className="text-sm text-gray-500">Periksa ejaan dan tanda baca</p>
+              <h2 className="text-lg font-semibold text-on-surface">Grammar Check</h2>
+              <p className="text-sm text-on-surface-variant">Periksa ejaan dan tanda baca</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-surface-container rounded-lg transition-colors"
           >
-            <span className="material-symbols-outlined text-gray-500">close</span>
+            <span className="material-symbols-outlined text-on-surface-variant">close</span>
           </button>
         </div>
 
@@ -168,12 +168,12 @@ export function GrammarCheckDrawer({
           {/* Check Button */}
           {!result && (
             <div className="text-center py-12">
-              <span className="material-symbols-outlined text-gray-300 text-6xl block mb-4">spellcheck</span>
-              <p className="text-gray-500 mb-4">Klik tombol di bawah untuk memulai pemeriksaan</p>
+              <span className="material-symbols-outlined text-on-surface-variant/70 text-6xl block mb-4">spellcheck</span>
+              <p className="text-on-surface-variant mb-4">Klik tombol di bawah untuk memulai pemeriksaan</p>
               <button
                 onClick={handleCheck}
                 disabled={isChecking || !content}
-                className="flex items-center gap-2 mx-auto px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 mx-auto px-4 py-2 rounded-xl bg-primary text-on-primary text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
               >
                 {isChecking ? (
                   <>
@@ -194,25 +194,25 @@ export function GrammarCheckDrawer({
           {result && (
             <>
               {/* Summary */}
-              <div className={`p-4 rounded-xl mb-4 ${
+              <div className={`p-4 rounded-xl mb-4 border ${
                 result.totalErrors === 0
-                  ? "bg-green-50 border border-green-200"
-                  : "bg-amber-50 border border-amber-200"
+                  ? "bg-primary/10 border-primary/30"
+                  : "bg-tertiary-container/50 border-tertiary/40"
               }`}>
                 <div className="flex items-center gap-3">
                   <span className={`material-symbols-outlined text-2xl ${
-                    result.totalErrors === 0 ? "text-green-600" : "text-amber-600"
+                    result.totalErrors === 0 ? "text-primary" : "text-on-tertiary-container"
                   }`} style={{ fontVariationSettings: "'FILL' 1" }}>
                     {result.totalErrors === 0 ? "check_circle" : "warning"}
                   </span>
                   <div>
                     <p className={`font-medium ${
-                      result.totalErrors === 0 ? "text-green-800" : "text-amber-800"
+                      result.totalErrors === 0 ? "text-primary" : "text-on-tertiary-container"
                     }`}>
                       {result.summary}
                     </p>
                     {result.totalErrors > 0 && (
-                      <p className="text-sm text-amber-600 mt-1">
+                      <p className="text-sm text-on-tertiary-container/80 mt-1">
                         {spellingErrors.length} typo, {punctuationErrors.length} error tanda baca
                       </p>
                     )}
@@ -224,11 +224,11 @@ export function GrammarCheckDrawer({
               {result.errors.length > 0 && (
                 <div className="space-y-2">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-medium text-gray-700">Daftar Error</h3>
+                    <h3 className="text-sm font-medium text-on-surface">Daftar Error</h3>
                     {result.errors.length > 1 && (
                       <button
                         onClick={handleApplyAll}
-                        className="px-3 py-1 text-xs font-medium rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                        className="px-3 py-1 text-xs font-medium rounded-lg border border-outline-variant hover:bg-surface-container transition-colors"
                       >
                         Perbaiki Semua
                       </button>
@@ -240,8 +240,8 @@ export function GrammarCheckDrawer({
                       key={index}
                       className={`border rounded-lg overflow-hidden transition-all ${
                         appliedFixes.has(index)
-                          ? "bg-green-50 border-green-200"
-                          : "bg-surface-container-lowest border-gray-200 hover:border-gray-300"
+                          ? "bg-primary/10 border-primary/30"
+                          : "bg-surface-container-lowest border-outline-variant hover:border-outline"
                       }`}
                     >
                       {/* Error Header */}
@@ -251,47 +251,47 @@ export function GrammarCheckDrawer({
                       >
                         <div className="flex items-center gap-3">
                           <div className={`p-1.5 rounded-md ${
-                            error.type === "spelling" ? "bg-red-100" : "bg-amber-100"
+                            error.type === "spelling" ? "bg-error-container" : "bg-tertiary-container"
                           }`}>
                             <span className={`material-symbols-outlined text-sm ${
-                              error.type === "spelling" ? "text-red-600" : "text-amber-600"
+                              error.type === "spelling" ? "text-error" : "text-on-tertiary-container"
                             }`}>
                               {error.type === "spelling" ? "error" : "warning"}
                             </span>
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-gray-900">{error.text}</p>
-                            <p className="text-xs text-gray-500">{error.reason}</p>
+                            <p className="text-sm font-medium text-on-surface">{error.text}</p>
+                            <p className="text-xs text-on-surface-variant">{error.reason}</p>
                           </div>
                         </div>
-                        <span className="material-symbols-outlined text-gray-400 text-lg">
+                        <span className="material-symbols-outlined text-on-surface-variant text-lg">
                           {expandedError === index ? "expand_less" : "expand_more"}
                         </span>
                       </button>
 
                       {/* Error Details */}
                       {expandedError === index && (
-                        <div className="p-3 pt-0 border-t border-gray-100">
+                        <div className="p-3 pt-0 border-t border-outline-variant/60">
                           <div className="mt-3 space-y-2">
                             <div>
-                              <p className="text-xs font-medium text-gray-500 mb-1">Konteks:</p>
-                              <p className="text-sm text-gray-700 bg-gray-50 p-2 rounded">{error.context}</p>
+                              <p className="text-xs font-medium text-on-surface-variant mb-1">Konteks:</p>
+                              <p className="text-sm text-on-surface bg-surface-container-low p-2 rounded">{error.context}</p>
                             </div>
                             <div>
-                              <p className="text-xs font-medium text-gray-500 mb-1">Saran:</p>
-                              <p className="text-sm text-green-700 bg-green-50 p-2 rounded font-medium">{error.suggestion}</p>
+                              <p className="text-xs font-medium text-on-surface-variant mb-1">Saran:</p>
+                              <p className="text-sm text-primary bg-primary/10 p-2 rounded font-medium">{error.suggestion}</p>
                             </div>
                             {!appliedFixes.has(index) && (
                               <button
                                 onClick={() => handleApplyFix(index, error.text, error.suggestion)}
-                                className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition-colors"
+                                className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-primary text-on-primary text-sm font-medium hover:opacity-90 transition-opacity"
                               >
                                 <span className="material-symbols-outlined text-[18px]">check</span>
                                 Terapkan Perbaikan
                               </button>
                             )}
                             {appliedFixes.has(index) && (
-                              <div className="flex items-center justify-center gap-2 text-green-600 py-2">
+                              <div className="flex items-center justify-center gap-2 text-primary py-2">
                                 <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
                                 <span className="text-sm font-medium">Sudah diperbaiki</span>
                               </div>
@@ -308,10 +308,10 @@ export function GrammarCheckDrawer({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-4 border-t bg-gray-50">
+        <div className="flex items-center justify-between p-4 border-t border-outline-variant/60 bg-surface-container-low">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-xl border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+            className="px-4 py-2 rounded-xl border border-outline-variant text-sm font-medium text-on-surface hover:bg-surface-container transition-colors"
           >
             Tutup
           </button>
@@ -319,7 +319,7 @@ export function GrammarCheckDrawer({
             <button
               onClick={handleCheck}
               disabled={isChecking}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-outline-variant text-sm font-medium text-on-surface hover:bg-surface-container transition-colors disabled:opacity-50"
             >
               <span className={`material-symbols-outlined text-[18px] ${isChecking ? "animate-spin" : ""}`}>refresh</span>
               Periksa Ulang

@@ -252,7 +252,7 @@ export default function DashboardPage() {
                   <p className="font-body-md text-on-surface-variant">{t("dashboard.subtitle")}</p>
                 </div>
                 {profileData === null ? (
-                  <div className="shrink-0 bg-paper rounded-[14px] p-4 shadow-hard-sm border-2 border-ink/15 min-w-[200px] animate-pulse">
+                  <div className="shrink-0 bg-paper rounded-[14px] p-4 shadow-hard-sm border-2 border-ink min-w-[200px] animate-pulse">
                     <div className="flex items-center justify-between mb-2">
                       <div className="h-3 bg-surface-container-high rounded w-20" />
                       <div className="h-3 bg-surface-container-high rounded w-8" />
@@ -270,7 +270,7 @@ export default function DashboardPage() {
                 ) : profileData && (
                   <Link
                     href="/settings/profile"
-                    className="shrink-0 bg-paper rounded-[14px] p-4 shadow-hard-sm border-2 border-ink/15 hover:shadow-hard transition-shadow group min-w-[200px]"
+                    className="shrink-0 bg-paper rounded-[14px] p-4 shadow-hard-sm border-2 border-ink hover:shadow-hard transition-shadow group min-w-[200px]"
                   >
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-label-sm font-semibold text-ink-soft">
@@ -316,13 +316,13 @@ export default function DashboardPage() {
             <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
               {[
                 { icon: "edit_document", label: t("dashboard.new-cv"), desc: t("dashboard.new-cv-desc"), color: "bg-lime/40", iconColor: "text-ink", onClick: () => setShowTemplatePicker(true), href: undefined },
-                { icon: "search", label: t("dashboard.check-cv"), desc: t("dashboard.check-cv-desc"), color: "bg-secondary-container/50", iconColor: "text-secondary", onClick: undefined, href: "/checker" },
+                { icon: "search", label: t("dashboard.check-cv"), desc: t("dashboard.check-cv-desc"), color: "bg-secondary-container/50", iconColor: "text-green-deep", onClick: undefined, href: "/checker" },
                 { icon: "grid_view", label: t("dashboard.portfolio"), desc: t("dashboard.portfolio-desc"), color: "bg-surface-container", iconColor: "text-green-deep", onClick: undefined, href: "/portfolio" },
                 { icon: "mail", label: t("dashboard.create-letter"), desc: t("dashboard.create-letter-desc"), color: "bg-lime/25", iconColor: "text-ink", onClick: undefined, href: "/surat-lamaran" },
                 { icon: "record_voice_over", label: t("dashboard.interview-prep"), desc: t("dashboard.interview-desc"), color: "bg-amber-50", iconColor: "text-amber-600", onClick: undefined, href: "/interview" },
               ].map((card, i) => {
                 const content = (
-                  <div className="bg-paper rounded-[14px] p-6 shadow-hard-sm border-2 border-ink/15 hover:shadow-hard hover:-translate-y-0.5 transition-[transform,box-shadow] duration-300 group active:scale-[0.98]">
+                  <div className="bg-paper rounded-[14px] p-6 shadow-hard-sm border-2 border-ink hover:shadow-hard hover:-translate-y-0.5 transition-[transform,box-shadow] duration-300 group active:scale-[0.98]">
                     <div className={`w-12 h-12 rounded-[7px] border-2 border-ink ${card.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
                       <span className={`material-symbols-outlined ${card.iconColor} text-2xl`}>{card.icon}</span>
                     </div>
@@ -378,7 +378,7 @@ export default function DashboardPage() {
             {recentActivity.length > 0 && (
               <section className="mb-8">
                 <h2 className="font-headline-md text-on-surface mb-3">{t("dashboard.recent-activity")}</h2>
-                <div className="bg-paper rounded-[14px] p-4 shadow-hard-sm border-2 border-ink/15 space-y-2">
+                <div className="bg-paper rounded-[14px] p-4 shadow-hard-sm border-2 border-ink space-y-2">
                   {recentActivity.map((cv, i) => (
                     <motion.div
                       key={cv.id}
@@ -416,7 +416,7 @@ export default function DashboardPage() {
                 <h2 className="font-headline-md text-on-surface mb-3">{t("dashboard.checker-history")}</h2>
                 <div className="space-y-2">
                   {[1,2,3].map((i) => (
-                    <div key={i} className="bg-paper rounded-[14px] p-4 shadow-hard-sm border-2 border-ink/15 flex items-center gap-4 animate-pulse">
+                    <div key={i} className="bg-paper rounded-[14px] p-4 shadow-hard-sm border-2 border-ink flex items-center gap-4 animate-pulse">
                       <div className="w-14 h-14 rounded-full bg-surface-container-high shrink-0" />
                       <div className="flex-1 space-y-2">
                         <div className="h-3 bg-surface-container-high rounded w-3/4" />
@@ -440,7 +440,7 @@ export default function DashboardPage() {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.25, delay: i * 0.03 }}
-                        className="bg-paper rounded-[14px] p-4 shadow-hard-sm border-2 border-ink/15 hover:shadow-hard hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-4 cursor-pointer"
+                        className="bg-paper rounded-[14px] p-4 shadow-hard-sm border-2 border-ink hover:shadow-hard hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-4 cursor-pointer"
                         onClick={() => router.push(`/checker/${item.id}`)}
                       >
                         {/* Score ring, pakai threshold yang sama dengan ScoreDonut */}
@@ -492,7 +492,7 @@ export default function DashboardPage() {
               {lettersLoading ? (
                 <div className="space-y-2">
                   {[1, 2].map((i) => (
-                    <div key={i} className="bg-paper rounded-[14px] p-4 shadow-hard-sm border-2 border-ink/15 flex items-center gap-4 animate-pulse">
+                    <div key={i} className="bg-paper rounded-[14px] p-4 shadow-hard-sm border-2 border-ink flex items-center gap-4 animate-pulse">
                       <div className="w-10 h-10 rounded-xl bg-surface-container-high shrink-0" />
                       <div className="flex-1 space-y-2">
                         <div className="h-3 bg-surface-container-high rounded w-2/3" />
@@ -534,7 +534,7 @@ export default function DashboardPage() {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.25, delay: i * 0.03 }}
-                        className="bg-paper rounded-[14px] p-4 shadow-hard-sm border-2 border-ink/15 hover:shadow-hard hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-4 cursor-pointer"
+                        className="bg-paper rounded-[14px] p-4 shadow-hard-sm border-2 border-ink hover:shadow-hard hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-4 cursor-pointer"
                         onClick={() => router.push(letter.cvId ? `/surat-lamaran/${letter.cvId}?letter=${letter.id}` : `/surat-lamaran?letter=${letter.id}`)}
                       >
                         <div className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center ${isMotivation ? "bg-amber-50" : "bg-violet-50"}`}>
@@ -576,7 +576,7 @@ export default function DashboardPage() {
                   {[1, 2, 3].map((i) => (
                     <div
                       key={i}
-                      className="bg-paper rounded-[14px] p-5 shadow-hard-sm border-2 border-ink/15 flex items-center justify-between gap-4 animate-pulse"
+                      className="bg-paper rounded-[14px] p-5 shadow-hard-sm border-2 border-ink flex items-center justify-between gap-4 animate-pulse"
                     >
                       <div className="flex-1 space-y-2">
                         <div className="h-4 bg-surface-container-high rounded w-1/3" />
@@ -616,7 +616,7 @@ export default function DashboardPage() {
                   {cvList.slice(0, 4).map((cv) => (
                     <div
                       key={cv.id}
-                      className="bg-paper rounded-[14px] p-5 shadow-hard-sm border-2 border-ink/15 flex items-center justify-between gap-4 hover:shadow-hard hover:-translate-y-0.5 transition-[transform,box-shadow] duration-300 group"
+                      className="bg-paper rounded-[14px] p-5 shadow-hard-sm border-2 border-ink flex items-center justify-between gap-4 hover:shadow-hard hover:-translate-y-0.5 transition-[transform,box-shadow] duration-300 group"
                     >
                       <div className="flex-1 min-w-0">
                         <h3 className="font-label-bold text-on-surface truncate">{cv.jobTitle || t("dashboard.untitled-cv")}</h3>
@@ -656,7 +656,7 @@ export default function DashboardPage() {
                             exit={{ opacity: 0, y: -6, scale: 0.98 }}
                             transition={{ duration: 0.15 }}
                             role="menu"
-                            className="absolute right-0 top-full mt-1 z-30 w-60 bg-paper rounded-[14px] shadow-hard border-2 border-ink/15 overflow-hidden py-1.5"
+                            className="absolute right-0 top-full mt-1 z-30 w-60 bg-paper rounded-[14px] shadow-hard border-2 border-ink overflow-hidden py-1.5"
                           >
                             <p className="px-4 pt-1 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">{t("dashboard.create-letter-from-cv")}</p>
                             <button
@@ -688,7 +688,7 @@ export default function DashboardPage() {
                     <MagneticButton>
                       <button
                         onClick={() => router.push(`/cv/${cv.id}/checkout`)}
-                        className="px-3 py-2 rounded-xl bg-secondary/10 text-secondary text-label-bold hover:bg-secondary/20 active:scale-[0.97] transition-colors flex items-center gap-1"
+                        className="px-3 py-2 rounded-xl bg-secondary/10 text-green-deep text-label-bold hover:bg-secondary/20 active:scale-[0.97] transition-colors flex items-center gap-1"
                         title={t("dashboard.ai-rev-title")}
                       >
                         <span className="material-symbols-outlined text-sm">auto_awesome</span>

@@ -276,7 +276,7 @@ export default function PositionDetailPage() {
             <section className="mt-8 bg-surface-container-lowest rounded-2xl p-5 border border-outline-variant/50 shadow-hard-sm">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-xl bg-secondary-container/50 flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-secondary">lightbulb</span>
+                  <span className="material-symbols-outlined text-green-deep">lightbulb</span>
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-on-surface mb-1">

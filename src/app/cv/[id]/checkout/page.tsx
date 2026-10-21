@@ -139,7 +139,7 @@ export default function CheckoutPage() {
             {/* Header */}
             <section className="bg-surface-container-lowest rounded-2xl p-6 shadow-hard-sm border border-outline-variant/50">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-xl bg-secondary-container/50 flex items-center justify-center text-secondary shrink-0">
+                <div className="w-12 h-12 rounded-xl bg-secondary-container/50 flex items-center justify-center text-green-deep shrink-0">
                   <span className="material-symbols-outlined text-2xl">shopping_cart_checkout</span>
                 </div>
                 <div>
@@ -169,7 +169,7 @@ export default function CheckoutPage() {
                 {/* CV Details Card */}
                 <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-hard-sm border border-outline-variant/50 space-y-4">
                   <h3 className="font-label-bold text-on-surface flex items-center gap-2">
-                    <span className="material-symbols-outlined text-secondary">description</span>
+                    <span className="material-symbols-outlined text-green-deep">description</span>
                     Detail CV
                   </h3>
                   <div className="space-y-3">
@@ -200,7 +200,7 @@ export default function CheckoutPage() {
                       <p className="text-sm text-on-surface-variant mt-0.5">Akses AI Smart Revision untuk 1 CV spesifik</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-2xl font-bold text-secondary">Rp25.000</p>
+                      <p className="text-2xl font-bold text-green-deep">Rp25.000</p>
                       <p className="text-xs text-on-surface-variant">1x pembayaran</p>
                     </div>
                   </div>
@@ -253,7 +253,7 @@ export default function CheckoutPage() {
                   <button
                     onClick={handleCheckout}
                     disabled={isProcessing}
-                    className="flex-1 py-3 rounded-xl bg-secondary text-on-secondary text-sm font-bold hover:-translate-y-0.5 transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="flex-1 py-3 rounded-xl bg-primary text-on-primary text-sm font-bold hover:-translate-y-0.5 transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {isProcessing ? (
                       <>

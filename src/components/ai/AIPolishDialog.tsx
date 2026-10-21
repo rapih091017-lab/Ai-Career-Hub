@@ -87,8 +87,8 @@ export function AIPolishButton({
       disabled={disabled || isPolishing || !content || content.trim().length < 10}
       className={`${padding} rounded-lg transition-all ${
         disabled || isPolishing || !content || content.trim().length < 10
-          ? "text-gray-300 cursor-not-allowed"
-          : "text-purple-500 hover:text-purple-700 hover:bg-purple-50 cursor-pointer"
+          ? "text-on-surface-variant/50 cursor-not-allowed"
+          : "text-green-deep hover:text-primary hover:bg-lime/15 cursor-pointer"
       }`}
       title={
         disabled || !content || content.trim().length < 10

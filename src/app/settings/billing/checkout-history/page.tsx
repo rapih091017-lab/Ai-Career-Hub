@@ -81,7 +81,7 @@ export default function CheckoutHistoryPage() {
     <div className="flex flex-col gap-8">
       <section className="bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/50 overflow-hidden">
         <div className="px-6 py-5 border-b border-outline-variant/50 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-secondary-container/50 flex items-center justify-center text-secondary">
+          <div className="w-10 h-10 rounded-xl bg-secondary-container/50 flex items-center justify-center text-green-deep">
             <span className="material-symbols-outlined">shopping_cart_checkout</span>
           </div>
           <div>
@@ -102,7 +102,7 @@ export default function CheckoutHistoryPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="p-5 rounded-xl bg-surface-container-low border border-outline-variant/50">
                 <p className="text-label-sm text-on-surface-variant">{t("billing.checkout-history")}</p>
-                <p className="text-headline-md text-secondary mt-1">{payments.length}</p>
+                <p className="text-headline-md text-green-deep mt-1">{payments.length}</p>
                 <p className="text-label-sm text-on-surface-variant mt-1">{t("billing.all-time")}</p>
               </div>
               <div className="p-5 rounded-xl bg-surface-container-low border border-outline-variant/50">
@@ -184,7 +184,7 @@ export default function CheckoutHistoryPage() {
                             <div className="flex items-center gap-2">
                               <span
                                 className={`material-symbols-outlined text-lg ${
-                                  isMonthly ? "text-primary" : "text-secondary"
+                                  isMonthly ? "text-primary" : "text-green-deep"
                                 }`}
                               >
                                 {isMonthly ? "workspace_premium" : "description"}
@@ -227,10 +227,10 @@ export default function CheckoutHistoryPage() {
             {/* Quick Link */}
             <div className="p-4 rounded-xl bg-surface-container border border-dashed border-secondary/30">
               <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-secondary">info</span>
+                <span className="material-symbols-outlined text-green-deep">info</span>
                 <p className="text-sm text-on-surface-variant">
                   {t("billing.buy-ai-rev")}{" "}
-                  <Link href="/dashboard" className="text-secondary font-bold underline">
+                  <Link href="/dashboard" className="text-green-deep font-bold underline">
                     {t("billing.open-dashboard")}
                   </Link>{" "}
                   {t("billing.click-ai-rev")} <strong>AI Rev</strong> {t("billing.on-desired-cv")}.

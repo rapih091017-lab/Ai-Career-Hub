@@ -123,7 +123,7 @@ export default function NavGroupMenu({ group, isLoggedIn, variant }: Props) {
       </button>
 
       {open && (
-        <div className="absolute left-0 top-full z-[60] min-w-[232px] rounded-[14px] border-2 border-ink/15 bg-paper py-2 shadow-hard-sm">
+        <div className="absolute left-0 top-full z-[60] min-w-[232px] rounded-[14px] border-2 border-ink bg-paper py-2 shadow-hard-sm">
           {group.items.map((item) => {
             const active = isNavActive(item, pathname);
             return (

@@ -37,7 +37,7 @@ const trustBadges: TrustBadge[] = [
     titleKey: "logos.badge-ai-title",
     descKey: "logos.badge-ai-desc",
     color: "bg-secondary/10",
-    iconColor: "text-secondary",
+    iconColor: "text-green-deep",
     glowColor: "#4a7c7a",
   },
   {
@@ -64,7 +64,7 @@ const trustBadges: TrustBadge[] = [
     titleKey: "logos.badge-free-title",
     descKey: "logos.badge-free-desc",
     color: "bg-secondary/10",
-    iconColor: "text-secondary",
+    iconColor: "text-green-deep",
     glowColor: "#4a7c7a",
   },
   {
@@ -73,7 +73,7 @@ const trustBadges: TrustBadge[] = [
     titleKey: "logos.badge-multi-title",
     descKey: "logos.badge-multi-desc",
     color: "bg-secondary/10",
-    iconColor: "text-secondary",
+    iconColor: "text-green-deep",
     glowColor: "#4a7c7a",
   },
   {

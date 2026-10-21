@@ -77,7 +77,7 @@ export default function SinonimPage() {
               {filtered.map((entry) => (
                 <li
                   key={entry.weak}
-                  className="rounded-[14px] border-2 border-ink/15 bg-paper p-4 shadow-hard-sm"
+                  className="rounded-[14px] border-2 border-ink bg-paper p-4 shadow-hard-sm"
                 >
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
                     <span className="text-label-bold text-ink-soft line-through decoration-error/50">
@@ -111,7 +111,7 @@ export default function SinonimPage() {
               {tips.map((tip, index) => (
                 <div
                   key={index}
-                  className="rounded-[14px] border-2 border-ink/15 bg-paper p-4 text-body-md text-ink-soft"
+                  className="rounded-[14px] border-2 border-ink bg-paper p-4 text-body-md text-ink-soft"
                 >
                   {tip}
                 </div>

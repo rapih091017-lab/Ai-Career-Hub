@@ -45,7 +45,7 @@ export default function BeforeAfter() {
                 <div className="p-6 md:p-8">
                   <div className="mb-6 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-ink/20 bg-error/10 text-error">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-ink bg-error/10 text-error">
                         <span aria-hidden="true" className="material-symbols-outlined text-[20px]">
                           close
                         </span>
@@ -109,7 +109,7 @@ export default function BeforeAfter() {
                 <div className="p-6 md:p-8">
                   <div className="mb-6 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-ink/20 bg-green/15 text-green-deep">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-ink bg-green/15 text-green-deep">
                         <span aria-hidden="true" className="material-symbols-outlined text-[20px]">
                           check
                         </span>
@@ -175,7 +175,7 @@ export default function BeforeAfter() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.3 }}
         >
-          <div className="inline-flex flex-col items-center gap-4 rounded-2xl border-2 border-ink/15 bg-paper px-8 py-5 sm:flex-row sm:gap-8">
+          <div className="inline-flex flex-col items-center gap-4 rounded-2xl border-2 border-ink bg-paper px-8 py-5 sm:flex-row sm:gap-8">
             <div className="flex items-center gap-3">
               <span
                 aria-hidden="true"

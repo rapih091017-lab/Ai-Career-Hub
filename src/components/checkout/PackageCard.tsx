@@ -23,14 +23,12 @@ export function PackageCard({
   t: (key: string) => string;
 }) {
   const benefits = packageBenefits(pkg);
-  const accent = highlighted ? "text-primary" : "text-secondary";
+  const accent = "text-green-deep";
 
   return (
     <div
-      className={`relative p-5 rounded-xl transition-all overflow-hidden ${
-        highlighted
-          ? "border-2 border-primary/30 bg-primary-fixed/5 group hover:border-primary/60"
-          : "border border-outline-variant/50 hover:border-secondary/40 group"
+      className={`relative p-5 rounded-[14px] transition-all overflow-hidden bg-paper shadow-hard-sm border-2 border-ink ${
+        highlighted ? "shadow-hard" : ""
       }`}
     >
       {highlighted && (
@@ -58,13 +56,13 @@ export function PackageCard({
           <ul className="space-y-1.5 mb-4">
             {benefits.map((benefit) => (
               <li key={benefit.key} className="flex items-center gap-2 text-sm text-on-surface-variant">
-                <span className="material-symbols-outlined text-green-600 text-[16px]">check</span>
+                <span className="material-symbols-outlined text-green-deep text-[16px]">check</span>
                 {benefitLabel(benefit, t)}
               </li>
             ))}
             {pkg.maxActivePortfolios > 0 && (
               <li className="flex items-center gap-2 text-sm text-on-surface-variant">
-                <span className="material-symbols-outlined text-green-600 text-[16px]">check</span>
+                <span className="material-symbols-outlined text-green-deep text-[16px]">check</span>
                 {pkg.maxActivePortfolios} {t("billing.period.portfolio")}
               </li>
             )}
@@ -76,15 +74,15 @@ export function PackageCard({
           disabled={busy}
           className={`w-full py-3 font-label-bold rounded-xl hover:-translate-y-0.5 active:scale-[0.98] transition-all disabled:opacity-60 flex items-center justify-center gap-2 ${
             selected
-              ? "border border-primary/40 text-primary bg-primary/5"
+              ? "border-2 border-green-deep text-green-deep bg-primary/5"
               : highlighted
-                ? "bg-primary text-on-primary"
-                : "bg-secondary text-on-secondary"
+                ? "border-2 border-ink bg-lime text-on-light"
+                : "bg-primary text-on-primary"
           }`}
         >
           {busy ? (
             <>
-              <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+              <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
               {t("billing.processing")}
             </>
           ) : selected ? (

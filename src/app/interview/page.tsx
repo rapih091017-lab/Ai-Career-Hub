@@ -209,7 +209,7 @@ export default function InterviewPage() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: i * 0.03 }}
                       onClick={() => setSelectedPosition(pos)}
-                      className="bg-paper rounded-xl p-4 border-2 border-ink/15 shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 hover:border-ink/40 active:scale-[0.98] transition-all text-left group focus-visible:outline-2 focus-visible:outline-green-deep focus-visible:outline-offset-2"
+                      className="bg-paper rounded-xl p-4 border-2 border-ink shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 hover:border-ink/40 active:scale-[0.98] transition-all text-left group focus-visible:outline-2 focus-visible:outline-green-deep focus-visible:outline-offset-2"
                     >
                       <div className="flex items-start gap-3 mb-2">
                         <div className="w-9 h-9 rounded-[7px] border-2 border-ink bg-lime/40 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
@@ -262,7 +262,7 @@ export default function InterviewPage() {
             <section className="mt-10 bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/50 shadow-hard-sm">
               <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
                 <div className="w-12 h-12 rounded-xl bg-secondary-container/50 flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-secondary">lightbulb</span>
+                  <span className="material-symbols-outlined text-green-deep">lightbulb</span>
                 </div>
                 <div className="flex-1">
                   <h3 className="text-sm font-bold text-on-surface mb-1">
