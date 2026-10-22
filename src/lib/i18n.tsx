@@ -764,9 +764,12 @@ const DICT: Record<string, { id: string; en: string }> = {
   "checker.mode-auto": { id: "Otomatis", en: "Automatic" },
   "checker.mode-auto-hint": { id: "Ikut paketmu", en: "Follows your plan" },
   "checker.mode-fast": { id: "Cepat", en: "Fast" },
-  "checker.mode-fast-hint": { id: "Hasil dalam hitungan detik", en: "Result in seconds" },
+  // Waktu terukur 22 Okt 2026 (CV 1 halaman): flash tanpa nalar ±18 detik,
+  // pro dengan nalar ringan ±2 menit. Hint menulis angka nyata, bukan
+  // janji "hitungan detik" yang dulu tidak pernah terbukti.
+  "checker.mode-fast-hint": { id: "±20 detik, model ringan", en: "~20s, lightweight model" },
   "checker.mode-deep": { id: "Mendalam", en: "Thorough" },
-  "checker.mode-deep-hint": { id: "Lebih teliti, perlu menunggu", en: "More detail, takes longer" },
+  "checker.mode-deep-hint": { id: "±2 menit, model berpikir", en: "~2 min, thinking model" },
   "checker.role-label": { id: "Kategori Posisi", en: "Position Category" },
   "checker.role-hint": { id: "Bobot penilaian menyesuaikan kategori (mis. fresh graduate tidak dihukum karena pengalaman singkat).", en: "Score weights adapt to the category (e.g. fresh graduates are not penalized for short experience)." },
   "checker.role-opt-general": { id: "Umum (default)", en: "General (default)" },

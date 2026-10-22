@@ -33,6 +33,18 @@ interface CallAIParams {
   /** Max retries on failure. Default: 2 */
   maxRetries?: number;
   /**
+   * Kontrol berapa banyak token nalar (reasoning_content) yang dipakai model
+   * SEBELUM menulis jawaban akhir.
+   *
+   * DeepSeek V4 (flash maupun pro) adalah model berpikir: tanpa batas yang
+   * jelas, nalar bisa menghabiskan seluruh budget `max_tokens` dan jawaban
+   * akhir menjadi KOSONG dengan finish_reason "length" — diukur pada 22 Okt
+   * 2026: flash dengan 8192 token menghasilkan 31.126 karakter nalar dan nol
+   * karakter konten. "none" mematikan nalar (±18 detik), "low" memakainya
+   * secukupnya (±42 detik flash / ±117 detik pro).
+   */
+  reasoningEffort?: "none" | "minimal" | "low" | "medium" | "high";
+  /**
    * Format output yang diharapkan.
    * - "json" (default): memaksa response_format json_object + validasi Zod.
    * - "text": mengembalikan teks mentah apa adanya (TANPA json_object, TANPA JSON.parse).
@@ -204,6 +216,7 @@ export async function callAI<T = unknown>({
   userContext,
   maxRetries = 2,
   responseFormat = "json",
+  reasoningEffort,
 }: CallAIParams): Promise<T> {
   // CATATAN: SECURITY_GUARDRAIL TIDAK lagi ditambahkan di sini karena SEMUA
   // system prompt yang dipakai aplikasi sudah menyisipkannya sendiri
@@ -256,6 +269,10 @@ export async function callAI<T = unknown>({
           // Saat retry, perjelas ke model bahwa respons sebelumnya gagal diverifikasi
           { role: "user", content: attempt === 0 ? enrichedUserPrompt : enrichedUserPrompt + retryInstruction },
         ],
+        // undefined dibiarkan: SDK membuangnya saat serialisasi, jadi model
+        // yang tidak mengenal parameter ini (atau pemanggil yang tidak
+        // mengaturnya) tetap berjalan seperti biasa.
+        reasoning_effort: reasoningEffort,
         // Text mode: TANPA response_format json_object (DeepSeek 400 jika dipaksa).
         // deepseek-v4-pro (thinking): json_object TIDAK didukung, JSON dipaksa via prompt.
         response_format: isTextMode || isReasoner ? undefined : { type: "json_object" },

@@ -25,6 +25,11 @@ import { apiHandler, errorResponse } from "@/lib/api-utils";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limiter";
 import { checkProCheckAllowance } from "@/lib/fair-use";
 
+// Model berpikir butuh ±2 menit (effort "low", terukur 22 Okt 2026). Tanpa
+// batas ini route ikut default akun, dan mode deep pernah berakhir 504
+// Vercel Runtime Timeout — pengguna menunggu lama lalu tidak dapat hasil.
+export const maxDuration = 300;
+
 export const POST = apiHandler(async (request: NextRequest) => {
   // ── 0. RATE LIMIT ─────────────────────────────────────────────────
   const ip =
@@ -234,9 +239,22 @@ message: t(
       // Catatan: R1 tidak mendukung response_format json_object, JSON dipaksa
       // via prompt analysis-v3 dan ditangani adapter (isReasoner).
       model: useReasoner ? MODELS.REASONER : MODELS.CHAT,
-      // R1: token reasoning ikut menghabiskan budget max_tokens → 16K agar
-      // JSON final tidak terpotong. V3 cukup 8K.
-      maxTokens: useReasoner ? 16384 : 8192,
+      // Kedua model V4 notabene model berpikir: token nalar (reasoning_content)
+      // menghabiskan max_tokens yang sama dengan JSON akhir. Terukur 22 Okt
+      // 2026 dengan CV contoh — flash 8K: seluruh 8192 token habis untuk nalar,
+      // konten kosong, finish=length, dan setiap percobaan gagal (makanya cek
+      // pernah selalu berakhir 503 setelah ±105 detik). Flash 16K: ±59 detik,
+      // JSON valid. Karena max_tokens hanya batas atas (bukan biaya), 16K untuk
+      // keduanya tidak menaikkan tagihan ketika keluaran lebih pendek.
+      maxTokens: 16384,
+      // Nalar dijaga tetap kecil supaya muat di maxDuration: "none" untuk flash
+      // (±18 detik) dan "low" untuk pro (±117 detik). Kualitas skor tetap dari
+      // prompt & skema yang divalidasi Zod, bukan dari lamanya nalar.
+      reasoningEffort: useReasoner ? "low" : "none",
+      // Pro ±2 menit per percobaan; tiga percobaan melewati batas 300 detik dan
+      // berakhir 504 tanpa pesan ke pengguna. Satu retry cukup menjaga kasus
+      // terburuk tetap di bawah batas.
+      maxRetries: useReasoner ? 1 : 2,
       taskType: "analysis",
       userContext: buildUserContext({
         jobTitle: roleHint,
