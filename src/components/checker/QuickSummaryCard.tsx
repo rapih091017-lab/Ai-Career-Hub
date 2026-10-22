@@ -103,9 +103,12 @@ export function QuickSummaryCard({ analysis, summary }: QuickSummaryCardProps) {
           {summary.top_fixes.map((fix, i) => (
             <li
               key={fix.id || i}
-              className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border-[1.5px] border-ink/15 bg-surface-container-low px-3 py-2"
+              className="flex flex-col items-stretch gap-2 rounded-xl border-[1.5px] border-ink/15 bg-surface-container-low px-3 py-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3"
             >
-              <span className="min-w-0 flex-1 text-sm font-semibold leading-snug text-ink">
+              {/* Di mobile judul dapat baris penuh; tanpa ini (flex-1 di baris
+                  yang sama dengan badge + dua tombol) judulnya pecah satu kata
+                  per baris di lebar 390px. */}
+              <span className="text-sm font-semibold leading-snug text-ink sm:min-w-0 sm:flex-1">
                 {fix.title}
               </span>
               <span
