@@ -1,11 +1,33 @@
 "use client";
 
 import { useState } from "react";
+import type { ReactNode } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { priorityBadge, severityMeta, toIssueItems, type BulletItem } from "./types";
 import { CopyButton } from "./CopyButton";
 import { PlaceholderText } from "./PlaceholderText";
 import { useTranslation } from "@/lib/i18n";
+
+/**
+ * Pita label di atas judul section, dari bahasa referensi desain (label mikro
+ * plus satu aksen lime).
+ *
+ * Normal case, bukan uppercase ber-tracking lebar: DESIGN.md melarang eyebrow
+ * uppercase yang berulang di setiap section, dan pita ini muncul di semua
+ * section hasil. Mono dipilih karena here isinya label teknis (urutan baca,
+ * bukan kalimat), bukan demi gaya "terminal".
+ *
+ * Sengaja tanpa angka urut: section hasil bersifat kondisional (muncul bila
+ * datanya ada), nomor akan melompat dan menyesatkan pembaca.
+ */
+export function SectionKicker({ children }: { children: ReactNode }) {
+  return (
+    <p className="mb-1.5 flex items-center gap-2 font-mono text-xs font-semibold tracking-[0.01em] text-ink-soft">
+      <span aria-hidden="true" className="inline-block h-2 w-2 shrink-0 border-[1.5px] border-ink bg-lime" />
+      {children}
+    </p>
+  );
+}
 
 /** Keyword tag chip */
 export function KeywordChip({ text, variant }: { text: string; variant: "found" | "missing" | "nice" | "synonym" }) {

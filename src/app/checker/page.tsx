@@ -12,7 +12,7 @@ import { ScoreDonut } from "@/components/checker/ScoreDonut";
 import { SectionScoreCard } from "@/components/checker/SectionScoreCard";
 import { ImpactForecastCard } from "@/components/checker/ImpactForecastCard";
 import HrPointOfView from "@/components/checker/HrPointOfView";
-import { KeywordChip, BulletReviewCard } from "@/components/checker/ResultComponents";
+import { KeywordChip, BulletReviewCard, SectionKicker } from "@/components/checker/ResultComponents";
 import { ImprovementChecklist } from "@/components/checker/ImprovementChecklist";
 import { QuickSummaryCard } from "@/components/checker/QuickSummaryCard";
 import { MissingSectionsCard } from "@/components/checker/MissingSectionsCard";
@@ -470,9 +470,15 @@ export default function CheckerPage() {
       <div className="flex min-h-screen flex-col bg-desk text-ink">
         <SiteHeader variant="pill" />
 
-        <main className="flex-1 px-5 py-24">
-          <div className="mx-auto flex w-full max-w-[600px] flex-col gap-6">
+        {/* pt-32, bukan py-24: pita kicker duduk di atas h1 dan nav melayang
+            setinggi ~112px, jadi ruang 96px membuat pitanya tersembunyi. */}
+        <main className="relative isolate flex-1 overflow-hidden px-5 pb-24 pt-32">
+          {/* Papan kerja: alasan garis petak ini ada tertulis di
+              `.workbench-grid` (globals.css), bukan dekorasi bebas. */}
+          <div aria-hidden="true" className="workbench-grid pointer-events-none absolute inset-x-0 top-0 -z-10 h-[540px]" />
+          <div className="relative mx-auto flex w-full max-w-[600px] flex-col gap-6">
             <div>
+              <SectionKicker>{t("checker.hero-kicker")}</SectionKicker>
               <h1 className="max-w-[20ch] font-display text-headline-lg font-bold text-ink">
                 {t("checker.title")}
               </h1>
@@ -883,7 +889,10 @@ export default function CheckerPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.15 }}
           >
-            <h2 className="px-1 font-display text-headline-md font-bold text-ink">{t("checker.sec-title")}</h2>
+            <div className="px-1">
+              <SectionKicker>{t("checker.kicker-breakdown")}</SectionKicker>
+              <h2 className="font-display text-headline-md font-bold text-ink">{t("checker.sec-title")}</h2>
+            </div>
             {breakdown.summary && (
               <SectionScoreCard title={t("checker.sec-summary")} score={breakdown.summary.score} issues={breakdown.summary.issues} suggestions={breakdown.summary.suggestions} delay={0.2} sectionKey="summary" analysis={result} />
             )}
@@ -917,6 +926,7 @@ export default function CheckerPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.3 }}
           >
+            <SectionKicker>{t("checker.kicker-narrative")}</SectionKicker>
             <h2 className="font-display text-headline-md font-bold text-ink">{t("checker.ai-review")}</h2>
 
             {/* Overall assessment */}
@@ -961,7 +971,10 @@ export default function CheckerPage() {
             transition={{ duration: 0.4, delay: 0.35 }}
           >
             <div className="flex items-center justify-between gap-3">
-              <h2 className="font-display text-headline-md font-bold text-ink">Keyword Analysis</h2>
+              <div>
+                <SectionKicker>{t("checker.kicker-keyword")}</SectionKicker>
+                <h2 className="font-display text-headline-md font-bold text-ink">{t("checker.kw-title")}</h2>
+              </div>
               <div className="flex items-center gap-2">
                 <span className="font-display text-sm font-bold text-ink">{keywordAnalysis.match_rate_pct}%</span>
                 <div className="h-2 w-16 overflow-hidden rounded-full bg-ink/10">
@@ -1061,7 +1074,10 @@ export default function CheckerPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.45 }}
           >
-            <h2 className="px-1 font-display text-headline-md font-bold text-ink">{t("checker.bullet-title").replace("{n}", String(bulletReview.length))}</h2>
+            <div className="px-1">
+              <SectionKicker>{t("checker.kicker-bullet")}</SectionKicker>
+              <h2 className="font-display text-headline-md font-bold text-ink">{t("checker.bullet-title").replace("{n}", String(bulletReview.length))}</h2>
+            </div>
             <div className="space-y-2">
               {bulletReview.map((item, i) => (
                 <BulletReviewCard key={i} item={item} index={i} />

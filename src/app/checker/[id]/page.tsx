@@ -7,7 +7,7 @@ import SiteHeader from "@/components/nav/SiteHeader";
 import AppFooter from "@/components/AppFooter";
 import { ScoreDonut } from "@/components/checker/ScoreDonut";
 import { SectionScoreCard } from "@/components/checker/SectionScoreCard";
-import { KeywordChip, BulletReviewCard } from "@/components/checker/ResultComponents";
+import { KeywordChip, BulletReviewCard, SectionKicker } from "@/components/checker/ResultComponents";
 import { ImprovementChecklist } from "@/components/checker/ImprovementChecklist";
 import { QuickSummaryCard } from "@/components/checker/QuickSummaryCard";
 import { MissingSectionsCard } from "@/components/checker/MissingSectionsCard";
@@ -240,7 +240,10 @@ export default function CheckerDetailPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.15 }}
           >
-            <h2 className="px-1 font-display text-headline-md font-bold text-ink">{t("checker.detail.section-breakdown")}</h2>
+            <div className="px-1">
+              <SectionKicker>{t("checker.kicker-breakdown")}</SectionKicker>
+              <h2 className="font-display text-headline-md font-bold text-ink">{t("checker.detail.section-breakdown")}</h2>
+            </div>
             {breakdown.summary && (
               <SectionScoreCard title={t("checker.detail.section-summary")} score={breakdown.summary.score} issues={breakdown.summary.issues} suggestions={breakdown.summary.suggestions} delay={0.2} sectionKey="summary" analysis={result} />
             )}
@@ -274,6 +277,7 @@ export default function CheckerDetailPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.3 }}
           >
+            <SectionKicker>{t("checker.kicker-narrative")}</SectionKicker>
             <h2 className="font-display text-headline-md font-bold text-ink">{t("checker.detail.review-title")}</h2>
             <div className="rounded-xl border-[2.5px] border-ink bg-lime/25 p-4">
               <p className="text-sm leading-relaxed text-ink">{narrativeFeedback.overall_assessment}</p>
@@ -307,7 +311,10 @@ export default function CheckerDetailPage() {
             transition={{ duration: 0.4, delay: 0.35 }}
           >
             <div className="flex items-center justify-between gap-3">
-              <h2 className="font-display text-headline-md font-bold text-ink">{t("checker.detail.keyword-title")}</h2>
+              <div>
+                <SectionKicker>{t("checker.kicker-keyword")}</SectionKicker>
+                <h2 className="font-display text-headline-md font-bold text-ink">{t("checker.detail.keyword-title")}</h2>
+              </div>
               <div className="flex items-center gap-2">
                 <span className="font-display text-sm font-bold text-ink">{keywordAnalysis.match_rate_pct}%</span>
                 <div className="h-2 w-16 overflow-hidden rounded-full bg-ink/10">
@@ -392,7 +399,10 @@ export default function CheckerDetailPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.45 }}
           >
-            <h2 className="px-1 font-display text-headline-md font-bold text-ink">{t("checker.detail.bullet-title")} ({bulletReview.length})</h2>
+            <div className="px-1">
+              <SectionKicker>{t("checker.kicker-bullet")}</SectionKicker>
+              <h2 className="font-display text-headline-md font-bold text-ink">{t("checker.detail.bullet-title")} ({bulletReview.length})</h2>
+            </div>
             <div className="space-y-2">
               {bulletReview.map((item, i) => (
                 <BulletReviewCard key={i} item={item} index={i} />

@@ -287,6 +287,23 @@
     box-shadow: 8px 8px 0 var(--shadow-hard-color);
   }
 
+  /* Papan kerja /checker.
+
+     Garis petak biasanya jadi hiasan tanpa alasan (R-07 antislop). Di sini
+     alasannya konkret: halaman ini adalah meja pemeriksaan — CV diletakkan,
+     diukur, lalu dinilai; petak 28px adalah garis ukur kertas kerja, dan
+     mask radial membuatnya memudar ke arah form supaya tidak bersaing dengan
+     kolom isian. Warnanya ikut token `ink`, jadi mode gelap tidak perlu
+     pengecualian. */
+  .workbench-grid {
+    background-image:
+      linear-gradient(rgb(var(--c-ink) / 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--c-ink) / 0.05) 1px, transparent 1px);
+    background-size: 28px 28px;
+    -webkit-mask-image: radial-gradient(115% 85% at 50% 0%, #000 32%, transparent 76%);
+    mask-image: radial-gradient(115% 85% at 50% 0%, #000 32%, transparent 76%);
+  }
+
   .kicker {
     width: fit-content;
     margin: 0 0 16px;

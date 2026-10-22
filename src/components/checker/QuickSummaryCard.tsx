@@ -2,7 +2,9 @@
 
 import { motion } from "motion/react";
 import { CopyButton } from "./CopyButton";
+import { SectionKicker } from "./ResultComponents";
 import { buildChangePack } from "@/lib/checker/copy";
+import { useTranslation } from "@/lib/i18n";
 import {
   gradeColor,
   type QuickFix,
@@ -52,6 +54,7 @@ interface QuickSummaryCardProps {
 export function QuickSummaryCard({ analysis, summary }: QuickSummaryCardProps) {
   const gc = gradeColor(analysis.grade);
   const changePack = buildChangePack(analysis);
+  const { t } = useTranslation();
 
   return (
     <motion.section
@@ -61,6 +64,8 @@ export function QuickSummaryCard({ analysis, summary }: QuickSummaryCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
+      <SectionKicker>{t("checker.kicker-summary")}</SectionKicker>
+
       {/* ── Header: judul + grade badge yang sudah ada ── */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="flex items-center gap-2 font-display text-headline-md font-bold text-ink">

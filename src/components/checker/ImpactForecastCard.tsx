@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import { useTranslation } from "@/lib/i18n";
+import { SectionKicker } from "./ResultComponents";
 import type { ImpactForecast } from "./types";
 
 /**
@@ -39,6 +40,7 @@ export function ImpactForecastCard({ forecast }: { forecast: ImpactForecast }) {
     >
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
+          <SectionKicker>{t("checker.kicker-impact")}</SectionKicker>
           <h2 className="flex items-center gap-1.5 font-display text-[19px] font-bold text-ink">
             <span className="material-symbols-outlined select-none text-lg text-green-deep" style={{ fontVariationSettings: "'FILL' 1" }}>
               trending_up

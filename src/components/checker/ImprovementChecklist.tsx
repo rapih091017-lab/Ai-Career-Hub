@@ -3,6 +3,7 @@
 import { useMemo, useState, useCallback } from "react";
 import { motion } from "motion/react";
 import { useTranslation } from "@/lib/i18n";
+import { SectionKicker } from "./ResultComponents";
 import type { ActionPlan, KeywordAnalysis, MissingSection } from "./types";
 
 /**
@@ -92,6 +93,7 @@ export function ImprovementChecklist({ actionPlan, missingSections, keywordAnaly
     >
       <div className="flex items-start justify-between gap-3">
         <div>
+          <SectionKicker>{t("checker.kicker-checklist")}</SectionKicker>
           <h2 className="font-display text-[19px] font-bold text-ink">{t("checker.detail.checklist-title")}</h2>
           <p className="mt-1 text-xs text-ink-soft">
             {t("checker.detail.checklist-sub").replace("{done}", String(done)).replace("{total}", String(items.length))}

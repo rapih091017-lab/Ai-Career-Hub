@@ -62,7 +62,7 @@ it("menampilkan temuan berhenti dan lanjut beserta kutipannya", () => {
   });
 
   it("tidak menampilkan kotak kutipan kalau kutipannya tidak ada", () => {
-    const { container } = renderPanel({
+    renderPanel({
       atsPredictionDetail: {
         risk_factors: [{ text: "Ada tabel", severity: "high", source_excerpt: null }],
         strengths: [],
@@ -80,7 +80,9 @@ it("menampilkan temuan berhenti dan lanjut beserta kutipannya", () => {
     for (const paragraph of paragraphs) {
       expect(paragraph.textContent?.trim()).not.toBe("");
     }
-    expect(container.querySelector("p.font-mono")).toBeNull();
+    // Cek di dalam list item, bukan seluruh panel: panel punya pita label
+    // mono sendiri (SectionKicker), jadi selector global akan menangkapnya.
+    expect(item!.querySelector("p.font-mono")).toBeNull();
   });
 
   it("saat kosong, jujur dan mengarahkan tanpa menyebut judul halaman lain", () => {

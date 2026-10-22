@@ -4,6 +4,7 @@ import { useId, useState } from "react";
 import { useTranslation } from "@/lib/i18n";
 import { buildHrPointOfView, type HrFinding } from "@/lib/checker/hr-point-of-view";
 import { CopyButton } from "./CopyButton";
+import { SectionKicker } from "./ResultComponents";
 import {
   severityMeta,
   type AnalysisResult,
@@ -414,6 +415,7 @@ export default function HrPointOfView({
       aria-labelledby={titleId}
       className="rounded-[18px] border-[2.5px] border-ink bg-paper p-6 shadow-hard"
     >
+      <SectionKicker>{t("checker.kicker-hr")}</SectionKicker>
       {/* Headline-md, bukan token yang lebih kecil: preflight membuat heading
           mewarisi ukuran body, jadi kelas yang tidak ada di config membuat
           judul panel jadi lebih kecil dari judul kolom di bawahnya. */}
