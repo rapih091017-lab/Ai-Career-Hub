@@ -581,7 +581,7 @@ const DICT: Record<string, { id: string; en: string }> = {
 
   /* Checker */
   "checker.title": { id: "Cek Seberapa Kuat CV-mu", en: "Check How Strong Your CV Is" },
-  "checker.subtitle": { id: "Unggah CV kamu dan deskripsi pekerjaan untuk mendapatkan analisis kecocokan instan bertenaga AI.", en: "Upload your CV and job description for instant AI-powered match analysis." },
+  "checker.subtitle": { id: "Unggah CV kamu dan tempel lowongan yang kamu incar. Kamu dapat skor per bagian, kata kunci yang kurang, dan langkah perbaikannya.", en: "Upload your CV and paste the job you are targeting. You get section scores, missing keywords, and concrete fix steps." },
   "checker.upload-label": { id: "Drag & drop CV kamu di sini atau klik untuk upload", en: "Drag & drop your CV here or click to upload" },
   "checker.upload-hint": { id: "Format: PDF, DOCX", en: "Format: PDF, DOCX" },
   "checker.jd-label": { id: "Paste Deskripsi Lowongan Kerja (Job Description)", en: "Paste Job Description" },
@@ -590,8 +590,8 @@ const DICT: Record<string, { id: string; en: string }> = {
   "checker.analyzing": { id: "Menganalisis...", en: "Analyzing..." },
   "checker.free-badge": { id: "Gratis · Hasil dalam 30 detik", en: "Free · Results in 30 seconds" },
   "checker.mock-sample": { id: "Contoh ilustrasi, bukan hasil nyata", en: "Illustrative sample, not real results" },
-  "checker.insight-title": { id: "AI Career Insights", en: "AI Career Insights" },
-  "checker.insight-desc": { id: "Skor CV Anda akan dihitung berdasarkan kata kunci, format, dan relevansi industri terkini.", en: "Your CV score will be calculated based on keywords, format, and current industry relevance." },
+  "checker.insight-title": { id: "Cara skor dihitung", en: "How the score is calculated" },
+  "checker.insight-desc": { id: "Skor kamu dihitung dari kecocokan kata kunci di lowongan, keterbacaan format CV oleh mesin ATS, dan relevansi tiap bagian CV dengan posisi yang kamu pilih.", en: "Your score comes from keyword match with the job posting, how clearly an ATS machine can parse your CV, and how relevant each section is to the role you picked." },
   "checker.back-btn": { id: "Cek Ulang CV Lain", en: "Check Another CV" },
   "checker.result-title": { id: "Analisis Selesai!", en: "Analysis Complete!" },
   "checker.result-subtitle": { id: "CV Anda telah dianalisis. Lihat detail di bawah.", en: "Your CV has been analyzed. See details below." },

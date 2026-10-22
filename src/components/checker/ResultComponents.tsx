@@ -110,7 +110,12 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
           <p className="line-clamp-2 text-sm text-ink">{item.original_text}</p>
           {/* Ringkasan skor CARI di header (kalau tersedia) */}
           {cari !== null && (
-            <span className={`inline-flex items-center gap-1 mt-1.5 text-[10px] font-bold ${cariColor(cari).text}`}>
+            // Akronim CARI dijelaskan di tooltip: versi panjangnya hanya ada
+            // di dalam accordion, jadi tanpa ini pembaca tidak tahu artinya.
+            <span
+              className={`inline-flex items-center gap-1 mt-1.5 text-[10px] font-bold ${cariColor(cari).text}`}
+              title={t("checker.detail.cari-desc")}
+            >
               <span className="material-symbols-outlined text-[12px] select-none">speed</span>
               CARI {cari}/100 · {cariLabel(cari, t)}
             </span>
