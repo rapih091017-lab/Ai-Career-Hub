@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import type { PortfolioFormData } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { Chip, Reveal, SectionHead, wbMono, wbPaper, wbSection, wbWrap } from "../workbench/kit";
 
 interface Props { data: PortfolioFormData; }
 
@@ -270,6 +271,64 @@ function MinimalistSkills({ f }: { f: PortfolioFormData }) {
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * WORKBENCH — rak perkakas: tiga baris (utama, alat,
+ * bahasa) di satu papan kertas. Label mono di kiri,
+ * chip bergaris tinta di kanan; tidak ada isian warna
+ * supaya lime tetap jadi satu-satunya penanda.
+ * ═══════════════════════════════════════════════ */
+function WorkbenchSkills({ f }: { f: PortfolioFormData }) {
+  const theme = usePortfolioTheme();
+  const groups = [
+    { label: "utama", value: f.skillsMain },
+    { label: "alat", value: f.skillsTools },
+    { label: "bahasa", value: f.skillsLanguages },
+  ].filter((g) => g.value && g.value.trim());
+
+  if (!groups.length) return null;
+
+  return (
+    <section style={wbSection(theme)}>
+      <div style={wbWrap()}>
+        <SectionHead label="keahlian" title="Keahlian" />
+
+        <Reveal>
+          <div
+            style={{
+              ...wbPaper(theme),
+              overflow: "hidden",
+            }}
+          >
+            {groups.map((group, i) => (
+              <div
+                key={group.label}
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "clamp(8px, 2vw, 24px)",
+                  alignItems: "flex-start",
+                  padding: "clamp(14px, 2vw, 20px)",
+                  borderTop: i === 0 ? "none" : `1.5px solid ${theme.colors.border}`,
+                }}
+              >
+                <span style={{ ...wbMono(theme), flex: "0 0 120px", fontSize: 12, color: theme.colors.textSecondary, paddingTop: 6, display: "flex", alignItems: "center", gap: 8 }}>
+                  <span aria-hidden="true" style={{ width: 8, height: 8, background: theme.colors.accent, border: `1.5px solid ${theme.colors.border}` }} />
+                  {group.label}
+                </span>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, flex: "1 1 240px" }}>
+                  {group.value.split(",").map((skill, idx) => (
+                    <Chip key={`${group.label}-${idx}`}>{skill.trim()}</Chip>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function SkillsSection({ data: f }: Props) {
   const theme = usePortfolioTheme();
@@ -278,6 +337,7 @@ export default function SkillsSection({ data: f }: Props) {
     case "brutal": return <BrutalSkills f={f} />;
     case "luxe": return <LuxeSkills f={f} />;
     case "minimalist": return <MinimalistSkills f={f} />;
+    case "workbench": return <WorkbenchSkills f={f} />;
     default: return <GlassSkills f={f} />;
   }
 }

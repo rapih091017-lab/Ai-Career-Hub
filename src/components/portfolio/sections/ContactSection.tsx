@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import type { PortfolioFormData, ExtraLink } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { PillLink, Reveal, SheetLabel, wbHeading, wbMono, wbPaper, wbSection, wbWrap } from "../workbench/kit";
 
 interface Props { data: PortfolioFormData; extraLinks: ExtraLink[]; }
 
@@ -282,6 +283,90 @@ function MinimalistContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * WORKBENCH — papan penutup: satu lembar kertas dengan
+ * pita lime di kepala, email sebagai jalur tercepat,
+ * lalu tautan lain di bawah garis perforasi.
+ * ═══════════════════════════════════════════════ */
+function WorkbenchContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: ExtraLink[] }) {
+  const theme = usePortfolioTheme();
+  const links = extraLinks.filter((l) => l.url);
+  const web = (value: string) => (value.startsWith("http") ? value : `https://${value.replace(/^https?:\/\//, "")}`);
+
+  return (
+    <section style={wbSection(theme, { paddingBottom: "clamp(64px, 8vw, 104px)" })}>
+      <div style={wbWrap()}>
+        <Reveal>
+          <div style={{ ...wbPaper(theme), overflow: "hidden" }}>
+            <div aria-hidden="true" style={{ height: 10, background: theme.colors.accent, borderBottom: `2.5px solid ${theme.colors.border}` }} />
+
+            <div
+              style={{
+                padding: "clamp(20px, 4vw, 40px)",
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+                gap: "clamp(20px, 3vw, 40px)",
+                alignItems: "start",
+              }}
+            >
+              <div>
+                <SheetLabel>kontak</SheetLabel>
+                <h2 style={{ ...wbHeading(theme, "clamp(28px, 4.6vw, 46px)"), margin: "14px 0 0", maxWidth: "14ch" }}>
+                  Mari bekerja sama
+                </h2>
+                <p style={{ margin: "12px 0 0", maxWidth: 420, fontSize: 15.5, lineHeight: 1.65, color: theme.colors.textSecondary }}>
+                  Ada peran, proyek, atau ide yang cocok? Email adalah jalur tercepat untuk menjangkau saya.
+                </p>
+              </div>
+
+              <div>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                  {f.contactEmail ? (
+                    <PillLink href={`mailto:${f.contactEmail}`} primary>
+                      Email
+                    </PillLink>
+                  ) : null}
+                  {f.contactLinkedin ? <PillLink href={web(f.contactLinkedin)} external>LinkedIn</PillLink> : null}
+                  {f.contactGithub ? <PillLink href={web(f.contactGithub)} external>GitHub</PillLink> : null}
+                  {f.contactPhone ? <PillLink href={`tel:${f.contactPhone}`}>Telepon</PillLink> : null}
+                </div>
+
+                {f.contactEmail ? (
+                  <p style={{ margin: "14px 0 0", ...wbMono(theme), fontSize: 12.5 }}>
+                    <a href={`mailto:${f.contactEmail}`} style={{ color: theme.colors.primary, textDecoration: "underline", textUnderlineOffset: 4, wordBreak: "break-word" }}>
+                      {f.contactEmail}
+                    </a>
+                  </p>
+                ) : null}
+
+                {links.length ? (
+                  <>
+                    <div aria-hidden="true" style={{ borderTop: `1.5px dashed ${theme.colors.border}`, margin: "24px 0 14px" }} />
+                    <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexWrap: "wrap", gap: "8px 22px" }}>
+                      {links.map((link) => (
+                        <li key={link.id}>
+                          <a
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ ...wbMono(theme), fontSize: 12.5, color: theme.colors.textSecondary, textDecoration: "underline", textUnderlineOffset: 4 }}
+                          >
+                            {link.label || "Tautan"}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                ) : null}
+              </div>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function ContactSection({ data: f, extraLinks }: Props) {
   const theme = usePortfolioTheme();
@@ -292,6 +377,7 @@ export default function ContactSection({ data: f, extraLinks }: Props) {
     case "brutal": return <BrutalContact f={f} extraLinks={extraLinks} />;
     case "luxe": return <LuxeContact f={f} extraLinks={extraLinks} />;
     case "minimalist": return <MinimalistContact f={f} extraLinks={extraLinks} />;
+    case "workbench": return <WorkbenchContact f={f} extraLinks={extraLinks} />;
     default: return <GlassContact f={f} extraLinks={extraLinks} />;
   }
 }

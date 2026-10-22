@@ -59,6 +59,7 @@ const THEME_THUMBNAILS: Record<ThemeId, PortfolioData> = {
   brutal: thumbnailData("Riley", "K.", "Creative Developer & Motion Designer", "Breaking boundaries with code", "Eksperimen interaksi web dan gerak."),
   luxe: thumbnailData("Maya", "Chen", "UI/UX Designer & Brand Strategist", "Crafting human-centered experiences", "Masalah rumit jadi produk yang enak dipakai."),
   minimalist: thumbnailData("Nadia", "P.", "Product Engineer", "Small systems, clear thinking", "Perangkat lunak tenang untuk masalah yang ribut."),
+  workbench: thumbnailData("Bagas", "Prakoso", "Product Designer", "Rapi di atas kertas, cepat di layar", "Menyusun alur produk dari sketsa sampai rilis."),
 };
 
 export default function PortfolioPage() {
@@ -170,7 +171,7 @@ export default function PortfolioPage() {
               transition={{ duration: 0.4 }}
             >
               <h2 className="font-headline-md text-on-surface mb-4">{t("portfolio.choose-theme")}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {THEME_LIST.map((theme, i) => {
                   return (
                     <motion.div

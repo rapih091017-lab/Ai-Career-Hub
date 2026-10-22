@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import type { OrganizationItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { Paper, Reveal, SectionHead, wbHeading, wbMono, wbSection, wbWrap } from "../workbench/kit";
 
 interface Props { items: OrganizationItem[]; }
 
@@ -262,6 +263,47 @@ function MinimalistOrganizations({ items }: { items: OrganizationItem[] }) {
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * WORKBENCH — kartu arsip kegiatan: peran mono di
+ * kepala kartu, nama organisasi display, periode di
+ * sudut kanan. Grid auto-fit supaya tidak memaksa dua
+ * kolom sempit di ponsel.
+ * ═══════════════════════════════════════════════ */
+function WorkbenchOrganizations({ items }: { items: OrganizationItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((o) => o.name);
+  if (!filtered.length) return null;
+
+  return (
+    <section style={wbSection(theme)}>
+      <div style={wbWrap()}>
+        <SectionHead label="organisasi" title="Organisasi" />
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 18 }}>
+          {filtered.map((o, i) => (
+            <Reveal key={o.id} delay={i * 0.06} y={18} style={{ display: "flex" }}>
+              <Paper style={{ padding: "clamp(16px, 2.2vw, 22px)", flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+                  {o.role ? (
+                    <span style={{ ...wbMono(theme), fontSize: 11.5, color: theme.colors.primary }}>{o.role}</span>
+                  ) : <span />}
+                  {o.period ? (
+                    <span style={{ ...wbMono(theme), fontSize: 11.5, color: theme.colors.textSecondary }}>{o.period}</span>
+                  ) : null}
+                </div>
+                <h3 style={{ ...wbHeading(theme, "clamp(17px, 2.1vw, 20px)"), margin: 0 }}>{o.name}</h3>
+                {o.description ? (
+                  <p style={{ margin: 0, fontSize: 14, lineHeight: 1.65, color: theme.colors.textSecondary }}>{o.description}</p>
+                ) : null}
+              </Paper>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function OrganizationsSection({ items }: Props) {
   const theme = usePortfolioTheme();
@@ -270,6 +312,7 @@ export default function OrganizationsSection({ items }: Props) {
     case "brutal": return <BrutalOrganizations items={items} />;
     case "luxe": return <LuxeOrganizations items={items} />;
     case "minimalist": return <MinimalistOrganizations items={items} />;
+    case "workbench": return <WorkbenchOrganizations items={items} />;
     default: return <GlassOrganizations items={items} />;
   }
 }

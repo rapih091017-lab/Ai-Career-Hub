@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import type { PortfolioFormData } from "../../portfolio-templates/types";
 import { useReducedMotion } from "../../../hooks/useReducedMotion";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { Paper, Reveal, SheetLabel, wbHeading, wbMono, wbSection, wbWrap } from "../workbench/kit";
 
 interface Props { data: PortfolioFormData; }
 
@@ -305,6 +306,62 @@ function MinimalistAbout({ f }: { f: PortfolioFormData }) {
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * WORKBENCH — teks di kolom kiri, catatan kecil
+ * (tahun, proyek, klien) ditempel miring di kanan.
+ * Angka jadi bukti, bukan hiasan: tiap catatan
+ * memakai label mono yang sama dengan label section.
+ * ═══════════════════════════════════════════════ */
+function WorkbenchAbout({ f }: { f: PortfolioFormData }) {
+  const theme = usePortfolioTheme();
+  const notes = [
+    { value: f.aboutYearsExp, label: "tahun pengalaman" },
+    { value: f.aboutProjectsDone, label: "proyek selesai" },
+    { value: f.aboutClientsHappy, label: "klien terbantu" },
+  ].filter((n) => n.value);
+
+  return (
+    <section style={wbSection(theme)}>
+      <div style={wbWrap()}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "clamp(28px, 4vw, 48px)", alignItems: "start" }}>
+          <Reveal>
+            <SheetLabel>tentang</SheetLabel>
+            <h2 style={{ ...wbHeading(theme), margin: "12px 0 0" }}>Tentang saya</h2>
+            <div aria-hidden="true" style={{ width: 56, height: 2.5, background: theme.colors.border, margin: "16px 0 18px" }} />
+            <p style={{ margin: 0, maxWidth: 560, fontSize: 16.5, lineHeight: 1.75, color: theme.colors.textSecondary }}>
+              {f.aboutText}
+            </p>
+          </Reveal>
+
+          {notes.length ? (
+            <div style={{ display: "grid", gap: 14, maxWidth: 380, marginLeft: "auto", width: "100%" }}>
+              {notes.map((note, i) => (
+                <Reveal key={note.label} delay={0.08 * i} y={16}>
+                  <Paper
+                    style={{
+                      padding: "16px 18px",
+                      display: "flex",
+                      alignItems: "baseline",
+                      justifyContent: "space-between",
+                      gap: 12,
+                      transform: `rotate(${i % 2 === 0 ? 1 : -1}deg)`,
+                    }}
+                  >
+                    <span style={{ ...wbHeading(theme, "clamp(28px, 3.4vw, 36px)"), color: theme.colors.primary }}>
+                      {note.value}
+                    </span>
+                    <span style={{ ...wbMono(theme), fontSize: 11.5, color: theme.colors.textSecondary }}>{note.label}</span>
+                  </Paper>
+                </Reveal>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function AboutSection({ data: f }: Props) {
   const theme = usePortfolioTheme();
@@ -314,6 +371,7 @@ export default function AboutSection({ data: f }: Props) {
     case "brutal": return <BrutalAbout f={f} />;
     case "luxe": return <LuxeAbout f={f} />;
     case "minimalist": return <MinimalistAbout f={f} />;
+    case "workbench": return <WorkbenchAbout f={f} />;
     default: return <GlassAbout f={f} />;
   }
 }

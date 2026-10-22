@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import type { HobbyItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { Paper, Reveal, SectionHead, wbHeading, wbSection, wbWrap } from "../workbench/kit";
 
 interface Props { items: HobbyItem[]; }
 
@@ -216,6 +217,38 @@ function MinimalistHobbies({ items }: { items: HobbyItem[] }) {
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * WORKBENCH — catatan tempel: tiap hobi satu potongan
+ * kertas kecil yang ditempel miring bergantian. Tanpa
+ * ikon generik; nama dan alasannya sudah cukup.
+ * ═══════════════════════════════════════════════ */
+function WorkbenchHobbies({ items }: { items: HobbyItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((h) => h.name);
+  if (!filtered.length) return null;
+
+  return (
+    <section style={wbSection(theme, { paddingTop: "clamp(40px, 6vw, 64px)" })}>
+      <div style={wbWrap()}>
+        <SectionHead label="di luar kerja" title="Hobi & minat" />
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 16 }}>
+          {filtered.map((h, i) => (
+            <Reveal key={h.id} delay={i * 0.05} y={14} style={{ display: "flex" }}>
+              <Paper style={{ padding: "16px 18px", flex: 1, transform: `rotate(${i % 2 === 0 ? -1.2 : 1.2}deg)` }}>
+                <p style={{ ...wbHeading(theme, "clamp(15px, 1.9vw, 17px)"), margin: 0 }}>{h.name}</p>
+                {h.description ? (
+                  <p style={{ margin: "6px 0 0", fontSize: 13.5, lineHeight: 1.6, color: theme.colors.textSecondary }}>{h.description}</p>
+                ) : null}
+              </Paper>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function HobbiesSection({ items }: Props) {
   const theme = usePortfolioTheme();
@@ -224,6 +257,7 @@ export default function HobbiesSection({ items }: Props) {
     case "brutal": return <BrutalHobbies items={items} />;
     case "luxe": return <LuxeHobbies items={items} />;
     case "minimalist": return <MinimalistHobbies items={items} />;
+    case "workbench": return <WorkbenchHobbies items={items} />;
     default: return <GlassHobbies items={items} />;
   }
 }

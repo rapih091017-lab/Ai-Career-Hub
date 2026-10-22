@@ -22,11 +22,10 @@ describe("copy jumlah tema", () => {
     expect(src).toContain("portfolio.theme.minimalist-desc");
   });
 
-  it("penyebutan jumlah tema di pricing memakai angka empat", () => {
+  it("penyebutan jumlah tema di pricing memakai angka lima", () => {
     // Copy-nya lives di kamus i18n; PricingSection hanya memakai kuncinya.
     const i18n = readFileSync(join(process.cwd(), "src/lib/i18n.tsx"), "utf8");
-    const pricing = readFileSync(join(process.cwd(), "src/components/PricingSection.tsx"), "utf8");
-    expect(i18n).toMatch(/4 (pilihan )?tema/);
+    expect(i18n).toMatch(/5 (pilihan )?tema/);
     // Jumlah tema tidak lagi ditulis di teks kartu: kartu paket membaca\n    // kuota dari katalog, jadi tidak perlu menyebut angka tema.
   });
 });

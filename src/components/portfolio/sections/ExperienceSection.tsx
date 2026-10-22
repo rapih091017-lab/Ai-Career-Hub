@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import type { ExperienceItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { Reveal, SectionHead, wbHeading, wbMono, wbSection, wbWrap } from "../workbench/kit";
 
 interface Props { items: ExperienceItem[]; }
 
@@ -318,6 +319,77 @@ function MinimalistExperience({ items }: { items: ExperienceItem[] }) {
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * WORKBENCH — buku catatan kerja: periode di kolom
+ * mono kiri, uraian di kanan, tiap entri dipisah garis
+ * tinta. Tanpa kartu, supaya daftar panjang tetap
+ * ringan dan mudah dipindai seperti log.
+ * ═══════════════════════════════════════════════ */
+function WorkbenchExperience({ items }: { items: ExperienceItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((e) => e.company || e.position);
+  if (!filtered.length) return null;
+
+  return (
+    <section style={wbSection(theme)}>
+      <div style={wbWrap()}>
+        <SectionHead label="pengalaman" title="Riwayat kerja" aside={<span style={{ ...wbMono(theme), fontSize: 11.5, color: theme.colors.textSecondary }}>{filtered.length} entri</span>} />
+
+        <div style={{ borderTop: `2.5px solid ${theme.colors.border}` }}>
+          {filtered.map((exp, i) => (
+            <Reveal key={exp.id} delay={i * 0.06} y={16}>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "clamp(12px, 2vw, 28px)",
+                  alignItems: "flex-start",
+                  padding: "20px 0",
+                  borderBottom: `1.5px solid ${theme.colors.border}`,
+                }}
+              >
+                <div style={{ flex: "0 0 120px", ...wbMono(theme), fontSize: 12, color: theme.colors.textSecondary, paddingTop: 4 }}>
+                  {exp.startDate || "—"}
+                  <span style={{ opacity: 0.6 }}> → </span>
+                  {exp.isPresent ? "sekarang" : exp.endDate || "—"}
+                </div>
+
+                <div style={{ flex: "1 1 260px", minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                    <span aria-hidden="true" style={{ width: 9, height: 9, background: theme.colors.accent, border: `1.5px solid ${theme.colors.border}`, flexShrink: 0 }} />
+                    {exp.companyLogo ? (
+                      <img src={exp.companyLogo} alt={exp.company} style={{ width: 24, height: 24, objectFit: "cover", border: `1.5px solid ${theme.colors.border}`, borderRadius: theme.radii.card }} loading="lazy" />
+                    ) : null}
+                    <h3 style={{ ...wbHeading(theme, "clamp(17px, 2.2vw, 21px)"), margin: 0 }}>{exp.position || "Posisi"}</h3>
+                    {exp.company ? (
+                      <span style={{ ...wbMono(theme), fontSize: 12, color: theme.colors.primary }}>{exp.company}</span>
+                    ) : null}
+                  </div>
+
+                  {exp.description ? (
+                    <p style={{ margin: "8px 0 0", maxWidth: 640, fontSize: 14.5, lineHeight: 1.7, color: theme.colors.textSecondary }}>
+                      {exp.description}
+                    </p>
+                  ) : null}
+
+                  {exp.imageUrl ? (
+                    <img
+                      src={exp.imageUrl}
+                      alt={`${exp.position} di ${exp.company}`}
+                      loading="lazy"
+                      style={{ marginTop: 12, width: "100%", maxWidth: 420, height: 150, objectFit: "cover", border: `2.5px solid ${theme.colors.border}`, borderRadius: theme.radii.image, display: "block" }}
+                    />
+                  ) : null}
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function ExperienceSection({ items }: Props) {
   const theme = usePortfolioTheme();
@@ -326,6 +398,7 @@ export default function ExperienceSection({ items }: Props) {
     case "brutal": return <BrutalExperience items={items} />;
     case "luxe": return <LuxeExperience items={items} />;
     case "minimalist": return <MinimalistExperience items={items} />;
+    case "workbench": return <WorkbenchExperience items={items} />;
     default: return <GlassExperience items={items} />;
   }
 }

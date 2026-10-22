@@ -57,6 +57,20 @@ describe("token layer", () => {
     expect(m.typography.display).toContain("Instrument Sans");
   });
 
+  it("tema workbench: kertas aplikasi, tinta, dan satu penanda lime", () => {
+    const w = THEMES.workbench;
+    expect(w.colors.bg).toBe("#F3F6F2");
+    expect(w.colors.surface).toBe("#FFFFFF");
+    expect(w.colors.border).toBe("#0A0F0D");
+    expect(w.colors.accent).toBe("#D6EE30");
+    expect(w.radii.card).toBe("14px");
+    expect(w.blur.card).toBe("");
+    expect(w.typography.eyebrow).toContain("monospace");
+    // Nama display harus font aplikasi, bukan serif editorial tema lain.
+    expect(w.typography.display).toContain("Stack Sans Headline");
+    expect(w.typography.display.toLowerCase()).not.toContain("playfair");
+  });
+
   it("token circle ada di semua tema (lingkaran hero tidak boleh literal)", () => {
     for (const id of THEME_IDS) {
       expect(THEMES[id].radii.circle, `tema ${id} tidak punya radii.circle`).toBeTruthy();

@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import type { TestimonialItem } from "../../portfolio-templates/types";
 import { useReducedMotion } from "../../../hooks/useReducedMotion";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { Paper, Reveal, SectionHead, wbMono, wbSection, wbWrap } from "../workbench/kit";
 
 interface Props { items: TestimonialItem[]; }
 
@@ -317,6 +318,44 @@ function MinimalistTestimonials({ items }: { items: TestimonialItem[] }) {
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * WORKBENCH — kutipan di kartu kertas: tanda kutip
+ * lime besar, isi rata kiri, lalu nama dan posisi di
+ * kaki kartu yang dipisah garis tinta.
+ * ═══════════════════════════════════════════════ */
+function WorkbenchTestimonials({ items }: { items: TestimonialItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((t) => t.name || t.testimonial);
+  if (!filtered.length) return null;
+
+  return (
+    <section style={wbSection(theme)}>
+      <div style={wbWrap()}>
+        <SectionHead label="kata mereka" title="Kata mereka" />
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 18 }}>
+          {filtered.map((t, i) => (
+            <Reveal key={t.id} delay={i * 0.07} y={18} style={{ display: "flex" }}>
+              <figure style={{ margin: 0, width: "100%", display: "flex" }}>
+                <Paper style={{ padding: "clamp(16px, 2.2vw, 22px)", display: "flex", flexDirection: "column", gap: 10, width: "100%" }}>
+                  <span aria-hidden="true" style={{ ...wbMono(theme), fontSize: 40, lineHeight: 0.55, color: theme.colors.primary }}>“</span>
+                  <blockquote style={{ margin: 0, flex: 1, fontSize: 15, lineHeight: 1.7, color: theme.colors.text }}>
+                    {t.testimonial}
+                  </blockquote>
+                  <figcaption style={{ borderTop: `1.5px solid ${theme.colors.border}`, paddingTop: 10, ...wbMono(theme), fontSize: 12, color: theme.colors.textSecondary }}>
+                    <span style={{ color: theme.colors.text }}>{t.name}</span>
+                    {t.position ? ` · ${t.position}` : ""}
+                  </figcaption>
+                </Paper>
+              </figure>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function TestimonialsSection({ items }: Props) {
   const theme = usePortfolioTheme();
@@ -325,6 +364,7 @@ export default function TestimonialsSection({ items }: Props) {
     case "brutal": return <BrutalTestimonials items={items} />;
     case "luxe": return <LuxeTestimonials items={items} />;
     case "minimalist": return <MinimalistTestimonials items={items} />;
+    case "workbench": return <WorkbenchTestimonials items={items} />;
     default: return <GlassTestimonials items={items} />;
   }
 }

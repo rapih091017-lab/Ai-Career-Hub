@@ -23,7 +23,7 @@ export type SectionVisibility = Partial<Record<SectionId, boolean>>;
 
 /** Tema yang tersedia. Sumber kebenaran untuk union ThemeId sekaligus untuk
  *  validasi Zod (publishPayloadSchema.themeId). */
-export const THEME_IDS = ["glass", "brutal", "luxe", "minimalist"] as const;
+export const THEME_IDS = ["glass", "brutal", "luxe", "minimalist", "workbench"] as const;
 
 export type ThemeId = (typeof THEME_IDS)[number];
 

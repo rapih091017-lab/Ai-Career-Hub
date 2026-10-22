@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import type { CertificationItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { ArrowUpRight, Reveal, SectionHead, wbHeading, wbMono, wbPaper, wbSection, wbWrap } from "../workbench/kit";
 
 interface Props { items: CertificationItem[]; }
 
@@ -268,6 +269,77 @@ function MinimalistCertifications({ items }: { items: CertificationItem[] }) {
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * WORKBENCH — daftar sertifikat di satu papan kertas:
+ * nama, penerbit, lalu tahun di kotak mono. Takik lime
+ * menandai tiap baris supaya urutannya terbaca tanpa
+ * nomor urut.
+ * ═══════════════════════════════════════════════ */
+function WorkbenchCertifications({ items }: { items: CertificationItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((c) => c.name);
+  if (!filtered.length) return null;
+
+  return (
+    <section style={wbSection(theme)}>
+      <div style={wbWrap()}>
+        <SectionHead label="sertifikasi" title="Sertifikasi" />
+
+        <Reveal>
+          <div style={{ ...wbPaper(theme), overflow: "hidden" }}>
+            {filtered.map((c, i) => (
+              <div
+                key={c.id}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "clamp(10px, 2vw, 18px)",
+                  flexWrap: "wrap",
+                  padding: "clamp(14px, 2vw, 18px)",
+                  borderTop: i === 0 ? "none" : `1.5px solid ${theme.colors.border}`,
+                }}
+              >
+                <span aria-hidden="true" style={{ width: 9, height: 9, background: theme.colors.accent, border: `1.5px solid ${theme.colors.border}`, flexShrink: 0 }} />
+                <div style={{ flex: "1 1 200px", minWidth: 0 }}>
+                  <p style={{ ...wbHeading(theme, "clamp(16px, 2vw, 19px)"), margin: 0 }}>{c.name}</p>
+                  {c.issuer ? (
+                    <p style={{ margin: "4px 0 0", fontSize: 13, color: theme.colors.textSecondary }}>{c.issuer}</p>
+                  ) : null}
+                </div>
+                {c.year ? (
+                  <span
+                    style={{
+                      ...wbMono(theme),
+                      fontSize: 12,
+                      padding: "3px 9px",
+                      background: theme.colors.bg,
+                      border: `1.5px solid ${theme.colors.border}`,
+                      borderRadius: theme.radii.pill,
+                      color: theme.colors.text,
+                    }}
+                  >
+                    {c.year}
+                  </span>
+                ) : null}
+                {c.url ? (
+                  <a
+                    href={c.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ display: "inline-flex", alignItems: "center", gap: 6, ...wbMono(theme), fontSize: 12, color: theme.colors.primary, textDecoration: "none", minHeight: 32 }}
+                  >
+                    lihat <ArrowUpRight size={12} />
+                  </a>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function CertificationsSection({ items }: Props) {
   const theme = usePortfolioTheme();
@@ -276,6 +348,7 @@ export default function CertificationsSection({ items }: Props) {
     case "brutal": return <BrutalCertifications items={items} />;
     case "luxe": return <LuxeCertifications items={items} />;
     case "minimalist": return <MinimalistCertifications items={items} />;
+    case "workbench": return <WorkbenchCertifications items={items} />;
     default: return <GlassCertifications items={items} />;
   }
 }

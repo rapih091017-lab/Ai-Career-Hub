@@ -5,6 +5,19 @@ import { useMemo } from "react";
 import { useReducedMotion } from "../../../hooks/useReducedMotion";
 import type { PortfolioFormData } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import {
+  ArrowRight,
+  PillLink,
+  Reveal,
+  SheetLabel,
+  Tape,
+  WB_EASE,
+  wbHeading,
+  wbMono,
+  wbPaper,
+  wbSection,
+  wbWrap,
+} from "../workbench/kit";
 
 interface Props { data: PortfolioFormData; }
 
@@ -679,6 +692,207 @@ function MinimalistHero({ data: f, name, initials }: { data: PortfolioFormData; 
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * WORKBENCH, Kertas kerja
+ * Poster asimetris: nama dengan penanda lime, foto seperti
+ * ditempel (selotip), lalu daftar isi bergaris. Garis kertas
+ * samar di latar menegaskan bahwa halaman ini satu lembar
+ * kerja, bukan kanvas gelap.
+ * ═══════════════════════════════════════════════ */
+function WorkbenchHero({ data: f, name, initials }: { data: PortfolioFormData; name: string; initials: string }) {
+  const theme = usePortfolioTheme();
+  const reduced = useReducedMotion();
+
+  const firstName = (f.heroFirstName || "").trim();
+  const lastName = (f.heroLastName || "").trim();
+  const contents = [
+    { href: "#about", label: "Tentang" },
+    { href: "#projects", label: "Karya" },
+    { href: "#experience", label: "Pengalaman" },
+    { href: "#contact", label: "Kontak" },
+  ];
+
+  return (
+    <section
+      data-hero-variant="workbench"
+      style={wbSection(theme, {
+        position: "relative",
+        overflow: "hidden",
+        padding: "clamp(48px, 7vw, 80px) 0 clamp(40px, 6vw, 64px)",
+      })}
+    >
+      {/* Garis kertas: mengukur tinggi baris seperti buku tulis, memudar
+          sebelum daftar isi supaya tidak mengganggu teks. */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          backgroundImage: `repeating-linear-gradient(to bottom, transparent 0 33px, ${theme.colors.border}0f 33px 34px)`,
+          maskImage: "linear-gradient(to bottom, black, transparent 72%)",
+          WebkitMaskImage: "linear-gradient(to bottom, black, transparent 72%)",
+        }}
+      />
+
+      <div style={wbWrap({ position: "relative" })}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "clamp(32px, 5vw, 56px)", alignItems: "center" }}>
+          <Reveal>
+            <SheetLabel>{f.heroSubHeadline || "Portofolio · kertas kerja"}</SheetLabel>
+
+            <h1
+              style={{
+                ...wbHeading(theme, "clamp(46px, 9vw, 86px)"),
+                lineHeight: 0.94,
+                letterSpacing: "-0.04em",
+                margin: "18px 0 0",
+              }}
+            >
+              {firstName ? (
+                <>
+                  {firstName}
+                  {lastName ? <br /> : null}
+                </>
+              ) : null}
+
+              {lastName ? (
+                <span style={{ position: "relative", display: "inline-block", padding: "0 8px" }}>
+                  {/* Penanda stabilo: sapuan lime dari kiri saat halaman dibuka. */}
+                  <motion.span
+                    aria-hidden="true"
+                    initial={{ scaleX: reduced ? 1 : 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ duration: 0.7, delay: 0.45, ease: WB_EASE }}
+                    style={{
+                      position: "absolute",
+                      left: 0,
+                      right: 0,
+                      top: "14%",
+                      bottom: "10%",
+                      background: theme.colors.accent,
+                      transformOrigin: "left center",
+                    }}
+                  />
+                  <span style={{ position: "relative" }}>{lastName}</span>
+                </span>
+              ) : !firstName ? (
+                name
+              ) : null}
+            </h1>
+
+            {f.heroHeadline ? (
+              <p style={{ margin: "18px 0 0", ...wbMono(theme), fontSize: 13, color: theme.colors.textSecondary }}>
+                {f.heroHeadline}
+              </p>
+            ) : null}
+
+            {f.heroBio ? (
+              <p style={{ margin: "14px 0 0", maxWidth: 460, fontSize: 16, lineHeight: 1.65, color: theme.colors.textSecondary }}>
+                {f.heroBio}
+              </p>
+            ) : null}
+
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 26 }}>
+              <PillLink href="#projects" primary>
+                Lihat karya
+                <ArrowRight />
+              </PillLink>
+              <PillLink href="#contact">Hubungi saya</PillLink>
+            </div>
+          </Reveal>
+
+          {/* Foto ditempel: kertas miring, selotip lime, monogram di sudut. */}
+          <Reveal delay={0.12} y={30} style={{ position: "relative", justifySelf: "center", width: "100%", maxWidth: 330 }}>
+            <div style={{ position: "relative", padding: 12, ...wbPaper(theme, { transform: "rotate(2deg)" }) }}>
+              <Tape style={{ top: -13, left: "50%", marginLeft: -48 }} rotate={-5} />
+              <div
+                style={{
+                  overflow: "hidden",
+                  border: `2.5px solid ${theme.colors.border}`,
+                  borderRadius: theme.radii.image,
+                  background: theme.colors.bgSecondary,
+                  aspectRatio: "4 / 5",
+                  display: "grid",
+                  placeItems: "center",
+                }}
+              >
+                {f.heroPhotoUrl ? (
+                  <img
+                    src={f.heroPhotoUrl}
+                    alt={name}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                  />
+                ) : (
+                  <span style={{ ...wbHeading(theme, "76px"), color: theme.colors.primary, opacity: 0.9 }}>{initials}</span>
+                )}
+              </div>
+            </div>
+
+            {/* Stempel monogram: penanda kertas kerja, bukan klaim apa pun. */}
+            <motion.span
+              aria-hidden="true"
+              initial={{ rotate: -14, opacity: 0 }}
+              animate={{ rotate: -12, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.55, ease: WB_EASE }}
+              style={{
+                position: "absolute",
+                right: -10,
+                bottom: -26,
+                width: 84,
+                height: 84,
+                display: "grid",
+                placeItems: "center",
+                background: theme.colors.surface,
+                border: `2px dashed ${theme.colors.border}`,
+                borderRadius: theme.radii.circle,
+                ...wbMono(theme),
+                fontSize: 13,
+                lineHeight: 1.2,
+                textAlign: "center",
+                color: theme.colors.text,
+              }}
+            >
+              {initials}
+            </motion.span>
+          </Reveal>
+        </div>
+
+        {/* Daftar isi: fungsi navigasi sekaligus penanda bahwa ini lembar kerja. */}
+        <Reveal delay={0.2} style={{ marginTop: "clamp(36px, 5vw, 52px)" }}>
+          <div style={{ borderTop: `2.5px solid ${theme.colors.border}` }}>
+            {contents.map((item) => (
+              <motion.a
+                key={item.href}
+                href={item.href}
+                whileHover={reduced ? undefined : { x: 6 }}
+                transition={{ duration: 0.2, ease: WB_EASE }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 12,
+                  padding: "13px 2px",
+                  textDecoration: "none",
+                  color: theme.colors.text,
+                  borderBottom: `1px solid ${theme.colors.border}`,
+                  ...wbMono(theme),
+                  fontSize: 13,
+                }}
+              >
+                <span>{item.label}</span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 8, color: theme.colors.primary }}>
+                  <span aria-hidden="true" style={{ width: 8, height: 8, background: theme.colors.accent, border: `1.5px solid ${theme.colors.border}` }} />
+                  <ArrowRight size={13} />
+                </span>
+              </motion.a>
+            ))}
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function HeroSection({ data }: Props) {
   const f = data;
@@ -695,6 +909,8 @@ export default function HeroSection({ data }: Props) {
       return <LuxeHero data={f} name={name} initials={initials} />;
     case "minimalist":
       return <MinimalistHero data={f} name={name} initials={initials} />;
+    case "workbench":
+      return <WorkbenchHero data={f} name={name} initials={initials} />;
     default:
       return <GlassHero data={f} name={name} initials={initials} />;
   }

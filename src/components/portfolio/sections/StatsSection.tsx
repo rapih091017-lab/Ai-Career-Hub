@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import type { PortfolioFormData } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { Paper, Reveal, wbHeading, wbMono, wbSection, wbWrap } from "../workbench/kit";
 
 interface Props { data: PortfolioFormData; }
 
@@ -203,6 +204,43 @@ function MinimalistStats({ stats }: { stats: { value: string; label: string; ico
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * WORKBENCH — satu lembar meteran: tiga sel
+ * dipisah garis tinta, angka display, label mono,
+ * dan takik lime di kepala tiap sel.
+ * ═══════════════════════════════════════════════ */
+function WorkbenchStats({ stats }: { stats: { value: string; label: string; icon: string }[] }) {
+  const theme = usePortfolioTheme();
+  return (
+    <section style={wbSection(theme, { paddingTop: 0, paddingBottom: "clamp(40px, 6vw, 64px)" })}>
+      <div style={wbWrap()}>
+        <Reveal>
+          <Paper hover={false} style={{ overflow: "hidden" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))" }}>
+              {stats.map((s, i) => (
+                <div
+                  key={s.label}
+                  style={{
+                    padding: "clamp(16px, 2.4vw, 24px)",
+                    borderLeft: i === 0 ? "none" : `1.5px solid ${theme.colors.border}`,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 8,
+                  }}
+                >
+                  <span aria-hidden="true" style={{ width: 22, height: 6, background: theme.colors.accent, border: `1.5px solid ${theme.colors.border}` }} />
+                  <span style={{ ...wbHeading(theme, "clamp(30px, 4.2vw, 42px)"), color: theme.colors.primary }}>{s.value}</span>
+                  <span style={{ ...wbMono(theme), fontSize: 11.5, color: theme.colors.textSecondary }}>{s.label}</span>
+                </div>
+              ))}
+            </div>
+          </Paper>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function StatsSection({ data: f }: Props) {
   const theme = usePortfolioTheme();
@@ -218,6 +256,7 @@ export default function StatsSection({ data: f }: Props) {
     case "brutal": return <BrutalStats stats={stats} />;
     case "luxe": return <LuxeStats stats={stats} />;
     case "minimalist": return <MinimalistStats stats={stats} />;
+    case "workbench": return <WorkbenchStats stats={stats} />;
     default: return <GlassStats stats={stats} />;
   }
 }

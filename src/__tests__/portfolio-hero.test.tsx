@@ -66,6 +66,17 @@ describe("hero per tema", () => {
     expect(circle.style.borderRadius).toBe(THEMES.minimalist.radii.circle);
   });
 
+  it("hero workbench: nama, daftar isi, dan penanda lime tanpa blur", () => {
+    const { container } = renderHero("workbench");
+
+    expect(container.querySelector("[data-hero-variant='workbench']")).toBeTruthy();
+    expect(container.textContent).toContain("Maya");
+    expect(container.textContent).toContain("Tentang");
+    expect(container.textContent).toContain("Masalah rumit");
+    // Tema ini sengaja tanpa blur/backdrop-filter: identitasnya kertas + garis tinta.
+    expect(container.innerHTML).not.toContain("backdrop-filter");
+  });
+
   it("tiga tema lama tetap punya varian hero masing-masing", () => {
     expect(renderHero("glass").container.querySelector("[data-hero-variant='glass']")).toBeTruthy();
     expect(renderHero("brutal").container.querySelector("[data-hero-variant='brutal']")).toBeTruthy();

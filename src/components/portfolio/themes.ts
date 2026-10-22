@@ -217,6 +217,61 @@ export const THEMES: Record<string, ThemeDefinition> = {
       contact: { primary: "#111111", accent: "#111111" },
     },
   },
+  /* ═══════════════════════════════════════════════
+   * WORKBENCH, Kertas kerja
+   * VIBE: Sama dengan tema aplikasi (Evergreen + Lime):
+   *       kertas desk-green, garis tinta 2,5px, bayangan
+   *       padat tanpa blur, satu penanda lime
+   * LAYOUT: Poster asimetris + daftar isi bergaris,
+   *         label mono, foto seperti ditempel
+   * ═══════════════════════════════════════════════ */
+  "workbench": {
+    id: "workbench",
+    name: "Kertas Kerja",
+    description: "Kertas kerja bertema aplikasi: garis tinta tebal, bayangan padat, label mono, dan satu penanda lime",
+    font: "Stack Sans Headline",
+    fontUrl: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Stack+Sans+Headline:wght@400;500;600;700&display=swap",
+    previewGradient: "bg-[#f3f6f2]",
+    colors: {
+      bg: "#F3F6F2",
+      bgSecondary: "#FFFFFF",
+      surface: "#FFFFFF",
+      surfaceHover: "#EEF3EE",
+      text: "#0A0F0D",
+      textSecondary: "#4A5B52",
+      textMuted: "#5B6B62",
+      primary: "#1D6B48",
+      onPrimary: "#FFFFFF",
+      primaryGlow: "rgba(29,107,72,0.18)",
+      secondary: "#3F8F77",
+      accent: "#D6EE30",
+      border: "#0A0F0D",
+      borderHover: "#1D6B48",
+    },
+    radii: { card: "14px", button: "9999px", pill: "9999px", image: "18px", circle: "9999px" },
+    blur: { card: "", glow: "" },
+    shadow: { card: "6px 6px 0 #D5DED8", focus: "0 0 0 3px rgba(29,107,72,0.45)" },
+    typography: {
+      display: "'Stack Sans Headline', ui-sans-serif, system-ui",
+      body: "'Inter', ui-sans-serif, system-ui",
+      eyebrow: "ui-monospace, SFMono-Regular, Menlo, monospace",
+    },
+    focusRing: { color: "#1D6B48", width: "3px" },
+    sectionColors: {
+      hero: { primary: "#1D6B48", accent: "#D6EE30" },
+      about: { primary: "#122922", accent: "#D6EE30" },
+      stats: { primary: "#1D6B48", accent: "#D6EE30" },
+      experience: { primary: "#2F5D3A", accent: "#D6EE30" },
+      education: { primary: "#3D5A2A", accent: "#D6EE30" },
+      projects: { primary: "#1D6B48", accent: "#D6EE30" },
+      skills: { primary: "#122922", accent: "#D6EE30" },
+      certifications: { primary: "#3D5A2A", accent: "#D6EE30" },
+      organizations: { primary: "#2F5D3A", accent: "#D6EE30" },
+      hobbies: { primary: "#4A5B52", accent: "#D6EE30" },
+      testimonials: { primary: "#122922", accent: "#D6EE30" },
+      contact: { primary: "#1D6B48", accent: "#D6EE30" },
+    },
+  },
 };
 
 export const TEMPLATE_PREVIEWS = {
@@ -235,6 +290,10 @@ export const TEMPLATE_PREVIEWS = {
   minimalist: {
     hero: { name: "Nadia P.", title: "Product Engineer", tagline: "Small Systems, Clear Thinking", bio: "I build quiet software for loud problems." },
     stats: ["6+", "14+", "9+"],
+  },
+  workbench: {
+    hero: { name: "Bagas P.", title: "Product Designer", tagline: "Rapi di atas kertas, cepat di layar", bio: "Menyusun alur produk dari sketsa sampai rilis." },
+    stats: ["8+", "26+", "15+"],
   },
 } as const;
 

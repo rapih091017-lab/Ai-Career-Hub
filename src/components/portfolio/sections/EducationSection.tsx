@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import type { EducationItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { Paper, Reveal, SectionHead, wbHeading, wbMono, wbSection, wbWrap } from "../workbench/kit";
 
 interface Props { items: EducationItem[]; }
 
@@ -298,6 +299,49 @@ function MinimalistEducation({ items }: { items: EducationItem[] }) {
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * WORKBENCH — kartu ijazah: tahun mono di kepala,
+ * gelar display, institusi berwarna aksi. Kartu
+ * ditempel dengan sudut bergantian sangat kecil
+ * supaya deretan tidak terasa seperti tabel.
+ * ═══════════════════════════════════════════════ */
+function WorkbenchEducation({ items }: { items: EducationItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((e) => e.institution || e.degree);
+  if (!filtered.length) return null;
+
+  const span = (e: EducationItem) =>
+    [e.startDate, e.isPresent ? "sekarang" : e.endDate].filter(Boolean).join(" → ") || "—";
+
+  return (
+    <section style={wbSection(theme)}>
+      <div style={wbWrap()}>
+        <SectionHead label="pendidikan" title="Pendidikan" />
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 18 }}>
+          {filtered.map((edu, i) => (
+            <Reveal key={edu.id} delay={i * 0.07} y={18} style={{ display: "flex" }}>
+              <Paper style={{ padding: "clamp(18px, 2.4vw, 24px)", flex: 1, transform: `rotate(${i % 2 === 0 ? -0.4 : 0.4}deg)` }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
+                  <span style={{ ...wbMono(theme), fontSize: 11.5, color: theme.colors.textSecondary }}>{span(edu)}</span>
+                  <span aria-hidden="true" style={{ width: 20, height: 6, background: theme.colors.accent, border: `1.5px solid ${theme.colors.border}` }} />
+                </div>
+                <h3 style={{ ...wbHeading(theme, "clamp(18px, 2.2vw, 21px)"), margin: "14px 0 0" }}>{edu.degree || "Gelar"}</h3>
+                {edu.institution ? (
+                  <p style={{ margin: "6px 0 0", fontSize: 14.5, fontWeight: 600, color: theme.colors.primary }}>{edu.institution}</p>
+                ) : null}
+                {edu.field ? (
+                  <p style={{ margin: "4px 0 0", fontSize: 13, color: theme.colors.textMuted }}>{edu.field}</p>
+                ) : null}
+              </Paper>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function EducationSection({ items }: Props) {
   const theme = usePortfolioTheme();
@@ -306,6 +350,7 @@ export default function EducationSection({ items }: Props) {
     case "brutal": return <BrutalEducation items={items} />;
     case "luxe": return <LuxeEducation items={items} />;
     case "minimalist": return <MinimalistEducation items={items} />;
+    case "workbench": return <WorkbenchEducation items={items} />;
     default: return <GlassEducation items={items} />;
   }
 }

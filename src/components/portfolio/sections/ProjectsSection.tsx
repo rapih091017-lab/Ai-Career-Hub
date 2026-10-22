@@ -3,6 +3,17 @@
 import { motion } from "motion/react";
 import type { ProjectItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import {
+  ArrowUpRight,
+  Chip,
+  Paper,
+  Reveal,
+  SectionHead,
+  wbHeading,
+  wbMono,
+  wbSection,
+  wbWrap,
+} from "../workbench/kit";
 
 interface Props { items: ProjectItem[]; }
 
@@ -372,6 +383,84 @@ function MinimalistProjects({ items }: { items: ProjectItem[] }) {
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * WORKBENCH — lembar folio: nomor kotak lime, gambar
+ * berbingkai tinta di kepala kartu, lalu nama, uraian,
+ * dan tumpukan teknologi. Hover mengangkat kartu
+ * seperti kertas yang diambil dari meja.
+ * ═══════════════════════════════════════════════ */
+function WorkbenchProjects({ items }: { items: ProjectItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((p) => p.name);
+  if (!filtered.length) return null;
+
+  return (
+    <section style={wbSection(theme)}>
+      <div style={wbWrap()}>
+        <SectionHead label="karya" title="Karya pilihan" aside={<span style={{ ...wbMono(theme), fontSize: 11.5, color: theme.colors.textSecondary }}>{filtered.length} proyek</span>} />
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
+          {filtered.map((p, i) => (
+            <Reveal key={p.id} delay={i * 0.07} y={20} style={{ display: "flex" }}>
+              <Paper style={{ display: "flex", flexDirection: "column", overflow: "hidden", width: "100%" }}>
+                {p.imageUrl ? (
+                  <img
+                    src={p.imageUrl}
+                    alt={p.name}
+                    loading="lazy"
+                    style={{ width: "100%", height: 168, objectFit: "cover", display: "block", borderBottom: `2.5px solid ${theme.colors.border}` }}
+                  />
+                ) : null}
+
+                <div style={{ padding: "clamp(16px, 2.2vw, 22px)", display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                    <span
+                      style={{
+                        ...wbMono(theme),
+                        fontSize: 12,
+                        padding: "2px 8px",
+                        background: theme.colors.accent,
+                        border: `1.5px solid ${theme.colors.border}`,
+                        borderRadius: theme.radii.pill,
+                        color: theme.colors.text,
+                      }}
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    {p.link ? (
+                      <a
+                        href={p.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ display: "inline-flex", alignItems: "center", gap: 6, ...wbMono(theme), fontSize: 12, color: theme.colors.primary, textDecoration: "none", minHeight: 32 }}
+                      >
+                        buka <ArrowUpRight size={12} />
+                      </a>
+                    ) : null}
+                  </div>
+
+                  <h3 style={{ ...wbHeading(theme, "clamp(18px, 2.2vw, 21px)"), margin: 0 }}>{p.name}</h3>
+                  {p.description ? (
+                    <p style={{ margin: 0, fontSize: 14, lineHeight: 1.65, color: theme.colors.textSecondary, flex: 1 }}>{p.description}</p>
+                  ) : null}
+
+                  {p.techStack ? (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 2 }}>
+                      {p.techStack.split(",").map((tech, idx) => (
+                        <Chip key={`${p.id}-${idx}`}>{tech.trim()}</Chip>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </Paper>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function ProjectsSection({ items }: Props) {
   const theme = usePortfolioTheme();
@@ -380,6 +469,7 @@ export default function ProjectsSection({ items }: Props) {
     case "brutal": return <BrutalProjects items={items} />;
     case "luxe": return <LuxeProjects items={items} />;
     case "minimalist": return <MinimalistProjects items={items} />;
+    case "workbench": return <WorkbenchProjects items={items} />;
     default: return <GlassProjects items={items} />;
   }
 }
