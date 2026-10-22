@@ -35,6 +35,18 @@ function cariLabel(score: number, t: (key: string) => string) {
   return t("checker.detail.cari-weak");
 }
 
+/** Label badge prioritas (High/Medium/Low). Data enum tidak diubah — hanya
+ *  tampilan, mengikuti pola atsReadinessLabel: riwayat dan API tetap memakai
+ *  nilai Inggris, UI Indonesia tidak menampilkan bahasa Inggris nyasar. */
+export function priorityLabel(priority: string, t: (key: string, fallback?: string) => string): string {
+  switch (priority) {
+    case "High": return t("checker.prio-high", "Prioritas Tinggi");
+    case "Medium": return t("checker.prio-medium", "Prioritas Sedang");
+    case "Low": return t("checker.prio-low", "Prioritas Rendah");
+    default: return priority;
+  }
+}
+
 /** Skor CARI (Context-Action-Result-Impact) 0-100 dengan meter visual */
 function CariMeter({ score }: { score: number }) {
   const { t } = useTranslation();
@@ -90,7 +102,7 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
       >
         <div className="mt-0.5 shrink-0">
           <span className={`inline-block rounded-full border-[1.5px] px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.06em] ${priorityBadge(item.priority)}`}>
-            {item.priority}
+            {priorityLabel(item.priority, t)}
           </span>
         </div>
         <div className="min-w-0 flex-1">
