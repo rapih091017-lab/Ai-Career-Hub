@@ -112,19 +112,19 @@ export function QuickSummaryCard({ analysis, summary }: QuickSummaryCardProps) {
                 {fix.title}
               </span>
               <span
-                className={`shrink-0 rounded-full border-[1.5px] px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.05em] ${IMPACT_CHIP[fix.impact]}`}
+                className={`shrink-0 rounded-full border-[1.5px] px-2 py-0.5 text-xs font-extrabold uppercase tracking-[0.05em] ${IMPACT_CHIP[fix.impact]}`}
               >
                 {fix.impact}
               </span>
               {typeof fix.est_minutes === "number" && (
-                <span className="shrink-0 text-[11px] font-semibold text-ink-soft">
+                <span className="shrink-0 text-xs font-semibold text-ink-soft">
                   ±{fix.est_minutes} menit
                 </span>
               )}
               <button
                 type="button"
                 onClick={() => scrollToSection(SECTION_ANCHORS[fix.target_section])}
-                className="inline-flex shrink-0 items-center gap-1 rounded-full border-[1.5px] border-ink px-3 py-1 text-[11px] font-bold text-ink transition-all hover:bg-surface-container active:scale-95"
+                className="inline-flex shrink-0 items-center gap-1 rounded-full border-[1.5px] border-ink px-3 py-1 text-xs font-bold text-ink transition-all hover:bg-surface-container active:scale-95"
               >
                 Lihat
                 <span className="material-symbols-outlined select-none text-[13px]" aria-hidden="true">
@@ -154,7 +154,7 @@ export function QuickSummaryCard({ analysis, summary }: QuickSummaryCardProps) {
               </span>
               Salin semua perubahan
             </button>
-            <p className="text-[11px] font-semibold text-ink-soft">
+            <p className="text-xs font-semibold text-ink-soft">
               Belum ada perubahan yang bisa disalin
             </p>
           </>

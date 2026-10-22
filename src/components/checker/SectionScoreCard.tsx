@@ -30,7 +30,7 @@ const CHECK_META: Record<FormatCheck["status"], { icon: string; label: string; c
 function CopyBlock({ label, text }: { label: string; text: string }) {
   return (
     <div className="rounded-md border-[1.5px] border-ink/15 bg-surface-container-low p-3">
-      <p className="text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-green-deep">{label}</p>
+      <p className="text-xs font-extrabold uppercase tracking-[0.06em] text-green-deep">{label}</p>
       <p className="mt-1 whitespace-pre-wrap text-xs leading-relaxed text-ink">{text}</p>
       <div className="mt-1.5">
         <CopyButton text={text} label="Salin teks" />
@@ -49,7 +49,7 @@ function SectionExtras({ sectionKey, analysis }: { sectionKey: PackSection; anal
     return (
       <div className="space-y-2">
         {summary.has_skills_and_achievement ? (
-          <span className="inline-flex items-center gap-1 rounded-full border-[1.5px] border-green-deep/40 bg-primary-fixed px-2 py-0.5 text-[10px] font-bold text-on-primary-fixed">
+          <span className="inline-flex items-center gap-1 rounded-full border-[1.5px] border-green-deep/40 bg-primary-fixed px-2 py-0.5 text-xs font-bold text-on-primary-fixed">
             <span className="material-symbols-outlined select-none text-[13px]" aria-hidden="true">check</span>
             Memuat keahlian dan pencapaian
           </span>
@@ -70,7 +70,7 @@ function SectionExtras({ sectionKey, analysis }: { sectionKey: PackSection; anal
     const showBullets = typeof total === "number" && typeof without === "number" && without <= total;
     if (!showBullets) return null;
     return (
-      <p className="inline-flex items-center gap-1.5 rounded-full border-[1.5px] border-tertiary/50 bg-tertiary-container px-2.5 py-1 text-[11px] font-bold text-on-tertiary-container">
+      <p className="inline-flex items-center gap-1.5 rounded-full border-[1.5px] border-tertiary/50 bg-tertiary-container px-2.5 py-1 text-xs font-bold text-on-tertiary-container">
         <span className="material-symbols-outlined select-none text-[14px]" aria-hidden="true">format_list_bulleted</span>
         {without} dari {total} poin belum menyebut hasil
       </p>
@@ -86,12 +86,12 @@ function SectionExtras({ sectionKey, analysis }: { sectionKey: PackSection; anal
       <div className="space-y-2">
         {unproven.length > 0 ? (
           <div>
-            <p className="text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-ink-soft">
+            <p className="text-xs font-extrabold uppercase tracking-[0.06em] text-ink-soft">
               Tercantum tapi belum terbukti di pengalaman
             </p>
             <div className="mt-1 flex flex-wrap gap-1.5">
               {unproven.map((skill, i) => (
-                <span key={i} className="rounded-full border-[1.5px] border-tertiary/50 bg-tertiary-container px-2 py-0.5 text-[10px] font-bold text-on-tertiary-container">
+                <span key={i} className="rounded-full border-[1.5px] border-tertiary/50 bg-tertiary-container px-2 py-0.5 text-xs font-bold text-on-tertiary-container">
                   {skill}
                 </span>
               ))}
@@ -103,7 +103,7 @@ function SectionExtras({ sectionKey, analysis }: { sectionKey: PackSection; anal
         ) : null}
         {missing.length > 0 ? (
           // Catatan statis: missing_skills TIDAK PERNAH ikut teks salin.
-          <p className="text-[11px] italic text-ink-soft">
+          <p className="text-xs italic text-ink-soft">
             Missing skills ditandai untuk referensi saja; tambahkan hanya jika benar-benar kamu kuasai.
           </p>
         ) : null}
@@ -123,7 +123,7 @@ function SectionExtras({ sectionKey, analysis }: { sectionKey: PackSection; anal
   if (checks.length === 0) return null;
   return (
     <div>
-      <p className="text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-ink-soft">
+      <p className="text-xs font-extrabold uppercase tracking-[0.06em] text-ink-soft">
         Cek format ATS
       </p>
       <ul className="mt-1.5 space-y-1.5">
@@ -131,13 +131,13 @@ function SectionExtras({ sectionKey, analysis }: { sectionKey: PackSection; anal
           const meta = CHECK_META[check.status];
           return (
             <li key={check.id} className="flex items-start gap-2 text-xs text-ink-soft">
-              <span className={`mt-0.5 inline-flex shrink-0 items-center gap-1 rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide ${meta.cls}`}>
+              <span className={`mt-0.5 inline-flex shrink-0 items-center gap-1 rounded border px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide ${meta.cls}`}>
                 <span className="material-symbols-outlined select-none text-[12px]" aria-hidden="true">{meta.icon}</span>
                 {meta.label}
               </span>
               <span className="min-w-0 flex-1">
                 <span className="text-ink">{check.label}</span>
-                {check.note ? <span className="block text-[11px]">{check.note}</span> : null}
+                {check.note ? <span className="block text-xs">{check.note}</span> : null}
               </span>
             </li>
           );
@@ -204,7 +204,7 @@ export function SectionScoreCard({
             <span className="ml-2 flex shrink-0 items-center gap-2">
               {statChip && (
                 <span
-                  className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold ${
+                  className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-bold ${
                     statChip.tone === "green"
                       ? "border-green-deep/40 bg-primary-fixed text-on-primary-fixed"
                       : statChip.tone === "red"
@@ -255,18 +255,18 @@ export function SectionScoreCard({
                   {scoreReason}
                 </p>
               )}
-              {caption && <p className="text-[11px] text-ink-soft">{caption}</p>}
+              {caption && <p className="text-xs text-ink-soft">{caption}</p>}
 
               {sectionKey && analysis ? <SectionExtras sectionKey={sectionKey} analysis={analysis} /> : null}
 
               {topFix && (
                 <div className="rounded-md border-l-2 border-tertiary/50 bg-surface-container-low px-3 py-2">
-                  <p className="text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-green-deep">
+                  <p className="text-xs font-extrabold uppercase tracking-[0.06em] text-green-deep">
                     Perbaikan terbesar
                   </p>
                   <p className="mt-0.5 text-xs font-semibold text-ink">{topFix.title}</p>
                   {topFix.replaces ? (
-                    <p className="mt-0.5 text-[11px] text-ink-soft">
+                    <p className="mt-0.5 text-xs text-ink-soft">
                       Mengganti: <span className="italic">{topFix.replaces}</span>
                     </p>
                   ) : null}
@@ -280,7 +280,7 @@ export function SectionScoreCard({
 
               {issueItems.length > 0 && (
                 <div>
-                  <p className="mb-1 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-error">{t("checker.detail.issues")}</p>
+                  <p className="mb-1 text-xs font-extrabold uppercase tracking-[0.06em] text-error">{t("checker.detail.issues")}</p>
                   <ul className="space-y-1">
                     {issueItems.map((iss, i) => {
                       const sev = severityMeta(iss.severity, t);
@@ -291,14 +291,14 @@ export function SectionScoreCard({
                             <span className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
                               <span>{iss.text}</span>
                               {sev && (
-                                <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[9px] font-bold uppercase tracking-wide ${sev.cls}`}>
+                                <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-xs font-bold uppercase tracking-wide ${sev.cls}`}>
                                   <span className={`w-1.5 h-1.5 rounded-full ${sev.dot}`} />
                                   {sev.label}
                                 </span>
                               )}
                             </span>
                             {iss.source_excerpt && (
-                              <span className="mt-1 block rounded-md border-l-2 border-error/40 bg-surface-container-low px-2 py-1 text-[11px] italic text-ink-soft">
+                              <span className="mt-1 block rounded-md border-l-2 border-error/40 bg-surface-container-low px-2 py-1 text-xs italic text-ink-soft">
                                 &ldquo;{iss.source_excerpt}&rdquo;
                               </span>
                             )}
@@ -311,7 +311,7 @@ export function SectionScoreCard({
               )}
               {suggestions && suggestions.length > 0 && (
                 <div>
-                  <p className="mb-1 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-green-deep">{t("checker.detail.suggestions")}</p>
+                  <p className="mb-1 text-xs font-extrabold uppercase tracking-[0.06em] text-green-deep">{t("checker.detail.suggestions")}</p>
                   <ul className="space-y-1">
                     {suggestions.map((sug, i) => (
                       <li key={i} className="flex items-start gap-1.5 text-xs text-ink-soft">

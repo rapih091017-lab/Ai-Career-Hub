@@ -494,7 +494,7 @@ export default function CheckerPage() {
               />
 
               <div className="flex flex-col gap-2">
-                <label className="text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-ink-soft">
+                <label className="text-xs font-extrabold uppercase tracking-[0.06em] text-ink-soft">
                   {t("checker.jd-label")}
                 </label>
                 <textarea
@@ -508,7 +508,7 @@ export default function CheckerPage() {
 
               {/* Kategori posisi → bobot penilaian per-section (transparansi skor) */}
               <div className="flex flex-col gap-2">
-                <label className="text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-ink-soft">
+                <label className="text-xs font-extrabold uppercase tracking-[0.06em] text-ink-soft">
                   {t("checker.role-label")}
                 </label>
                 <select
@@ -522,14 +522,14 @@ export default function CheckerPage() {
                     </option>
                   ))}
                 </select>
-                <p className="text-[11px] text-ink-soft">
+                <p className="text-xs text-ink-soft">
                   {t("checker.role-hint")}
                 </p>
               </div>
 
               {/* Kecepatan analisis: pilihan nyata, bukan janji kecepatan. */}
               <div className="flex flex-col gap-2">
-                <span className="text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-ink-soft">
+                <span className="text-xs font-extrabold uppercase tracking-[0.06em] text-ink-soft">
                   {t("checker.mode-label")}
                 </span>
                 <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={t("checker.mode-label")}>
@@ -556,7 +556,7 @@ export default function CheckerPage() {
                       {/* Petunjuk di dalam pilihan aktif duduk di atas lime 25%:
                           di mode gelap latarnya jadi olive, dan ink-soft hanya
                           3,55:1 untuk teks 11px. Pakai tinta penuh di sana. */}
-                      <span className={`text-[11px] leading-snug ${analyzeMode === option.value ? "text-ink/80" : "text-ink-soft"}`}>{option.hint}</span>
+                      <span className={`text-xs leading-snug ${analyzeMode === option.value ? "text-ink/80" : "text-ink-soft"}`}>{option.hint}</span>
                     </button>
                   ))}
                 </div>
@@ -846,14 +846,14 @@ export default function CheckerPage() {
 
           {/* Keterangan kesiapan dibaca: estimasi, bukan skor ATS resmi. */}
           {atsPrediction && (
-            <p className="mt-3 text-center text-[10.5px] text-ink-soft">
+            <p className="mt-3 text-center text-xs text-ink-soft">
               Kesiapan dibaca HR &amp; mesin: estimasi, bukan skor ATS resmi; tiap perusahaan memakai sistem berbeda.
             </p>
           )}
 
           {/* Transparansi bobot penilaian (role category) */}
           {weightsApplied && weightsApplied.role_category !== "general" && (
-            <p className="mt-3 flex flex-wrap items-center justify-center gap-1 text-center text-[11px] text-ink-soft">
+            <p className="mt-3 flex flex-wrap items-center justify-center gap-1 text-center text-xs text-ink-soft">
               <span className="material-symbols-outlined select-none text-[13px]">tune</span>
               {t("checker.weights-note")
                 .replace("{cat}", weightsApplied.role_category.replace("_", " "))
@@ -932,7 +932,7 @@ export default function CheckerPage() {
             {/* ATS Recommendations */}
             {narrativeFeedback.ats_recommendations.length > 0 && (
               <div className="rounded-xl border-[1.5px] border-ink/15 bg-surface-container-low p-4">
-                <h3 className="mb-2 flex items-center gap-1.5 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-green-deep">
+                <h3 className="mb-2 flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-[0.06em] text-green-deep">
                   <span className="material-symbols-outlined select-none text-sm">description</span>
                   {t("checker.ats-recs")}
                 </h3>
@@ -983,7 +983,7 @@ export default function CheckerPage() {
               {/* Matched */}
               {keywordAnalysis.matched.length > 0 && (
                 <div>
-                  <p className="mb-2 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-green-deep">{t("checker.kw-found").replace("{n}", String(keywordAnalysis.matched.length))}</p>
+                  <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.06em] text-green-deep">{t("checker.kw-found").replace("{n}", String(keywordAnalysis.matched.length))}</p>
                   <div className="flex flex-wrap items-center gap-1.5">
                     {keywordAnalysis.matched.map((kw, i) => (
                       <span key={i} className="inline-flex flex-wrap items-center gap-1">
@@ -998,7 +998,7 @@ export default function CheckerPage() {
               {/* Missing critical */}
               {keywordAnalysis.missing_critical.length > 0 && (
                 <div>
-                  <p className="mb-2 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-error">{t("checker.kw-critical").replace("{n}", String(keywordAnalysis.missing_critical.length))}</p>
+                  <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.06em] text-error">{t("checker.kw-critical").replace("{n}", String(keywordAnalysis.missing_critical.length))}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {keywordAnalysis.missing_critical.map((kw, i) => (
                       <KeywordChip key={i} text={kw} variant="missing" />
@@ -1010,7 +1010,7 @@ export default function CheckerPage() {
               {/* Missing nice-to-have */}
               {keywordAnalysis.missing_nice_to_have.length > 0 && (
                 <div>
-                  <p className="mb-2 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-tertiary">{t("checker.kw-nice").replace("{n}", String(keywordAnalysis.missing_nice_to_have.length))}</p>
+                  <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.06em] text-tertiary">{t("checker.kw-nice").replace("{n}", String(keywordAnalysis.missing_nice_to_have.length))}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {keywordAnalysis.missing_nice_to_have.map((kw, i) => (
                       <KeywordChip key={i} text={kw} variant="nice" />
@@ -1022,7 +1022,7 @@ export default function CheckerPage() {
               {/* Synonym suggestions */}
               {keywordAnalysis.synonym_suggestions.length > 0 && (
                 <div className="rounded-xl border-[1.5px] border-ink/15 bg-surface-container-low p-4">
-                  <p className="mb-2 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-ink-soft">{t("checker.kw-synonym")}</p>
+                  <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.06em] text-ink-soft">{t("checker.kw-synonym")}</p>
                   <ul className="space-y-1">
                     {keywordAnalysis.synonym_suggestions.map((s, i) => (
                       <li key={i} className="flex items-start gap-2 text-xs leading-relaxed text-ink-soft">

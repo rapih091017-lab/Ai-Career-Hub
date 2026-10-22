@@ -22,7 +22,7 @@ export function ScoreDonut({ score, color, label }: { score: number; color: stri
         <span className="font-display text-5xl font-bold leading-none tracking-tight" style={{ color }}>
           {score}%
         </span>
-        <span className="mt-2 max-w-[8rem] text-center text-[10.5px] font-extrabold uppercase leading-tight tracking-[0.06em] text-ink-soft">
+        <span className="mt-2 max-w-[8rem] text-center text-xs font-extrabold uppercase leading-tight tracking-[0.06em] text-ink-soft">
           {label}
         </span>
       </div>

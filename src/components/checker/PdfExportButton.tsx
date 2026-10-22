@@ -88,7 +88,7 @@ export function PdfExportButton({
           <p>{errorMsg}</p>
           <button
             onClick={() => setErrorMsg(null)}
-            className="mt-1 text-red-500 hover:text-red-700 underline text-[11px]"
+            className="mt-1 text-error underline text-xs"
           >
             {t("pdfbtn.close")}
           </button>

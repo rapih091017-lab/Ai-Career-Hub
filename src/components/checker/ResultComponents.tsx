@@ -55,8 +55,8 @@ function CariMeter({ score }: { score: number }) {
     <div className={`flex items-center gap-3 rounded-xl border-[1.5px] px-3 py-2 ${c.bg}`}>
       <div className="min-w-0 flex-1">
         <div className="mb-1 flex items-center justify-between">
-          <span className="text-[10px] font-extrabold uppercase tracking-[0.06em] opacity-80">{t("checker.detail.cari-score")}</span>
-          <span className={`text-[11px] font-bold ${c.text}`}>{score}/100 · {cariLabel(score, t)}</span>
+          <span className="text-xs font-extrabold uppercase tracking-[0.06em] opacity-80">{t("checker.detail.cari-score")}</span>
+          <span className={`text-xs font-bold ${c.text}`}>{score}/100 · {cariLabel(score, t)}</span>
         </div>
         <div
           className="h-2 w-full overflow-hidden rounded-full bg-ink/10"
@@ -101,19 +101,19 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
         className="flex w-full items-start gap-3 p-4 text-left transition-colors hover:bg-surface-container-low"
       >
         <div className="mt-0.5 shrink-0">
-          <span className={`inline-block rounded-full border-[1.5px] px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.06em] ${priorityBadge(item.priority)}`}>
+          <span className={`inline-block rounded-full border-[1.5px] px-2 py-0.5 text-xs font-extrabold uppercase tracking-[0.06em] ${priorityBadge(item.priority)}`}>
             {priorityLabel(item.priority, t)}
           </span>
         </div>
         <div className="min-w-0 flex-1">
-          <p className="mb-0.5 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-green-deep">{item.section}</p>
+          <p className="mb-0.5 text-xs font-extrabold uppercase tracking-[0.06em] text-green-deep">{item.section}</p>
           <p className="line-clamp-2 text-sm text-ink">{item.original_text}</p>
           {/* Ringkasan skor CARI di header (kalau tersedia) */}
           {cari !== null && (
             // Akronim CARI dijelaskan di tooltip: versi panjangnya hanya ada
             // di dalam accordion, jadi tanpa ini pembaca tidak tahu artinya.
             <span
-              className={`inline-flex items-center gap-1 mt-1.5 text-[10px] font-bold ${cariColor(cari).text}`}
+              className={`inline-flex items-center gap-1 mt-1.5 text-xs font-bold ${cariColor(cari).text}`}
               title={t("checker.detail.cari-desc")}
             >
               <span className="material-symbols-outlined text-[12px] select-none">speed</span>
@@ -142,11 +142,11 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
               {/* CARI meter detail */}
               {cari !== null && (
                 <div>
-                  <p className="mb-1.5 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-ink-soft">
+                  <p className="mb-1.5 text-xs font-extrabold uppercase tracking-[0.06em] text-ink-soft">
                     {t("checker.detail.cari-strength-title")}
                   </p>
                   <CariMeter score={cari} />
-                  <p className="mt-1.5 text-[10px] leading-relaxed text-ink-soft">
+                  <p className="mt-1.5 text-xs leading-relaxed text-ink-soft">
                     {t("checker.detail.cari-desc")}
                   </p>
                 </div>
@@ -154,7 +154,7 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
 
               {issues.length > 0 && (
                 <div>
-                  <p className="mb-1 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-error">{t("checker.detail.issues-found")}</p>
+                  <p className="mb-1 text-xs font-extrabold uppercase tracking-[0.06em] text-error">{t("checker.detail.issues-found")}</p>
                   <ul className="space-y-1">
                     {issues.map((iss, i) => {
                       const sev = severityMeta(iss.severity, t);
@@ -165,14 +165,14 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
                             <span className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
                               <span>{iss.text}</span>
                               {sev && (
-                                <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[9px] font-bold uppercase tracking-wide ${sev.cls}`}>
+                                <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-xs font-bold uppercase tracking-wide ${sev.cls}`}>
                                   <span className={`w-1.5 h-1.5 rounded-full ${sev.dot}`} />
                                   {sev.label}
                                 </span>
                               )}
                             </span>
                             {iss.source_excerpt && (
-                              <span className="mt-1 block rounded-md border-l-2 border-error/40 bg-paper px-2 py-1 text-[11px] italic text-ink-soft">
+                              <span className="mt-1 block rounded-md border-l-2 border-error/40 bg-paper px-2 py-1 text-xs italic text-ink-soft">
                                 &ldquo;{iss.source_excerpt}&rdquo;
                               </span>
                             )}
@@ -188,7 +188,7 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Sebelum */}
                 <div>
-                  <p className="mb-1 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-ink-soft">{t("checker.detail.before")}</p>
+                  <p className="mb-1 text-xs font-extrabold uppercase tracking-[0.06em] text-ink-soft">{t("checker.detail.before")}</p>
                   <div className="rounded-xl border-[1.5px] border-ink/15 bg-surface-container-low p-3">
                     <p className="text-sm text-ink">{item.original_text}</p>
                   </div>
@@ -197,7 +197,7 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
                 {item.suggested_rewrite && (
                   <div>
                     <div className="mb-1 flex items-center justify-between gap-2">
-                      <p className="text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-green-deep">{t("checker.detail.after")}</p>
+                      <p className="text-xs font-extrabold uppercase tracking-[0.06em] text-green-deep">{t("checker.detail.after")}</p>
                       <CopyButton text={item.suggested_rewrite} label={t("checker.detail.copy", "Salin")} />
                     </div>
                     <div className="rounded-xl border-[1.5px] border-green-deep/40 bg-primary-fixed p-3">

@@ -42,7 +42,7 @@ export function CopyButton({ text, label = "Salin", onCopied }: CopyButtonProps)
         type="button"
         onClick={handleClick}
         aria-label={copied ? "Tersalin ✓" : label}
-        className="inline-flex items-center gap-1 rounded-full border-[1.5px] border-ink/20 px-2 py-1 text-[10px] font-bold text-ink transition-colors hover:border-ink hover:bg-surface-container-low active:scale-[0.97]"
+        className="inline-flex items-center gap-1 rounded-full border-[1.5px] border-ink/20 px-2 py-1 text-xs font-bold text-ink transition-colors hover:border-ink hover:bg-surface-container-low active:scale-[0.97]"
       >
         <span className="material-symbols-outlined select-none text-[13px]" aria-hidden="true">
           {copied ? "check" : "content_copy"}
@@ -53,7 +53,7 @@ export function CopyButton({ text, label = "Salin", onCopied }: CopyButtonProps)
         {copied ? "Tersalin ✓" : ""}
       </span>
       {placeholders.length > 0 && (
-        <span className="w-full rounded-lg border border-tertiary/50 bg-tertiary-container px-2 py-1 text-left text-[10px] font-semibold leading-snug text-on-tertiary-container">
+        <span className="w-full rounded-lg border border-tertiary/50 bg-tertiary-container px-2 py-1 text-left text-xs font-semibold leading-snug text-on-tertiary-container">
           Masih ada bagian {placeholders.join(", ")}, ganti dengan data aslimu sebelum dikirim.
         </span>
       )}

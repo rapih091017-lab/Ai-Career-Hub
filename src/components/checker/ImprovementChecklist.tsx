@@ -128,7 +128,7 @@ export function ImprovementChecklist({ actionPlan, missingSections, keywordAnaly
           const meta = { ...GROUP_KEYS[group], label: t(GROUP_KEYS[group].label) };
           return (
             <div key={group}>
-              <p className={`mb-2 inline-flex items-center gap-1.5 rounded-full border-[1.5px] px-2.5 py-1 text-[10.5px] font-extrabold uppercase tracking-[0.06em] ${meta.chip}`}>
+              <p className={`mb-2 inline-flex items-center gap-1.5 rounded-full border-[1.5px] px-2.5 py-1 text-xs font-extrabold uppercase tracking-[0.06em] ${meta.chip}`}>
                 <span className="material-symbols-outlined select-none text-sm">{meta.icon}</span>
                 {meta.label} ({groupItems.length})
               </p>

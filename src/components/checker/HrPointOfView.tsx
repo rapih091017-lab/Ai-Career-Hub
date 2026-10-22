@@ -72,7 +72,7 @@ function FindingList({
             <p className="text-body-md text-ink">{finding.text}</p>
             {badge ? (
               <span
-                className={`mt-1.5 inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide ${badge.cls}`}
+                className={`mt-1.5 inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide ${badge.cls}`}
               >
                 <span className={`h-1.5 w-1.5 rounded-full ${badge.dot}`} aria-hidden="true" />
                 {badge.label}
@@ -227,7 +227,7 @@ function HrPanelExtra({ result }: { result: AnalysisResult }) {
       {/* ── 1. Scan 30 detik ── */}
       {hrScan ? (
         <div>
-          <h3 className="text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-green-deep">
+          <h3 className="text-xs font-extrabold uppercase tracking-[0.06em] text-green-deep">
             Yang HR tangkap dalam 30 detik
           </h3>
           <div className="mt-2 grid gap-2 sm:grid-cols-2">
@@ -242,7 +242,7 @@ function HrPanelExtra({ result }: { result: AnalysisResult }) {
                       {HR_SCAN_LABEL[key]}
                     </p>
                     <span
-                      className={`shrink-0 rounded-full border-[1.5px] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide ${status.cls}`}
+                      className={`shrink-0 rounded-full border-[1.5px] px-2 py-0.5 text-xs font-bold uppercase tracking-wide ${status.cls}`}
                     >
                       {status.label}
                     </span>
@@ -266,7 +266,7 @@ function HrPanelExtra({ result }: { result: AnalysisResult }) {
       {hrFlags.length > 0 ? (
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
-            <h3 className="text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-error">
+            <h3 className="text-xs font-extrabold uppercase tracking-[0.06em] text-error">
               Perlu diperiksa
             </h3>
             {redFlags.length === 0 ? (
@@ -280,7 +280,7 @@ function HrPanelExtra({ result }: { result: AnalysisResult }) {
             )}
           </div>
           <div>
-            <h3 className="text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-green-deep">
+            <h3 className="text-xs font-extrabold uppercase tracking-[0.06em] text-green-deep">
               Patut dipertahankan
             </h3>
             {greenFlags.length === 0 ? (
@@ -299,7 +299,7 @@ function HrPanelExtra({ result }: { result: AnalysisResult }) {
       {/* ── 3. Pertanyaan yang kemungkinan ditanyakan HR ── */}
       {hrQuestions.length > 0 ? (
         <div>
-          <h3 className="text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-green-deep">
+          <h3 className="text-xs font-extrabold uppercase tracking-[0.06em] text-green-deep">
             Pertanyaan yang kemungkinan ditanyakan HR
           </h3>
           <HrQuestionsAccordion questions={hrQuestions} />
@@ -309,7 +309,7 @@ function HrPanelExtra({ result }: { result: AnalysisResult }) {
       {/* ── 4. Risiko syarat wajib ── */}
       {knockoutRisks.length > 0 ? (
         <div>
-          <h3 className="text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-error">
+          <h3 className="text-xs font-extrabold uppercase tracking-[0.06em] text-error">
             Risiko syarat wajib
           </h3>
           <ul className="mt-2 space-y-3">
@@ -320,7 +320,7 @@ function HrPanelExtra({ result }: { result: AnalysisResult }) {
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="text-body-md text-ink">{risk.requirement}</p>
                     <span
-                      className={`shrink-0 rounded-full border-[1.5px] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide ${status.cls}`}
+                      className={`shrink-0 rounded-full border-[1.5px] px-2 py-0.5 text-xs font-bold uppercase tracking-wide ${status.cls}`}
                     >
                       {status.label}
                     </span>
@@ -337,7 +337,7 @@ function HrPanelExtra({ result }: { result: AnalysisResult }) {
       {/* ── 5. Kartu format durasi kerja ── */}
       {durationRewrite ? (
         <div className="rounded-xl border-[1.5px] border-ink/15 bg-surface-container-low p-4">
-          <h3 className="text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-green-deep">
+          <h3 className="text-xs font-extrabold uppercase tracking-[0.06em] text-green-deep">
             Format durasi kerja
           </h3>
           <p className="mt-2 text-body-md text-ink">{durationRewrite.copy_text}</p>
@@ -426,7 +426,7 @@ export default function HrPointOfView({
           temuan kosong. Sembunyikan keduanya dan panel jadi kehilangan
           informasi yang paling sering dibutuhkan pembaca. */}
       {view.seniority ? (
-        <p className="mt-3 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-green-deep">
+        <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.06em] text-green-deep">
           {/* Tanpa titik-kolon: pemisah nilai begitu membaca seperti label
               sistem, bukan seperti orang yang sedang menyebut posisi kandidat. */}
           {t(`${keyPrefix}hrview-level`).replace("{level}", pick(LEVEL_LABEL[view.seniority]))}
@@ -444,7 +444,7 @@ export default function HrPointOfView({
       ) : (
         <div className="mt-4 grid gap-5 sm:grid-cols-2">
           <div>
-            <h3 className="text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-error">{t(`${keyPrefix}hrview-stopping`)}</h3>
+            <h3 className="text-xs font-extrabold uppercase tracking-[0.06em] text-error">{t(`${keyPrefix}hrview-stopping`)}</h3>
             <FindingList
               findings={view.stopping}
               t={t}
@@ -452,7 +452,7 @@ export default function HrPointOfView({
             />
           </div>
           <div>
-            <h3 className="text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-green-deep">{t(`${keyPrefix}hrview-continuing`)}</h3>
+            <h3 className="text-xs font-extrabold uppercase tracking-[0.06em] text-green-deep">{t(`${keyPrefix}hrview-continuing`)}</h3>
             <FindingList
               findings={view.continuing}
               t={t}

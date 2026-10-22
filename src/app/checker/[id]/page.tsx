@@ -163,7 +163,7 @@ export default function CheckerDetailPage() {
           </button>
           <div className="flex items-center gap-2">
             {createdAt && (
-              <span className="hidden text-[10px] uppercase tracking-[0.06em] text-ink-soft sm:inline">{timeAgo(new Date(createdAt), t)}</span>
+              <span className="hidden text-xs uppercase tracking-[0.06em] text-ink-soft sm:inline">{timeAgo(new Date(createdAt), t)}</span>
             )}
           </div>
         </div>
@@ -215,7 +215,7 @@ export default function CheckerDetailPage() {
 
           {/* Keterangan kesiapan dibaca: estimasi, bukan skor ATS resmi. */}
           {atsPrediction && (
-            <p className="mt-3 text-center text-[10.5px] text-ink-soft">
+            <p className="mt-3 text-center text-xs text-ink-soft">
               Kesiapan dibaca HR &amp; mesin: estimasi, bukan skor ATS resmi; tiap perusahaan memakai sistem berbeda.
             </p>
           )}
@@ -283,7 +283,7 @@ export default function CheckerDetailPage() {
                 CV; menyisakannya berarti kelemahan yang sama tampil dua kali. */}
             {narrativeFeedback.ats_recommendations.length > 0 && (
               <div className="rounded-xl border-[1.5px] border-ink/15 bg-surface-container-low p-4">
-                <h3 className="mb-2 flex items-center gap-1.5 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-green-deep">                    <span className="material-symbols-outlined select-none text-sm">description</span>{t("checker.detail.ats-recs")}
+                <h3 className="mb-2 flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-[0.06em] text-green-deep">                    <span className="material-symbols-outlined select-none text-sm">description</span>{t("checker.detail.ats-recs")}
                 </h3>
                 <ul className="space-y-1">
                   {narrativeFeedback.ats_recommendations.map((r, i) => (
@@ -327,7 +327,7 @@ export default function CheckerDetailPage() {
             <div className="space-y-4">
               {keywordAnalysis.matched.length > 0 && (
                 <div>
-                  <p className="mb-2 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-green-deep">{t("checker.detail.keyword-found")} ({keywordAnalysis.matched.length})</p>
+                  <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.06em] text-green-deep">{t("checker.detail.keyword-found")} ({keywordAnalysis.matched.length})</p>
                   <div className="flex flex-wrap items-center gap-1.5">
                     {keywordAnalysis.matched.map((kw, i) => (
                       <span key={i} className="inline-flex flex-wrap items-center gap-1">
@@ -340,7 +340,7 @@ export default function CheckerDetailPage() {
               )}
               {keywordAnalysis.missing_critical.length > 0 && (
                 <div>
-                  <p className="mb-2 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-error">{t("checker.detail.keyword-missing-critical")} ({keywordAnalysis.missing_critical.length})</p>
+                  <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.06em] text-error">{t("checker.detail.keyword-missing-critical")} ({keywordAnalysis.missing_critical.length})</p>
                   <div className="flex flex-wrap gap-1.5">
                     {keywordAnalysis.missing_critical.map((kw, i) => <KeywordChip key={i} text={kw} variant="missing" />)}
                   </div>
@@ -348,7 +348,7 @@ export default function CheckerDetailPage() {
               )}
               {keywordAnalysis.missing_nice_to_have.length > 0 && (
                 <div>
-                  <p className="mb-2 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-tertiary">{t("checker.detail.keyword-missing-nice")} ({keywordAnalysis.missing_nice_to_have.length})</p>
+                  <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.06em] text-tertiary">{t("checker.detail.keyword-missing-nice")} ({keywordAnalysis.missing_nice_to_have.length})</p>
                   <div className="flex flex-wrap gap-1.5">
                     {keywordAnalysis.missing_nice_to_have.map((kw, i) => <KeywordChip key={i} text={kw} variant="nice" />)}
                   </div>
@@ -356,7 +356,7 @@ export default function CheckerDetailPage() {
               )}
               {keywordAnalysis.synonym_suggestions.length > 0 && (
                 <div className="rounded-xl border-[1.5px] border-ink/15 bg-surface-container-low p-4">
-                  <p className="mb-2 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-ink-soft">{t("checker.detail.keyword-synonyms")}</p>
+                  <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.06em] text-ink-soft">{t("checker.detail.keyword-synonyms")}</p>
                   <ul className="space-y-1">
                     {keywordAnalysis.synonym_suggestions.map((s, i) => (
                       <li key={i} className="flex items-start gap-2 text-xs leading-relaxed text-ink-soft"><span className="mt-0.5 select-none text-green-deep">→</span>{s}</li>
@@ -405,7 +405,7 @@ export default function CheckerDetailPage() {
         {/*  6. CTA, Surat Lamaran / Motivation Letter                  */}
         {/* ============================================================ */}
         <div className="space-y-3">
-          <p className="px-1 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-ink-soft">
+          <p className="px-1 text-xs font-extrabold uppercase tracking-[0.06em] text-ink-soft">
             {t("checker.detail.cta-letters")}
           </p>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -424,7 +424,7 @@ export default function CheckerDetailPage() {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-bold text-ink">{t("checker.detail.cover-letter")}</p>
-                <p className="text-[11px] text-ink-soft">{t("checker.detail.cover-formats")}</p>
+                <p className="text-xs text-ink-soft">{t("checker.detail.cover-formats")}</p>
               </div>
               <span
                 className="material-symbols-outlined shrink-0 text-ink-soft transition-colors group-hover:text-green-deep"
@@ -448,7 +448,7 @@ export default function CheckerDetailPage() {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-bold text-ink">{t("checker.detail.motivation-letter")}</p>
-                <p className="text-[11px] text-ink-soft">{t("checker.detail.motivation-formats")}</p>
+                <p className="text-xs text-ink-soft">{t("checker.detail.motivation-formats")}</p>
               </div>
               <span
                 className="material-symbols-outlined shrink-0 text-ink-soft transition-colors group-hover:text-green-deep"

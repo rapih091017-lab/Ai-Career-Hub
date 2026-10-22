@@ -82,7 +82,7 @@ export function ImpactForecastCard({ forecast }: { forecast: ImpactForecast }) {
               s.active ? "border-ink/15 bg-surface-container-low" : "border-ink/10 opacity-70"
             }`}
           >
-            <p className="truncate text-[10px] font-bold uppercase tracking-[0.06em] text-ink-soft">{s.label}</p>
+            <p className="truncate text-xs font-bold uppercase tracking-[0.06em] text-ink-soft">{s.label}</p>
             <p className="font-display text-lg font-bold text-ink">{s.score}%</p>
           </div>
         ))}
