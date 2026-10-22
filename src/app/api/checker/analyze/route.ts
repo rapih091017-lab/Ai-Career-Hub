@@ -247,10 +247,10 @@ message: t(
       // JSON valid. Karena max_tokens hanya batas atas (bukan biaya), 16K untuk
       // keduanya tidak menaikkan tagihan ketika keluaran lebih pendek.
       maxTokens: 16384,
-      // Nalar dijaga tetap kecil supaya muat di maxDuration: "none" untuk flash
-      // (±18 detik) dan "low" untuk pro (±117 detik). Kualitas skor tetap dari
-      // prompt & skema yang divalidasi Zod, bukan dari lamanya nalar.
-      reasoningEffort: useReasoner ? "low" : "none",
+      // Nalar dimatikan untuk keduanya supaya muat di maxDuration. Terukur
+      // pada prompt analisis sungguhan: pro "none" ±29 detik vs "low" ±50 detik,
+      // keduanya JSON valid. Kualitas skor tetap dari prompt & skema Zod.
+      reasoningEffort: "none",
       // Pro ±2 menit per percobaan; tiga percobaan melewati batas 300 detik dan
       // berakhir 504 tanpa pesan ke pengguna. Satu retry cukup menjaga kasus
       // terburuk tetap di bawah batas.
