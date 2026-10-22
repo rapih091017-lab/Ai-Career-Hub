@@ -179,7 +179,10 @@
     --c-hairline: 43 63 54;
     --c-rule: 36 54 46;
 
-    --shadow-hard-color: #0a1512;
+    /* Bayangan tinta di mode gelap harus lebih gelap dari latar kartu,
+       bukan warna latar itu sendiri (#0a1512 dulu bikin shadow-hard mati
+       dan kartu terasa datar). */
+    --shadow-hard-color: #000000;
     --hairline-color: #2b3f36;
     --rule-color: #24362e;
 
@@ -250,7 +253,7 @@
     --c-ink-soft: 168 189 177;
     --c-hairline: 43 63 54;
     --c-rule: 36 54 46;
-    --shadow-hard-color: #0a1512;
+    --shadow-hard-color: #000000;
     --hairline-color: #2b3f36;
     --rule-color: #24362e;
     --c-footer: 22 49 40;
