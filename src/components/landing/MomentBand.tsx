@@ -10,7 +10,7 @@ export default function MomentBand() {
   const { t } = useTranslation();
 
   return (
-    <section className="relative overflow-hidden border-t-[2.5px] border-ink bg-lime py-14 md:py-20">
+    <section className="relative overflow-hidden border-t-[2.5px] border-on-light bg-lime py-14 md:py-20">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0"
@@ -18,12 +18,16 @@ export default function MomentBand() {
       />
       <div className="shell relative grid items-center gap-6 md:grid-cols-[1fr_auto]">
         <blockquote
+          data-reveal
           className="m-0 max-w-[26ch] font-serif font-semibold leading-[1.22] tracking-[-0.02em] text-on-light"
           style={{ fontSize: "clamp(1.5rem, 3vw, 2.375rem)" }}
         >
           {t("lp.moment.title")}
         </blockquote>
-        <p className="max-w-[24ch] -rotate-2 font-script text-[clamp(1.25rem,1.8vw,1.625rem)] font-bold leading-[1.2] text-on-light/80">
+        <p
+          data-reveal
+          style={{ ["--reveal-delay" as string]: "0.12s" }}
+          className="max-w-[24ch] -rotate-2 font-script text-[clamp(1.25rem,1.8vw,1.625rem)] font-bold leading-[1.2] text-on-light/80">
           {t("lp.moment.body")}
         </p>
       </div>

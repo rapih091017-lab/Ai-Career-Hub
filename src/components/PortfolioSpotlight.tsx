@@ -4,11 +4,15 @@ import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { useTranslation } from "@/lib/i18n";
 
+// Sampel tema = kertas + aksen tema itu sendiri, bukan satu warna acak.
+// Di mode gelap cincin aksennya yang terbaca, jadi bulatannya tidak jadi
+// titik putih tanpa arti.
 const THEMES = [
-  { name: "Glassmorphism", swatch: "#f3f6f2" },
-  { name: "Neo Brutal", swatch: "#0a0f0d" },
-  { name: "Editorial Luxe", swatch: "#122922" },
-  { name: "Minimalist", swatch: "#d6ee30" },
+  { name: "Glassmorphism", bg: "#12121F", accent: "#8365FC" },
+  { name: "Neo Brutal", bg: "#FFFAF0", accent: "#E40039" },
+  { name: "Editorial Luxe", bg: "#FDFBF7", accent: "#936B30" },
+  { name: "Minimalist", bg: "#FFFFFF", accent: "#111111" },
+  { name: "Kertas Kerja", bg: "#F3F6F2", accent: "#1D6B48" },
 ];
 
 /** Spotlight satu fitur: Portfolio Web. Split layout, preview tipografis
@@ -49,7 +53,7 @@ export default function PortfolioSpotlight() {
                 transition={{ duration: 0.4, delay: index * 0.08 }}
                 className="flex items-start gap-3"
               >
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[7px] border-2 border-ink bg-lime">
+                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[7px] border-2 border-on-light bg-lime">
                   <span className="material-symbols-outlined text-[18px] text-on-light" aria-hidden>
                     {bullet.icon}
                   </span>
@@ -61,7 +65,7 @@ export default function PortfolioSpotlight() {
           <div className="mt-10">
             <Link
               href="/portfolio/build"
-              className="inline-flex min-h-[54px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-7 font-display text-[15.5px] font-bold text-on-light shadow-[0_4px_0_rgb(var(--c-ink))] transition-transform hover:-translate-y-0.5 active:scale-[0.98]"
+              className="inline-flex min-h-[54px] items-center gap-2 rounded-full border-[2.5px] border-on-light bg-lime px-7 font-display text-[15.5px] font-bold text-on-light shadow-[0_4px_0_rgb(var(--c-print))] transition-transform hover:-translate-y-0.5 active:scale-[0.98]"
             >
               {t("portfolio.spot.cta")}
               <span className="material-symbols-outlined text-[18px]" aria-hidden>
@@ -79,12 +83,12 @@ export default function PortfolioSpotlight() {
           transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
           className="relative"
         >
-          <div className="rounded-[18px] border-[2.5px] border-ink bg-paper p-6 shadow-hard md:p-8">
+          <div className="rounded-[18px] border-[2.5px] border-edge bg-paper p-6 shadow-hard md:p-8">
             <p className="mb-4 font-mono text-[11.5px] font-extrabold uppercase tracking-[0.06em] text-ink-soft">
               {t("portfolio.spot.preview-label")}
             </p>
             {/* Mini hero portfolio */}
-            <div className="rounded-xl border-2 border-ink bg-evergreen p-6 text-on-dark md:p-8">
+            <div className="rounded-xl border-2 border-edge bg-evergreen p-6 text-on-dark md:p-8">
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-on-dark/60">
                 <span className="h-1.5 w-1.5 rounded-full bg-lime" aria-hidden />
                 Rizki Firmansyah
@@ -103,15 +107,15 @@ export default function PortfolioSpotlight() {
               </div>
             </div>
             {/* Tema */}
-            <div className="mt-5 grid grid-cols-4 gap-3">
+            <div className="mt-5 grid grid-cols-5 gap-2">
               {THEMES.map((theme) => (
-                <div key={theme.name} className="rounded-lg border-2 border-ink bg-paper p-3 text-center">
+                <div key={theme.name} className="rounded-lg border-2 border-edge bg-paper p-3 text-center">
                   <span
-                    className="mx-auto mb-2 block h-6 w-6 rounded-full border-2 border-ink"
-                    style={{ backgroundColor: theme.swatch }}
-                    aria-hidden
+                    aria-hidden="true"
+                    className="mx-auto mb-2 block h-6 w-6 rounded-full border-2"
+                    style={{ backgroundColor: theme.bg, borderColor: theme.accent }}
                   />
-                  <p className="text-[11px] font-bold text-ink-soft">{theme.name}</p>
+                  <p className="text-[10.5px] font-bold leading-tight text-ink-soft">{theme.name}</p>
                 </div>
               ))}
             </div>

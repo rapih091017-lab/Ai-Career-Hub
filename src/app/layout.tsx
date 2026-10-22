@@ -89,10 +89,14 @@ export default function RootLayout({
           Tema dipasang sebelum cat pertama supaya tidak ada kedipan terang
           saat pengguna memilih mode gelap. Pilihan disimpan di localStorage;
           tanpa pilihan, tema mengikuti preferensi sistem.
+
+          Skrip yang sama menandai `data-reveal-ready` (dipakai CSS animasi
+          masuk) dan memulihkan saklar animasi sebelum cat pertama, supaya
+          blok yang menunggu reveal tidak sempat tampil lalu melompat.
         */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){var d=document.documentElement;try{var c=localStorage.getItem('theme');var m=window.matchMedia('(prefers-color-scheme: dark)').matches;var t=(c==='light'||c==='dark')?c:(m?'dark':'light');d.dataset.theme=t;d.dataset.themeChoice=(c==='light'||c==='dark')?c:'system';d.style.colorScheme=t}catch(e){d.dataset.theme='light';d.dataset.themeChoice='system'}})();`,
+            __html: `(function(){var d=document.documentElement;d.dataset.revealReady='';try{var c=localStorage.getItem('theme');var m=window.matchMedia('(prefers-color-scheme: dark)').matches;var t=(c==='light'||c==='dark')?c:(m?'dark':'light');d.dataset.theme=t;d.dataset.themeChoice=(c==='light'||c==='dark')?c:'system';d.style.colorScheme=t;if(localStorage.getItem('motion')==='off')d.dataset.motion='off'}catch(e){d.dataset.theme='light';d.dataset.themeChoice='system'}})();`,
           }}
         />
         <script type="application/ld+json" dangerouslySetInnerHTML={{

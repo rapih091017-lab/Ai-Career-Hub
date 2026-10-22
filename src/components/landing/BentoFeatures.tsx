@@ -97,7 +97,7 @@ export default function BentoFeatures() {
   return (
     <section id="fitur" className="section section-rule bg-paper">
       <div className="shell">
-        <div className="grid gap-6 md:grid-cols-[1.2fr_0.8fr] md:items-end md:gap-x-16">
+        <div data-reveal className="grid gap-6 md:grid-cols-[1.2fr_0.8fr] md:items-end md:gap-x-16">
           <div>
             <p className="kicker">{t("lp.bento.kicker")}</p>
             <h2 className="max-w-[17ch] font-display text-headline-lg font-bold text-ink">
@@ -108,15 +108,20 @@ export default function BentoFeatures() {
         </div>
 
         <div className="mt-10 grid grid-cols-1 gap-[18px] md:mt-14 md:grid-cols-6">
-          {FEATURES.map((feature) => {
+          {FEATURES.map((feature, index) => {
             const dark = feature.tone === "dark";
             const lime = feature.tone === "lime";
             return (
               <article
                 key={feature.title}
+                data-reveal
+                style={{ ["--reveal-delay" as string]: `${index * 0.06}s` }}
                 className={[
-                  "grid content-start gap-3 rounded-xl border-[2.5px] border-ink p-6 transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5",
+                  "grid content-start gap-3 rounded-xl border-[2.5px] p-6 transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5",
                   feature.span,
+                  // Hanya kartu lime yang tetap terang di malam; kartu kertas
+                  // dan evergreen memakai garis panel malam.
+                  lime ? "border-on-light" : "border-edge",
                   dark
                     ? "bg-evergreen text-on-dark shadow-hard-ink-sm"
                     : lime

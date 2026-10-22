@@ -45,7 +45,7 @@ export default function CaraKerja() {
   return (
     <section id="cara-kerja" className="section section-rule bg-desk">
       <div className="shell">
-        <div className="grid gap-6 md:grid-cols-[1.2fr_0.8fr] md:items-end md:gap-x-16">
+        <div data-reveal className="grid gap-6 md:grid-cols-[1.2fr_0.8fr] md:items-end md:gap-x-16">
           <div>
             <p className="kicker">{t("lp.steps.kicker")}</p>
             <h2 className="max-w-[17ch] font-display text-headline-lg font-bold text-ink">
@@ -59,7 +59,12 @@ export default function CaraKerja() {
 
         <ol className="mt-10 grid gap-5 md:mt-14 md:grid-cols-2">
           {STEPS.map((step, index) => (
-            <li key={step.title} className="card-hard flex flex-col bg-paper p-6 md:p-7">
+            <li
+              key={step.title}
+              data-reveal
+              style={{ ["--reveal-delay" as string]: `${index * 0.08}s` }}
+              className="card-hard flex flex-col bg-paper p-6 md:p-7"
+            >
               <div className="flex items-center gap-3">
                 <span className="rounded-full bg-brand-dark px-3 py-1 font-mono text-[11.5px] font-extrabold uppercase tracking-[0.06em] text-lime">
                   {t("lp.steps.side-title")} {index + 1}

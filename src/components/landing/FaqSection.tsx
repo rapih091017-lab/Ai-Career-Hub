@@ -23,13 +23,13 @@ export default function FaqSection() {
   return (
     <section id="faq" className="section section-rule bg-desk">
       <div className="shell grid items-start gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
-        <div className="lg:sticky lg:top-24">
+        <div data-reveal className="lg:sticky lg:top-24">
           <p className="kicker">{t("lp.faq.kicker")}</p>
           <h2 className="max-w-[13ch] font-display text-headline-lg font-bold text-ink">{t("lp.faq.title")}</h2>
           <p className="mt-4 max-w-[38ch] text-body-md leading-relaxed text-ink-soft">{t("lp.faq.lede")}</p>
         </div>
 
-        <div className="px-0 md:px-6">
+        <div data-reveal style={{ ["--reveal-delay" as string]: "0.1s" }} className="px-0 md:px-6">
           {QA.map((item) => (
             <details key={item.q} className="group border-b border-hairline">
               <summary className="flex min-h-[68px] cursor-pointer list-none items-center justify-between gap-4 py-4 text-[16.5px] font-bold tracking-[-0.01em] text-ink transition-colors hover:text-green-deep">

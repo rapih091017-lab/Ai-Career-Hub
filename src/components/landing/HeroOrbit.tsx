@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRef } from "react";
 import { useTranslation } from "@/lib/i18n";
 import { ANNOUNCEMENT } from "@/lib/nav-items";
 
@@ -11,8 +12,9 @@ import { ANNOUNCEMENT } from "@/lib/nav-items";
  * (motif dokumen yang dipindai mesin). Kartu orbit miring sedikit supaya
  * halaman tidak terasa seperti grid yang terlalu rapi.
  *
- * Hero memakai permukaan `bg-evergreen` bertema tetap, jadi teksnya
- * memakai pasangan `on-dark` dan tetap terbaca di mode terang maupun gelap.
+ * Hero memakai permukaan `bg-stage`: bidang merek paling gelap di siang,
+ * dan di malam naik satu tingkat di atas lantai ruangan (lihat globals.css).
+ * Teksnya memakai pasangan `on-dark`, jadi terbaca di kedua tema.
  */
 
 const NODES = [
@@ -25,6 +27,7 @@ const NODES = [
     rot: "-2.5deg",
     delay: "0.45s",
     tone: "paper" as const,
+    cascade: "",
   },
   {
     href: "/checker",
@@ -35,6 +38,7 @@ const NODES = [
     rot: "1.8deg",
     delay: "0.6s",
     tone: "lime" as const,
+    cascade: "lg:justify-self-end lg:mt-[72px]",
   },
   {
     href: "/surat-lamaran",
@@ -45,6 +49,7 @@ const NODES = [
     rot: "-1.4deg",
     delay: "0.75s",
     tone: "paper" as const,
+    cascade: "lg:mt-[-12px]",
   },
   {
     href: "/portfolio",
@@ -55,23 +60,54 @@ const NODES = [
     rot: "2.6deg",
     delay: "0.9s",
     tone: "paper" as const,
+    cascade: "lg:justify-self-end lg:mt-[64px]",
   },
 ];
 
 export default function HeroOrbit() {
   const { t } = useTranslation();
+  const backdrop = useRef<HTMLDivElement>(null);
+
+  /**
+   * Sorotan petak mengikuti kursor.
+   *
+   * Ditulis langsung ke CSS variable lewat ref, bukan state React: nilainya
+   * berubah di tiap gerakan mouse, dan render ulang komponen di tiap frame
+   * hanya untuk dua variabel jelas boros. Hanya pointer mouse yang dipakai —
+   * di layar sentuh sorotan akan macet di titik terakhir.
+   */
+  const lightUpGrid = (event: React.PointerEvent<HTMLElement>) => {
+    if (event.pointerType !== "mouse") return;
+    const layer = backdrop.current;
+    if (!layer) return;
+    const rect = layer.getBoundingClientRect();
+    layer.style.setProperty("--mx", `${event.clientX - rect.left}px`);
+    layer.style.setProperty("--my", `${event.clientY - rect.top}px`);
+    layer.dataset.lit = "";
+  };
+
+  const dimGrid = () => {
+    delete backdrop.current?.dataset.lit;
+  };
 
   return (
-    <header id="hero" className="relative overflow-hidden bg-evergreen text-on-dark">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[0.07]"
-        style={{
-          backgroundImage:
-            "linear-gradient(#d6ee30 1px, transparent 1px), linear-gradient(90deg, #d6ee30 1px, transparent 1px)",
-          backgroundSize: "56px 56px",
-        }}
-      />
+    <header
+      id="hero"
+      className="relative overflow-hidden bg-stage text-on-dark"
+      onPointerMove={lightUpGrid}
+      onPointerLeave={dimGrid}
+    >
+      {/* Petak ukur: lapisan dasar bergeser pelan (16s), lalu lapisan tipis
+          yang menyala di sekitar kursor. Masking membuat garis memudar ke
+          arah kanan atas, jadi teks di kiri tetap bersih. */}
+      <div ref={backdrop} aria-hidden="true" className="hero-backdrop pointer-events-none absolute inset-0">
+        <div className="hero-grid-mask absolute inset-0 overflow-hidden">
+          <div className="hero-grid-drift will-change-transform animate-ach-hero-grid-drift absolute -left-[140px] -top-[140px] h-[calc(100%+280px)] w-[calc(100%+280px)]" />
+        </div>
+        <div className="hero-grid-glow absolute inset-0 overflow-hidden">
+          <div className="hero-grid-drift hero-grid-drift-lit will-change-transform animate-ach-hero-grid-drift absolute -left-[140px] -top-[140px] h-[calc(100%+280px)] w-[calc(100%+280px)]" />
+        </div>
+      </div>
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0"
@@ -81,7 +117,7 @@ export default function HeroOrbit() {
       <div className="shell relative pb-16 pt-28 md:pb-24 md:pt-36">
         <Link
           href={ANNOUNCEMENT.href}
-          className="mb-8 inline-flex items-center gap-2 rounded-full border border-lime/40 bg-evergreen/80 px-4 py-1.5 text-[12px] font-bold text-lime transition-colors hover:border-lime"
+          className="mb-8 inline-flex items-center gap-2 rounded-full border border-lime/40 bg-stage/80 px-4 py-1.5 text-[12px] font-bold text-lime transition-colors hover:border-lime"
         >
           <span aria-hidden="true" className="material-symbols-outlined text-base">
             campaign
@@ -117,7 +153,7 @@ export default function HeroOrbit() {
             <div className="mt-8 flex flex-wrap items-center gap-5">
               <Link
                 href="/builder/new"
-                className="inline-flex min-h-[54px] items-center justify-center gap-3 rounded-full border-[3px] border-ink bg-lime px-6 font-display text-[15.5px] font-bold text-on-light shadow-[4px_4px_0_rgb(var(--c-ink))] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_rgb(var(--c-ink))]"
+                className="inline-flex min-h-[54px] items-center justify-center gap-3 rounded-full border-[3px] border-on-light bg-lime px-6 font-display text-[15.5px] font-bold text-on-light shadow-[4px_4px_0_rgb(var(--c-print))] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_rgb(var(--c-print))]"
               >
                 {t("lp.hero.cta-primary")}
                 <span aria-hidden="true">&rarr;</span>
@@ -147,13 +183,19 @@ export default function HeroOrbit() {
             </ul>
           </div>
 
-          <div className="grid grid-cols-2 items-start gap-x-8 gap-y-10">
+          {/* Kaskade: tiap kartu turun/naik sedikit dari grid, jadi susunannya
+              terbaca sebagai tumpukan kertas di meja, bukan empat kotak rapi. */}
+          <div className="grid grid-cols-2 items-start gap-x-8 gap-y-10 lg:pr-4">
             {NODES.map((node) => (
               <article
                 key={node.tag}
                 className={[
-                  "rounded-xl border-2 border-ink p-3 shadow-[4px_5px_rgba(10,15,13,0.55)] animate-ach-node-in",
+                  "w-full rounded-xl border-2 p-3 shadow-[4px_5px_rgba(10,15,13,0.55)] animate-ach-node-in lg:max-w-[190px]",
+                  // Kartu lime adalah permukaan merek yang tetap terang di malam
+                  // hari, jadi garisnya tinta; kartu kertas ikut jadi panel malam.
+                  node.tone === "lime" ? "border-on-light" : "border-edge",
                   node.tone === "lime" ? "bg-lime" : "bg-paper text-ink",
+                  node.cascade,
                 ].join(" ")}
                 style={{ ["--node-rot" as string]: node.rot, animationDelay: node.delay }}
               >
@@ -178,7 +220,7 @@ export default function HeroOrbit() {
                 </p>
                 <Link
                   href={node.href}
-                  className="mt-3 inline-flex items-center rounded-[6px] border-2 border-ink bg-brand-dark px-2.5 py-1.5 text-[11px] font-bold text-lime shadow-[2px_2px_rgba(10,15,13,0.35)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5"
+                  className="mt-3 inline-flex items-center rounded-[6px] border-2 border-edge bg-brand-dark px-2.5 py-1.5 text-[11px] font-bold text-lime shadow-[2px_2px_rgba(10,15,13,0.35)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5"
                 >
                   {t(node.cta)}
                 </Link>

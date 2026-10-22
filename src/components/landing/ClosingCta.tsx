@@ -13,7 +13,9 @@ export default function ClosingCta() {
   return (
     <section id="cta" className="section section-rule bg-desk">
       <div className="shell">
-        <div className="relative mx-auto w-full max-w-[1040px] -rotate-1 rounded-[44px] bg-evergreen px-6 py-12 text-center text-on-dark shadow-[12px_12px_0_rgb(var(--c-lime))] md:px-16 md:py-20">
+        <div
+          data-reveal
+          className="relative mx-auto w-full max-w-[1040px] -rotate-1 rounded-[44px] border-[2.5px] border-edge bg-stage px-6 py-12 text-center text-on-dark shadow-[12px_12px_0_rgb(var(--c-lime))] md:px-16 md:py-20">
           <h2
             className="font-display font-bold text-on-dark"
             style={{ fontSize: "clamp(2.75rem, 6vw, 5.25rem)", lineHeight: 0.98, letterSpacing: "-0.035em" }}

@@ -9,7 +9,11 @@ import type { Config } from "tailwindcss";
 const tone = (name: string) => `rgb(var(--c-${name}) / <alpha-value>)`;
 
 const config: Config = {
-  darkMode: "class",
+  // Tema gelap dipasang sebagai `data-theme="dark"` di <html> (lihat
+  // layout.tsx), bukan class `.dark`. Tanpa selector ini, `dark:` tidak
+  // pernah aktif dan mode malam hanya bisa membalik warna lewat token —
+  // padahal sebagian elemen memang perlu struktur berbeda di malam hari.
+  darkMode: ["class", '[data-theme="dark"]'],
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -73,6 +77,11 @@ const config: Config = {
         paper: tone("paper"),
         evergreen: tone("evergreen"),
         "evergreen-deep": tone("evergreen-deep"),
+        // Panggung merek selebar layar (hero, panggung harga, penutup).
+        // Berbeda dengan `evergreen` yang di malam hari naik jadi panel
+        // tersorot di atas kertas, panggung tetap area paling tenang di
+        // atas lantai ruangan.
+        stage: tone("stage"),
         green: tone("green"),
         "green-deep": tone("green-deep"),
         lime: tone("lime"),
@@ -81,12 +90,24 @@ const config: Config = {
         "ink-soft": tone("ink-soft"),
         hairline: tone("hairline"),
         rule: tone("rule"),
+        // Bingkai kartu di atas permukaan netral: tinta di siang, garis hijau
+        // redup di malam. Pakai ini untuk bingkai panel, bukan `ink` — `ink`
+        // ikut berbalik jadi putih dan bikin setiap kartu bergaris putih.
+        edge: tone("edge"),
+        // Tinta cetak untuk bayangan kartu aksen yang tetap terang di kedua
+        // tema (lime, evergreen). Tidak berbalik jadi putih di malam.
+        print: tone("print"),
         // Pasangan tetap untuk permukaan brand yang tidak berbalik di mode
         // gelap. Pakai ini, bukan `paper`/`ink`, saat latarnya evergreen,
         // ink, atau lime.
         "on-dark": tone("on-dark"),
         "on-light": tone("on-light"),
         cream: tone("cream"),
+        // Kertas netral: krem di siang, lembar malam di malam. Dipakai untuk
+        // permukaan yang bukan aksen merek (mis. kertas pintu harga), supaya
+        // mode gelap tidak menyisakan blok putih di tengah halaman.
+        sheet: tone("sheet"),
+        "on-sheet": tone("on-sheet"),
         footer: tone("footer"),
         "brand-dark": tone("brand-dark"),
         "brand-green": tone("brand-green"),
@@ -143,8 +164,8 @@ const config: Config = {
         hard: "6px 6px 0 var(--shadow-hard-color)",
         "hard-sm": "4px 4px 0 var(--shadow-hard-color)",
         "hard-lg": "10px 10px 0 var(--shadow-hard-color)",
-        "hard-ink": "4px 4px 0 var(--c-ink)",
-        "hard-ink-sm": "3px 3px 0 var(--c-ink)",
+        "hard-ink": "4px 4px 0 rgb(var(--c-print))",
+        "hard-ink-sm": "3px 3px 0 rgb(var(--c-print))",
       },
       keyframes: {
         ripple: {
@@ -170,6 +191,21 @@ const config: Config = {
         "ach-caret-blink": {
           "50%": { opacity: "0" },
         },
+        // Motif hero: garis ukur 28px yang bergeser pelan, seperti kertas
+        // yang ditarik meja pemindaian. Satu putaran 16s, tanpa blur.
+        "ach-hero-grid-drift": {
+          to: { transform: "translate(140px, 140px)" },
+        },
+        // Kilau foil pada kartu pass: satu sapuan 4,5s, cukup untuk terasa
+        // hidup tanpa jadi lampu berkedip.
+        "ach-pass-foil": {
+          "0%": { backgroundPosition: "120% 0" },
+          "100%": { backgroundPosition: "-120% 0" },
+        },
+        "ach-pass-sway": {
+          "0%, 100%": { transform: "rotate(var(--tilt, 1.6deg))" },
+          "50%": { transform: "rotate(calc(var(--tilt, 1.6deg) - 1.2deg))" },
+        },
       },
       animation: {
         ripple: "ripple 3s ease-out infinite",
@@ -178,6 +214,9 @@ const config: Config = {
         "ach-persona-in": "ach-persona-in 0.36s cubic-bezier(0.16, 1, 0.3, 1) both",
         "ach-door-in": "ach-door-in 0.42s cubic-bezier(0.16, 1, 0.3, 1) both",
         "ach-caret-blink": "ach-caret-blink 1s step-end infinite",
+        "ach-hero-grid-drift": "ach-hero-grid-drift 16s linear infinite",
+        "ach-pass-foil": "ach-pass-foil 4.5s linear infinite",
+        "ach-pass-sway": "ach-pass-sway 6s ease-in-out infinite",
       },
     },
   },

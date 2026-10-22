@@ -24,7 +24,7 @@ export default function BeforeAfter() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.3 }}
         >
-          <span className="mb-4 inline-flex items-center gap-2 rounded-full border-2 border-ink bg-lime px-4 py-1.5 text-[12px] font-bold tracking-wide text-on-light">
+          <span className="mb-4 inline-flex items-center gap-2 rounded-full border-2 border-on-light bg-lime px-4 py-1.5 text-[12px] font-bold tracking-wide text-on-light">
             {t("before-after.badge")}
           </span>
           <h2 className="font-display text-headline-lg font-bold text-ink">{t("before-after.title")}</h2>
@@ -45,7 +45,7 @@ export default function BeforeAfter() {
                 <div className="p-6 md:p-8">
                   <div className="mb-6 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-ink bg-error/10 text-error">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-edge bg-error/10 text-error">
                         <span aria-hidden="true" className="material-symbols-outlined text-[20px]">
                           close
                         </span>
@@ -65,12 +65,12 @@ export default function BeforeAfter() {
                     <div className="h-3 w-full rounded-[6px] bg-ink/5" />
                     <div className="h-3 w-5/6 rounded-[6px] bg-ink/5" />
                     <div className="h-3 w-4/6 rounded-[6px] bg-ink/5" />
-                    <div className="border-t border-ink/10 pt-3">
+                    <div className="border-t border-edge/25 pt-3">
                       <div className="mb-2 h-4 w-1/3 rounded-[6px] bg-ink/10" />
                       <div className="h-3 w-full rounded-[6px] bg-ink/5" />
                       <div className="h-3 w-3/4 rounded-[6px] bg-ink/5" />
                     </div>
-                    <div className="border-t border-ink/10 pt-3">
+                    <div className="border-t border-edge/25 pt-3">
                       <div className="mb-2 h-4 w-1/4 rounded-[6px] bg-ink/10" />
                       <div className="flex flex-wrap gap-1.5">
                         {["HTML", "CSS", "JS"].map((skill) => (
@@ -109,7 +109,7 @@ export default function BeforeAfter() {
                 <div className="p-6 md:p-8">
                   <div className="mb-6 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-ink bg-green/15 text-green-deep">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-edge bg-green/15 text-green-deep">
                         <span aria-hidden="true" className="material-symbols-outlined text-[20px]">
                           check
                         </span>
@@ -175,7 +175,7 @@ export default function BeforeAfter() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.3 }}
         >
-          <div className="inline-flex flex-col items-center gap-4 rounded-2xl border-2 border-ink bg-paper px-8 py-5 sm:flex-row sm:gap-8">
+          <div className="inline-flex flex-col items-center gap-4 rounded-2xl border-2 border-edge bg-paper px-8 py-5 sm:flex-row sm:gap-8">
             <div className="flex items-center gap-3">
               <span
                 aria-hidden="true"
@@ -205,7 +205,7 @@ export default function BeforeAfter() {
           <div className="mt-6">
             <Link
               href="/checker"
-              className="inline-flex min-h-[54px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-7 font-display text-[15.5px] font-bold text-on-light shadow-hard-ink-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5"
+              className="inline-flex min-h-[54px] items-center gap-2 rounded-full border-[2.5px] border-on-light bg-lime px-7 font-display text-[15.5px] font-bold text-on-light shadow-hard-ink-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5"
             >
               {t("before-after.cta")}
               <span aria-hidden="true">&rarr;</span>

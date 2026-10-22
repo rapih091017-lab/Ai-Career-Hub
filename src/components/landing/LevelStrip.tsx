@@ -21,17 +21,19 @@ export default function LevelStrip() {
   return (
     <section className="section section-rule bg-paper">
       <div className="shell">
-        <h2 className="max-w-[20ch] font-display text-headline-lg font-bold text-ink">{t("lp.level.kicker")}</h2>
+        <h2 data-reveal className="max-w-[20ch] font-display text-headline-lg font-bold text-ink">{t("lp.level.kicker")}</h2>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {DOORS.map((door) => (
+          {DOORS.map((door, index) => (
             <div
               key={door.tag}
+              data-reveal
+              style={{ ["--reveal-delay" as string]: `${index * 0.08}s` }}
               className={[
                 "grid content-start gap-2 rounded-xl p-4",
                 door.free
-                  ? "border-[2.5px] border-ink bg-lime shadow-hard-ink-sm"
-                  : "border-2 border-dashed border-ink/40 bg-paper",
+                  ? "border-[2.5px] border-on-light bg-lime shadow-hard-ink-sm"
+                  : "border-2 border-dashed border-edge/55 bg-paper",
               ].join(" ")}
             >
               <p

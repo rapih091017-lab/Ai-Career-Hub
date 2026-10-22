@@ -29,7 +29,7 @@ export default function PersonaTabs() {
     <section id="persona" className="section section-rule bg-desk">
       <div className="shell">
         <div className="grid items-center gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
-          <div>
+          <div data-reveal>
             <p className="kicker">{t("lp.persona.kicker")}</p>
             <h2 className="max-w-[15ch] font-display text-headline-lg font-bold text-ink">
               {t("lp.persona.title")}
@@ -49,7 +49,7 @@ export default function PersonaTabs() {
                   aria-controls={`persona-panel-${item.key}`}
                   onClick={() => setActive(index)}
                   className={[
-                    "min-h-[44px] rounded-full border-2 border-ink px-4 text-[14.5px] font-bold transition-all",
+                    "min-h-[44px] rounded-full border-2 border-edge px-4 text-[14.5px] font-bold transition-all",
                     active === index
                       ? "-translate-x-0.5 -translate-y-0.5 bg-evergreen text-on-dark shadow-hard-ink-sm"
                       : "bg-paper text-ink hover:-translate-x-0.5 hover:-translate-y-0.5",
@@ -67,9 +67,10 @@ export default function PersonaTabs() {
             role="tabpanel"
             id={`persona-panel-${persona.key}`}
             aria-labelledby={`persona-tab-${persona.key}`}
-            className="overflow-hidden rounded-[24px] border-[2.5px] border-ink bg-paper shadow-hard"
+            data-reveal
+            className="overflow-hidden rounded-[24px] border-[2.5px] border-edge bg-paper shadow-hard"
           >
-            <div className="flex items-center gap-3 border-b-2 border-ink bg-evergreen px-4 py-3 text-on-dark">
+            <div className="flex items-center gap-3 border-b-2 border-edge bg-evergreen px-4 py-3 text-on-dark">
               <span aria-hidden="true" className="h-7 w-7 rounded-full border-2 border-on-dark bg-lime" />
               <div>
                 <p className="text-[14px] font-bold">{t(persona.name)}</p>
@@ -82,12 +83,14 @@ export default function PersonaTabs() {
                 <p className="font-mono text-[11.5px] font-extrabold uppercase tracking-[0.06em] text-ink-soft">
                   SEBELUM
                 </p>
-                <p className="mt-2 max-w-[86%] rounded-2xl rounded-bl-sm border-[1.5px] border-ink/25 bg-paper px-4 py-3 text-[15px] font-semibold leading-[1.45] text-ink">
+                <p className="mt-2 max-w-[86%] rounded-2xl rounded-bl-sm border-[1.5px] border-edge/40 bg-paper px-4 py-3 text-[15px] font-semibold leading-[1.45] text-ink">
                   {t(persona.before)}
                 </p>
               </div>
               <div className="flex justify-end">
-                <p className="max-w-[86%] rounded-2xl rounded-br-sm border-[1.5px] border-ink bg-lime/60 px-4 py-3 text-[15px] font-semibold leading-[1.45] text-on-light">
+                {/* Balon tanya tetap lime di malam, tapi bukan lime 60%: di
+                    atas panel gelap campuran 60% jadi hijau keruh. */}
+                <p className="max-w-[86%] rounded-2xl rounded-br-sm border-[1.5px] border-on-light bg-lime/60 px-4 py-3 text-[15px] font-semibold leading-[1.45] text-on-light dark:bg-lime/90">
                   {t(persona.ask)}
                 </p>
               </div>
@@ -95,7 +98,7 @@ export default function PersonaTabs() {
                 <p className="font-mono text-[11.5px] font-extrabold uppercase tracking-[0.06em] text-ink-soft">
                   SESUDAH
                 </p>
-                <p className="mt-2 max-w-[86%] rounded-2xl rounded-bl-sm border-[1.5px] border-ink bg-evergreen px-4 py-3 text-[15px] font-semibold leading-[1.45] text-on-dark">
+                <p className="mt-2 max-w-[86%] rounded-2xl rounded-bl-sm border-[1.5px] border-edge bg-evergreen px-4 py-3 text-[15px] font-semibold leading-[1.45] text-on-dark">
                   {t(persona.after)}
                 </p>
               </div>
@@ -104,8 +107,13 @@ export default function PersonaTabs() {
         </div>
 
         <div className="mt-12 grid gap-4 md:grid-cols-3">
-          {NOTES.map((note) => (
-            <div key={note.title} className="rounded-xl border-2 border-dashed border-ink/40 bg-paper p-5">
+          {NOTES.map((note, index) => (
+            <div
+              key={note.title}
+              data-reveal
+              style={{ ["--reveal-delay" as string]: `${index * 0.07}s` }}
+              className="rounded-xl border-2 border-dashed border-edge/55 bg-paper p-5"
+            >
               <h3 className="font-display text-[16px] font-bold text-ink">{t(note.title)}</h3>
               <p className="mt-2 text-[14px] leading-relaxed text-ink-soft">{t(note.desc)}</p>
             </div>

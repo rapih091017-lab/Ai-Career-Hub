@@ -14,7 +14,7 @@ export default function CheckerTeaser() {
   return (
     <section id="cek-cv" className="section section-rule bg-paper">
       <div className="shell grid items-start gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:gap-16">
-        <div>
+        <div data-reveal>
           <p className="kicker">{t("lp.checker.kicker")}</p>
           <h2 className="max-w-[17ch] font-display text-headline-lg font-bold text-ink">
             {t("lp.checker.title")}
@@ -41,7 +41,12 @@ export default function CheckerTeaser() {
           </div>
         </div>
 
-        <div className="rounded-[18px] border-[2.5px] border-ink bg-paper p-6 shadow-hard md:p-8">
+        {/* Contoh keluaran. Bingkainya pakai `edge` (tinta di siang, garis
+            hijau redup di malam) supaya tidak jadi kotak bergaris putih. */}
+        <div
+          data-reveal
+          className="rounded-[18px] border-[2.5px] border-edge bg-paper p-6 shadow-hard md:p-8"
+        >
           <p className="font-mono text-[11.5px] font-extrabold uppercase tracking-[0.06em] text-ink-soft">
             {t("lp.checker.mock-title")}
           </p>
@@ -51,10 +56,15 @@ export default function CheckerTeaser() {
             <span className="text-[12px] font-bold text-ink-soft">{t("lp.checker.mock-note")}</span>
           </div>
 
+          {/* Bar mengisi setelah kartunya masuk layar, bukan sejak halaman
+              dimuat: gerakan itu yang memberi tahu angka 70% baru dihitung. */}
           <div className="mt-3 h-3 w-full overflow-hidden rounded-full bg-ink/10">
             <span
-              className="block h-full w-[70%] rounded-full"
-              style={{ background: "linear-gradient(90deg, #3f8f77, #c9ff5c)" }}
+              className="reveal-fill block h-full rounded-full"
+              style={{
+                background: "linear-gradient(90deg, #3f8f77, #c9ff5c)",
+                ["--fill" as string]: "70%",
+              }}
             />
           </div>
 
@@ -67,7 +77,7 @@ export default function CheckerTeaser() {
               <li key={item} className="flex items-start gap-2.5 text-[13.5px] leading-relaxed text-ink-soft">
                 <span
                   aria-hidden="true"
-                  className="mt-0.5 inline-block h-4 w-4 flex-none rounded-full border-[1.5px] border-ink bg-lime"
+                  className="mt-0.5 inline-block h-4 w-4 flex-none rounded-full border-[1.5px] border-on-light bg-lime"
                 />
                 <span>{item}</span>
               </li>
@@ -76,7 +86,7 @@ export default function CheckerTeaser() {
 
           <Link
             href="/checker"
-            className="mt-6 inline-flex min-h-[54px] w-full items-center justify-center gap-2 rounded-2xl border-[3px] border-ink bg-lime px-4 font-display text-[16px] font-bold text-on-light shadow-[0_5px_#0a0f0d] transition-transform hover:-translate-y-0.5 hover:shadow-[0_7px_#0a0f0d]"
+            className="mt-6 inline-flex min-h-[54px] w-full items-center justify-center gap-2 rounded-2xl border-[3px] border-on-light bg-lime px-4 font-display text-[16px] font-bold text-on-light shadow-[0_5px_#0a0f0d] transition-transform hover:-translate-y-0.5 hover:shadow-[0_7px_#0a0f0d]"
           >
             {t("lp.checker.cta")}
             <span aria-hidden="true">&rarr;</span>

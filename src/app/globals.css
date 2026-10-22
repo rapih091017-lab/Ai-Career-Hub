@@ -83,14 +83,33 @@
   --c-hairline: 201 211 205;
   --c-rule: 213 222 216;
 
+  /* Garis bingkai kartu di atas permukaan netral. Di siang hari ini sama
+     dengan tinta, jadi kartu tetap bergaya gambar tinta. Di malam hari
+     nilainya diganti garis hijau yang lebih terang dari kertas: di atas
+     kertas gelap, bingkai gelap hilang dan kartu kehilangan tepinya. */
+  --c-edge: 10 15 13;
+  /* Tinta cetak: dipakai bayangan kartu aksen (lime/evergreen) yang tetap
+     terang di kedua tema, jadi bayangannya harus tetap gelap. */
+  --c-print: 10 15 13;
+
   /* Warna pasangan tetap: permukaan brand tidak ikut berbalik di mode
      gelap, jadi teks di atasnya juga tidak boleh ikut berbalik. */
   --c-on-dark: 243 246 242;
   --c-on-light: 10 15 13;
-  --c-cream: 255 251 234; /* kertas krem pintu harga */
+  --c-cream: 255 251 234; /* kertas krem di dalam kartu pass (tetap terang) */
+  /* Kertas netral: krem di siang, lembar malam di malam. Bedanya dengan
+     `cream`: cream adalah kertas yang menempel di permukaan merek terang
+     (mis. baris paket di kartu pass lime) dan harus tetap terang; `sheet`
+     adalah kertas bebas yang ikut jadi malam. */
+  --c-sheet: 255 251 234;
+  --c-on-sheet: 10 15 13;
   --c-footer: 6 35 25; /* dasar footer, lebih dalam dari evergreen */
   --c-brand-dark: 18 41 34;
   --c-brand-green: 29 107 72;
+  /* Panggung merek: blok selebar layar yang jadi latar hero, panggung harga,
+     dan penutup. Di siang ini bidang paling gelap di halaman; di malam naik
+     satu tingkat di atas lantai supaya terbaca sebagai area yang disorot. */
+  --c-stage: 18 41 34;
   --c-mint: 143 179 166; /* label sekunder di atas permukaan gelap tetap */
 
   /* Motif */
@@ -126,7 +145,7 @@
 
     --c-on-background: 238 243 238;
     --c-on-surface: 238 243 238;
-    --c-on-surface-variant: 168 189 177;
+    --c-on-surface-variant: 176 197 185;
 
     --c-primary: 214 238 48; /* lime jadi aksi utama di latar gelap */
     --c-on-primary: 15 32 26;
@@ -157,7 +176,7 @@
     --c-on-tertiary-fixed-variant: 63 74 18;
 
     --c-outline: 159 179 168;
-    --c-outline-variant: 43 63 54;
+    --c-outline-variant: 45 68 58;
     --c-inverse-surface: 10 21 17;
     --c-inverse-on-surface: 232 240 234;
 
@@ -166,48 +185,74 @@
     --c-error-container: 74 26 18;
     --c-on-error-container: 247 221 216;
 
-    --c-desk: 18 33 28;
-    --c-paper: 27 48 41;
-    --c-evergreen: 13 28 23;
-    --c-evergreen-deep: 10 21 17;
+    --c-desk: 10 22 18;
+    --c-paper: 24 46 39;
+    --c-evergreen: 31 64 53;
+    --c-evergreen-deep: 8 20 16;
     --c-green: 127 192 168;
     --c-green-deep: 168 217 194;
     --c-lime: 214 238 48;
     --c-lime-bright: 201 255 92;
-    --c-ink: 238 243 238;
-    --c-ink-soft: 168 189 177;
-    --c-hairline: 43 63 54;
-    --c-rule: 36 54 46;
+    --c-ink: 236 242 237;
+    --c-ink-soft: 176 197 185;
+    --c-hairline: 34 54 46;
+    --c-rule: 30 48 41;
 
     /* Bayangan tinta di mode gelap harus lebih gelap dari latar kartu,
        bukan warna latar itu sendiri (#0a1512 dulu bikin shadow-hard mati
        dan kartu terasa datar). */
-    --shadow-hard-color: #000000;
-    --hairline-color: #2b3f36;
-    --rule-color: #24362e;
+    --shadow-hard-color: #040d0a;
+    --hairline-color: #223a30;
+    --rule-color: #1e332a;
 
-    /* Footer dinaikkan satu tingkat dari latar halaman supaya pitanya
-       kelihatan; kalau sama, teks di dalamnya terlihat "nyaru". */
-    --c-footer: 22 49 40;
+    /* Malam bukan pembalikan warna. Yang berubah jadi malam hanya lantai
+       ruangan dan kertas yang tidur di atasnya; tinta tidak berubah jadi
+       putih, ia jadi cahaya bulan (236 242 237, bukan #fff). Bingkai kartu
+       justru harus lebih terang dari kertas, karena garis gelap di atas
+       kertas gelap sama saja dengan tidak ada garis. */
+    --c-edge: 84 118 103;
+
+    /* Malam: yang berubah jadi gelap adalah semua permukaan netral,
+       termasuk kertas bebas (`sheet`). Aksen merek tidak ikut berbalik:
+       lime tetap lime, cream tetap cream karena hidup di dalam kartu lime. */
+    --c-sheet: 24 44 37;
+    --c-on-sheet: 236 242 237;
+
+    /* Aksen gelap yang menempel di atas kertas (`bg-brand-dark`: pil pilihan
+       paket, label di kartu lime). Di malam ini bukan warna merek lagi,
+       melainkan bidang cekung: sedikit lebih gelap dari kertas supaya pil
+       pilihan tetap terbaca "terpilih", dan tetap gelap di atas lime. */
+    --c-brand-dark: 14 32 26;
+
+    /* Panggung merek: hero, panggung harga, dan penutup. Di siang panggung
+       ini bidang paling gelap; di malam tidak ada yang lebih gelap dari
+       ruangan, jadi panggung naik satu tingkat di atas lantai dan dibaca
+       sebagai area yang disorot lampu, bukan lubang hitam. */
+    --c-stage: 17 39 32;
+
+    /* Footer jadi lapisan paling dasar, bukan slab yang lebih terang dari
+       halaman: di malam, kedalaman dibaca dari gelap ke gelap, bukan dari
+       blok terang di atas gelap. Garis lime di atasnya tetap pemisah. */
+    --c-footer: 7 18 14;
 }
 
 /* Cadangan sebelum skrip sempat jalan (misal JavaScript diblokir). */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
-    --c-background: 15 32 26;
-    --c-surface: 23 43 36;
-    --c-surface-bright: 28 50 42;
-    --c-surface-container-lowest: 20 38 31;
-    --c-surface-container-low: 23 43 36;
-    --c-surface-container: 27 48 41;
-    --c-surface-container-high: 33 56 47;
-    --c-surface-container-highest: 39 64 53;
-    --c-surface-variant: 27 48 41;
-    --c-surface-dim: 18 33 28;
+    --c-background: 10 22 18;
+    --c-surface: 24 46 39;
+    --c-surface-bright: 31 56 48;
+    --c-surface-container-lowest: 18 36 30;
+    --c-surface-container-low: 20 40 34;
+    --c-surface-container: 26 49 42;
+    --c-surface-container-high: 32 57 49;
+    --c-surface-container-highest: 38 66 57;
+    --c-surface-variant: 26 49 42;
+    --c-surface-dim: 14 28 23;
     --c-surface-tint: 127 192 168;
     --c-on-background: 238 243 238;
     --c-on-surface: 238 243 238;
-    --c-on-surface-variant: 168 189 177;
+    --c-on-surface-variant: 176 197 185;
     --c-primary: 214 238 48;
     --c-on-primary: 15 32 26;
     --c-primary-container: 44 74 61;
@@ -234,29 +279,44 @@
     --c-on-tertiary-fixed: 15 32 26;
     --c-on-tertiary-fixed-variant: 63 74 18;
     --c-outline: 159 179 168;
-    --c-outline-variant: 43 63 54;
+    --c-outline-variant: 45 68 58;
     --c-inverse-surface: 10 21 17;
     --c-inverse-on-surface: 232 240 234;
     --c-error: 242 167 154;
     --c-on-error: 59 17 9;
     --c-error-container: 74 26 18;
     --c-on-error-container: 247 221 216;
-    --c-desk: 18 33 28;
-    --c-paper: 27 48 41;
-    --c-evergreen: 13 28 23;
-    --c-evergreen-deep: 10 21 17;
+    --c-desk: 10 22 18;
+    --c-paper: 24 46 39;
+    --c-evergreen: 31 64 53;
+    --c-evergreen-deep: 8 20 16;
     --c-green: 127 192 168;
     --c-green-deep: 168 217 194;
     --c-lime: 214 238 48;
     --c-lime-bright: 201 255 92;
-    --c-ink: 238 243 238;
-    --c-ink-soft: 168 189 177;
-    --c-hairline: 43 63 54;
-    --c-rule: 36 54 46;
-    --shadow-hard-color: #000000;
-    --hairline-color: #2b3f36;
-    --rule-color: #24362e;
-    --c-footer: 22 49 40;
+    --c-ink: 236 242 237;
+    --c-ink-soft: 176 197 185;
+    --c-hairline: 34 54 46;
+    --c-rule: 30 48 41;
+    --shadow-hard-color: #040d0a;
+    --hairline-color: #223a30;
+    --rule-color: #1e332a;
+    --c-edge: 84 118 103;
+    --c-sheet: 24 44 37;
+    --c-on-sheet: 236 242 237;
+
+    /* Aksen gelap yang menempel di atas kertas (`bg-brand-dark`: pil pilihan
+       paket, label di kartu lime). Di malam ini bukan warna merek lagi,
+       melainkan bidang cekung: sedikit lebih gelap dari kertas supaya pil
+       pilihan tetap terbaca "terpilih", dan tetap gelap di atas lime. */
+    --c-brand-dark: 14 32 26;
+
+    /* Panggung merek: hero, panggung harga, dan penutup. Di siang panggung
+       ini bidang paling gelap; di malam tidak ada yang lebih gelap dari
+       ruangan, jadi panggung naik satu tingkat di atas lantai dan dibaca
+       sebagai area yang disorot lampu, bukan lubang hitam. */
+    --c-stage: 17 39 32;
+    --c-footer: 7 18 14;
   }
 }
 
@@ -276,7 +336,7 @@
   }
 
   .card-hard {
-    border: 2px solid rgb(var(--c-ink));
+    border: 2px solid rgb(var(--c-edge));
     border-radius: 14px;
     box-shadow: 6px 6px 0 var(--shadow-hard-color);
     transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
@@ -302,6 +362,84 @@
     background-size: 28px 28px;
     -webkit-mask-image: radial-gradient(115% 85% at 50% 0%, #000 32%, transparent 76%);
     mask-image: radial-gradient(115% 85% at 50% 0%, #000 32%, transparent 76%);
+  }
+
+  /* Petak ukur hero landing.
+
+     Dua lapisan dengan gambar yang sama: lapisan dasar bergeser pelan 16s
+     (kertas ditarik meja pemindai), lapisan kedua menyala hanya di lingkaran
+     sekitar kursor. Alasannya bukan hiasan bebas: petak 28px + garis mayor
+     140px adalah garis ukur dokumen, dan sorotan menunjukkan area "dibaca"
+     mesin. Tanpa sorotan, petak tetap jalan sendiri. */
+  .hero-grid-mask {
+    -webkit-mask-image: radial-gradient(130% 110% at 72% 0, #000 38%, transparent 80%);
+    mask-image: radial-gradient(130% 110% at 72% 0, #000 38%, transparent 80%);
+  }
+
+  .hero-grid-drift {
+    background-image:
+      linear-gradient(rgb(var(--c-lime) / 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--c-lime) / 0.05) 1px, transparent 1px),
+      linear-gradient(rgb(var(--c-lime) / 0.09) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--c-lime) / 0.09) 1px, transparent 1px);
+    background-size: 28px 28px, 28px 28px, 140px 140px, 140px 140px;
+  }
+
+  .hero-grid-drift-lit {
+    background-image:
+      linear-gradient(rgb(var(--c-lime) / 0.22) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--c-lime) / 0.22) 1px, transparent 1px),
+      linear-gradient(rgb(var(--c-lime) / 0.4) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--c-lime) / 0.4) 1px, transparent 1px);
+  }
+
+  .hero-grid-glow {
+    opacity: 0;
+    transition: opacity 0.4s var(--ease);
+    -webkit-mask-image: radial-gradient(220px circle at var(--mx, -999px) var(--my, -999px), #000 0%, transparent 100%);
+    mask-image: radial-gradient(220px circle at var(--mx, -999px) var(--my, -999px), #000 0%, transparent 100%);
+  }
+
+  .hero-backdrop[data-lit] .hero-grid-glow {
+    opacity: 1;
+  }
+
+  /* Masuk viewport sekali saja.
+
+     Elemen disembunyikan hanya kalau <html data-reveal-ready> sudah dipasang
+     skrip di layout — jadi tanpa JavaScript konten tetap kelihatan. Satu
+     gerakan naik 20px dalam 0,6 detik, tanpa blur: cukup untuk memberi tahu
+     bahwa blok baru mulai, tanpa membuat halaman terasa mengambang. Jarak
+     ini yang membuat gerakannya terbaca; 14px sebelumnya terlalu kecil dan
+     terbaca seperti halaman yang cuma telat render.
+
+     Gesernya memakai properti `translate`, bukan `transform`, karena banyak
+     blok di tema ini sudah punya rotasi sendiri (kartu miring, pita penutup).
+     `transform` di sini akan menimpa rotasi itu dan membuat kartunya lurus. */
+  html[data-reveal-ready] [data-reveal] {
+    opacity: 0;
+    translate: 0 20px;
+    transition:
+      opacity 0.6s var(--ease),
+      translate 0.6s var(--ease);
+    transition-delay: var(--reveal-delay, 0s);
+  }
+
+  html[data-reveal-ready] [data-reveal].is-revealed {
+    opacity: 1;
+    translate: none;
+  }
+
+  /* Isian yang tumbuh setelah blok induknya masuk layar (mis. bar skor
+     contoh di teaser checker). Lebarnya dari variabel, jadi angka contoh
+     tetap satu sumber di komponen. */
+  [data-reveal] .reveal-fill {
+    width: 0;
+    transition: width 1.1s var(--ease) 0.2s;
+  }
+
+  [data-reveal].is-revealed .reveal-fill {
+    width: var(--fill, 100%);
   }
 
   .kicker {
@@ -348,6 +486,30 @@ html[data-motion="off"] *::after {
   animation: none !important;
   transition: none !important;
   scroll-behavior: auto !important;
+}
+
+/* Saat animasi dimatikan, blok yang menunggu reveal harus langsung tampil —
+   kalau tidak, halaman jadi kosong karena transisinya tidak pernah jalan. */
+html[data-motion="off"] [data-reveal] {
+  opacity: 1 !important;
+  translate: none !important;
+}
+
+html[data-motion="off"] [data-reveal] .reveal-fill {
+  width: var(--fill, 100%) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-reveal-ready] [data-reveal] {
+    opacity: 1;
+    translate: none;
+    transition-delay: 0s;
+  }
+
+  [data-reveal] .reveal-fill,
+  [data-reveal].is-revealed .reveal-fill {
+    width: var(--fill, 100%);
+  }
 }
 
 body {
@@ -772,6 +934,25 @@ a:focus-visible {
   0% { box-shadow: 0 0 0 0 rgba(13, 115, 119, 0.3); }
   70% { box-shadow: 0 0 0 8px rgba(13, 115, 119, 0); }
   100% { box-shadow: 0 0 0 0 rgba(13, 115, 119, 0); }
+}
+
+/* Kartu pass bulanan. Ayunannya sudah jalan sendiri (6s); saat kursor
+   menyentuh kartu, ayunan pelan diganti satu ayunan penuh — gerakan yang
+   sama seperti kartu akses yang diangkat dari meja. Kejadian ini bukan
+   hiasan tambahan: ia menandai bahwa kartu itu bisa dipilih. */
+@keyframes ach-pass-swing {
+  0% { transform: rotate(var(--tilt, 1.6deg)); }
+  30% { transform: rotate(calc(var(--tilt, 1.6deg) + 3deg)); }
+  65% { transform: rotate(calc(var(--tilt, 1.6deg) - 1.2deg)); }
+  to { transform: rotate(var(--tilt, 1.6deg)); }
+}
+
+@media (hover: hover) {
+  .animate-ach-pass-sway:hover {
+    animation:
+      ach-pass-swing 0.9s cubic-bezier(0.33, 1, 0.68, 1),
+      ach-pass-sway 6s ease-in-out 0.9s infinite;
+  }
 }
 
 /* Selection */

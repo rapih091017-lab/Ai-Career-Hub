@@ -78,7 +78,7 @@ export default function AppFooter({ variant = "simple", bordered = false }: AppF
           <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr_1fr_1fr] gap-12 mb-16">
             <div>
               <div className="flex items-center gap-2 mb-6">
-                <div className="w-8 h-8 rounded-[7px] border-2 border-ink bg-lime flex items-center justify-center text-on-light">
+                <div className="w-8 h-8 rounded-[7px] border-2 border-on-light bg-lime flex items-center justify-center text-on-light">
                   <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
                 </div>
                 <span className="font-display text-[20px] font-bold tracking-[-0.02em] text-on-dark">AI Career Hub</span>

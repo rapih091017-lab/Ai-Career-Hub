@@ -2,6 +2,7 @@
 
 import AppFooter from "@/components/AppFooter";
 import PortfolioSpotlight from "@/components/PortfolioSpotlight";
+import RevealOnScroll from "@/components/RevealOnScroll";
 import PricingSection from "@/components/PricingSection";
 import ScrollProgress from "@/components/ScrollProgress";
 import ScrollSectionIndicator from "@/components/ScrollSectionIndicator";
@@ -33,6 +34,7 @@ export default function Home() {
     <>
       <ScrollProgress />
       <ScrollSectionIndicator />
+      <RevealOnScroll />
 
       <SiteHeader variant="pill" />
 

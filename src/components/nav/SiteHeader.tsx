@@ -51,7 +51,22 @@ export default function SiteHeader({ variant = "bar" }: Props) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const accountRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * Nav memadat setelah halaman bergeser sedikit.
+   *
+   * Di halaman panjang, nav yang ukurannya tetap terasa seperti lapisan
+   * terpisah dari isi. Menipiskan padding dan bayangannya saat scroll
+   * membuatnya terbaca sebagai alat yang sedang dipakai, bukan pigura.
+   */
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
@@ -69,7 +84,9 @@ export default function SiteHeader({ variant = "bar" }: Props) {
   }, [pathname]);
 
   const shell = isPill
-    ? "fixed top-0 md:top-4 left-0 md:left-1/2 right-0 md:-translate-x-1/2 z-50 w-full md:w-[calc(100%-32px)] md:max-w-7xl bg-paper/90 backdrop-blur-lg border-b border-hairline md:border md:border-ink/15 md:rounded-2xl md:shadow-hard"
+    ? `fixed left-0 right-0 z-50 w-full bg-paper/90 backdrop-blur-lg border-b border-hairline md:left-1/2 md:w-[calc(100%-32px)] md:max-w-7xl md:-translate-x-1/2 md:border md:border-edge/25 md:rounded-2xl transition-[top,box-shadow] duration-300 ${
+        scrolled ? "top-0 md:top-2 md:shadow-hard-sm" : "top-0 md:top-4 md:shadow-hard"
+      }`
     : "fixed top-0 left-0 right-0 z-50 w-full bg-paper border-b border-hairline";
 
   return (
@@ -78,12 +95,12 @@ export default function SiteHeader({ variant = "bar" }: Props) {
 
       <header className={shell}>
         <div
-          className={`mx-auto flex items-center justify-between gap-4 px-margin-mobile md:px-gutter ${
-            isPill ? "py-3" : "py-4"
+          className={`mx-auto flex items-center justify-between gap-4 px-margin-mobile md:px-gutter transition-[padding] duration-300 ${
+            isPill ? (scrolled ? "py-2" : "py-3") : "py-4"
           }`}
         >
           <Link href="/" className="flex shrink-0 items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-[7px] border-2 border-ink bg-evergreen text-lime">
+            <span className="flex h-8 w-8 items-center justify-center rounded-[7px] border-2 border-edge bg-evergreen text-lime">
               <span
                 className="material-symbols-outlined text-[20px]"
                 style={{ fontVariationSettings: "'FILL' 1" }}
@@ -210,7 +227,7 @@ export default function SiteHeader({ variant = "bar" }: Props) {
             ) : (
               <Link
                 href="/#pricing"
-                className="hidden items-center rounded-full border-2 border-brand-dark bg-brand-dark px-4 py-2 font-label-bold text-on-dark transition-colors hover:bg-brand-green active:scale-95 sm:inline-flex"
+                className="hidden items-center rounded-full border-2 border-brand-dark bg-brand-dark px-4 py-2 font-label-bold text-on-dark transition-colors hover:bg-brand-green active:scale-95 dark:border-lime/60 dark:bg-lime/15 dark:text-lime dark:hover:bg-lime/25 sm:inline-flex"
               >
                 {t("nav.try-free")}
               </Link>
@@ -304,7 +321,7 @@ export default function SiteHeader({ variant = "bar" }: Props) {
                     <Link
                       href="/#pricing"
                       onClick={() => setMobileOpen(false)}
-                      className="mt-2 mb-1 flex min-h-[48px] items-center justify-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-5 text-label-bold text-on-light shadow-[0_3px_0_rgb(var(--c-ink))]"
+                      className="mt-2 mb-1 flex min-h-[48px] items-center justify-center gap-2 rounded-full border-[2.5px] border-on-light bg-lime px-5 text-label-bold text-on-light shadow-[0_3px_0_rgb(var(--c-print))]"
                     >
                       {t("nav.try-free")}
                     </Link>
