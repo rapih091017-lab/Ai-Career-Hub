@@ -28,3 +28,13 @@ For UI, copy, people, mobile layout, or code comments work, read `antislop.md` (
 - Code comments: `skills/antislop-code/SKILL.md`
 Before starting, ask the user when antislop applies: during the work, or after it is done.
 <!-- antislop:end -->
+
+## Checker upgrade — aturan global
+- Hasil disimpan di `checker_results` (jsonb `scores`, `aiFeedback`, `fullResult`); pemetaan ke UI lewat `analysisFromFullResult`.
+- Field baru: opsional, di dalam `fullResult`, tanpa migrasi DB. Baris lama harus tampil persis seperti sebelumnya. Yang tidak ada di baris tidak ditampilkan sebagai angka atau klaim. Nilai invalid dibuang, bukan diganti default. Untuk field AI baru pakai `.optional().catch(undefined)`.
+- Setiap saran yang bisa ditempel ke CV punya `copy_text` (teks polos) + CopyButton.
+- Aturan output AI: jangan mengarang fakta, angka, perusahaan, tools, atau sertifikasi (fakta kurang → placeholder `[angka]`, `[persen]`, `[jumlah orang]`); jangan menyebut statistik tentang HR/perekrut; `copy_text` dalam bahasa yang sama dengan CV (jangan campur Indonesia–Inggris); kutipan bukti harus potongan persis dari teks CV; jangan menjanjikan lolos ATS atau diterima.
+- Dampak perbaikan = level Tinggi/Sedang/Rendah + estimasi menit. Angka poin hanya di `impactForecast`, berlabel estimasi.
+- Tanpa dependency baru. Teks UI bahasa Indonesia. Komentar kode bahasa Indonesia.
+- Di luar scope: fitur bandingkan versi.
+

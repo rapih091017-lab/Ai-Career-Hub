@@ -46,6 +46,33 @@ const StrengthArr = () =>
 /** Bobot per-section (desimal 0-1, mis. 0.20) sesuai role category, 
  * dipakai transparansi skor di UI. BUKAN ScoreField karena bobot bukan integer. */
 const WeightField = () => z.number().min(0).max(1).catch(0);
+
+/** Satu kotak "Yang HR tangkap dalam 30 detik". `status` sengaja string biasa:
+ *  enum invalid harus membuat kunci itu DIBUANG di mapper, bukan diganti
+ *  default yang membuat kotak terlihat terbaca padahal tidak pernah. */
+const HrScanFieldSchema = () => z.object({
+  value: z.string().nullable().catch(null),
+  status: z.string().catch(""),
+  note: z.string().optional().catch(undefined),
+});
+
+/** Perbaikan terbesar satu section (v5). Tanpa `title` tidak ada yang
+ *  ditampilkan, jadi objeknya jatuh ke undefined — bukan kartu judul kosong. */
+const TopFixSchema = () => z.object({
+  title: z.string().catch(""),
+  copy_text: z.string().optional().catch(undefined),
+  replaces: z.string().optional().catch(undefined),
+  // .transform() menghapus penanda optional, jadi .optional() harus di LUAR
+  // transform — kalau tidak, default .catch() objek section kehilangan key ini.
+}).transform((fix) => (fix && fix.title ? fix : undefined)).optional();
+
+/** Satu cek format ATS (v5). status string biasa: enum invalid dibuang di mapper. */
+const FormatCheckSchema = () => z.object({
+  id: z.string().catch(""),
+  label: z.string().catch(""),
+  status: z.string().catch(""),
+  note: z.string().optional().catch(undefined),
+});
 const ROLE_CATEGORIES = ["tech", "creative", "sales_marketing", "fresh_graduate", "general"] as const;
 const WeightsAppliedSchema = z.object({
   role_category: z.enum(ROLE_CATEGORIES).catch("general"),
@@ -98,16 +125,42 @@ export const AnalysisResultSchema = z.object({
 
   // ── Per-section breakdown ──
   breakdown: z.object({
-    summary: z.object({ score: ScoreField(), issues: IssueArr(), suggestions: StringArr() })
-      .catch({ score: 50, issues: [], suggestions: [] }),
-    experience: z.object({ score: ScoreField(), quantification_pct: z.number().int().min(0).max(100).catch(0).optional(), issues: IssueArr(), suggestions: StringArr() })
-      .catch({ score: 50, issues: [], suggestions: [] }),
-    skills: z.object({ score: ScoreField(), missing_skills: StringArr(), adjacent_skills: StringArr().optional(), recommendations: StringArr() })
-      .catch({ score: 50, missing_skills: [], adjacent_skills: [], recommendations: [] }),
-    education: z.object({ score: ScoreField(), relevance: StringField(), suggestions: StringArr() })
-      .catch({ score: 50, relevance: "", suggestions: [] }),
-    format_ats: z.object({ score: ScoreField(), issues: IssueArr(), tips: StringArr() })
-      .catch({ score: 50, issues: [], tips: [] }),
+    summary: z.object({
+      score: ScoreField(), issues: IssueArr(), suggestions: StringArr(),
+      // v5: alasan skor, perbaikan terbesar, dan rewrite summary.
+      score_reason: z.string().optional().catch(undefined),
+      top_fix: TopFixSchema(),
+      has_skills_and_achievement: z.boolean().optional().catch(undefined),
+      rewrite_copy_text: z.string().optional().catch(undefined),
+    }).catch({ score: 50, issues: [], suggestions: [] }),
+    experience: z.object({
+      score: ScoreField(), quantification_pct: z.number().int().min(0).max(100).catch(0).optional(), issues: IssueArr(), suggestions: StringArr(),
+      score_reason: z.string().optional().catch(undefined),
+      top_fix: TopFixSchema(),
+      // Tanpa .catch(0): nol palsu membuat "0 dari 0 poin" tampil sebagai temuan.
+      bullets_total: z.number().int().min(0).optional().catch(undefined),
+      bullets_without_result: z.number().int().min(0).optional().catch(undefined),
+    }).catch({ score: 50, issues: [], suggestions: [] }),
+    skills: z.object({
+      score: ScoreField(), missing_skills: StringArr(), adjacent_skills: StringArr().optional(), recommendations: StringArr(),
+      score_reason: z.string().optional().catch(undefined),
+      top_fix: TopFixSchema(),
+      unproven_skills: z.array(z.string()).optional().catch(undefined),
+      grouped_skills_copy_text: z.string().optional().catch(undefined),
+    }).catch({ score: 50, missing_skills: [], adjacent_skills: [], recommendations: [] }),
+    education: z.object({
+      score: ScoreField(), relevance: StringField(), suggestions: StringArr(),
+      score_reason: z.string().optional().catch(undefined),
+      top_fix: TopFixSchema(),
+      copy_text: z.string().optional().catch(undefined),
+    }).catch({ score: 50, relevance: "", suggestions: [] }),
+    format_ats: z.object({
+      score: ScoreField(), issues: IssueArr(), tips: StringArr(),
+      score_reason: z.string().optional().catch(undefined),
+      top_fix: TopFixSchema(),
+      // Per butir .catch(null): satu cek rusak gugur sendiri (alasan IssueArr).
+      checks: z.array(FormatCheckSchema().nullable().catch(null)).catch([]).transform((checks) => checks.filter((check) => check !== null)).optional(),
+    }).catch({ score: 50, issues: [], tips: [] }),
   }).catch({
     summary: { score: 50, issues: [], suggestions: [] },
     experience: { score: 50, issues: [], suggestions: [] },
@@ -125,6 +178,30 @@ export const AnalysisResultSchema = z.object({
     synonym_suggestions: StringArr(),
     match_rate_pct: ScoreField(),
     semantic_match_rate_pct: ScoreField().optional(),
+    // ── v5 (prompt 5): bukti, penempatan, syarat lowongan ──
+    // `source` SENGADA TIDAK ada di schema: zod membuang key tak dikenal,
+    // sehingga output AI tidak pernah bisa menentukan sumber daftar keyword.
+    // Per butir .catch(null) + filter: satu butir rusak gugur sendiri (alasan
+    // IssueArr). .optional() paling luar supaya default .catch() objek di bawah
+    // tidak kehilangan key (penanda optional hilang saat transform).
+    evidence: z.array(z.object({
+      keyword: z.string().catch(""),
+      level: z.string().catch(""),
+      excerpt: z.string().optional().catch(undefined),
+    }).nullable().catch(null)).catch([]).transform((items) => items.filter((item) => item !== null)).optional(),
+    placements: z.array(z.object({
+      keyword: z.string().catch(""),
+      priority: z.string().catch(""),
+      where: z.string().catch(""),
+      replaces: z.string().optional().catch(undefined),
+      copy_text: z.string().catch(""),
+    }).nullable().catch(null)).catch([]).transform((items) => items.filter((item) => item !== null)).optional(),
+    requirements: z.array(z.object({
+      requirement: z.string().catch(""),
+      status: z.string().catch(""),
+      evidence: z.string().optional().catch(undefined),
+      tip: z.string().optional().catch(undefined),
+    }).nullable().catch(null)).catch([]).transform((items) => items.filter((item) => item !== null)).optional(),
   }).catch({ matched: [], semantic_matched: [], missing_critical: [], missing_nice_to_have: [], synonym_suggestions: [], match_rate_pct: 0, semantic_match_rate_pct: 0 }),
 
   // ── Career velocity analysis (v3 new) ──
@@ -177,8 +254,79 @@ export const AnalysisResultSchema = z.object({
     projected_after_all_fixes: ScoreField(),
   }).catch({ current_score: 50, projected_after_quick_wins: 55, projected_after_all_fixes: 60 }).optional(),
 
+  // ── Ringkasan 10 detik (v5), kartu paling atas halaman hasil ──
+  // Schema di sini hanya menjaga bentuk; validasi berat (fix invalid dibuang,
+  // batas kata, urutan deterministik, pembulatan/clamping menit) dikerjakan
+  // mapper `toQuickSummary`. Field AI baru: .optional().catch(undefined),
+  // jadi baris lama dan AI yang tidak mengirimnya tetap lolos parse.
+  quick_summary: z.object({
+    verdict: z.string().catch(""),
+    top_strengths: StringArr(),
+    // .catch(null) per item: satu fix rusak gugur sendiri, bukan menghapus
+    // seluruh daftar (alasan yang sama dengan IssueArr di atas).
+    top_fixes: z.array(z.object({
+      id: z.string().catch(""),
+      title: z.string().catch(""),
+      // String biasa, bukan enum: nilai di luar daftar harus dibuang oleh mapper,
+      // bukan diganti default oleh schema.
+      target_section: z.string().catch(""),
+      impact: z.string().catch(""),
+      // Tanpa int/min/max: 90 harus di-clamp mapper ke 60, bukan hilang dari UI;
+      // non-numerik jatuh ke undefined sehingga fieldnya dibuang (tampil tanpa menit).
+      est_minutes: z.number().optional().catch(undefined),
+      copy_text: z.string().optional().catch(undefined),
+    }).nullable().catch(null)).catch([]).transform((fixes) => fixes.filter((fix) => fix !== null)),
+  }).optional().catch(undefined),
+
+  // ── Panel HR (v5, prompt 3): scan 30 detik, flag, pertanyaan, knockout, durasi ──
+  // Gaya sama dengan quick_summary: schema hanya menjaga bentuk (enum jadi
+  // string + validasi/pelemparan di mapper), field AI baru opsional + catch.
+  hr_scan: z.object({
+    // Tiap kunci nullable: satu kotak rusak tidak menghapus panel scan.
+    last_title: HrScanFieldSchema().nullable().catch(null),
+    total_experience: HrScanFieldSchema().nullable().catch(null),
+    top_achievement: HrScanFieldSchema().nullable().catch(null),
+    key_skills: HrScanFieldSchema().nullable().catch(null),
+  }).optional().catch(undefined),
+
+  hr_flags: z.array(z.object({
+    // String biasa, bukan enum: type/label invalid harus dibuang mapper.
+    type: z.string().catch(""),
+    label: z.string().catch(""),
+    evidence: z.string().optional().catch(undefined),
+    fix: z.object({
+      copy_text: z.string().catch(""),
+      replaces: z.string().optional().catch(undefined),
+    }).optional().catch(undefined),
+  }).nullable().catch(null)).catch([]).transform((flags) => flags.filter((flag) => flag !== null)),
+
+  hr_questions: z.array(z.object({
+    question: z.string().catch(""),
+    why_asked: z.string().catch(""),
+    answer_tip: z.string().catch(""),
+  }).nullable().catch(null)).catch([]).transform((items) => items.filter((item) => item !== null)),
+
+  knockout_risks: z.array(z.object({
+    requirement: z.string().catch(""),
+    status: z.string().catch(""),
+    evidence: z.string().optional().catch(undefined),
+    tip: z.string().optional().catch(undefined),
+  }).nullable().catch(null)).catch([]).transform((items) => items.filter((item) => item !== null)),
+
+  duration_rewrite: z.object({
+    copy_text: z.string().catch(""),
+    replaces: z.string().optional().catch(undefined),
+  }).optional().catch(undefined),
+
   // ── Missing sections + section order ──
-  missing_sections: StringArr(),
+  missing_sections: z.array(z.union([
+    z.string(),
+    z.object({
+      name: z.string().catch(""),
+      why_it_matters: z.string().optional().catch(undefined),
+      template_copy_text: z.string().optional().catch(undefined),
+    }),
+  ]).nullable().catch(null)).catch([]).transform((items) => items.filter((item) => item !== null)),
   section_order_recommendation: StringField().optional(),
 });
 

@@ -9,9 +9,12 @@ import { ScoreDonut } from "@/components/checker/ScoreDonut";
 import { SectionScoreCard } from "@/components/checker/SectionScoreCard";
 import { KeywordChip, BulletReviewCard } from "@/components/checker/ResultComponents";
 import { ImprovementChecklist } from "@/components/checker/ImprovementChecklist";
+import { QuickSummaryCard } from "@/components/checker/QuickSummaryCard";
+import { MissingSectionsCard } from "@/components/checker/MissingSectionsCard";
+import { KeywordEvidenceBadge, KeywordExtrasBlock, KeywordSourceLine } from "@/components/checker/KeywordAnalysisExtras";
 import { ImpactForecastCard } from "@/components/checker/ImpactForecastCard";
 import HrPointOfView from "@/components/checker/HrPointOfView";
-import { scoreColor, gradeColor, atsBadgeColor, type AnalysisResult, type StoredAnalysisResult, type ExperienceSection, type SkillsSection } from "@/components/checker/types";
+import { scoreColor, gradeColor, atsBadgeColor, atsReadinessLabel, type AnalysisResult, type StoredAnalysisResult, type ExperienceSection, type SkillsSection } from "@/components/checker/types";
 import MagneticButton from "@/components/MagneticButton";
 import Link from "next/link";
 import { useTranslation } from "@/lib/i18n";
@@ -128,7 +131,7 @@ export default function CheckerDetailPage() {
     );
   }
 
-  const { scores, summary, grade, atsPrediction, breakdown, keywordAnalysis, narrativeFeedback, actionPlan, bulletReview, missingSections, impactForecast } = result;
+  const { scores, summary, grade, atsPrediction, breakdown, keywordAnalysis, narrativeFeedback, actionPlan, bulletReview, missingSections, impactForecast, quickSummary } = result;
   const color = scoreColor(scores.overall);
   const gc = gradeColor(grade);
   const atsBadge = atsBadgeColor(atsPrediction);
@@ -174,7 +177,14 @@ export default function CheckerDetailPage() {
         {/* StoredAnalysisResult boleh punya breakdown terpotong, sedangkan
             panel hanya membaca meta, careerVelocity, dan atsPredictionDetail.
             Bentuk penuhnya sama persis di ketiga field itu. */}
-        <HrPointOfView result={result as AnalysisResult} keyPrefix="checker.detail." />
+        {/* Ringkasan 10 detik di paling atas. Baris lama tanpa field ini di
+            fullResult → mapper null → kartu tidak muncul. */}
+        {quickSummary && <QuickSummaryCard analysis={result} summary={quickSummary} />}
+
+        {/* Anchor "Lihat" di kartu ringkasan; wrapper selalu ada supaya id stabil. */}
+        <div id="section-hr" className="scroll-mt-24">
+          <HrPointOfView result={result as AnalysisResult} keyPrefix="checker.detail." />
+        </div>
 
         {/* ============================================================ */}
         {/*  1. SCORE OVERVIEW                                            */}
@@ -197,10 +207,18 @@ export default function CheckerDetailPage() {
             {atsPrediction && (
               <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold ${atsBadge.bg} ${atsBadge.text}`}>
                 <span className={`w-2 h-2 rounded-full ${atsBadge.dot}`} />
-                {atsPrediction}
+                {/* Enum di data tidak diubah — hanya tampilan (prompt 3). */}
+                {atsReadinessLabel(atsPrediction)}
               </div>
             )}
           </div>
+
+          {/* Keterangan kesiapan dibaca: estimasi, bukan skor ATS resmi. */}
+          {atsPrediction && (
+            <p className="mt-3 text-center text-[10.5px] text-ink-soft">
+              Kesiapan dibaca HR &amp; mesin: estimasi, bukan skor ATS resmi; tiap perusahaan memakai sistem berbeda.
+            </p>
+          )}
         </section>
 
         {/* ============================================================ */}
@@ -216,31 +234,35 @@ export default function CheckerDetailPage() {
          *  persentase yang tidak pernah dihitung. */}
         {breakdown && Object.keys(breakdown).length > 0 && (
           <motion.section
-            className="space-y-3"
+            id="section-skor"
+            className="space-y-3 scroll-mt-24"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.15 }}
           >
             <h2 className="px-1 font-display text-headline-md font-bold text-ink">{t("checker.detail.section-breakdown")}</h2>
             {breakdown.summary && (
-              <SectionScoreCard title={t("checker.detail.section-summary")} score={breakdown.summary.score} issues={breakdown.summary.issues} suggestions={breakdown.summary.suggestions} delay={0.2} />
+              <SectionScoreCard title={t("checker.detail.section-summary")} score={breakdown.summary.score} issues={breakdown.summary.issues} suggestions={breakdown.summary.suggestions} delay={0.2} sectionKey="summary" analysis={result} />
             )}
             {breakdown.experience && (
-              <SectionScoreCard title={t("checker.detail.section-experience")} score={breakdown.experience.score} issues={breakdown.experience.issues} suggestions={breakdown.experience.suggestions} delay={0.25} statChip={quantChip} />
+              <SectionScoreCard title={t("checker.detail.section-experience")} score={breakdown.experience.score} issues={breakdown.experience.issues} suggestions={breakdown.experience.suggestions} delay={0.25} statChip={quantChip} sectionKey="experience" analysis={result} />
             )}
             {breakdown.skills && (
-              <SectionScoreCard title={t("checker.detail.section-skills")} score={breakdown.skills.score} issues={(breakdown.skills as SkillsSection).missing_skills} suggestions={(breakdown.skills as SkillsSection).recommendations} delay={0.3} />
+              <SectionScoreCard title={t("checker.detail.section-skills")} score={breakdown.skills.score} issues={(breakdown.skills as SkillsSection).missing_skills} suggestions={(breakdown.skills as SkillsSection).recommendations} delay={0.3} sectionKey="skills" analysis={result} />
             )}
             {breakdown.education && (
               // relevance bisa kosong di baris lama; tanpa penjaga, SectionScoreCard
               // menampilkan bullet ISSUES tanpa teks apa pun.
-              <SectionScoreCard title={t("checker.detail.section-education")} score={breakdown.education.score} issues={breakdown.education.relevance ? [breakdown.education.relevance] : []} suggestions={breakdown.education.suggestions} delay={0.35} />
+              <SectionScoreCard title={t("checker.detail.section-education")} score={breakdown.education.score} issues={breakdown.education.relevance ? [breakdown.education.relevance] : []} suggestions={breakdown.education.suggestions} delay={0.35} sectionKey="education" analysis={result} />
             )}
             {breakdown.format_ats && (
-              <SectionScoreCard title={t("checker.detail.section-format")} score={breakdown.format_ats.score} issues={breakdown.format_ats.issues} suggestions={breakdown.format_ats.tips} delay={0.4} />
+              <SectionScoreCard title={t("checker.detail.section-format")} score={breakdown.format_ats.score} issues={breakdown.format_ats.issues} suggestions={breakdown.format_ats.tips} delay={0.4} sectionKey="format_ats" analysis={result} />
             )}
           </motion.section>
         )}
+
+        {/* Section yang belum ada (prompt 4): kartu tampil hanya bila ada isinya. */}
+        <MissingSectionsCard items={missingSections} />
 
         {/* ============================================================ */}
         {/*  3. NARRATIVE FEEDBACK                                        */}
@@ -278,7 +300,8 @@ export default function CheckerDetailPage() {
         {/* ============================================================ */}
         {keywordAnalysis && (
           <motion.section
-            className="space-y-5 rounded-[18px] border-[2.5px] border-ink bg-paper p-6 shadow-hard"
+            id="section-keyword"
+            className="space-y-5 scroll-mt-24 rounded-[18px] border-[2.5px] border-ink bg-paper p-6 shadow-hard"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.35 }}
@@ -298,12 +321,20 @@ export default function CheckerDetailPage() {
                 </div>
               </div>
             </div>
+
+            {/* Sumber daftar + keterangan (prompt 5); muncul hanya bila source ada. */}
+            <KeywordSourceLine analysis={keywordAnalysis} />
             <div className="space-y-4">
               {keywordAnalysis.matched.length > 0 && (
                 <div>
                   <p className="mb-2 text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-green-deep">{t("checker.detail.keyword-found")} ({keywordAnalysis.matched.length})</p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {keywordAnalysis.matched.map((kw, i) => <KeywordChip key={i} text={kw} variant="found" />)}
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {keywordAnalysis.matched.map((kw, i) => (
+                      <span key={i} className="inline-flex flex-wrap items-center gap-1">
+                        <KeywordChip text={kw} variant="found" />
+                        <KeywordEvidenceBadge analysis={keywordAnalysis} keyword={kw} />
+                      </span>
+                    ))}
                   </div>
                 </div>
               )}
@@ -334,17 +365,22 @@ export default function CheckerDetailPage() {
                 </div>
               )}
             </div>
+
+            {/* Kartu penempatan + tabel syarat (prompt 5); null bila tidak ada data. */}
+            <KeywordExtrasBlock analysis={keywordAnalysis} />
           </motion.section>
         )}
 
         {/* ============================================================ */}
         {/*  5. IMPROVEMENT CHECKLIST, langkah perbaikan interaktif      */}
         {/* ============================================================ */}
-        <ImprovementChecklist
-          actionPlan={actionPlan}
-          missingSections={missingSections}
-          keywordAnalysis={keywordAnalysis}
-        />
+        <div id="section-checklist" className="scroll-mt-24">
+          <ImprovementChecklist
+            actionPlan={actionPlan}
+            missingSections={missingSections}
+            keywordAnalysis={keywordAnalysis}
+          />
+        </div>
 
         {/* ============================================================ */}
         {/*  6. BULLET REVIEW, per poin pengalaman                       */}

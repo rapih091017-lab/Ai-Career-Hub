@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { priorityBadge, severityMeta, toIssueItems, type BulletItem } from "./types";
+import { CopyButton } from "./CopyButton";
+import { PlaceholderText } from "./PlaceholderText";
 import { useTranslation } from "@/lib/i18n";
 
 /** Keyword tag chip */
@@ -67,19 +69,7 @@ function CariMeter({ score }: { score: number }) {
 /** Bullet review card with expand */
 export function BulletReviewCard({ item, index }: { item: BulletItem; index: number }) {
   const [open, setOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
   const { t } = useTranslation();
-
-  const copyRewrite = async () => {
-    if (!item.suggested_rewrite) return;
-    try {
-      await navigator.clipboard.writeText(item.suggested_rewrite);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // clipboard unavailable, diam
-    }
-  };
 
   const cari = typeof item.cari_score === "number" ? item.cari_score : null;
   // Normalisasi bentuk issue lama (string) & baru ({ text, source_excerpt })
@@ -191,19 +181,12 @@ export function BulletReviewCard({ item, index }: { item: BulletItem; index: num
                   <div>
                     <div className="mb-1 flex items-center justify-between gap-2">
                       <p className="text-[10.5px] font-extrabold uppercase tracking-[0.06em] text-green-deep">{t("checker.detail.after")}</p>
-                      <button
-                        onClick={copyRewrite}
-                        className="inline-flex items-center gap-1 rounded-full border-[1.5px] border-ink/20 px-2 py-1 text-[10px] font-bold text-ink transition-colors hover:border-ink hover:bg-surface-container-low active:scale-[0.97]"
-                        title={t("checker.detail.copy-fix")}
-                      >
-                        <span className="material-symbols-outlined select-none text-[13px]">
-                          {copied ? "check" : "content_copy"}
-                        </span>
-                        {copied ? t("checker.detail.copied") : t("checker.detail.copy")}
-                      </button>
+                      <CopyButton text={item.suggested_rewrite} label={t("checker.detail.copy", "Salin")} />
                     </div>
                     <div className="rounded-xl border-[1.5px] border-green-deep/40 bg-primary-fixed p-3">
-                      <p className="text-sm text-on-primary-fixed">{item.suggested_rewrite}</p>
+                      <p className="text-sm text-on-primary-fixed">
+                        <PlaceholderText text={item.suggested_rewrite} />
+                      </p>
                     </div>
                   </div>
                 )}

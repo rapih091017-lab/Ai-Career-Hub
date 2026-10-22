@@ -97,6 +97,20 @@ matching, bukan keyword counting):
 8. Impact forecast (monoton, lihat aturan #8)
 9. Action plan terukur (quick wins / short-term / long-term)
 10. Missing sections + urutan section yang disarankan
+11. Ringkasan 10 detik (quick_summary): pilih maksimal 5 perbaikan paling
+    berdampak LINTAS section (bukan semuanya dari satu bagian). verdict ≤25 kata;
+    top_strengths maksimal 3 (tiap ≤15 kata, berdasar isi CV); top_fixes: title
+    ≤12 kata berupa tindakan, target_section "hr"|"skor"|"keyword"|"checklist",
+    impact HARUS literal "Tinggi"|"Sedang"|"Rendah" apa pun bahasa output,
+    est_minutes menit kerja nyata 1-60, copy_text opsional teks siap tempel.
+    Tanpa angka poin per fix. Tidak ada perbaikan konkret → top_fixes [].
+12. Panel HR (hr_scan, hr_flags, hr_questions, knockout_risks,
+    duration_rewrite) — aturan per field ada di bagian PANEL HR.
+13. Rincian per section di dalam breakdown: score_reason, top_fix, plus field
+    khusus tiap section — aturannya di bagian RINCIAN PER SECTION.
+14. Lanjutan analisis keyword (evidence, placements, requirements), aturannya
+    di bagian ANALISIS KATA KUNCI (TAMBAHAN). "source" TIDAK usah dikirim;
+    route yang menghitung dari ada/tidaknya JD.
 
 Ini bounded scoring task dengan skema jelas, bukan eksplorasi terbuka. Reasoning
 internal, langsung kembalikan JSON final.
@@ -202,7 +216,100 @@ ${DELIM.SECTION}
 9. CV > 1500 kata: fokus 3 pengalaman paling relevan, sebutkan di verdict.
 10. bullets/issues/rekomendasi: JANGAN memaksakan panjang, kutip yang berdampak,
     jangan padding demi jumlah.
+11. quick_summary: judul fix adalah TINDAKAN konkret, bukan deskripsi masalah;
+    est_minutes realistis untuk satu orang mengerjakannya. Kalau satu perbaikan
+    sama dampaknya, pilih yang menitnya lebih kecil.
+${DELIM.SECTION}
 
+${DELIM.SECTION}
+--- ATURAN OUTPUT TEKS YANG BISA DITEMPEL KE CV ---
+Berlaku untuk semua teks saran yang akan disalin pengguna ke CV (copy_text,
+suggested_rewrite, suggestions, tips, quick_wins, dan teks sejenis):
+1. JANGAN mengarang fakta, angka, perusahaan, tools, atau sertifikasi. Kalau fakta
+   itu tidak ada di CV, tulis placeholder "[angka]", "[persen]", atau
+   "[jumlah orang]" — jangan menggantinya dengan angka karangan.
+2. JANGAN menyebut statistik tentang HR/perekrut (mis. "90% recruiter menolak...").
+3. copy_text memakai bahasa yang sama dengan CV — jangan campur Indonesia dan
+   Inggris di luar nama tools/skill yang memang berbahasa Inggris.
+4. Kutipan bukti WAJIB potongan persis dari teks CV (ikuti aturan #6).
+5. JANGAN menjanjikan lolos ATS atau diterima kerja; sampaikan sebagai kemungkinan,
+   bukan kepastian.
+${DELIM.SECTION}
+
+${DELIM.SECTION}
+--- PANEL HR (tambahan, semua field opsional) ---
+Dipakai panel "Analisa HR" di halaman hasil. Semua status/enum memakai literal
+bahasa Indonesia apa pun bahasa output. Jangan mengarang: teks yang tidak ada
+di CV → nilai null / array kosong.
+1. hr_scan, empat kunci tetap { last_title, total_experience, top_achievement,
+   key_skills }, tiap kunci { value: string|null, status: "terbaca"|"samar"|
+   "tidak_terbaca", note?: string }. "tidak_terbaca" berarti CV memang tidak
+   menyebutkannya (value null) — bukan lupa mengisi.
+2. hr_flags, maksimal 8, { type: "red"|"green", label, evidence?: string,
+   fix?: { copy_text, replaces? } }. evidence WAJIB potongan persis dari
+   {{CV_TEXT}} (abaikan beda spasi/kapital); bukan kutipan CV → tulis "".
+   Red flag: typo, bahasa campur, jeda karier tak dijelaskan, pindah kerja
+   sangat sering, email tidak profesional, dsb. Green flag: sinyal yang bikin
+   HR lanjut membaca. fix (opsional) teks siap tempel sesuai ATURAN OUTPUT
+   TEKS; replaces = teks CV yang diganti.
+3. hr_questions, 3-5, { question, why_asked, answer_tip }. why_asked menyebut
+   bagian CV yang memantik pertanyaan; answer_tip maksimal 2 kalimat dan tidak
+   boleh mengarang fakta yang tidak ada di CV.
+4. knockout_risks, maksimal 8, { requirement, status: "terpenuhi"|
+   "belum_terlihat"|"tidak_ada", evidence?, tip? }. HANYA diisi kalau ada
+   {{JD_TEXT}} atau syarat standar role; tanpa itu kosongkan array. evidence
+   sama ketatnya dengan hr_flags.
+5. duration_rewrite, { copy_text, replaces? } — hanya kalau ada jeda ≥6 bulan
+   antar posisi ATAU CV memakai tanggal lengkap. Hitung lama kerja HANYA dari
+   tanggal yang tertulis; tanggal tidak lengkap → jangan kirim field ini.
+   copy_text format durasi yang jujur dan bisa ditempel apa adanya.
+${DELIM.SECTION}
+
+${DELIM.SECTION}
+--- RINCIAN PER SECTION (semua opsional, di dalam objek breakdown) ---
+Jangan mengutip statistik dan jangan mengarang fakta; placeholder "[angka]"
+bila perlu. Umum untuk tiap section: score_reason (≤25 kata, merujuk bukti di
+CV) dan top_fix { title (tindakan), copy_text?, replaces? }.
+1. summary: has_skills_and_achievement (boolean), rewrite_copy_text (40-70
+   kata, hanya fakta dari CV, placeholder bila perlu).
+2. experience: bullets_total, bullets_without_result (integer ≥0, dihitung dari
+   bullet yang benar-benar ada di CV; bullets_without_result ≤ bullets_total).
+   quantification_pct tetap seperti sebelumnya.
+3. skills: unproven_skills (skill tercantum tapi tidak muncul di pengalaman),
+   grouped_skills_copy_text (baris skills terkelompok yang HANYA memakai skill
+   yang sudah ada di CV — jangan sekali-kali menyisipkan missing_skills).
+4. education: copy_text (format ulang blok pendidikan; IPK, organisasi, dan
+   magang hanya bila sudah ada di CV).
+5. format_ats: checks (maksimal 8) { id, label, status: "ok"|"perlu_perbaikan"|
+   "tidak_dapat_dinilai", note? }. Yang boleh dicek: panjang halaman (hanya jika
+   jumlah halaman tersedia), urutan kronologis terbalik, bullet vs paragraf,
+   konsistensi bahasa, kontak lengkap dan email profesional, foto (informasi
+   saja, bukan penalti). Tanpa data pendukung → "tidak_dapat_dinilai".
+6. missing_sections: boleh string (nama section) ATAU objek { name,
+   why_it_matters, template_copy_text }.
+${DELIM.SECTION}
+
+${DELIM.SECTION}
+--- ANALISIS KATA KUNCI (TAMBAHAN, semua opsional) ---
+Di dalam objek keyword_analysis yang sudah ada. Jangan mengubah cara
+match_rate_pct dihitung, dan jangan mengutip statistik.
+1. evidence, untuk tiap keyword di matched: { keyword (harus persis satu dari
+   matched), level: "dibuktikan" | "hanya_daftar_skill", excerpt? }.
+   "dibuktikan" = keyword muncul di bagian pengalaman/bukan sekadar daftar
+   skills; "hanya_daftar_skill" = hanya ada di daftar skills. excerpt =
+   potongan persis dari {{CV_TEXT}}; tidak yakin → kosongkan.
+2. placements, maksimal 8, critical dulu: { keyword, priority: "critical" |
+   "nice", where (mis. "Pengalaman > PT X > poin 2" atau "Skills"),
+   replaces?, copy_text }. copy_text = revisi poin yang SUDAH ada (replaces =
+   teks aslinya, persis) ATAU baris tambahan di Skills. DILARANG menambah
+   pengalaman, pencapaian, atau perusahaan baru; fakta kurang → placeholder
+   "[angka]". Tanpa copy_text → jangan kirim itemnya.
+3. requirements, maksimal 12: { requirement, status: "terpenuhi" |
+   "sebagian" | "tidak_ada", evidence?, tip? } — HANYA kalau ada {{JD_TEXT}}.
+   evidence sama ketatnya dengan evidence di atas.
+${DELIM.SECTION}
+
+${DELIM.SECTION}
 --- VERIFIKASI AKHIR (internal, sebelum output) ---
 (a) overall_score = ROUND(Σ score×weight) persis, bukan angka bebas
 (b) grade WAJIB sama dengan hasil tabel GRADE di atas untuk overall_score yang kamu tulis. Kalau tidak cocok, angka itu salah.
@@ -212,6 +319,14 @@ ${DELIM.SECTION}
 (f) nominal Rupiah format penuh
 (g) bullet_review tidak melebihi {{BULLET_MAX}} item, dan yang dipilih benar-benar
     yang PALING BERDAMPAK (CARI terendah / potensi perbaikan terbesar, relevan JD)
+(h) quick_summary: ≤5 top_fixes dengan title ≤12 kata, impact literal
+    "Tinggi"|"Sedang"|"Rendah", est_minutes 1-60, dan pilihannya lintas section
+(i) panel HR: status hr_scan/knockout_risks memakai literal enum; evidence
+    (hr_flags, knockout_risks) adalah potongan persis dari CV atau "";
+    duration_rewrite hanya dikirim kalau lama kerja dihitung dari tanggal tertulis
+(k) analisis keyword: evidence.level/placements.priority/requirements.status
+    memakai literal enum; placements tanpa copy_text tidak dikirim; requirements
+    hanya ada kalau ada JD
 Jangan tampilkan proses verifikasi ini.
 ${DELIM.SECTION}
 
@@ -245,11 +360,11 @@ ${DELIM.SECTION}
     "strengths": [{ "text": string, "source_excerpt": string | null }]
   },
   "breakdown": {
-    "summary":    { "score": 0-100, "issues": [{ "text": string, "severity": "critical"|"high"|"medium"|"low", "source_excerpt": string|null }], "suggestions": string[] },
-    "experience": { "score": 0-100, "quantification_pct": 0-100, "issues": [issue], "suggestions": string[] },
-    "skills":     { "score": 0-100, "missing_skills": string[], "adjacent_skills": string[], "recommendations": string[] },
-    "education":  { "score": 0-100, "relevance": string, "suggestions": string[] },
-    "format_ats": { "score": 0-100, "issues": [issue], "tips": string[] }
+    "summary":    { "score": 0-100, "issues": [{ "text": string, "severity": "critical"|"high"|"medium"|"low", "source_excerpt": string|null }], "suggestions": string[], "score_reason": string, "top_fix": { "title": string, "copy_text": string, "replaces": string }, "has_skills_and_achievement": boolean, "rewrite_copy_text": string },
+    "experience": { "score": 0-100, "quantification_pct": 0-100, "issues": [issue], "suggestions": string[], "score_reason": string, "top_fix": { "title": string, "copy_text": string, "replaces": string }, "bullets_total": number, "bullets_without_result": number },
+    "skills":     { "score": 0-100, "missing_skills": string[], "adjacent_skills": string[], "recommendations": string[], "score_reason": string, "top_fix": { "title": string, "copy_text": string, "replaces": string }, "unproven_skills": string[], "grouped_skills_copy_text": string },
+    "education":  { "score": 0-100, "relevance": string, "suggestions": string[], "score_reason": string, "top_fix": { "title": string, "copy_text": string, "replaces": string }, "copy_text": string },
+    "format_ats": { "score": 0-100, "issues": [issue], "tips": string[], "score_reason": string, "top_fix": { "title": string, "copy_text": string, "replaces": string }, "checks": [ { "id": string, "label": string, "status": "ok"|"perlu_perbaikan"|"tidak_dapat_dinilai", "note": string } ] }
   },
   "keyword_analysis": {
     "matched": string[],
@@ -258,7 +373,16 @@ ${DELIM.SECTION}
     "missing_nice_to_have": string[],
     "synonym_suggestions": string[],
     "match_rate_pct": 0-100,
-    "semantic_match_rate_pct": 0-100
+    "semantic_match_rate_pct": 0-100,
+    "evidence": [
+      { "keyword": string, "level": "dibuktikan" | "hanya_daftar_skill", "excerpt": string }
+    ],
+    "placements": [
+      { "keyword": string, "priority": "critical" | "nice", "where": string, "replaces": string, "copy_text": string }
+    ],
+    "requirements": [
+      { "requirement": string, "status": "terpenuhi" | "sebagian" | "tidak_ada", "evidence": string, "tip": string }
+    ]
   },
   "career_velocity": {
     "time_in_role_analysis": string,
@@ -294,7 +418,30 @@ ${DELIM.SECTION}
       "priority": "High" | "Medium" | "Low"
     }
   ],
-  "missing_sections": string[],
+  "missing_sections": [ string | { "name": string, "why_it_matters": string, "template_copy_text": string } ],
+  "hr_scan": {
+    "last_title":    { "value": string | null, "status": "terbaca" | "samar" | "tidak_terbaca", "note": string },
+    "total_experience": { "value": string | null, "status": "terbaca" | "samar" | "tidak_terbaca", "note": string },
+    "top_achievement": { "value": string | null, "status": "terbaca" | "samar" | "tidak_terbaca", "note": string },
+    "key_skills":   { "value": string | null, "status": "terbaca" | "samar" | "tidak_terbaca", "note": string }
+  },
+  "hr_flags": [
+    { "type": "red" | "green", "label": string, "evidence": string, "fix": { "copy_text": string, "replaces": string } }
+  ],
+  "hr_questions": [
+    { "question": string, "why_asked": string, "answer_tip": string }
+  ],
+  "knockout_risks": [
+    { "requirement": string, "status": "terpenuhi" | "belum_terlihat" | "tidak_ada", "evidence": string, "tip": string }
+  ],
+  "duration_rewrite": { "copy_text": string, "replaces": string },
+  "quick_summary": {
+    "verdict": string,
+    "top_strengths": string[],
+    "top_fixes": [
+      { "id": string, "title": string, "target_section": "hr" | "skor" | "keyword" | "checklist", "impact": "Tinggi" | "Sedang" | "Rendah", "est_minutes": number, "copy_text": string }
+    ]
+  },
   "section_order_recommendation": string
 }
 ${DELIM.SECTION}
@@ -333,6 +480,7 @@ ${DELIM.SECTION}
     { "section": "experience", "original_text": "Membangun fitur login menggunakan React dan Node.js", "cari_score": 15, "issues": ["Verb moderate", "Result & Impact = 0"], "suggested_rewrite": "Merancang sistem autentikasi end-to-end (React + Node.js, JWT + OAuth2) yang melayani [est.] 10.000+ pengguna dan memangkas response time [est.] 40%.", "priority": "High" }
   ],
   "missing_sections": ["Sertifikasi", "Portfolio/GitHub"],
+  "quick_summary": { "verdict": "Fondasi React solid, tapi TypeScript absen dan 4 bullet tanpa metrik — dua hal ini yang paling menahan skor.", "top_strengths": ["Fondasi React & Node.js sesuai stack JD", "Career velocity positif: Junior ke Mid dalam 2 tahun", "Pendidikan relevan: S1 Ilmu Komputer"], "top_fixes": [ { "id": "q1", "title": "Tambah TypeScript di Skills", "target_section": "keyword", "impact": "Tinggi", "est_minutes": 5, "copy_text": "TypeScript | Next.js | CI/CD" }, { "id": "q2", "title": "Kuantifikasi 4 bullet experience", "target_section": "skor", "impact": "Tinggi", "est_minutes": 30 }, { "id": "q3", "title": "Pindahkan kontak ke body", "target_section": "hr", "impact": "Sedang", "est_minutes": 5 } ] },
   "section_order_recommendation": "Contact → Summary → Skills → Experience → Education → Certifications" }
 ${DELIM.SECTION}
 

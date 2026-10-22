@@ -8,6 +8,16 @@ import { getUserAccess } from "@/lib/access";
 import { ANALYSIS_PROMPT_V4 } from "@/lib/ai/prompts/analysis-v4";
 import { PROMPT_MARKERS } from "@/lib/ai/prompts/shared";
 import { sanitizeExtractedText } from "@/lib/checker/extracted-text";
+import {
+  toDurationRewrite,
+  toHrFlags,
+  toHrQuestions,
+  toHrScan,
+  toKeywordAnalysis,
+  toKnockoutRisks,
+  toMissingSections,
+  toQuickSummary,
+} from "@/lib/checker/analysis-from-full-result";
 import { analyzeFailureMessage } from "@/lib/checker/analyze-failure";
 
 import type { AnalysisResult } from "@/lib/ai/prompts/schemas";
@@ -300,7 +310,16 @@ message: t(
   // supaya UI bisa render badge severity. Field ini additive, hasil V3 lama tetap aman.
   const aiStructuredData = {
     breakdown: aiAnalysis?.breakdown ?? null,
-    keywordAnalysis: aiAnalysis?.keyword_analysis ?? null,
+    // keywordAnalysis dinormalisasi di sini: `source` dihitung DETERMINISTIK
+    // dari ada/tidaknya JD (bukan dari output AI, schema pun tidak memuatnya),
+    // evidence/requirements diverifikasi ke teks CV, placements disortir.
+    // match_rate_pct diteruskan apa adanya oleh mapper.
+    keywordAnalysis: aiAnalysis?.keyword_analysis
+      ? toKeywordAnalysis(aiAnalysis.keyword_analysis, {
+          source: jd?.trim() ? "job_description" : "role_generic",
+          cvText: extractedText,
+        })
+      : null,
     narrativeFeedback: aiAnalysis?.narrative_feedback ?? null,
     // meta belum pernah diteruskan; detected_seniority di dalamnya dibutuhkan panel sisi HR.
     meta: aiAnalysis?.meta ?? null,
@@ -311,10 +330,25 @@ message: t(
     careerVelocity: aiAnalysis?.career_velocity ?? null,
     actionPlan: aiAnalysis?.action_plan ?? null,
     bulletReview: aiAnalysis?.bullet_review ?? [],
-    missingSections: aiAnalysis?.missing_sections ?? [],
+    // String lama dinormalkan jadi { name } di sini juga: respons live dan baris
+    // tersimpan harus punya satu bentuk yang sama.
+    missingSections: toMissingSections(aiAnalysis?.missing_sections),
     grade: aiAnalysis?.grade ?? null,
     weightsApplied: aiAnalysis?.weights_applied ?? null,
     impactForecast: aiAnalysis?.impact_forecast ?? null,
+    // Ringkasan 10 detik dinormalisasi di sini juga, bukan disimpan mentah:
+    // respons live dan baris tersimpan harus identik, dan mapper mengulanginya
+    // dengan aman karena toQuickSummary idempoten. null untuk baris tanpa ringkasan.
+    quickSummary: toQuickSummary(aiAnalysis?.quick_summary),
+    /* Panel HR (prompt 3). evidence flag/knockout divalidasi ke teks CV di sini
+     * (bukan di mapper): teks yang bukan potongan CV dikosongkan, flag tetap ada.
+     * Teks CV tersedia di semua request analyze, jadi validasi tidak pernah
+     * dilewati diam-diam. */
+    hrScan: toHrScan(aiAnalysis?.hr_scan),
+    hrFlags: toHrFlags(aiAnalysis?.hr_flags, extractedText),
+    hrQuestions: toHrQuestions(aiAnalysis?.hr_questions),
+    knockoutRisks: toKnockoutRisks(aiAnalysis?.knockout_risks, extractedText),
+    durationRewrite: toDurationRewrite(aiAnalysis?.duration_rewrite),
     atsPrediction: normalizedAtsPrediction,
     atsPredictionDetail: aiAnalysis?.ats_prediction && typeof aiAnalysis.ats_prediction === "object"
       ? aiAnalysis.ats_prediction

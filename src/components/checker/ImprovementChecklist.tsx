@@ -3,7 +3,7 @@
 import { useMemo, useState, useCallback } from "react";
 import { motion } from "motion/react";
 import { useTranslation } from "@/lib/i18n";
-import type { ActionPlan, KeywordAnalysis } from "./types";
+import type { ActionPlan, KeywordAnalysis, MissingSection } from "./types";
 
 /**
  * ImprovementChecklist, mengubah rekomendasi analisis CV menjadi langkah
@@ -15,7 +15,8 @@ import type { ActionPlan, KeywordAnalysis } from "./types";
  */
 interface ImprovementChecklistProps {
   actionPlan?: ActionPlan | null;
-  missingSections?: string[];
+  /** Objek sejak prompt 4; mapper menormalkan string lama jadi { name }. */
+  missingSections?: MissingSection[];
   keywordAnalysis?: KeywordAnalysis | null;
 }
 
@@ -50,7 +51,8 @@ export function ImprovementChecklist({ actionPlan, missingSections, keywordAnaly
     push("quick", actionPlan?.quick_wins);
     push("short", actionPlan?.short_term);
     push("long", actionPlan?.long_term);
-    push("section", missingSections);
+    // Bentuk objek (prompt 4): hanya namanya yang masuk daftar langkah.
+    push("section", (missingSections ?? []).map((section) => section?.name ?? ""));
     push("keyword", keywordAnalysis?.missing_critical);
     return out;
   }, [actionPlan, missingSections, keywordAnalysis]);
