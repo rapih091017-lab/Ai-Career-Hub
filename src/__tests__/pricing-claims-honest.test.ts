@@ -4,6 +4,7 @@ import { join } from "node:path";
 
 const i18nSrc = readFileSync(join(process.cwd(), "src/lib/i18n.tsx"), "utf8");
 const pricingSrc = readFileSync(join(process.cwd(), "src/components/PricingSection.tsx"), "utf8");
+const faqSectionSrc = readFileSync(join(process.cwd(), "src/components/landing/FaqSection.tsx"), "utf8");
 const deleteRouteSrc = readFileSync(join(process.cwd(), "src/app/api/account/delete/route.ts"), "utf8");
 const deleteUiSrc = readFileSync(join(process.cwd(), "src/components/settings/DeleteAccountSection.tsx"), "utf8");
 
@@ -38,13 +39,15 @@ describe("setiap klaim di halaman harga benar", () => {
   });
 
   it("FAQ menjawab keberatan pembeli yang teliti", () => {
-    // Retensi, kuota habis, dan uang kembali adalah tiga pertanyaan yang
-    // paling sering menahan orang sebelum membayar.
-    expect(pricingSrc).toContain("const FAQ_KEYS = [0, 1, 2, 3, 4, 5, 6]");
-    expect(i18nSrc).toContain("pricing.faq.5.q");
-    expect(i18nSrc).toContain("pricing.faq.6.q");
-    expect(i18nSrc).toContain("Apa yang terjadi kalau kuota habis");
-    expect(i18nSrc).toContain("Apakah langganan diperpanjang otomatis");
+    // Satu daftar pertanyaan saja di landing. Blok FAQ lama yang tertinggal di
+    // dalam bagian harga sudah dihapus, jadi pengunjung tidak membaca dua FAQ.
+    expect(pricingSrc).not.toContain("FAQ_KEYS");
+    expect(faqSectionSrc).toContain('{ q: "lp.faq.q7", a: "lp.faq.a7" }');
+    // Kuota habis dan perpanjangan adalah dua hal yang paling sering ditanya
+    // sebelum membayar.
+    expect(i18nSrc).toContain("Kuota gratis habis");
+    expect(i18nSrc).toContain("tanpa penarikan otomatis");
+    expect(i18nSrc).not.toContain("paket bulanan auto-renew");
   });
 
   it("akun bisa benar-benar dihapus, seperti janji di Privacy", () => {

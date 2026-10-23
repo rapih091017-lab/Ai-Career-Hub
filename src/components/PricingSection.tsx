@@ -145,8 +145,6 @@ const COMPARISON_ROWS: { key: string; labelKey: string }[] = [
   { key: "pdf_export", labelKey: "pricing.compare.pdf-export" },
 ];
 
-const FAQ_KEYS = [0, 1, 2, 3, 4, 5, 6];
-
 /* ─── Component ─── */
 
 /** Satu sel tabel perbandingan, nilainya dari kuota paket di katalog. */
@@ -180,7 +178,6 @@ interface PricingSectionProps {
 export default function PricingSection({ defaultMode = "satuan", onSelectPlan }: PricingSectionProps) {
   const { t } = useTranslation();
   const [showComparison, setShowComparison] = useState(true);
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [activeSatuan, setActiveSatuan] = useState<PlanId>("bikin_cv");
 
   const { packages, loading: catalogLoading } = useCatalogPackages();
@@ -551,46 +548,6 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
           </AnimatePresence>
         </motion.div>
 
-        {/* ─── FAQ ─── */}
-        <motion.div
-          className="mt-16"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: 0.1 }}
-        >
-          <h3 className="mb-8 text-center font-display text-ink">{t("pricing.faq-title")}</h3>
-          <div className="mx-auto max-w-2xl divide-y divide-hairline overflow-hidden rounded-[14px] border-[2.5px] border-edge bg-paper shadow-hard-sm">
-            {FAQ_KEYS.map((idx) => (
-              <div key={idx}>
-                <button
-                  onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                  className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors hover:bg-lime/15"
-                >
-                  <span className="flex-1 font-label-bold text-sm text-on-surface">{t("pricing.faq." + idx + ".q")}</span>
-                  <motion.span
-                    animate={{ rotate: openFaq === idx ? 180 : 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="material-symbols-outlined shrink-0 text-on-surface-variant"
-                  >
-                    expand_more
-                  </motion.span>
-                </button>
-                <div
-                  className="accordion-content"
-                  style={{
-                    maxHeight: openFaq === idx ? "900px" : "0px",
-                    paddingBottom: openFaq === idx ? "1.25rem" : "0px",
-                  }}
-                >
-                  <p className="px-6 text-sm leading-relaxed text-on-surface-variant">
-                    {t("pricing.faq." + idx + ".a")}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
       </div>
     </section>
   );
