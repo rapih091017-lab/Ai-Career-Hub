@@ -37,7 +37,7 @@ afterEach(() => {
 describe("FeaturedArticle", () => {
   it("menampilkan artikel interview yang dipatok", async () => {
     const fetchMock = mockFetch({ post: POST });
-    renderSection();
+    const { container } = renderSection();
 
     await waitFor(() => expect(screen.getByText(POST.title)).toBeTruthy());
     expect(fetchMock).toHaveBeenCalledWith(`/api/career-hub/${FEATURED_SLUG}`);
@@ -46,6 +46,10 @@ describe("FeaturedArticle", () => {
     expect(screen.getByRole("link", { name: /baca artikelnya/i }).getAttribute("href")).toBe(
       `/career-hub/${POST.slug}`,
     );
+    // Kartu ini lahir setelah fetch, sedangkan RevealOnScroll hanya memindai
+    // [data-reveal] sekali saat mount. Kalau atribut itu dipasang lagi,
+    // kartunya tertinggal di opacity 0 dan section-nya tampak kosong.
+    expect(container.querySelector("[data-reveal]")).toBeNull();
   });
 
   it("tidak merender section saat artikel tidak ditemukan", async () => {

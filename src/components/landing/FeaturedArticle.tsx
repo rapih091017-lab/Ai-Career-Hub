@@ -8,6 +8,12 @@ import { CAREER_HUB_CATEGORIES } from "@/lib/career-hub-schemas";
 /**
  * Satu artikel Career Hub sebagai pemancing.
  *
+ * Sengaja tanpa `data-reveal`: RevealOnScroll memindai `[data-reveal]` sekali
+ * saat mount, sedangkan kartu ini baru ada setelah fetch selesai. Elemen yang
+ * lahir setelah pemindaian tidak pernah diamati, jadi kelas `is-revealed`
+ * tidak pernah masuk dan kartunya tertinggal di opacity 0 alias tidak
+ * kelihatan.
+ *
  * Artikelnya dipatok lewat slug, bukan "yang terbaru", supaya hook-nya bisa
  * dipilih: artikel interview adalah yang paling sering jadi titik masuk.
  * Kalau artikel ini di-unpublish atau slug-nya berganti, section tidak
@@ -51,10 +57,7 @@ export default function FeaturedArticle() {
   return (
     <section id="bacaan" className="section section-rule bg-desk">
       <div className="shell">
-        <div
-          data-reveal
-          className="grid gap-6 md:grid-cols-[1.2fr_0.8fr] md:items-end md:gap-x-16"
-        >
+        <div className="grid gap-6 md:grid-cols-[1.2fr_0.8fr] md:items-end md:gap-x-16">
           <div>
             <p className="kicker">{t("lp.article.kicker")}</p>
             <h2 className="max-w-[22ch] font-display text-headline-lg font-bold text-ink">
@@ -66,7 +69,7 @@ export default function FeaturedArticle() {
           </p>
         </div>
 
-        <article data-reveal className="card-hard mt-10 grid gap-6 bg-stage p-6 text-on-dark md:mt-12 md:p-9">
+        <article className="card-hard mt-10 grid gap-6 bg-stage p-6 text-on-dark md:mt-12 md:p-9">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[11.5px] font-extrabold uppercase tracking-[0.06em] text-lime">
             <span>{categoryLabel}</span>
             {post.publishedAt ? (
