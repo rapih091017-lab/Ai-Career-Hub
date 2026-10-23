@@ -122,10 +122,21 @@ const FEATURE_ORDER: readonly string[] = [
  */
 export function packageBenefits(pkg: CatalogPackage): { key: string; value: number | "unlimited" }[] {
   if (!pkg.limits) return [];
-  return FEATURE_ORDER.filter((f) => pkg.limits?.[f] !== false && pkg.limits?.[f] !== undefined).map((f) => ({
+  const benefits = FEATURE_ORDER.filter((f) => pkg.limits?.[f] !== false && pkg.limits?.[f] !== undefined).map((f) => ({
     key: f,
     value: pkg.limits![f] as number | "unlimited",
   }));
+
+  // LinkedIn Optimizer memakai jatah cv_analyzer yang sama, dengan penghitung
+  // terpisah. Barisnya ditampilkan sendiri supaya pembeli tahu fitur ini ikut
+  // tanpa menambah kolom baru di katalog atau database.
+  const analyzer = pkg.limits.cv_analyzer;
+  if (analyzer !== false && analyzer !== undefined) {
+    const index = benefits.findIndex((benefit) => benefit.key === "cv_analyzer");
+    benefits.splice(index + 1, 0, { key: "linkedin_optimizer", value: analyzer });
+  }
+
+  return benefits;
 }
 
 /** Label satu baris isi paket, misalnya "3x cek CV" atau "Cover letter tanpa batas". */

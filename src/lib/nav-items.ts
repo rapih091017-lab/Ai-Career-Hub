@@ -60,6 +60,13 @@ export const NAV_GROUPS: NavGroup[] = [
         activePrefixes: ["/checker/"],
       },
       {
+        labelKey: "nav.item.linkedin-optimizer",
+        label: "LinkedIn Optimizer",
+        href: "/linkedin-optimizer",
+        icon: "person_search",
+        activePrefixes: ["/linkedin-optimizer/"],
+      },
+      {
         labelKey: "nav.item.interview",
         label: "Latihan Interview",
         href: "/interview",

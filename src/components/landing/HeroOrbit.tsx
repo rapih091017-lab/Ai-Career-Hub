@@ -226,6 +226,40 @@ export default function HeroOrbit() {
                 </Link>
               </article>
             ))}
+
+            {/* Kartu lebar untuk fitur yang bukan bagian dari alur 01–04.
+                Tetap memakai bentuk kartu kertas yang sama supaya terbaca
+                sebagai anggota himpunan, bukan banner iklan. */}
+            <article
+              className="col-span-2 rounded-xl border-2 border-edge bg-paper p-3 text-ink shadow-[4px_5px_rgba(10,15,13,0.55)] animate-ach-node-in"
+              style={{ ["--node-rot" as string]: "-0.8deg", animationDelay: "1.05s" }}
+            >
+              <div className="flex items-center gap-3">
+                <span
+                  aria-hidden="true"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-edge bg-brand-dark text-lime"
+                >
+                  <span className="material-symbols-outlined text-[18px]">person_search</span>
+                </span>
+                <div className="min-w-0 flex-1">
+                  <span className="inline-block rounded-full bg-brand-dark px-2 py-0.5 text-[10.5px] font-bold text-lime">
+                    {t("lp.hero.linkedin.tag")}
+                  </span>
+                  <h2 className="mt-1.5 font-display text-[13px] font-bold leading-tight text-ink">
+                    {t("lp.hero.linkedin.title")}
+                  </h2>
+                  <p className="mt-1 text-[11.5px] font-semibold leading-[1.45] text-ink-soft">
+                    {t("lp.hero.linkedin.desc")}
+                  </p>
+                  <Link
+                    href="/linkedin-optimizer"
+                    className="mt-2.5 inline-flex items-center rounded-[6px] border-2 border-edge bg-brand-dark px-2.5 py-1.5 text-[11px] font-bold text-lime shadow-[2px_2px_rgba(10,15,13,0.35)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5"
+                  >
+                    {t("lp.hero.linkedin.cta")}
+                  </Link>
+                </div>
+              </div>
+            </article>
           </div>
         </div>
       </div>

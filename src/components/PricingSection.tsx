@@ -135,6 +135,9 @@ const LANGGANAN_PLAN_DATA: LandingPlan[] = [
 const COMPARISON_ROWS: { key: string; labelKey: string }[] = [
   { key: "ai_cv_generate", labelKey: "pricing.compare.ai-gen" },
   { key: "cv_analyzer", labelKey: "pricing.compare.analyzer" },
+  // Nilainya sengaja membaca cv_analyzer: LinkedIn Optimizer memakai kelayakan
+  // fitur yang sama dengan penghitung terpisah, jadi angkanya identik.
+  { key: "cv_analyzer", labelKey: "pricing.compare.linkedin" },
   { key: "ai_revision", labelKey: "pricing.compare.ai-revision" },
   { key: "ai_suggestion", labelKey: "pricing.compare.ai-suggestion" },
   { key: "cover_letter", labelKey: "pricing.compare.cover-letter" },

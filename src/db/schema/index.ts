@@ -144,6 +144,26 @@ export const checkerResults = pgTable("checker_results", {
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
 });
 
+/**
+ * Hasil LinkedIn Optimizer.
+ *
+ * Satu baris = satu kali optimasi. `full_result` menyimpan seluruh keluaran AI
+ * (skor per bagian + teks rewrite), jadi halaman hasil tidak perlu memanggil
+ * model lagi. Baris bisa milik tamu (userId null) dengan fingerprint anonim,
+ * sama seperti checker_results.
+ */
+export const linkedinOptimizations = pgTable("linkedin_optimizations", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
+  anonymousFingerprint: jsonb("anonymous_fingerprint").$type<{ ip: string; cookieHash: string; anonId?: string }>(),
+  branding: text("branding").notNull(),
+  resumeText: text("resume_text").notNull(),
+  overallScore: integer("overall_score").notNull(),
+  grade: varchar("grade", { length: 2 }).notNull(),
+  fullResult: jsonb("full_result").$type<Record<string, unknown>>().notNull(),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
+});
+
 export const coverLetters = pgTable("cover_letters", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),

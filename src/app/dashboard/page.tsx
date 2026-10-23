@@ -47,6 +47,15 @@ interface CheckerHistoryItem {
   jobDescription: string;
 }
 
+interface LinkedInHistoryItem {
+  id: string;
+  branding: string;
+  overallScore: number;
+  grade: string;
+  verdict: string | null;
+  createdAt: string;
+}
+
 interface LetterItem {
   id: string;
   cvId: string | null;
@@ -97,6 +106,7 @@ export default function DashboardPage() {
   const [profileData, setProfileData] = useState<ProfileCompleteness | null>(null);
   const [checkerHistory, setCheckerHistory] = useState<CheckerHistoryItem[]>([]);
   const [checkerHistoryLoading, setCheckerHistoryLoading] = useState(true);
+  const [linkedinHistory, setLinkedinHistory] = useState<LinkedInHistoryItem[]>([]);
   const [letters, setLetters] = useState<LetterItem[]>([]);
   const [lettersLoading, setLettersLoading] = useState(true);
   const [suratMenuFor, setSuratMenuFor] = useState<string | null>(null);
@@ -181,6 +191,14 @@ export default function DashboardPage() {
       .then((data) => setCheckerHistory(Array.isArray(data) ? data : []))
       .catch(() => setCheckerHistory([]))
       .finally(() => setCheckerHistoryLoading(false));
+  }, []);
+
+  /* ── Fetch riwayat LinkedIn Optimizer ── */
+  useEffect(() => {
+    fetch("/api/linkedin-optimizer/history")
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => setLinkedinHistory(Array.isArray(data) ? data : []))
+      .catch(() => setLinkedinHistory([]));
   }, []);
 
   /* ── Fetch riwayat surat (semua CV) ── */
@@ -459,6 +477,48 @@ export default function DashboardPage() {
                         </div>
 
                         {/* Arrow */}
+                        <span className="material-symbols-outlined text-on-surface-variant text-sm shrink-0">chevron_right</span>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
+
+            {/* ── LinkedIn Optimizer History ── */}
+            {linkedinHistory.length > 0 && (
+              <section className="mb-8">
+                <h2 className="font-headline-md text-on-surface mb-3">{t("dashboard.linkedin-history")}</h2>
+                <div className="space-y-2">
+                  {linkedinHistory.map((item, i) => {
+                    const tone = item.overallScore >= 75
+                      ? "bg-green-50 border-green-300 text-green-700"
+                      : item.overallScore >= 45
+                        ? "bg-amber-50 border-amber-300 text-amber-700"
+                        : "bg-red-50 border-red-300 text-red-700";
+                    return (
+                      <motion.div
+                        key={item.id}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.25, delay: i * 0.03 }}
+                        className="bg-paper rounded-[14px] p-4 shadow-hard-sm border-2 border-ink hover:shadow-hard hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-4 cursor-pointer"
+                        onClick={() => router.push(`/linkedin-optimizer/${item.id}`)}
+                      >
+                        <div className={`shrink-0 w-14 h-14 rounded-full flex items-center justify-center font-extrabold text-sm border-2 ${tone}`}>
+                          {item.overallScore}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-semibold text-on-surface truncate">
+                            {item.branding}
+                          </p>
+                          <p className="text-[10px] text-on-surface-variant mt-0.5 truncate">
+                            {item.verdict || `${t("lo.result.grade")} ${item.grade}`}
+                          </p>
+                          <p className="text-[10px] text-on-surface-variant mt-0.5">
+                            {timeAgo(new Date(item.createdAt), t, lang)}
+                          </p>
+                        </div>
                         <span className="material-symbols-outlined text-on-surface-variant text-sm shrink-0">chevron_right</span>
                       </motion.div>
                     );

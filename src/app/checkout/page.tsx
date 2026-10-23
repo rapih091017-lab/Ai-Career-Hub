@@ -69,6 +69,20 @@ const [submitting, setSubmitting] = useState(false);
           ? [sp.package]
           : [];
       const spCvId = typeof sp.cvId === "string" ? sp.cvId : undefined;
+
+      // Katalog dipasang sebelum cabang keranjang. Dulu cabang "packages dari
+      // URL" return lebih awal, jadi catalog tetap null dan halaman berhenti
+      // di "Memuat katalog paket…" — padahal tautan dari kartu harga justru
+      // yang membawa packages.
+      if (data?.packages) {
+        const map: Record<string, CatalogPackage> = {};
+        // `id` diturunkan dari `key` di sisi klien supaya `PackageDef` yang
+        // dipakai `mergePackageSelection` selalu punya identitas. Kalau `id`
+        // kosong, kunci paket terkirim ke server sebagai `null` dan order gagal.
+        for (const p of data.packages) map[p.key] = { ...p, id: p.id ?? p.key };
+        setCatalog(map);
+      }
+
       if (keys.length > 0) {
         setSelected(keys);
         setCvId(spCvId);
@@ -80,14 +94,6 @@ const [submitting, setSubmitting] = useState(false);
       if (stored) {
         setSelected(stored.keys);
         if (stored.cvId) setCvId(stored.cvId);
-      }
-      if (data?.packages) {
-        const map: Record<string, CatalogPackage> = {};
-        // `id` diturunkan dari `key` di sisi klien supaya `PackageDef` yang
-        // dipakai `mergePackageSelection` selalu punya identitas. Kalau `id`
-        // kosong, kunci paket terkirim ke server sebagai `null` dan order gagal.
-        for (const p of data.packages) map[p.key] = { ...p, id: p.id ?? p.key };
-        setCatalog(map);
       }
     });
   }, [searchParams]);

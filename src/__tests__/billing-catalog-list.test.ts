@@ -56,10 +56,15 @@ describe("daftar paket di halaman tagihan", () => {
     expect(benefits.map((b) => b.key)).toEqual([
       "ai_cv_generate",
       "cv_analyzer",
+      // Memakai jatah cv_analyzer yang sama, jadi ikut tampil dengan nilai identik.
+      "linkedin_optimizer",
       "ai_revision",
       "ai_suggestion",
     ]);
+    expect(benefits).toContainEqual({ key: "linkedin_optimizer", value: "unlimited" });
     expect(benefits).not.toContainEqual({ key: "portfolio_web", value: "unlimited" });
+    // Paket tanpa cv_analyzer tidak mendapat baris LinkedIn.
+    expect(packageBenefits(single).map((b) => b.key)).not.toContain("linkedin_optimizer");
   });
 
   it("kuota dan masa berlaku ditulis dalam bahasa manusia", () => {

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useTranslation } from "@/lib/i18n";
 
 /**
- * Bento fitur: delapan alat dengan lebar dan warna berbeda, bukan delapan
+ * Bento fitur: sembilan alat dengan lebar dan warna berbeda, bukan sembilan
  * kartu identik. Kartu lime dipakai untuk alat yang paling sering dipakai.
  */
 
@@ -88,6 +88,16 @@ const FEATURES = [
     href: "/career-path",
     span: "md:col-span-3",
     tone: "dark" as const,
+  },
+  {
+    tag: "lp.bento.f9.tag",
+    title: "lp.bento.f9.title",
+    desc: "lp.bento.f9.desc",
+    bullets: ["lp.bento.f9.b1", "lp.bento.f9.b2"],
+    cta: "lp.bento.f9.cta",
+    href: "/linkedin-optimizer",
+    span: "md:col-span-3",
+    tone: "paper" as const,
   },
 ];
 

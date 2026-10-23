@@ -439,6 +439,57 @@ export const PortfolioResultSchema = z.object({
 
 export type PortfolioResult = z.infer<typeof PortfolioResultSchema>;
 
+/* ─── Schema: LINKEDIN OPTIMIZER ─────────────────────────── */
+
+/** Enam bagian LinkedIn yang dinilai dari resume.
+ *  Kunci tetap, bukan teks bebas: UI menyusun label dan bobot dari kunci ini. */
+export const LINKEDIN_SECTION_KEYS = [
+  "headline",
+  "about",
+  "experience_titles",
+  "experience_descriptions",
+  "skills",
+  "education",
+] as const;
+
+const LinkedInSectionScoreSchema = z.object({
+  key: z.enum(LINKEDIN_SECTION_KEYS).catch("headline"),
+  /** Skala 0–10, sama dengan rubrik referensi. Skor total dihitung di server. */
+  score: z.number().min(0).max(10).catch(0),
+  issues: z
+    .array(z.string())
+    .catch([])
+    .transform((items) => items.map((item) => item.trim()).filter(Boolean)),
+  suggestion: z.string().catch(""),
+});
+
+const LinkedInExperienceRewriteSchema = z.object({
+  company: z.string().catch(""),
+  title: z.string().catch(""),
+  period: z.string().catch(""),
+  bullets: z
+    .array(z.string())
+    .catch([])
+    .transform((items) => items.map((item) => item.trim()).filter(Boolean)),
+});
+
+export const LinkedInOptimizerResultSchema = z.object({
+  sections: z.array(LinkedInSectionScoreSchema).catch([]),
+  headline: z
+    .object({ text: z.string().catch(""), why: z.string().catch("") })
+    .catch({ text: "", why: "" }),
+  about: z
+    .object({ text: z.string().catch(""), why: z.string().catch("") })
+    .catch({ text: "", why: "" }),
+  experience: z.array(LinkedInExperienceRewriteSchema).catch([]),
+  skills: z
+    .object({ text: z.string().catch(""), note: z.string().catch("") })
+    .catch({ text: "", note: "" }),
+  verdict: z.string().catch(""),
+});
+
+export type LinkedInOptimizerResult = z.infer<typeof LinkedInOptimizerResultSchema>;
+
 /* ─── Registry: Map task type → schema ──────────────────── */
 export const AI_SCHEMAS = {
   analysis: AnalysisResultSchema,
@@ -446,6 +497,7 @@ export const AI_SCHEMAS = {
   suggestion: SuggestionResultSchema,
   summary_suggestion: SummarySuggestionResultSchema,
   portfolio: PortfolioResultSchema,
+  linkedin_optimizer: LinkedInOptimizerResultSchema,
 } as const;
 
 export type AiTaskType = keyof typeof AI_SCHEMAS;

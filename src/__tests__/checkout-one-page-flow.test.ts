@@ -39,6 +39,16 @@ describe("checkout adalah satu halaman untuk pembelian", () => {
     expect(landingSrc).not.toContain('href="/checkout"');
   });
 
+  it("katalog tetap dipasang saat URL membawa paket", () => {
+    // Tautan dari kartu harga membawa ?packages=..., dan dulu cabang itu
+    // return sebelum setCatalog, jadi halaman berhenti di "Memuat katalog".
+    const setCatalog = checkoutSrc.indexOf("setCatalog(map)");
+    const earlyReturn = checkoutSrc.indexOf("if (keys.length > 0)");
+    expect(setCatalog).toBeGreaterThan(-1);
+    expect(earlyReturn).toBeGreaterThan(-1);
+    expect(setCatalog).toBeLessThan(earlyReturn);
+  });
+
   it("tombol Beli di landing langsung ke checkout, tidak lewat halaman tagihan", () => {
     expect(pricingSrc).not.toContain('href="/settings/billing"');
     expect(pricingSrc).toContain("paket_lamaran");
