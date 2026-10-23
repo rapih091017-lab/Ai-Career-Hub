@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { analysisFromFullResult } from "@/lib/checker/analysis-from-full-result";
 import { buildChangePack, copyToClipboard, findPlaceholders, sanitizeCopyText } from "@/lib/checker/copy";
 import { BulletReviewCard } from "@/components/checker/ResultComponents";
+import { LanguageProvider } from "@/lib/i18n";
 import { ANALYSIS_PROMPT_V4 } from "@/lib/ai/prompts/analysis-v4";
 import type { StoredAnalysisResult } from "@/components/checker/types";
 
@@ -269,6 +270,37 @@ describe("CopyButton di BulletReviewCard", () => {
       expect(writeText).toHaveBeenCalledWith("Merancang autentikasi yang dipakai [persen] pengguna");
     });
     expect(await screen.findByRole("button", { name: "Tersalin ✓" })).toBeInTheDocument();
+  });
+
+  it("mengikuti bahasa aktif saat pengguna memilih Inggris", async () => {
+    localStorage.setItem("lang", "en");
+    try {
+      render(
+        <LanguageProvider>
+          <BulletReviewCard
+            index={0}
+            item={{
+              section: "experience",
+              original_text: "Built the login flow",
+              issues: ["No metric"],
+              suggested_rewrite: "**Redesigned** auth used by [persen] users",
+              priority: "High",
+            }}
+          />
+        </LanguageProvider>,
+      );
+
+      fireEvent.click(screen.getByRole("button", { expanded: false }));
+
+      expect(
+        screen.getByText("Still contains [persen]. Replace it with your real data before sending."),
+      ).toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole("button", { name: "Copy" }));
+      expect(await screen.findByRole("button", { name: "Copied ✓" })).toBeInTheDocument();
+    } finally {
+      localStorage.removeItem("lang");
+    }
   });
 });
 

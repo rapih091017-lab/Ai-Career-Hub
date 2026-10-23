@@ -11,8 +11,27 @@ import { BOUNDARY, SECURITY_GUARDRAIL } from "./shared";
  * Skor total tidak diminta dari model. Server menghitungnya dari skor bagian
  * dan bobot tetap di `src/lib/linkedin-optimizer/result.ts`, supaya angka di
  * layar tidak bisa bertentangan dengan rincian per bagian.
+ *
+ * Instruksi bahasanya dibuat dua versi. Pengguna yang memilih English di UI
+ * harus mendapat verdict, catatan, dan teks siap tempel berbahasa Inggris
+ * juga — bukan formulir Inggris dengan hasil Indonesia. Nama perusahaan dan
+ * jabatan tetap disalin apa adanya dari resume, tidak diterjemahkan.
  */
-export const LINKEDIN_OPTIMIZER_PROMPT = `
+export type LinkedInPromptLang = "id" | "en";
+
+export function buildLinkedInOptimizerPrompt(lang: LinkedInPromptLang = "id"): string {
+  const isEnglish = lang === "en";
+  const tr = (id: string, en: string) => (isEnglish ? en : id);
+
+  const languageRule = isEnglish
+    ? "TULIS SELURUH TEKS YANG DIBACA PENGGUNA DALAM BAHASA INGGRIS yang natural dan profesional. Ini berlaku untuk verdict, issues, suggestion, why, note, dan isi headline, About, bullet pengalaman, serta skills. Jangan memakai Bahasa Indonesia. Nama perusahaan dan jabatan tetap persis seperti di resume."
+    : "TULIS SELURUH TEKS YANG DIBACA PENGGUNA DALAM BAHASA INDONESIA yang natural dan profesional. Ini berlaku untuk verdict, issues, suggestion, why, note, dan isi headline, About, bullet pengalaman, serta skills. Nama perusahaan dan jabatan tetap persis seperti di resume.";
+
+  const styleLanguage = isEnglish
+    ? "Natural English. Keep technical terms (React, SQL, Figma) as they are."
+    : "Bahasa Indonesia yang natural. Istilah teknis yang lazim (React, SQL, Figma) tetap dalam bentuk aslinya.";
+
+  return `
 ${SECURITY_GUARDRAIL}
 
 ${BOUNDARY}
@@ -36,6 +55,9 @@ Enam bagian dan artinya:
 - skills: daftar keahlian.
 - education: pendidikan dan sertifikasi yang relevan.
 
+--- BAHASA KELUARAN ---
+${languageRule}
+
 --- ATURAN FAKTA (WAJIB) ---
 1. JANGAN mengarang perusahaan, jabatan, tanggal, angka, alat, sertifikasi,
    atau pencapaian yang tidak ada di resume.
@@ -50,8 +72,7 @@ Enam bagian dan artinya:
    perekrut.
 
 --- GAYA ---
-- Bahasa Indonesia yang natural. Istilah teknis yang lazim (React, SQL,
-  Figma) tetap dalam bentuk aslinya.
+- ${styleLanguage}
 - Headline: pola "Peran | Keahlian utama | Konteks/dampak", maksimal 220
   karakter, tanpa emoji dan tanpa tanda kutip.
 - About: 3–5 paragraf pendek. Paragraf pertama menyebut peran dan kekuatan
@@ -68,27 +89,43 @@ Enam bagian dan artinya:
 Kembalikan HANYA JSON valid, tanpa markdown, tanpa penjelasan di luar JSON:
 
 {
-  "verdict": "2-3 kalimat ringkas tentang kondisi profil saat ini dan peluang perbaikannya",
+  "verdict": "${tr(
+    "2-3 kalimat ringkas tentang kondisi profil saat ini dan peluang perbaikannya",
+    "2-3 short sentences on the current state of the profile and how much it can improve",
+  )}",
   "sections": [
     {
       "key": "headline | about | experience_titles | experience_descriptions | skills | education",
       "score": 0-10,
-      "issues": ["masalah konkret, maksimal 3 per bagian"],
-      "suggestion": "satu langkah perbaikan paling berdampak untuk bagian ini"
+      "issues": ["${tr("masalah konkret, maksimal 3 per bagian", "concrete issue, at most 3 per section")}"],
+      "suggestion": "${tr(
+        "satu langkah perbaikan paling berdampak untuk bagian ini",
+        "the single highest-impact fix for this section",
+      )}"
     }
   ],
-  "headline": { "text": "headline baru", "why": "alasan singkat" },
-  "about": { "text": "isi About baru", "why": "alasan singkat" },
+  "headline": { "text": "${tr("headline baru", "new headline")}", "why": "${tr(
+    "alasan singkat",
+    "short reason",
+  )}" },
+  "about": { "text": "${tr("isi About baru", "new About copy")}", "why": "${tr(
+    "alasan singkat",
+    "short reason",
+  )}" },
   "experience": [
     {
-      "company": "nama perusahaan persis dari resume",
-      "title": "jabatan versi LinkedIn",
-      "period": "mis. Mar 2023 - Sekarang",
-      "bullets": ["bullet pencapaian", "..."]
+      "company": "${tr("nama perusahaan persis dari resume", "company name exactly as in the resume")}",
+      "title": "${tr("jabatan versi LinkedIn", "LinkedIn version of the job title")}",
+      "period": "${tr("mis. Mar 2023 - Sekarang", "e.g. Mar 2023 - Present")}",
+      "bullets": ["${tr("bullet pencapaian", "achievement bullet")}", "..."]
     }
   ],
-  "skills": { "text": "daftar skills terkelompok siap tempel", "note": "catatan singkat" }
+  "skills": { "text": "${tr(
+    "daftar skills terkelompok siap tempel",
+    "grouped, copy-ready skills list",
+  )}", "note": "${tr("catatan singkat", "short note")}" }
 }
 
 Semua enam kunci "sections" wajib ada, masing-masing tepat satu kali.
 `.trim();
+}

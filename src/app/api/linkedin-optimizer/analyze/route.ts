@@ -5,7 +5,7 @@ import { db } from "@/db";
 import { linkedinOptimizations, usageLogs } from "@/db/schema";
 import { callAI, MODELS } from "@/lib/ai/adapter";
 import { getUserAccess } from "@/lib/access";
-import { LINKEDIN_OPTIMIZER_PROMPT } from "@/lib/ai/prompts/linkedin-optimizer";
+import { buildLinkedInOptimizerPrompt } from "@/lib/ai/prompts/linkedin-optimizer";
 import type { LinkedInOptimizerResult } from "@/lib/ai/prompts/schemas";
 import { sanitizeExtractedText } from "@/lib/checker/extracted-text";
 import { buildLinkedInResult } from "@/lib/linkedin-optimizer/result";
@@ -152,7 +152,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
   let aiResult: LinkedInOptimizerResult | null = null;
   try {
     aiResult = await callAI<LinkedInOptimizerResult>({
-      systemPrompt: LINKEDIN_OPTIMIZER_PROMPT,
+      systemPrompt: buildLinkedInOptimizerPrompt(outputLang),
       userPrompt: [
         "=== ARAH BRANDING ===",
         branding,
