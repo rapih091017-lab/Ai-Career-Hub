@@ -106,19 +106,31 @@ export default function PortfolioSpotlight() {
                 ))}
               </div>
             </div>
-            {/* Tema */}
-            <div className="mt-5 grid grid-cols-5 gap-2">
+            {/* Tema.
+
+                Sebelumnya lima kolom sama lebar. "Glassmorphism" satu kata
+                yang tidak bisa dipenggal, jadi di kolom sempit kata itu
+                melebar keluar kotaknya dan menabrak garis tepi kartu.
+                Sekarang tiap tema jadi chip selebar isinya sendiri dan
+                barisnya dibungkus kalau tidak muat, jadi tidak ada label
+                yang keluar kotak. */}
+            <ul className="mt-5 flex flex-wrap gap-2">
               {THEMES.map((theme) => (
-                <div key={theme.name} className="rounded-lg border-2 border-edge bg-paper p-3 text-center">
+                <li
+                  key={theme.name}
+                  className="inline-flex items-center gap-2 rounded-lg border-2 border-edge bg-paper px-2.5 py-1.5"
+                >
                   <span
                     aria-hidden="true"
-                    className="mx-auto mb-2 block h-6 w-6 rounded-full border-2"
+                    className="h-3.5 w-3.5 shrink-0 rounded-full border-2"
                     style={{ backgroundColor: theme.bg, borderColor: theme.accent }}
                   />
-                  <p className="text-[10.5px] font-bold leading-tight text-ink-soft">{theme.name}</p>
-                </div>
+                  <span className="whitespace-nowrap text-[10.5px] font-bold leading-none text-ink-soft">
+                    {theme.name}
+                  </span>
+                </li>
               ))}
-            </div>
+            </ul>
             <p className="mt-4 text-xs text-ink-soft">{t("portfolio.spot.sample-note")}</p>
           </div>
         </motion.div>
