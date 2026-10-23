@@ -14,10 +14,12 @@ import CaraKerja from "@/components/landing/CaraKerja";
 import CheckerTeaser from "@/components/landing/CheckerTeaser";
 import ClosingCta from "@/components/landing/ClosingCta";
 import FaqSection from "@/components/landing/FaqSection";
+import FeaturedArticle from "@/components/landing/FeaturedArticle";
 import HeroOrbit from "@/components/landing/HeroOrbit";
 import LevelStrip from "@/components/landing/LevelStrip";
 import MomentBand from "@/components/landing/MomentBand";
 import PersonaTabs from "@/components/landing/PersonaTabs";
+import SalaryBenchmark from "@/components/landing/SalaryBenchmark";
 import StatsStrip from "@/components/landing/StatsStrip";
 
 /**
@@ -50,6 +52,8 @@ export default function Home() {
         <PortfolioSpotlight />
         <BeforeAfter />
         <StatsStrip />
+        <SalaryBenchmark />
+        <FeaturedArticle />
         <FaqSection />
         <ClosingCta />
       </main>
