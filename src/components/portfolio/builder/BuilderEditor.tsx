@@ -1708,13 +1708,17 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
 
 /* ── Sub-components ── */
 
-function AccordionItem({ id, icon, title, isOpen, onToggle, children }: {
+export function AccordionItem({ id, icon, title, isOpen, onToggle, children }: {
   id: AccordionKey; icon: string; title: string; isOpen: boolean; onToggle: (id: AccordionKey) => void; children: React.ReactNode;
 }) {
   return (
-    <div className={`bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/50 overflow-hidden transition-all`}>
+    // Saat terbuka, overflow harus terlihat: dropdown tanggal (DateField) berposisi
+    // absolute dan akan terpotong jika kartu memakai overflow-hidden.
+    <div className={`bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/50 transition-all ${isOpen ? "" : "overflow-hidden"}`}>
       <button
-        className="w-full px-6 py-5 flex items-center justify-between text-left focus:bg-surface-container"
+        type="button"
+        aria-expanded={isOpen}
+        className="w-full px-6 py-5 flex items-center justify-between text-left focus-visible:bg-surface-container"
         onClick={() => onToggle(id)}
       >
         <div className="flex items-center gap-4">
@@ -1725,14 +1729,20 @@ function AccordionItem({ id, icon, title, isOpen, onToggle, children }: {
           expand_more
         </span>
       </button>
+      {/* Animasi buka/tutup lewat grid-template-rows (0fr → 1fr), bukan max-height,
+          supaya penutupan tetap dianimasikan dan tinggi section tidak dibatasi. */}
       <div
-        className="accordion-content"
-        style={{
-          maxHeight: isOpen ? "4000px" : "0px",
-          paddingBottom: isOpen ? "1.5rem" : "0px",
-        }}
+        className="grid transition-[grid-template-rows] duration-300 ease-out"
+        style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
       >
-        {children}
+        <div
+          className="min-h-0"
+          // Tertutup: overflow disembunyikan saat animasi. Terbuka: terlihat, supaya
+          // dropdown tanggal (DateField, absolute) tidak terpotong.
+          style={{ overflow: isOpen ? "visible" : "hidden", paddingBottom: isOpen ? "1.5rem" : "0px" }}
+        >
+          {children}
+        </div>
       </div>
     </div>
   );

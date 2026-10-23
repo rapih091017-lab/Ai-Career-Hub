@@ -8,7 +8,7 @@ import {
   STATIC_HIDDEN_INITIAL_SELECTORS,
   STATIC_REVEAL_FALLBACK_CSS,
 } from "@/components/portfolio/render/PortfolioDocument";
-import { DEFAULT_SECTION_ORDER } from "@/components/portfolio/themes";
+import { DEFAULT_SECTION_ORDER, THEMES } from "@/components/portfolio/themes";
 import { portfolioFormDataSchema } from "@/lib/portfolio/schema";
 import type { FontSize, SectionId, ThemeId } from "@/components/portfolio/types";
 import type { PortfolioData } from "@/components/portfolio-templates/types";
@@ -380,9 +380,12 @@ describe("PortfolioDocument", () => {
     const { container } = render(
       <PortfolioDocument data={data} themeId="brutal" mode="static" />,
     );
-    // projects bawaan brutal: primary biru tua #1D4ED8, hero crimson #E40039 (hasil geser kontras)
-    expect(subtreeMent(anchor(container, "projects"), "#1D4ED8")).toBe(true);
-    expect(subtreeMent(anchor(container, "hero"), "#E40039")).toBe(true);
+    // Warna diambil dari token tema, bukan hex yang ditulis ulang di sini:
+    // fixture hex ikut basi setiap palet template disetel ulang.
+    const brutalProjects = THEMES.brutal.sectionColors!.projects!;
+    const brutalHero = THEMES.brutal.sectionColors!.hero!;
+    expect(subtreeMent(anchor(container, "projects"), brutalProjects.primary!)).toBe(true);
+    expect(subtreeMent(anchor(container, "hero"), brutalHero.primary!)).toBe(true);
   });
 
   it("menolak override warna yang bisa menyuntik deklarasi CSS lain", () => {
@@ -406,7 +409,7 @@ describe("PortfolioDocument", () => {
     expect(html).not.toContain("display:none");
     // nilai yang benar-benar aman tetap dipakai, bawaan tema tetap utuh
     expect(html).toContain("rgb(1, 2, 3)");
-    expect(subtreeMent(anchor(container, "projects"), "#6dd5fa")).toBe(true);
+    expect(subtreeMent(anchor(container, "projects"), THEMES.glass.sectionColors!.projects!.primary!)).toBe(true);
   });
 
   it("mengabaikan kunci override yang bukan warna milik tema", () => {

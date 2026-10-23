@@ -8,7 +8,7 @@ import { useTranslation } from "@/lib/i18n";
 // Di mode gelap cincin aksennya yang terbaca, jadi bulatannya tidak jadi
 // titik putih tanpa arti.
 const THEMES = [
-  { name: "Glassmorphism", bg: "#12121F", accent: "#8365FC" },
+  { name: "Glassmorphism", bg: "#12121F", accent: "#60A5FA" },
   { name: "Neo Brutal", bg: "#FFFAF0", accent: "#E40039" },
   { name: "Editorial Luxe", bg: "#FDFBF7", accent: "#936B30" },
   { name: "Minimalist", bg: "#FFFFFF", accent: "#111111" },
