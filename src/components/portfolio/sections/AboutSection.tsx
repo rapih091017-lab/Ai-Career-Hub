@@ -362,7 +362,135 @@ function WorkbenchAbout({ f }: { f: PortfolioFormData }) {
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * DECAL — kartu stiker: judul besar, teks bio di
+ * dalam bidang pill terang, dan dua angka besar
+ * ditempel miring. Animasi masuk per stiker.
+ * ═══════════════════════════════════════════════ */
+function DecalAbout({ f }: { f: PortfolioFormData }) {
+  const theme = usePortfolioTheme();
+  const notes = [
+    { value: f.aboutYearsExp, label: "tahun" },
+    { value: f.aboutProjectsDone, label: "proyek" },
+    { value: f.aboutClientsHappy, label: "klien" },
+  ].filter((n) => n.value);
+
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <Reveal>
+          <h2 style={{ ...wbHeading(theme, "clamp(2rem, 5vw, 3.2rem)"), fontWeight: 800 }}>Tentang saya</h2>
+        </Reveal>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20, marginTop: 28, alignItems: "start" }}>
+          <Reveal>
+            <div style={{ padding: "clamp(20px, 3vw, 28px)", background: theme.colors.surface, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, border: `2.5px solid ${theme.colors.border}` }}>
+              <p style={{ margin: 0, fontSize: 16, lineHeight: 1.7, color: theme.colors.textSecondary }}>{f.aboutText}</p>
+            </div>
+          </Reveal>
+          {notes.length ? (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
+              {notes.map((note, i) => (
+                <Reveal key={note.label} delay={0.08 * i} y={14}>
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      flexDirection: "column",
+                      padding: "14px 20px",
+                      background: i % 2 ? theme.colors.secondary : theme.colors.accent,
+                      color: theme.colors.onPrimary,
+                      borderRadius: theme.radii.card,
+                      boxShadow: theme.shadow.card,
+                      transform: `rotate(${i % 2 ? 2 : -2}deg)`,
+                    }}
+                  >
+                    <strong style={{ fontFamily: theme.typography.display, fontSize: 30, fontWeight: 800, lineHeight: 1 }}>{note.value}</strong>
+                    <span style={{ fontSize: 13, fontWeight: 700 }}>{note.label}</span>
+                  </span>
+                </Reveal>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* CRAYON: bio di kartu putih dengan kotak warna di sampingnya. */
+function CrayonAbout({ f }: { f: PortfolioFormData }) {
+  const theme = usePortfolioTheme();
+  if (!f.aboutText) return null;
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 32, alignItems: "start" }}>
+        <Reveal>
+          <h2 style={{ fontFamily: theme.typography.display, fontSize: "clamp(2.2rem, 5vw, 3.2rem)", fontWeight: 800, margin: 0, color: theme.colors.primary }}>Tentang saya</h2>
+          <p style={{ margin: "16px 0 0", fontSize: 17, lineHeight: 1.75, color: theme.colors.textSecondary }}>{f.aboutText}</p>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <div style={{ padding: 24, background: theme.colors.surface, border: `3px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
+            <div style={{ display: "flex", gap: 8 }}>
+              <span style={{ width: 28, height: 28, borderRadius: 999, background: theme.colors.primary }} />
+              <span style={{ width: 28, height: 28, borderRadius: 999, background: theme.colors.secondary }} />
+              <span style={{ width: 28, height: 28, borderRadius: 999, background: theme.colors.accent }} />
+            </div>
+            <p style={{ margin: "14px 0 0", fontSize: 14, lineHeight: 1.6, color: theme.colors.textMuted }}>Angka di bawah ini adalah ringkasan kerja yang bisa Anda ubah di editor.</p>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* SCRAPBOOK: teks bio di kertas tempel, dengan catatan kecil. */
+function ScrapbookAbout({ f }: { f: PortfolioFormData }) {
+  const theme = usePortfolioTheme();
+  if (!f.aboutText) return null;
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 36, alignItems: "start" }}>
+        <Reveal>
+          <h2 style={{ ...wbHeading(theme, "clamp(2rem, 5vw, 3rem)"), fontWeight: 700, color: theme.colors.primary }}>Tentang saya</h2>
+          <p style={{ margin: "16px 0 0", fontSize: 17, lineHeight: 1.75, color: theme.colors.textSecondary }}>{f.aboutText}</p>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <div style={{ padding: 24, background: theme.colors.surface, border: `2px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, transform: "rotate(-1deg)" }}>
+            <p style={{ margin: 0, fontFamily: theme.typography.display, fontSize: 26, color: theme.colors.secondary }}>catatan kecil</p>
+            <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: theme.colors.textMuted }}>Angka di bawah ini adalah ringkasan kerja yang bisa Anda ubah di editor.</p>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
+function InterstellaAbout({ f }: { f: PortfolioFormData }) {
+  const theme = usePortfolioTheme();
+  return (
+    <section style={{ padding: "clamp(56px, 9vw, 112px) 0", background: theme.colors.bg }}>
+      <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", display: "flex", flexWrap: "wrap", gap: "24px 80px", overflowWrap: "anywhere" }}>
+        <h2 style={{ flex: "1 1 220px", margin: 0, fontFamily: theme.typography.display, fontSize: "clamp(2rem, 4vw, 3rem)", lineHeight: 1.15, fontWeight: 700, color: theme.colors.text }}>Tentang saya</h2>
+        <p style={{ flex: "2 1 280px", maxWidth: "65ch", margin: 0, fontSize: "clamp(18px, 2.2vw, 24px)", lineHeight: 1.7, whiteSpace: "pre-line", color: theme.colors.textSecondary }}>{f.aboutText}</p>
+      </div>
+    </section>
+  );
+}
+
+function SherbetAbout({ f }: { f: PortfolioFormData }) {
+  const theme = usePortfolioTheme();
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
+        <div style={{ background: theme.colors.secondary, borderRadius: theme.radii.card, padding: "clamp(24px, 5vw, 56px)" }}>
+          <h2 style={{ margin: "0 0 24px", maxWidth: "18ch", fontFamily: theme.typography.display, fontWeight: 800, fontSize: "clamp(2rem, 5vw, 3.5rem)", lineHeight: 1.1, color: theme.colors.text }}>Kenali saya lebih dekat.</h2>
+          <p style={{ margin: 0, maxWidth: "65ch", fontSize: 18, lineHeight: 1.8, whiteSpace: "pre-line", color: theme.colors.textSecondary }}>{f.aboutText}</p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function AboutSection({ data: f }: Props) {
   const theme = usePortfolioTheme();
   if (!f.aboutText) return null;
@@ -372,6 +500,11 @@ export default function AboutSection({ data: f }: Props) {
     case "luxe": return <LuxeAbout f={f} />;
     case "minimalist": return <MinimalistAbout f={f} />;
     case "workbench": return <WorkbenchAbout f={f} />;
+    case "decal": return <DecalAbout f={f} />;
+    case "scrapbook": return <ScrapbookAbout f={f} />;
+    case "crayon": return <CrayonAbout f={f} />;
+    case "interstella": return <InterstellaAbout f={f} />;
+    case "sherbet": return <SherbetAbout f={f} />;
     default: return <GlassAbout f={f} />;
   }
 }

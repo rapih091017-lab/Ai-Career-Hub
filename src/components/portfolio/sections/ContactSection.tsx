@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { safeUrlUnescaped } from "@/lib/portfolio-safety";
 import type { PortfolioFormData, ExtraLink } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
 import { PillLink, Reveal, SheetLabel, wbHeading, wbMono, wbPaper, wbSection, wbWrap } from "../workbench/kit";
@@ -367,7 +368,140 @@ function WorkbenchContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks:
   );
 }
 
+/* DECAL: kontak sebagai stiker pill besar yang bisa diklik. */
+function DecalContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: ExtraLink[] }) {
+  const theme = usePortfolioTheme();
+  const links: { label: string; href: string }[] = [];
+  if (f.contactEmail) links.push({ label: f.contactEmail, href: `mailto:${f.contactEmail}` });
+  if (f.contactPhone) links.push({ label: f.contactPhone, href: `tel:${f.contactPhone}` });
+  if (f.contactLinkedin) links.push({ label: "LinkedIn", href: f.contactLinkedin });
+  if (f.contactGithub) links.push({ label: "GitHub", href: f.contactGithub });
+  extraLinks.filter((l) => l.url).forEach((l) => links.push({ label: l.label || l.url, href: l.url }));
+
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)", textAlign: "center" }}>
+        <Reveal>
+          <h2 style={{ ...wbHeading(theme, "clamp(2.2rem, 6vw, 4rem)"), fontWeight: 800 }}>Mari terhubung</h2>
+        </Reveal>
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 14, marginTop: 32 }}>
+          {links.map((l, i) => (
+            <Reveal key={`${l.href}-${i}`} delay={i * 0.06} y={10}>
+              <a href={l.href} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", padding: "12px 22px", background: i % 2 === 0 ? theme.colors.primary : theme.colors.secondary, color: theme.colors.onPrimary, borderRadius: theme.radii.pill, fontWeight: 800, fontSize: 15, textDecoration: "none", border: `2px solid ${theme.colors.border}`, boxShadow: theme.shadow.card }}>
+                {l.label}
+              </a>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
+/* CRAYON: kontak sebagai pil berwarna yang bisa diklik. */
+function CrayonContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: ExtraLink[] }) {
+  const theme = usePortfolioTheme();
+  const links: { label: string; href: string }[] = [];
+  if (f.contactEmail) links.push({ label: f.contactEmail, href: `mailto:${f.contactEmail}` });
+  if (f.contactPhone) links.push({ label: f.contactPhone, href: `tel:${f.contactPhone}` });
+  if (f.contactLinkedin) links.push({ label: "LinkedIn", href: f.contactLinkedin });
+  if (f.contactGithub) links.push({ label: "GitHub", href: f.contactGithub });
+  extraLinks.filter((l) => l.url).forEach((l) => links.push({ label: l.label || l.url, href: l.url }));
+  if (!links.length) return null;
+  const fills = [theme.colors.primary, theme.colors.secondary, theme.colors.accent];
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)", textAlign: "center" }}>
+        <Reveal>
+          <h2 style={{ fontFamily: theme.typography.display, fontSize: "clamp(2.4rem, 6vw, 4rem)", fontWeight: 800, margin: 0, color: theme.colors.primary }}>Ayo mengobrol</h2>
+        </Reveal>
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 14, marginTop: 30 }}>
+          {links.map((l, i) => (
+            <Reveal key={`${l.href}-${i}`} delay={i * 0.06} y={10}>
+              <a href={l.href} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", padding: "12px 22px", background: fills[i % fills.length], color: i % 3 === 2 ? theme.colors.text : theme.colors.onPrimary, borderRadius: theme.radii.pill, border: `3px solid ${theme.colors.border}`, fontWeight: 800, textDecoration: "none" }}>
+                {l.label}
+              </a>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* SCRAPBOOK: kontak sebagai label tempel di satu kertas. */
+function ScrapbookContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: ExtraLink[] }) {
+  const theme = usePortfolioTheme();
+  const links: { label: string; href: string }[] = [];
+  if (f.contactEmail) links.push({ label: f.contactEmail, href: `mailto:${f.contactEmail}` });
+  if (f.contactPhone) links.push({ label: f.contactPhone, href: `tel:${f.contactPhone}` });
+  if (f.contactLinkedin) links.push({ label: "LinkedIn", href: f.contactLinkedin });
+  if (f.contactGithub) links.push({ label: "GitHub", href: f.contactGithub });
+  extraLinks.filter((l) => l.url).forEach((l) => links.push({ label: l.label || l.url, href: l.url }));
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)", textAlign: "center" }}>
+        <Reveal>
+          <h2 style={{ ...wbHeading(theme, "clamp(2.2rem, 6vw, 3.6rem)"), fontWeight: 700, color: theme.colors.primary }}>Mari bertemu di kertas berikutnya</h2>
+        </Reveal>
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 14, marginTop: 30 }}>
+          {links.map((l, i) => (
+            <Reveal key={`${l.href}-${i}`} delay={i * 0.06} y={10}>
+              <a href={l.href} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", padding: "10px 18px", background: i % 2 ? theme.colors.accent : theme.colors.surface, color: theme.colors.text, border: `2px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, fontWeight: 700, textDecoration: "none", transform: `rotate(${i % 2 ? 1 : -1}deg)` }}>
+                {l.label}
+              </a>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function InterstellaContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: ExtraLink[] }) {
+  const theme = usePortfolioTheme();
+  const webUrl = (value: string) => value && !/^[a-z][a-z0-9+.-]*:/i.test(value) ? `https://${value}` : value;
+  const links = [
+    { label: f.contactEmail, url: f.contactEmail ? `mailto:${f.contactEmail}` : "" },
+    { label: f.contactPhone, url: f.contactPhone ? `tel:${f.contactPhone}` : "" },
+    { label: "LinkedIn", url: webUrl(f.contactLinkedin) },
+    { label: "GitHub", url: webUrl(f.contactGithub) },
+    ...extraLinks.map((l) => ({ label: l.label || l.url, url: webUrl(l.url) })),
+  ].map((l) => ({ ...l, href: safeUrlUnescaped(l.url) })).filter((l) => l.href);
+  if (!links.length) return null;
+  return (
+    <section style={{ padding: "clamp(64px, 10vw, 128px) 0", background: theme.colors.bgSecondary }}>
+      <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
+        <h2 style={{ margin: "0 0 40px", maxWidth: "14ch", fontFamily: theme.typography.display, fontSize: "clamp(2.8rem, 7vw, 5rem)", fontWeight: 800, lineHeight: 1.1, letterSpacing: "-0.03em", color: theme.colors.text }}>Mari bekerja sama.</h2>
+        <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>{links.map((l, i) => <li key={`${l.href}-${i}`} style={{ borderTop: `1px solid ${theme.colors.border}` }}>
+          <a href={l.href} className="hover:underline" {...(/^https?:/i.test(l.href) ? { target: "_blank", rel: "noopener noreferrer" } : {})} style={{ display: "flex", alignItems: "center", minHeight: 56, padding: "16px 0", fontSize: "clamp(1rem, 2.5vw, 1.5rem)", color: theme.colors.primary, textUnderlineOffset: 6 }}>{l.label}</a>
+        </li>)}</ul>
+      </div>
+    </section>
+  );
+}
+
+function SherbetContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: ExtraLink[] }) {
+  const theme = usePortfolioTheme();
+  const links = [
+    { label: f.contactEmail, url: f.contactEmail ? `mailto:${f.contactEmail}` : "" },
+    { label: f.contactPhone, url: f.contactPhone ? `tel:${f.contactPhone}` : "" },
+    { label: "LinkedIn", url: f.contactLinkedin },
+    { label: "GitHub", url: f.contactGithub },
+    ...extraLinks.map((l) => ({ label: l.label || l.url, url: l.url })),
+  ].map((l) => ({ ...l, href: safeUrlUnescaped(l.url) })).filter((l) => l.href);
+  if (!links.length) return null;
+  return (
+    <section style={{ background: theme.colors.secondary, padding: "clamp(64px, 9vw, 112px) 0" }}>
+      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", textAlign: "center", overflowWrap: "anywhere" }}>
+        <h2 style={{ maxWidth: "18ch", margin: "0 auto 32px", fontFamily: theme.typography.display, fontSize: "clamp(2.5rem, 6vw, 4.5rem)", lineHeight: 1.1, fontWeight: 800, color: theme.colors.text }}>Mulai cerita berikutnya.</h2>
+        <address style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 16, fontStyle: "normal" }}>{links.map((l, i) => <a key={`${l.href}-${i}`} href={l.href} className="hover:underline" {...(/^https?:/i.test(l.href) ? { target: "_blank", rel: "noopener noreferrer" } : {})} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minHeight: 48, maxWidth: "100%", padding: "12px 24px", borderRadius: theme.radii.button, background: i === 0 ? theme.colors.primary : theme.colors.surface, color: i === 0 ? theme.colors.onPrimary : theme.colors.text, fontWeight: 700, textUnderlineOffset: 5 }}>{l.label}</a>)}</address>
+      </div>
+    </section>
+  );
+}
+
 export default function ContactSection({ data: f, extraLinks }: Props) {
   const theme = usePortfolioTheme();
   const hasContact = f.contactEmail || f.contactPhone || f.contactLinkedin || f.contactGithub || extraLinks.some(l => l.url);
@@ -378,6 +512,11 @@ export default function ContactSection({ data: f, extraLinks }: Props) {
     case "luxe": return <LuxeContact f={f} extraLinks={extraLinks} />;
     case "minimalist": return <MinimalistContact f={f} extraLinks={extraLinks} />;
     case "workbench": return <WorkbenchContact f={f} extraLinks={extraLinks} />;
+    case "decal": return <DecalContact f={f} extraLinks={extraLinks} />;
+    case "scrapbook": return <ScrapbookContact f={f} extraLinks={extraLinks} />;
+    case "crayon": return <CrayonContact f={f} extraLinks={extraLinks} />;
+    case "interstella": return <InterstellaContact f={f} extraLinks={extraLinks} />;
+    case "sherbet": return <SherbetContact f={f} extraLinks={extraLinks} />;
     default: return <GlassContact f={f} extraLinks={extraLinks} />;
   }
 }

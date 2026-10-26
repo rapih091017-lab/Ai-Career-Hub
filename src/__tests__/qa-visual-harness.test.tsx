@@ -36,11 +36,16 @@ function thumbnailData(first: string, last: string, headline: string, sub: strin
 }
 
 const HERO_ONLY: Record<ThemeId, PortfolioData> = {
+  sherbet: thumbnailData("[Nama Anda]", "", "Kreator Konten", "Cerita produk, dari sudut pandang saya", "[Tuliskan jenis konten dan bidang yang Anda kerjakan.]"),
+  interstella: thumbnailData("[Nama Anda]", "", "Direktur Kreatif", "Dari gagasan menjadi kampanye", "[Tuliskan pendekatan kreatif dan bidang kerja Anda.]"),
   glass: thumbnailData("Alex", "Morgan", "Full-Stack Developer", "Designing scalable digital ecosystems", "Antarmuka cepat dengan arsitektur modern."),
   brutal: thumbnailData("Riley", "K.", "Creative Developer & Motion Designer", "Breaking boundaries with code", "Eksperimen interaksi web dan gerak."),
   luxe: thumbnailData("Maya", "Chen", "UI/UX Designer & Brand Strategist", "Crafting human-centered experiences", "Masalah rumit jadi produk yang enak dipakai."),
   minimalist: thumbnailData("Nadia", "P.", "Product Engineer", "Small systems, clear thinking", "Perangkat lunak tenang untuk masalah yang ribut."),
   workbench: thumbnailData("Bagas", "Prakoso", "Product Designer", "Rapi di atas kertas, cepat di layar", "Menyusun alur produk dari sketsa sampai rilis."),
+  decal: thumbnailData("Sari", "W.", "Content Creator", "Cerita pendek yang bikin orang berhenti", "Membuat konten video singkat untuk brand lokal."),
+  crayon: thumbnailData("Dimas", "R.", "Guru Gambar & Animator", "Warna berani untuk cerita yang ringan", "Membuat ilustrasi dan animasi pendek untuk buku anak."),
+  scrapbook: thumbnailData("Rani", "A.", "Ilustrator & Penulis", "Catatan kecil dari meja kerja", "Menggambar, menulis, dan menempel ide di kertas."),
 };
 
 const RICH: PortfolioData = {

@@ -242,6 +242,92 @@ function WorkbenchStats({ stats }: { stats: { value: string; label: string; icon
 }
 
 /* ─── MAIN ─── */
+/* DECAL: angka besar sebagai stiker miring. */
+function DecalStats({ stats }: { stats: { value: string; label: string; icon: string }[] }) {
+  const theme = usePortfolioTheme();
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(40px, 6vw, 64px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)", display: "flex", flexWrap: "wrap", gap: 14 }}>
+        {stats.map((s, i) => (
+          <Reveal key={s.label} delay={i * 0.08} y={14}>
+            <div style={{ padding: "14px 20px", background: i % 2 ? theme.colors.secondary : theme.colors.accent, color: theme.colors.onPrimary, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, transform: `rotate(${i % 2 ? 2 : -2}deg)` }}>
+              <strong style={{ display: "block", fontFamily: theme.typography.display, fontSize: 30, fontWeight: 800, lineHeight: 1 }}>{s.value}</strong>
+              <span style={{ fontSize: 13, fontWeight: 700 }}>{s.label}</span>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* CRAYON: tiga kartu warna dengan angka besar membulat. */
+function CrayonStats({ stats }: { stats: { value: string; label: string; icon: string }[] }) {
+  const theme = usePortfolioTheme();
+  const fills = [theme.colors.primary, theme.colors.secondary, theme.colors.accent];
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(40px, 6vw, 64px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 18 }}>
+        {stats.map((s, i) => (
+          <Reveal key={s.label} delay={i * 0.08} y={12}>
+            <div style={{ padding: "20px 22px", background: fills[i % fills.length], color: i === 2 ? theme.colors.text : theme.colors.onPrimary, borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
+              <p style={{ margin: 0, fontFamily: theme.typography.display, fontSize: 48, fontWeight: 800, lineHeight: 1 }}>{s.value}</p>
+              <p style={{ margin: "6px 0 0", fontSize: 14, fontWeight: 700 }}>{s.label}</p>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* SCRAPBOOK: angka sebagai tiga label tempel di satu kertas. */
+function ScrapbookStats({ stats }: { stats: { value: string; label: string; icon: string }[] }) {
+  const theme = usePortfolioTheme();
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(40px, 6vw, 64px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 18 }}>
+        {stats.map((s, i) => (
+          <Reveal key={s.label} delay={i * 0.08} y={12}>
+            <div style={{ padding: "18px 20px", background: i === 1 ? theme.colors.accent : theme.colors.surface, border: `2px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, transform: `rotate(${i % 2 ? 1.2 : -1.2}deg)` }}>
+              <p style={{ margin: 0, fontFamily: theme.typography.display, fontSize: 44, lineHeight: 1, color: theme.colors.primary }}>{s.value}</p>
+              <p style={{ margin: "6px 0 0", fontSize: 14, fontWeight: 700, color: theme.colors.textSecondary }}>{s.label}</p>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function InterstellaStats({ stats }: { stats: { value: string; label: string; icon: string }[] }) {
+  const theme = usePortfolioTheme();
+  return (
+    <section style={{ padding: "32px 0 64px", background: theme.colors.bg }}>
+      <dl style={{ maxWidth: 1160, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", display: "flex", flexWrap: "wrap", gap: "24px 64px" }}>
+        {stats.map((s) => <div key={s.label} style={{ flex: "1 1 160px", minWidth: 0, paddingTop: 24, borderTop: `1px solid ${theme.colors.border}`, overflowWrap: "anywhere" }}>
+          <dt style={{ fontSize: 14, color: theme.colors.textMuted }}>{s.label}</dt>
+          <dd style={{ margin: "12px 0 0", fontFamily: theme.typography.display, fontWeight: 700, fontSize: "clamp(2.5rem, 5vw, 4rem)", lineHeight: 1.15, color: theme.colors.text }}>{s.value}</dd>
+        </div>)}
+      </dl>
+    </section>
+  );
+}
+
+function SherbetStats({ stats }: { stats: { value: string; label: string; icon: string }[] }) {
+  const theme = usePortfolioTheme();
+  return (
+    <section style={{ background: theme.colors.secondary, padding: "clamp(40px, 6vw, 72px) 0" }}>
+      <dl style={{ maxWidth: 1120, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 180px), 1fr))", gap: 32 }}>
+        {stats.map((s) => <div key={s.label} style={{ minWidth: 0, overflowWrap: "anywhere" }}>
+          <dd style={{ margin: 0, fontFamily: theme.typography.display, fontWeight: 800, fontSize: "clamp(3.5rem, 8vw, 6rem)", lineHeight: 1.05, letterSpacing: "-0.03em", color: theme.colors.text }}>{s.value}</dd>
+          <dt style={{ marginTop: 12, fontSize: 16, color: theme.colors.textSecondary }}>{s.label}</dt>
+        </div>)}
+      </dl>
+    </section>
+  );
+}
+
 export default function StatsSection({ data: f }: Props) {
   const theme = usePortfolioTheme();
   const stats = [
@@ -257,6 +343,11 @@ export default function StatsSection({ data: f }: Props) {
     case "luxe": return <LuxeStats stats={stats} />;
     case "minimalist": return <MinimalistStats stats={stats} />;
     case "workbench": return <WorkbenchStats stats={stats} />;
+    case "decal": return <DecalStats stats={stats} />;
+    case "scrapbook": return <ScrapbookStats stats={stats} />;
+    case "crayon": return <CrayonStats stats={stats} />;
+    case "interstella": return <InterstellaStats stats={stats} />;
+    case "sherbet": return <SherbetStats stats={stats} />;
     default: return <GlassStats stats={stats} />;
   }
 }

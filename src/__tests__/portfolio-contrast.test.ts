@@ -19,6 +19,15 @@ export function contrast(a: string, b: string): number {
 const isHex = (v: string) => /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v);
 
 describe("WCAG AA per tema", () => {
+  it("Sherbet: semua teks di permukaan pastel dan putih memenuhi AA", () => {
+    const theme = THEMES.sherbet;
+    for (const bg of [theme.colors.bg, theme.colors.bgSecondary, theme.colors.secondary, theme.colors.surface]) {
+      for (const fg of [theme.colors.text, theme.colors.textSecondary, theme.colors.textMuted, theme.colors.primary]) {
+        expect(contrast(fg, bg), `${fg} di ${bg}`).toBeGreaterThanOrEqual(4.5);
+      }
+      expect(contrast(theme.focusRing.color, bg)).toBeGreaterThanOrEqual(3);
+    }
+  });
   it.each(THEME_IDS)("%s: pasangan teks utama >= 4.5", (id) => {
     const theme = THEMES[id];
     const c = theme.colors;

@@ -893,6 +893,174 @@ function WorkbenchHero({ data: f, name, initials }: { data: PortfolioFormData; n
   );
 }
 
+/* CRAYON, kanvas lilac dengan kartu putih dan judul tebal membulat. */
+function CrayonHero({ data: f, name, initials }: { data: PortfolioFormData; name: string; initials: string }) {
+  const theme = usePortfolioTheme();
+  return (
+    <section data-hero-variant="crayon" style={{ background: theme.colors.bg, padding: "clamp(64px, 9vw, 112px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 40, alignItems: "center" }}>
+        <div>
+          <span style={{ display: "inline-block", padding: "6px 14px", background: theme.colors.secondary, color: theme.colors.text, borderRadius: theme.radii.pill, fontWeight: 800, fontSize: 13 }}>{f.heroSubHeadline}</span>
+          <h1 style={{ margin: "16px 0 0", fontFamily: theme.typography.display, fontSize: "clamp(3.2rem, 8vw, 5.4rem)", fontWeight: 800, lineHeight: 1, color: theme.colors.primary }}>{name}</h1>
+          <p style={{ margin: "18px 0 0", fontSize: 17, lineHeight: 1.7, color: theme.colors.textSecondary, maxWidth: 520 }}>{f.heroBio}</p>
+          {f.heroHeadline ? <span style={{ display: "inline-block", marginTop: 22, padding: "8px 16px", background: theme.colors.accent, color: theme.colors.text, borderRadius: theme.radii.pill, fontWeight: 800, fontSize: 14 }}>{f.heroHeadline}</span> : null}
+        </div>
+        <div style={{ padding: 32, background: theme.colors.surface, border: `3px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, transform: "rotate(-2deg)" }}>
+          <span style={{ fontFamily: theme.typography.display, fontSize: 60, fontWeight: 800, color: theme.colors.primary }}>{initials}</span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* SCRAPBOOK, kertas krem bertumpuk dengan judul tulisan tangan. */
+function ScrapbookHero({ data: f, name, initials }: { data: PortfolioFormData; name: string; initials: string }) {
+  const theme = usePortfolioTheme();
+  return (
+    <section data-hero-variant="scrapbook" style={{ background: theme.colors.bg, padding: "clamp(64px, 9vw, 112px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 40, alignItems: "center" }}>
+        <div>
+          <p style={{ margin: 0, fontFamily: theme.typography.body, fontWeight: 800, fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", color: theme.colors.secondary }}>{f.heroSubHeadline}</p>
+          <h1 style={{ margin: "12px 0 0", fontFamily: theme.typography.display, fontSize: "clamp(3.2rem, 8vw, 5.6rem)", fontWeight: 700, lineHeight: 0.95, color: theme.colors.primary }}>{name}</h1>
+          <p style={{ margin: "18px 0 0", fontSize: 17, lineHeight: 1.7, color: theme.colors.textSecondary, maxWidth: 520 }}>{f.heroBio}</p>
+          {f.heroHeadline ? <span style={{ display: "inline-block", marginTop: 22, padding: "6px 14px", background: theme.colors.accent, color: theme.colors.text, border: `2px solid ${theme.colors.border}`, fontFamily: theme.typography.body, fontWeight: 800, fontSize: 14, transform: "rotate(-2deg)" }}>{f.heroHeadline}</span> : null}
+        </div>
+        <div style={{ position: "relative", padding: 28, background: theme.colors.surface, border: `2px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, transform: "rotate(1.5deg)" }}>
+          <span style={{ fontFamily: theme.typography.display, fontSize: 56, color: theme.colors.secondary }}>{initials}</span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════
+ * DECAL, Stiker pill di atas tinta gelap.
+ * Nama besar, stiker kategori berwarna, dan dua
+ * tombol pill. Stiker memantul pelan saat masuk.
+ * ═══════════════════════════════════════════════ */
+function DecalHero({ data: f, name, initials }: { data: PortfolioFormData; name: string; initials: string }) {
+  const theme = usePortfolioTheme();
+  const reduced = useReducedMotion();
+  const stickers = [f.heroSubHeadline, f.heroHeadline].filter(Boolean) as string[];
+
+  return (
+    <section data-hero-variant="decal" style={{ background: theme.colors.bg, padding: "clamp(64px, 9vw, 112px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 28 }}>
+          {stickers.map((s, i) => (
+            <motion.span
+              key={s}
+              initial={reduced ? false : { opacity: 0, y: 12, rotate: i % 2 ? 3 : -3 }}
+              animate={{ opacity: 1, y: 0, rotate: i % 2 ? 2 : -2 }}
+              transition={{ type: "spring", stiffness: 260, damping: 18, delay: 0.1 * i }}
+              style={{
+                ...wbMono(theme),
+                fontFamily: theme.typography.display,
+                fontSize: 13,
+                fontWeight: 700,
+                padding: "6px 14px",
+                background: i % 2 ? theme.colors.secondary : theme.colors.primary,
+                color: theme.colors.onPrimary,
+                borderRadius: theme.radii.pill,
+                boxShadow: theme.shadow.card,
+              }}
+            >
+              {s}
+            </motion.span>
+          ))}
+        </div>
+
+        <motion.h1
+          initial={reduced ? false : { opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: WB_EASE }}
+          style={{
+            fontFamily: theme.typography.display,
+            fontSize: "clamp(3rem, 9vw, 6.5rem)",
+            fontWeight: 800,
+            lineHeight: 0.95,
+            letterSpacing: "-0.04em",
+            color: theme.colors.text,
+            margin: 0,
+          }}
+        >
+          {name}
+          <span aria-hidden="true" style={{ color: theme.colors.primary }}>.</span>
+        </motion.h1>
+
+        {f.heroBio ? (
+          <p style={{ margin: "24px 0 0", maxWidth: 560, fontSize: 17, lineHeight: 1.6, color: theme.colors.textSecondary }}>
+            {f.heroBio}
+          </p>
+        ) : null}
+
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 32 }}>
+          <PillLink href="#projects" primary>
+            Lihat karya
+            <ArrowRight />
+          </PillLink>
+          <PillLink href="#contact">Hubungi saya</PillLink>
+        </div>
+
+        {f.heroPhotoUrl ? (
+          <motion.div
+            initial={reduced ? false : { opacity: 0, scale: 0.94 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.7, delay: 0.25, ease: WB_EASE }}
+            style={{ marginTop: 48, width: "min(100%, 300px)", borderRadius: theme.radii.card, overflow: "hidden", border: `2.5px solid ${theme.colors.border}`, boxShadow: theme.shadow.card }}
+          >
+            <img src={f.heroPhotoUrl} alt={name} style={{ width: "100%", height: 300, objectFit: "cover", display: "block" }} />
+          </motion.div>
+        ) : (
+          <span aria-hidden="true" style={{ display: "none" }}>{initials}</span>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function InterstellaHero({ data: f, name }: { data: PortfolioFormData; name: string }) {
+  const theme = usePortfolioTheme();
+  const reduced = useReducedMotion();
+  return (
+    <section style={{ padding: "clamp(64px, 12vw, 144px) 0 clamp(56px, 9vw, 108px)", background: `linear-gradient(135deg, ${theme.colors.bg} 35%, ${theme.colors.secondary} 75%, ${theme.colors.primaryGlow})` }}>
+      <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
+        <motion.div initial={reduced ? false : { y: 20 }} animate={{ y: 0 }} transition={{ duration: 0.8, ease: WB_EASE }}>
+          <h1 style={{ margin: 0, maxWidth: "17ch", fontFamily: theme.typography.display, fontSize: "clamp(2.8rem, 8vw, 6rem)", fontWeight: 800, lineHeight: 1.06, letterSpacing: "-0.04em", color: theme.colors.text }}>{f.heroSubHeadline || f.heroHeadline || name}</h1>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "start", gap: "24px 64px", marginTop: 40 }}>
+            <div style={{ flex: "1 1 220px" }}>
+              <p style={{ margin: 0, fontWeight: 700, fontSize: 18, color: theme.colors.text }}>{name}</p>
+              {f.heroHeadline && <p style={{ margin: "8px 0 0", color: theme.colors.textSecondary }}>{f.heroHeadline}</p>}
+            </div>
+            {f.heroBio && <p style={{ flex: "2 1 280px", maxWidth: "60ch", margin: 0, fontSize: 18, lineHeight: 1.75, color: theme.colors.textSecondary }}>{f.heroBio}</p>}
+          </div>
+          {f.contactEmail && <a href={`mailto:${f.contactEmail}`} className="inline-flex items-center hover:underline" style={{ marginTop: 36, minHeight: 48, padding: "12px 24px", borderRadius: theme.radii.button, background: theme.colors.primary, color: theme.colors.onPrimary, fontWeight: 700, textUnderlineOffset: 5 }}>Hubungi saya</a>}
+        </motion.div>
+        {f.heroPhotoUrl && <img src={f.heroPhotoUrl} alt={name} style={{ display: "block", marginTop: 56, width: "100%", maxHeight: 520, aspectRatio: "21 / 9", objectFit: "cover", borderRadius: theme.radii.image }} />}
+      </div>
+    </section>
+  );
+}
+
+function SherbetHero({ data: f, name }: { data: PortfolioFormData; name: string }) {
+  const theme = usePortfolioTheme();
+  const reduced = useReducedMotion();
+  return (
+    <section style={{ background: theme.colors.bgSecondary, padding: "clamp(48px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", display: "flex", flexWrap: "wrap", alignItems: "center", gap: 40, overflowWrap: "anywhere" }}>
+        <motion.div initial={reduced ? false : { y: 16 }} animate={{ y: 0 }} transition={{ duration: 0.7, ease: WB_EASE }} style={{ flex: "2 1 280px", minWidth: 0 }}>
+          <h1 style={{ margin: 0, maxWidth: "16ch", fontFamily: theme.typography.display, fontSize: "clamp(2.6rem, 7vw, 5.5rem)", lineHeight: 1.06, letterSpacing: "-0.03em", fontWeight: 800, color: theme.colors.text }}>{f.heroSubHeadline || f.heroHeadline || name}</h1>
+          <p style={{ margin: "28px 0 0", fontSize: 18, fontWeight: 700, color: theme.colors.text }}>{name}</p>
+          {f.heroHeadline && <p style={{ margin: "6px 0 0", color: theme.colors.textSecondary }}>{f.heroHeadline}</p>}
+          {f.heroBio && <p style={{ margin: "20px 0 0", maxWidth: "60ch", fontSize: 18, lineHeight: 1.7, color: theme.colors.textSecondary }}>{f.heroBio}</p>}
+          {f.contactEmail && <a href={`mailto:${f.contactEmail}`} className="inline-flex items-center hover:underline" style={{ minHeight: 48, marginTop: 28, padding: "12px 24px", borderRadius: theme.radii.button, background: theme.colors.primary, color: theme.colors.onPrimary, fontWeight: 700, textUnderlineOffset: 5 }}>Diskusikan kolaborasi</a>}
+        </motion.div>
+        {f.heroPhotoUrl && <figure style={{ flex: "1 1 240px", minWidth: 0, margin: 0 }}><img src={f.heroPhotoUrl} alt={name} style={{ display: "block", width: "100%", maxHeight: 520, aspectRatio: "4 / 5", objectFit: "cover", borderRadius: theme.radii.image }} /></figure>}
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
 export default function HeroSection({ data }: Props) {
   const f = data;
@@ -911,6 +1079,16 @@ export default function HeroSection({ data }: Props) {
       return <MinimalistHero data={f} name={name} initials={initials} />;
     case "workbench":
       return <WorkbenchHero data={f} name={name} initials={initials} />;
+    case "decal":
+      return <DecalHero data={f} name={name} initials={initials} />;
+    case "scrapbook":
+      return <ScrapbookHero data={f} name={name} initials={initials} />;
+    case "crayon":
+      return <CrayonHero data={f} name={name} initials={initials} />;
+    case "interstella":
+      return <InterstellaHero data={f} name={name} />;
+    case "sherbet":
+      return <SherbetHero data={f} name={name} />;
     default:
       return <GlassHero data={f} name={name} initials={initials} />;
   }

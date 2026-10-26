@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 import type { TestimonialItem } from "../../portfolio-templates/types";
 import { useReducedMotion } from "../../../hooks/useReducedMotion";
 import { usePortfolioTheme } from "../PortfolioCanvas";
-import { Paper, Reveal, SectionHead, wbMono, wbSection, wbWrap } from "../workbench/kit";
+import { Paper, Reveal, SectionHead, wbHeading, wbMono, wbSection, wbWrap } from "../workbench/kit";
 
 interface Props { items: TestimonialItem[]; }
 
@@ -356,7 +356,129 @@ function WorkbenchTestimonials({ items }: { items: TestimonialItem[] }) {
   );
 }
 
+/* DECAL: testimoni sebagai kartu stiker dengan kutipan tebal. */
+function DecalTestimonials({ items }: { items: TestimonialItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((t) => t.testimonial);
+  if (!filtered.length) return null;
+
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <Reveal>
+          <h2 style={{ ...wbHeading(theme, "clamp(2rem, 5vw, 3.2rem)"), fontWeight: 800 }}>Testimoni</h2>
+        </Reveal>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20, marginTop: 28 }}>
+          {filtered.map((t, i) => (
+            <Reveal key={t.id} delay={i * 0.08} y={14}>
+              <figure style={{ margin: 0, padding: "20px 22px", background: theme.colors.surface, border: `2.5px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
+                <blockquote style={{ margin: 0, fontSize: 16, lineHeight: 1.6, fontWeight: 500, color: theme.colors.text }}>“{t.testimonial}”</blockquote>
+                <figcaption style={{ marginTop: 14, fontSize: 14, color: theme.colors.textSecondary }}>
+                  <strong style={{ color: theme.colors.text }}>{t.name}</strong>
+                  {t.position ? ` · ${t.position}` : ""}
+                </figcaption>
+              </figure>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
+/* CRAYON: testimoni sebagai balon kutipan putih. */
+function CrayonTestimonials({ items }: { items: TestimonialItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((t) => t.testimonial);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <Reveal>
+          <h2 style={{ fontFamily: theme.typography.display, fontSize: "clamp(2.2rem, 5vw, 3.2rem)", fontWeight: 800, margin: 0, color: theme.colors.primary }}>Testimoni</h2>
+        </Reveal>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 22, marginTop: 28 }}>
+          {filtered.map((t, i) => (
+            <Reveal key={t.id} delay={i * 0.08} y={14}>
+              <figure style={{ margin: 0, padding: "22px 24px", background: theme.colors.surface, border: `3px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
+                <blockquote style={{ margin: 0, fontFamily: theme.typography.display, fontSize: 22, lineHeight: 1.35, fontWeight: 700, color: theme.colors.primary }}>“{t.testimonial}”</blockquote>
+                <figcaption style={{ marginTop: 12, fontSize: 14, color: theme.colors.textSecondary }}>
+                  <strong style={{ color: theme.colors.text }}>{t.name}</strong>
+                  {t.position ? ` · ${t.position}` : ""}
+                </figcaption>
+              </figure>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* SCRAPBOOK: testimoni sebagai kartu kertas dengan kutipan tulisan tangan. */
+function ScrapbookTestimonials({ items }: { items: TestimonialItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((t) => t.testimonial);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <Reveal>
+          <h2 style={{ ...wbHeading(theme, "clamp(2rem, 5vw, 3rem)"), fontWeight: 700, color: theme.colors.primary }}>Testimoni</h2>
+        </Reveal>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 22, marginTop: 28 }}>
+          {filtered.map((t, i) => (
+            <Reveal key={t.id} delay={i * 0.08} y={14}>
+              <figure style={{ margin: 0, padding: "20px 22px", background: theme.colors.surface, border: `2px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, transform: `rotate(${i % 2 ? 1 : -1}deg)` }}>
+                <blockquote style={{ margin: 0, fontFamily: theme.typography.display, fontSize: 24, lineHeight: 1.3, color: theme.colors.primary }}>“{t.testimonial}”</blockquote>
+                <figcaption style={{ marginTop: 12, fontSize: 14, color: theme.colors.textSecondary }}>
+                  <strong style={{ color: theme.colors.text }}>{t.name}</strong>
+                  {t.position ? ` · ${t.position}` : ""}
+                </figcaption>
+              </figure>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function InterstellaTestimonials({ items }: { items: TestimonialItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((t) => t.testimonial);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ padding: "clamp(64px, 10vw, 120px) 0", background: theme.colors.bg }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
+        <h2 style={{ margin: "0 0 48px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 4vw, 3rem)", color: theme.colors.text }}>Kata rekan kerja</h2>
+        {filtered.map((t) => <figure key={t.id} style={{ margin: "0 0 40px", padding: "32px 0", borderTop: `1px solid ${theme.colors.border}` }}>
+          <blockquote style={{ margin: 0, fontFamily: theme.typography.display, fontSize: "clamp(1.5rem, 3.5vw, 2.5rem)", fontWeight: 500, lineHeight: 1.5, color: theme.colors.text }}>{t.testimonial}</blockquote>
+          {(t.name || t.position) && <figcaption style={{ marginTop: 24, fontSize: 15, color: theme.colors.textMuted }}>{[t.name, t.position].filter(Boolean).join(" · ")}</figcaption>}
+        </figure>)}
+      </div>
+    </section>
+  );
+}
+
+function SherbetTestimonials({ items }: { items: TestimonialItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((t) => t.testimonial);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ background: theme.colors.bgSecondary, padding: "clamp(64px, 9vw, 112px) 0" }}>
+      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
+        <h2 style={{ margin: "0 0 40px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 800, color: theme.colors.text }}>Cerita setelah kolaborasi</h2>
+        <div style={{ display: "grid", gap: 36 }}>{filtered.map((t) => <figure key={t.id} style={{ margin: 0 }}>
+          <blockquote style={{ margin: 0, maxWidth: "40ch", fontFamily: theme.typography.display, fontSize: "clamp(1.5rem, 3vw, 2.5rem)", lineHeight: 1.5, fontWeight: 600, color: theme.colors.text }}><p style={{ margin: 0 }}>{t.testimonial}</p></blockquote>
+          {(t.name || t.position) && <figcaption style={{ marginTop: 20, color: theme.colors.textSecondary }}><strong style={{ display: "block" }}>{t.name}</strong>{t.position && <span style={{ display: "block", marginTop: 4 }}>{t.position}</span>}</figcaption>}
+        </figure>)}</div>
+      </div>
+    </section>
+  );
+}
+
 export default function TestimonialsSection({ items }: Props) {
   const theme = usePortfolioTheme();
   switch (theme.id) {
@@ -365,6 +487,11 @@ export default function TestimonialsSection({ items }: Props) {
     case "luxe": return <LuxeTestimonials items={items} />;
     case "minimalist": return <MinimalistTestimonials items={items} />;
     case "workbench": return <WorkbenchTestimonials items={items} />;
+    case "decal": return <DecalTestimonials items={items} />;
+    case "scrapbook": return <ScrapbookTestimonials items={items} />;
+    case "crayon": return <CrayonTestimonials items={items} />;
+    case "interstella": return <InterstellaTestimonials items={items} />;
+    case "sherbet": return <SherbetTestimonials items={items} />;
     default: return <GlassTestimonials items={items} />;
   }
 }

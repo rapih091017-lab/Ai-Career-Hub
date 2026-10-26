@@ -343,6 +343,130 @@ function WorkbenchEducation({ items }: { items: EducationItem[] }) {
 }
 
 /* ─── MAIN ─── */
+/* DECAL — kartu pill berisi institusi dan periode. */
+function DecalEducation({ items }: { items: EducationItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((e) => e.institution);
+  if (!filtered.length) return null;
+
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <Reveal>
+          <h2 style={{ ...wbHeading(theme, "clamp(2rem, 5vw, 3.2rem)"), fontWeight: 800 }}>Pendidikan</h2>
+        </Reveal>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 16, marginTop: 28 }}>
+          {filtered.map((e, i) => (
+            <Reveal key={e.id} delay={i * 0.07} y={16}>
+              <div style={{ padding: "18px 22px", background: theme.colors.surface, border: `2.5px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, minWidth: 240 }}>
+                <h3 style={{ ...wbHeading(theme, "clamp(17px, 2vw, 19px)"), margin: 0 }}>{e.institution}</h3>
+                <p style={{ margin: "6px 0 0", fontSize: 14, color: theme.colors.textSecondary }}>{[e.degree, e.field].filter(Boolean).join(" · ")}</p>
+                {e.startDate || e.endDate ? (
+                  <span style={{ display: "inline-block", marginTop: 10, fontSize: 12, fontWeight: 800, padding: "4px 12px", background: theme.colors.primary, color: theme.colors.onPrimary, borderRadius: theme.radii.pill }}>
+                    {[e.startDate, e.endDate].filter(Boolean).join(" – ")}
+                  </span>
+                ) : null}
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* CRAYON: kartu pendidikan putih dengan label tahun berwarna. */
+function CrayonEducation({ items }: { items: EducationItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((e) => e.institution || e.degree);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <Reveal>
+          <h2 style={{ fontFamily: theme.typography.display, fontSize: "clamp(2.2rem, 5vw, 3.2rem)", fontWeight: 800, margin: 0, color: theme.colors.primary }}>Pendidikan</h2>
+        </Reveal>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20, marginTop: 28 }}>
+          {filtered.map((e, i) => (
+            <Reveal key={e.id} delay={i * 0.07} y={14}>
+              <div style={{ padding: "20px 22px", background: theme.colors.surface, border: `3px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
+                <span style={{ fontWeight: 800, fontSize: 12, padding: "3px 12px", background: i % 2 ? theme.colors.primary : theme.colors.accent, color: i % 2 ? theme.colors.onPrimary : theme.colors.text, borderRadius: theme.radii.pill }}>{e.startDate} – {e.endDate}</span>
+                <h3 style={{ fontFamily: theme.typography.display, fontSize: "clamp(18px, 2.2vw, 22px)", fontWeight: 800, margin: "12px 0 0", color: theme.colors.primary }}>{e.institution}</h3>
+                {e.degree || e.field ? <p style={{ margin: "4px 0 0", fontSize: 14, color: theme.colors.textSecondary }}>{[e.degree, e.field].filter(Boolean).join(" · ")}</p> : null}
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* SCRAPBOOK: ijazah sebagai kartu kertas dengan tahun di selotip. */
+function ScrapbookEducation({ items }: { items: EducationItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((e) => e.institution || e.degree);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <Reveal>
+          <h2 style={{ ...wbHeading(theme, "clamp(2rem, 5vw, 3rem)"), fontWeight: 700, color: theme.colors.primary }}>Pendidikan</h2>
+        </Reveal>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20, marginTop: 28 }}>
+          {filtered.map((e, i) => (
+            <Reveal key={e.id} delay={i * 0.07} y={14}>
+              <div style={{ padding: "20px 22px", background: theme.colors.surface, border: `2px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, transform: `rotate(${i % 2 ? 1 : -1}deg)` }}>
+                <span style={{ fontWeight: 800, fontSize: 12, padding: "2px 10px", background: theme.colors.accent, border: `1.5px solid ${theme.colors.border}` }}>{e.startDate} – {e.endDate}</span>
+                <h3 style={{ ...wbHeading(theme, "clamp(18px, 2.2vw, 22px)"), margin: "12px 0 0", color: theme.colors.primary }}>{e.institution}</h3>
+                {e.degree || e.field ? <p style={{ margin: "4px 0 0", fontSize: 14, color: theme.colors.textSecondary }}>{[e.degree, e.field].filter(Boolean).join(" · ")}</p> : null}
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function InterstellaEducation({ items }: { items: EducationItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((e) => e.institution || e.degree);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ padding: "clamp(48px, 7vw, 80px) 0", background: theme.colors.bgSecondary }}>
+      <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
+        <h2 style={{ margin: "0 0 32px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 700, color: theme.colors.text }}>Pendidikan</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))", gap: 32 }}>
+          {filtered.map((e) => <article key={e.id} style={{ paddingTop: 24, borderTop: `1px solid ${theme.colors.border}` }}>
+            <h3 style={{ margin: 0, fontFamily: theme.typography.display, fontSize: 22, color: theme.colors.text }}>{e.institution}</h3>
+            {(e.degree || e.field) && <p style={{ margin: "12px 0 0", lineHeight: 1.7, color: theme.colors.textSecondary }}>{[e.degree, e.field].filter(Boolean).join(" · ")}</p>}
+            <p style={{ margin: "12px 0 0", color: theme.colors.textMuted, fontSize: 14 }}>{[e.startDate, e.isPresent ? "Sekarang" : e.endDate].filter(Boolean).join(" – ")}</p>
+          </article>)}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SherbetEducation({ items }: { items: EducationItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((e) => e.institution || e.degree);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ background: theme.colors.secondary, padding: "clamp(48px, 7vw, 80px) 0" }}>
+      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
+        <h2 style={{ margin: "0 0 32px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 800, color: theme.colors.text }}>Pendidikan</h2>
+        <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>{filtered.map((e) => <li key={e.id} style={{ padding: "24px 0", borderTop: `1px solid ${theme.colors.border}` }}>
+          <p style={{ margin: "0 0 10px", fontSize: 14, color: theme.colors.textMuted }}>{[e.startDate, e.isPresent ? "Sekarang" : e.endDate].filter(Boolean).join(" – ")}</p>
+          <h3 style={{ margin: 0, fontSize: 24, color: theme.colors.text }}>{e.institution}</h3>
+          {(e.degree || e.field) && <p style={{ margin: "10px 0 0", lineHeight: 1.7, color: theme.colors.textSecondary }}>{[e.degree, e.field].filter(Boolean).join(" · ")}</p>}
+        </li>)}</ul>
+      </div>
+    </section>
+  );
+}
+
 export default function EducationSection({ items }: Props) {
   const theme = usePortfolioTheme();
   switch (theme.id) {
@@ -351,6 +475,11 @@ export default function EducationSection({ items }: Props) {
     case "luxe": return <LuxeEducation items={items} />;
     case "minimalist": return <MinimalistEducation items={items} />;
     case "workbench": return <WorkbenchEducation items={items} />;
+    case "decal": return <DecalEducation items={items} />;
+    case "scrapbook": return <ScrapbookEducation items={items} />;
+    case "crayon": return <CrayonEducation items={items} />;
+    case "interstella": return <InterstellaEducation items={items} />;
+    case "sherbet": return <SherbetEducation items={items} />;
     default: return <GlassEducation items={items} />;
   }
 }

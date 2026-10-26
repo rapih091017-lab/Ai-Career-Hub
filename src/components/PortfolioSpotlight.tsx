@@ -3,17 +3,16 @@
 import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { useTranslation } from "@/lib/i18n";
+import { THEMES as PORTFOLIO_THEMES } from "@/components/portfolio/themes";
 
 // Sampel tema = kertas + aksen tema itu sendiri, bukan satu warna acak.
 // Di mode gelap cincin aksennya yang terbaca, jadi bulatannya tidak jadi
 // titik putih tanpa arti.
-const THEMES = [
-  { name: "Glassmorphism", bg: "#12121F", accent: "#60A5FA" },
-  { name: "Neo Brutal", bg: "#FFFAF0", accent: "#E40039" },
-  { name: "Editorial Luxe", bg: "#FDFBF7", accent: "#936B30" },
-  { name: "Minimalist", bg: "#FFFFFF", accent: "#111111" },
-  { name: "Kertas Kerja", bg: "#F3F6F2", accent: "#1D6B48" },
-];
+const THEMES = Object.values(PORTFOLIO_THEMES).map((theme) => ({
+  name: theme.name,
+  bg: theme.colors.bg,
+  accent: theme.colors.primary,
+}));
 
 /** Spotlight satu fitur: Portfolio Web. Split layout, preview tipografis
  * berlabel contoh, bukan fake screenshot. */

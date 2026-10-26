@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { safeUrlUnescaped } from "@/lib/portfolio-safety";
 import type { ProjectItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
 import {
@@ -461,7 +462,173 @@ function WorkbenchProjects({ items }: { items: ProjectItem[] }) {
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * DECAL — kartu stiker berbentuk pill di dalam
+ * kartu besar, nomor stiker, dan teknologi sebagai
+ * pill kecil. Hover mengangkat stiker.
+ * ═══════════════════════════════════════════════ */
+function DecalProjects({ items }: { items: ProjectItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((p) => p.name);
+  if (!filtered.length) return null;
+
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <Reveal>
+          <h2 style={{ ...wbHeading(theme, "clamp(2rem, 5vw, 3.2rem)"), fontWeight: 800 }}>Karya pilihan</h2>
+        </Reveal>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 22, marginTop: 32 }}>
+          {filtered.map((p, i) => (
+            <Reveal key={p.id} delay={i * 0.07} y={20} style={{ display: "flex" }}>
+              <Paper style={{ display: "flex", flexDirection: "column", overflow: "hidden", width: "100%", borderRadius: theme.radii.card }}>
+                {p.imageUrl ? (
+                  <img src={p.imageUrl} alt={p.name} loading="lazy" style={{ width: "100%", height: 176, objectFit: "cover", display: "block", borderBottom: `2.5px solid ${theme.colors.border}` }} />
+                ) : null}
+                <div style={{ padding: "clamp(18px, 2.4vw, 24px)", display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
+                  <span style={{ alignSelf: "flex-start", fontFamily: theme.typography.display, fontSize: 12, fontWeight: 800, padding: "3px 12px", background: theme.colors.primary, color: theme.colors.onPrimary, borderRadius: theme.radii.pill }}>
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <h3 style={{ ...wbHeading(theme, "clamp(18px, 2.2vw, 22px)"), margin: 0 }}>{p.name}</h3>
+                  {p.description ? <p style={{ margin: 0, fontSize: 14, lineHeight: 1.65, color: theme.colors.textSecondary, flex: 1 }}>{p.description}</p> : null}
+                  {p.techStack ? (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                      {p.techStack.split(",").map((tech, idx) => (
+                        <span key={`${p.id}-${idx}`} style={{ fontSize: 12, fontWeight: 700, padding: "3px 10px", background: theme.colors.secondary, color: theme.colors.onPrimary, borderRadius: theme.radii.pill }}>
+                          {tech.trim()}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                  {p.link ? (
+                    <a href={p.link} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: theme.colors.accent, textDecoration: "none", minHeight: 32 }}>
+                      Lihat proyek <ArrowUpRight size={12} />
+                    </a>
+                  ) : null}
+                </div>
+              </Paper>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* CRAYON: proyek sebagai kartu putih dengan nomor berwarna. */
+function CrayonProjects({ items }: { items: ProjectItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((p) => p.name);
+  if (!filtered.length) return null;
+  const fills = [theme.colors.primary, theme.colors.secondary, theme.colors.accent];
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <Reveal>
+          <h2 style={{ fontFamily: theme.typography.display, fontSize: "clamp(2.2rem, 5vw, 3.2rem)", fontWeight: 800, margin: 0, color: theme.colors.primary }}>Karya pilihan</h2>
+        </Reveal>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24, marginTop: 28 }}>
+          {filtered.map((p, i) => (
+            <Reveal key={p.id} delay={i * 0.07} y={16}>
+              <div style={{ padding: 22, background: theme.colors.surface, border: `3px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
+                <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 44, height: 44, borderRadius: 999, background: fills[i % fills.length], color: i % 3 === 2 ? theme.colors.text : theme.colors.onPrimary, fontFamily: theme.typography.display, fontWeight: 800, fontSize: 18 }}>{String(i + 1).padStart(2, "0")}</span>
+                <h3 style={{ fontFamily: theme.typography.display, fontSize: "clamp(20px, 2.4vw, 24px)", fontWeight: 800, margin: "12px 0 0", color: theme.colors.primary }}>{p.name}</h3>
+                {p.description ? <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: theme.colors.textSecondary }}>{p.description}</p> : null}
+                {p.techStack ? <p style={{ margin: "10px 0 0", fontSize: 12, fontWeight: 800, color: theme.colors.textMuted }}>{p.techStack}</p> : null}
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* SCRAPBOOK: proyek sebagai foto tempel bertumpuk dengan judul tulisan tangan. */
+function ScrapbookProjects({ items }: { items: ProjectItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((p) => p.name);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <Reveal>
+          <h2 style={{ ...wbHeading(theme, "clamp(2rem, 5vw, 3rem)"), fontWeight: 700, color: theme.colors.primary }}>Karya pilihan</h2>
+        </Reveal>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 26, marginTop: 28 }}>
+          {filtered.map((p, i) => (
+            <Reveal key={p.id} delay={i * 0.07} y={16}>
+              <div style={{ padding: 20, background: theme.colors.surface, border: `2px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, transform: `rotate(${i % 2 ? 1 : -1.2}deg)` }}>
+                <span style={{ fontFamily: theme.typography.display, fontSize: 34, color: theme.colors.secondary }}>{String(i + 1).padStart(2, "0")}</span>
+                <h3 style={{ ...wbHeading(theme, "clamp(20px, 2.4vw, 24px)"), margin: "4px 0 0", color: theme.colors.primary }}>{p.name}</h3>
+                {p.description ? <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: theme.colors.textSecondary }}>{p.description}</p> : null}
+                {p.techStack ? <p style={{ margin: "10px 0 0", fontSize: 12, fontWeight: 800, color: theme.colors.textMuted }}>{p.techStack}</p> : null}
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
+function InterstellaProjects({ items }: { items: ProjectItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((p) => p.name);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ padding: "clamp(64px, 10vw, 128px) 0", background: theme.colors.bgSecondary }}>
+      <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
+        <h2 style={{ fontFamily: theme.typography.display, fontSize: "clamp(2.5rem, 6vw, 4.5rem)", lineHeight: 1.1, letterSpacing: "-0.03em", fontWeight: 800, margin: "0 0 48px", color: theme.colors.text }}>Karya pilihan.</h2>
+        <div style={{ display: "grid", gap: 56 }}>
+          {filtered.map((p) => {
+            const links = [{ label: "Lihat proyek", url: p.liveUrl || p.link }, { label: "Repositori", url: p.repoUrl }].map((l) => ({ ...l, href: safeUrlUnescaped(l.url || "") })).filter((l) => l.href);
+            return <article key={p.id}>
+              {p.imageUrl && <div style={{ overflow: "hidden", borderRadius: theme.radii.image, background: theme.colors.surface }}><img src={p.imageUrl} alt={p.name} loading="lazy" style={{ display: "block", width: "100%", aspectRatio: "16 / 9", objectFit: "cover" }} /></div>}
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "16px 48px", paddingTop: 24, borderTop: p.imageUrl ? undefined : `1px solid ${theme.colors.border}` }}>
+                <div style={{ flex: "1 1 240px" }}>
+                  <h3 style={{ margin: 0, fontFamily: theme.typography.display, fontSize: "clamp(1.8rem, 4vw, 3rem)", fontWeight: 700, color: theme.colors.text }}>{p.name}</h3>
+                  {p.role && <p style={{ margin: "8px 0 0", color: theme.colors.textMuted }}>{p.role}</p>}
+                </div>
+                <div style={{ flex: "1 1 260px" }}>
+                  {p.description && <p style={{ margin: 0, lineHeight: 1.75, color: theme.colors.textSecondary }}>{p.description}</p>}
+                  {p.techStack && <p style={{ margin: "12px 0 0", fontSize: 14, color: theme.colors.textMuted }}>{p.techStack}</p>}
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 24 }}>{links.map((l) => <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ display: "inline-flex", alignItems: "center", minHeight: 44, marginTop: 8, color: theme.colors.primary, textUnderlineOffset: 5 }}>{l.label}<span className="sr-only">: {p.name}</span></a>)}</div>
+                </div>
+              </div>
+            </article>;
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SherbetProjects({ items }: { items: ProjectItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((p) => p.name);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(64px, 9vw, 112px) 0" }}>
+      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
+        <h2 style={{ margin: "0 0 40px", fontFamily: theme.typography.display, fontWeight: 800, fontSize: "clamp(2.4rem, 5vw, 4rem)", lineHeight: 1.1, color: theme.colors.text }}>Cerita dalam karya.</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))", gap: "40px 28px" }}>{filtered.map((p) => {
+          const links = [{ label: "Lihat karya", url: p.liveUrl || p.link }, { label: "Repositori", url: p.repoUrl }].map((l) => ({ ...l, href: safeUrlUnescaped(l.url || "") })).filter((l) => l.href);
+          return <article key={p.id} style={{ minWidth: 0 }}>
+            {p.imageUrl && <img src={p.imageUrl} alt={p.name} loading="lazy" style={{ width: "100%", aspectRatio: "4 / 5", objectFit: "cover", display: "block", marginBottom: 20, borderRadius: theme.radii.image }} />}
+            <h3 style={{ margin: 0, fontFamily: theme.typography.display, fontSize: 28, fontWeight: 700, lineHeight: 1.2, color: theme.colors.text }}>{p.name}</h3>
+            {p.role && <p style={{ margin: "8px 0 0", fontWeight: 600, color: theme.colors.textMuted }}>{p.role}</p>}
+            {p.description && <p style={{ margin: "12px 0 0", lineHeight: 1.75, color: theme.colors.textSecondary }}>{p.description}</p>}
+            {p.techStack && <p style={{ margin: "12px 0 0", fontSize: 14, color: theme.colors.textMuted }}>{p.techStack}</p>}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 20 }}>{links.map((l) => <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ display: "inline-flex", alignItems: "center", minHeight: 44, color: theme.colors.primary, fontWeight: 700, textUnderlineOffset: 5 }}>{l.label}<span className="sr-only">: {p.name}</span></a>)}</div>
+          </article>;
+        })}</div>
+      </div>
+    </section>
+  );
+}
+
 export default function ProjectsSection({ items }: Props) {
   const theme = usePortfolioTheme();
   switch (theme.id) {
@@ -470,6 +637,11 @@ export default function ProjectsSection({ items }: Props) {
     case "luxe": return <LuxeProjects items={items} />;
     case "minimalist": return <MinimalistProjects items={items} />;
     case "workbench": return <WorkbenchProjects items={items} />;
+    case "decal": return <DecalProjects items={items} />;
+    case "scrapbook": return <ScrapbookProjects items={items} />;
+    case "crayon": return <CrayonProjects items={items} />;
+    case "interstella": return <InterstellaProjects items={items} />;
+    case "sherbet": return <SherbetProjects items={items} />;
     default: return <GlassProjects items={items} />;
   }
 }

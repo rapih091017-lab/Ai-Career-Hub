@@ -104,6 +104,61 @@ function staticMarkup(node: React.ReactElement): string {
   return renderToStaticMarkup(node);
 }
 
+describe.each(["interstella", "sherbet"] as const)("tema %s", (themeId) => {
+  const rich: PortfolioData = {
+    ...data,
+    formData: { ...data.formData, heroSubHeadline: "Kampanye dari gagasan sampai layar", heroBio: "Pendekatan kreatif", skillsTools: "Figma", skillsLanguages: "Indonesia", contactPhone: "+628123456", contactLinkedin: "linkedin.com/in/contoh" },
+    projects: [{ id: "p1", name: "Proyek contoh", description: "Deskripsi proyek", techStack: "React", link: "https://example.com/proyek?a=1&b=2", repoUrl: "https://example.com/repo", imageUrl: "https://example.com/proyek.jpg", role: "Direktur kreatif" }],
+    experiences: [{ id: "e1", company: "Studio contoh", position: "Desainer", startDate: "2024", endDate: "", isPresent: true, description: "Pengalaman contoh" }],
+    educations: [{ id: "ed1", institution: "Kampus contoh", degree: "S1", field: "Desain", startDate: "2020", endDate: "", isPresent: true }],
+    certifications: [{ id: "c1", name: "Sertifikat contoh", issuer: "Penerbit contoh", year: "2025", url: "https://example.com/sertifikat" }],
+    organizations: [{ id: "o1", name: "Komunitas contoh", role: "Anggota", period: "2025", description: "Kegiatan contoh" }],
+    hobbies: [{ id: "h1", name: "Fotografi", description: "Minat contoh" }],
+    testimonials: [{ id: "t1", name: "Rekan contoh", position: "Desainer", testimonial: "Kutipan untuk pengujian" }],
+    extraLinks: [{ id: "x1", label: "Situs pribadi", url: "https://example.com" }],
+  };
+
+  it("merender isi seluruh section, gambar, dan tautan yang bisa diaktifkan", () => {
+    const { container } = render(<PortfolioDocument data={rich} themeId={themeId} mode="static" />);
+    for (const id of DEFAULT_SECTION_ORDER) expect(anchor(container, id).querySelector("section"), id).toBeTruthy();
+    expect(container.querySelector("h1")).toHaveTextContent("Kampanye dari gagasan sampai layar");
+    expect(anchor(container, "projects").querySelector("img")).toHaveAttribute("src", "https://example.com/proyek.jpg");
+    expect(anchor(container, "projects")).toHaveTextContent("Direktur kreatif");
+    expect(anchor(container, "certifications")).toHaveTextContent("Penerbit contoh");
+    expect(anchor(container, "experience")).toHaveTextContent("Sekarang");
+    expect(anchor(container, "education")).toHaveTextContent("Sekarang");
+    for (const href of ["mailto:teguh@example.com", "tel:+628123456", "https://linkedin.com/in/contoh", "https://example.com/proyek?a=1&b=2", "https://example.com/repo", "https://example.com/sertifikat"]) {
+      const link = Array.from(container.querySelectorAll("a")).find((a) => a.getAttribute("href") === href);
+      expect(link, href).toBeTruthy();
+      link?.focus();
+      expect(link).toHaveFocus();
+      const handler = vi.fn((event: MouseEvent) => event.preventDefault());
+      link?.addEventListener("click", handler);
+      link?.click();
+      expect(handler).toHaveBeenCalledOnce();
+    }
+  });
+
+  it("tidak menciptakan isi atau kontrol pada section kosong", () => {
+    const empty: PortfolioData = { formData: { ...EMPTY_FORM_DATA }, projects: [], experiences: [], educations: [], certifications: [], organizations: [], hobbies: [], testimonials: [], extraLinks: [] };
+    const { container } = render(<PortfolioDocument data={empty} themeId={themeId} mode="static" />);
+    for (const id of DEFAULT_SECTION_ORDER.filter((id) => id !== "hero")) expect(anchor(container, id).querySelector("section"), id).toBeNull();
+    expect(container.querySelector("a")).toBeNull();
+    expect(container.querySelector("img")).toBeNull();
+  });
+
+  it("menolak skema tautan berbahaya dan tetap dapat diekspor tanpa JS", () => {
+    const unsafe: PortfolioData = { ...rich, formData: { ...rich.formData, contactLinkedin: "javascript:alert(1)", contactGithub: "data:text/html,bad" }, projects: [{ ...rich.projects[0], link: "javascript:alert(1)", repoUrl: "data:text/html,bad" }], certifications: [{ ...rich.certifications[0], url: "javascript:alert(1)" }], extraLinks: [{ id: "bad", label: "Tidak aman", url: "javascript:alert(1)" }] };
+    const html = renderToStaticMarkup(<PortfolioDocument data={unsafe} themeId={themeId} mode="static" />);
+    const host = document.createElement("div");
+    host.innerHTML = html;
+    expect(host.querySelector('a[href^="javascript:"], a[href^="data:"]')).toBeNull();
+    expect(host.querySelector("h1")).toHaveTextContent("Kampanye dari gagasan sampai layar");
+    expect(host.querySelector("h1")?.closest('[style*="opacity:0"]')).toBeNull();
+    expect(html).not.toContain("NaN");
+  });
+});
+
 describe("PortfolioDocument", () => {
   it("memberi id pada setiap section supaya anchor hero bekerja", () => {
     const { container } = render(

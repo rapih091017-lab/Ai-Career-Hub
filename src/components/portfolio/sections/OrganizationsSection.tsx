@@ -305,6 +305,122 @@ function WorkbenchOrganizations({ items }: { items: OrganizationItem[] }) {
 }
 
 /* ─── MAIN ─── */
+/* DECAL: organisasi sebagai kartu pill berlabel peran. */
+function DecalOrganizations({ items }: { items: OrganizationItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((o) => o.name);
+  if (!filtered.length) return null;
+
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <Reveal>
+          <h2 style={{ ...wbHeading(theme, "clamp(2rem, 5vw, 3.2rem)"), fontWeight: 800 }}>Organisasi</h2>
+        </Reveal>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 18, marginTop: 28 }}>
+          {filtered.map((o, i) => (
+            <Reveal key={o.id} delay={i * 0.07} y={14}>
+              <div style={{ padding: "16px 20px", background: theme.colors.surface, border: `2.5px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
+                <h3 style={{ ...wbHeading(theme, "clamp(16px, 2vw, 18px)"), margin: 0 }}>{o.name}</h3>
+                {o.role ? <span style={{ display: "inline-block", marginTop: 8, fontSize: 12, fontWeight: 800, padding: "3px 12px", background: theme.colors.secondary, color: theme.colors.onPrimary, borderRadius: theme.radii.pill }}>{o.role}</span> : null}
+                {o.description ? <p style={{ margin: "10px 0 0", fontSize: 14, lineHeight: 1.6, color: theme.colors.textSecondary }}>{o.description}</p> : null}
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* CRAYON: organisasi sebagai kartu putih dengan label peran berwarna. */
+function CrayonOrganizations({ items }: { items: OrganizationItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((o) => o.name);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <Reveal>
+          <h2 style={{ fontFamily: theme.typography.display, fontSize: "clamp(2.2rem, 5vw, 3.2rem)", fontWeight: 800, margin: 0, color: theme.colors.primary }}>Organisasi</h2>
+        </Reveal>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20, marginTop: 28 }}>
+          {filtered.map((o, i) => (
+            <Reveal key={o.id} delay={i * 0.07} y={14}>
+              <div style={{ padding: "18px 22px", background: theme.colors.surface, border: `3px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
+                {o.role ? <span style={{ display: "inline-block", fontSize: 12, fontWeight: 800, padding: "2px 12px", background: i % 2 ? theme.colors.secondary : theme.colors.accent, color: theme.colors.text, borderRadius: theme.radii.pill }}>{o.role}</span> : null}
+                <h3 style={{ fontFamily: theme.typography.display, fontSize: "clamp(18px, 2.2vw, 22px)", fontWeight: 800, margin: "10px 0 0", color: theme.colors.primary }}>{o.name}</h3>
+                {o.description ? <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: theme.colors.textSecondary }}>{o.description}</p> : null}
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* SCRAPBOOK: organisasi sebagai kartu kertas dengan peran di selotip. */
+function ScrapbookOrganizations({ items }: { items: OrganizationItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((o) => o.name);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <Reveal>
+          <h2 style={{ ...wbHeading(theme, "clamp(2rem, 5vw, 3rem)"), fontWeight: 700, color: theme.colors.primary }}>Organisasi</h2>
+        </Reveal>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20, marginTop: 28 }}>
+          {filtered.map((o, i) => (
+            <Reveal key={o.id} delay={i * 0.07} y={14}>
+              <div style={{ padding: "18px 20px", background: theme.colors.surface, border: `2px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, transform: `rotate(${i % 2 ? 1 : -1}deg)` }}>
+                {o.role ? <span style={{ display: "inline-block", fontSize: 12, fontWeight: 800, padding: "2px 10px", background: theme.colors.accent, border: `1.5px solid ${theme.colors.border}` }}>{o.role}</span> : null}
+                <h3 style={{ ...wbHeading(theme, "clamp(18px, 2.2vw, 22px)"), margin: "10px 0 0", color: theme.colors.primary }}>{o.name}</h3>
+                {o.description ? <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: theme.colors.textSecondary }}>{o.description}</p> : null}
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function InterstellaOrganizations({ items }: { items: OrganizationItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((o) => o.name);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ padding: "clamp(56px, 8vw, 96px) 0", background: theme.colors.bg }}>
+      <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
+        <h2 style={{ margin: "0 0 40px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 4vw, 3rem)", color: theme.colors.text }}>Organisasi</h2>
+        {filtered.map((o) => <article key={o.id} style={{ display: "flex", flexWrap: "wrap", gap: "20px 64px", padding: "28px 0", borderTop: `1px solid ${theme.colors.border}` }}>
+          <div style={{ flex: "1 1 220px" }}><h3 style={{ margin: 0, fontSize: 24, color: theme.colors.text }}>{o.name}</h3>{o.period && <p style={{ margin: "10px 0 0", fontSize: 14, color: theme.colors.textMuted }}>{o.period}</p>}</div>
+          <div style={{ flex: "2 1 280px" }}>{o.role && <p style={{ margin: 0, fontSize: 18, fontWeight: 600, color: theme.colors.text }}>{o.role}</p>}{o.description && <p style={{ margin: "12px 0 0", maxWidth: "65ch", lineHeight: 1.75, whiteSpace: "pre-line", color: theme.colors.textSecondary }}>{o.description}</p>}</div>
+        </article>)}
+      </div>
+    </section>
+  );
+}
+
+function SherbetOrganizations({ items }: { items: OrganizationItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((o) => o.name);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ background: theme.colors.secondary, padding: "clamp(48px, 7vw, 80px) 0" }}>
+      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
+        <h2 style={{ margin: "0 0 32px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 800, color: theme.colors.text }}>Tumbuh bersama</h2>
+        <dl style={{ margin: 0 }}>{filtered.map((o) => <div key={o.id} style={{ padding: "24px 0", borderTop: `1px solid ${theme.colors.border}` }}>
+          <dt style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}><strong style={{ fontSize: 24, color: theme.colors.text }}>{o.name}</strong><span style={{ fontSize: 14, color: theme.colors.textMuted }}>{o.period}</span></dt>
+          <dd style={{ margin: "12px 0 0" }}>{o.role && <p style={{ margin: 0, fontWeight: 700, color: theme.colors.text }}>{o.role}</p>}{o.description && <p style={{ margin: "10px 0 0", maxWidth: "65ch", lineHeight: 1.75, whiteSpace: "pre-line", color: theme.colors.textSecondary }}>{o.description}</p>}</dd>
+        </div>)}</dl>
+      </div>
+    </section>
+  );
+}
+
 export default function OrganizationsSection({ items }: Props) {
   const theme = usePortfolioTheme();
   switch (theme.id) {
@@ -313,6 +429,11 @@ export default function OrganizationsSection({ items }: Props) {
     case "luxe": return <LuxeOrganizations items={items} />;
     case "minimalist": return <MinimalistOrganizations items={items} />;
     case "workbench": return <WorkbenchOrganizations items={items} />;
+    case "decal": return <DecalOrganizations items={items} />;
+    case "scrapbook": return <ScrapbookOrganizations items={items} />;
+    case "crayon": return <CrayonOrganizations items={items} />;
+    case "interstella": return <InterstellaOrganizations items={items} />;
+    case "sherbet": return <SherbetOrganizations items={items} />;
     default: return <GlassOrganizations items={items} />;
   }
 }

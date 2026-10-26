@@ -249,7 +249,117 @@ function WorkbenchHobbies({ items }: { items: HobbyItem[] }) {
   );
 }
 
+/* DECAL: hobi sebagai stiker pill berwarna. */
+function DecalHobbies({ items }: { items: HobbyItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((h) => h.name);
+  if (!filtered.length) return null;
+  const colors = [theme.colors.primary, theme.colors.secondary, theme.colors.accent];
+
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <Reveal>
+          <h2 style={{ ...wbHeading(theme, "clamp(2rem, 5vw, 3.2rem)"), fontWeight: 800 }}>Hobi</h2>
+        </Reveal>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 28 }}>
+          {filtered.map((h, i) => (
+            <Reveal key={h.id} delay={i * 0.05} y={10}>
+              <span title={h.description || undefined} style={{ display: "inline-block", padding: "10px 18px", background: colors[i % colors.length], color: theme.colors.onPrimary, borderRadius: theme.radii.pill, fontWeight: 800, fontSize: 15, border: `2px solid ${theme.colors.border}` }}>
+                {h.name}
+              </span>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
+/* CRAYON: hobi sebagai pil warna-warni. */
+function CrayonHobbies({ items }: { items: HobbyItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((h) => h.name);
+  if (!filtered.length) return null;
+  const fills = [theme.colors.primary, theme.colors.secondary, theme.colors.accent];
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <Reveal>
+          <h2 style={{ fontFamily: theme.typography.display, fontSize: "clamp(2.2rem, 5vw, 3.2rem)", fontWeight: 800, margin: 0, color: theme.colors.primary }}>Hobi</h2>
+        </Reveal>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 28 }}>
+          {filtered.map((h, i) => (
+            <Reveal key={h.id} delay={i * 0.05} y={10}>
+              <span title={h.description || undefined} style={{ display: "inline-block", padding: "10px 20px", background: fills[i % fills.length], color: i % 3 === 2 ? theme.colors.text : theme.colors.onPrimary, borderRadius: theme.radii.pill, fontWeight: 800, fontSize: 15 }}>
+                {h.name}
+              </span>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* SCRAPBOOK: hobi sebagai label selotip kecil yang miring. */
+function ScrapbookHobbies({ items }: { items: HobbyItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((h) => h.name);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <Reveal>
+          <h2 style={{ ...wbHeading(theme, "clamp(2rem, 5vw, 3rem)"), fontWeight: 700, color: theme.colors.primary }}>Hobi</h2>
+        </Reveal>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 28 }}>
+          {filtered.map((h, i) => (
+            <Reveal key={h.id} delay={i * 0.05} y={10}>
+              <span title={h.description || undefined} style={{ display: "inline-block", padding: "8px 16px", background: i % 2 ? theme.colors.accent : theme.colors.surface, color: theme.colors.text, border: `2px solid ${theme.colors.border}`, fontWeight: 700, fontSize: 15, transform: `rotate(${i % 2 ? 2 : -2}deg)` }}>
+                {h.name}
+              </span>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function InterstellaHobbies({ items }: { items: HobbyItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((h) => h.name);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ padding: "clamp(48px, 7vw, 80px) 0", background: theme.colors.bgSecondary }}>
+      <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
+        <h2 style={{ margin: "0 0 32px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 4vw, 3rem)", color: theme.colors.text }}>Di luar pekerjaan</h2>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "24px 48px" }}>{filtered.map((h) => <article key={h.id} style={{ flex: "1 1 240px", minWidth: 0 }}>
+          <h3 style={{ margin: 0, fontSize: 22, fontWeight: 600, color: theme.colors.text }}>{h.name}</h3>{h.description && <p style={{ margin: "12px 0 0", lineHeight: 1.75, color: theme.colors.textSecondary }}>{h.description}</p>}
+        </article>)}</div>
+      </div>
+    </section>
+  );
+}
+
+function SherbetHobbies({ items }: { items: HobbyItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((h) => h.name);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(48px, 7vw, 80px) 0" }}>
+      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", display: "flex", flexWrap: "wrap", gap: "24px 56px", overflowWrap: "anywhere" }}>
+        <h2 style={{ flex: "1 1 220px", margin: 0, fontFamily: theme.typography.display, fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 800, color: theme.colors.text }}>Sumber inspirasi</h2>
+        <ul style={{ flex: "2 1 260px", listStyle: "none", margin: 0, padding: 0 }}>{filtered.map((h) => <li key={h.id} style={{ padding: "0 0 24px" }}>
+          <h3 style={{ margin: 0, fontSize: 24, color: theme.colors.text }}>{h.name}</h3>{h.description && <p style={{ margin: "10px 0 0", lineHeight: 1.75, color: theme.colors.textSecondary }}>{h.description}</p>}
+        </li>)}</ul>
+      </div>
+    </section>
+  );
+}
+
 export default function HobbiesSection({ items }: Props) {
   const theme = usePortfolioTheme();
   switch (theme.id) {
@@ -258,6 +368,11 @@ export default function HobbiesSection({ items }: Props) {
     case "luxe": return <LuxeHobbies items={items} />;
     case "minimalist": return <MinimalistHobbies items={items} />;
     case "workbench": return <WorkbenchHobbies items={items} />;
+    case "decal": return <DecalHobbies items={items} />;
+    case "scrapbook": return <ScrapbookHobbies items={items} />;
+    case "crayon": return <CrayonHobbies items={items} />;
+    case "interstella": return <InterstellaHobbies items={items} />;
+    case "sherbet": return <SherbetHobbies items={items} />;
     default: return <GlassHobbies items={items} />;
   }
 }

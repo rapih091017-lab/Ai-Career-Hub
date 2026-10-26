@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { safeUrlUnescaped } from "@/lib/portfolio-safety";
 import type { CertificationItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
 import { ArrowUpRight, Reveal, SectionHead, wbHeading, wbMono, wbPaper, wbSection, wbWrap } from "../workbench/kit";
@@ -341,6 +342,127 @@ function WorkbenchCertifications({ items }: { items: CertificationItem[] }) {
 }
 
 /* ─── MAIN ─── */
+/* DECAL: sertifikat sebagai stiker pill bertanggal. */
+function DecalCertifications({ items }: { items: CertificationItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((c) => c.name);
+  if (!filtered.length) return null;
+
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <Reveal>
+          <h2 style={{ ...wbHeading(theme, "clamp(2rem, 5vw, 3.2rem)"), fontWeight: 800 }}>Sertifikasi</h2>
+        </Reveal>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 28 }}>
+          {filtered.map((c, i) => (
+            <Reveal key={c.id} delay={i * 0.06} y={12}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 16px", background: theme.colors.surface, border: `2px solid ${theme.colors.border}`, borderRadius: theme.radii.pill, boxShadow: theme.shadow.card }}>
+                <strong style={{ fontFamily: theme.typography.display, fontSize: 15, fontWeight: 700, color: theme.colors.text }}>{c.name}</strong>
+                {c.year ? <span style={{ fontSize: 12, fontWeight: 800, padding: "2px 10px", background: theme.colors.accent, color: theme.colors.onPrimary, borderRadius: theme.radii.pill }}>{c.year}</span> : null}
+              </span>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* CRAYON: sertifikat sebagai kartu putih dengan label tahun. */
+function CrayonCertifications({ items }: { items: CertificationItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((c) => c.name);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <Reveal>
+          <h2 style={{ fontFamily: theme.typography.display, fontSize: "clamp(2.2rem, 5vw, 3.2rem)", fontWeight: 800, margin: 0, color: theme.colors.primary }}>Sertifikasi</h2>
+        </Reveal>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 16, marginTop: 28 }}>
+          {filtered.map((c, i) => (
+            <Reveal key={c.id} delay={i * 0.06} y={12}>
+              <div style={{ padding: "14px 20px", background: theme.colors.surface, border: `3px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
+                <strong style={{ display: "block", fontSize: 16, color: theme.colors.text }}>{c.name}</strong>
+                {c.year ? <span style={{ display: "inline-block", marginTop: 6, fontSize: 12, fontWeight: 800, padding: "2px 12px", background: theme.colors.accent, borderRadius: theme.radii.pill }}>{c.year}</span> : null}
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* SCRAPBOOK: sertifikat sebagai tiket tempel dengan tahun di selotip. */
+function ScrapbookCertifications({ items }: { items: CertificationItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((c) => c.name);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <Reveal>
+          <h2 style={{ ...wbHeading(theme, "clamp(2rem, 5vw, 3rem)"), fontWeight: 700, color: theme.colors.primary }}>Sertifikasi</h2>
+        </Reveal>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 16, marginTop: 28 }}>
+          {filtered.map((c, i) => (
+            <Reveal key={c.id} delay={i * 0.06} y={12}>
+              <div style={{ padding: "14px 18px", background: theme.colors.surface, border: `2px dashed ${theme.colors.primary}`, borderRadius: theme.radii.card, transform: `rotate(${i % 2 ? 1 : -1}deg)` }}>
+                <strong style={{ display: "block", fontSize: 16, color: theme.colors.text }}>{c.name}</strong>
+                {c.year ? <span style={{ display: "inline-block", marginTop: 6, fontSize: 12, fontWeight: 800, padding: "2px 10px", background: theme.colors.accent, border: `1.5px solid ${theme.colors.border}` }}>{c.year}</span> : null}
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function InterstellaCertifications({ items }: { items: CertificationItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((c) => c.name);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ padding: "clamp(48px, 7vw, 80px) 0", background: theme.colors.bgSecondary }}>
+      <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
+        <h2 style={{ margin: "0 0 32px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 4vw, 3rem)", color: theme.colors.text }}>Sertifikasi</h2>
+        {filtered.map((c) => {
+          const href = safeUrlUnescaped(c.url || "");
+          return <article key={c.id} style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 16, padding: "24px 0", borderTop: `1px solid ${theme.colors.border}` }}>
+            <div style={{ flex: "1 1 240px" }}><h3 style={{ margin: 0, fontSize: 20, color: theme.colors.text }}>{c.name}</h3>{c.issuer && <p style={{ margin: "8px 0 0", color: theme.colors.textSecondary }}>{c.issuer}</p>}</div>
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 24 }}><span style={{ color: theme.colors.textMuted }}>{c.year}</span>{href && <a href={href} target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ display: "inline-flex", alignItems: "center", minHeight: 44, color: theme.colors.primary, textUnderlineOffset: 5 }}>Lihat sertifikat<span className="sr-only">: {c.name}</span></a>}</div>
+          </article>;
+        })}
+      </div>
+    </section>
+  );
+}
+
+function SherbetCertifications({ items }: { items: CertificationItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((c) => c.name);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(48px, 7vw, 80px) 0" }}>
+      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
+        <h2 style={{ margin: "0 0 32px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 800, color: theme.colors.text }}>Sertifikasi</h2>
+        <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))", gap: 24 }}>{filtered.map((c) => {
+          const href = safeUrlUnescaped(c.url || "");
+          return <li key={c.id} style={{ minWidth: 0, padding: 24, background: theme.colors.surface, borderRadius: theme.radii.card }}>
+            <p style={{ margin: "0 0 12px", fontSize: 14, color: theme.colors.textMuted }}>{c.year}</p>
+            <h3 style={{ margin: 0, fontSize: 22, color: theme.colors.text }}>{c.name}</h3>
+            {c.issuer && <p style={{ margin: "10px 0 0", color: theme.colors.textSecondary }}>{c.issuer}</p>}
+            {href && <a href={href} target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ display: "inline-flex", alignItems: "center", minHeight: 44, marginTop: 12, fontWeight: 700, color: theme.colors.primary, textUnderlineOffset: 5 }}>Lihat sertifikat<span className="sr-only">: {c.name}</span></a>}
+          </li>;
+        })}</ul>
+      </div>
+    </section>
+  );
+}
+
 export default function CertificationsSection({ items }: Props) {
   const theme = usePortfolioTheme();
   switch (theme.id) {
@@ -349,6 +471,11 @@ export default function CertificationsSection({ items }: Props) {
     case "luxe": return <LuxeCertifications items={items} />;
     case "minimalist": return <MinimalistCertifications items={items} />;
     case "workbench": return <WorkbenchCertifications items={items} />;
+    case "decal": return <DecalCertifications items={items} />;
+    case "scrapbook": return <ScrapbookCertifications items={items} />;
+    case "crayon": return <CrayonCertifications items={items} />;
+    case "interstella": return <InterstellaCertifications items={items} />;
+    case "sherbet": return <SherbetCertifications items={items} />;
     default: return <GlassCertifications items={items} />;
   }
 }

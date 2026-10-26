@@ -69,12 +69,13 @@ export function Reveal({
   style?: CSSProperties;
   className?: string;
 }) {
+  const reduced = useReducedMotion();
   return (
     <motion.div
       className={className}
       style={style}
-      initial={{ opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={reduced ? false : { opacity: 0, y }}
+      whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
       // Ambang "some" (bukan rasio tinggi): panel panjang seperti daftar
       // sertifikasi bisa lebih tinggi dari layar, dan ambang rasio membuat
       // isinya tidak pernah muncul.

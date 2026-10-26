@@ -3,7 +3,7 @@
 import { motion } from "motion/react";
 import type { PortfolioFormData } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
-import { Chip, Reveal, SectionHead, wbMono, wbPaper, wbSection, wbWrap } from "../workbench/kit";
+import { Chip, Reveal, SectionHead, wbHeading, wbMono, wbPaper, wbSection, wbWrap } from "../workbench/kit";
 
 interface Props { data: PortfolioFormData; }
 
@@ -330,6 +330,133 @@ function WorkbenchSkills({ f }: { f: PortfolioFormData }) {
 }
 
 /* ─── MAIN ─── */
+/* DECAL — tiap kelompok keahlian jadi stiker berwarna. */
+function DecalSkills({ f }: { f: PortfolioFormData }) {
+  const theme = usePortfolioTheme();
+  const groups = [
+    { label: "Keahlian", value: f.skillsMain, tone: theme.colors.primary },
+    { label: "Tools", value: f.skillsTools, tone: theme.colors.secondary },
+    { label: "Bahasa", value: f.skillsLanguages, tone: theme.colors.accent },
+  ].filter((g) => g.value);
+  if (!groups.length) return null;
+
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <Reveal>
+          <h2 style={{ ...wbHeading(theme, "clamp(2rem, 5vw, 3.2rem)"), fontWeight: 800 }}>Keahlian</h2>
+        </Reveal>
+        <div style={{ display: "grid", gap: 20, marginTop: 28 }}>
+          {groups.map((g, i) => (
+            <Reveal key={g.label} delay={i * 0.08} y={14}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+                <span style={{ fontSize: 13, fontWeight: 800, padding: "5px 14px", background: g.tone, color: theme.colors.onPrimary, borderRadius: theme.radii.pill, transform: `rotate(${i % 2 ? 1.5 : -1.5}deg)` }}>{g.label}</span>
+                {g.value.split(",").map((s, idx) => (
+                  <span key={`${g.label}-${idx}`} style={{ fontSize: 14, fontWeight: 600, padding: "5px 12px", border: `2px solid ${theme.colors.border}`, color: theme.colors.text, borderRadius: theme.radii.pill }}>{s.trim()}</span>
+                ))}
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* CRAYON: keahlian sebagai kartu putih dengan label berwarna. */
+function CrayonSkills({ f }: { f: PortfolioFormData }) {
+  const theme = usePortfolioTheme();
+  const groups = [
+    { label: "utama", value: f.skillsMain, fill: theme.colors.primary, text: theme.colors.onPrimary },
+    { label: "alat", value: f.skillsTools, fill: theme.colors.accent, text: theme.colors.text },
+    { label: "bahasa", value: f.skillsLanguages, fill: theme.colors.secondary, text: theme.colors.text },
+  ].filter((g) => g.value);
+  if (!groups.length) return null;
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <Reveal>
+          <h2 style={{ fontFamily: theme.typography.display, fontSize: "clamp(2.2rem, 5vw, 3.2rem)", fontWeight: 800, margin: 0, color: theme.colors.primary }}>Keahlian</h2>
+        </Reveal>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 16, marginTop: 28 }}>
+          {groups.map((g, i) => (
+            <Reveal key={g.label} delay={i * 0.06} y={10}>
+              <div style={{ padding: "16px 20px", background: theme.colors.surface, border: `3px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, maxWidth: 360 }}>
+                <span style={{ display: "inline-block", padding: "2px 12px", borderRadius: theme.radii.pill, background: g.fill, color: g.text, fontWeight: 800, fontSize: 12, textTransform: "uppercase", letterSpacing: "0.06em" }}>{g.label}</span>
+                <p style={{ margin: "8px 0 0", fontSize: 15, lineHeight: 1.6, color: theme.colors.text }}>{g.value}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* SCRAPBOOK: keahlian sebagai potongan label tulisan tangan di kertas. */
+function ScrapbookSkills({ f }: { f: PortfolioFormData }) {
+  const theme = usePortfolioTheme();
+  const groups = [
+    { label: "utama", value: f.skillsMain },
+    { label: "alat", value: f.skillsTools },
+    { label: "bahasa", value: f.skillsLanguages },
+  ].filter((g) => g.value);
+  if (!groups.length) return null;
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <Reveal>
+          <h2 style={{ ...wbHeading(theme, "clamp(2rem, 5vw, 3rem)"), fontWeight: 700, color: theme.colors.primary }}>Keahlian</h2>
+        </Reveal>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 28 }}>
+          {groups.map((g, i) => (
+            <Reveal key={g.label} delay={i * 0.06} y={10}>
+              <div style={{ padding: "14px 18px", background: theme.colors.surface, border: `2px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, transform: `rotate(${i % 2 ? 1 : -1}deg)`, maxWidth: 360 }}>
+                <span style={{ fontSize: 12, fontWeight: 800, color: theme.colors.secondary, textTransform: "uppercase", letterSpacing: "0.06em" }}>{g.label}</span>
+                <p style={{ margin: "6px 0 0", fontSize: 15, lineHeight: 1.6, color: theme.colors.text }}>{g.value}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function InterstellaSkills({ f }: { f: PortfolioFormData }) {
+  const theme = usePortfolioTheme();
+  const groups = [{ label: "Keahlian utama", value: f.skillsMain }, { label: "Perangkat kerja", value: f.skillsTools }, { label: "Bahasa", value: f.skillsLanguages }].filter((g) => g.value);
+  if (!groups.length) return null;
+  return (
+    <section style={{ padding: "clamp(64px, 10vw, 120px) 0", background: theme.colors.bg }}>
+      <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
+        <h2 style={{ margin: "0 0 40px", fontFamily: theme.typography.display, fontSize: "clamp(2.5rem, 6vw, 4rem)", fontWeight: 800, lineHeight: 1.1, color: theme.colors.text }}>Keahlian.</h2>
+        {groups.map((g) => <div key={g.label} style={{ display: "flex", flexWrap: "wrap", gap: "16px 48px", padding: "28px 0", borderTop: `1px solid ${theme.colors.border}` }}>
+          <h3 style={{ flex: "1 1 220px", margin: 0, fontSize: 18, fontWeight: 600, color: theme.colors.textMuted }}>{g.label}</h3>
+          <p style={{ flex: "2 1 280px", margin: 0, fontFamily: theme.typography.display, fontSize: "clamp(1.4rem, 3vw, 2rem)", lineHeight: 1.6, fontWeight: 600, color: theme.colors.text }}>{g.value}</p>
+        </div>)}
+      </div>
+    </section>
+  );
+}
+
+function SherbetSkills({ f }: { f: PortfolioFormData }) {
+  const theme = usePortfolioTheme();
+  const groups = [{ label: "Keahlian utama", value: f.skillsMain }, { label: "Perangkat kerja", value: f.skillsTools }, { label: "Bahasa", value: f.skillsLanguages }].filter((g) => g.value);
+  if (!groups.length) return null;
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
+        <h2 style={{ margin: "0 0 32px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 800, color: theme.colors.text }}>Bekal berkarya</h2>
+        <dl style={{ margin: 0, display: "flex", flexWrap: "wrap", gap: "32px 48px" }}>{groups.map((g) => <div key={g.label} style={{ flex: "1 1 240px", minWidth: 0 }}>
+          <dt style={{ fontSize: 20, fontWeight: 700, color: theme.colors.text }}>{g.label}</dt>
+          <dd style={{ margin: "16px 0 0", display: "flex", flexWrap: "wrap", gap: 10 }}>{g.value.split(",").map((v) => v.trim()).filter(Boolean).map((v, i) => <span key={`${v}-${i}`} style={{ padding: "8px 16px", background: theme.colors.secondary, borderRadius: theme.radii.pill, color: theme.colors.textSecondary }}>{v}</span>)}</dd>
+        </div>)}</dl>
+      </div>
+    </section>
+  );
+}
+
 export default function SkillsSection({ data: f }: Props) {
   const theme = usePortfolioTheme();
   switch (theme.id) {
@@ -338,6 +465,11 @@ export default function SkillsSection({ data: f }: Props) {
     case "luxe": return <LuxeSkills f={f} />;
     case "minimalist": return <MinimalistSkills f={f} />;
     case "workbench": return <WorkbenchSkills f={f} />;
+    case "decal": return <DecalSkills f={f} />;
+    case "scrapbook": return <ScrapbookSkills f={f} />;
+    case "crayon": return <CrayonSkills f={f} />;
+    case "interstella": return <InterstellaSkills f={f} />;
+    case "sherbet": return <SherbetSkills f={f} />;
     default: return <GlassSkills f={f} />;
   }
 }

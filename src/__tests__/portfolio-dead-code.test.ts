@@ -46,9 +46,9 @@ describe("kode mati dan copy basi", () => {
       expect(src).not.toContain("Modern Slate");
       expect(src).not.toContain("Minimal Dark");
       expect(src).not.toContain("Modern Blue");
-      expect(src).toContain("Glassmorphism");
-      expect(src).toContain("Neo Brutal");
-      expect(src).toContain("Editorial Luxe");
+      expect(src).toContain('from "@/components/portfolio/themes"');
+      expect(src).toMatch(/Object\.values\((?:PORTFOLIO_)?THEMES\)/);
+      expect(src).toContain("{theme.name}");
     }
   });
 

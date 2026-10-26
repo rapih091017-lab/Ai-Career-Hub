@@ -390,7 +390,148 @@ function WorkbenchExperience({ items }: { items: ExperienceItem[] }) {
   );
 }
 
+/* ═══════════════════════════════════════════════
+ * DECAL — stiker periode di kiri, kartu pill di kanan.
+ * ═══════════════════════════════════════════════ */
+function DecalExperience({ items }: { items: ExperienceItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((e) => e.position || e.company);
+  if (!filtered.length) return null;
+
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <Reveal>
+          <h2 style={{ ...wbHeading(theme, "clamp(2rem, 5vw, 3.2rem)"), fontWeight: 800 }}>Pengalaman</h2>
+        </Reveal>
+        <div style={{ display: "grid", gap: 18, marginTop: 32 }}>
+          {filtered.map((e, i) => (
+            <Reveal key={e.id} delay={i * 0.07} y={18}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 18, alignItems: "start" }}>
+                <span style={{ justifySelf: "start", fontFamily: theme.typography.display, fontSize: 13, fontWeight: 800, padding: "6px 14px", background: i % 2 ? theme.colors.secondary : theme.colors.accent, color: theme.colors.onPrimary, borderRadius: theme.radii.pill, transform: `rotate(${i % 2 ? 2 : -2}deg)` }}>
+                  {e.startDate} – {e.isPresent ? "kini" : e.endDate}
+                </span>
+                <div style={{ padding: "18px 22px", background: theme.colors.surface, border: `2.5px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
+                  <h3 style={{ ...wbHeading(theme, "clamp(17px, 2vw, 20px)"), margin: 0 }}>{e.position}</h3>
+                  {e.company ? <p style={{ margin: "4px 0 0", fontSize: 14, fontWeight: 700, color: theme.colors.secondary }}>{e.company}</p> : null}
+                  {e.description ? <p style={{ margin: "10px 0 0", fontSize: 14, lineHeight: 1.65, color: theme.colors.textSecondary }}>{e.description}</p> : null}
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* CRAYON: kartu putih berlabel periode dengan warna aksen. */
+function CrayonExperience({ items }: { items: ExperienceItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((e) => e.company || e.position);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <Reveal>
+          <h2 style={{ fontFamily: theme.typography.display, fontSize: "clamp(2.2rem, 5vw, 3.2rem)", fontWeight: 800, margin: 0, color: theme.colors.primary }}>Pengalaman</h2>
+        </Reveal>
+        <div style={{ display: "grid", gap: 20, marginTop: 28 }}>
+          {filtered.map((e, i) => (
+            <Reveal key={e.id} delay={i * 0.07} y={16}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, alignItems: "start" }}>
+                <span style={{ justifySelf: "start", fontWeight: 800, fontSize: 13, padding: "6px 14px", background: i % 2 ? theme.colors.secondary : theme.colors.accent, color: theme.colors.text, borderRadius: theme.radii.pill }}>
+                  {e.startDate} – {e.isPresent ? "kini" : e.endDate}
+                </span>
+                <div style={{ padding: "18px 22px", background: theme.colors.surface, border: `3px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
+                  <h3 style={{ fontFamily: theme.typography.display, fontSize: "clamp(20px, 2.4vw, 24px)", fontWeight: 800, margin: 0, color: theme.colors.primary }}>{e.position}</h3>
+                  <p style={{ margin: "4px 0 0", fontWeight: 700, fontSize: 14, color: theme.colors.secondary }}>{e.company}</p>
+                  {e.description ? <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.65, color: theme.colors.textSecondary }}>{e.description}</p> : null}
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* SCRAPBOOK: catatan kerja di kertas tempel, periode di label selotip. */
+function ScrapbookExperience({ items }: { items: ExperienceItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((e) => e.company || e.position);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)" }}>
+        <Reveal>
+          <h2 style={{ ...wbHeading(theme, "clamp(2rem, 5vw, 3rem)"), fontWeight: 700, color: theme.colors.primary }}>Pengalaman</h2>
+        </Reveal>
+        <div style={{ display: "grid", gap: 22, marginTop: 28 }}>
+          {filtered.map((e, i) => (
+            <Reveal key={e.id} delay={i * 0.07} y={16}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 18, alignItems: "start" }}>
+                <span style={{ justifySelf: "start", fontFamily: theme.typography.body, fontWeight: 800, fontSize: 13, padding: "4px 12px", background: theme.colors.accent, color: theme.colors.text, border: `2px solid ${theme.colors.border}`, transform: `rotate(${i % 2 ? 1.5 : -1.5}deg)` }}>
+                  {e.startDate} – {e.isPresent ? "kini" : e.endDate}
+                </span>
+                <div style={{ padding: "16px 20px", background: theme.colors.surface, border: `2px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
+                  <h3 style={{ ...wbHeading(theme, "clamp(20px, 2.4vw, 24px)"), margin: 0, color: theme.colors.primary }}>{e.position}</h3>
+                  <p style={{ margin: "4px 0 0", fontWeight: 700, fontSize: 14, color: theme.colors.secondary }}>{e.company}</p>
+                  {e.description ? <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.65, color: theme.colors.textSecondary }}>{e.description}</p> : null}
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── MAIN ─── */
+function InterstellaExperience({ items }: { items: ExperienceItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((e) => e.company || e.position);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ padding: "clamp(56px, 9vw, 112px) 0", background: theme.colors.bg }}>
+      <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
+        <h2 style={{ margin: "0 0 40px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 700, color: theme.colors.text }}>Pengalaman</h2>
+        {filtered.map((e) => <article key={e.id} style={{ display: "flex", flexWrap: "wrap", gap: "16px 48px", padding: "28px 0", borderTop: `1px solid ${theme.colors.border}` }}>
+          <div style={{ flex: "1 1 220px" }}>
+            <p style={{ margin: 0, color: theme.colors.textMuted, fontSize: 14 }}>{[e.startDate, e.isPresent ? "Sekarang" : e.endDate].filter(Boolean).join(" – ")}</p>
+            <p style={{ margin: "8px 0 0", color: theme.colors.textSecondary }}>{e.company}</p>
+          </div>
+          <div style={{ flex: "2 1 280px" }}>
+            <h3 style={{ margin: 0, fontFamily: theme.typography.display, fontSize: "clamp(1.4rem, 3vw, 2rem)", fontWeight: 700, color: theme.colors.text }}>{e.position}</h3>
+            {e.description && <p style={{ margin: "12px 0 0", maxWidth: "65ch", whiteSpace: "pre-line", lineHeight: 1.75, color: theme.colors.textSecondary }}>{e.description}</p>}
+          </div>
+        </article>)}
+      </div>
+    </section>
+  );
+}
+
+function SherbetExperience({ items }: { items: ExperienceItem[] }) {
+  const theme = usePortfolioTheme();
+  const filtered = items.filter((e) => e.company || e.position);
+  if (!filtered.length) return null;
+  return (
+    <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
+      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
+        <h2 style={{ margin: "0 0 32px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 800, color: theme.colors.text }}>Perjalanan kerja</h2>
+        <ol style={{ padding: 0, margin: 0, listStyle: "none", display: "grid", gap: 20 }}>{filtered.map((e) => <li key={e.id} style={{ background: theme.colors.surface, padding: "clamp(20px, 4vw, 32px)", borderRadius: theme.radii.card }}>
+          <article style={{ display: "flex", flexWrap: "wrap", gap: "16px 40px" }}>
+            <header style={{ flex: "1 1 220px", minWidth: 0 }}><h3 style={{ margin: 0, fontSize: 24, color: theme.colors.text }}>{e.position || e.company}</h3>{e.position && <p style={{ margin: "8px 0 0", fontWeight: 600, color: theme.colors.textSecondary }}>{e.company}</p>}<p style={{ margin: "12px 0 0", fontSize: 14, color: theme.colors.textMuted }}>{[e.startDate, e.isPresent ? "Sekarang" : e.endDate].filter(Boolean).join(" – ")}</p></header>
+            {e.description && <p style={{ flex: "2 1 260px", margin: 0, maxWidth: "65ch", lineHeight: 1.75, whiteSpace: "pre-line", color: theme.colors.textSecondary }}>{e.description}</p>}
+          </article>
+        </li>)}</ol>
+      </div>
+    </section>
+  );
+}
+
 export default function ExperienceSection({ items }: Props) {
   const theme = usePortfolioTheme();
   switch (theme.id) {
@@ -399,6 +540,11 @@ export default function ExperienceSection({ items }: Props) {
     case "luxe": return <LuxeExperience items={items} />;
     case "minimalist": return <MinimalistExperience items={items} />;
     case "workbench": return <WorkbenchExperience items={items} />;
+    case "decal": return <DecalExperience items={items} />;
+    case "scrapbook": return <ScrapbookExperience items={items} />;
+    case "crayon": return <CrayonExperience items={items} />;
+    case "interstella": return <InterstellaExperience items={items} />;
+    case "sherbet": return <SherbetExperience items={items} />;
     default: return <GlassExperience items={items} />;
   }
 }

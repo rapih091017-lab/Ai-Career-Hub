@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import { describe, it, expect, vi, beforeAll, beforeEach } from "vitest";
-import { render } from "@testing-library/react";
+import { render, fireEvent, waitFor } from "@testing-library/react";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { ReactNode } from "react";
@@ -21,6 +21,9 @@ vi.mock("next-auth/react", () => ({
 }));
 
 import PortfolioPage from "@/app/portfolio/page";
+import FeatureTabs from "@/components/FeatureTabs";
+import PortfolioSpotlight from "@/components/PortfolioSpotlight";
+import { THEMES } from "@/components/portfolio/themes";
 import { LanguageProvider } from "@/lib/i18n";
 import { ToastProvider } from "@/components/ui/toast";
 
@@ -173,6 +176,46 @@ describe("picker tema: thumbnail nyata + deskripsi per tema", () => {
     const cards = themeCards(container);
     const skels = cards.map((c) => skeleton(c.firstElementChild as Element));
     expect(new Set(skels).size).toBe(cards.length);
+  });
+
+  it("Interstella tampil dengan deskripsi, thumbnail berisi, dan bisa dipilih", () => {
+    const { container } = renderPage();
+    const card = Array.from(container.querySelectorAll("button")).find((b) => b.textContent?.includes("Interstella"));
+    expect(card).toBeTruthy();
+    expect(card).toHaveTextContent("Panggung agensi gelap");
+    expect(card?.querySelector('[data-section-id="about"] section')).toHaveTextContent("[Ceritakan bidang kerja");
+    if (!card) throw new Error("Kartu Interstella tidak ditemukan");
+    fireEvent.click(card);
+    expect(container.querySelector('a[href="/portfolio/preview?template=interstella"]')).toBeTruthy();
+  });
+
+  it("Sherbet punya thumbnail berisi dan pilihan yang membuka preview Sherbet", () => {
+    const { container } = renderPage();
+    const card = Array.from(container.querySelectorAll("button")).find((b) => b.textContent?.includes("Sherbet"));
+    expect(card).toBeTruthy();
+    expect(card).toHaveTextContent("Pastel peach dan mint");
+    expect(card?.querySelector('[data-section-id="about"] section')).toHaveTextContent("[Ceritakan gaya konten");
+    if (!card) throw new Error("Kartu Sherbet tidak ditemukan");
+    fireEvent.click(card);
+    expect(container.querySelector('a[href="/portfolio/preview?template=sherbet"]')).toBeTruthy();
+  });
+
+  it("landing menampilkan semua tema dengan tautan preview yang sesuai", async () => {
+    const { container, getByRole } = render(<LanguageProvider><FeatureTabs /></LanguageProvider>);
+    fireEvent.click(getByRole("button", { name: /Portfolio/ }));
+    await waitFor(() => {
+      for (const theme of Object.values(THEMES)) {
+        const link = container.querySelector(`a[href="/portfolio/preview?template=${theme.id}"]`);
+        expect(link, theme.id).toHaveTextContent(theme.name);
+        expect(link).toHaveTextContent(/.+/);
+        expect(link?.textContent).not.toContain("portfolio.theme.");
+      }
+    });
+  });
+
+  it("spotlight landing menampilkan nama semua tema dari katalog", () => {
+    const { container } = render(<LanguageProvider><PortfolioSpotlight /></LanguageProvider>);
+    for (const theme of Object.values(THEMES)) expect(container).toHaveTextContent(theme.name);
   });
 
   it("page berhenti memakai mockup TEMPLATE_PREVIEWS dan merender via renderer", () => {

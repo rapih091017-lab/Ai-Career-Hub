@@ -9,6 +9,7 @@ import TiltCard from "@/components/TiltCard";
 import MagneticButton from "@/components/MagneticButton";
 import CvTemplateCard from "@/components/CvTemplateCard";
 import { CV_TEMPLATES } from "@/lib/templates";
+import { THEMES } from "@/components/portfolio/themes";
 
 interface TabData {
   id: string;
@@ -81,35 +82,7 @@ const TABS: TabData[] = [
 ];
 
 /* ─── Portfolio Theme Previews ─── */
-const PORTFOLIO_THEMES = [
-  {
-    id: "glass",
-    name: "Glassmorphism",
-    descKey: "features.theme-glass-desc",
-    primary: "#1e293b",
-    secondary: "#64748b",
-    accent: "#0ea5e9",
-    bg: "#f8fafc",
-  },
-  {
-    id: "brutal",
-    name: "Neo Brutal",
-    descKey: "features.theme-brutal-desc",
-    primary: "#0f172a",
-    secondary: "#334155",
-    accent: "#2563eb",
-    bg: "#0f172a",
-  },
-  {
-    id: "luxe",
-    name: "Editorial Luxe",
-    descKey: "features.theme-luxe-desc",
-    primary: "#0891b2",
-    secondary: "#06b6d4",
-    accent: "#0284c7",
-    bg: "#ecfeff",
-  },
-];
+const PORTFOLIO_THEMES = Object.values(THEMES);
 
 /* ─── Stagger Variants ─── */
 const containerStagger = {
@@ -258,15 +231,15 @@ function PortfolioShowcase({ t }: { t: (key: string) => string }) {
     >
 
       <div className="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {PORTFOLIO_THEMES.map((theme, idx) => (
+        {PORTFOLIO_THEMES.map((theme) => (
           <motion.div key={theme.id} variants={cardReveal}>
             <TiltCard tiltOptions={{ maxAngle: 6, scale: 1.03, glare: true }}>
               <Link
-                href="/portfolio"
+                href={`/portfolio/preview?template=${theme.id}`}
                 className="block rounded-2xl border border-outline-variant/50 bg-surface-container-lowest overflow-hidden group hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 cursor-pointer"
               >
                 {/* Color swatch strip with overlay glow on hover */}
-                <div className="h-20 relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${theme.primary}, ${theme.accent})` }}>
+                <div className="h-20 relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.accent})` }}>
                   <motion.div
                     className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-500"
                     style={{
@@ -274,8 +247,8 @@ function PortfolioShowcase({ t }: { t: (key: string) => string }) {
                     }}
                   />
                   <div className="absolute inset-0 opacity-20">
-                    <div className="absolute top-2 left-2 w-8 h-8 rounded-lg backdrop-blur-sm" style={{ background: theme.bg + "80" }} />
-                    <div className="absolute bottom-2 right-2 w-4 h-4 rounded-full" style={{ background: theme.secondary }} />
+                    <div className="absolute top-2 left-2 w-8 h-8 rounded-lg backdrop-blur-sm" style={{ background: theme.colors.bg + "80" }} />
+                    <div className="absolute bottom-2 right-2 w-4 h-4 rounded-full" style={{ background: theme.colors.secondary }} />
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full backdrop-blur-sm" style={{ background: "rgba(255,255,255,0.15)" }} />
                   </div>
                 </div>
@@ -283,7 +256,7 @@ function PortfolioShowcase({ t }: { t: (key: string) => string }) {
                   <div>
                     <h4 className="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">{theme.name}</h4>
                     <p className="text-xs text-on-surface-variant mt-0.5">
-                      {t(theme.descKey)}
+                      {t(`portfolio.theme.${theme.id}-desc`)}
                     </p>
                   </div>
                   <motion.div
@@ -292,9 +265,9 @@ function PortfolioShowcase({ t }: { t: (key: string) => string }) {
                     whileHover={{ x: 3 }}
                     transition={{ type: "spring", stiffness: 300 }}
                   >
-                    <span className="w-3 h-3 rounded-full ring-1 ring-white/50" style={{ background: theme.primary }} />
-                    <span className="w-3 h-3 rounded-full ring-1 ring-white/50" style={{ background: theme.accent }} />
-                    <span className="w-3 h-3 rounded-full ring-1 ring-white/50" style={{ background: theme.secondary }} />
+                    <span className="w-3 h-3 rounded-full ring-1 ring-white/50" style={{ background: theme.colors.primary }} />
+                    <span className="w-3 h-3 rounded-full ring-1 ring-white/50" style={{ background: theme.colors.accent }} />
+                    <span className="w-3 h-3 rounded-full ring-1 ring-white/50" style={{ background: theme.colors.secondary }} />
                   </motion.div>
                 </div>
               </Link>

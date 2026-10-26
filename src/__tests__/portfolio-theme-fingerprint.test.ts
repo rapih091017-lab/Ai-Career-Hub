@@ -11,7 +11,7 @@ import type { SectionId, ThemeId } from "@/components/portfolio/types";
  * `return <BrutalX />`), jadi bedanya kosmetik dan tidak menjamin komposisi
  * beda. Fingerprint diambil dari render nyata: struktur tag HTML per tema.
  */
-const THEME_IDS: readonly ThemeId[] = ["glass", "brutal", "luxe"];
+const THEME_IDS: readonly ThemeId[] = ["glass", "brutal", "luxe", "interstella", "sherbet"];
 
 /**
  * Dua API browser yang dipakai section di jsdom: matchMedia (useReducedMotion
@@ -120,7 +120,7 @@ const PENDING_SECTIONS: SectionId[] = []; // Task 7 memastikan tetap kosong
 describe("DOM-fingerprint: kerangka struktur berbeda antar tema", () => {
   for (const id of DEFAULT_SECTION_ORDER) {
     const run = PENDING_SECTIONS.includes(id) ? it.skip : it;
-    run(`${id}: tiga tema menghasilkan kerangka tag berbeda`, () => {
+    run(`${id}: tema menghasilkan kerangka tag berbeda`, () => {
       const skels = THEME_IDS.map((t) => skeleton(sectionMarkup(t, id)));
       expect(
         skels.every(Boolean),
