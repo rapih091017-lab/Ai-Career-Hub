@@ -7,6 +7,7 @@ import AuthGuard from "@/components/AuthGuard";
 import { useTranslation } from "@/lib/i18n";
 
 import { THEMES, DEFAULT_THEME_ID } from "@/components/portfolio/themes";
+import { SECTION_IDS } from "@/components/portfolio/types";
 import type { ThemeDefinition, PortfolioFormData, ProjectItem, ExperienceItem, EducationItem, CertificationItem, OrganizationItem, HobbyItem, TestimonialItem, ExtraLink, SectionId, SectionVisibility, FontSize, ThemeId } from "@/components/portfolio/types";
 import PortfolioDocument from "@/components/portfolio/render/PortfolioDocument";
 import { alignmentToSectionStyle } from "@/components/portfolio/alignment-style";
@@ -34,6 +35,12 @@ interface PortfolioData {
   alignment?: Record<string, "left" | "center" | "right">;
 }
 
+/** Rail hanya memuat hero tiap tema: sepuluh preview utuh terlalu berat, dan
+ *  hero sudah cukup untuk membedakan komposisi, warna, serta tipografi. */
+const HERO_ONLY_VISIBILITY: SectionVisibility = Object.fromEntries(
+  SECTION_IDS.filter((id) => id !== "hero").map((id) => [id, false]),
+);
+
 export default function PortfolioPreviewPage() {
   const { t } = useTranslation();
   const [data, setData] = useState<PortfolioData | null>(null);
@@ -45,6 +52,10 @@ export default function PortfolioPreviewPage() {
   const [publishedSlug, setPublishedSlug] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
+  // Font tema dimuat saat kartu di rail disentuh atau difokus, supaya preview
+  // yang sedang dibandingkan tampil dengan huruf aslinya tanpa mengunduh
+  // sepuluh keluarga font sekaligus saat halaman dibuka.
+  const [previewFontId, setPreviewFontId] = useState<string | null>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -211,6 +222,7 @@ export default function PortfolioPreviewPage() {
   }
 
   const theme = THEMES[themeId] || THEMES[DEFAULT_THEME_ID];
+  const railThemes = Object.values(THEMES);
   const name = [data.formData.heroFirstName, data.formData.heroLastName].filter(Boolean).join(" ") || "Nama Lengkap";
   const sectionStyle = alignmentToSectionStyle(data.alignment);
 
@@ -248,7 +260,7 @@ export default function PortfolioPreviewPage() {
 
   return (
     <AuthGuard>
-      <ThemeFonts themeId={themeId} />
+      <ThemeFonts themeId={previewFontId ?? themeId} />
       <div
           className="min-h-screen"
           style={{
@@ -259,27 +271,11 @@ export default function PortfolioPreviewPage() {
         >
           <AppHeader />
           <main className="pt-20 pb-16 px-4 md:px-6">
-            <div className="mx-auto" style={{ maxWidth: 1140 }}>
+            <div className="mx-auto" style={{ maxWidth: 1280 }}>
               {/* Toolbar */}
               <div className="flex items-center justify-between flex-wrap gap-4 mb-6">
                 <h1 className="font-headline-md" style={{ color: theme.colors.text }}>{t("preview.title")}</h1>
                 <div className="flex items-center gap-2 flex-wrap">
-                  {/* Theme Switcher */}
-                  <div className="flex items-center gap-1 p-1 rounded-xl" style={{ backgroundColor: theme.colors.bgSecondary, border: `1px solid ${theme.colors.border}` }}>
-                    {Object.keys(THEMES).map((tid) => (
-                      <button
-                        key={tid}
-                        onClick={() => setThemeId(tid)}
-                        className="px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all"
-                        style={{
-                          backgroundColor: themeId === tid ? theme.colors.primary : "transparent",
-                          color: themeId === tid ? "#fff" : theme.colors.textMuted,
-                        }}
-                      >
-                        {THEMES[tid].name}
-                      </button>
-                    ))}
-                  </div>
                   <Link href={draftId ? `/portfolio/build/${draftId}` : "/portfolio/build"} className="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
                     style={{ border: `1px solid ${theme.colors.border}`, color: theme.colors.text }}>
                     {t("preview.edit")}
@@ -366,21 +362,85 @@ export default function PortfolioPreviewPage() {
                 ) : null}
               </div>
 
-              {/* Document */}
-              <PortfolioDocument
-                data={data}
-                themeId={themeId as ThemeId}
-                mode="editor"
-                sectionOrder={data.sectionOrder}
-                sectionVisibility={data.sectionVisibility}
-                fontSize={data.fontSize}
-                sectionStyle={sectionStyle}
-              />
+              <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[208px_minmax(0,1fr)] lg:items-start lg:gap-8">
+                <aside aria-label={t("portfolio.choose-theme")} className="min-w-0 lg:sticky lg:top-24">
+                  <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.08em]" style={{ color: theme.colors.textMuted }}>
+                    {t("portfolio.choose-theme")}
+                  </p>
+                  <div className="flex snap-x gap-3 overflow-x-auto pb-2 lg:max-h-[calc(100vh-9rem)] lg:snap-none lg:flex-col lg:overflow-x-hidden lg:overflow-y-auto lg:pb-0">
+                    {railThemes.map((option) => {
+                      const active = option.id === themeId;
+                      return (
+                        <button
+                          key={option.id}
+                          type="button"
+                          aria-pressed={active}
+                          onClick={() => setThemeId(option.id)}
+                          onMouseEnter={() => setPreviewFontId(option.id)}
+                          onFocus={() => setPreviewFontId(option.id)}
+                          className="group w-[132px] shrink-0 snap-start text-left transition-transform hover:-translate-y-0.5 active:translate-y-0 lg:w-full"
+                        >
+                          <div
+                            className="relative overflow-hidden rounded-[10px] border-2 transition-colors"
+                            style={{
+                              height: 104,
+                              background: option.colors.bg,
+                              borderColor: active ? theme.colors.primary : theme.colors.border,
+                            }}
+                          >
+                            <div
+                              aria-hidden="true"
+                              inert
+                              className="pointer-events-none absolute left-0 top-0 origin-top-left"
+                              style={{ width: "calc(100% / 0.3)", transform: "scale(0.3)" }}
+                            >
+                              <PortfolioDocument
+                                data={data}
+                                themeId={option.id as ThemeId}
+                                mode="static"
+                                sectionVisibility={HERO_ONLY_VISIBILITY}
+                                sectionIdPrefix={`rail-${option.id}-`}
+                              />
+                            </div>
+                            {active ? (
+                              <span
+                                className="absolute right-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full"
+                                style={{ background: theme.colors.primary, color: theme.colors.onPrimary }}
+                              >
+                                <span className="material-symbols-outlined text-[13px]" aria-hidden="true">check</span>
+                              </span>
+                            ) : null}
+                          </div>
+                          <span
+                            className="mt-2 block truncate text-[13px] font-semibold"
+                            style={{ color: active ? theme.colors.primary : theme.colors.text }}
+                          >
+                            {option.name}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </aside>
 
-              {/* Info */}
-              <div className="px-6 mt-4">
-                <div style={{ padding: 14, borderRadius: 12, background: `${theme.colors.primary}0D`, border: `1px solid ${theme.colors.primary}1A`, fontSize: 13, color: theme.colors.textMuted, textAlign: "center" }}>
-                  {t("preview.template")}: <strong style={{ color: theme.colors.primary }}>{theme.name}</strong> &middot; Font: {theme.font}
+                <div className="min-w-0">
+                  {/* Document */}
+                  <PortfolioDocument
+                    data={data}
+                    themeId={themeId as ThemeId}
+                    mode="editor"
+                    sectionOrder={data.sectionOrder}
+                    sectionVisibility={data.sectionVisibility}
+                    fontSize={data.fontSize}
+                    sectionStyle={sectionStyle}
+                  />
+
+                  {/* Info */}
+                  <div className="px-6 mt-4">
+                    <div style={{ padding: 14, borderRadius: 12, background: `${theme.colors.primary}0D`, border: `1px solid ${theme.colors.primary}1A`, fontSize: 13, color: theme.colors.textMuted, textAlign: "center" }}>
+                      {t("preview.template")}: <strong style={{ color: theme.colors.primary }}>{theme.name}</strong> &middot; Font: {theme.font}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

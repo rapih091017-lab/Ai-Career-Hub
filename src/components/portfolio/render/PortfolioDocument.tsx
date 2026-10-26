@@ -59,6 +59,10 @@ export type PortfolioDocumentProps = {
   sectionOrder?: SectionId[];
   sectionVisibility?: SectionVisibility;
   sectionColors?: PortfolioSectionColors | null;
+  /** Prefix id section. Dipakai saat beberapa dokumen tampil sekaligus
+   *  (rail preview): id mentah akan bertabrakan dan anchor melompat ke
+   *  dokumen yang salah. */
+  sectionIdPrefix?: string;
   fontSize?: FontSize;
   onSectionClick?: (id: SectionId) => void;
   /**
@@ -337,6 +341,7 @@ export function PortfolioDocument({
   sectionOrder,
   sectionVisibility,
   sectionColors,
+  sectionIdPrefix,
   fontSize,
   onSectionClick,
   sectionWrapper,
@@ -387,7 +392,7 @@ export function PortfolioDocument({
             const section = (
               <div
                 key={id}
-                id={id}
+                id={`${sectionIdPrefix ?? ""}${id}`}
                 data-section-id={id}
                 style={sectionStyle?.[id]}
                 onClick={interactive ? () => interactive(id) : undefined}
