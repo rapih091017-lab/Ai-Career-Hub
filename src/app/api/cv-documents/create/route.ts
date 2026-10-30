@@ -215,7 +215,13 @@ export async function POST(request: NextRequest) {
 
   // Catat pemakaian setelah CV berhasil dibuat, supaya kuota terpakai untuk
   // generate yang benar-benar terjadi dan HPP bisa dilacak.
-  await logUsage(session.user.id, "cv_build").catch(() => {});
+  // CV sudah tersimpan, jadi gagal mencatat tidak boleh menggagalkan respons.
+  // Tetap dicatat ke log supaya kuota yang bocor bisa dilacak.
+  try {
+    await logUsage(session.user.id, "cv_build");
+  } catch (err) {
+    console.error("[cv-documents/create] gagal mencatat pemakaian cv_build", err);
+  }
 
   return NextResponse.json({ ...newDoc, consolidationSuggestion: aiNote }, { status: 201 });
 }

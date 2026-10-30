@@ -83,3 +83,37 @@ export function mapEventToPaymentUpdate(event: KaseraWebhookPayload): PaymentUpd
 export function shouldIgnoreUpdate(currentStatus: string, next: PaymentUpdate): boolean {
   return currentStatus === "success" && next.paymentStatus !== "success";
 }
+
+export type PaymentMatch<T extends { id: string }> =
+  | { kind: "found"; payment: T }
+  | { kind: "not_found" }
+  | { kind: "conflict"; byExternalId: T; byTransactionId: T };
+
+/**
+ * Pilih baris payment untuk sebuah event. external_id (= orderId kita) jadi
+ * acuan utama; payment_request_id hanya cadangan. Kalau keduanya menunjuk
+ * baris berbeda, event ditolak supaya tidak mengubah order milik orang lain.
+ */
+export function resolvePaymentMatch<T extends { id: string }>(
+  byExternalId: T | undefined,
+  byTransactionId: T | undefined,
+): PaymentMatch<T> {
+  if (byExternalId && byTransactionId && byExternalId.id !== byTransactionId.id) {
+    return { kind: "conflict", byExternalId, byTransactionId };
+  }
+  const payment = byExternalId ?? byTransactionId;
+  return payment ? { kind: "found", payment } : { kind: "not_found" };
+}
+
+/**
+ * Nominal pada event `success` wajib sama persis dengan payments.amount.
+ * Nominal yang tidak dikirim juga dianggap tidak cocok.
+ */
+export function isAmountMismatch(
+  next: PaymentUpdate,
+  payloadAmount: number | undefined,
+  expectedAmount: number,
+): boolean {
+  if (next.paymentStatus !== PAYMENT_SUCCESS_STATUS) return false;
+  return typeof payloadAmount !== "number" || payloadAmount !== expectedAmount;
+}

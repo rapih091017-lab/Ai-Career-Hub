@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { payments } from "@/db/schema";
-import { eq, or, type SQL } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { verifyWebhookSignature } from "@/lib/kasera";
 import {
   mapEventToPaymentUpdate,
   shouldIgnoreUpdate,
+  resolvePaymentMatch,
+  isAmountMismatch,
   type KaseraWebhookPayload,
 } from "@/lib/kasera-webhook";
 import { createConversionForPayment } from "@/lib/affiliate.server";
@@ -53,26 +55,39 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "MISSING_REFERENCE" }, { status: 400 });
   }
 
-  const conditions: SQL[] = [];
-  if (externalId) conditions.push(eq(payments.orderId, externalId));
-  if (paymentRequestId) conditions.push(eq(payments.transactionId, paymentRequestId));
+  const [byExternalId] = externalId
+    ? await db.select().from(payments).where(eq(payments.orderId, externalId)).limit(1)
+    : [];
+  const [byTransactionId] = paymentRequestId
+    ? await db.select().from(payments).where(eq(payments.transactionId, paymentRequestId)).limit(1)
+    : [];
 
-  const [payment] = await db
-    .select()
-    .from(payments)
-    .where(or(...conditions))
-    .limit(1);
-
-  if (!payment) {
+  const match = resolvePaymentMatch(byExternalId, byTransactionId);
+  if (match.kind === "conflict") {
+    console.error(
+      `Kasera: external_id ${externalId} dan payment_request_id ${paymentRequestId} menunjuk order berbeda (${match.byExternalId.orderId} vs ${match.byTransactionId.orderId}), event ditolak`,
+    );
+    return NextResponse.json({ status: "OK", conflict: true });
+  }
+  if (match.kind === "not_found") {
     console.error("Kasera: payment not found for", externalId ?? paymentRequestId);
     return NextResponse.json({ status: "OK", matched: false });
   }
+  const payment = match.payment;
 
   if (shouldIgnoreUpdate(payment.paymentStatus, update)) {
     console.log(
       `Kasera: order ${payment.orderId} sudah success, abaikan event ${payload.type}`,
     );
     return NextResponse.json({ status: "OK", ignored: true });
+  }
+
+  if (isAmountMismatch(update, payload.data?.amount, payment.amount)) {
+    // 200 supaya Kasera berhenti retry; status tidak diubah, perlu dicek manual.
+    console.error(
+      `Kasera: nominal tidak cocok untuk order ${payment.orderId}: payload ${payload.data?.amount}, tercatat ${payment.amount}`,
+    );
+    return NextResponse.json({ status: "OK", mismatch: true });
   }
 
   await db
