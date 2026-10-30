@@ -15,6 +15,7 @@ import {
   type SectionKey,
   type TemplateStyle,
 } from "@/components/cv-templates";
+import { formatCertification, formatSkill, groupNamedSkills, namedCertifications } from "@/lib/cv-sections";
 
 /* ───────── helpers ───────── */
 
@@ -50,6 +51,7 @@ const CV_LABELS: Record<string, { id: string; en: string }> = {
   skills: { id: "KEAHLIAN", en: "SKILLS" },
   organizations: { id: "ORGANISASI & PROYEK", en: "ORGANIZATIONS & PROJECTS" },
   selfEvaluation: { id: "EVALUASI DIRI", en: "SELF EVALUATION" },
+  certifications: { id: "SERTIFIKASI", en: "CERTIFICATIONS" },
   present: { id: "Sekarang", en: "Present" },
   namePlaceholder: { id: "NAMA LENGKAP ANDA", en: "YOUR FULL NAME" },
 };
@@ -67,6 +69,7 @@ const SECTION_RENDER_KEYS: Record<string, boolean> = {
   skills: true,
   organizations: true,
   selfEvaluation: true,
+  certifications: true,
 };
 
 /* ───────── props ───────── */
@@ -83,6 +86,8 @@ export interface CvPdfDocumentProps {
   /** Page margin in mm, matches the builder's margin mode. */
   marginMm?: number;
   lang?: "id" | "en";
+  /** Tampilkan level di belakang nama skill, mis. "React (Mahir)". */
+  showSkillLevel?: boolean;
 }
 
 /* ───────── section header ───────── */
@@ -129,6 +134,7 @@ export function CvPdfDocument({
   lineHeight,
   marginMm,
   lang: langProp,
+  showSkillLevel = false,
 }: CvPdfDocumentProps) {
   const lang = langProp || data.cvLang || "id";
   const bodySize = style.bodySize;
@@ -151,18 +157,9 @@ export function CvPdfDocument({
     return customKey || CV_LABELS[key]?.[lang] || key;
   };
 
-  /* ── skill grouping (same as template) ── */
-  const groups: Record<string, typeof data.skills> = {
-    technical: [],
-    soft: [],
-    tools: [],
-  };
-  for (const s of data.skills) {
-    const cat = s.category || "technical";
-    if (groups[cat]) groups[cat].push(s);
-    else groups.technical.push(s);
-  }
-  const groupedSkills = Object.entries(groups).filter(([, skills]) => skills.length > 0);
+  /* ── skill grouping (sama dengan pratinjau: hanya skill bernama) ── */
+  const groupedSkills = groupNamedSkills(data.skills);
+  const certifications = namedCertifications(data.certifications);
 
   const visibleWork = data.workHistory.filter((w) => w.visible !== false);
   const visibleEducation = data.education.filter((e) => e.visible !== false);
@@ -283,7 +280,7 @@ export function CvPdfDocument({
     },
     skills: {
       render: () =>
-        data.skills.length > 0 ? (
+        groupedSkills.length > 0 ? (
           <>
             <PdfSectionHeader title={L("skills")} style={style} />
             {groupedSkills.map(([category, catSkills]) => (
@@ -292,24 +289,23 @@ export function CvPdfDocument({
                   {CATEGORY_LABELS_LOOKUP[category]?.[lang] || category}:
                 </Text>
                 <Text style={{ fontSize: bodySize, color: "#111111", marginBottom: 6, textAlign }}>
-                  {catSkills.map((s) => s.name).filter(Boolean).join(", ")}
+                  {catSkills.map((s) => formatSkill(s, showSkillLevel, lang)).join(", ")}
                 </Text>
               </View>
             ))}
-            {data.certifications && data.certifications.length > 0 && (
-              <View style={{ marginTop: 12 }}>
-                <Text style={{ fontSize: bodySize - 1, fontWeight: "bold", color: "#111111", marginBottom: 4 }}>
-                  {lang === "en" ? "Certifications:" : "Sertifikasi:"}
-                </Text>
-                {data.certifications.map((cert, i) => (
-                  <Text key={cert.id || i} style={{ fontSize: bodySize - 1, color: "#111111", marginBottom: 2 }}>
-                    •  {cert.name}
-                    {cert.issuer ? ` · ${cert.issuer}` : ""}
-                    {cert.year ? ` (${cert.year})` : ""}
-                  </Text>
-                ))}
-              </View>
-            )}
+          </>
+        ) : null,
+    },
+    certifications: {
+      render: () =>
+        certifications.length > 0 ? (
+          <>
+            <PdfSectionHeader title={L("certifications")} style={style} />
+            {certifications.map((cert, i) => (
+              <Text key={cert.id || i} style={{ fontSize: bodySize - 1, color: "#111111", marginBottom: 2 }}>
+                •  {formatCertification(cert)}
+              </Text>
+            ))}
           </>
         ) : null,
     },

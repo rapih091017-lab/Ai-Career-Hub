@@ -33,3 +33,25 @@ Blocked by: 00
 - Test renderer (`renderToStaticMarkup`) untuk keempat kasus di atas + CV lama tanpa `layout`.
 
 ## Comments
+
+### 2026-10-30 — Reproduksi (tim frontend)
+Diuji dengan `renderToStaticMarkup(AtsBaseRenderer)` + `normalizeCvDocument`. Skill berbentuk
+objek `{ name, level }` dengan urutan bawaan **tampil normal**. Skill hilang terjadi pada:
+1. **`cv_fmt_<id>` tanpa `skills` di `sectionOrder` atau `sectionVisibility.skills=false`** →
+   section tidak dirender (renderer hanya merender key di urutan). Tidak ada petunjuk di form.
+   Sertifikasi ikut hilang karena dulu dirender di dalam section skills.
+2. **Bentuk data skill lama**: `skills: ["React", ...]` (array string) → nama jadi kosong
+   (format datar: `undefined`; format bersarang: `s.name || ""`) sehingga header KEAHLIAN muncul
+   dengan daftar kosong. `skills: { technical: [...] }` (objek per kategori) di format bersarang →
+   `.map` pada objek melempar error → builder gagal dimuat.
+3. Sertifikasi hanya dirender bila `data.skills.length > 0` (tertanam di section skills).
+4. Skill tanpa nama tetap membuat header + label kategori kosong.
+Catatan: bug C1 (effect simpan format menimpa localStorage sebelum dimuat) membuat pengaturan
+tampilan kembali ke default setiap halaman dibuka; bukan penyebab skill hilang, tapi membuat
+gejala sulit direproduksi.
+
+Perbaikan: section `certifications` sendiri, migrasi urutan tersimpan (sisip certifications
+setelah skills, selfEvaluation setelah summary, section bawaan lain dikembalikan), normalisasi
+skill array string / objek per kategori, skill & kategori kosong tidak dirender, catatan
+"Bagian ini disembunyikan dari CV." + tombol Tampilkan di kartu form. CV lama dengan
+`sectionVisibility.skills=false` → `certifications=false` ikut diset agar tampilan tetap sama.

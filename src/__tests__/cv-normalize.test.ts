@@ -66,3 +66,20 @@ describe("aiSkillNames", () => {
     ).toEqual(["React", "SQL"]);
   });
 });
+
+describe("normalizeCvDocument — bentuk skill lama", () => {
+  it("array string jadi skill bernama", () => {
+    const cv = normalizeCvDocument({ tailoredContent: { skills: ["React", " ", "SQL"] } });
+    expect(cv.skills.map((s) => s.name)).toEqual(["React", "SQL"]);
+  });
+  it("objek per kategori diratakan dengan kategorinya", () => {
+    const cv = normalizeCvDocument({
+      tailoredContent: { personalInfo: {}, skills: { technical: ["React"], soft: [{ name: "Komunikasi" }], languages: ["Inggris"] } },
+    });
+    expect(cv.skills.map((s) => [s.name, s.category])).toEqual([
+      ["React", "technical"],
+      ["Komunikasi", "soft"],
+      ["Inggris", "tools"],
+    ]);
+  });
+});

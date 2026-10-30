@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { formatCertification, formatSkill, groupNamedSkills, namedCertifications } from "@/lib/cv-sections";
 
 /* ───────── shared types ───────── */
 
@@ -113,13 +114,23 @@ export interface CvData {
 
 /* ───────── template style config ───────── */
 
-export type SectionKey = "summary" | "experience" | "education" | "skills" | "organizations" | "selfEvaluation";
+export type SectionKey =
+  | "summary"
+  | "selfEvaluation"
+  | "experience"
+  | "education"
+  | "skills"
+  | "certifications"
+  | "organizations";
 
+/** Urutan bawaan. Section kosong tidak dirender, jadi aman ada di sini. */
 export const DEFAULT_SECTION_ORDER: SectionKey[] = [
   "summary",
+  "selfEvaluation",
   "experience",
   "education",
   "skills",
+  "certifications",
   "organizations",
 ];
 
@@ -240,6 +251,8 @@ interface RendererProps {
   lang?: "id" | "en";
   /** Click handler for sections, maps section key to edit step */
   onSectionClick?: (sectionKey: string) => void;
+  /** Tampilkan level di belakang nama skill, mis. "React (Mahir)". */
+  showSkillLevel?: boolean;
 }
 
 const CV_LABELS: Record<string, { id: string; en: string }> = {
@@ -249,12 +262,13 @@ const CV_LABELS: Record<string, { id: string; en: string }> = {
   skills: { id: "KEAHLIAN", en: "SKILLS" },
   organizations: { id: "ORGANISASI & PROYEK", en: "ORGANIZATIONS & PROJECTS" },
   selfEvaluation: { id: "EVALUASI DIRI", en: "SELF EVALUATION" },
+  certifications: { id: "SERTIFIKASI", en: "CERTIFICATIONS" },
   skillsLabel: { id: "Keahlian:", en: "Skills:" },
   present: { id: "Sekarang", en: "Present" },
   namePlaceholder: { id: "NAMA LENGKAP ANDA", en: "YOUR FULL NAME" },
 };
 
-export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang: langProp, sectionLabels: customLabels, headerLayout, lineHeight: lineHeightProp, onSectionClick }: RendererProps & { sectionLabels?: Record<SectionKey, string>; headerLayout?: "centered" | "left"; lineHeight?: number }) {
+export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang: langProp, sectionLabels: customLabels, headerLayout, lineHeight: lineHeightProp, onSectionClick, showSkillLevel = false }: RendererProps & { sectionLabels?: Record<SectionKey, string>; headerLayout?: "centered" | "left"; lineHeight?: number }) {
   const lang = langProp || data.cvLang || "id";
   const bodyFontSize = style.bodySize;
   const textAlign = style.textAlign || "left";
@@ -274,20 +288,9 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
     return customKey || CV_LABELS[key]?.[lang] || key;
   };
 
-  /* ── skill grouping helper ── */
-  const groupedSkills = useMemo(() => {
-    const groups: Record<string, SkillEntry[]> = {
-      technical: [],
-      soft: [],
-      tools: [],
-    };
-    for (const s of data.skills) {
-      const cat = s.category || "technical";
-      if (groups[cat]) groups[cat].push(s);
-      else groups.technical.push(s);
-    }
-    return Object.entries(groups).filter(([, skills]) => skills.length > 0);
-  }, [data.skills]);
+  /* ── skill grouping helper (hanya skill bernama) ── */
+  const groupedSkills = useMemo(() => groupNamedSkills(data.skills), [data.skills]);
+  const certifications = useMemo(() => namedCertifications(data.certifications), [data.certifications]);
 
   const CATEGORY_LABELS: Record<string, string> = {
     technical: lang === "en" ? "Technical" : "Teknis",
@@ -462,7 +465,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
     skills: {
       label: L("skills"),
       render: () =>
-        data.skills.length > 0 ? (
+        groupedSkills.length > 0 ? (
           <>
             <SectionHeader title={L("skills")} style={style} />
             {/* Grouped skills by category */}
@@ -472,23 +475,24 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                   {CATEGORY_LABELS[category] || category}:
                 </p>
                 <p style={{ margin: "0 0 6px 0", color: "#111111", textAlign }}>
-                  {catSkills.map((s) => s.name).filter(Boolean).join(", ")}
+                  {catSkills.map((s) => formatSkill(s, showSkillLevel, lang)).join(", ")}
                 </p>
               </div>
             ))}
-            {/* Certifications */}
-            {data.certifications && data.certifications.length > 0 && (
-              <div style={{ marginTop: 12 }}>
-                <p style={{ margin: "0 0 4px 0", color: "#111111", fontWeight: 700, fontSize: bodyFontSize - 1 }}>
-                  {lang === "en" ? "Certifications:" : "Sertifikasi:"}
-                </p>
-                {data.certifications.map((cert, i) => (
-                  <p key={cert.id || i} style={{ margin: "0 0 2px 0", color: "#111111", fontSize: bodyFontSize - 1 }}>
-                    • {cert.name}{cert.issuer ? ` · ${cert.issuer}` : ""}{cert.year ? ` (${cert.year})` : ""}
-                  </p>
-                ))}
-              </div>
-            )}
+          </>
+        ) : null,
+    },
+    certifications: {
+      label: L("certifications"),
+      render: () =>
+        certifications.length > 0 ? (
+          <>
+            <SectionHeader title={L("certifications")} style={style} />
+            {certifications.map((cert, i) => (
+              <p key={cert.id || i} style={{ margin: "0 0 2px 0", color: "#111111", fontSize: bodyFontSize - 1 }}>
+                • {formatCertification(cert)}
+              </p>
+            ))}
           </>
         ) : null,
     },

@@ -44,6 +44,32 @@ const idOf = (item: Record<string, any>, prefix: string) =>
   typeof item.id === "string" && item.id ? item.id : newId(prefix);
 
 /**
+ * Skill bisa tersimpan sebagai array objek, array string ("React"), atau
+ * objek per kategori ({ technical: [...], soft: [...] }). Dulu dua bentuk
+ * terakhir membuat nama skill hilang (atau builder gagal dimuat).
+ */
+function rawSkills(v: unknown): Record<string, any>[] {
+  const fromList = (list: unknown, category?: string): Record<string, any>[] =>
+    Array.isArray(list)
+      ? list.flatMap((s) =>
+          typeof s === "string"
+            ? s.trim() ? [{ name: s.trim(), ...(category ? { category } : {}) }] : []
+            : isObj(s) ? [category && !s.category ? { ...s, category } : s] : [],
+        )
+      : [];
+  if (Array.isArray(v)) return fromList(v);
+  if (isObj(v)) {
+    return [
+      ...fromList(v.technical, "technical"),
+      ...fromList(v.soft, "soft"),
+      ...fromList(v.tools, "tools"),
+      ...fromList(v.languages, "tools"),
+    ];
+  }
+  return [];
+}
+
+/**
  * Normalisasi item secara additive: field yang tidak dikenal dari item asli
  * tetap ada (spread dulu), field yang dikenal di-override dengan nilai aman.
  */
@@ -91,7 +117,7 @@ function normalizeLists(src: Record<string, any>) {
       isPresent: o.isPresent === true,
       visible: o.visible !== false,
     })),
-    skills: arr(src.skills).map((s) => ({
+    skills: rawSkills(src.skills).map((s) => ({
       ...s,
       id: idOf(s, "sk"),
       name: str(s.name),

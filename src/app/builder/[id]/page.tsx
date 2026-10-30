@@ -117,7 +117,17 @@ export default function BuilderPage() {
     sectionVisibility, setSectionVisibility, customSections, setCustomSections,
     showDisplaySettings, setShowDisplaySettings, showSectionOrderModal, setShowSectionOrderModal,
     isPdfExporting, setIsPdfExporting, MARGIN_VALUES, marginPadding, contentAreaMm,
+    showSkillLevel, setShowSkillLevel,
   } = format;
+
+  /* ── Section tersembunyi ── */
+  // Section dianggap tersembunyi bila dimatikan di pengaturan tampilan atau
+  // tidak ada di urutan section. Kartu form memberi tahu user + tombol Tampilkan.
+  const isSectionHidden = (key: string) => sectionVisibility[key] === false || !sectionOrder.includes(key);
+  const showSection = (key: string) => {
+    setSectionVisibility((prev) => ({ ...prev, [key]: true }));
+    setSectionOrder((prev) => (prev.includes(key) ? prev : [...prev, key]));
+  };
 
   const {
     aiJdKeywords, setAiJdKeywords, reducedMotion, computeAtsScore,
@@ -149,6 +159,7 @@ export default function BuilderPage() {
         headerLayout,
         lineHeight: spacingMode === "compact" ? 1.3 : spacingMode === "spacious" ? 1.8 : 1.5,
         lang: cvData.cvLang,
+        showSkillLevel,
       });
       addToast({ type: "success", message: t("builder.pdf-export-success") });
     } catch (err) {
@@ -491,6 +502,8 @@ export default function BuilderPage() {
                   onCertAdd={addCertification}
                   onLainnyaChange={updateLainnyaContent}
                   onSelfEvaluationChange={(v) => updateField("selfEvaluation", v)}
+                  isSectionHidden={isSectionHidden}
+                  onShowSection={showSection}
                 />
               )}
 
@@ -580,12 +593,16 @@ export default function BuilderPage() {
                     showDividers={showDividers}
                     headerLayout={headerLayout}
                     lineHeight={spacingMode === "compact" ? 1.3 : spacingMode === "spacious" ? 1.8 : 1.5}
+                    showSkillLevel={showSkillLevel}
                     onSectionClick={(sectionKey) => {
                       const sectionStepMap: Record<string, number> = {
                         "summary": 0,
                         "experience": 2,
                         "education": 3,
                         "skills": 5,
+                        "certifications": 5,
+                        "selfEvaluation": 5,
+                        "lainnya": 5,
                         "organizations": 4,
                       };
                       const step = sectionStepMap[sectionKey];
@@ -671,6 +688,8 @@ export default function BuilderPage() {
           headerLayout={headerLayout}
           marginMode={marginMode}
           sectionVisibility={sectionVisibility}
+          showSkillLevel={showSkillLevel}
+          onShowSkillLevelChange={setShowSkillLevel}
           onClose={() => setShowDisplaySettings(false)}
           onPrimaryColorChange={setCustomPrimaryColor}
           onSpacingModeChange={setSpacingMode}

@@ -16,6 +16,36 @@ interface SkillSectionProps {
   onCertAdd: () => void;
   onLainnyaChange: (content: string) => void;
   onSelfEvaluationChange?: (content: string) => void;
+  /** true bila section tidak ikut tampil di CV (disembunyikan / tidak ada di urutan). */
+  isSectionHidden?: (key: string) => boolean;
+  onShowSection?: (key: string) => void;
+}
+
+export const SKILL_LEVEL_OPTIONS = [
+  { value: "beginner", label: "Pemula", desc: "masih belajar dan butuh arahan" },
+  { value: "intermediate", label: "Menengah", desc: "bisa mengerjakan sendiri" },
+  { value: "advanced", label: "Mahir", desc: "lancar dan bisa membimbing orang lain" },
+] as const;
+
+/** Catatan di kartu form: data ada, tapi section tidak tampil di CV. */
+export function HiddenSectionNotice({ onShow }: { onShow?: () => void }) {
+  return (
+    <div role="status" className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+      <span className="flex items-center gap-1.5">
+        <span className="material-symbols-outlined text-[16px]" aria-hidden="true">visibility_off</span>
+        Bagian ini disembunyikan dari CV.
+      </span>
+      {onShow && (
+        <button
+          type="button"
+          onClick={onShow}
+          className="rounded-md px-2 py-1 font-semibold text-amber-900 underline underline-offset-2 hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700"
+        >
+          Tampilkan
+        </button>
+      )}
+    </div>
+  );
 }
 
 const CATEGORY_OPTIONS = [
@@ -37,7 +67,14 @@ export function SkillSection({
   onCertAdd,
   onLainnyaChange,
   onSelfEvaluationChange,
+  isSectionHidden,
+  onShowSection,
 }: SkillSectionProps) {
+  const hiddenNotice = (key: string, hasData: boolean) =>
+    hasData && isSectionHidden?.(key) ? (
+      <HiddenSectionNotice onShow={onShowSection ? () => onShowSection(key) : undefined} />
+    ) : null;
+
   return (
     <>
       {/* ── Skills with Category ── */}
@@ -51,6 +88,7 @@ export function SkillSection({
             <p className="text-xs text-on-surface-variant">Kelompokkan skill berdasarkan kategori agar CV lebih profesional</p>
           </div>
         </div>
+        {hiddenNotice("skills", skills.some((s) => s.name.trim()))}
 
         <div className="space-y-3">
           {skills.map((skill, i) => (
@@ -74,14 +112,15 @@ export function SkillSection({
                 ))}
               </select>
               <select
+                aria-label="Level keahlian"
                 value={skill.level}
                 onChange={(e) => onSkillChange(i, "level", e.target.value as SkillEntry["level"])}
                 className="bg-surface-container-lowest border border-outline-variant/50 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary text-xs min-w-[100px]"
               >
                 <option value="">Level (opsional)</option>
-                <option value="beginner">Beginner</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="advanced">Advanced</option>
+                {SKILL_LEVEL_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value} title={opt.desc}>{opt.label}</option>
+                ))}
               </select>
               <button
                 type="button"
@@ -102,6 +141,10 @@ export function SkillSection({
           </button>
         </div>
 
+        <p className="text-[11px] text-on-surface-variant">
+          {SKILL_LEVEL_OPTIONS.map((o) => `${o.label}: ${o.desc}.`).join(" ")} Level hanya tampil di CV bila diaktifkan di Pengaturan Tampilan.
+        </p>
+
         {/* Color legend */}
         <div className="flex items-center gap-3 text-[10px] text-on-surface-variant pt-1">
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500" /> Technical</span>
@@ -121,6 +164,7 @@ export function SkillSection({
             <p className="text-xs text-on-surface-variant">Sertifikasi profesional, kursus, atau lisensi yang dimiliki</p>
           </div>
         </div>
+        {hiddenNotice("certifications", certifications.some((c) => c.name.trim()))}
 
         <div className="space-y-3">
           {certifications.map((cert, i) => (
@@ -183,6 +227,7 @@ export function SkillSection({
             <p className="text-xs text-on-surface-variant">Tuliskan kekuatan utama, motivasi, atau tujuan kariermu (opsional)</p>
           </div>
         </div>
+        {hiddenNotice("selfEvaluation", !!selfEvaluation.trim())}
         {onSelfEvaluationChange ? (
           <textarea
             value={selfEvaluation}
@@ -213,6 +258,7 @@ export function SkillSection({
             <p className="text-xs text-on-surface-variant">Key achievements, penghargaan, atau apapun yang ingin ditambahkan</p>
           </div>
         </div>
+        {hiddenNotice("lainnya", !!lainnyaContent.trim())}
         <textarea
           value={lainnyaContent}
           onChange={(e) => onLainnyaChange(e.target.value)}

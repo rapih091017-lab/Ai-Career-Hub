@@ -23,6 +23,8 @@ export interface GenerateCvPdfOptions {
   headerLayout?: "centered" | "left";
   lineHeight?: number;
   lang?: "id" | "en";
+  /** Tampilkan level di belakang nama skill, mis. "React (Mahir)". */
+  showSkillLevel?: boolean;
 }
 
 /** Render the CV to a PDF Blob (works in browser AND Node). */

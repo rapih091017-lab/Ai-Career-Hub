@@ -9,20 +9,25 @@ interface DisplaySettingsModalProps {
   headerLayout: "centered" | "left";
   marginMode: "tight" | "normal" | "wide";
   sectionVisibility: Record<string, boolean>;
+  showSkillLevel: boolean;
   onClose: () => void;
   onPrimaryColorChange: (color: string) => void;
   onSpacingModeChange: (mode: "compact" | "normal" | "spacious") => void;
   onHeaderLayoutChange: (layout: "centered" | "left") => void;
   onMarginModeChange: (mode: "tight" | "normal" | "wide") => void;
   onSectionVisibilityChange: (key: string, visible: boolean) => void;
+  onShowSkillLevelChange: (show: boolean) => void;
 }
 
 const SECTION_LABELS: Record<string, string> = {
   summary: "Ringkasan Profesional",
+  selfEvaluation: "Evaluasi Diri",
   experience: "Pengalaman Kerja",
   education: "Pendidikan",
   skills: "Keahlian",
+  certifications: "Sertifikasi",
   organizations: "Organisasi",
+  lainnya: "Lainnya",
 };
 
 const SPACING_OPTIONS = [
@@ -55,12 +60,14 @@ export function DisplaySettingsModal({
   headerLayout,
   marginMode,
   sectionVisibility,
+  showSkillLevel,
   onClose,
   onPrimaryColorChange,
   onSpacingModeChange,
   onHeaderLayoutChange,
   onMarginModeChange,
   onSectionVisibilityChange,
+  onShowSkillLevelChange,
 }: DisplaySettingsModalProps) {
   return (
     <Modal open={open} onClose={onClose} title="Pengaturan Tampilan CV" size="max-w-lg">
@@ -167,6 +174,27 @@ export function DisplaySettingsModal({
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Level keahlian */}
+        <div>
+          <label className="flex items-start gap-3 px-3 py-2 rounded-lg hover:bg-surface-container-low cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showSkillLevel}
+              onChange={(e) => onShowSkillLevelChange(e.target.checked)}
+              className="peer sr-only"
+            />
+            <div className="mt-0.5 w-5 h-5 shrink-0 rounded-md border-2 border-outline-variant bg-surface-container-lowest flex items-center justify-center transition-colors duration-200 peer-checked:bg-primary peer-checked:border-primary peer-focus-visible:ring-2 peer-focus-visible:ring-primary">
+              {showSkillLevel && (
+                <span className="material-symbols-outlined text-sm text-white" aria-hidden="true">check</span>
+              )}
+            </div>
+            <span>
+              <span className="block text-body-md text-on-surface">Tampilkan level keahlian</span>
+              <span className="block text-xs text-on-surface-variant">Level ditulis setelah nama skill, misalnya React (Mahir).</span>
+            </span>
+          </label>
         </div>
 
         {/* Visibilitas Section */}

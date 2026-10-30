@@ -183,9 +183,11 @@ export function useBuilderAI({
   /* ── Section label map for modals ── */
   const SECTION_LABEL_MAP: Record<string, string> = {
     summary: "Ringkasan Profesional",
+    selfEvaluation: "Evaluasi Diri",
     experience: "Pengalaman Kerja",
     education: "Pendidikan",
-    skills: "Keahlian & Sertifikasi",
+    skills: "Keahlian",
+    certifications: "Sertifikasi",
     organizations: "Organisasi",
     lainnya: "Lainnya (Key Achievements, dll.)",
   };

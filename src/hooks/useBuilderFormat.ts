@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { readSavedFormat } from "@/lib/builder-format";
+import { migrateSavedFormat, readSavedFormat } from "@/lib/builder-format";
 import { DEFAULT_SECTION_ORDER } from "@/components/cv-templates";
 import type { SectionKey, CustomSectionEntry } from "@/components/cv-templates";
 
@@ -33,8 +33,12 @@ export function useBuilderFormat({ cvId }: UseBuilderFormatProps) {
     experience: true,
     education: true,
     skills: true,
+    certifications: true,
+    selfEvaluation: true,
     organizations: true,
   });
+  // Level skill tidak dirender kecuali user menyalakannya (keputusan K3).
+  const [showSkillLevel, setShowSkillLevel] = useState(false);
   const [customSections, setCustomSections] = useState<CustomSectionEntry[]>([
     { id: "lainnya", title: "Lainnya", content: "", contentType: "bullets" },
   ]);
@@ -69,6 +73,7 @@ export function useBuilderFormat({ cvId }: UseBuilderFormatProps) {
           sectionVisibility,
           customSections,
           marginMode,
+          showSkillLevel,
         }),
       );
     } catch {
@@ -88,24 +93,26 @@ export function useBuilderFormat({ cvId }: UseBuilderFormatProps) {
     sectionVisibility,
     marginMode,
     customSections,
+    showSkillLevel,
   ]);
 
   /* ── Load formatting from localStorage on mount ── */
   useEffect(() => {
-    const parsed = readSavedFormat(FORMAT_KEY);
-    if (parsed) {
-      if (parsed.fontFamily) setFontFamily(parsed.fontFamily);
-      if (parsed.fontSize) setFontSize(parsed.fontSize);
-      if (parsed.textAlign) setTextAlign(parsed.textAlign);
-      if (typeof parsed.showDividers === "boolean") setShowDividers(parsed.showDividers);
-      if (parsed.sectionOrder?.length) setSectionOrder(parsed.sectionOrder);
-      if (parsed.customPrimaryColor) setCustomPrimaryColor(parsed.customPrimaryColor);
-      if (parsed.spacingMode) setSpacingMode(parsed.spacingMode);
-      if (parsed.headerLayout) setHeaderLayout(parsed.headerLayout);
-      if (parsed.sectionVisibility) setSectionVisibility(parsed.sectionVisibility);
-      if (parsed.customSections) setCustomSections(parsed.customSections);
-      if (parsed.marginMode) setMarginMode(parsed.marginMode);
-    }
+    // Nilai invalid dibuang; urutan section lama dimigrasi (certifications,
+    // selfEvaluation, dan section bawaan yang hilang disisipkan kembali).
+    const parsed = migrateSavedFormat(readSavedFormat(FORMAT_KEY));
+    if (parsed.fontFamily) setFontFamily(parsed.fontFamily);
+    if (parsed.fontSize) setFontSize(parsed.fontSize);
+    if (parsed.textAlign) setTextAlign(parsed.textAlign);
+    if (parsed.showDividers !== undefined) setShowDividers(parsed.showDividers);
+    if (parsed.sectionOrder) setSectionOrder(parsed.sectionOrder);
+    if (parsed.customPrimaryColor !== undefined) setCustomPrimaryColor(parsed.customPrimaryColor);
+    if (parsed.spacingMode) setSpacingMode(parsed.spacingMode);
+    if (parsed.headerLayout) setHeaderLayout(parsed.headerLayout);
+    if (parsed.sectionVisibility) setSectionVisibility(parsed.sectionVisibility);
+    if (parsed.customSections) setCustomSections(parsed.customSections);
+    if (parsed.marginMode) setMarginMode(parsed.marginMode);
+    if (parsed.showSkillLevel !== undefined) setShowSkillLevel(parsed.showSkillLevel);
     setLoadedKey(FORMAT_KEY);
   }, [FORMAT_KEY]);
 
@@ -130,6 +137,7 @@ export function useBuilderFormat({ cvId }: UseBuilderFormatProps) {
     sectionOrder, setSectionOrder,
     sectionVisibility, setSectionVisibility,
     customSections, setCustomSections,
+    showSkillLevel, setShowSkillLevel,
     // Modals
     showDisplaySettings, setShowDisplaySettings,
     showSectionOrderModal, setShowSectionOrderModal,
