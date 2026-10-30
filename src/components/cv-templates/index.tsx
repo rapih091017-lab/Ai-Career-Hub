@@ -49,7 +49,8 @@ export interface OrganizationEntry {
 export interface SkillEntry {
   id: string;
   name: string;
-  level: "beginner" | "intermediate" | "advanced";
+  /** "" = level belum dipilih; tidak dirender. */
+  level: "beginner" | "intermediate" | "advanced" | "";
   /** Skill category for grouped display: technical | soft | tools */
   category?: "technical" | "soft" | "tools";
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { aiSkillNames } from "@/lib/cv-normalize";
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import type { CvData } from "@/components/cv-templates";
 
@@ -53,9 +54,7 @@ export function useBuilderAI({
 
     if (justLeftTargetPekerjaan && hasTargetData && !aiJdTriggered) {
       setAiJdTriggered(true);
-      const skills = cvData.skills
-        .filter((s) => s.level === "advanced" || s.level === "intermediate")
-        .map((s) => s.name);
+      const skills = aiSkillNames(cvData.skills);
 
       fetch(`/api/cv-documents/${cvId}/revise`, {
         method: "POST",

@@ -78,6 +78,7 @@ export function SkillSection({
                 onChange={(e) => onSkillChange(i, "level", e.target.value as SkillEntry["level"])}
                 className="bg-surface-container-lowest border border-outline-variant/50 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary text-xs min-w-[100px]"
               >
+                <option value="">Level (opsional)</option>
                 <option value="beginner">Beginner</option>
                 <option value="intermediate">Intermediate</option>
                 <option value="advanced">Advanced</option>

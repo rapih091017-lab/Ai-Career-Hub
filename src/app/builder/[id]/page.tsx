@@ -8,6 +8,7 @@ import AuthGuard from "@/components/AuthGuard";
 import { AtsBaseRenderer, TEMPLATE_STYLES, type CvData } from "@/components/cv-templates";
 import { downloadCvPdf } from "@/lib/pdf/generate-cv-pdf";
 import { buildCvSaveBody } from "@/lib/builder-save";
+import { aiSkillNames } from "@/lib/cv-normalize";
 import dynamic from "next/dynamic";
 const AIProposalModal = dynamic(() => import("@/components/AIProposalModal"), { ssr: false });
 import { useToast } from "@/components/ui/toast";
@@ -334,7 +335,7 @@ export default function BuilderPage() {
                     fullName={cvData.fullName}
                     jobTitle={cvData.jobTitle}
                     professionalTitle={cvData.professionalTitle}
-                    skills={cvData.skills.filter(s => s.level === "advanced" || s.level === "intermediate").map(s => s.name)}
+                    skills={aiSkillNames(cvData.skills)}
                     workHistorySummary={cvData.workHistory.map(w => w.position && w.company ? `${w.position} @ ${w.company}` : "").filter(Boolean).join("; ")}
                     eduSummary={cvData.education.map(e => e.degree ? `${e.degree}${e.field ? ` di ${e.field}` : ""}` : "").filter(Boolean).join("; ")}
                     certSummary={(cvData.certifications || []).map(c => c.name).filter(Boolean)}
@@ -386,7 +387,7 @@ export default function BuilderPage() {
   index={i}
   totalItems={cvData.workHistory.length}
   isCollapsed={collapsedWorkIds.has(work.id)}
-  skills={cvData.skills.filter(s => s.level === "advanced" || s.level === "intermediate").map(s => s.name)}
+  skills={aiSkillNames(cvData.skills)}
   cvId={cvId}
   jobTitle={cvData.jobTitle}
   jobDescription={cvData.jobDescription}
@@ -429,7 +430,7 @@ export default function BuilderPage() {
   jobTitle={cvData.jobTitle}
   jobDescription={cvData.jobDescription}
   aiKeywords={aiJdKeywords}
-  skills={cvData.skills.filter(s => s.level === "advanced" || s.level === "intermediate").map(s => s.name)}
+  skills={aiSkillNames(cvData.skills)}
   onJobTitleChange={(v) => updateField("jobTitle", v)}
                   onJobDescriptionChange={(v) => updateField("jobDescription", v)}
                 />
@@ -443,7 +444,7 @@ export default function BuilderPage() {
   index={i}
   totalItems={cvData.education.length}
   jobTitle={cvData.jobTitle}
-  skills={cvData.skills.filter(s => s.level === "advanced" || s.level === "intermediate").map(s => s.name)}
+  skills={aiSkillNames(cvData.skills)}
   jobDescription={cvData.jobDescription}
   onUpdate={updateEducation}
                       onRemove={removeEducation}
@@ -468,7 +469,7 @@ export default function BuilderPage() {
   index={i}
   totalItems={cvData.organisations.length}
   jobTitle={cvData.jobTitle}
-  skills={cvData.skills.filter(s => s.level === "advanced" || s.level === "intermediate").map(s => s.name)}
+  skills={aiSkillNames(cvData.skills)}
   jobDescription={cvData.jobDescription}
   onUpdate={updateOrganization}
                       onSetPresent={(idx, isPresent) => {
