@@ -9,6 +9,7 @@ import { AtsBaseRenderer, TEMPLATE_STYLES, type CvData } from "@/components/cv-t
 import { downloadCvPdf } from "@/lib/pdf/generate-cv-pdf";
 import { buildCvSaveBody } from "@/lib/builder-save";
 import { aiSkillNames } from "@/lib/cv-normalize";
+import { countPages } from "@/lib/builder-format";
 import dynamic from "next/dynamic";
 const AIProposalModal = dynamic(() => import("@/components/AIProposalModal"), { ssr: false });
 import { useToast } from "@/components/ui/toast";
@@ -71,42 +72,25 @@ export default function BuilderPage() {
   const contentRef = useRef<HTMLDivElement>(null);
   const [allPageCount, setAllPageCount] = useState(1);
   const previewRef = useRef<HTMLDivElement>(null);
-  const roRef = useRef<ResizeObserver | null>(null);
 
-  // Detect multi-page overflow via content height measurement
-  const initialMeasureDoneRef = useRef(false);
+  // Hitung jumlah halaman dari tinggi konten. Observer dipasang ulang hanya
+  // saat tinggi area konten berubah (margin) atau saat konten baru muncul
+  // setelah data selesai dimuat (sebelumnya yang tampil skeleton, ref null).
+  const pageContentAreaMm = format.contentAreaMm;
+  const contentMounted = !isLoading && !fetchError;
   useEffect(() => {
-    if (!contentRef.current) return;
-    const mmToPx = (mm: number) => mm * (96 / 25.4);
-    const contentHeightPx = mmToPx(contentAreaMm);
-
-    if (!initialMeasureDoneRef.current) {
-      const h = contentRef.current.offsetHeight;
-      if (h > 0) {
-        initialMeasureDoneRef.current = true;
-        const pages = Math.max(1, Math.ceil(h / contentHeightPx));
-        setAllPageCount(pages);
-      }
-    }
-
-    if (roRef.current) {
-      roRef.current.disconnect();
-      roRef.current = null;
-    }
-    const ro = new ResizeObserver((entries) => {
-      for (const e of entries) {
-        const h = e.contentBoxSize?.[0]?.blockSize || e.contentRect.height;
-        const pages = Math.max(1, Math.ceil(h / contentHeightPx));
-        setAllPageCount(pages);
-      }
-    });
-    ro.observe(contentRef.current);
-    roRef.current = ro;
-    return () => {
-      ro.disconnect();
-      roRef.current = null;
+    const el = contentRef.current;
+    if (!el) return;
+    const update = (h: number) => {
+      if (h > 0) setAllPageCount(countPages(h, pageContentAreaMm));
     };
-  });
+    update(el.offsetHeight);
+    const ro = new ResizeObserver((entries) => {
+      for (const e of entries) update(e.contentBoxSize?.[0]?.blockSize || e.contentRect.height);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [pageContentAreaMm, contentMounted]);
 
   /* ── AI & Scoring Hook ── */
   const ai = useBuilderAI({ cvData, setCvData, cvId, activeStep, setActiveStep, addToast });
