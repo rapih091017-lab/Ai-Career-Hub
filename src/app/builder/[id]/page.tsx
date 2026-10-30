@@ -7,6 +7,7 @@ import AppHeader from "@/components/AppHeader";
 import AuthGuard from "@/components/AuthGuard";
 import { AtsBaseRenderer, TEMPLATE_STYLES, type CvData } from "@/components/cv-templates";
 import { downloadCvPdf } from "@/lib/pdf/generate-cv-pdf";
+import { buildCvSaveBody } from "@/lib/builder-save";
 import dynamic from "next/dynamic";
 const AIProposalModal = dynamic(() => import("@/components/AIProposalModal"), { ssr: false });
 import { useToast } from "@/components/ui/toast";
@@ -183,7 +184,7 @@ export default function BuilderPage() {
       const res = await fetch(`/api/cv-documents/${cvId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(cvData),
+        body: buildCvSaveBody(cvData),
       });
       if (!res.ok) throw new Error(`${t("builder.save-failed")} (${res.status})`);
       addToast({ type: "success", message: t("builder.save-success") });

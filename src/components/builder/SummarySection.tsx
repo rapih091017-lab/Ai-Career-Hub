@@ -263,11 +263,11 @@ export function SummarySection({
                 } disabled:opacity-40`}
                 title="Optimalkan ringkasan dengan AI"
               >
-                <span className={`material-symbols-outlined text-[14px] transition-all duration-500 ${
-                  aiReviseLoading ? "animate-spin" : ""
-                }`} style={{ fontVariationSettings: "'FILL' 1" }}>
-                  {aiReviseLoading ? "sync" : "spark"}
-                </span>
+                {aiReviseLoading && (
+                  <span className="material-symbols-outlined text-[14px] animate-spin" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">
+                    sync
+                  </span>
+                )}
                 <span>
                   {aiReviseLoading ? "Mengoptimalkan..." : "Optimalkan"}
                 </span>
