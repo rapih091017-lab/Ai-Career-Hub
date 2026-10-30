@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkRateLimit, rateLimitResponse, clientIp } from "@/lib/rate-limiter";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limiter";
+import { withAuth, errorResponse } from "@/lib/api-utils";
 import { callAI, MODELS } from "@/lib/ai/adapter";
 import { SECURITY_GUARDRAIL } from "@/lib/ai/prompts/shared";
 import { z } from "zod";
@@ -91,37 +92,36 @@ Input: "Saya mengembangkan aplikasi web menggunakan React dan Node.js, serta men
 Output: {"errors": [], "totalErrors": 0, "summary": "Tidak ditemukan error"}
 `;
 
+const GrammarBodySchema = z.object({
+  content: z.string().trim().min(1).max(10000),
+  language: z.enum(["id", "en", "auto"]).optional(),
+});
+
 export async function POST(request: NextRequest) {
+  const authResult = await withAuth();
+  if (authResult instanceof NextResponse) return authResult;
+
+  // Tanpa kuota, tapi tetap dibatasi per akun karena memanggil model berbayar.
+  const rl = checkRateLimit({
+    key: `ai-grammar:${authResult.userId}`,
+    maxRequests: 10,
+    windowSeconds: 60,
+  });
+  if (!rl.allowed) return rateLimitResponse(rl.resetInSeconds);
+
+  let rawBody: unknown;
   try {
-    // Endpoint ini memanggil model AI berbayar. Tanpa autentikasi dan tanpa
-    // batas permintaan, siapa pun bisa memakainya tanpa jejak.
-    const rl = checkRateLimit({
-      key: `ai-grammar:${clientIp(request)}`,
-      maxRequests: 10,
-      windowSeconds: 60,
-    });
-    if (!rl.allowed) return rateLimitResponse(rl.resetInSeconds);
+    rawBody = await request.json();
+  } catch {
+    return errorResponse("INVALID_BODY", "Permintaan tidak bisa dibaca. Muat ulang halaman lalu coba lagi.", 400);
+  }
+  const parsed = GrammarBodySchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return errorResponse("INVALID_BODY", "Teks kosong atau lebih dari 10.000 karakter. Periksa isinya lalu coba lagi.", 400);
+  }
 
-    const body = await request.json();
-    const { content, language = "auto" } = body as {
-      content: string;
-      language?: "id" | "en" | "auto";
-    };
-
-    // Validasi input
-    if (!content || content.trim().length === 0) {
-      return NextResponse.json(
-        { error: "Content is required and cannot be empty" },
-        { status: 400 }
-      );
-    }
-
-    if (content.length > 10000) {
-      return NextResponse.json(
-        { error: "Content is too long. Maximum 10000 characters." },
-        { status: 400 }
-      );
-    }
+  try {
+    const { content, language = "auto" } = parsed.data;
 
     // Deteksi bahasa
     let detectedLanguage = language;
@@ -166,13 +166,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error("AI Grammar Check error:", error);
-    return NextResponse.json(
-      {
-        error: "Failed to check grammar",
-        details: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    return errorResponse("AI_FAILED", "Pemeriksaan ejaan belum berhasil. Coba lagi sebentar lagi.", 500);
   }
 }
 

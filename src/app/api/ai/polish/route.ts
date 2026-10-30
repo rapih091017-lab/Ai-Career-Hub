@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkRateLimit, rateLimitResponse, clientIp } from "@/lib/rate-limiter";
+import { z } from "zod";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limiter";
+import { withAuth, errorResponse } from "@/lib/api-utils";
 import { callAI, MODELS } from "@/lib/ai/adapter";
 import { SECURITY_GUARDRAIL } from "@/lib/ai/prompts/shared";
 
@@ -60,42 +62,41 @@ INPUT: "made website for company"
 OUTPUT: "Built the company website using React and TypeScript, improving page load performance and organic traffic [est.]"
 `;
 
-interface PolishRequest {
-  content: string;
-  jobTitle?: string;
-  skills?: string[];
-  jobDescription?: string;
-  field?: string;
-}
+// Batas body. Konteks (skills, jobDescription) hanya pelengkap prompt,
+// jadi dibatasi ketat supaya biaya token tetap terkendali.
+const PolishBodySchema = z.object({
+  content: z.string().trim().min(1).max(5000),
+  jobTitle: z.string().max(200).optional(),
+  skills: z.array(z.string().max(100)).max(50).optional(),
+  jobDescription: z.string().max(5000).optional(),
+  field: z.string().max(100).optional(),
+});
 
 export async function POST(request: NextRequest) {
-  // Endpoint ini memanggil model AI berbayar: perlu batas permintaan supaya
-  // tidak bisa dipakai tanpa jejak.
+  const authResult = await withAuth();
+  if (authResult instanceof NextResponse) return authResult;
+
+  // Tanpa kuota, tapi tetap dibatasi per akun karena memanggil model berbayar.
   const rl = checkRateLimit({
-    key: `ai-polish:${clientIp(request)}`,
+    key: `ai-polish:${authResult.userId}`,
     maxRequests: 10,
     windowSeconds: 60,
   });
   if (!rl.allowed) return rateLimitResponse(rl.resetInSeconds);
 
+  let rawBody: unknown;
   try {
-    const body: PolishRequest = await request.json();
-    const { content, jobTitle, skills, jobDescription, field } = body;
+    rawBody = await request.json();
+  } catch {
+    return errorResponse("INVALID_BODY", "Permintaan tidak bisa dibaca. Muat ulang halaman lalu coba lagi.", 400);
+  }
+  const parsed = PolishBodySchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return errorResponse("INVALID_BODY", "Teks kosong atau lebih dari 5.000 karakter. Periksa isinya lalu coba lagi.", 400);
+  }
 
-    // Validasi input
-    if (!content || content.trim().length === 0) {
-      return NextResponse.json(
-        { error: "Content is required" },
-        { status: 400 }
-      );
-    }
-
-    if (content.length > 3000) {
-      return NextResponse.json(
-        { error: "Content too long. Maximum 3000 characters." },
-        { status: 400 }
-      );
-    }
+  try {
+    const { content, jobTitle, skills, jobDescription, field } = parsed.data;
 
     // Bangun CV context untuk prompt
     let contextStr = "";
@@ -135,9 +136,6 @@ ${content}
 
   } catch (error) {
     console.error("AI Polish error:", error);
-    return NextResponse.json(
-      { error: "Failed to polish content" },
-      { status: 500 }
-    );
+    return errorResponse("AI_FAILED", "Teks belum berhasil dipoles. Coba lagi sebentar lagi.", 500);
   }
 }

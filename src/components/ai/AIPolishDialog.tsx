@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useToast } from "@/components/ui/toast";
+import { aiErrorMessage } from "@/components/ai/ai-error-message";
 
 /**
  * AI Polish Button, Inline one-click polish
@@ -47,15 +48,15 @@ export function AIPolishButton({
         body: JSON.stringify({
           content: content.trim(),
           jobTitle,
-          skills,
-          jobDescription,
+          // Batas server: maks 50 skill; JD hanya dipakai 500 karakter pertama.
+          skills: skills?.slice(0, 50),
+          jobDescription: jobDescription?.slice(0, 500),
           field,
         }),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Gagal memoles teks");
+        throw new Error(await aiErrorMessage(response, "Gagal memoles teks"));
       }
 
       const data = await response.json();
