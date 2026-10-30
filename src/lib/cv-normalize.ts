@@ -1,3 +1,4 @@
+import { newId } from "@/lib/id";
 import type { CvData, SkillEntry } from "@/components/cv-templates";
 
 export const EMPTY_CV_DATA: CvData = {
@@ -38,12 +39,9 @@ export function normalizeSkillLevel(v: unknown): SkillEntry["level"] {
   return (SKILL_LEVELS as readonly string[]).includes(v as string) ? (v as SkillEntry["level"]) : "";
 }
 
-function fallbackId(prefix: string, i: number): string {
-  return `${prefix}_${i}_${Date.now()}`;
-}
-
-const idOf = (item: Record<string, any>, prefix: string, i: number) =>
-  typeof item.id === "string" && item.id ? item.id : fallbackId(prefix, i);
+// Item tanpa id diberi id baru sekali saat muat; tersimpan oleh autosave berikutnya.
+const idOf = (item: Record<string, any>, prefix: string) =>
+  typeof item.id === "string" && item.id ? item.id : newId(prefix);
 
 /**
  * Normalisasi item secara additive: field yang tidak dikenal dari item asli
@@ -51,15 +49,15 @@ const idOf = (item: Record<string, any>, prefix: string, i: number) =>
  */
 function normalizeLists(src: Record<string, any>) {
   return {
-    customFields: arr(src.customFields).map((f, i) => ({
+    customFields: arr(src.customFields).map((f) => ({
       ...f,
-      id: idOf(f, "cf", i),
+      id: idOf(f, "cf"),
       label: str(f.label),
       value: str(f.value),
     })),
-    workHistory: arr(src.workHistory).map((w, i) => ({
+    workHistory: arr(src.workHistory).map((w) => ({
       ...w,
-      id: idOf(w, "wh", i),
+      id: idOf(w, "wh"),
       position: str(w.position),
       company: str(w.company),
       companyDescription: str(w.companyDescription),
@@ -71,9 +69,9 @@ function normalizeLists(src: Record<string, any>) {
       visible: w.visible !== false,
       projectUrl: str(w.projectUrl),
     })),
-    education: arr(src.education).map((e, i) => ({
+    education: arr(src.education).map((e) => ({
       ...e,
-      id: idOf(e, "edu", i),
+      id: idOf(e, "edu"),
       institution: str(e.institution),
       degree: str(e.degree),
       field: str(e.field),
@@ -82,9 +80,9 @@ function normalizeLists(src: Record<string, any>) {
       gpa: str(e.gpa),
       visible: e.visible !== false,
     })),
-    organisations: arr(src.organisations).map((o, i) => ({
+    organisations: arr(src.organisations).map((o) => ({
       ...o,
-      id: idOf(o, "org", i),
+      id: idOf(o, "org"),
       name: str(o.name),
       position: str(o.position),
       startDate: str(o.startDate),
@@ -93,16 +91,16 @@ function normalizeLists(src: Record<string, any>) {
       isPresent: o.isPresent === true,
       visible: o.visible !== false,
     })),
-    skills: arr(src.skills).map((s, i) => ({
+    skills: arr(src.skills).map((s) => ({
       ...s,
-      id: idOf(s, "sk", i),
+      id: idOf(s, "sk"),
       name: str(s.name),
       level: normalizeSkillLevel(s.level),
       category: (SKILL_CATEGORIES as readonly string[]).includes(s.category) ? s.category : "technical",
     })),
-    certifications: arr(src.certifications).map((c, i) => ({
+    certifications: arr(src.certifications).map((c) => ({
       ...c,
-      id: idOf(c, "cert", i),
+      id: idOf(c, "cert"),
       name: str(c.name),
       issuer: str(c.issuer),
       year: str(c.year),

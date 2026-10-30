@@ -1,5 +1,6 @@
 "use client";
 
+import { newId } from "@/lib/id";
 import { useCallback } from "react";
 import type {
   CvData,
@@ -36,7 +37,7 @@ export function useBuilderHelpers({
   /* ── Work History ── */
   const addWork = useCallback(() => {
     const entry: WorkEntry = {
-      id: "work_" + Date.now(),
+      id: newId("work"),
       position: "",
       company: "",
       location: "",
@@ -109,7 +110,7 @@ export function useBuilderHelpers({
   /* ── Education ── */
   const addEducation = useCallback(() => {
     const entry: EducationEntry = {
-      id: "edu_" + Date.now(),
+      id: newId("edu"),
       institution: "",
       degree: "",
       field: "",
@@ -181,7 +182,7 @@ export function useBuilderHelpers({
   /* ── Organizations ── */
   const addOrganization = useCallback(() => {
     const entry: OrganizationEntry = {
-      id: "org_" + Date.now(),
+      id: newId("org"),
       name: "",
       position: "",
       startDate: "",
@@ -254,7 +255,7 @@ export function useBuilderHelpers({
   /* ── Skills ── */
   const addSkill = useCallback(() => {
     const entry: SkillEntry = {
-      id: "sk_" + Date.now(),
+      id: newId("sk"),
       name: "",
       level: "intermediate",
     };
@@ -288,7 +289,7 @@ export function useBuilderHelpers({
   /* ── Certifications ── */
   const addCertification = useCallback(() => {
     const entry: CertificationEntry = {
-      id: "cert_" + Date.now(),
+      id: newId("cert"),
       name: "",
       issuer: "",
       year: "",

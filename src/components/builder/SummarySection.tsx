@@ -1,5 +1,6 @@
 "use client";
 
+import { newId } from "@/lib/id";
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { AiLoadingOverlay } from "./AiLoadingOverlay";
@@ -134,7 +135,7 @@ export function SummarySection({
   const addCustomField = () => {
     if (!onCustomFieldsChange) return;
     const newField: CustomFieldEntry = {
-      id: "cf_" + Date.now(),
+      id: newId("cf"),
       label: "",
       value: "",
     };
