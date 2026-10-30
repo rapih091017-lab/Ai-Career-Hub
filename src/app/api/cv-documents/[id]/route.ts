@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { cvDocuments } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
-import { apiHandler, staleWhileRevalidate } from "@/lib/api-utils";
+import { apiHandler, noCache } from "@/lib/api-utils";
 
 async function authenticate(request: NextRequest, params: Promise<{ id: string }>) {
   const session = await auth();
@@ -59,7 +59,7 @@ export const GET = apiHandler(async (request: NextRequest, { params }: { params:
 
   return NextResponse.json(doc, {
     status: 200,
-    headers: staleWhileRevalidate(30),
+    headers: noCache(),
   });
 });
 

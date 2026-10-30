@@ -102,7 +102,7 @@ export function staleWhileRevalidate(seconds: number = 60): Record<string, strin
 
 export function noCache(): Record<string, string> {
   return {
-    "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+    "Cache-Control": "private, no-store, no-cache, must-revalidate, proxy-revalidate",
     Pragma: "no-cache",
     Expires: "0",
   };

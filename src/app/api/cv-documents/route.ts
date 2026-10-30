@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { cvDocuments } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
-import { apiHandler, staleWhileRevalidate } from "@/lib/api-utils";
+import { apiHandler, noCache } from "@/lib/api-utils";
 
 export const GET = apiHandler(async () => {
   const session = await auth();
@@ -28,6 +28,6 @@ export const GET = apiHandler(async () => {
 
   return NextResponse.json(docs, {
     status: 200,
-    headers: staleWhileRevalidate(30),
+    headers: noCache(),
   });
 });
