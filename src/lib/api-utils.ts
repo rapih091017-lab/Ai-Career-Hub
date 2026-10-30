@@ -141,6 +141,15 @@ const FEATURE_NOT_AVAILABLE_LABEL: Record<string, string> = {
   ai_suggestion: "saran perbaikan",
 };
 
+/**
+ * Awal bulan berjalan dalam UTC. Dipakai bersama oleh checkQuota dan
+ * /api/usage supaya angka kuota di halaman tagihan sama dengan yang ditegakkan,
+ * apa pun zona waktu server.
+ */
+export function startOfMonthUtc(now: Date = new Date()): Date {
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+}
+
 /* ─── Quota check helper ─── */
 export async function checkQuota(
   userId: string,
@@ -168,12 +177,27 @@ export async function checkQuota(
     case "cover_letter_generate":
       limitKey = "cover_letter";
       break;
+    case "cv_build":
+      // Paket menjual fitur ini sebagai ai_cv_generate; log tetap "cv_build".
+      limitKey = "ai_cv_generate";
+      break;
     default:
       limitKey = actionType;
   }
 
   const limit = (access.limits as Record<string, number | "unlimited" | false>)[limitKey];
   const label = FEATURE_NOT_AVAILABLE_LABEL[actionType] ?? actionType;
+
+  if (limit === undefined) {
+    // Key yang tidak terdaftar di paket berarti pemetaan di atas salah.
+    // Tolak, jangan anggap tanpa batas.
+    console.error(`[checkQuota] limit untuk "${limitKey}" (${actionType}) tidak ada di paket ${access.tierName}`);
+    return errorResponse(
+      "FEATURE_NOT_AVAILABLE",
+      `${label} tidak tersedia di paket kamu.`,
+      403,
+    ) as NextResponse;
+  }
 
   if (limit === false) {
     // Paket berbayar pun bisa punya fitur yang tidak termasuk, jadi pesannya
@@ -189,9 +213,7 @@ export async function checkQuota(
   }
 
   if (limit !== "unlimited") {
-    const firstOfMonth = new Date();
-    firstOfMonth.setDate(1);
-    firstOfMonth.setHours(0, 0, 0, 0);
+    const firstOfMonth = startOfMonthUtc();
 
     const [usageRow] = await db
       .select({ value: countFn() })
