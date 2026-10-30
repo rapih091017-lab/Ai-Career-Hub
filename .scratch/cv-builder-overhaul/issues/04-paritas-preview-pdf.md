@@ -1,6 +1,6 @@
 # 04 — PDF 100% sama dengan preview
 
-Status: butuh-info (menunggu keputusan K1 di PRD)
+Status: siap-agent (K1 = Opsi A, bebas kuota)
 Blocked by: -
 
 ## Masalah
@@ -28,7 +28,16 @@ Detail di PRD temuan A.
    `POST /api/export-pdf-v2` dengan `@page { size: A4; margin: 0 }` dan `page-break-after: always`
    per halaman. Gunakan/menyesuaikan `serializePreviewHtml` di `src/lib/pdf-export.ts`.
    Pastikan CSS font ikut di HTML dan Chromium menunggu `document.fonts.ready`.
-   Tangani error kuota (pesan jelas + tautan paket) sesuai keputusan K1.
+   **Bebas kuota, tapi jangan jadi celah.** Jangan sekadar menambah flag `source: "builder"` di
+   `export-pdf-v2`: klien bisa mengirim HTML apa saja (portfolio, surat) lewat flag itu tanpa kuota.
+   Buat route khusus `POST /api/cv-documents/[id]/pdf` yang:
+   - memeriksa sesi + kepemilikan CV,
+   - membaca `tailoredContent` + `templateId` dari DB (bukan HTML dari klien),
+   - menerima dari klien hanya hasil paginasi (daftar id blok per halaman), divalidasi terhadap data,
+   - merender HTML di server dengan komponen renderer yang sama (`renderToStaticMarkup`, mode print),
+   - mencetak dengan Chromium (pakai ulang logika peluncuran browser dari `export-pdf-v2`, dipindah ke
+     helper bersama di `src/lib/pdf/`), tanpa `checkQuota`, dengan rate limit (`rate-limiter.ts`).
+   Konsekuensi: autosave harus sudah tersimpan sebelum ekspor (flush autosave dulu).
 5. Hapus `CvPdfDocument`/`generate-cv-pdf` dari builder bila tidak dipakai di tempat lain
    (cek `src/__tests__/cv-pdf*.ts`, perbarui test).
 6. Badge "N halaman" memakai hasil paginasi, bukan tinggi/konstanta.

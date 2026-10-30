@@ -1,6 +1,6 @@
 # PRD — Perombakan Builder CV (`/builder/[id]`)
 
-Status: butuh-evaluasi (menunggu 3 keputusan di bagian "Keputusan terbuka")
+Status: siap-agent (keputusan K1–K3 sudah dijawab user, 2026-10-30)
 
 Dokumen ini adalah hasil audit kode builder CV + rencana eksekusi bertahap.
 Eksekusi dikerjakan per issue di `issues/`, urut nomor. Setiap issue berdiri sendiri
@@ -110,7 +110,16 @@ di modal Pengaturan Tampilan, tidak mudah ditemukan.
 
 ---
 
-## 3. Keputusan terbuka (perlu jawaban user sebelum eksekusi issue terkait)
+## 3. Keputusan (sudah dijawab user 2026-10-30)
+
+- **K1 → Opsi A**, download PDF dari builder **bebas kuota**.
+- **K2 → antislop dijalankan selama pengerjaan** (tiap issue yang menyentuh UI/copy/komentar).
+- **K3 → level skill default disembunyikan**, toggle "Tampilkan level keahlian".
+- Arahan umum user: jangan terpaku pada daftar permintaan. Bug atau hal yang kurang pas yang
+  ditemukan selama pengerjaan dilaporkan ke user (dan dicatat di Comments issue terkait),
+  lalu diperbaiki bila masih dalam lingkup builder.
+
+Catatan pilihan semula di bawah dipertahankan sebagai konteks.
 
 ### K1. Cara membuat PDF supaya 100% sama dengan preview (issue 04)
 Rekomendasi: **Opsi A**.
