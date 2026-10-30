@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { readSavedFormat } from "@/lib/builder-format";
 import { DEFAULT_SECTION_ORDER } from "@/components/cv-templates";
 import type { SectionKey, CustomSectionEntry } from "@/components/cv-templates";
 
@@ -45,8 +46,14 @@ export function useBuilderFormat({ cvId }: UseBuilderFormatProps) {
   /* ── PDF Export state ── */
   const [isPdfExporting, setIsPdfExporting] = useState(false);
 
+  // Key format yang sudah selesai dimuat. Selama belum sama dengan FORMAT_KEY,
+  // effect simpan dilewati agar nilai default tidak menimpa localStorage
+  // sebelum format tersimpan sempat dibaca.
+  const [loadedKey, setLoadedKey] = useState<string | null>(null);
+
   /* ── Save formatting to localStorage on change ── */
   useEffect(() => {
+    if (loadedKey !== FORMAT_KEY) return;
     try {
       localStorage.setItem(
         FORMAT_KEY,
@@ -74,6 +81,7 @@ export function useBuilderFormat({ cvId }: UseBuilderFormatProps) {
     showDividers,
     sectionOrder,
     FORMAT_KEY,
+    loadedKey,
     customPrimaryColor,
     spacingMode,
     headerLayout,
@@ -84,25 +92,21 @@ export function useBuilderFormat({ cvId }: UseBuilderFormatProps) {
 
   /* ── Load formatting from localStorage on mount ── */
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(FORMAT_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.fontFamily) setFontFamily(parsed.fontFamily);
-        if (parsed.fontSize) setFontSize(parsed.fontSize);
-        if (parsed.textAlign) setTextAlign(parsed.textAlign);
-        if (typeof parsed.showDividers === "boolean") setShowDividers(parsed.showDividers);
-        if (parsed.sectionOrder?.length) setSectionOrder(parsed.sectionOrder);
-        if (parsed.customPrimaryColor) setCustomPrimaryColor(parsed.customPrimaryColor);
-        if (parsed.spacingMode) setSpacingMode(parsed.spacingMode);
-        if (parsed.headerLayout) setHeaderLayout(parsed.headerLayout);
-        if (parsed.sectionVisibility) setSectionVisibility(parsed.sectionVisibility);
-        if (parsed.customSections) setCustomSections(parsed.customSections);
-        if (parsed.marginMode) setMarginMode(parsed.marginMode);
-      }
-    } catch {
-      /* corrupt data, ignore */
+    const parsed = readSavedFormat(FORMAT_KEY);
+    if (parsed) {
+      if (parsed.fontFamily) setFontFamily(parsed.fontFamily);
+      if (parsed.fontSize) setFontSize(parsed.fontSize);
+      if (parsed.textAlign) setTextAlign(parsed.textAlign);
+      if (typeof parsed.showDividers === "boolean") setShowDividers(parsed.showDividers);
+      if (parsed.sectionOrder?.length) setSectionOrder(parsed.sectionOrder);
+      if (parsed.customPrimaryColor) setCustomPrimaryColor(parsed.customPrimaryColor);
+      if (parsed.spacingMode) setSpacingMode(parsed.spacingMode);
+      if (parsed.headerLayout) setHeaderLayout(parsed.headerLayout);
+      if (parsed.sectionVisibility) setSectionVisibility(parsed.sectionVisibility);
+      if (parsed.customSections) setCustomSections(parsed.customSections);
+      if (parsed.marginMode) setMarginMode(parsed.marginMode);
     }
+    setLoadedKey(FORMAT_KEY);
   }, [FORMAT_KEY]);
 
   /* ── Computed margin & page dimensions ── */
