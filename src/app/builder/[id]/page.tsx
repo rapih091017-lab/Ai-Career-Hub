@@ -61,7 +61,7 @@ export default function BuilderPage() {
   const { cvData, isLoading, fetchError, selectedTemplateId, setCvData, setSelectedTemplateId } = useFetchCvData(cvId);
 
   /* ── Auto-Save ── */
-  const { saveStatus, lastSaved } = useAutoSave(cvId, cvData);
+  const { saveStatus, lastSaved } = useAutoSave(cvId, cvData, !isLoading && !fetchError);
 
   /* ── Format Settings Hook ── */
   const format = useBuilderFormat({ cvId });
