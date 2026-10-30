@@ -118,6 +118,9 @@ di modal Pengaturan Tampilan, tidak mudah ditemukan.
 - Arahan umum user: jangan terpaku pada daftar permintaan. Bug atau hal yang kurang pas yang
   ditemukan selama pengerjaan dilaporkan ke user (dan dicatat di Comments issue terkait),
   lalu diperbaiki bila masih dalam lingkup builder.
+- Arahan tambahan (2026-10-30): logika yang salah di **seluruh project Career Hub** (bukan hanya
+  builder) langsung diperbaiki tanpa menunggu izin. Tiap perbaikan: commit terpisah dengan pesan
+  jelas, test bila memungkinkan, dan dilaporkan ke user di ringkasan tahap.
 
 Catatan pilihan semula di bawah dipertahankan sebagai konteks.
 
