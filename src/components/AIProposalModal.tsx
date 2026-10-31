@@ -99,16 +99,16 @@ export default function AIProposalModal({
   }
   var isMultiSuggest = mode === "suggest" && !isSingleSelectSuggest;
 
-  var buttonLabel = "Gunakan Versi Ini";
+  var buttonLabel = "Pakai versi ini";
   if (isMultiSuggest) {
     buttonLabel = checked.size > 0 ? "Tambahkan " + checked.size + " poin" : "Tambahkan";
   }
 
   /* ── Mode context labels ── */
-  var modeLabel = mode === "suggest" ? "Gaya Baru" : "Optimasi";
+  var modeLabel = mode === "suggest" ? "Saran baru" : "Perbaikan";
   var modeHint = mode === "suggest"
-    ? "Pilih gaya penulisan yang paling cocok · konten fresh dari AI"
-    : "Pilih tingkat perbaikan · teks asli akan ditingkatkan secara progresif";
+    ? "Ditulis dari posisi dan skill kamu. Periksa dulu; isi sendiri bagian dalam [kurung]."
+    : "Tiga versi dari teks kamu, dari perubahan paling kecil sampai paling tegas.";
   var modeColors = mode === "suggest"
     ? "bg-amber-100 text-amber-700"
     : "bg-primary/10 text-primary";
@@ -134,9 +134,20 @@ export default function AIProposalModal({
           <div className="space-y-3">
             <p className="text-sm text-on-surface-variant">
               {isSingleSelectSuggest
-                ? "Pilih versi ringkasan yang paling cocok untuk kamu:"
-                : "Centang poin yang mau dipakai. Tambahkan menaruhnya di bawah deskripsi yang ada; Ganti semua menimpa deskripsi."}
+                ? "Pilih satu versi ringkasan:"
+                : checked.size + " dari " + suggestions.length + " poin dipilih. Tambahkan menaruhnya di bawah deskripsi; Ganti semua menimpa deskripsi."}
             </p>
+            {!isSingleSelectSuggest && (
+              <button
+                type="button"
+                onClick={function () {
+                  setChecked(checked.size === suggestions.length ? new Set() : new Set(suggestions.map(function (_, i) { return i; })));
+                }}
+                className="min-h-11 rounded-md px-1 text-xs font-semibold text-primary underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:min-h-8"
+              >
+                {checked.size === suggestions.length ? "Kosongkan pilihan" : "Pilih semua"}
+              </button>
+            )}
             <div className="space-y-2">
               {suggestions.map(function (s, i) {
                 var isSelected = isSingleSelectSuggest ? selectedSuggestionIndex === i : checked.has(i);
@@ -228,9 +239,9 @@ export default function AIProposalModal({
 
             <div className="grid gap-3">
               {([
-                { key: "conservative" as const, label: "Konservatif", desc: "Perbaikan ringan, tetap humble", color: "border-blue-300 bg-blue-50/30", labelColor: "bg-blue-100 text-blue-700", iconColor: "text-blue-600" },
-                { key: "improved" as const, label: "Improved", desc: "Lebih impactful, ada metrik", color: "border-amber-300 bg-amber-50/30", labelColor: "bg-amber-100 text-amber-700", iconColor: "text-amber-600" },
-                { key: "bold" as const, label: "Bold", desc: "Paling kuat, untuk senior role", color: "border-green-300 bg-green-50/30", labelColor: "bg-green-100 text-green-700", iconColor: "text-green-600" },
+                { key: "conservative" as const, label: "Ringan", desc: "Perubahan kecil, isi tetap sama", color: "border-blue-300 bg-blue-50/30", labelColor: "bg-blue-100 text-blue-700", iconColor: "text-blue-600" },
+                { key: "improved" as const, label: "Lebih tegas", desc: "Hasil kerja lebih menonjol", color: "border-amber-300 bg-amber-50/30", labelColor: "bg-amber-100 text-amber-700", iconColor: "text-amber-600" },
+                { key: "bold" as const, label: "Paling tegas", desc: "Cocok untuk peran senior", color: "border-green-300 bg-green-50/30", labelColor: "bg-green-100 text-green-700", iconColor: "text-green-600" },
               ]).map(function (item) {
                 var text = versions[item.key];
                 var isSelected = selectedVersion === item.key;
@@ -280,7 +291,7 @@ export default function AIProposalModal({
                     <line x1="12" y1="16" x2="12" y2="12" />
                     <line x1="12" y1="8" x2="12.01" y2="8" />
                   </svg>
-                  <span className="text-[10px] font-bold text-primary uppercase tracking-wider">Mengapa Ini Lebih Baik</span>
+                  <span className="text-[10px] font-bold text-primary uppercase tracking-wider">Apa yang berubah</span>
                 </div>
                 <p className="text-sm text-on-surface-variant leading-relaxed">{explanation}</p>
               </div>
