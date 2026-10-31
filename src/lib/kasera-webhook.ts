@@ -27,7 +27,7 @@ export interface KaseraWebhookPayload {
     payment_request_id?: string;
     external_id?: string;
     merchant_ref?: string | null;
-    amount?: number;
+    amount?: number | string;
     currency?: string;
     paid_at?: string | null;
     status?: string;
@@ -111,9 +111,22 @@ export function resolvePaymentMatch<T extends { id: string }>(
  */
 export function isAmountMismatch(
   next: PaymentUpdate,
-  payloadAmount: number | undefined,
+  payloadAmount: number | string | undefined,
   expectedAmount: number,
 ): boolean {
   if (next.paymentStatus !== PAYMENT_SUCCESS_STATUS) return false;
-  return typeof payloadAmount !== "number" || payloadAmount !== expectedAmount;
+  const paid = parsePayloadAmount(payloadAmount);
+  return paid === null || paid !== expectedAmount;
+}
+
+/**
+ * Nominal dari payload bisa datang sebagai angka atau teks ("50000", "50000.00").
+ * "50.000" ditolak karena ambigu dengan pemisah ribuan. Teks lain yang bukan angka rupiah utuh dianggap tidak terbaca (null), bukan nol.
+ */
+export function parsePayloadAmount(value: number | string | undefined): number | null {
+  if (typeof value === "number") return Number.isFinite(value) ? value : null;
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  if (!/^\d+(\.00)?$/.test(trimmed)) return null;
+  return Number(trimmed.split(".")[0]);
 }

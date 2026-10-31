@@ -51,3 +51,19 @@ describe("webhook Kasera: nominal", () => {
     expect(src.indexOf("mismatch: true")).toBeLessThan(src.indexOf(".update(payments)"));
   });
 });
+
+describe("parsePayloadAmount", () => {
+  it("membaca angka dan teks angka rupiah", async () => {
+    const { parsePayloadAmount } = await import("@/lib/kasera-webhook");
+    expect(parsePayloadAmount(50000)).toBe(50000);
+    expect(parsePayloadAmount("50000")).toBe(50000);
+    expect(parsePayloadAmount("50000.00")).toBe(50000);
+  });
+  it("menolak nilai yang tidak terbaca", async () => {
+    const { parsePayloadAmount } = await import("@/lib/kasera-webhook");
+    expect(parsePayloadAmount(undefined)).toBeNull();
+    expect(parsePayloadAmount("50.000")).toBeNull();
+    expect(parsePayloadAmount("50000.50")).toBeNull();
+    expect(parsePayloadAmount("abc")).toBeNull();
+  });
+});
