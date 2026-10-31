@@ -94,6 +94,19 @@ describe("POST /api/cv-documents/[id]/pdf", () => {
     expect(res.status).toBe(409);
   });
 
+  it("render kedua user yang sama saat render pertama berjalan → 429", async () => {
+    authMock.mockResolvedValue({ user: { id: "u-busy" } });
+    rows.current = [{ id: "cv1", tailoredContent: sampleCv, templateId: null, updatedAt: new Date() }];
+    let release!: () => void;
+    printMock.mockImplementationOnce(() => new Promise((r) => (release = () => r(new Uint8Array([1]))))) ;
+    const first = POST(req({}), ctx);
+    await vi.waitFor(() => expect(printMock).toHaveBeenCalled());
+    const second = await POST(req({}), ctx);
+    expect(second.status).toBe(429);
+    release();
+    expect((await first).status).toBe(200);
+  });
+
   it("mencetak dari data DB tanpa kuota, lalu dibatasi rate limit", async () => {
     authMock.mockResolvedValue({ user: { id: "u-ok" } });
     rows.current = [{ id: "cv1", tailoredContent: sampleCv, templateId: "executive-serif", updatedAt: new Date() }];

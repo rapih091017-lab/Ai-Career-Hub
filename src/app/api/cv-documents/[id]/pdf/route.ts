@@ -28,6 +28,12 @@ const LIMITS = [
 ];
 
 /**
+ * Render yang sedang berjalan per user (per instance). Chromium berat;
+ * satu user cukup satu render sekaligus.
+ */
+const rendering = new Set<string>();
+
+/**
  * POST /api/cv-documents/[id]/pdf
  *
  * PDF CV dari builder. Bebas kuota untuk semua paket (keputusan user
@@ -76,10 +82,14 @@ export const POST = apiHandler(async (request: NextRequest, { params }: { params
 
   const { marginMm, ...props } = cvRenderProps(normalizeCvDocument(doc), format, doc.templateId ?? undefined);
 
+  if (rendering.has(userId)) {
+    return errorResponse("PDF_BUSY", "PDF sebelumnya masih dibuat. Tunggu sampai selesai lalu coba lagi.", 429);
+  }
+  rendering.add(userId);
   try {
     const html = await buildCvPdfHtml(props, marginMm);
     const pdf = await printStandaloneHtml(html);
-    const fileName = `${(props.data.fullName || "CV").replace(/[^\p{L}\p{N} _-]/gu, "").trim() || "CV"}.pdf`;
+    const fileName = cvPdfFileName(props.data.fullName);
     return new NextResponse(pdf as unknown as BodyInit, {
       status: 200,
       headers: {
@@ -92,5 +102,12 @@ export const POST = apiHandler(async (request: NextRequest, { params }: { params
   } catch (error) {
     console.error("[cv-pdf] render error:", error instanceof Error ? error.message : error);
     return errorResponse("PDF_SERVER_ERROR", "Gagal membuat PDF di server. Coba lagi sebentar lagi.", 500);
+  } finally {
+    rendering.delete(userId);
   }
 });
+
+/** Nama file PDF CV dari nama lengkap; hanya huruf, angka, spasi, _ dan -. */
+function cvPdfFileName(fullName: string): string {
+  return `${(fullName || "CV").replace(/[^\p{L}\p{N} _-]/gu, "").trim() || "CV"}.pdf`;
+}
