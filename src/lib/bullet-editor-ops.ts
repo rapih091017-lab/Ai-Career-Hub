@@ -84,8 +84,7 @@ export function removeLine(lines: string[], index: number): string[] {
   return next.length === 0 ? [""] : next;
 }
 
-/** Teks tempel perlu dipecah bila multi-baris atau mengandung penanda bullet. */
+/** Hanya tempel multi-baris yang dipecah; tempel satu baris dibiarkan apa adanya. */
 export function shouldSplitPaste(text: string): boolean {
-  if (/\r|\n/.test(text)) return true;
-  return bulletList(text).join("\n") !== text.trim();
+  return /\r|\n/.test(text.trim());
 }

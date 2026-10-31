@@ -43,7 +43,9 @@ describe("bullet-editor-ops", () => {
     expect(shouldSplitPaste("teks biasa")).toBe(false);
     expect(shouldSplitPaste("https://a-b.com")).toBe(false);
     expect(shouldSplitPaste("a\nb")).toBe(true);
-    expect(shouldSplitPaste("• a")).toBe(true);
+    expect(shouldSplitPaste("• a")).toBe(false);
+    expect(shouldSplitPaste("a • b")).toBe(false);
+    expect(shouldSplitPaste("satu baris\n")).toBe(false);
   });
 });
 
