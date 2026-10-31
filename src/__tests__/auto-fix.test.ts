@@ -159,7 +159,26 @@ describe("applyApprovedFixes: deskripsi tetap satu poin per baris", () => {
       { id: "a", type: "replace_text", target: "experience", index: 0, original: "Bikin laporan", replacement: "1. Menyusun laporan 2. Mengirim laporan", category: "bullet", reason: "" },
       { id: "b", type: "replace_text", target: "experience", index: 0, original: "- Urus stok", replacement: "• Mengelola stok", category: "bullet", reason: "" },
     ]);
-    expect(next.workHistory[0].description).toBe("Menyusun laporan\nMengirim laporan\nMengelola stok");
+    // Hanya pengganti yang dirapikan; penanda "- " milik user tidak disentuh.
+    expect(next.workHistory[0].description).toBe("- Menyusun laporan\nMengirim laporan\n- Mengelola stok");
+  });
+
+  it("pencocokan toleran spasi & baris; yang tidak cocok dilaporkan", async () => {
+    const { applyApprovedFixesWithReport } = await import("@/lib/auto-fix");
+    const { normalizeCvDocument } = await import("@/lib/cv-normalize");
+    const cv = normalizeCvDocument({
+      tailoredContent: { summary: "Analis data  dengan\npengalaman SQL.", workHistory: [{ id: "w1", description: "12. Juni dipromosikan\nMengelola   stok" }] },
+    });
+    const r = applyApprovedFixesWithReport(cv, [
+      { id: "a", type: "replace_text", target: "summary", original: "Analis data dengan pengalaman SQL.", replacement: "Analis data berpengalaman\nSQL.", category: "bahasa", reason: "" },
+      { id: "b", type: "replace_text", target: "experience", index: 0, original: "• Mengelola stok", replacement: "Mengelola stok gudang", category: "bullet", reason: "" },
+      { id: "c", type: "replace_text", target: "experience", index: 0, original: "Tidak ada di CV", replacement: "x", category: "bullet", reason: "" },
+      { id: "d", type: "replace_text", target: "experience", index: 5, original: "apa saja", replacement: "x", category: "bullet", reason: "" },
+    ]);
+    expect(r.cv.summary).toBe("Analis data berpengalaman SQL.");
+    expect(r.cv.workHistory[0].description).toBe("12. Juni dipromosikan\nMengelola stok gudang");
+    expect(r.applied).toBe(2);
+    expect(r.skipped.map((f) => f.id)).toEqual(["c", "d"]);
   });
 });
 

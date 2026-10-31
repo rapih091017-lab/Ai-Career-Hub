@@ -75,27 +75,62 @@ export function cvToPlainText(cv: CvData): string {
   return lines.join("\n");
 }
 
+// Penanda bullet di awal potongan asli diabaikan saat mencocokkan.
+const LEADING_MARK = /^\s*(?:[•▪►●◦‣·*–—+-]\s*)+/;
+
+/**
+ * Cari potongan `original` di `text` dengan toleransi: penanda bullet di awal
+ * dan perbedaan spasi/baris baru diabaikan. Mengembalikan rentang yang cocok.
+ */
+export function findTolerant(text: string, original: string): { start: number; end: number } | null {
+  const core = original.replace(LEADING_MARK, "").trim();
+  if (!core) return null;
+  const exact = text.indexOf(core);
+  if (exact >= 0) return { start: exact, end: exact + core.length };
+  const pattern = core
+    .split(/\s+/)
+    .map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .join("\\s+");
+  const m = new RegExp(pattern).exec(text);
+  return m ? { start: m.index, end: m.index + m[0].length } : null;
+}
+
+function replaceAt(text: string, r: { start: number; end: number }, replacement: string): string {
+  return text.slice(0, r.start) + replacement + text.slice(r.end);
+}
+
+export interface AutoFixReport {
+  cv: CvData;
+  applied: number;
+  /** Saran yang potongan aslinya tidak ditemukan lagi di CV. */
+  skipped: AutoFixSuggestion[];
+}
+
 /**
  * Terapkan saran yang disetujui ke CV. Fungsi murni: mengembalikan CV baru.
- * Saran `replace_text` dilewati jika potongan asli tidak ditemukan persis,
- * supaya teks user tidak rusak.
+ * Saran `replace_text` dilewati (dan dilaporkan) jika potongan asli tidak
+ * ditemukan, supaya teks user tidak rusak. Hanya teks pengganti yang
+ * dirapikan; bagian deskripsi lain tidak disentuh.
  */
-export function applyApprovedFixes(cv: CvData, fixes: AutoFixSuggestion[]): CvData {
+export function applyApprovedFixesWithReport(cv: CvData, fixes: AutoFixSuggestion[]): AutoFixReport {
   let next: CvData = { ...cv, workHistory: cv.workHistory.map((w) => ({ ...w })), skills: [...cv.skills] };
-  const touched = new Set<CvData["workHistory"][number]>();
+  const skipped: AutoFixSuggestion[] = [];
+  let applied = 0;
 
   for (const fix of fixes) {
     if (fix.type === "replace_text") {
       if (fix.target === "summary") {
-        if (next.summary.includes(fix.original)) {
-          next = { ...next, summary: next.summary.replace(fix.original, () => fix.replacement) };
-        }
+        const r = findTolerant(next.summary, fix.original);
+        if (!r) { skipped.push(fix); continue; }
+        next = { ...next, summary: replaceAt(next.summary, r, fix.replacement.replace(/\s*\n\s*/g, " ").trim()) };
+        applied++;
       } else {
         const work = next.workHistory[fix.index ?? -1];
-        if (work && work.description.includes(fix.original)) {
-          work.description = work.description.replace(fix.original, () => fix.replacement);
-          touched.add(work);
-        }
+        const r = work ? findTolerant(work.description, fix.original) : null;
+        if (!work || !r) { skipped.push(fix); continue; }
+        // Pengganti bisa berisi beberapa poin/bernomor: jadi satu poin per baris.
+        work.description = replaceAt(work.description, r, aiTextForField(fix.replacement, work.descriptionType));
+        applied++;
       }
     } else {
       const exists = next.skills.some((s) => s.name.toLowerCase() === fix.name.toLowerCase());
@@ -107,10 +142,13 @@ export function applyApprovedFixes(cv: CvData, fixes: AutoFixSuggestion[]): CvDa
           level: "",
         });
       }
+      applied++;
     }
   }
-  // Dirapikan setelah semua saran diterapkan, supaya `original` saran berikutnya masih cocok.
-  // Pengganti bisa berisi beberapa poin/bernomor; hasilnya satu poin per baris.
-  for (const work of touched) work.description = aiTextForField(work.description, work.descriptionType);
-  return next;
+  return { cv: next, applied, skipped };
+}
+
+/** Versi lama: hanya CV hasil. */
+export function applyApprovedFixes(cv: CvData, fixes: AutoFixSuggestion[]): CvData {
+  return applyApprovedFixesWithReport(cv, fixes).cv;
 }

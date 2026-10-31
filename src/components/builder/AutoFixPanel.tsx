@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { CvData } from "@/components/cv-templates";
 import {
   type AutoFixSuggestion,
-  applyApprovedFixes,
+  applyApprovedFixesWithReport,
 } from "@/lib/auto-fix";
 
 interface AutoFixPanelProps {
@@ -34,6 +34,7 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
   const [edits, setEdits] = useState<Record<string, string>>({});
   const [copiedId, setCopiedId] = useState("");
   const [appliedCount, setAppliedCount] = useState(0);
+  const [skippedCount, setSkippedCount] = useState(0);
 
   const editedValue = (s: AutoFixSuggestion) =>
     edits[s.id] ?? (s.type === "replace_text" ? s.replacement : s.name);
@@ -42,6 +43,7 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
     setLoading(true);
     setError("");
     setAppliedCount(0);
+      setSkippedCount(0);
     try {
       const res = await fetch(`/api/cv-documents/${cvId}/auto-fix`, {
         method: "POST",
@@ -101,8 +103,10 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
       else fixes.push({ ...s, name: value });
     }
     if (fixes.length === 0) return;
-    onApply(applyApprovedFixes(cvData, fixes));
-    setAppliedCount(fixes.length);
+    const report = applyApprovedFixesWithReport(cvData, fixes);
+    onApply(report.cv);
+    setAppliedCount(report.applied);
+    setSkippedCount(report.skipped.length);
     setSuggestions([]);
     setDecisions({});
     setEdits({});
@@ -188,7 +192,23 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
             </div>
           )}
 
-          {!loading && !error && suggestions.length === 0 && appliedCount === 0 && (
+          {!loading && !error && skippedCount > 0 && suggestions.length === 0 && (
+            <div role="status" className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2">
+              <span className="material-symbols-outlined text-amber-700 text-base shrink-0" aria-hidden="true">warning</span>
+              <div className="flex-1">
+                <p className="text-sm text-amber-900">
+                  {`${skippedCount} perbaikan tidak bisa diterapkan karena teks aslinya sudah berubah.`}
+                </p>
+                {appliedCount === 0 && (
+                  <button type="button" onClick={() => void fetchSuggestions()} className="text-xs font-bold text-amber-900 underline mt-1">
+                    Cek lagi
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {!loading && !error && suggestions.length === 0 && appliedCount === 0 && skippedCount === 0 && (
             <p className="text-sm text-on-surface-variant">
               Tidak ada saran perbaikan — CV-mu sudah rapi. Kerja bagus!
             </p>
