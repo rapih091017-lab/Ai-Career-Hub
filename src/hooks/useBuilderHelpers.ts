@@ -333,6 +333,15 @@ export function useBuilderHelpers({
     [setCustomSections],
   );
 
+  const updateLainnyaContentType = useCallback(
+    (contentType: "bullets" | "paragraph") => {
+      setCustomSections((prev) =>
+        prev.map((cs) => (cs.id === "lainnya" ? { ...cs, contentType } : cs)),
+      );
+    },
+    [setCustomSections],
+  );
+
   /* ── Section Order ── */
   const moveSectionUp = useCallback(
     (index: number) => {
@@ -411,6 +420,7 @@ export function useBuilderHelpers({
     addCertification, updateCertification, removeCertification,
     // Custom Sections
     updateLainnyaContent,
+    updateLainnyaContentType,
     // Section Order
     moveSectionUp, moveSectionDown,
   };

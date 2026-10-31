@@ -73,6 +73,11 @@ function rawSkills(v: unknown): Record<string, any>[] {
  * Normalisasi item secara additive: field yang tidak dikenal dari item asli
  * tetap ada (spread dulu), field yang dikenal di-override dengan nilai aman.
  */
+/** Nilai invalid dibuang (bukan diganti default); renderer menganggap tidak ada = poin. */
+function descriptionTypeOf(v: unknown): "bullets" | "paragraph" | undefined {
+  return v === "bullets" || v === "paragraph" ? v : undefined;
+}
+
 function normalizeLists(src: Record<string, any>) {
   return {
     customFields: arr(src.customFields).map((f) => ({
@@ -91,6 +96,7 @@ function normalizeLists(src: Record<string, any>) {
       startDate: str(w.startDate),
       endDate: str(w.endDate),
       description: str(w.description),
+      descriptionType: descriptionTypeOf(w.descriptionType),
       achievement: str(w.achievement),
       visible: w.visible !== false,
       projectUrl: str(w.projectUrl),
@@ -114,6 +120,7 @@ function normalizeLists(src: Record<string, any>) {
       startDate: str(o.startDate),
       endDate: str(o.endDate),
       description: str(o.description),
+      descriptionType: descriptionTypeOf(o.descriptionType),
       isPresent: o.isPresent === true,
       visible: o.visible !== false,
     })),

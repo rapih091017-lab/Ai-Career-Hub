@@ -2,6 +2,7 @@
 
 import { Field } from "@/components/builder/Field";
 import { AIPolishButton } from "@/components/ai/AIPolishDialog";
+import { BulletEditor } from "./BulletEditor";
 import type { OrganizationEntry } from "@/components/cv-templates";
 
 interface OrgCardProps {
@@ -99,31 +100,27 @@ export function OrgCard({ org, index, totalItems, jobTitle, skills, jobDescripti
         </div>
         <span className="text-xs text-on-surface-variant">Sampai Sekarang</span>
       </label>
-      <div>
-        <label className="block text-label-bold text-on-surface mb-1.5">Deskripsi Kegiatan</label>
-        <div className="relative">
-          <textarea
-            rows={3}
-            value={org.description}
-            onChange={(e) => onUpdate(index, "description", e.target.value)}
-            className="w-full bg-surface-container-low border-none rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary resize-none text-body-md pr-10"
-            placeholder="Jelaskan kegiatan dan kontribusimu...&#10;Tip: Gunakan bullet points (satu poin per baris)"
-          />
-          {org.description && (
-            <span className="absolute right-2 top-2">
-              <AIPolishButton
-                content={org.description}
-                onApply={(text) => onUpdate(index, "description", text)}
-                jobTitle={jobTitle}
-                skills={skills}
-                jobDescription={jobDescription}
-                field="deskripsi organisasi"
-                size="sm"
-              />
-            </span>
-          )}
-        </div>
-      </div>
+      <BulletEditor
+        label="Deskripsi Kegiatan"
+        value={org.description}
+        onChange={(v) => onUpdate(index, "description", v)}
+        mode={org.descriptionType ?? "bullets"}
+        onModeChange={(m) => onUpdate(index, "descriptionType", m)}
+        placeholder="Contoh: Mengoordinasi acara seminar kampus"
+        headerAction={
+          org.description ? (
+            <AIPolishButton
+              content={org.description}
+              onApply={(text) => onUpdate(index, "description", text)}
+              jobTitle={jobTitle}
+              skills={skills}
+              jobDescription={jobDescription}
+              field="deskripsi organisasi"
+              size="sm"
+            />
+          ) : null
+        }
+      />
     </div>
   );
 }

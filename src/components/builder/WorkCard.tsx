@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { Field } from "@/components/builder/Field";
 import { AIPolishButton } from "@/components/ai/AIPolishDialog";
 import { AiLoadingOverlay } from "./AiLoadingOverlay";
+import { BulletEditor } from "./BulletEditor";
 import type { WorkEntry } from "@/components/cv-templates";
 
 interface WorkCardProps {
@@ -235,7 +236,6 @@ export function WorkCard({
                 <span className="text-body-md text-on-surface-variant group-hover:text-on-surface transition-colors">Saya masih bekerja di sini</span>
               </label>
               <div>
-                <label className="block text-label-bold text-on-surface mb-1.5">Deskripsi</label>
                 <div className="relative">
                   <AnimatePresence>
                     {(aiSuggestLoading || aiReviseLoading) && (
@@ -251,39 +251,33 @@ export function WorkCard({
                       </motion.div>
                     )}
                   </AnimatePresence>
-                  <textarea
-                    rows={3}
+                  <BulletEditor
+                    label="Deskripsi"
                     value={work.description}
-                    onChange={(e) => onUpdate(index, "description", e.target.value)}
-                    className="w-full bg-surface-container-low border-none rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary resize-none text-body-md transition-all duration-300 pr-10"
-                    placeholder="Jelaskan tanggung jawab dan pencapaianmu...&#10;Tip: Gunakan bullet points (satu poin per baris)"
+                    onChange={(v) => onUpdate(index, "description", v)}
+                    mode={work.descriptionType ?? "bullets"}
+                    onModeChange={(m) => onUpdate(index, "descriptionType", m)}
+                    placeholder="Contoh: Menyusun laporan stok mingguan untuk 3 gudang"
                     maxLength={2500}
                     disabled={aiSuggestLoading || aiReviseLoading}
+                    headerAction={
+                      work.description && !aiSuggestLoading && !aiReviseLoading ? (
+                        <AIPolishButton
+                          content={work.description}
+                          onApply={(text) => onUpdate(index, "description", text)}
+                          jobTitle={jobTitle}
+                          skills={skills}
+                          jobDescription={jobDescription}
+                          field="deskripsi pengalaman kerja"
+                          size="sm"
+                        />
+                      ) : null
+                    }
                   />
-                  {/* AI Polish inline button */}
-                  {work.description && !aiSuggestLoading && !aiReviseLoading && (
-                    <span className="absolute right-2 top-2">
-                      <AIPolishButton
-                        content={work.description}
-                        onApply={(text) => onUpdate(index, "description", text)}
-                        jobTitle={jobTitle}
-                        skills={skills}
-                        jobDescription={jobDescription}
-                        field="deskripsi pengalaman kerja"
-                        size="sm"
-                      />
-                    </span>
-                  )}
-                  {work.description && !aiSuggestLoading && !aiReviseLoading && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="absolute bottom-3 left-3"
-                    >
-                      <span className={`text-[10px] font-medium ${work.description.length > 2300 ? "text-amber-600" : "text-on-surface-variant"}`}>
-                        {work.description.length}/2500 | {work.description.split(/\s+/).filter(Boolean).length} kata
-                      </span>
-                    </motion.div>
+                  {work.description && (
+                    <p className={`mt-1 text-[10px] font-medium ${work.description.length > 2300 ? "text-amber-700" : "text-on-surface-variant"}`}>
+                      {work.description.length}/2500 | {work.description.split(/\s+/).filter(Boolean).length} kata
+                    </p>
                   )}
                   <div className="flex justify-end mt-2.5">
                     <div className="flex items-center gap-1.5">

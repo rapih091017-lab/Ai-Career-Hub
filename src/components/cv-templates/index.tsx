@@ -20,6 +20,8 @@ export interface WorkEntry {
   visible?: boolean;
   /** Optional project/portfolio URL */
   projectUrl?: string;
+  /** Bentuk deskripsi; tidak ada = "bullets" (perilaku lama). */
+  descriptionType?: "bullets" | "paragraph";
 }
 
 export interface EducationEntry {
@@ -42,6 +44,8 @@ export interface OrganizationEntry {
   startDate: string;
   endDate: string;
   description: string;
+  /** Bentuk deskripsi; tidak ada = "bullets" (perilaku lama). */
+  descriptionType?: "bullets" | "paragraph";
   isPresent?: boolean;
   /** Visibility toggle, hide this entry from CV without deleting */
   visible?: boolean;
@@ -385,7 +389,11 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                     {work.achievement}
                   </p>
                 )}
-                {work.description && (
+                {work.description && (work.descriptionType === "paragraph" ? (
+                  <p style={{ margin: "0 0 8pt 0", color: "#111111", lineHeight: lineHeightProp ?? 1.5, textAlign }}>
+                    {work.description}
+                  </p>
+                ) : (
                   <ul style={{ margin: "0 0 8pt 0", paddingLeft: pt(20), listStyle: "disc" }}>
                     {work.description.split("\n").filter(Boolean).map((line, j) => (
                       <li key={j} style={{ marginBottom: pt(4), color: "#111111", textAlign }}>
@@ -393,7 +401,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                       </li>
                     ))}
                   </ul>
-                )}
+                ))}
                 {/* Project URL */}
                 {work.projectUrl && (
                   <p style={{ fontSize: pt(bodyFontSize - 1), color: "#0066cc", margin: "0 0 4pt 0" }}>
@@ -533,7 +541,11 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                 >
                   {org.position || "-"}
                 </p>
-                {org.description && (
+                {org.description && (org.descriptionType === "paragraph" ? (
+                  <p style={{ margin: "0 0 8pt 0", color: "#111111", lineHeight: lineHeightProp ?? 1.5, textAlign }}>
+                    {org.description}
+                  </p>
+                ) : (
                   <ul style={{ margin: "0 0 8pt 0", paddingLeft: pt(20), listStyle: "disc" }}>
                     {org.description.split("\n").filter(Boolean).map((line, j) => (
                       <li key={j} style={{ marginBottom: pt(4), color: "#111111", textAlign }}>
@@ -541,7 +553,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                       </li>
                     ))}
                   </ul>
-                )}
+                ))}
               </div>
             ))}
           </>

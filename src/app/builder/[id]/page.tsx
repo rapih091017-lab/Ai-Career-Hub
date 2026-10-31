@@ -563,6 +563,8 @@ export default function BuilderPage() {
                   skills={cvData.skills}
                   certifications={cvData.certifications || []}
                   lainnyaContent={customSections.find(cs => cs.id === "lainnya")?.content || ""}
+                  lainnyaContentType={customSections.find(cs => cs.id === "lainnya")?.contentType === "paragraph" ? "paragraph" : "bullets"}
+                  onLainnyaContentTypeChange={helpers.updateLainnyaContentType}
                   selfEvaluation={cvData.selfEvaluation || ""}
                   onSkillChange={updateSkill}
                   onSkillRemove={removeSkill}

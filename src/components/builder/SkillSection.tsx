@@ -1,12 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { BulletEditor } from "./BulletEditor";
 import type { SkillEntry, CertificationEntry } from "@/components/cv-templates";
 
 interface SkillSectionProps {
   skills: SkillEntry[];
   certifications: CertificationEntry[];
   lainnyaContent: string;
+  /** Bentuk isi "Lainnya"; default poin. */
+  lainnyaContentType?: "bullets" | "paragraph";
+  onLainnyaContentTypeChange?: (mode: "bullets" | "paragraph") => void;
   selfEvaluation?: string;
   onSkillChange: (index: number, field: keyof SkillEntry, value: string) => void;
   onSkillRemove: (index: number) => void;
@@ -58,6 +62,8 @@ export function SkillSection({
   skills,
   certifications,
   lainnyaContent,
+  lainnyaContentType = "bullets",
+  onLainnyaContentTypeChange,
   selfEvaluation = "",
   onSkillChange,
   onSkillRemove,
@@ -259,12 +265,14 @@ export function SkillSection({
           </div>
         </div>
         {hiddenNotice("lainnya", !!lainnyaContent.trim())}
-        <textarea
+        <BulletEditor
+          label="Isi bagian Lainnya"
           value={lainnyaContent}
-          onChange={(e) => onLainnyaChange(e.target.value)}
-          className="w-full bg-surface-container-low border-none rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary resize-none text-body-md"
-          rows={4}
-          placeholder="Contoh: Meningkatkan efisiensi produksi sebesar 20%, Juara 1 Lomba Inovasi Teknologi Tingkat Nasional"
+          onChange={onLainnyaChange}
+          mode={lainnyaContentType}
+          onModeChange={onLainnyaContentTypeChange}
+          placeholder="Contoh: Juara 1 Lomba Inovasi Teknologi Tingkat Nasional"
+          maxLength={5000}
         />
       </div>
     </>
