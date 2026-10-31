@@ -18,7 +18,7 @@ describe("ekspor CV memakai route PDF server dari renderer pratinjau", () => {
 
   it("pratinjau dan PDF memakai format yang sama", () => {
     expect(builderSrc).toContain("cvRenderProps(cvData, printFormat");
-    expect(builderSrc).toContain("body: JSON.stringify({ format: printFormat })");
+    expect(builderSrc).toContain("JSON.stringify({ format: printFormat, expectedUpdatedAt");
   });
 });
 

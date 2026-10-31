@@ -120,4 +120,15 @@ describe("useAutoSave", () => {
     await advance(15000);
     expect(ok).toBe(false);
   });
+
+  it("updatedAt dari GET lalu diperbarui dari respons PUT", async () => {
+    fetchMock.mockImplementation(async () => ({ ok: true, json: async () => ({ updatedAt: "2026-10-31T10:00:00.000Z" }) }) as Response);
+    const { rerender, result } = renderHook(({ d }) => useAutoSave("x", d, true, "2026-10-31T09:00:00.000Z"), {
+      initialProps: { d: cv("A") },
+    });
+    expect(result.current.getUpdatedAt()).toBe("2026-10-31T09:00:00.000Z");
+    rerender({ d: cv("B") });
+    await advance(2100);
+    expect(result.current.getUpdatedAt()).toBe("2026-10-31T10:00:00.000Z");
+  });
 });

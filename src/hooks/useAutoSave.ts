@@ -11,6 +11,8 @@ interface UseAutoSaveReturn {
   lastSaved: Date | null;
   /** Kirim perubahan tertunda dan tunggu PUT sukses; false bila gagal setelah semua percobaan. */
   flush: () => Promise<boolean>;
+  /** updatedAt CV versi yang terakhir dimuat/disimpan tab ini (ISO), untuk deteksi 409. */
+  getUpdatedAt: () => string | null;
 }
 
 const DEBOUNCE_MS = 2000;
@@ -31,7 +33,7 @@ const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
  * - Perubahan yang belum terkirim di-flush saat pagehide/unmount dengan
  *   fetch keepalive.
  */
-export function useAutoSave(cvId: string, cvData: CvData, enabled: boolean): UseAutoSaveReturn {
+export function useAutoSave(cvId: string, cvData: CvData, enabled: boolean, initialUpdatedAt?: string | null): UseAutoSaveReturn {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
@@ -39,6 +41,18 @@ export function useAutoSave(cvId: string, cvData: CvData, enabled: boolean): Use
   const savedJson = useRef<string | null>(null);
   const chain = useRef<Promise<void>>(Promise.resolve());
   const alive = useRef(true);
+  const updatedAt = useRef<string | null>(null);
+  if (updatedAt.current === null && initialUpdatedAt) updatedAt.current = initialUpdatedAt;
+
+  // Catat updatedAt dari respons PUT (bila ada) supaya ekspor PDF bisa minta 409.
+  const rememberUpdatedAt = useCallback(async (res: Response) => {
+    try {
+      const json = typeof res.json === "function" ? await res.json() : null;
+      if (json && typeof json.updatedAt === "string") updatedAt.current = json.updatedAt;
+    } catch {
+      /* respons tanpa JSON: biarkan nilai lama */
+    }
+  }, []);
 
   latestJson.current = enabled ? buildCvSaveBody(cvData) : null;
 
@@ -55,9 +69,10 @@ export function useAutoSave(cvId: string, cvData: CvData, enabled: boolean): Use
         headers: { "Content-Type": "application/json" },
         body,
       });
+      if (res.ok) await rememberUpdatedAt(res);
       return res.ok;
     },
-    [cvId],
+    [cvId, rememberUpdatedAt],
   );
 
   const runSave = useCallback(async () => {
@@ -118,7 +133,9 @@ export function useAutoSave(cvId: string, cvData: CvData, enabled: boolean): Use
           keepalive: true,
         })
           .then((res) => {
-            if (res.ok) savedJson.current = body;
+            if (!res.ok) return;
+            savedJson.current = body;
+            void rememberUpdatedAt(res);
           })
           .catch(() => {});
       } catch {
@@ -131,7 +148,7 @@ export function useAutoSave(cvId: string, cvData: CvData, enabled: boolean): Use
       flush();
       alive.current = false;
     };
-  }, [cvId]);
+  }, [cvId, rememberUpdatedAt]);
 
   const flushNow = useCallback(async () => {
     chain.current = chain.current.then(runSave);
@@ -139,5 +156,7 @@ export function useAutoSave(cvId: string, cvData: CvData, enabled: boolean): Use
     return latestJson.current !== null && latestJson.current === savedJson.current;
   }, [runSave]);
 
-  return { saveStatus, lastSaved, flush: flushNow };
+  const getUpdatedAt = useCallback(() => updatedAt.current, []);
+
+  return { saveStatus, lastSaved, flush: flushNow, getUpdatedAt };
 }

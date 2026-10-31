@@ -9,6 +9,8 @@ interface UseFetchCvDataReturn {
   isLoading: boolean;
   fetchError: string | null;
   selectedTemplateId: string;
+  /** updatedAt CV saat dimuat (ISO), dasar deteksi perubahan dari tab lain. */
+  loadedUpdatedAt: string | null;
   setCvData: React.Dispatch<React.SetStateAction<CvData>>;
   setSelectedTemplateId: React.Dispatch<React.SetStateAction<string>>;
   setFetchError: React.Dispatch<React.SetStateAction<string | null>>;
@@ -19,6 +21,7 @@ export function useFetchCvData(cvId: string): UseFetchCvDataReturn {
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("industrial-pro");
+  const [loadedUpdatedAt, setLoadedUpdatedAt] = useState<string | null>(null);
 
   useEffect(() => {
     if (!cvId) return;
@@ -43,6 +46,7 @@ export function useFetchCvData(cvId: string): UseFetchCvDataReturn {
         if (controller.signal.aborted) return;
         setCvData(normalizeCvDocument(data));
         setSelectedTemplateId(data?.templateId || "industrial-pro");
+        setLoadedUpdatedAt(typeof data?.updatedAt === "string" ? data.updatedAt : null);
         setIsLoading(false);
       })
       .catch((err) => {
@@ -59,6 +63,7 @@ export function useFetchCvData(cvId: string): UseFetchCvDataReturn {
     isLoading,
     fetchError,
     selectedTemplateId,
+    loadedUpdatedAt,
     setCvData,
     setSelectedTemplateId,
     setFetchError,

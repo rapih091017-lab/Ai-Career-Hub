@@ -61,10 +61,10 @@ export default function BuilderPage() {
   const { addToast } = useToast();
 
   /* ── Data Fetch ── */
-  const { cvData, isLoading, fetchError, selectedTemplateId, setCvData, setSelectedTemplateId } = useFetchCvData(cvId);
+  const { cvData, isLoading, fetchError, selectedTemplateId, loadedUpdatedAt, setCvData, setSelectedTemplateId } = useFetchCvData(cvId);
 
   /* ── Auto-Save ── */
-  const { saveStatus, lastSaved, flush: flushAutoSave } = useAutoSave(cvId, cvData, !isLoading && !fetchError);
+  const { saveStatus, lastSaved, flush: flushAutoSave, getUpdatedAt } = useAutoSave(cvId, cvData, !isLoading && !fetchError, loadedUpdatedAt);
 
   /* ── Format Settings Hook ── */
   const format = useBuilderFormat({ cvId });
@@ -174,17 +174,21 @@ export default function BuilderPage() {
       const res = await fetch(`/api/cv-documents/${cvId}/pdf`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ format: printFormat }),
+        body: JSON.stringify({ format: printFormat, expectedUpdatedAt: getUpdatedAt() ?? undefined }),
       });
       if (!res.ok) {
         const body = await res.json().catch(() => null);
         const fallback =
-          res.status === 429
+          res.status === 409
+            ? "CV berubah di tab lain. Muat ulang halaman ini lalu unduh lagi."
+            : res.status === 429
             ? "Terlalu sering mengunduh PDF. Tunggu sebentar lalu coba lagi."
             : res.status === 401
               ? "Sesi login berakhir. Masuk lagi lalu unduh ulang."
               : "Gagal membuat PDF. Coba lagi sebentar lagi.";
-        addToast({ type: "error", message: (body && typeof body.message === "string" && body.message) || fallback });
+        // 409: pesan klien yang dipakai, karena user perlu tahu harus memuat ulang.
+        const serverMsg = res.status !== 409 && body && typeof body.message === "string" ? body.message : "";
+        addToast({ type: "error", message: serverMsg || fallback });
         return;
       }
       const blob = await res.blob();
