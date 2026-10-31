@@ -9,6 +9,8 @@ import MagneticButton from "@/components/MagneticButton";
 import { useToast } from "@/components/ui/toast";
 import { ImportResumeModal } from "@/components/profile/ImportResumeModal";
 import { DeleteAccountSection } from "@/components/settings/DeleteAccountSection";
+import { newId } from "@/lib/id";
+import { SKILL_LEVEL_OPTIONS } from "@/components/builder/SkillSection";
 import { mergeImportedProfile, type ImportedProfile, type MergeMode } from "@/lib/profile-merge";
 
 interface PersonalInfo {
@@ -62,7 +64,8 @@ interface OrganisationItem {
 interface SkillItem {
   id: string;
   name: string;
-  level: "beginner" | "intermediate" | "advanced";
+  /** "" = level belum dipilih. */
+  level: "beginner" | "intermediate" | "advanced" | "";
 }
 
 function HelpIcon({ hint }: { hint: string }) {
@@ -159,24 +162,24 @@ export default function ProfilePage() {
   const toggleWorkPresent = (id: string, present: boolean) => setWorkHistory((prev) => prev.map((w) => w.id === id ? { ...w, isPresent: present, endDate: present ? "" : w.endDate } : w));
   const toggleWorkPresentEdu = (id: string, present: boolean) => setEducation((prev) => prev.map((e) => e.id === id ? { ...e, isPresent: present, endDate: present ? "" : e.endDate } : e));
   const deleteWork = (id: string) => setWorkHistory((prev) => prev.filter((w) => w.id !== id));
-  const addWork = () => { setWorkHistory((prev) => [...prev, { id: "wh_" + Date.now(), company: "", position: "", startDate: "", endDate: "", description: "", isPresent: false }]); setActiveSection("section-experience"); };
+  const addWork = () => { setWorkHistory((prev) => [...prev, { id: newId("wh"), company: "", position: "", startDate: "", endDate: "", description: "", isPresent: false }]); setActiveSection("section-experience"); };
 
   const updateEdu = (id: string, field: keyof EducationItem, value: string) => setEducation((prev) => prev.map((e) => (e.id === id ? { ...e, [field]: value } : e)));
   const deleteEdu = (id: string) => setEducation((prev) => prev.filter((e) => e.id !== id));
-  const addEdu = () => { setEducation((prev) => [...prev, { id: "edu_" + Date.now(), institution: "", degree: "", field: "", startDate: "", endDate: "", gpa: "", isPresent: false }]); setActiveSection("section-education"); };
+  const addEdu = () => { setEducation((prev) => [...prev, { id: newId("edu"), institution: "", degree: "", field: "", startDate: "", endDate: "", gpa: "", isPresent: false }]); setActiveSection("section-education"); };
 
   const updateOrg = (id: string, field: keyof OrganisationItem, value: string) => setOrganisation((prev) => prev.map((o) => (o.id === id ? { ...o, [field]: value } : o)));
   const toggleOrgPresent = (id: string, present: boolean) => setOrganisation((prev) => prev.map((o) => o.id === id ? { ...o, isPresent: present, endDate: present ? "" : o.endDate } : o));
   const deleteOrg = (id: string) => setOrganisation((prev) => prev.filter((o) => o.id !== id));
-  const addOrg = () => { setOrganisation((prev) => [...prev, { id: "org_" + Date.now(), name: "", position: "", startDate: "", endDate: "", description: "", isPresent: false }]); setActiveSection("section-organisation"); };
+  const addOrg = () => { setOrganisation((prev) => [...prev, { id: newId("org"), name: "", position: "", startDate: "", endDate: "", description: "", isPresent: false }]); setActiveSection("section-organisation"); };
 
   const updateSkill = (id: string, field: keyof SkillItem, value: string) => setSkills((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: value } : s)));
   const deleteSkill = (id: string) => setSkills((prev) => prev.filter((s) => s.id !== id));
-  const addSkill = () => { setSkills((prev) => [...prev, { id: "sk_" + Date.now(), name: "", level: "intermediate" }]); setActiveSection("section-skills"); };
+  const addSkill = () => { setSkills((prev) => [...prev, { id: newId("sk"), name: "", level: "" }]); setActiveSection("section-skills"); };
 
   const updateCert = (id: string, field: keyof CertificationItem, value: string) => setCertifications((prev) => prev.map((c) => (c.id === id ? { ...c, [field]: value } : c)));
   const deleteCert = (id: string) => setCertifications((prev) => prev.filter((c) => c.id !== id));
-  const addCert = () => { setCertifications((prev) => [...prev, { id: "cert_" + Date.now(), name: "", issuer: "", year: "" }]); setActiveSection("section-certification"); };
+  const addCert = () => { setCertifications((prev) => [...prev, { id: newId("cert"), name: "", issuer: "", year: "" }]); setActiveSection("section-certification"); };
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -392,10 +395,11 @@ const handleImported = (imported: ImportedProfile, mode: MergeMode) => {
                   {skills.map((item) => (
                     <div key={item.id} className="flex items-center gap-3 border border-outline-variant rounded-xl p-3 bg-background">
                       <input className="flex-1 p-2 rounded-lg border border-outline-variant bg-surface-container-lowest text-body-md" placeholder={t("profile.placeholder-skill")} value={item.name} onChange={(e) => updateSkill(item.id, "name", e.target.value)} />
-                      <select className="p-2 rounded-lg border border-outline-variant bg-surface-container-lowest text-body-md" value={item.level} onChange={(e) => updateSkill(item.id, "level", e.target.value)}>
-                        <option value="beginner">Beginner</option>
-                        <option value="intermediate">Intermediate</option>
-                        <option value="advanced">Advanced</option>
+                      <select aria-label="Level keahlian" className="p-2 rounded-lg border border-outline-variant bg-surface-container-lowest text-body-md" value={item.level} onChange={(e) => updateSkill(item.id, "level", e.target.value)}>
+                        <option value="">Pilih level</option>
+                        {SKILL_LEVEL_OPTIONS.map((o) => (
+                          <option key={o.value} value={o.value}>{o.label}</option>
+                        ))}
                       </select>
                       <button className="text-error hover:bg-error-container/30 p-1 rounded" onClick={() => deleteSkill(item.id)} aria-label={t("profile.delete-skill")}>
                         <span className="material-symbols-outlined select-none" aria-hidden="true">close</span>

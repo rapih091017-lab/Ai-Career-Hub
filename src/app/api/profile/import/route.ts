@@ -79,7 +79,8 @@ const importedProfileSchema = z.object({
       z.object({
         id: textItem(40),
         name: textItem(120),
-        level: z.enum(["beginner", "intermediate", "advanced"]).catch("intermediate"),
+        // Level tidak dikenal dibuang (kosong), bukan dipaksa "intermediate".
+        level: z.enum(["beginner", "intermediate", "advanced", ""]).catch(""),
       }),
     )
     .catch([]),

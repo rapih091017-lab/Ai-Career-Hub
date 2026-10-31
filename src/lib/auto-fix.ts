@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { CvData } from "@/components/cv-templates";
 import { aiTextForField } from "@/lib/bullet-lines";
+import { newId } from "@/lib/id";
 
 /**
  * Saran perbaikan dari AI. Tiap saran hanya boleh mengubah teks yang
@@ -100,9 +101,10 @@ export function applyApprovedFixes(cv: CvData, fixes: AutoFixSuggestion[]): CvDa
       const exists = next.skills.some((s) => s.name.toLowerCase() === fix.name.toLowerCase());
       if (!exists) {
         next.skills.push({
-          id: `auto-${next.skills.length}-${fix.name.toLowerCase().replace(/\s+/g, "-")}`,
+          id: newId("sk"),
           name: fix.name,
-          level: "intermediate",
+          // Level tidak diketahui dari saran AI; dibiarkan kosong (tidak dirender).
+          level: "",
         });
       }
     }

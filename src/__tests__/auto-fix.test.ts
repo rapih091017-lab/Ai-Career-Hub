@@ -162,3 +162,18 @@ describe("applyApprovedFixes: deskripsi tetap satu poin per baris", () => {
     expect(next.workHistory[0].description).toBe("Menyusun laporan\nMengirim laporan\nMengelola stok");
   });
 });
+
+describe("applyApprovedFixes: add_skill", () => {
+  it("level tidak dipaksa intermediate dan id memakai newId", async () => {
+    const { applyApprovedFixes } = await import("@/lib/auto-fix");
+    const { normalizeCvDocument } = await import("@/lib/cv-normalize");
+    const cv = normalizeCvDocument({ tailoredContent: {} });
+    const next = applyApprovedFixes(cv, [
+      { id: "k", type: "add_skill", name: "Docker", category: "kata_kunci", reason: "" },
+      { id: "l", type: "add_skill", name: "Excel", category: "kata_kunci", reason: "" },
+    ]);
+    expect(next.skills.map((s) => s.level)).toEqual(["", ""]);
+    expect(next.skills[0].id).toMatch(/^sk_/);
+    expect(next.skills[0].id).not.toBe(next.skills[1].id);
+  });
+});
