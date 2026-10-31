@@ -90,4 +90,34 @@ describe("useAutoSave", () => {
     await advance(3000);
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
+
+  it("pagehide gagal → perubahan tetap belum tersimpan", async () => {
+    fetchMock.mockImplementation(async () => ({ ok: false }) as Response);
+    const { rerender, result } = renderHook(({ d }) => useAutoSave("x", d, true), {
+      initialProps: { d: cv("A") },
+    });
+    rerender({ d: cv("B") });
+    window.dispatchEvent(new Event("pagehide"));
+    fetchMock.mockImplementation(async () => ({ ok: true }) as Response);
+    let ok = false;
+    await act(async () => {
+      ok = await result.current.flush();
+    });
+    expect(ok).toBe(true);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("flush menunggu PUT; gagal semua percobaan → false", async () => {
+    fetchMock.mockImplementation(async () => ({ ok: false }) as Response);
+    const { rerender, result } = renderHook(({ d }) => useAutoSave("x", d, true), {
+      initialProps: { d: cv("A") },
+    });
+    rerender({ d: cv("B") });
+    let ok: boolean | undefined;
+    act(() => {
+      void result.current.flush().then((v) => (ok = v));
+    });
+    await advance(15000);
+    expect(ok).toBe(false);
+  });
 });

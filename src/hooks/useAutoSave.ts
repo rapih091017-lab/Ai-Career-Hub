@@ -9,7 +9,7 @@ type SaveStatus = "idle" | "saving" | "saved" | "error";
 interface UseAutoSaveReturn {
   saveStatus: SaveStatus;
   lastSaved: Date | null;
-  /** Kirim perubahan yang tertunda sekarang; true bila DB sudah sama dengan data terbaru. */
+  /** Kirim perubahan tertunda dan tunggu PUT sukses; false bila gagal setelah semua percobaan. */
   flush: () => Promise<boolean>;
 }
 
@@ -109,13 +109,18 @@ export function useAutoSave(cvId: string, cvData: CvData, enabled: boolean): Use
       const body = latestJson.current;
       if (!cvId || body === null || savedJson.current === null || body === savedJson.current) return;
       try {
+        // Baseline baru diperbarui setelah respons OK; kalau gagal,
+        // perubahan tetap dianggap belum tersimpan (flush/ekspor akan mencoba lagi).
         fetch(`/api/cv-documents/${cvId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body,
           keepalive: true,
-        }).catch(() => {});
-        savedJson.current = body;
+        })
+          .then((res) => {
+            if (res.ok) savedJson.current = body;
+          })
+          .catch(() => {});
       } catch {
         /* peramban menolak keepalive (mis. body terlalu besar) */
       }
