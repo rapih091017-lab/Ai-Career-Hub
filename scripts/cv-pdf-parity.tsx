@@ -66,6 +66,22 @@ const fixtures: { name: string; data: CvData; format: CvPrintFormat }[] = [
     },
   },
   { name: "serif-margin-mepet", data: longCv, format: { fontFamily: "'Times New Roman', serif", fontSize: 11, marginMode: "tight", templateId: "executive-serif" } },
+  {
+    // Garis per bagian (global on, Pendidikan dimatikan) + bagian kustom di urutan.
+    name: "garis-per-bagian-kustom",
+    data: sampleCv,
+    format: {
+      fontFamily: "'CV Inter', sans-serif",
+      fontSize: 10,
+      showDividers: true,
+      dividers: { education: false, organizations: false, cs_bahasa: true },
+      sectionOrder: ["summary", "experience", "cs_bahasa", "education", "skills", "certifications", "organizations", "lainnya"],
+      customSections: [
+        { id: "lainnya", title: "Lainnya", content: "" },
+        { id: "cs_bahasa", title: "Bahasa", content: "Inggris (aktif)\nJepang (dasar)" },
+      ],
+    },
+  },
 ];
 
 // Sebagian preflight Tailwind + gaya aplikasi, supaya pratinjau diuji di
