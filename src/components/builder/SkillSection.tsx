@@ -119,11 +119,11 @@ export function SkillSection({
               </select>
               <select
                 aria-label="Level keahlian"
-                value={skill.level}
+                value={skill.level ?? ""}
                 onChange={(e) => onSkillChange(i, "level", e.target.value as SkillEntry["level"])}
                 className="bg-surface-container-lowest border border-outline-variant/50 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary text-xs min-w-[100px]"
               >
-                <option value="">Level (opsional)</option>
+                <option value="">Pilih level</option>
                 {SKILL_LEVEL_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value} title={opt.desc}>{opt.label}</option>
                 ))}
