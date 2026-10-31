@@ -21,3 +21,6 @@ Blocked by: 05
 - Test unit untuk tiap jalur accept (fungsi murni yang menggabungkan poin).
 
 ## Comments
+- Selesai: splitAiBullets/aiTextForField di WorkCard (Saran AI/Optimalkan/Poles), OrgCard (Poles),
+  auto-fix (dirapikan setelah semua saran). Modal Saran AI multi-poin: centang + "Tambahkan N poin" /
+  "Ganti semua". Modal kini menutup setelah dipakai (sebelumnya tetap terbuka untuk kartu kerja).

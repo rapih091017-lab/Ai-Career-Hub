@@ -28,3 +28,7 @@ tidak terlihat.
 - Test unit `normalizeBulletLines`.
 
 ## Comments
+- Desain dipilih: daftar input per poin (`src/components/builder/BulletEditor.tsx`), bukan overlay textarea —
+  lebih stabil untuk fokus/kursor, drag (dnd-kit) dan tombol naik/turun. Nama komponen BulletEditor
+  (bukan BulletTextarea). Logika murni di `src/lib/bullet-editor-ops.ts` + `src/lib/bullet-lines.ts`.
+  Diuji di Chromium 390px (Enter, Backspace gabung/hapus, tempel, Alt+panah, drag keyboard & mouse).
