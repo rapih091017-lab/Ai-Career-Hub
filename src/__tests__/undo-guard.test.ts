@@ -31,3 +31,13 @@ describe("Urungkan hasil AI", () => {
     expect(unchanged()).toBe(false);
   });
 });
+
+import { versionLabelsInText } from "@/components/AIProposalModal";
+
+describe("label versi di penjelasan Optimalkan", () => {
+  it("Conservative/Improved/Bold berlabel dipetakan ke label Indonesia", () => {
+    expect(versionLabelsInText("Conservative: a. Improved: b. Bold: c, Improved results")).toBe(
+      "Ringan: a. Lebih tegas: b. Paling tegas: c, Improved results",
+    );
+  });
+});

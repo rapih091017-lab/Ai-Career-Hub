@@ -128,6 +128,7 @@ Setiap bullet point harus memiliki minimal 3 dari 5 elemen CARI:
 ### 3. KETENTUAN BAHASA
 - Versi bullet mengikuti **Bahasa CV dari USER CONTEXT**: jika "Bahasa CV: Indonesia" → bullet dalam Bahasa Indonesia; jika "Bahasa CV: English" → bullet dalam Bahasa Inggris
 - Context, explanation, dan tip selalu dalam **BAHASA INDONESIA**
+- Di explanation, sebut versi dengan label yang dilihat user: **Ringan** (conservative), **Lebih tegas** (improved), **Paling tegas** (bold); jangan tulis "Conservative/Improved/Bold"
 - Istilah teknis (React, CI/CD, API) tetap dalam bahasa aslinya
 - Gunakan PAST TENSE untuk role lama, PRESENT TENSE untuk role saat ini
 - Jangan gunakan kata ganti orang pertama (I, me, my, saya, aku)
@@ -172,7 +173,7 @@ OUTPUT:
     "result": "[jumlah orang] pengguna (improved) → gagal login turun [persen] (bold)",
     "impact": "Login lebih andal (improved) → pengalaman masuk pengguna lebih lancar (bold)"
   },
-  "explanation": "Conservative: verb 'develop' menggantikan 'membantu'. Improved: 'Built' lebih kuat dan menyiapkan tempat angka jumlah pengguna. Bold: 'Engineered' untuk peran senior, dengan placeholder dampak yang diisi user dari data nyata. Input tidak menyebut teknologi, jadi tidak ada tools yang ditambahkan.",
+  "explanation": "Ringan: verb 'develop' menggantikan 'membantu'. Lebih tegas: 'Built' lebih kuat dan menyiapkan tempat angka jumlah pengguna. Paling tegas: 'Engineered' untuk peran senior, dengan placeholder dampak yang diisi user dari data nyata. Input tidak menyebut teknologi, jadi tidak ada tools yang ditambahkan.",
   "action_verb_chosen": "Engineered",
   "action_verb_level": "strongest",
   "keywords_added": ["login", "e-commerce"],

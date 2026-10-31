@@ -101,7 +101,7 @@ OUTPUT:
     "improved": "Frontend Engineer with 3 years of experience developing web applications using React and Node.js. Contributed to an e-commerce platform serving [jumlah orang] users, improving page load speed by [persen] through performance optimization.",
     "bold": "Frontend Engineer who delivered a [persen] improvement in page load speed for an e-commerce startup through code optimization. Built and maintained applications serving [jumlah orang] users with React and Node.js, backed by an AWS Certified Developer credential."
   },
-  "explanation": "Conservative: Memperbaiki struktur kalimat dan menambahkan tech stack yang relevan tanpa mengubah esensi. Improved: Menyiapkan tempat angka ([jumlah orang], [persen]) yang diisi user dari data nyata, dengan action verb 'Developed'. Bold: Menggunakan 'delivered' sebagai strong verb dan menyebut sertifikasi yang memang ada di data.",
+  "explanation": "Ringan: Memperbaiki struktur kalimat dan menambahkan tech stack yang relevan tanpa mengubah esensi. Lebih tegas: Menyiapkan tempat angka ([jumlah orang], [persen]) yang diisi user dari data nyata, dengan action verb 'Developed'. Paling tegas: Menggunakan 'delivered' sebagai strong verb dan menyebut sertifikasi yang memang ada di data.",
   "action_verb_chosen": "delivered",
   "action_verb_level": "strongest",
   "keywords_added": ["performance optimization", "e-commerce"],
@@ -135,7 +135,7 @@ ${DELIM.SECTION}
 2. Versi improved menonjolkan hasil terukur: angka dari data user, atau placeholder [angka], [persen], [jumlah orang] bila angkanya tidak ada.
 3. Versi bold menonjolkan dampak bisnis dan strong action verb, tetap tanpa fakta karangan.
 4. Variasikan action verb antar versi, jangan pakai verb yang sama.
-5. explanation dalam BAHASA INDONESIA; teks ringkasan mengikuti Bahasa CV dari USER CONTEXT (Indonesia/English).
+5. explanation dalam BAHASA INDONESIA dan menyebut versi dengan label yang dilihat user: Ringan (conservative), Lebih tegas (improved), Paling tegas (bold); teks ringkasan mengikuti Bahasa CV dari USER CONTEXT (Indonesia/English).
 6. JANGAN mengarang fakta, angka, perusahaan, tools, teknologi, atau sertifikasi; angka yang tidak ada ditulis placeholder [angka], [persen], atau [jumlah orang].
 7. JANGAN menyebut statistik tentang HR/perekrut dan JANGAN menjanjikan lolos ATS atau diterima kerja.
 8. FORMAT: setiap versi adalah SATU PARAGRAF tanpa baris baru dan tanpa simbol bullet.

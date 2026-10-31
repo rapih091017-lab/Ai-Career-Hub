@@ -293,7 +293,7 @@ export default function AIProposalModal({
                   </svg>
                   <span className="text-[10px] font-bold text-primary uppercase tracking-wider">Apa yang berubah</span>
                 </div>
-                <p className="text-sm text-on-surface-variant leading-relaxed">{explanation}</p>
+                <p className="text-sm text-on-surface-variant leading-relaxed">{versionLabelsInText(explanation)}</p>
               </div>
             )}
           </div>
@@ -346,4 +346,14 @@ export default function AIProposalModal({
       </div>
     </Modal>
   );
+}
+
+/**
+ * Penjelasan Optimalkan kadang masih menyebut "Conservative:/Improved:/Bold:"
+ * (respons lama atau model tidak patuh). Petakan ke label kartu versi.
+ * Hanya bentuk berlabel (diikuti titik dua) yang diganti, isi teks lain tidak.
+ */
+export function versionLabelsInText(text: string): string {
+  const map: Record<string, string> = { conservative: "Ringan", improved: "Lebih tegas", bold: "Paling tegas" };
+  return text.replace(/\b(Conservative|Improved|Bold)(\s*):/gi, (_m, w: string, sp: string) => `${map[w.toLowerCase()]}${sp}:`);
 }
