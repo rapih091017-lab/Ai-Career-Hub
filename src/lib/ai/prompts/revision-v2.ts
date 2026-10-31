@@ -216,6 +216,7 @@ ${DELIM.SECTION}
 4. CARI analysis wajib diisi untuk setiap versi, tunjukkan progresi dari conservative ke bold.
 5. Jika input hanya 1-3 kata (sangat pendek), buat konteks yang masuk akal berdasarkan role dari user context.
 6. ats_keywords berisi kata kunci target role yang relevan dengan teks ini, tanpa klaim akan lolos ATS.
+7. FORMAT VERSI: tiap versi deskripsi pengalaman ditulis SATU POIN PER BARIS (pisahkan dengan "\n"), TANPA simbol bullet atau nomor di awal baris (tanpa "•", "-", "*", "1."). Jumlah poin mengikuti input; input satu kalimat → satu poin.
 
 ${BOUNDARY}
 

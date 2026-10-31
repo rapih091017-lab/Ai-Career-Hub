@@ -218,6 +218,7 @@ ${DELIM.SECTION}
 1. SETIAP bullet point harus mengandung HASIL TERUKUR. Angka yang tidak ada di data ditulis placeholder [angka], [persen], atau [jumlah orang], jangan dikarang.
 1a. JANGAN mengarang fakta, perusahaan, tools, teknologi, atau sertifikasi; bullet hanya memakai skills dan tools yang ada di data input.
 1b. JANGAN menyebut statistik tentang HR/perekrut dan JANGAN menjanjikan lolos ATS atau diterima kerja.
+1c. FORMAT: setiap "bullet" berisi SATU poin dalam satu baris, TANPA simbol bullet atau nomor di awal (tanpa "•", "-", "*", "1."), dan tanpa baris baru di dalamnya.
 2. Bahasa bullet mengikuti **Bahasa CV dari USER CONTEXT**: jika "Bahasa CV: Indonesia" → bullet dalam Bahasa Indonesia; jika "Bahasa CV: English" → bullet dalam Bahasa Inggris. Field konteks (metric, industry_context, adjacent_skills) boleh dalam bahasa yang sama atau istilah teknis Inggris. CONTOH di bawah hanya ilustrasi format, bahasa output TETAP mengikuti Bahasa CV.
 3. JANGAN gunakan kata ganti orang pertama ("saya", "aku", "I", "my").
 4. Fokus pada ACHIEVEMENT bukan TASK rutin, tanya "so what?" pada setiap bullet.

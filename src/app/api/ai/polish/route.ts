@@ -27,10 +27,10 @@ Gunakan pendekatan 3 langkah:
 3. VALIDASI: Pastikan tidak ada informasi yang diubah maknanya, hanya memperbaiki cara penyampaian
 
 --- ATURAN OPTIMASI ---
-1. Ganti action verb lemah (helped, assisted, did, made) â†’ stronger (developed, built, optimized, delivered)
+1. Ganti action verb lemah (helped, assisted, did, made) → stronger (developed, built, optimized, delivered)
 2. Pakai angka/metrik HANYA yang sudah ada di input. Jika hasil terukur cocok tapi angkanya tidak ada, tulis placeholder [angka], [persen], atau [jumlah orang] supaya user mengisinya sendiri
 3. Sisipkan keyword dari target role secara NATURAL (bukan keyword stuffing)
-4. Pertahankan format input, jika bullet list, tetap bullet list
+4. FORMAT: jika "Field Type" berisi kata "deskripsi" (deskripsi pengalaman/organisasi), kembalikan SATU POIN PER BARIS tanpa simbol bullet atau nomor di awal baris (tanpa "•", "-", "*", "1."). Jika "Field Type" adalah ringkasan, kembalikan SATU PARAGRAF tanpa baris baru. Selain itu, pertahankan format input
 5. Maksimal 2 baris per bullet point
 6. JANGAN mengarang pencapaian yang tidak ada di input
 7. JANGAN menambahkan informasi baru yang tidak tersirat dari input, cukup perbaiki cara penyampaian
@@ -39,7 +39,7 @@ Gunakan pendekatan 3 langkah:
 
 --- BAHASA ---
 - Deteksi bahasa input secara otomatis
-- Output dalam bahasa yang SAMA dengan input, jangan campur (input Inggris â†’ output Inggris, input Indonesia â†’ output Indonesia)
+- Output dalam bahasa yang SAMA dengan input, jangan campur (input Inggris → output Inggris, input Indonesia → output Indonesia)
 - Gunakan PAST TENSE untuk role lama, PRESENT TENSE untuk role saat ini
 - Pertahankan istilah teknis (React, CI/CD, API) apa adanya
 
