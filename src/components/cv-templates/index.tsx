@@ -127,6 +127,32 @@ export interface CvData {
   cvLang?: "id" | "en";
   /** Custom section labels, user can rename section titles */
   sectionLabels?: Record<string, string>;
+  /**
+   * Pengaturan tampilan yang ikut tersimpan di server. Tidak ada = CV lama,
+   * tampil dengan nilai bawaan builder (lihat LEGACY_LAYOUT di builder-format).
+   */
+  layout?: CvLayout;
+}
+
+/**
+ * Pengaturan tampilan CV. Field yang tidak ada memakai gaya template
+ * (font, ukuran, warna) atau nilai bawaan (spasi, margin, urutan).
+ */
+export interface CvLayout {
+  fontFamily?: string;
+  fontSize?: number;
+  textAlign?: "left" | "center" | "right" | "justify";
+  /** Garis di atas semua section; `dividers[key]` menimpa per section. */
+  showDividers?: boolean;
+  primaryColor?: string;
+  spacingMode?: "compact" | "normal" | "spacious";
+  headerLayout?: "centered" | "left";
+  marginMode?: "tight" | "normal" | "wide";
+  sectionOrder?: string[];
+  sectionVisibility?: Record<string, boolean>;
+  showSkillLevel?: boolean;
+  /** Garis di atas section tertentu (true = ada, false = tidak ada). */
+  dividers?: Record<string, boolean>;
 }
 
 /* ───────── template style config ───────── */
@@ -265,8 +291,12 @@ interface RendererProps {
   style: TemplateStyle;
   /** Section ordering, controls which sections appear & in what order */
   sectionOrder?: (SectionKey | string)[];
-  /** Show horizontal dividers between sections */
+  /** Garis di atas semua section (kecuali yang pertama). */
   showDividers?: boolean;
+  /** Garis per section; menimpa `showDividers` untuk section tsb. */
+  dividers?: Record<string, boolean>;
+  /** Pratinjau saja: tombol tambah/hapus garis di atas section. */
+  onToggleDivider?: (sectionKey: string) => void;
   /** Language override, defaults to data.cvLang or "id" */
   lang?: "id" | "en";
   /** Click handler for sections, maps section key to edit step */
@@ -288,7 +318,7 @@ const CV_LABELS: Record<string, { id: string; en: string }> = {
   namePlaceholder: { id: "NAMA LENGKAP ANDA", en: "YOUR FULL NAME" },
 };
 
-export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang: langProp, sectionLabels: customLabels, headerLayout, lineHeight: lineHeightProp, onSectionClick, showSkillLevel = false }: RendererProps & { sectionLabels?: Record<SectionKey, string>; headerLayout?: "centered" | "left"; lineHeight?: number }) {
+export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, dividers, onToggleDivider, lang: langProp, sectionLabels: customLabels, headerLayout, lineHeight: lineHeightProp, onSectionClick, showSkillLevel = false }: RendererProps & { sectionLabels?: Record<SectionKey, string>; headerLayout?: "centered" | "left"; lineHeight?: number }) {
   const lang = langProp || data.cvLang || "id";
   const bodyFontSize = style.bodySize;
   const textAlign = style.textAlign || "left";
@@ -663,7 +693,8 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
       </header>
 
       {/* ── DYNAMIC SECTIONS (ordered by sectionOrder) ── */}
-      {order.map((key, idx) => {
+      {order
+        .map((key) => {
         const isPredefined = key in sectionRenderers;
         let content: React.ReactNode = null;
 
@@ -675,7 +706,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
           const customSection = data.customSections?.find(cs => cs.id === key);
           if (customSection) {
             const lines = customSection.content.split('\n').filter(Boolean);
-            content = (
+            content = lines.length === 0 ? null : (
               <>
                 <SectionHeader title={customSection.title} style={style} />
                 {customSection.contentType === "paragraph" ? (
@@ -695,18 +726,38 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
             );
           }
         }
-
-        if (!content) return null;
+        return { key, content };
+        })
+        // Section kosong tidak dirender, jadi garis dihitung dari section yang tampil.
+        .filter((s) => s.content)
+        .map(({ key, content }, idx) => {
+        const hasDivider = idx > 0 && (dividers?.[key] ?? showDividers ?? false);
         return (
           <div
             key={key}
+            data-cv-section={key}
             // Mode edit (klik & hover) hanya di pratinjau; mode cetak tanpa handler.
             {...(onSectionClick
               ? { onClick: () => onSectionClick(key), title: "Klik untuk edit section ini" }
               : {})}
-            style={{ cursor: onSectionClick ? "pointer" : undefined }}
+            style={{ cursor: onSectionClick ? "pointer" : undefined, position: onToggleDivider ? "relative" : undefined }}
           >
-            {showDividers && idx > 0 && (
+            {onToggleDivider && idx > 0 && (
+              // Tombol melayang (absolute) agar tidak menggeser tata letak pratinjau.
+              <button
+                type="button"
+                className="cv-divider-toggle"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleDivider(key);
+                }}
+                aria-label={hasDivider ? "Hapus garis di atas bagian ini" : "Tambah garis di atas bagian ini"}
+                title={hasDivider ? "Hapus garis" : "Tambah garis"}
+              >
+                {hasDivider ? "× garis" : "+ garis"}
+              </button>
+            )}
+            {hasDivider && (
               <hr
                 style={{
                   border: "none",

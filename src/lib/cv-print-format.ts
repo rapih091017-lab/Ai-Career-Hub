@@ -1,39 +1,52 @@
-import { z } from "zod";
 import { DEFAULT_SECTION_ORDER, TEMPLATE_STYLES, type CvData, type CustomSectionEntry, type SectionKey, type TemplateStyle } from "@/components/cv-templates";
+import { DEFAULT_CUSTOM_SECTIONS, LEGACY_LAYOUT } from "@/lib/builder-format";
 
 /**
- * Format tampilan CV yang dikirim builder ke route PDF. Format masih
- * tersimpan di localStorage, jadi server menerimanya dari klien dan
- * memvalidasinya di sini. Data CV sendiri selalu dibaca dari DB.
+ * Format tampilan CV untuk renderer. Dibentuk dari `CvData.layout` (lihat
+ * `cvPrintFormatFromData`), jadi pratinjau dan PDF di server membaca
+ * sumber yang sama: data CV di DB.
  */
-export const CvPrintFormatSchema = z.object({
-  templateId: z.string().max(50).optional(),
-  fontFamily: z.string().max(200).optional(),
-  fontSize: z.number().min(6).max(30).optional(),
-  textAlign: z.enum(["left", "center", "right", "justify"]).optional(),
-  showDividers: z.boolean().optional(),
-  customPrimaryColor: z.union([z.literal(""), z.string().regex(/^#[0-9a-fA-F]{3,8}$/)]).optional(),
-  spacingMode: z.enum(["compact", "normal", "spacious"]).optional(),
-  headerLayout: z.enum(["centered", "left"]).optional(),
-  marginMode: z.enum(["tight", "normal", "wide"]).optional(),
-  sectionOrder: z.array(z.string().max(100)).max(60).optional(),
-  sectionVisibility: z.record(z.string().max(100), z.boolean()).optional(),
-  customSections: z
-    .array(
-      z.object({
-        id: z.string().min(1).max(100),
-        title: z.string().max(100),
-        content: z.string().max(5_000),
-        contentType: z.enum(["paragraph", "bullets"]).optional(),
-      }),
-    )
-    // Batas sementara selama section kustom masih dikirim klien (issue 00 memindahkannya ke DB).
-    .max(10)
-    .optional(),
-  showSkillLevel: z.boolean().optional(),
-});
+export interface CvPrintFormat {
+  templateId?: string;
+  fontFamily?: string;
+  fontSize?: number;
+  textAlign?: "left" | "center" | "right" | "justify";
+  showDividers?: boolean;
+  dividers?: Record<string, boolean>;
+  customPrimaryColor?: string;
+  spacingMode?: "compact" | "normal" | "spacious";
+  headerLayout?: "centered" | "left";
+  marginMode?: "tight" | "normal" | "wide";
+  sectionOrder?: string[];
+  sectionVisibility?: Record<string, boolean>;
+  customSections?: CustomSectionEntry[];
+  showSkillLevel?: boolean;
+}
 
-export type CvPrintFormat = z.infer<typeof CvPrintFormatSchema>;
+/**
+ * Format renderer dari data CV. CV tanpa `layout` (data lama) memakai
+ * LEGACY_LAYOUT, nilai yang dulu selalu dipakai builder, supaya tampilannya
+ * tidak berubah. Field layout yang kosong mengikuti gaya template.
+ */
+export function cvPrintFormatFromData(data: CvData, templateId?: string): CvPrintFormat {
+  const l = data.layout ?? LEGACY_LAYOUT;
+  return {
+    templateId,
+    fontFamily: l.fontFamily,
+    fontSize: l.fontSize,
+    textAlign: l.textAlign,
+    showDividers: l.showDividers,
+    dividers: l.dividers,
+    customPrimaryColor: l.primaryColor,
+    spacingMode: l.spacingMode,
+    headerLayout: l.headerLayout,
+    marginMode: l.marginMode,
+    sectionOrder: l.sectionOrder,
+    sectionVisibility: l.sectionVisibility,
+    customSections: data.customSections ?? DEFAULT_CUSTOM_SECTIONS,
+    showSkillLevel: l.showSkillLevel,
+  };
+}
 
 export const MARGIN_MM = { tight: 10, normal: 20, wide: 30 } as const;
 export const LINE_HEIGHT = { compact: 1.3, normal: 1.5, spacious: 1.8 } as const;
@@ -43,6 +56,7 @@ export interface CvRenderProps {
   style: TemplateStyle;
   sectionOrder: (SectionKey | string)[];
   showDividers: boolean;
+  dividers?: Record<string, boolean>;
   headerLayout: "centered" | "left";
   lineHeight: number;
   lang: "id" | "en";
@@ -67,13 +81,14 @@ export function cvRenderProps(data: CvData, format: CvPrintFormat, fallbackTempl
       bodySize: format.fontSize ?? base.bodySize,
       bodyFont: font,
       headingFont: font,
-      textAlign: format.textAlign ?? "left",
+      textAlign: format.textAlign ?? base.textAlign ?? "left",
       ...(format.customPrimaryColor ? { primary: format.customPrimaryColor, sectionTitle: format.customPrimaryColor } : {}),
     },
     sectionOrder: (format.sectionOrder ?? [...DEFAULT_SECTION_ORDER, "lainnya"]).filter(
       (key) => visibility[key] !== false,
     ),
     showDividers: format.showDividers ?? false,
+    dividers: format.dividers,
     headerLayout: format.headerLayout ?? "centered",
     lineHeight: LINE_HEIGHT[format.spacingMode ?? "normal"],
     lang: data.cvLang === "en" ? "en" : "id",

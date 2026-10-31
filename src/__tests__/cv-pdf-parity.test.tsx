@@ -14,7 +14,7 @@ vi.mock("@/db", () => ({
 vi.mock("@/lib/pdf/chromium", () => ({ printStandaloneHtml: (html: string) => printMock(html) }));
 
 import { CV_FONTS, CV_FONT_VARIANTS, cvFontFile, resolveCvFont } from "@/lib/cv-fonts";
-import { CvPrintFormatSchema, cvRenderProps } from "@/lib/cv-print-format";
+import { cvPrintFormatFromData, cvRenderProps } from "@/lib/cv-print-format";
 import { normalizeCvDocument } from "@/lib/cv-normalize";
 import { buildCvPdfHtml } from "@/lib/pdf/cv-html";
 import { POST } from "@/app/api/cv-documents/[id]/pdf/route";
@@ -50,13 +50,18 @@ describe("HTML cetak", () => {
     expect(html).not.toContain("cv-section-hover");
   });
 
-  it("format invalid ditolak", () => {
-    expect(CvPrintFormatSchema.safeParse({ customPrimaryColor: "red;background:url(x)" }).success).toBe(false);
-    expect(CvPrintFormatSchema.safeParse({ fontSize: 99 }).success).toBe(false);
-    const sec = (i: number, content = "x") => ({ id: `s${i}`, title: "T", content });
-    expect(CvPrintFormatSchema.safeParse({ customSections: Array.from({ length: 11 }, (_, i) => sec(i)) }).success).toBe(false);
-    expect(CvPrintFormatSchema.safeParse({ customSections: [sec(1, "a".repeat(5001))] }).success).toBe(false);
-    expect(CvPrintFormatSchema.safeParse({ customSections: [{ ...sec(1), title: "t".repeat(101) }] }).success).toBe(false);
+  it("CV tanpa layout memakai nilai lama builder (Inter 11pt, margin normal)", async () => {
+    const { marginMm, ...props } = cvRenderProps(sampleCv, cvPrintFormatFromData({ ...sampleCv, layout: undefined }, "executive-serif"));
+    expect(marginMm).toBe(20);
+    const html = await buildCvPdfHtml(props, marginMm);
+    expect(html).toContain("'CV Inter'");
+    expect(html).toContain("font-size:11pt");
+  });
+
+  it("layout tanpa font mengikuti font template", async () => {
+    const { marginMm, ...props } = cvRenderProps(sampleCv, cvPrintFormatFromData({ ...sampleCv, layout: { marginMode: "wide" } }, "executive-serif"));
+    expect(marginMm).toBe(30);
+    expect(props.style.bodyFont).toContain("CV Tinos");
   });
 });
 
@@ -82,9 +87,9 @@ describe("POST /api/cv-documents/[id]/pdf", () => {
     expect((await POST(req({}), ctx)).status).toBe(404);
   });
 
-  it("format invalid → 400", async () => {
+  it("body invalid → 400", async () => {
     authMock.mockResolvedValue({ user: { id: "u-400" } });
-    expect((await POST(req({ format: { marginMode: "lebar" } }), ctx)).status).toBe(400);
+    expect((await POST(req({ expectedUpdatedAt: "kemarin" }), ctx)).status).toBe(400);
   });
 
   it("CV di DB lebih baru dari yang dilihat klien → 409", async () => {
@@ -107,15 +112,16 @@ describe("POST /api/cv-documents/[id]/pdf", () => {
     expect((await first).status).toBe(200);
   });
 
-  it("mencetak dari data DB tanpa kuota, lalu dibatasi rate limit", async () => {
+  it("mencetak dari data & layout DB tanpa kuota (format dari klien diabaikan), lalu dibatasi rate limit", async () => {
     authMock.mockResolvedValue({ user: { id: "u-ok" } });
-    rows.current = [{ id: "cv1", tailoredContent: sampleCv, templateId: "executive-serif", updatedAt: new Date() }];
-    const res = await POST(req({ format: { fontFamily: "'Times New Roman', serif" } }), ctx);
+    rows.current = [{ id: "cv1", tailoredContent: { ...sampleCv, layout: { fontFamily: "'Times New Roman', serif" } }, templateId: "executive-serif", updatedAt: new Date() }];
+    const res = await POST(req({ format: { fontFamily: "Arial, sans-serif" } }), ctx);
     expect(res.status).toBe(200);
     expect(res.headers.get("Content-Type")).toBe("application/pdf");
     const html = printMock.mock.calls[0][0];
     expect(html).toContain(normalizeCvDocument({ tailoredContent: sampleCv }).fullName);
     expect(html).toContain("'CV Tinos'");
+    expect(html).not.toContain("'CV Arimo'");
     const statuses = [];
     for (let i = 0; i < 6; i++) statuses.push((await POST(req({}), ctx)).status);
     expect(statuses).toContain(429);

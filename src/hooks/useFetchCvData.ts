@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { CvData } from "@/components/cv-templates";
+import { TEMPLATE_STYLES, type CvData } from "@/components/cv-templates";
 import { EMPTY_CV_DATA, normalizeCvDocument } from "@/lib/cv-normalize";
 
 interface UseFetchCvDataReturn {
@@ -45,7 +45,8 @@ export function useFetchCvData(cvId: string): UseFetchCvDataReturn {
       .then((data) => {
         if (controller.signal.aborted) return;
         setCvData(normalizeCvDocument(data));
-        setSelectedTemplateId(data?.templateId || "industrial-pro");
+        // Id template tak dikenal dirender sebagai industrial-pro; samakan di sini.
+        setSelectedTemplateId(typeof data?.templateId === "string" && TEMPLATE_STYLES[data.templateId] ? data.templateId : "industrial-pro");
         setLoadedUpdatedAt(typeof data?.updatedAt === "string" ? data.updatedAt : null);
         setIsLoading(false);
       })

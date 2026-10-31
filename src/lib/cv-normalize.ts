@@ -1,4 +1,5 @@
 import { newId } from "@/lib/id";
+import { DEFAULT_CUSTOM_SECTIONS, migrateCustomSections, sanitizeLayout, sectionHasContent } from "@/lib/builder-format";
 import type { CvData, SkillEntry } from "@/components/cv-templates";
 
 export const EMPTY_CV_DATA: CvData = {
@@ -147,6 +148,34 @@ function normalizeLists(src: Record<string, any>) {
  * Field tak dikenal dipertahankan agar tidak hilang saat disimpan ulang.
  */
 export function normalizeCvDocument(data: unknown): CvData {
+  return withLayout(normalizeContent(data));
+}
+
+/**
+ * Layout & section kustom dirapikan saat muat. Tidak ada di data = tetap
+ * tidak ada (CV lama tampil dengan nilai bawaan seperti sebelumnya).
+ */
+function withLayout(cv: CvData): CvData {
+  const out = { ...cv };
+  if ("customSections" in out) {
+    const cs = migrateCustomSections(out.customSections);
+    if (cs) out.customSections = cs;
+    else delete out.customSections;
+  }
+  if ("layout" in out) {
+    if (isObj(out.layout)) {
+      out.layout = sanitizeLayout(out.layout, {
+        customSections: out.customSections ?? DEFAULT_CUSTOM_SECTIONS,
+        hasContent: (key) => sectionHasContent(out, key),
+      });
+    } else {
+      delete out.layout;
+    }
+  }
+  return out;
+}
+
+function normalizeContent(data: unknown): CvData {
   const doc = isObj(data) ? data : {};
   const tc = doc.tailoredContent;
   if (!isObj(tc)) return { ...EMPTY_CV_DATA, customFields: [], workHistory: [], education: [], organisations: [], skills: [], certifications: [] };

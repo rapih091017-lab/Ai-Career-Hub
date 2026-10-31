@@ -5,6 +5,6 @@ import type { CvData } from "@/components/cv-templates";
  * `tailoredContent`; mengirim cvData mentah membuat simpan manual tidak
  * menyimpan apa pun. Simpan manual dan autosave wajib lewat fungsi ini.
  */
-export function buildCvSaveBody(cvData: CvData): string {
-  return JSON.stringify({ tailoredContent: cvData });
+export function buildCvSaveBody(cvData: CvData, templateId?: string): string {
+  return JSON.stringify(templateId ? { tailoredContent: cvData, templateId } : { tailoredContent: cvData });
 }

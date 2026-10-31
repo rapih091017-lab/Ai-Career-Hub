@@ -7,7 +7,7 @@ import AppHeader from "@/components/AppHeader";
 import AuthGuard from "@/components/AuthGuard";
 import { AtsBaseRenderer, TEMPLATE_STYLES, type CvData } from "@/components/cv-templates";
 import { CvPagedPreview, measurePageCount } from "@/components/cv-templates/print";
-import { cvRenderProps, type CvPrintFormat } from "@/lib/cv-print-format";
+import { cvPrintFormatFromData, cvRenderProps } from "@/lib/cv-print-format";
 import { buildCvSaveBody } from "@/lib/builder-save";
 import { aiSkillNames } from "@/lib/cv-normalize";
 import dynamic from "next/dynamic";
@@ -64,10 +64,17 @@ export default function BuilderPage() {
   const { cvData, isLoading, fetchError, selectedTemplateId, loadedUpdatedAt, setCvData, setSelectedTemplateId } = useFetchCvData(cvId);
 
   /* ── Auto-Save ── */
-  const { saveStatus, lastSaved, flush: flushAutoSave, getUpdatedAt } = useAutoSave(cvId, cvData, !isLoading && !fetchError, loadedUpdatedAt);
+  const { saveStatus, lastSaved, flush: flushAutoSave, getUpdatedAt } = useAutoSave(cvId, cvData, !isLoading && !fetchError, loadedUpdatedAt, selectedTemplateId);
 
   /* ── Format Settings Hook ── */
-  const format = useBuilderFormat({ cvId });
+  const format = useBuilderFormat({
+    cvId,
+    cvData,
+    setCvData,
+    ready: !isLoading && !fetchError,
+    templateId: selectedTemplateId,
+    flush: flushAutoSave,
+  });
 
   /* ── Compute margin & page dimensions ── */
   const contentRef = useRef<HTMLDivElement>(null);
@@ -151,26 +158,8 @@ export default function BuilderPage() {
 
   /* ── PDF Export ── */
 
-  // Format tampilan yang sama dipakai pratinjau dan dikirim ke server PDF.
-  const printFormat: CvPrintFormat = useMemo(
-    () => ({
-      templateId: selectedTemplateId,
-      fontFamily,
-      fontSize,
-      textAlign,
-      showDividers,
-      customPrimaryColor,
-      spacingMode,
-      headerLayout,
-      marginMode,
-      sectionOrder,
-      sectionVisibility,
-      customSections,
-      showSkillLevel,
-    }),
-    [selectedTemplateId, fontFamily, fontSize, textAlign, showDividers, customPrimaryColor, spacingMode,
-      headerLayout, marginMode, sectionOrder, sectionVisibility, customSections, showSkillLevel],
-  );
+  // Format tampilan dari cvData.layout; server PDF membentuknya dengan fungsi yang sama dari DB.
+  const printFormat = useMemo(() => cvPrintFormatFromData(cvData, selectedTemplateId), [cvData, selectedTemplateId]);
 
   // Klik section di pratinjau → lompat ke langkah form terkait.
   const handlePreviewSectionClick = useCallback((sectionKey: string) => {
@@ -207,7 +196,7 @@ export default function BuilderPage() {
       const res = await fetch(`/api/cv-documents/${cvId}/pdf`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ format: printFormat, expectedUpdatedAt: getUpdatedAt() ?? undefined }),
+        body: JSON.stringify({ expectedUpdatedAt: getUpdatedAt() ?? undefined }),
       });
       if (!res.ok) {
         const body = await res.json().catch(() => null);
@@ -250,7 +239,7 @@ export default function BuilderPage() {
       const res = await fetch(`/api/cv-documents/${cvId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: buildCvSaveBody(cvData),
+        body: buildCvSaveBody(cvData, selectedTemplateId),
       });
       if (!res.ok) throw new Error(`${t("builder.save-failed")} (${res.status})`);
       addToast({ type: "success", message: t("builder.save-success") });
@@ -259,7 +248,7 @@ export default function BuilderPage() {
     } finally {
       setIsSaving(false);
     }
-  }, [cvId, cvData, addToast, t]);
+  }, [cvId, cvData, selectedTemplateId, addToast, t]);
 
   /* ── section title helper ── */
 

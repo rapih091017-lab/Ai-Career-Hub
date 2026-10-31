@@ -14,7 +14,7 @@ describe("buildCvSaveBody", () => {
 
   it("dipakai handleSave di halaman builder", () => {
     const src = readFileSync(path.join(process.cwd(), "src/app/builder/[id]/page.tsx"), "utf8");
-    expect(src).toContain("body: buildCvSaveBody(cvData)");
+    expect(src).toContain("body: buildCvSaveBody(cvData, selectedTemplateId)");
     expect(src).not.toMatch(/body:\s*JSON\.stringify\(cvData\)/);
   });
 });

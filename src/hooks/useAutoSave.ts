@@ -33,7 +33,14 @@ const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
  * - Perubahan yang belum terkirim di-flush saat pagehide/unmount dengan
  *   fetch keepalive.
  */
-export function useAutoSave(cvId: string, cvData: CvData, enabled: boolean, initialUpdatedAt?: string | null): UseAutoSaveReturn {
+export function useAutoSave(
+  cvId: string,
+  cvData: CvData,
+  enabled: boolean,
+  initialUpdatedAt?: string | null,
+  /** Template ikut disimpan, jadi flush sebelum unduh PDF juga mencakup ganti template. */
+  templateId?: string,
+): UseAutoSaveReturn {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
@@ -54,7 +61,7 @@ export function useAutoSave(cvId: string, cvData: CvData, enabled: boolean, init
     }
   }, []);
 
-  latestJson.current = enabled ? buildCvSaveBody(cvData) : null;
+  latestJson.current = enabled ? buildCvSaveBody(cvData, templateId) : null;
 
   // Baseline = data hasil muat, diset sekali saat enabled pertama kali true.
   useEffect(() => {

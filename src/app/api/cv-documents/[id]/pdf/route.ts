@@ -7,7 +7,7 @@ import { cvDocuments } from "@/db/schema";
 import { apiHandler, errorResponse } from "@/lib/api-utils";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limiter";
 import { normalizeCvDocument } from "@/lib/cv-normalize";
-import { CvPrintFormatSchema, cvRenderProps } from "@/lib/cv-print-format";
+import { cvPrintFormatFromData, cvRenderProps } from "@/lib/cv-print-format";
 import { buildCvPdfHtml } from "@/lib/pdf/cv-html";
 import { printStandaloneHtml } from "@/lib/pdf/chromium";
 
@@ -15,8 +15,9 @@ export const runtime = "nodejs";
 // Cold start: ekstraksi binary Chromium + launch butuh waktu. Warm: ~2-4s.
 export const maxDuration = 60;
 
+// Format tampilan dibaca dari DB (CvData.layout). Field `format` dari klien
+// lama tidak dipakai lagi; z.object membuangnya tanpa error.
 const BodySchema = z.object({
-  format: CvPrintFormatSchema.default({}),
   /** updatedAt CV yang dilihat klien; bila DB lebih baru → 409. */
   expectedUpdatedAt: z.string().datetime({ offset: true }).optional(),
 });
@@ -38,9 +39,9 @@ const rendering = new Set<string>();
  *
  * PDF CV dari builder. Bebas kuota untuk semua paket (keputusan user
  * 2026-10-31), tapi wajib login, CV harus milik user, dan dibatasi rate
- * limit. Data CV dibaca dari DB; klien hanya mengirim format tampilan
- * (masih di localStorage) yang divalidasi zod. HTML dirender di server
- * dengan renderer yang sama dengan pratinjau.
+ * limit. Data CV dan pengaturan tampilan dibaca dari DB (klien flush
+ * autosave dulu). HTML dirender di server dengan renderer yang sama dengan
+ * pratinjau.
  */
 export const POST = apiHandler(async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
   const session = await auth();
@@ -63,7 +64,7 @@ export const POST = apiHandler(async (request: NextRequest, { params }: { params
   }
   const parsed = BodySchema.safeParse(raw);
   if (!parsed.success) {
-    return errorResponse("INVALID_INPUT", "Format tampilan CV tidak valid. Section kustom maksimal 10, judul 100 karakter, isi 5.000 karakter.", 400);
+    return errorResponse("INVALID_INPUT", "Permintaan PDF tidak valid.", 400);
   }
 
   const [doc] = await db
@@ -75,12 +76,13 @@ export const POST = apiHandler(async (request: NextRequest, { params }: { params
     return errorResponse("CV_NOT_FOUND", "Dokumen CV tidak ditemukan atau bukan milik Anda", 404);
   }
 
-  const { expectedUpdatedAt, format } = parsed.data;
+  const { expectedUpdatedAt } = parsed.data;
   if (expectedUpdatedAt && doc.updatedAt && new Date(doc.updatedAt).getTime() > new Date(expectedUpdatedAt).getTime()) {
     return errorResponse("CV_STALE", "CV sudah diubah di tempat lain. Muat ulang halaman lalu unduh lagi.", 409);
   }
 
-  const { marginMm, ...props } = cvRenderProps(normalizeCvDocument(doc), format, doc.templateId ?? undefined);
+  const data = normalizeCvDocument(doc);
+  const { marginMm, ...props } = cvRenderProps(data, cvPrintFormatFromData(data, doc.templateId ?? undefined));
 
   if (rendering.has(userId)) {
     return errorResponse("PDF_BUSY", "PDF sebelumnya masih dibuat. Tunggu sampai selesai lalu coba lagi.", 429);
