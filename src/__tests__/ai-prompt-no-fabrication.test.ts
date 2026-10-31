@@ -37,6 +37,10 @@ describe.each(Object.entries(allPrompts))("prompt %s", (name, prompt) => {
     expect(prompt).not.toMatch(/\[est/i);
   });
 
+  it("persona tidak menggoda klaim ATS", () => {
+    expect(prompt).not.toMatch(/ATS Copywriter|ATS-safe/);
+  });
+
   it("'lolos ATS' hanya muncul di kalimat larangan", () => {
     const mentions = prompt.match(/lolos ATS/gi) ?? [];
     const forbids = prompt.match(/(menjanjikan|klaim akan) lolos ATS/gi) ?? [];
