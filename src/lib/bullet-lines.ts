@@ -3,21 +3,42 @@
  * Nilai disimpan sebagai teks: satu baris = satu poin, tanpa simbol bullet.
  */
 
-// Simbol bullet yang aman dipecah walau muncul di tengah baris ("• a • b").
-// "·" tidak termasuk: sering dipakai sebagai pemisah biasa ("Python · SQL").
-const INLINE_BULLET = /\s*[•▪►●◦‣]\s*/;
+// Simbol bullet di tengah baris ("a • b") hanya dipecah bila diapit spasi, jadi
+// rating "●●●○" atau "4●" tidak rusak. "·" tidak termasuk: sering dipakai sebagai
+// pemisah biasa ("Python · SQL").
+const INLINE_BULLET = /\s+[•▪►●◦‣]\s+/;
 
-// Penanda di awal baris. "-", "*", "–", "—" wajib diikuti spasi agar "-5%" atau
-// "*catatan" tidak rusak. Angka/huruf ("1.", "1)", "a)") juga wajib diikuti spasi
-// agar "3.5 tahun" tidak terpotong.
-const LEADING_MARKER =
-  /^\s*(?:[•▪►●◦‣·]+\s*|[-*–—+]+(?:\s+|$)|\(?\d{1,2}[.)]\s+|\(?[a-z][)]\s+|[a-z]\.\s+(?=\S))/;
+// Simbol di awal baris. "•" boleh menempel ("•teks"); simbol lain dan "-", "*",
+// "–", "—", "+" wajib diikuti spasi agar "-5%", "*catatan", "●●●○" tidak rusak.
+const LEADING_SYMBOL = /^\s*(?:•\s*|[▪►●◦‣·]\s+|[-*–—+]+(?:\s+|$))/;
 
-function stripMarker(line: string): string {
+// Penomoran ("1.", "1)", "(2)", "a.", "a)"). Hanya dibuang bila terlihat sebagai
+// daftar (≥2 baris berurutan bernomor) atau teksnya dari AI, supaya "12. Juni",
+// "5) tahun", atau "s. d. 2023" yang berdiri sendiri tidak terpotong.
+const LEADING_NUMBER = /^\s*\(?\d{1,2}[.)]\s+/;
+const LEADING_LETTER = /^\s*\(?[a-z][.)]\s+(?=\S)/;
+
+export interface BulletOptions {
+  /** Teks dari AI: penomoran selalu dibuang. */
+  fromAi?: boolean;
+}
+
+type ListKind = "number" | "letter" | null;
+
+function listKind(line: string): ListKind {
+  const l = line.replace(LEADING_SYMBOL, "");
+  if (LEADING_NUMBER.test(l)) return "number";
+  if (LEADING_LETTER.test(l)) return "letter";
+  return null;
+}
+
+function stripMarker(line: string, stripList: ListKind | "any"): string {
   let out = line;
   // Ulangi untuk penanda bertumpuk seperti "1. • teks".
   for (let i = 0; i < 3; i++) {
-    const next = out.replace(LEADING_MARKER, "");
+    let next = out.replace(LEADING_SYMBOL, "");
+    if (stripList === "number" || stripList === "any") next = next.replace(LEADING_NUMBER, "");
+    if (stripList === "letter" || stripList === "any") next = next.replace(LEADING_LETTER, "");
     if (next === out) break;
     out = next;
   }
@@ -25,21 +46,26 @@ function stripMarker(line: string): string {
 }
 
 /** Ubah teks bebas menjadi baris poin bersih (tanpa simbol, tanpa baris kosong). */
-export function normalizeBulletLines(text: string | null | undefined): string {
+export function normalizeBulletLines(text: string | null | undefined, opts: BulletOptions = {}): string {
   if (!text) return "";
-  return bulletList(text).join("\n");
+  return bulletList(text, opts).join("\n");
 }
 
 /** Sama seperti normalizeBulletLines tetapi mengembalikan array poin. */
-export function bulletList(text: string | null | undefined): string[] {
+export function bulletList(text: string | null | undefined, opts: BulletOptions = {}): string[] {
   if (!text) return [];
+  const lines = text.replace(/\r\n?/g, "\n").split("\n").filter((l) => l.trim() !== "");
+  const kinds = lines.map(listKind);
   const out: string[] = [];
-  for (const rawLine of text.replace(/\r\n?/g, "\n").split("\n")) {
-    for (const part of stripMarker(rawLine).split(INLINE_BULLET)) {
-      const clean = stripMarker(part);
+  lines.forEach((rawLine, i) => {
+    const kind = kinds[i];
+    const inList = kind !== null && (kinds[i - 1] === kind || kinds[i + 1] === kind);
+    const strip: ListKind | "any" = opts.fromAi ? "any" : inList ? kind : null;
+    for (const part of stripMarker(rawLine, strip).split(INLINE_BULLET)) {
+      const clean = stripMarker(part, opts.fromAi ? "any" : null);
       if (clean) out.push(clean);
     }
-  }
+  });
   return out;
 }
 
@@ -53,11 +79,11 @@ const INLINE_NUMBERED = /\s+(?=\d{1,2}[.)]\s+\S)/;
 export function splitAiBullets(input: unknown): string {
   if (Array.isArray(input)) {
     return input
-      .flatMap((item) => (typeof item === "string" ? bulletList(splitInlineNumbered(item)) : []))
+      .flatMap((item) => (typeof item === "string" ? bulletList(splitInlineNumbered(item), { fromAi: true }) : []))
       .join("\n");
   }
   if (typeof input !== "string") return "";
-  return normalizeBulletLines(splitInlineNumbered(input));
+  return normalizeBulletLines(splitInlineNumbered(input), { fromAi: true });
 }
 
 function splitInlineNumbered(text: string): string {
@@ -97,5 +123,27 @@ export function applyAiBullets(
  * mode paragraf → teks apa adanya (dirapikan).
  */
 export function aiTextForField(text: string, type: "bullets" | "paragraph" | undefined): string {
-  return type === "paragraph" ? text.trim() : splitAiBullets(text);
+  return type === "paragraph" ? joinAsParagraph(text) : splitAiBullets(text);
+}
+
+const SENTENCE_END = /[.!?:;…]["')\]]*$/;
+
+/**
+ * Gabung poin menjadi satu paragraf. Poin yang belum diakhiri tanda baca akhir
+ * diberi titik supaya tidak jadi kalimat sambung. Penanda bullet dibuang.
+ */
+export function joinAsParagraph(text: string | null | undefined): string {
+  return bulletList(text)
+    .map((line) => (SENTENCE_END.test(line) ? line : `${line}.`))
+    .join(" ");
+}
+
+/** Pecah paragraf per kalimat (untuk mode Paragraf → Poin). Tidak ada teks yang hilang. */
+export function splitSentences(text: string | null | undefined): string[] {
+  if (!text) return [];
+  return text
+    .replace(/\r\n?/g, "\n")
+    .split(/\n+|(?<=[.!?…]["')\]]*)\s+(?=["'(\[]?[A-Z\u00C0-\u00DE])/)
+    .map((s) => s.trim())
+    .filter(Boolean);
 }

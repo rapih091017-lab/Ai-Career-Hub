@@ -13,14 +13,34 @@ describe("normalizeBulletLines", () => {
   });
 
   it("menghapus semua jenis penanda di awal baris", () => {
-    const input = ["• satu", "· dua", "- tiga", "* empat", "– lima", "— enam", "▪ tujuh", "► delapan", "1. sembilan", "2) sepuluh", "a) sebelas", "(3) dua belas", "● tiga belas", "+ empat belas"].join("\n");
+    const input = ["• satu", "· dua", "- tiga", "* empat", "– lima", "— enam", "▪ tujuh", "► delapan", "● sembilan", "+ sepuluh", "•sebelas"].join("\n");
     expect(normalizeBulletLines(input).split("\n")).toEqual([
-      "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas", "dua belas", "tiga belas", "empat belas",
+      "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas",
     ]);
   });
 
+  it("penomoran dibuang bila terlihat sebagai daftar (≥2 baris berurutan)", () => {
+    expect(normalizeBulletLines("1. satu\n2) dua\n(3) tiga")).toBe("satu\ndua\ntiga");
+    expect(normalizeBulletLines("a) satu\nb) dua")).toBe("satu\ndua");
+    expect(normalizeBulletLines("a. satu\nb. dua")).toBe("satu\ndua");
+    expect(normalizeBulletLines("- 1. satu\n- 2. dua")).toBe("satu\ndua");
+  });
+
+  it("nomor/huruf tunggal yang bukan daftar tidak rusak", () => {
+    expect(normalizeBulletLines("s. d. 2023 di PT A")).toBe("s. d. 2023 di PT A");
+    expect(normalizeBulletLines("5) tahun pengalaman")).toBe("5) tahun pengalaman");
+    expect(normalizeBulletLines("12. Juni 2023 diangkat jadi supervisor")).toBe("12. Juni 2023 diangkat jadi supervisor");
+    expect(normalizeBulletLines("Mengelola gudang\n12. Juni 2023 promosi")).toBe("Mengelola gudang\n12. Juni 2023 promosi");
+  });
+
+  it("simbol berulang (rating) tidak dipecah atau dibuang", () => {
+    expect(normalizeBulletLines("Excel ●●●○")).toBe("Excel ●●●○");
+    expect(normalizeBulletLines("●●●○ Excel")).toBe("●●●○ Excel");
+    expect(normalizeBulletLines("Bahasa Inggris ●●○○ • Excel ●●●○")).toBe("Bahasa Inggris ●●○○\nExcel ●●●○");
+  });
+
   it("memecah bullet inline", () => {
-    expect(normalizeBulletLines("• a • b •c")).toBe("a\nb\nc");
+    expect(normalizeBulletLines("• a • b • c")).toBe("a\nb\nc");
     expect(normalizeBulletLines("Memimpin tim ▪ Menyusun laporan")).toBe("Memimpin tim\nMenyusun laporan");
   });
 
@@ -50,7 +70,8 @@ describe("normalizeBulletLines", () => {
   });
 
   it("penanda bertumpuk dibersihkan", () => {
-    expect(normalizeBulletLines("1. • Mengelola stok")).toBe("Mengelola stok");
+    expect(normalizeBulletLines("1. • Mengelola stok\n2. • Audit")).toBe("Mengelola stok\nAudit");
+    expect(splitAiBullets("1. • Mengelola stok")).toBe("Mengelola stok");
   });
 
   it("idempoten", () => {
@@ -113,5 +134,28 @@ describe("aiTextForField", () => {
     expect(aiTextForField("1. foo\n2. bar", undefined)).toBe("foo\nbar");
     expect(aiTextForField("• foo • bar", "bullets")).toBe("foo\nbar");
     expect(aiTextForField("  Satu paragraf - utuh.  ", "paragraph")).toBe("Satu paragraf - utuh.");
+    expect(aiTextForField("Kalimat satu.\nKalimat dua", "paragraph")).toBe("Kalimat satu. Kalimat dua.");
+  });
+});
+
+describe("joinAsParagraph / splitSentences", () => {
+  it("gabung poin jadi paragraf dengan titik", async () => {
+    const { joinAsParagraph } = await import("@/lib/bullet-lines");
+    expect(joinAsParagraph("Menyusun laporan\nMelatih staf!\nAudit stok:")).toBe("Menyusun laporan. Melatih staf! Audit stok:");
+    expect(joinAsParagraph("- a\n\n- b.")).toBe("a. b.");
+  });
+
+  it("pecah per kalimat tanpa kehilangan teks", async () => {
+    const { splitSentences } = await import("@/lib/bullet-lines");
+    expect(splitSentences("Menyusun laporan. Melatih 3 staf! Naik 2.5 poin s. d. 2023.")).toEqual(["Menyusun laporan.", "Melatih 3 staf!", "Naik 2.5 poin s. d. 2023."]);
+    const para = "Satu. Dua? Tiga";
+    expect(splitSentences(para).join(" ")).toBe(para);
+  });
+
+  it("bolak-balik poin → paragraf → poin tidak kehilangan teks", async () => {
+    const { joinAsParagraph, splitSentences } = await import("@/lib/bullet-lines");
+    const bullets = "Menyusun laporan stok\nMelatih [jumlah orang] staf baru.\nAudit gudang tiap bulan";
+    const back = splitSentences(joinAsParagraph(bullets));
+    expect(back.map((l) => l.replace(/\.$/, ""))).toEqual(bullets.split("\n").map((l) => l.replace(/\.$/, "")));
   });
 });

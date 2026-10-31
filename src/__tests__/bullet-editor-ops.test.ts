@@ -23,7 +23,7 @@ describe("bullet-editor-ops", () => {
   });
 
   it("tempel multi-baris dipecah jadi poin", () => {
-    expect(pasteAt(["Xy"], 0, 1, 1, "• a\n- b\n3. c")).toEqual({ lines: ["Xa", "b", "cy"], focus: 2, caret: 1 });
+    expect(pasteAt(["Xy"], 0, 1, 1, "• a\n- b\n• c")).toEqual({ lines: ["Xa", "b", "cy"], focus: 2, caret: 1 });
     expect(pasteAt(["hapus"], 0, 0, 5, "- satu\n- dua")).toEqual({ lines: ["satu", "dua"], focus: 1, caret: 3 });
     expect(pasteAt(["ab"], 0, 1, 1, "\n\n")).toEqual({ lines: ["ab"], focus: 0, caret: 1 });
     // Baris baru di awal: poin tempel tidak menyambung ke teks sebelumnya.
@@ -44,5 +44,12 @@ describe("bullet-editor-ops", () => {
     expect(shouldSplitPaste("https://a-b.com")).toBe(false);
     expect(shouldSplitPaste("a\nb")).toBe(true);
     expect(shouldSplitPaste("• a")).toBe(true);
+  });
+});
+
+describe("pasteAt: daftar bernomor", () => {
+  it("nomor berurutan dibuang, nomor tunggal dipertahankan", () => {
+    expect(pasteAt([""], 0, 0, 0, "1. a\n2. b").lines).toEqual(["a", "b"]);
+    expect(pasteAt([""], 0, 0, 0, "Mulai\n12. Juni dipromosikan").lines).toEqual(["Mulai", "12. Juni dipromosikan"]);
   });
 });
