@@ -50,3 +50,8 @@
 - PDF builder (issue 04, sesi berikut): tidak dihitung kuota, tapi paket pdf_export:false tetap 403 — PERLU KONFIRMASI USER.
 - Sesi ini: Batch A (A1 R1+UTC+hapus .catch create:218, A2 R4 noCache semua GET ber-auth, A3 R8 Kasera, A4 R2, A5 prompt AI) + Batch C (C1 F1 loadedRef, C2 autosave retry/flush/prev setelah sukses, C3 R6 additive normalisasi, C4 newId() crypto.randomUUID di src/lib/id.ts, C5 AbortController, C6 handleSave, C7 ResizeObserver deps) + issue 01 + issue 02 (certifications & selfEvaluation di urutan default + migrasi sisip, layout.showSkillLevel default false, toggle di DisplaySettingsModal, label Pemula/Menengah/Mahir, terapkan ke preview & CvPdfDocument).
 - Ditunda: R7 lanjutan (reserveQuota), B1/R9, B5, F6/F7/F9/F10, issue 00, 03–13.
+
+# Keputusan user 2026-10-31
+- PDF builder: BEBAS untuk semua paket (termasuk pdf_export:false), tanpa hitungan kuota. Tetap auth + ownership + rate limit anti-abuse.
+- Kasera: nominal kosong/tak terbaca → tolak (tetap). Nominal teks "50000"/"50000.00" dibaca benar (commit fix pembayaran).
+- Sertifikasi: punya toggle tampil/sembunyi sendiri (sudah ada di Pengaturan Tampilan).
