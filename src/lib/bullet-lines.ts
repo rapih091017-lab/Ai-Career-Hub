@@ -143,7 +143,8 @@ export function splitSentences(text: string | null | undefined): string[] {
   if (!text) return [];
   return text
     .replace(/\r\n?/g, "\n")
-    .split(/\n+|(?<=[.!?…]["')\]]*)\s+(?=["'(\[]?[A-Z\u00C0-\u00DE])/)
+    // Tidak memecah setelah angka ("3. Tempel") atau inisial satu huruf ("A. Rahman").
+    .split(/\n+|(?<=[^\s\d][.!?…]["')\]]*)(?<!(?:^|\s)\p{L}\.)\s+(?=["'(\[]?[A-Z\u00C0-\u00DE])/u)
     .map((s) => s.trim())
     .filter(Boolean);
 }

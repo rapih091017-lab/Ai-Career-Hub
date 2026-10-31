@@ -148,6 +148,7 @@ describe("joinAsParagraph / splitSentences", () => {
   it("pecah per kalimat tanpa kehilangan teks", async () => {
     const { splitSentences } = await import("@/lib/bullet-lines");
     expect(splitSentences("Menyusun laporan. Melatih 3 staf! Naik 2.5 poin s. d. 2023.")).toEqual(["Menyusun laporan.", "Melatih 3 staf!", "Naik 2.5 poin s. d. 2023."]);
+    expect(splitSentences("Langkah 3. Tempel tiga. Dibimbing A. Rahman.")).toEqual(["Langkah 3. Tempel tiga.", "Dibimbing A. Rahman."]);
     const para = "Satu. Dua? Tiga";
     expect(splitSentences(para).join(" ")).toBe(para);
   });
