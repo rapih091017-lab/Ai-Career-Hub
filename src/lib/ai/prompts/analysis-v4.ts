@@ -56,9 +56,9 @@ ${DELIM.SECTION}
    sekadar prioritas High: prioritasnya adalah (a) bullet dengan CARI terendah /
    potensi perbaikan terbesar, (b) relevan dengan JD / role target, (c) mewakili
    section berbeda bila memungkinkan (jangan semua dari satu experience). Urutkan
-   hasilnya dari yang paling berdampak ke paling kecil. suggested_rewrite BOLEH
-   memakai metrik estimasi konservatif TANPA menambah fakta baru, asal bertanda
-   "[est.]", jangan menulis angka pasti untuk hal yang tidak ada di CV.
+   hasilnya dari yang paling berdampak ke paling kecil. suggested_rewrite TIDAK
+   boleh menambah fakta atau angka baru; angka yang tidak ada di CV ditulis
+   placeholder "[angka]", "[persen]", atau "[jumlah orang]".
 8. impact_forecast WAJIB monoton: current_score ≤ projected_after_quick_wins ≤
    projected_after_all_fixes ≤ 96.
 9. Semua field skema wajib terisi ([] atau "" bila kosong). Jangan null/undefined.
@@ -174,9 +174,9 @@ jika sinyal tidak pasti dari teks mentah):
 | Result  | Hasil terukur (%, angka, waktu, revenue)? | 0-25 |
 | Impact  | Dampak bisnis lebih luas? | 0-25 |
 
-Contoh weak: "Bertanggung jawab mengelola tim IT". Strong: "Memimpin tim 5 engineer
+Contoh weak: "Bertanggung jawab mengelola tim IT". Strong: "Memimpin tim [jumlah orang] engineer
 dalam migrasi cloud (Context), merancang arsitektur baru (Action), mengurangi downtime
-40% (Result), menghemat biaya operasional Rp500.000.000/tahun (Impact)."
+[persen] (Result), menghemat biaya operasional Rp[angka]/tahun (Impact)."
 
 Action verb: past tense role lama, present tense role aktif. Lemah: helped, assisted,
 "was part of", "bertanggung jawab". Kuat: led, architected, spearheaded, drove,
@@ -473,11 +473,11 @@ ${DELIM.SECTION}
   "impact_forecast": { "current_score": 62, "projected_after_quick_wins": 68, "projected_after_all_fixes": 80 },
   "action_plan": {
     "quick_wins": ["Tambah TypeScript, GraphQL, Docker di Skills, keyword kritis JD", "Pindahkan kontak dari header ke body"],
-    "short_term": ["Rewrite bullet dengan CARI, tambah metrik ([est.] bila data tidak ada)", "Tambahkan link portfolio/GitHub"],
+    "short_term": ["Rewrite bullet dengan CARI, tambah metrik (placeholder [angka] bila data tidak ada)", "Tambahkan link portfolio/GitHub"],
     "long_term": ["Sertifikasi AWS/Docker untuk tutup gap infrastruktur"]
   },
   "bullet_review": [
-    { "section": "experience", "original_text": "Membangun fitur login menggunakan React dan Node.js", "cari_score": 15, "issues": ["Verb moderate", "Result & Impact = 0"], "suggested_rewrite": "Merancang sistem autentikasi end-to-end (React + Node.js, JWT + OAuth2) yang melayani [est.] 10.000+ pengguna dan memangkas response time [est.] 40%.", "priority": "High" }
+    { "section": "experience", "original_text": "Membangun fitur login menggunakan React dan Node.js", "cari_score": 15, "issues": ["Verb moderate", "Result & Impact = 0"], "suggested_rewrite": "Merancang fitur login end-to-end dengan React dan Node.js yang melayani [jumlah orang] pengguna dan memangkas response time [persen].", "priority": "High" }
   ],
   "missing_sections": ["Sertifikasi", "Portfolio/GitHub"],
   "quick_summary": { "verdict": "Fondasi React solid, tapi TypeScript absen dan 4 bullet tanpa metrik — dua hal ini yang paling menahan skor.", "top_strengths": ["Fondasi React & Node.js sesuai stack JD", "Career velocity positif: Junior ke Mid dalam 2 tahun", "Pendidikan relevan: S1 Ilmu Komputer"], "top_fixes": [ { "id": "q1", "title": "Tambah TypeScript di Skills", "target_section": "keyword", "impact": "Tinggi", "est_minutes": 5, "copy_text": "TypeScript | Next.js | CI/CD" }, { "id": "q2", "title": "Kuantifikasi 4 bullet experience", "target_section": "skor", "impact": "Tinggi", "est_minutes": 30 }, { "id": "q3", "title": "Pindahkan kontak ke body", "target_section": "hr", "impact": "Sedang", "est_minutes": 5 } ] },
