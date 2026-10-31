@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useToast } from "@/components/ui/toast";
 import type { CvData } from "@/components/cv-templates";
 import {
   type AutoFixSuggestion,
@@ -27,6 +28,7 @@ function targetLabel(s: AutoFixSuggestion): string {
 
 export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
   const [enabled, setEnabled] = useState(false);
+  const { addToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [suggestions, setSuggestions] = useState<AutoFixSuggestion[]>([]);
@@ -103,8 +105,17 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
       else fixes.push({ ...s, name: value });
     }
     if (fixes.length === 0) return;
+    const before = cvData;
     const report = applyApprovedFixesWithReport(cvData, fixes);
     onApply(report.cv);
+    if (report.applied > 0) {
+      addToast({
+        type: "success",
+        message: `${report.applied} perbaikan diterapkan.`,
+        duration: 8000,
+        action: { label: "Urungkan", onClick: () => onApply(before) },
+      });
+    }
     setAppliedCount(report.applied);
     setSkippedCount(report.skipped.length);
     setSuggestions([]);

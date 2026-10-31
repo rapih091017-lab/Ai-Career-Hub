@@ -6,6 +6,7 @@ import { Field } from "@/components/builder/Field";
 import { AIPolishButton } from "@/components/ai/AIPolishDialog";
 import { AiLoadingOverlay } from "./AiLoadingOverlay";
 import { BulletEditor } from "./BulletEditor";
+import { useToast } from "@/components/ui/toast";
 import { aiTextForField, applyAiBullets } from "@/lib/bullet-lines";
 import type { WorkEntry } from "@/components/cv-templates";
 
@@ -53,6 +54,17 @@ export function WorkCard({
 }: WorkCardProps) {
   const [aiSuggestLoading, setAiSuggestLoading] = useState(false);
   const [aiReviseLoading, setAiReviseLoading] = useState(false);
+  const { addToast } = useToast();
+
+  // Hasil AI menimpa deskripsi: beri kesempatan mengembalikan teks lama.
+  const offerUndo = (message: string, before: string) => {
+    addToast({
+      type: "success",
+      message,
+      duration: 8000,
+      action: { label: "Urungkan", onClick: () => onUpdate(index, "description", before) },
+    });
+  };
 
   const handleSuggest = async () => {
     setAiSuggestLoading(true);
@@ -78,7 +90,9 @@ export function WorkCard({
             `Saran AI · ${work.position || "Posisi " + (index + 1)}`,
             data.suggestions,
             (text: string, mode: "append" | "replace" = "replace") => {
-              onUpdate(index, "description", applyAiBullets(work.description, text, mode));
+              const before = work.description;
+              onUpdate(index, "description", applyAiBullets(before, text, mode));
+              offerUndo(mode === "append" ? "Poin saran ditambahkan." : "Deskripsi diganti dengan saran AI.", before);
             }
           );
         }
@@ -114,7 +128,9 @@ export function WorkCard({
           data.explanation,
           data.tip,
           (text: string) => {
+            const before = work.description;
             onUpdateDescription(index, aiTextForField(text, work.descriptionType));
+            offerUndo("Deskripsi diganti dengan versi yang dioptimalkan.", before);
           }
         );
       }
@@ -271,6 +287,7 @@ export function WorkCard({
                           jobDescription={jobDescription}
                           field="deskripsi pengalaman kerja"
                           format={work.descriptionType ?? "bullets"}
+                          onRevert={(text) => onUpdate(index, "description", text)}
                           size="sm"
                         />
                       ) : null

@@ -20,6 +20,8 @@ interface AIPolishButtonProps {
   format?: "bullets" | "paragraph";
   disabled?: boolean;
   size?: "sm" | "md";
+  /** Mengembalikan teks sebelum dipoles (tombol Urungkan di toast). Default: onApply. */
+  onRevert?: (original: string) => void;
 }
 
 export function AIPolishButton({
@@ -30,6 +32,7 @@ export function AIPolishButton({
   jobDescription,
   field,
   format,
+  onRevert,
   disabled = false,
   size = "sm",
 }: AIPolishButtonProps) {
@@ -66,8 +69,14 @@ export function AIPolishButton({
       const data = await response.json();
 
       if (data.success && data.polished) {
+        const original = content;
         onApply(data.polished);
-        addToast({ type: "success", message: "Teks berhasil dioptimasi!" });
+        addToast({
+          type: "success",
+          message: "Teks sudah dipoles.",
+          duration: 8000,
+          action: { label: "Urungkan", onClick: () => (onRevert ?? onApply)(original) },
+        });
       } else {
         throw new Error("Response tidak valid");
       }
@@ -80,7 +89,7 @@ export function AIPolishButton({
     } finally {
       setIsPolishing(false);
     }
-  }, [content, jobTitle, skills, jobDescription, field, format, onApply, addToast]);
+  }, [content, jobTitle, skills, jobDescription, field, format, onApply, onRevert, addToast]);
 
   const iconSize = size === "sm" ? "text-[14px]" : "text-[18px]";
   const padding = size === "sm" ? "p-1" : "p-1.5";

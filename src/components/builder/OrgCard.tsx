@@ -118,6 +118,7 @@ export function OrgCard({ org, index, totalItems, jobTitle, skills, jobDescripti
               jobDescription={jobDescription}
               field="deskripsi organisasi"
               format={org.descriptionType ?? "bullets"}
+              onRevert={(text) => onUpdate(index, "description", text)}
               size="sm"
             />
           ) : null
