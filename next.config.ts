@@ -12,6 +12,11 @@ let nextConfig: NextConfig = {
     "mammoth",
   ],
 
+  // Font CV dibaca lewat fs saat membuat PDF; pastikan ikut ter-bundle ke fungsi.
+  outputFileTracingIncludes: {
+    "/api/cv-documents/[id]/pdf": ["./public/fonts/cv/**"],
+  },
+
   // Optimasi gambar: remotePatterns untuk CDN eksternal
   images: {
     remotePatterns: [

@@ -59,3 +59,28 @@ export async function resolveLocalBrowserPath(): Promise<string | null> {
   }
   return null;
 }
+
+/**
+ * Cetak HTML mandiri ke PDF A4. Ukuran & margin halaman diambil dari CSS
+ * (`@page`). Semua permintaan jaringan diblokir kecuali data: dan about:,
+ * jadi HTML hanya bisa memakai aset yang sudah disematkan.
+ */
+export async function printStandaloneHtml(html: string): Promise<Uint8Array> {
+  const browser = await launchPdfBrowser();
+  try {
+    const page = await browser.newPage();
+    await page.setJavaScriptEnabled(false);
+    await page.setRequestInterception(true);
+    page.on("request", (req) => {
+      const url = req.url();
+      if (url.startsWith("data:") || url.startsWith("about:")) void req.continue();
+      else void req.abort();
+    });
+    await page.setContent(html, { waitUntil: "load", timeout: 45_000 });
+    await page.evaluate(() => document.fonts.ready);
+    return await page.pdf({ printBackground: true, preferCSSPageSize: true });
+  } finally {
+    // Selalu tutup browser, di serverless instance menggantung = memori bocor
+    await browser.close().catch(() => {});
+  }
+}
