@@ -80,12 +80,18 @@ export default function BuilderPage() {
     const el = contentRef.current;
     if (!el) return;
     let alive = true;
-    const update = () => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const measure = () => {
       if (alive) setAllPageCount(measurePageCount(el));
     };
-    update();
+    // Debounce: saat mengetik, ukur ulang sekali setelah jeda, bukan tiap tombol.
+    const update = () => {
+      clearTimeout(timer);
+      timer = setTimeout(measure, 150);
+    };
+    measure();
     // Font CV dimuat belakangan; ukur ulang setelah siap.
-    void document.fonts?.ready.then(update);
+    void document.fonts?.ready.then(measure);
     const ro = new ResizeObserver(update);
     ro.observe(el);
     for (const child of Array.from(el.children)) ro.observe(child);
@@ -93,6 +99,7 @@ export default function BuilderPage() {
     mo.observe(el, { childList: true, subtree: true, characterData: true, attributes: true });
     return () => {
       alive = false;
+      clearTimeout(timer);
       ro.disconnect();
       mo.disconnect();
     };
@@ -145,22 +152,48 @@ export default function BuilderPage() {
   /* ── PDF Export ── */
 
   // Format tampilan yang sama dipakai pratinjau dan dikirim ke server PDF.
-  const printFormat: CvPrintFormat = {
-    templateId: selectedTemplateId,
-    fontFamily,
-    fontSize,
-    textAlign,
-    showDividers,
-    customPrimaryColor,
-    spacingMode,
-    headerLayout,
-    marginMode,
-    sectionOrder,
-    sectionVisibility,
-    customSections,
-    showSkillLevel,
-  };
-  const { marginMm: _marginMm, ...renderProps } = cvRenderProps(cvData, printFormat, selectedTemplateId);
+  const printFormat: CvPrintFormat = useMemo(
+    () => ({
+      templateId: selectedTemplateId,
+      fontFamily,
+      fontSize,
+      textAlign,
+      showDividers,
+      customPrimaryColor,
+      spacingMode,
+      headerLayout,
+      marginMode,
+      sectionOrder,
+      sectionVisibility,
+      customSections,
+      showSkillLevel,
+    }),
+    [selectedTemplateId, fontFamily, fontSize, textAlign, showDividers, customPrimaryColor, spacingMode,
+      headerLayout, marginMode, sectionOrder, sectionVisibility, customSections, showSkillLevel],
+  );
+
+  // Klik section di pratinjau → lompat ke langkah form terkait.
+  const handlePreviewSectionClick = useCallback((sectionKey: string) => {
+    const sectionStepMap: Record<string, number> = {
+      summary: 0,
+      experience: 2,
+      education: 3,
+      skills: 5,
+      certifications: 5,
+      selfEvaluation: 5,
+      lainnya: 5,
+      organizations: 4,
+    };
+    const step = sectionStepMap[sectionKey];
+    if (step !== undefined) setActiveStep(step);
+  }, []);
+
+  // Elemen pratinjau di-memo: render ulang hanya saat data/format CV berubah,
+  // bukan saat status autosave, modal, dsb. berubah.
+  const previewContent = useMemo(() => {
+    const { marginMm: _marginMm, ...renderProps } = cvRenderProps(cvData, printFormat, selectedTemplateId);
+    return <AtsBaseRenderer {...renderProps} onSectionClick={handlePreviewSectionClick} />;
+  }, [cvData, printFormat, selectedTemplateId, handlePreviewSectionClick]);
 
   const handleExportPdf = async () => {
     setIsPdfExporting(true);
@@ -590,23 +623,7 @@ export default function BuilderPage() {
                 <div className="a4-preview origin-top scale-[0.85] lg:scale-100 max-w-full shrink-0" style={{ margin: "0 auto", width: "210mm" }}>
                   <CvFontFaces />
                   <CvPagedPreview pageCount={allPageCount} marginMm={marginPadding} measureRef={contentRef}>
-                    <AtsBaseRenderer
-                      {...renderProps}
-                      onSectionClick={(sectionKey) => {
-                        const sectionStepMap: Record<string, number> = {
-                          "summary": 0,
-                          "experience": 2,
-                          "education": 3,
-                          "skills": 5,
-                          "certifications": 5,
-                          "selfEvaluation": 5,
-                          "lainnya": 5,
-                          "organizations": 4,
-                        };
-                        const step = sectionStepMap[sectionKey];
-                        if (step !== undefined) setActiveStep(step);
-                      }}
-                    />
+                    {previewContent}
                   </CvPagedPreview>
                 </div>
               </div>

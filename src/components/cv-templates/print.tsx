@@ -47,7 +47,8 @@ interface PagedPreviewProps {
  * yang sama dengan cetak, jadi `break-inside: avoid` dan `break-after: avoid`
  * berlaku sama seperti di PDF. Halaman ke-k menampilkan kolom ke-k lewat
  * translateX. Tiap halaman merender alur yang sama; halaman selain pertama
- * diberi aria-hidden agar pembaca layar tidak membaca isi ganda.
+ * diberi inert + aria-hidden agar isi ganda tidak bisa difokus atau dibaca.
+ * Klik edit section hanya bekerja di halaman pertama.
  */
 export function CvPagedPreview({ pageCount, marginMm, children, measureRef, pageGapPx = 16 }: PagedPreviewProps) {
   const w = contentWidthMm(marginMm);
@@ -59,7 +60,9 @@ export function CvPagedPreview({ pageCount, marginMm, children, measureRef, page
         <div
           key={k}
           data-cv-page={k + 1}
+          // Halaman k>0 hanya salinan visual: tidak bisa difokus/diklik, tidak dibaca pembaca layar.
           aria-hidden={k > 0 ? true : undefined}
+          inert={k > 0 ? true : undefined}
           style={{
             width: `${A4_W_MM}mm`,
             height: `${A4_H_MM}mm`,
