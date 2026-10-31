@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useToast } from "@/components/ui/toast";
+import { UNDO_BLOCKED_MESSAGE, useUndoGuard } from "@/hooks/useUndoGuard";
 import { aiErrorMessage } from "@/components/ai/ai-error-message";
 
 /**
@@ -38,6 +39,7 @@ export function AIPolishButton({
 }: AIPolishButtonProps) {
   const [isPolishing, setIsPolishing] = useState(false);
   const { addToast } = useToast();
+  const undoGuard = useUndoGuard(content);
 
   const handlePolish = useCallback(async () => {
     if (!content || content.trim().length < 10) {
@@ -71,11 +73,22 @@ export function AIPolishButton({
       if (data.success && data.polished) {
         const original = content;
         onApply(data.polished);
+        const unchanged = undoGuard.markApplied();
         addToast({
           type: "success",
           message: "Teks sudah dipoles.",
           duration: 8000,
-          action: { label: "Urungkan", onClick: () => (onRevert ?? onApply)(original) },
+          action: {
+            label: "Urungkan",
+            onClick: () => {
+              // Teks sudah diedit lagi setelah dipoles: jangan ditimpa.
+              if (!unchanged()) {
+                addToast({ type: "info", message: UNDO_BLOCKED_MESSAGE });
+                return;
+              }
+              (onRevert ?? onApply)(original);
+            },
+          },
         });
       } else {
         throw new Error("Response tidak valid");
@@ -89,7 +102,7 @@ export function AIPolishButton({
     } finally {
       setIsPolishing(false);
     }
-  }, [content, jobTitle, skills, jobDescription, field, format, onApply, onRevert, addToast]);
+  }, [content, jobTitle, skills, jobDescription, field, format, onApply, onRevert, addToast, undoGuard]);
 
   const iconSize = size === "sm" ? "text-[14px]" : "text-[18px]";
   const padding = size === "sm" ? "p-1" : "p-1.5";

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useToast } from "@/components/ui/toast";
+import { UNDO_BLOCKED_MESSAGE, useUndoGuard } from "@/hooks/useUndoGuard";
 import type { CvData } from "@/components/cv-templates";
 import {
   type AutoFixSuggestion,
@@ -29,6 +30,7 @@ function targetLabel(s: AutoFixSuggestion): string {
 export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
   const [enabled, setEnabled] = useState(false);
   const { addToast } = useToast();
+  const undoGuard = useUndoGuard(cvData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [suggestions, setSuggestions] = useState<AutoFixSuggestion[]>([]);
@@ -109,11 +111,22 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
     const report = applyApprovedFixesWithReport(cvData, fixes);
     onApply(report.cv);
     if (report.applied > 0) {
+      const unchanged = undoGuard.markApplied();
       addToast({
         type: "success",
         message: `${report.applied} perbaikan diterapkan.`,
         duration: 8000,
-        action: { label: "Urungkan", onClick: () => onApply(before) },
+        action: {
+          label: "Urungkan",
+          onClick: () => {
+            // Urungkan mengembalikan seluruh CV; batalkan bila CV sudah diedit lagi.
+            if (!unchanged()) {
+              addToast({ type: "info", message: "CV sudah diubah setelah perbaikan, urungkan dibatalkan." });
+              return;
+            }
+            onApply(before);
+          },
+        },
       });
     }
     setAppliedCount(report.applied);

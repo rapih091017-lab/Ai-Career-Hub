@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Field } from "@/components/builder/Field";
 import { AIPolishButton } from "@/components/ai/AIPolishDialog";
 import { AiLoadingOverlay } from "./AiLoadingOverlay";
 import { BulletEditor } from "./BulletEditor";
 import { useToast } from "@/components/ui/toast";
+import { UNDO_BLOCKED_MESSAGE, useUndoGuard } from "@/hooks/useUndoGuard";
 import { aiTextForField, applyAiBullets } from "@/lib/bullet-lines";
 import type { WorkEntry } from "@/components/cv-templates";
 
@@ -59,13 +60,29 @@ export function WorkCard({
   const [aiReviseLoading, setAiReviseLoading] = useState(false);
   const { addToast } = useToast();
 
-  // Hasil AI menimpa deskripsi: beri kesempatan mengembalikan teks lama.
+  const undoGuard = useUndoGuard(work.description);
+  // Indeks bisa bergeser bila entri diurutkan ulang sebelum Urungkan diklik.
+  const indexRef = useRef(index);
+  indexRef.current = index;
+
+  // Hasil AI menimpa deskripsi: beri kesempatan mengembalikan teks lama,
+  // kecuali deskripsi sudah diedit lagi setelah hasil AI diterima.
   const offerUndo = (message: string, before: string) => {
+    const unchanged = undoGuard.markApplied();
     addToast({
       type: "success",
       message,
       duration: 8000,
-      action: { label: "Urungkan", onClick: () => onUpdate(index, "description", before) },
+      action: {
+        label: "Urungkan",
+        onClick: () => {
+          if (!unchanged()) {
+            addToast({ type: "info", message: UNDO_BLOCKED_MESSAGE });
+            return;
+          }
+          onUpdate(indexRef.current, "description", before);
+        },
+      },
     });
   };
 
