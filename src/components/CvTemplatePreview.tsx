@@ -1,6 +1,7 @@
 "use client";
 
 import { AtsBaseRenderer, TEMPLATE_STYLES, type CvData } from "@/components/cv-templates/index";
+import { CvFontFaces } from "@/components/cv-templates/CvFontFaces";
 
 /* ───────── dummy data for preview ───────── */
 
@@ -91,6 +92,7 @@ export default function CvTemplatePreview({ templateId = "industrial-pro" }: CvT
           userSelect: "none",
         }}
       >
+        <CvFontFaces />
         <AtsBaseRenderer data={DUMMY_CV_DATA} style={style} />
       </div>
     </div>

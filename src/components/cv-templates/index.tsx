@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { cvFontStack } from "@/lib/cv-fonts";
 import { formatCertification, formatSkill, groupNamedSkills, namedCertifications } from "@/lib/cv-sections";
 
 /* ───────── shared types ───────── */
@@ -149,7 +149,7 @@ export interface TemplateStyle {
   sectionStyle: "underline" | "bordered" | "minimal";
   /** Body font size in pt */
   bodySize: number;
-  /** Heading font */
+  /** Heading font, nilai dari `cvFontValue` (nilai lama tetap dipetakan lewat `resolveCvFont`). */
   headingFont: string;
   /** Body font */
   bodyFont: string;
@@ -167,8 +167,8 @@ export const TEMPLATE_STYLES: Record<string, TemplateStyle> = {
     sectionTitle: "#111111",
     sectionStyle: "underline",
     bodySize: 10,
-    headingFont: "'Calibri', 'Arial', 'Helvetica', sans-serif",
-    bodyFont: "'Calibri', 'Arial', 'Helvetica', sans-serif",
+    headingFont: "'CV Carlito', sans-serif",
+    bodyFont: "'CV Carlito', sans-serif",
   },
   "clean-slate": {
     id: "clean-slate",
@@ -179,8 +179,8 @@ export const TEMPLATE_STYLES: Record<string, TemplateStyle> = {
     sectionTitle: "#334155",
     sectionStyle: "bordered",
     bodySize: 10.5,
-    headingFont: "'Inter', 'Helvetica Neue', sans-serif",
-    bodyFont: "'Inter', 'Helvetica Neue', sans-serif",
+    headingFont: "'CV Inter', sans-serif",
+    bodyFont: "'CV Inter', sans-serif",
   },
   "executive-serif": {
     id: "executive-serif",
@@ -191,8 +191,8 @@ export const TEMPLATE_STYLES: Record<string, TemplateStyle> = {
     sectionTitle: "#1e3a5f",
     sectionStyle: "underline",
     bodySize: 10.5,
-    headingFont: "'Georgia', 'Times New Roman', serif",
-    bodyFont: "'Georgia', 'Times New Roman', serif",
+    headingFont: "'CV Tinos', serif",
+    bodyFont: "'CV Tinos', serif",
   },
   "fresh-graduate": {
     id: "fresh-graduate",
@@ -203,8 +203,8 @@ export const TEMPLATE_STYLES: Record<string, TemplateStyle> = {
     sectionTitle: "#0d9488",
     sectionStyle: "minimal",
     bodySize: 10.5,
-    headingFont: "'Open Sans', 'Segoe UI', sans-serif",
-    bodyFont: "'Open Sans', 'Segoe UI', sans-serif",
+    headingFont: "'CV Open Sans', sans-serif",
+    bodyFont: "'CV Open Sans', sans-serif",
   },
   "compact-pro": {
     id: "compact-pro",
@@ -215,10 +215,13 @@ export const TEMPLATE_STYLES: Record<string, TemplateStyle> = {
     sectionTitle: "#1f2937",
     sectionStyle: "bordered",
     bodySize: 9.5,
-    headingFont: "system-ui, 'Segoe UI', sans-serif",
-    bodyFont: "system-ui, 'Segoe UI', sans-serif",
+    headingFont: "'CV Inter', sans-serif",
+    bodyFont: "'CV Inter', sans-serif",
   },
 };
+
+/** Semua ukuran CV memakai pt agar pratinjau = ukuran cetak. */
+const pt = (n: number) => `${n}pt`;
 
 /* ───────── format date helper (ATS-friendly) ───────── */
 
@@ -289,8 +292,8 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
   };
 
   /* ── skill grouping helper (hanya skill bernama) ── */
-  const groupedSkills = useMemo(() => groupNamedSkills(data.skills), [data.skills]);
-  const certifications = useMemo(() => namedCertifications(data.certifications), [data.certifications]);
+  const groupedSkills = groupNamedSkills(data.skills);
+  const certifications = namedCertifications(data.certifications);
 
   const CATEGORY_LABELS: Record<string, string> = {
     technical: lang === "en" ? "Technical" : "Teknis",
@@ -299,18 +302,9 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
   };
 
   /* ── Filter visible items helper ── */
-  const visibleWork = useMemo(
-    () => data.workHistory.filter((w) => w.visible !== false),
-    [data.workHistory]
-  );
-  const visibleEducation = useMemo(
-    () => data.education.filter((e) => e.visible !== false),
-    [data.education]
-  );
-  const visibleOrgs = useMemo(
-    () => data.organisations.filter((o) => o.visible !== false),
-    [data.organisations]
-  );
+  const visibleWork = data.workHistory.filter((w) => w.visible !== false);
+  const visibleEducation = data.education.filter((e) => e.visible !== false);
+  const visibleOrgs = data.organisations.filter((o) => o.visible !== false);
 
   /* ── section renderers map ── */
   const sectionRenderers: Record<SectionKey, { render: () => React.ReactNode; label: string }> = {
@@ -333,7 +327,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
           <>
             <SectionHeader title={L("experience")} style={style} />
             {visibleWork.map((work, i) => (
-              <div key={work.id || i} style={{ marginBottom: 12, pageBreakInside: "avoid", textAlign }}>
+              <div key={work.id || i} style={{ marginBottom: pt(12), breakInside: "avoid", textAlign }}>
                 {/* Company + Location, BOLD, primary row with date */}
                 <div
                   style={{
@@ -342,15 +336,15 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                     fontWeight: 700,
                   }}
                 >
-                  <span style={{ fontSize: bodyFontSize, fontWeight: 700, color: "#111111" }}>
+                  <span style={{ fontSize: pt(bodyFontSize), fontWeight: 700, color: "#111111" }}>
                     {work.company || "-"}{work.location ? `, ${work.location}` : ""}
                   </span>
                   <span
                     style={{
-                      fontSize: bodyFontSize,
+                      fontSize: pt(bodyFontSize),
                       fontWeight: 400,
                       whiteSpace: "nowrap",
-                      marginLeft: 8,
+                      marginLeft: pt(8),
                     }}
                   >
                     {formatDate(work.startDate)}
@@ -363,14 +357,14 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                   style={{
                     fontStyle: "italic",
                     color: "#444444",
-                    margin: "0 0 3px 0",
-                    fontSize: bodyFontSize - 1,
+                    margin: "0 0 3pt 0",
+                    fontSize: pt(bodyFontSize - 1),
                   }}
                 >
                   {work.position || "-"}
                 </p>
                 {work.companyDescription && (
-                  <p style={{ fontSize: bodyFontSize - 1, color: "#666666", margin: "0 0 5px 0", fontStyle: "italic" }}>
+                  <p style={{ fontSize: pt(bodyFontSize - 1), color: "#666666", margin: "0 0 5pt 0", fontStyle: "italic" }}>
                     {work.companyDescription}
                   </p>
                 )}
@@ -378,23 +372,23 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                 {work.achievement && (
                   <p
                     style={{
-                      fontSize: bodyFontSize - 1,
-                      fontWeight: 500,
+                      fontSize: pt(bodyFontSize - 1),
+                      fontWeight: 400,
                       color: "#111111",
-                      margin: "0 0 5px 0",
-                      padding: "3px 6px",
+                      margin: "0 0 5pt 0",
+                      padding: "3pt 6pt",
                       background: "#f0fdf4",
-                      borderLeft: "3px solid #22c55e",
-                      borderRadius: 2,
+                      borderLeft: "3pt solid #22c55e",
+                      borderRadius: pt(2),
                     }}
                   >
-                    ✦ {work.achievement}
+                    {work.achievement}
                   </p>
                 )}
                 {work.description && (
-                  <ul style={{ margin: "0 0 8px 0", paddingLeft: 20, listStyle: "disc" }}>
+                  <ul style={{ margin: "0 0 8pt 0", paddingLeft: pt(20), listStyle: "disc" }}>
                     {work.description.split("\n").filter(Boolean).map((line, j) => (
-                      <li key={j} style={{ marginBottom: 4, color: "#111111", textAlign }}>
+                      <li key={j} style={{ marginBottom: pt(4), color: "#111111", textAlign }}>
                         {line}
                       </li>
                     ))}
@@ -402,8 +396,8 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                 )}
                 {/* Project URL */}
                 {work.projectUrl && (
-                  <p style={{ fontSize: bodyFontSize - 1, color: "#0066cc", margin: "0 0 4px 0" }}>
-                    🔗 {work.projectUrl}
+                  <p style={{ fontSize: pt(bodyFontSize - 1), color: "#0066cc", margin: "0 0 4pt 0" }}>
+                    {work.projectUrl}
                   </p>
                 )}
               </div>
@@ -418,7 +412,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
           <>
             <SectionHeader title={L("education")} style={style} />
             {visibleEducation.map((edu, i) => (
-              <div key={edu.id || i} style={{ marginBottom: 12, pageBreakInside: "avoid", textAlign }}>
+              <div key={edu.id || i} style={{ marginBottom: pt(12), breakInside: "avoid", textAlign }}>
                 <div
                   style={{
                     display: "flex",
@@ -426,15 +420,15 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                     fontWeight: 700,
                   }}
                 >
-                  <span style={{ fontSize: bodyFontSize }}>
+                  <span style={{ fontSize: pt(bodyFontSize) }}>
                     {edu.degree || "-"}{edu.field ? ` · ${edu.field}` : ""}
                   </span>
                   <span
                     style={{
-                      fontSize: bodyFontSize,
+                      fontSize: pt(bodyFontSize),
                       fontWeight: 400,
                       whiteSpace: "nowrap",
-                      marginLeft: 8,
+                      marginLeft: pt(8),
                     }}
                   >
                     {formatDate(edu.startDate)}
@@ -447,13 +441,13 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                     fontStyle: "italic",
                     color: "#444444",
                     margin: "0",
-                    fontSize: bodyFontSize,
+                    fontSize: pt(bodyFontSize),
                   }}
                 >
                   {edu.institution}
                 </p>
                 {edu.gpa && (
-                  <p style={{ fontSize: bodyFontSize - 1, color: "#555555", margin: "2px 0 0 0" }}>
+                  <p style={{ fontSize: pt(bodyFontSize - 1), color: "#555555", margin: "2pt 0 0 0" }}>
                     GPA: {edu.gpa}
                   </p>
                 )}
@@ -470,11 +464,11 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
             <SectionHeader title={L("skills")} style={style} />
             {/* Grouped skills by category */}
             {groupedSkills.map(([category, catSkills]) => (
-              <div key={category} style={{ marginBottom: 8 }}>
-                <p style={{ margin: "0 0 3px 0", color: "#111111", fontSize: bodyFontSize - 1, fontWeight: 600 }}>
+              <div key={category} style={{ marginBottom: pt(8) }}>
+                <p style={{ margin: "0 0 3pt 0", color: "#111111", fontSize: pt(bodyFontSize - 1), fontWeight: 700 }}>
                   {CATEGORY_LABELS[category] || category}:
                 </p>
-                <p style={{ margin: "0 0 6px 0", color: "#111111", textAlign }}>
+                <p style={{ margin: "0 0 6pt 0", color: "#111111", textAlign }}>
                   {catSkills.map((s) => formatSkill(s, showSkillLevel, lang)).join(", ")}
                 </p>
               </div>
@@ -489,7 +483,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
           <>
             <SectionHeader title={L("certifications")} style={style} />
             {certifications.map((cert, i) => (
-              <p key={cert.id || i} style={{ margin: "0 0 2px 0", color: "#111111", fontSize: bodyFontSize - 1 }}>
+              <p key={cert.id || i} style={{ margin: "0 0 2pt 0", color: "#111111", fontSize: pt(bodyFontSize - 1) }}>
                 • {formatCertification(cert)}
               </p>
             ))}
@@ -503,7 +497,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
           <>
             <SectionHeader title={L("organizations")} style={style} />
             {visibleOrgs.map((org, i) => (
-              <div key={org.id || i} style={{ marginBottom: 12, pageBreakInside: "avoid", textAlign }}>
+              <div key={org.id || i} style={{ marginBottom: pt(12), breakInside: "avoid", textAlign }}>
                 {/* Organization name, BOLD, primary row with date */}
                 <div
                   style={{
@@ -512,15 +506,15 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                     fontWeight: 700,
                   }}
                 >
-                  <span style={{ fontSize: bodyFontSize, fontWeight: 700, color: "#111111" }}>
+                  <span style={{ fontSize: pt(bodyFontSize), fontWeight: 700, color: "#111111" }}>
                     {org.name || "-"}
                   </span>
                   <span
                     style={{
-                      fontSize: bodyFontSize,
+                      fontSize: pt(bodyFontSize),
                       fontWeight: 400,
                       whiteSpace: "nowrap",
-                      marginLeft: 8,
+                      marginLeft: pt(8),
                     }}
                   >
                     {formatDate(org.startDate)}
@@ -533,16 +527,16 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                   style={{
                     fontStyle: "italic",
                     color: "#444444",
-                    margin: "0 0 5px 0",
-                    fontSize: bodyFontSize - 1,
+                    margin: "0 0 5pt 0",
+                    fontSize: pt(bodyFontSize - 1),
                   }}
                 >
                   {org.position || "-"}
                 </p>
                 {org.description && (
-                  <ul style={{ margin: "0 0 8px 0", paddingLeft: 20, listStyle: "disc" }}>
+                  <ul style={{ margin: "0 0 8pt 0", paddingLeft: pt(20), listStyle: "disc" }}>
                     {org.description.split("\n").filter(Boolean).map((line, j) => (
-                      <li key={j} style={{ marginBottom: 4, color: "#111111", textAlign }}>
+                      <li key={j} style={{ marginBottom: pt(4), color: "#111111", textAlign }}>
                         {line}
                       </li>
                     ))}
@@ -570,25 +564,23 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
   return (
     <div
       style={{
-        fontFamily: style.bodyFont,
+        fontFamily: cvFontStack(style.bodyFont),
         color: "#111111",
-        fontSize: bodyFontSize,
+        fontSize: pt(bodyFontSize),
         lineHeight: lineHeightProp ?? 1.5,
-        maxWidth: 800,
-        margin: "0 auto",
       }}
     >
       {/* ── HEADER ── */}
-      <header style={{ textAlign: headerLayout === "left" ? "left" : "center", marginBottom: 25 }}>
+      <header style={{ textAlign: headerLayout === "left" ? "left" : "center", marginBottom: pt(25) }}>
         <h1
           style={{
-            fontSize: Math.round(bodyFontSize * 2.2),
+            fontSize: pt(Math.round(bodyFontSize * 2.2)),
             fontWeight: 700,
             textTransform: "uppercase",
-            letterSpacing: 0.5,
-            margin: "0 0 5px 0",
+            letterSpacing: pt(0.5),
+            margin: "0 0 5pt 0",
             color: "#111111",
-            fontFamily: style.headingFont,
+            fontFamily: cvFontStack(style.headingFont),
           }}
         >
           {data.fullName || "NAMA LENGKAP ANDA"}
@@ -597,11 +589,11 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
         {data.professionalTitle && (
           <p
             style={{
-              fontSize: bodyFontSize + 2,
+              fontSize: pt(bodyFontSize + 2),
               fontWeight: 700,
               color: "#333333",
-              margin: "0 0 8px 0",
-              fontFamily: style.headingFont,
+              margin: "0 0 8pt 0",
+              fontFamily: cvFontStack(style.headingFont),
             }}
           >
             {data.professionalTitle}
@@ -611,9 +603,9 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
         {data.employmentStatus && (
           <p
             style={{
-              fontSize: bodyFontSize - 1,
+              fontSize: pt(bodyFontSize - 1),
               color: "#666666",
-              margin: "0 0 6px 0",
+              margin: "0 0 6pt 0",
               fontStyle: "italic",
             }}
           >
@@ -623,7 +615,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
         {contactItems.length > 0 && (
           <p
             style={{
-              fontSize: bodyFontSize - 1,
+              fontSize: pt(bodyFontSize - 1),
               color: "#555555",
               margin: 0,
             }}
@@ -635,9 +627,9 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
         {data.customFields && data.customFields.length > 0 && (
           <p
             style={{
-              fontSize: bodyFontSize - 1,
+              fontSize: pt(bodyFontSize - 1),
               color: "#555555",
-              margin: "4px 0 0 0",
+              margin: "4pt 0 0 0",
             }}
           >
             {data.customFields.map((f) => `${f.label}: ${f.value}`).filter(Boolean).join("  •  ")}
@@ -666,9 +658,9 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                     {customSection.content}
                   </p>
                 ) : (
-                  <ul style={{ margin: "0 0 8px 0", paddingLeft: 20, listStyle: "disc" }}>
+                  <ul style={{ margin: "0 0 8pt 0", paddingLeft: pt(20), listStyle: "disc" }}>
                     {lines.map((line, j) => (
-                      <li key={j} style={{ marginBottom: 4, color: "#111111", textAlign: style.textAlign || "left" }}>
+                      <li key={j} style={{ marginBottom: pt(4), color: "#111111", textAlign: style.textAlign || "left" }}>
                         {line}
                       </li>
                     ))}
@@ -683,27 +675,28 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
         return (
           <div
             key={key}
-            onClick={() => onSectionClick?.(key)}
+            // Mode edit (klik & hover) hanya di pratinjau; mode cetak tanpa handler.
+            {...(onSectionClick
+              ? { onClick: () => onSectionClick(key), title: "Klik untuk edit section ini" }
+              : {})}
             style={{ cursor: onSectionClick ? "pointer" : undefined }}
-            title={onSectionClick ? "Klik untuk edit section ini" : undefined}
           >
             {showDividers && idx > 0 && (
               <hr
                 style={{
                   border: "none",
-                  borderTop: "1px solid #cccccc",
-                  margin: "16px 0",
+                  borderTop: "1pt solid #cccccc",
+                  margin: "16pt 0",
                 }}
               />
             )}
             <section
               style={{
-                marginBottom: 20,
-                transition: "background-color 0.15s",
-                padding: "2px 4px",
-                borderRadius: 4,
+                marginBottom: pt(20),
+                padding: "2pt 4pt",
+                borderRadius: pt(4),
               }}
-              className="cv-section-hover"
+              className={onSectionClick ? "cv-section-hover" : undefined}
             >
               {content}
             </section>
@@ -719,20 +712,22 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
 function SectionHeader({ title, style }: { title: string; style: TemplateStyle }) {
   const sectionBorder =
     style.sectionStyle === "bordered"
-      ? { border: `2px solid ${style.sectionTitle}`, padding: "4px 8px", borderRadius: 2 }
+      ? { border: `2pt solid ${style.sectionTitle}`, padding: "4pt 8pt", borderRadius: pt(2) }
       : style.sectionStyle === "minimal"
-        ? { borderBottom: `2px solid ${style.primary}`, paddingBottom: 3 }
-        : { borderBottom: `1px solid ${style.sectionTitle}`, paddingBottom: 3 };
+        ? { borderBottom: `2pt solid ${style.primary}`, paddingBottom: pt(3) }
+        : { borderBottom: `1pt solid ${style.sectionTitle}`, paddingBottom: pt(3) };
 
   return (
     <h2
       style={{
-        fontSize: style.bodySize + 1,
+        fontSize: pt(style.bodySize + 1),
         fontWeight: 700,
         textTransform: "uppercase",
-        margin: "0 0 12px 0",
-        letterSpacing: 0.5,
+        margin: "0 0 12pt 0",
+        letterSpacing: pt(0.5),
         color: style.sectionTitle,
+        // Judul section tidak boleh sendirian di bawah halaman.
+        breakAfter: "avoid",
         ...sectionBorder,
       }}
     >
