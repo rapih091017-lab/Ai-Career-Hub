@@ -16,6 +16,8 @@ interface AIPolishButtonProps {
   skills?: string[];
   jobDescription?: string;
   field?: string;
+  /** Bentuk field deskripsi; menentukan format keluaran AI (poin per baris / satu paragraf). */
+  format?: "bullets" | "paragraph";
   disabled?: boolean;
   size?: "sm" | "md";
 }
@@ -27,6 +29,7 @@ export function AIPolishButton({
   skills,
   jobDescription,
   field,
+  format,
   disabled = false,
   size = "sm",
 }: AIPolishButtonProps) {
@@ -52,6 +55,7 @@ export function AIPolishButton({
           skills: skills?.slice(0, 50),
           jobDescription: jobDescription?.slice(0, 500),
           field,
+          format,
         }),
       });
 
@@ -76,7 +80,7 @@ export function AIPolishButton({
     } finally {
       setIsPolishing(false);
     }
-  }, [content, jobTitle, skills, jobDescription, field, onApply, addToast]);
+  }, [content, jobTitle, skills, jobDescription, field, format, onApply, addToast]);
 
   const iconSize = size === "sm" ? "text-[14px]" : "text-[18px]";
   const padding = size === "sm" ? "p-1" : "p-1.5";

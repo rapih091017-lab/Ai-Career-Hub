@@ -30,7 +30,7 @@ Gunakan pendekatan 3 langkah:
 1. Ganti action verb lemah (helped, assisted, did, made) → stronger (developed, built, optimized, delivered)
 2. Pakai angka/metrik HANYA yang sudah ada di input. Jika hasil terukur cocok tapi angkanya tidak ada, tulis placeholder [angka], [persen], atau [jumlah orang] supaya user mengisinya sendiri
 3. Sisipkan keyword dari target role secara NATURAL (bukan keyword stuffing)
-4. FORMAT: jika "Field Type" berisi kata "deskripsi" (deskripsi pengalaman/organisasi), kembalikan SATU POIN PER BARIS tanpa simbol bullet atau nomor di awal baris (tanpa "•", "-", "*", "1."). Jika "Field Type" adalah ringkasan, kembalikan SATU PARAGRAF tanpa baris baru. Selain itu, pertahankan format input
+4. FORMAT: jika CV CONTEXT memuat "Format Output: bullets", kembalikan SATU POIN PER BARIS tanpa simbol bullet atau nomor di awal baris (tanpa "•", "-", "*", "1."). Jika "Format Output: paragraph" atau "Field Type" adalah ringkasan, kembalikan SATU PARAGRAF tanpa baris baru. Tanpa keduanya, pertahankan format input
 5. Maksimal 2 baris per bullet point
 6. JANGAN mengarang pencapaian yang tidak ada di input
 7. JANGAN menambahkan informasi baru yang tidak tersirat dari input, cukup perbaiki cara penyampaian
@@ -71,6 +71,7 @@ const PolishBodySchema = z.object({
   skills: z.array(z.string().max(100)).max(50).optional(),
   jobDescription: z.string().max(5000).optional(),
   field: z.string().max(100).optional(),
+  format: z.enum(["bullets", "paragraph"]).optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -97,7 +98,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { content, jobTitle, skills, jobDescription, field } = parsed.data;
+    const { content, jobTitle, skills, jobDescription, field, format } = parsed.data;
 
     // Bangun CV context untuk prompt
     let contextStr = "";
@@ -105,6 +106,7 @@ export async function POST(request: NextRequest) {
     if (skills && skills.length > 0) contextStr += `Skills: ${skills.join(", ")}\n`;
     if (jobDescription) contextStr += `Job Description: ${jobDescription.slice(0, 500)}\n`;
     if (field) contextStr += `Field Type: ${field}\n`;
+    if (format) contextStr += `Format Output: ${format}\n`;
 
     // Bangun user prompt
     let userPrompt = content;

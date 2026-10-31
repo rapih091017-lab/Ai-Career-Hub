@@ -56,6 +56,14 @@ describe("/api/ai/polish (R2)", () => {
     expect((await polishPOST(req("/api/ai/polish", { content: "abc", skills }))).status).toBe(400);
   });
 
+  it("format deskripsi diteruskan ke prompt; format invalid → 400", async () => {
+    callAIMock.mockResolvedValue("Menyusun laporan");
+    const ok = await polishPOST(req("/api/ai/polish", { content: "menyusun laporan stok", field: "deskripsi", format: "paragraph" }));
+    expect(ok.status).toBe(200);
+    expect(callAIMock.mock.calls[0][0].userPrompt).toContain("Format Output: paragraph");
+    expect((await polishPOST(req("/api/ai/polish", { content: "menyusun laporan", format: "tabel" }))).status).toBe(400);
+  });
+
   it("body valid memanggil AI", async () => {
     callAIMock.mockResolvedValue(" Membangun situs perusahaan ");
     const res = await polishPOST(req("/api/ai/polish", { content: "membuat website", skills: ["React"] }));

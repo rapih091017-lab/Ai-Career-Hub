@@ -270,6 +270,7 @@ export function WorkCard({
                           skills={skills}
                           jobDescription={jobDescription}
                           field="deskripsi pengalaman kerja"
+                          format={work.descriptionType ?? "bullets"}
                           size="sm"
                         />
                       ) : null

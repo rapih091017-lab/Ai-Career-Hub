@@ -117,6 +117,7 @@ export function OrgCard({ org, index, totalItems, jobTitle, skills, jobDescripti
               skills={skills}
               jobDescription={jobDescription}
               field="deskripsi organisasi"
+              format={org.descriptionType ?? "bullets"}
               size="sm"
             />
           ) : null
