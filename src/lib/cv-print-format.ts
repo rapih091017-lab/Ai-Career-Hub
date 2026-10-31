@@ -22,12 +22,13 @@ export const CvPrintFormatSchema = z.object({
     .array(
       z.object({
         id: z.string().min(1).max(100),
-        title: z.string().max(200),
-        content: z.string().max(20_000),
+        title: z.string().max(100),
+        content: z.string().max(5_000),
         contentType: z.enum(["paragraph", "bullets"]).optional(),
       }),
     )
-    .max(30)
+    // Batas sementara selama section kustom masih dikirim klien (issue 00 memindahkannya ke DB).
+    .max(10)
     .optional(),
   showSkillLevel: z.boolean().optional(),
 });

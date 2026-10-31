@@ -53,6 +53,10 @@ describe("HTML cetak", () => {
   it("format invalid ditolak", () => {
     expect(CvPrintFormatSchema.safeParse({ customPrimaryColor: "red;background:url(x)" }).success).toBe(false);
     expect(CvPrintFormatSchema.safeParse({ fontSize: 99 }).success).toBe(false);
+    const sec = (i: number, content = "x") => ({ id: `s${i}`, title: "T", content });
+    expect(CvPrintFormatSchema.safeParse({ customSections: Array.from({ length: 11 }, (_, i) => sec(i)) }).success).toBe(false);
+    expect(CvPrintFormatSchema.safeParse({ customSections: [sec(1, "a".repeat(5001))] }).success).toBe(false);
+    expect(CvPrintFormatSchema.safeParse({ customSections: [{ ...sec(1), title: "t".repeat(101) }] }).success).toBe(false);
   });
 });
 

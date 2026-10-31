@@ -57,7 +57,7 @@ export const POST = apiHandler(async (request: NextRequest, { params }: { params
   }
   const parsed = BodySchema.safeParse(raw);
   if (!parsed.success) {
-    return errorResponse("INVALID_INPUT", "Format tampilan CV tidak valid", 400);
+    return errorResponse("INVALID_INPUT", "Format tampilan CV tidak valid. Section kustom maksimal 10, judul 100 karakter, isi 5.000 karakter.", 400);
   }
 
   const [doc] = await db
