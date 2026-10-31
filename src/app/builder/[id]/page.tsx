@@ -7,7 +7,6 @@ import AppHeader from "@/components/AppHeader";
 import AuthGuard from "@/components/AuthGuard";
 import { AtsBaseRenderer, TEMPLATE_STYLES, type CvData } from "@/components/cv-templates";
 import { CvPagedPreview, measurePageCount } from "@/components/cv-templates/print";
-import { CvFontFaces } from "@/components/cv-templates/CvFontFaces";
 import { cvRenderProps, type CvPrintFormat } from "@/lib/cv-print-format";
 import { buildCvSaveBody } from "@/lib/builder-save";
 import { aiSkillNames } from "@/lib/cv-normalize";
@@ -621,7 +620,6 @@ export default function BuilderPage() {
                 )}
                 {/* Halaman A4 nyata: ukuran pt/mm sama dengan PDF */}
                 <div className="a4-preview origin-top scale-[0.85] lg:scale-100 max-w-full shrink-0" style={{ margin: "0 auto", width: "210mm" }}>
-                  <CvFontFaces />
                   <CvPagedPreview pageCount={allPageCount} marginMm={marginPadding} measureRef={contentRef}>
                     {previewContent}
                   </CvPagedPreview>
