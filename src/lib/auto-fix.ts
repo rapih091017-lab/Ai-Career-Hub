@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { CvData } from "@/components/cv-templates";
+import { aiTextForField } from "@/lib/bullet-lines";
 
 /**
  * Saran perbaikan dari AI. Tiap saran hanya boleh mengubah teks yang
@@ -80,6 +81,7 @@ export function cvToPlainText(cv: CvData): string {
  */
 export function applyApprovedFixes(cv: CvData, fixes: AutoFixSuggestion[]): CvData {
   let next: CvData = { ...cv, workHistory: cv.workHistory.map((w) => ({ ...w })), skills: [...cv.skills] };
+  const touched = new Set<CvData["workHistory"][number]>();
 
   for (const fix of fixes) {
     if (fix.type === "replace_text") {
@@ -91,6 +93,7 @@ export function applyApprovedFixes(cv: CvData, fixes: AutoFixSuggestion[]): CvDa
         const work = next.workHistory[fix.index ?? -1];
         if (work && work.description.includes(fix.original)) {
           work.description = work.description.replace(fix.original, () => fix.replacement);
+          touched.add(work);
         }
       }
     } else {
@@ -104,5 +107,8 @@ export function applyApprovedFixes(cv: CvData, fixes: AutoFixSuggestion[]): CvDa
       }
     }
   }
+  // Dirapikan setelah semua saran diterapkan, supaya `original` saran berikutnya masih cocok.
+  // Pengganti bisa berisi beberapa poin/bernomor; hasilnya satu poin per baris.
+  for (const work of touched) work.description = aiTextForField(work.description, work.descriptionType);
   return next;
 }

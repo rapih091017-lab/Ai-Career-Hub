@@ -177,7 +177,9 @@ export function useBuilderAI({
     versions?: { conservative: string; improved: string; bold: string };
     explanation?: string;
     tip?: string;
-    onAccept: (text: string) => void;
+    /** Tampilkan versi sebagai daftar poin (field deskripsi). */
+    asBullets?: boolean;
+    onAccept: (text: string, mode?: "append" | "replace") => void;
   }>({ open: false, mode: "suggest", title: "", onAccept: () => {} });
 
   /* ── Section label map for modals ── */

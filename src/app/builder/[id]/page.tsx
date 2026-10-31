@@ -469,10 +469,23 @@ export default function BuilderPage() {
                       onMoveDown={moveWorkDown}
                       onToggleVisibility={toggleWorkVisible}
                       onAISuggest={(title, suggestions, onAccept) => {
-                        setAiModal({ open: true, mode: "suggest", title, suggestions, onAccept });
+                        setAiModal({
+                          open: true, mode: "suggest", title, suggestions,
+                          onAccept: (text, mode) => {
+                            onAccept(text, mode);
+                            setAiModal((prev) => ({ ...prev, open: false }));
+                          },
+                        });
                       }}
                       onAIRevise={(title, original, versions, explanation, tip, onAccept) => {
-                        setAiModal({ open: true, mode: "revise", title, original, versions, explanation, tip, onAccept });
+                        setAiModal({
+                          open: true, mode: "revise", title, original, versions, explanation, tip,
+                          asBullets: work.descriptionType !== "paragraph",
+                          onAccept: (text) => {
+                            onAccept(text);
+                            setAiModal((prev) => ({ ...prev, open: false }));
+                          },
+                        });
                       }}
                       onError={(msg) => addToast({ type: "error", message: msg })}
                       onUpdateDescription={(idx, text) => {
@@ -646,6 +659,7 @@ export default function BuilderPage() {
           versions={aiModal.versions}
           explanation={aiModal.explanation}
           tip={aiModal.tip}
+          asBullets={aiModal.asBullets}
           onAccept={aiModal.onAccept}
         />
 

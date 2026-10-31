@@ -3,6 +3,7 @@
 import { Field } from "@/components/builder/Field";
 import { AIPolishButton } from "@/components/ai/AIPolishDialog";
 import { BulletEditor } from "./BulletEditor";
+import { aiTextForField } from "@/lib/bullet-lines";
 import type { OrganizationEntry } from "@/components/cv-templates";
 
 interface OrgCardProps {
@@ -111,7 +112,7 @@ export function OrgCard({ org, index, totalItems, jobTitle, skills, jobDescripti
           org.description ? (
             <AIPolishButton
               content={org.description}
-              onApply={(text) => onUpdate(index, "description", text)}
+              onApply={(text) => onUpdate(index, "description", aiTextForField(text, org.descriptionType))}
               jobTitle={jobTitle}
               skills={skills}
               jobDescription={jobDescription}

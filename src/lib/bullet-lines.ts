@@ -11,7 +11,7 @@ const INLINE_BULLET = /\s*[•▪►●◦‣]\s*/;
 // "*catatan" tidak rusak. Angka/huruf ("1.", "1)", "a)") juga wajib diikuti spasi
 // agar "3.5 tahun" tidak terpotong.
 const LEADING_MARKER =
-  /^\s*(?:[•▪►●◦‣·]+\s*|[-*–—+]+\s+|\(?\d{1,2}[.)]\s+|\(?[a-z][)]\s+|[a-z]\.\s+(?=\S))/;
+  /^\s*(?:[•▪►●◦‣·]+\s*|[-*–—+]+(?:\s+|$)|\(?\d{1,2}[.)]\s+|\(?[a-z][)]\s+|[a-z]\.\s+(?=\S))/;
 
 function stripMarker(line: string): string {
   let out = line;
@@ -63,7 +63,7 @@ export function splitAiBullets(input: unknown): string {
 function splitInlineNumbered(text: string): string {
   return text
     .split("\n")
-    .map((line) => (/^\s*1[.)]\s+/.test(line) ? line.split(INLINE_NUMBERED).join("\n") : line))
+    .map((line) => (/^\s*(?:[-*•▪►●◦–—+]\s+)?1[.)]\s+/.test(line) ? line.split(INLINE_NUMBERED).join("\n") : line))
     .join("\n");
 }
 
@@ -90,4 +90,12 @@ export function applyAiBullets(
   mode: "append" | "replace" = "replace",
 ): string {
   return mode === "append" ? appendBullets(current, incoming) : splitAiBullets(incoming);
+}
+
+/**
+ * Hasil AI untuk field deskripsi: mode poin → satu poin per baris,
+ * mode paragraf → teks apa adanya (dirapikan).
+ */
+export function aiTextForField(text: string, type: "bullets" | "paragraph" | undefined): string {
+  return type === "paragraph" ? text.trim() : splitAiBullets(text);
 }

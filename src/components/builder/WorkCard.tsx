@@ -6,6 +6,7 @@ import { Field } from "@/components/builder/Field";
 import { AIPolishButton } from "@/components/ai/AIPolishDialog";
 import { AiLoadingOverlay } from "./AiLoadingOverlay";
 import { BulletEditor } from "./BulletEditor";
+import { aiTextForField, applyAiBullets } from "@/lib/bullet-lines";
 import type { WorkEntry } from "@/components/cv-templates";
 
 interface WorkCardProps {
@@ -24,7 +25,7 @@ interface WorkCardProps {
   onMoveUp: (index: number) => void;
   onMoveDown: (index: number) => void;
   onToggleVisibility: (index: number) => void;
-  onAISuggest: (title: string, suggestions: any[], onAccept: (text: string) => void) => void;
+  onAISuggest: (title: string, suggestions: any[], onAccept: (text: string, mode?: "append" | "replace") => void) => void;
   onAIRevise: (title: string, original: string, versions: any, explanation: string, tip: string, onAccept: (text: string) => void) => void;
   onError: (message: string) => void;
   onUpdateDescription: (index: number, text: string) => void;
@@ -76,8 +77,8 @@ export function WorkCard({
           onAISuggest(
             `Saran AI · ${work.position || "Posisi " + (index + 1)}`,
             data.suggestions,
-            (text: string) => {
-              onUpdate(index, "description", text);
+            (text: string, mode: "append" | "replace" = "replace") => {
+              onUpdate(index, "description", applyAiBullets(work.description, text, mode));
             }
           );
         }
@@ -113,7 +114,7 @@ export function WorkCard({
           data.explanation,
           data.tip,
           (text: string) => {
-            onUpdateDescription(index, text);
+            onUpdateDescription(index, aiTextForField(text, work.descriptionType));
           }
         );
       }
@@ -264,7 +265,7 @@ export function WorkCard({
                       work.description && !aiSuggestLoading && !aiReviseLoading ? (
                         <AIPolishButton
                           content={work.description}
-                          onApply={(text) => onUpdate(index, "description", text)}
+                          onApply={(text) => onUpdate(index, "description", aiTextForField(text, work.descriptionType))}
                           jobTitle={jobTitle}
                           skills={skills}
                           jobDescription={jobDescription}

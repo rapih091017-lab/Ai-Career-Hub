@@ -147,3 +147,18 @@ describe("applyApprovedFixes", () => {
     expect(hasil.skills.filter((s) => s.name.toLowerCase() === "react")).toHaveLength(1);
   });
 });
+
+describe("applyApprovedFixes: deskripsi tetap satu poin per baris", () => {
+  it("pengganti bernomor dipecah jadi poin, saran berikutnya tetap cocok", async () => {
+    const { applyApprovedFixes } = await import("@/lib/auto-fix");
+    const { normalizeCvDocument } = await import("@/lib/cv-normalize");
+    const cv = normalizeCvDocument({
+      tailoredContent: { workHistory: [{ id: "w1", description: "- Bikin laporan\n- Urus stok" }] },
+    });
+    const next = applyApprovedFixes(cv, [
+      { id: "a", type: "replace_text", target: "experience", index: 0, original: "Bikin laporan", replacement: "1. Menyusun laporan 2. Mengirim laporan", category: "bullet", reason: "" },
+      { id: "b", type: "replace_text", target: "experience", index: 0, original: "- Urus stok", replacement: "• Mengelola stok", category: "bullet", reason: "" },
+    ]);
+    expect(next.workHistory[0].description).toBe("Menyusun laporan\nMengirim laporan\nMengelola stok");
+  });
+});

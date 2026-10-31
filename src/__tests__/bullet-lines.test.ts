@@ -106,3 +106,12 @@ describe("appendBullets / applyAiBullets", () => {
     expect(applyAiBullets("lama", "baru")).toBe("baru");
   });
 });
+
+describe("aiTextForField", () => {
+  it("mode poin memecah respons AI, mode paragraf dibiarkan", async () => {
+    const { aiTextForField } = await import("@/lib/bullet-lines");
+    expect(aiTextForField("1. foo\n2. bar", undefined)).toBe("foo\nbar");
+    expect(aiTextForField("• foo • bar", "bullets")).toBe("foo\nbar");
+    expect(aiTextForField("  Satu paragraf - utuh.  ", "paragraph")).toBe("Satu paragraf - utuh.");
+  });
+});
