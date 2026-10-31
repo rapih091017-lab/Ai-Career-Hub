@@ -27,6 +27,7 @@ import { DisplaySettingsModal } from "@/components/builder/DisplaySettingsModal"
 import { ReviewStep } from "@/components/builder/ReviewStep";
 import { SectionOrderModal } from "@/components/builder/SectionOrderModal";
 import { SortableList } from "@/components/builder/SortableList";
+import { PanelSplitter, usePanelSplit } from "@/components/builder/PanelSplitter";
 import { AddSectionPanel } from "@/components/builder/AddSectionPanel";
 import { CustomSectionCard, RemoveSectionButton, UnusedSectionCard } from "@/components/builder/SectionControls";
 import { HiddenSectionNotice } from "@/components/builder/SkillSection";
@@ -76,6 +77,8 @@ export default function BuilderPage() {
   const steps = STEP_KEYS.map((k) => t(k));
   const [collapsedWorkIds, setCollapsedWorkIds] = useState<Set<string>>(new Set());
   const [confirm, setConfirm] = useState<ConfirmAction | null>(null);
+  const [leftPct, setLeftPct] = usePanelSplit();
+  const workspaceRef = useRef<HTMLDivElement>(null);
   const { addToast } = useToast();
 
   /* ── Data Fetch ── */
@@ -389,9 +392,13 @@ export default function BuilderPage() {
         </div>
 
         {/* ── WORKSPACE LAYOUT ── */}
-        <div className="flex-1 flex flex-col lg:flex-row overflow-hidden h-auto lg:h-[calc(100vh-64px-80px)]">
-          {/* ── LEFT PANEL ── */}
-          <div className="w-full lg:w-1/2 bg-background border-b lg:border-b-0 lg:border-r border-outline-variant/50 overflow-y-auto custom-scrollbar">
+        <div
+          ref={workspaceRef}
+          className="flex-1 flex flex-col lg:flex-row overflow-hidden h-auto lg:h-[calc(100vh-64px-80px)]"
+          style={{ "--left-w": `${leftPct}%` } as React.CSSProperties}
+        >
+          {/* ── LEFT PANEL ── (lebar diatur splitter di lg ke atas) */}
+          <div className="w-full lg:w-[var(--left-w)] lg:shrink-0 bg-background border-b lg:border-b-0 border-outline-variant/50 overflow-y-auto custom-scrollbar">
             <div className="px-6 pt-8 pb-4 flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                 <span className="material-symbols-outlined text-green-deep text-xl" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">{sectionMeta[activeStep].icon}</span>
@@ -705,8 +712,10 @@ export default function BuilderPage() {
             </AnimatePresence>
           </div>
 
+          <PanelSplitter value={leftPct} onChange={setLeftPct} containerRef={workspaceRef} />
+
           {/* ── RIGHT PANEL ── */}
-          <div className="w-full lg:w-1/2 flex flex-col bg-surface-dim/20 relative overflow-hidden h-full">
+          <div className="w-full lg:w-auto lg:flex-1 lg:min-w-0 flex flex-col bg-surface-dim/20 relative overflow-hidden h-full">
             {/* ── FORMATTING TOOLBAR ── */}
             <FormatToolbar
               cvCompleteness={cvCompleteness}
