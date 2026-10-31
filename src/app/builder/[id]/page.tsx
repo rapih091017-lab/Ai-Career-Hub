@@ -6,10 +6,11 @@ import { motion, AnimatePresence } from "motion/react";
 import AppHeader from "@/components/AppHeader";
 import AuthGuard from "@/components/AuthGuard";
 import { AtsBaseRenderer, TEMPLATE_STYLES, type CvData } from "@/components/cv-templates";
-import { downloadCvPdf } from "@/lib/pdf/generate-cv-pdf";
+import { CvPagedPreview, measurePageCount } from "@/components/cv-templates/print";
+import { CvFontFaces } from "@/components/cv-templates/CvFontFaces";
+import { cvRenderProps, type CvPrintFormat } from "@/lib/cv-print-format";
 import { buildCvSaveBody } from "@/lib/builder-save";
 import { aiSkillNames } from "@/lib/cv-normalize";
-import { countPages } from "@/lib/builder-format";
 import dynamic from "next/dynamic";
 const AIProposalModal = dynamic(() => import("@/components/AIProposalModal"), { ssr: false });
 import { useToast } from "@/components/ui/toast";
@@ -63,7 +64,7 @@ export default function BuilderPage() {
   const { cvData, isLoading, fetchError, selectedTemplateId, setCvData, setSelectedTemplateId } = useFetchCvData(cvId);
 
   /* ── Auto-Save ── */
-  const { saveStatus, lastSaved } = useAutoSave(cvId, cvData, !isLoading && !fetchError);
+  const { saveStatus, lastSaved, flush: flushAutoSave } = useAutoSave(cvId, cvData, !isLoading && !fetchError);
 
   /* ── Format Settings Hook ── */
   const format = useBuilderFormat({ cvId });
@@ -71,26 +72,31 @@ export default function BuilderPage() {
   /* ── Compute margin & page dimensions ── */
   const contentRef = useRef<HTMLDivElement>(null);
   const [allPageCount, setAllPageCount] = useState(1);
-  const previewRef = useRef<HTMLDivElement>(null);
 
-  // Hitung jumlah halaman dari tinggi konten. Observer dipasang ulang hanya
-  // saat tinggi area konten berubah (margin) atau saat konten baru muncul
-  // setelah data selesai dimuat (sebelumnya yang tampil skeleton, ref null).
-  const pageContentAreaMm = format.contentAreaMm;
+  // Jumlah halaman diukur dari kontainer multikolom halaman pertama
+  // (lihat CvPagedPreview): sama dengan pemenggalan Chromium saat cetak.
   const contentMounted = !isLoading && !fetchError;
   useEffect(() => {
     const el = contentRef.current;
     if (!el) return;
-    const update = (h: number) => {
-      if (h > 0) setAllPageCount(countPages(h, pageContentAreaMm));
+    let alive = true;
+    const update = () => {
+      if (alive) setAllPageCount(measurePageCount(el));
     };
-    update(el.offsetHeight);
-    const ro = new ResizeObserver((entries) => {
-      for (const e of entries) update(e.contentBoxSize?.[0]?.blockSize || e.contentRect.height);
-    });
+    update();
+    // Font CV dimuat belakangan; ukur ulang setelah siap.
+    void document.fonts?.ready.then(update);
+    const ro = new ResizeObserver(update);
     ro.observe(el);
-    return () => ro.disconnect();
-  }, [pageContentAreaMm, contentMounted]);
+    for (const child of Array.from(el.children)) ro.observe(child);
+    const mo = new MutationObserver(update);
+    mo.observe(el, { childList: true, subtree: true, characterData: true, attributes: true });
+    return () => {
+      alive = false;
+      ro.disconnect();
+      mo.disconnect();
+    };
+  }, [format.marginPadding, contentMounted]);
 
   /* ── AI & Scoring Hook ── */
   const ai = useBuilderAI({ cvData, setCvData, cvId, activeStep, setActiveStep, addToast });
@@ -116,7 +122,7 @@ export default function BuilderPage() {
     marginMode, setMarginMode, sectionOrder, setSectionOrder,
     sectionVisibility, setSectionVisibility, customSections, setCustomSections,
     showDisplaySettings, setShowDisplaySettings, showSectionOrderModal, setShowSectionOrderModal,
-    isPdfExporting, setIsPdfExporting, MARGIN_VALUES, marginPadding, contentAreaMm,
+    isPdfExporting, setIsPdfExporting, marginPadding,
     showSkillLevel, setShowSkillLevel,
   } = format;
 
@@ -138,39 +144,66 @@ export default function BuilderPage() {
 
   /* ── PDF Export ── */
 
+  // Format tampilan yang sama dipakai pratinjau dan dikirim ke server PDF.
+  const printFormat: CvPrintFormat = {
+    templateId: selectedTemplateId,
+    fontFamily,
+    fontSize,
+    textAlign,
+    showDividers,
+    customPrimaryColor,
+    spacingMode,
+    headerLayout,
+    marginMode,
+    sectionOrder,
+    sectionVisibility,
+    customSections,
+    showSkillLevel,
+  };
+  const { marginMm: _marginMm, ...renderProps } = cvRenderProps(cvData, printFormat, selectedTemplateId);
+
   const handleExportPdf = async () => {
     setIsPdfExporting(true);
     try {
-      // PDF dibuat di peramban dengan @react-pdf/renderer: teks asli yang bisa
-      // dibaca ATS, tanpa server Chromium dan tanpa dialog cetak.
-      await downloadCvPdf({ ...cvData, customSections } as CvData, {
-        fileName: `${cvData.fullName || "CV"}_AI_Career_Hub.pdf`,
-        marginMm: marginPadding,
-        sectionOrder: sectionOrder.filter((key) => sectionVisibility[key] !== false),
-        templateStyle: {
-          ...(TEMPLATE_STYLES[selectedTemplateId] || TEMPLATE_STYLES["industrial-pro"]),
-          bodySize: fontSize,
-          bodyFont: fontFamily,
-          headingFont: fontFamily,
-          textAlign,
-          ...(customPrimaryColor ? { primary: customPrimaryColor, sectionTitle: customPrimaryColor } : {}),
-        },
-        showDividers,
-        headerLayout,
-        lineHeight: spacingMode === "compact" ? 1.3 : spacingMode === "spacious" ? 1.8 : 1.5,
-        lang: cvData.cvLang,
-        showSkillLevel,
+      // PDF dibuat server dari data di DB, jadi perubahan terakhir harus tersimpan dulu.
+      const saved = await flushAutoSave();
+      if (!saved) {
+        addToast({ type: "error", message: "Perubahan terakhir belum tersimpan. Periksa koneksi lalu coba unduh lagi." });
+        return;
+      }
+      const res = await fetch(`/api/cv-documents/${cvId}/pdf`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ format: printFormat }),
       });
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        const fallback =
+          res.status === 429
+            ? "Terlalu sering mengunduh PDF. Tunggu sebentar lalu coba lagi."
+            : res.status === 401
+              ? "Sesi login berakhir. Masuk lagi lalu unduh ulang."
+              : "Gagal membuat PDF. Coba lagi sebentar lagi.";
+        addToast({ type: "error", message: (body && typeof body.message === "string" && body.message) || fallback });
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${cvData.fullName || "CV"}_AI_Career_Hub.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10_000);
       addToast({ type: "success", message: t("builder.pdf-export-success") });
     } catch (err) {
       console.error("PDF Export Error:", err);
-      addToast({ type: "error", message: t("builder.pdf-export-failed") });
+      addToast({ type: "error", message: "Gagal mengunduh PDF. Periksa koneksi lalu coba lagi." });
     } finally {
       setIsPdfExporting(false);
     }
   };
-
-
 
   /* ── save ── */
 
@@ -549,104 +582,29 @@ export default function BuilderPage() {
                     {t("builder.page-badge").replace("{pages}", String(allPageCount)).replace("{margin}", marginMode === "tight" ? "10" : marginMode === "normal" ? "20" : "30")}
                   </div>
                 )}
-                {/* A4 Paper Preview, scrollable continuous paper */}
-                <div
-                  ref={previewRef}
-                  className="a4-preview origin-top scale-[0.85] lg:scale-100 max-w-full shrink-0"
-                  style={{
-                    fontFamily,
-                    width: '210mm',
-                    padding: `${marginPadding}mm`,
-                    position: 'relative',
-                    background: '#ffffff',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-                    margin: '0 auto',
-                  }}
-                >
-                  <div
-                    ref={contentRef}
-                    style={{
-                      minHeight: `${contentAreaMm}mm`,
-                      background: '#ffffff',
-                      backgroundImage: `repeating-linear-gradient(
-                        to bottom,
-                        transparent 0,
-                        transparent calc(${contentAreaMm}mm - 0.5px),
-                        #ddd calc(${contentAreaMm}mm - 0.5px),
-                        #ddd ${contentAreaMm}mm
-                      )`,
-                      position: 'relative',
-                    }}
-                  >
+                {/* Halaman A4 nyata: ukuran pt/mm sama dengan PDF */}
+                <div className="a4-preview origin-top scale-[0.85] lg:scale-100 max-w-full shrink-0" style={{ margin: "0 auto", width: "210mm" }}>
+                  <CvFontFaces />
+                  <CvPagedPreview pageCount={allPageCount} marginMm={marginPadding} measureRef={contentRef}>
                     <AtsBaseRenderer
-                    data={{ ...cvData, customSections }}
-                    lang={cvData.cvLang}
-                    style={{
-                      ...(TEMPLATE_STYLES[selectedTemplateId] || TEMPLATE_STYLES["industrial-pro"]),
-                      bodySize: fontSize,
-                      bodyFont: fontFamily,
-                      headingFont: fontFamily,
-                      textAlign,
-                      ...(customPrimaryColor ? { primary: customPrimaryColor, sectionTitle: customPrimaryColor } : {}),
-                    }}
-                    sectionOrder={sectionOrder.filter(key => sectionVisibility[key] !== false)}
-                    showDividers={showDividers}
-                    headerLayout={headerLayout}
-                    lineHeight={spacingMode === "compact" ? 1.3 : spacingMode === "spacious" ? 1.8 : 1.5}
-                    showSkillLevel={showSkillLevel}
-                    onSectionClick={(sectionKey) => {
-                      const sectionStepMap: Record<string, number> = {
-                        "summary": 0,
-                        "experience": 2,
-                        "education": 3,
-                        "skills": 5,
-                        "certifications": 5,
-                        "selfEvaluation": 5,
-                        "lainnya": 5,
-                        "organizations": 4,
-                      };
-                      const step = sectionStepMap[sectionKey];
-                      if (step !== undefined) setActiveStep(step);
-                    }}
-                  />
-
-                  {/* Page number indicators at page breaks */}
-                  {allPageCount > 1 && Array.from({ length: allPageCount - 1 }, (_, i) => (
-                    <div
-                      key={i}
-                      data-page-indicator="true"
-                      aria-hidden="true"
-                      style={{
-                        position: 'absolute',
-                        top: `${(i + 1) * contentAreaMm}mm`,
-                        left: 0,
-                        right: 0,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        pointerEvents: 'none',
-                        zIndex: 5,
-                        transform: 'translateY(-50%)',
+                      {...renderProps}
+                      onSectionClick={(sectionKey) => {
+                        const sectionStepMap: Record<string, number> = {
+                          "summary": 0,
+                          "experience": 2,
+                          "education": 3,
+                          "skills": 5,
+                          "certifications": 5,
+                          "selfEvaluation": 5,
+                          "lainnya": 5,
+                          "organizations": 4,
+                        };
+                        const step = sectionStepMap[sectionKey];
+                        if (step !== undefined) setActiveStep(step);
                       }}
-                    >
-                      <span style={{ flex: 1, height: 0, borderTop: '0.5px dashed #ccc' }} />
-                      <span style={{
-                        background: '#ffffff',
-                        padding: '0 10px',
-                        fontSize: '9px',
-                        color: '#b0b0b0',
-                        fontWeight: 500,
-                        letterSpacing: '1px',
-                        whiteSpace: 'nowrap',
-                        lineHeight: 1,
-                      }}>
-                        {i + 1}
-                      </span>
-                      <span style={{ flex: 1, height: 0, borderTop: '0.5px dashed #ccc' }} />
-                    </div>
-                  ))}
+                    />
+                  </CvPagedPreview>
                 </div>
-              </div>
               </div>
 
               {/* ATS Score Insight */}

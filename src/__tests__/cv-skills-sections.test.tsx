@@ -1,8 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { isValidElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { AtsBaseRenderer, DEFAULT_SECTION_ORDER, TEMPLATE_STYLES, type CvData } from "@/components/cv-templates";
-import { CvPdfDocument } from "@/lib/pdf/CvPdfDocument";
 import { migrateSavedFormat, migrateSectionOrder } from "@/lib/builder-format";
 import { normalizeCvDocument } from "@/lib/cv-normalize";
 
@@ -19,25 +17,11 @@ function preview(data: CvData, opts: { order?: string[]; showSkillLevel?: boolea
   ).replace(/<[^>]+>/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ");
 }
 
-/** Teks PDF: telusuri pohon elemen react-pdf tanpa merender PDF. */
-function collect(node: ReactNode): string {
-  if (node == null || typeof node === "boolean") return "";
-  if (typeof node === "string" || typeof node === "number") return String(node);
-  if (Array.isArray(node)) return node.map(collect).join("");
-  if (isValidElement(node)) {
-    const el = node as { type: unknown; props: { children?: ReactNode } };
-    if (typeof el.type === "function") {
-      return collect((el.type as (p: unknown) => ReactNode)(el.props));
-    }
-    const text = collect(el.props.children);
-    return typeof el.type === "string" || el.type ? ` ${text} ` : text;
-  }
-  return "";
-}
+/** Teks PDF: HTML cetak dari renderer yang sama, mode cetak (tanpa handler edit). */
 function pdfText(data: CvData, opts: { order?: string[]; showSkillLevel?: boolean } = {}) {
-  return collect(
-    CvPdfDocument({ data, templateStyle: style, sectionOrder: opts.order, showSkillLevel: opts.showSkillLevel }),
-  ).replace(/\s+/g, " ");
+  return renderToStaticMarkup(
+    <AtsBaseRenderer data={data} style={style} sectionOrder={opts.order} showSkillLevel={opts.showSkillLevel} />,
+  ).replace(/<[^>]+>/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ");
 }
 
 const both = (data: CvData, opts?: { order?: string[]; showSkillLevel?: boolean }) => [

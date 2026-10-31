@@ -8,19 +8,17 @@ const extractSrc = readFileSync(join(process.cwd(), "src/app/api/checker/extract
 const adapterSrc = readFileSync(join(process.cwd(), "src/lib/ai/adapter.ts"), "utf8");
 const importSrc = readFileSync(join(process.cwd(), "src/app/api/profile/import/route.ts"), "utf8");
 
-describe("ekspor CV memakai renderer vektor, bukan Chromium", () => {
-  it("builder mengunduh PDF dari @react-pdf/renderer", () => {
-    // Renderer ini sudah ada di repo dan menghasilkan PDF teks asli, jadi
-    // tidak perlu server Chromium yang harus start tiap ekspor.
-    expect(builderSrc).toContain("downloadCvPdf");
-    expect(builderSrc).not.toContain("exportPdfViaServer");
+describe("ekspor CV memakai route PDF server dari renderer pratinjau", () => {
+  it("builder flush autosave lalu memanggil route PDF CV", () => {
+    expect(builderSrc).toContain("flushAutoSave()");
+    expect(builderSrc).toContain("/pdf`");
+    expect(builderSrc).not.toContain("downloadCvPdf");
     expect(builderSrc).not.toContain("window.print()");
   });
 
-  it("template yang sama diteruskan ke renderer PDF", () => {
-    expect(builderSrc).toContain("templateStyle:");
-    expect(builderSrc).toContain("sectionOrder:");
-    expect(builderSrc).toContain("marginMm: marginPadding");
+  it("pratinjau dan PDF memakai format yang sama", () => {
+    expect(builderSrc).toContain("cvRenderProps(cvData, printFormat");
+    expect(builderSrc).toContain("body: JSON.stringify({ format: printFormat })");
   });
 });
 

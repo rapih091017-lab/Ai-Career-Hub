@@ -19,7 +19,7 @@ describe("countPages", () => {
 describe("ResizeObserver builder", () => {
   it("effect punya deps (tidak jalan tiap render)", () => {
     const src = readFileSync(path.join(process.cwd(), "src/app/builder/[id]/page.tsx"), "utf8");
-    expect(src).toContain("}, [pageContentAreaMm, contentMounted]);");
-    expect(src).toContain("return () => ro.disconnect();");
+    expect(src).toContain("}, [format.marginPadding, contentMounted]);");
+    expect(src).toContain("ro.disconnect();");
   });
 });

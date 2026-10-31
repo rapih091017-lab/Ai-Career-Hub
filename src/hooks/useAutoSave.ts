@@ -9,6 +9,8 @@ type SaveStatus = "idle" | "saving" | "saved" | "error";
 interface UseAutoSaveReturn {
   saveStatus: SaveStatus;
   lastSaved: Date | null;
+  /** Kirim perubahan yang tertunda sekarang; true bila DB sudah sama dengan data terbaru. */
+  flush: () => Promise<boolean>;
 }
 
 const DEBOUNCE_MS = 2000;
@@ -126,5 +128,11 @@ export function useAutoSave(cvId: string, cvData: CvData, enabled: boolean): Use
     };
   }, [cvId]);
 
-  return { saveStatus, lastSaved };
+  const flushNow = useCallback(async () => {
+    chain.current = chain.current.then(runSave);
+    await chain.current;
+    return latestJson.current !== null && latestJson.current === savedJson.current;
+  }, [runSave]);
+
+  return { saveStatus, lastSaved, flush: flushNow };
 }

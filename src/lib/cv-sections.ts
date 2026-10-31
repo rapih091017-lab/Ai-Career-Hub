@@ -2,7 +2,7 @@ import type { CertificationEntry, SkillEntry } from "@/components/cv-templates";
 
 /**
  * Logika tampilan section Keahlian & Sertifikasi yang dipakai bersama oleh
- * pratinjau (AtsBaseRenderer) dan PDF (CvPdfDocument), supaya keduanya sama.
+ * pratinjau dan PDF builder; keduanya dirender oleh AtsBaseRenderer.
  */
 
 export const SKILL_LEVEL_LABELS: Record<"id" | "en", Record<Exclude<SkillEntry["level"], "">, string>> = {
