@@ -5,6 +5,16 @@ import { AtsScoreRing } from "@/components/builder/AtsScoreRing";
 import MagneticButton from "@/components/MagneticButton";
 import { PdfExportButton } from "@/components/checker/PdfExportButton";
 import { useTranslation } from "@/lib/i18n";
+import { resolveCvFont } from "@/lib/cv-fonts";
+import { TemplatePopover } from "@/components/builder/TemplatePopover";
+
+const FONT_OPTIONS = [
+  { value: "'Inter', sans-serif", label: "Inter" },
+  { value: "'Plus Jakarta Sans', sans-serif", label: "Plus Jakarta Sans" },
+  { value: "Arial, sans-serif", label: "Arial" },
+  { value: "'Times New Roman', serif", label: "Times New Roman" },
+  { value: "Roboto, sans-serif", label: "Roboto" },
+];
 
 interface FormatToolbarProps {
   cvCompleteness: number;
@@ -25,6 +35,10 @@ interface FormatToolbarProps {
   onOpenDisplaySettings: () => void;
   onNavigateToCheckout: () => void;
   onExportPdf: () => Promise<void>;
+  templateId: string;
+  onTemplateChange: (id: string) => void;
+  hasStyleOverrides: boolean;
+  onResetStyle: () => void;
 }
 
 export function FormatToolbar({
@@ -46,10 +60,16 @@ export function FormatToolbar({
   onOpenDisplaySettings,
   onNavigateToCheckout,
   onExportPdf,
+  templateId,
+  onTemplateChange,
+  hasStyleOverrides,
+  onResetStyle,
 }: FormatToolbarProps) {
+  // Font dari template (bukan salah satu pilihan) tetap ditampilkan apa adanya.
+  const fontKnown = FONT_OPTIONS.some((o) => o.value === fontFamily);
   const { t } = useTranslation();
   return (
-    <div className="h-auto px-3 md:px-4 py-2 border-b border-outline-variant/50 flex flex-wrap items-center gap-2 bg-surface-container-lowest shadow-sm z-20 shrink-0">
+    <div className="relative h-auto px-3 md:px-4 py-2 border-b border-outline-variant/50 flex flex-wrap items-center gap-2 bg-surface-container-lowest shadow-sm z-20 shrink-0">
       {/* CV Completeness Bar */}
       <div className="flex items-center gap-1.5 shrink-0" title={`CV ${cvCompleteness}% ${t("builder.complete")}`}>
         <div className="w-12 h-1.5 bg-outline-variant/30 rounded-full overflow-hidden">
@@ -95,15 +115,17 @@ export function FormatToolbar({
       {/* ATS Score */}
       <AtsScoreRing score={computeAtsScore} />
 
+      {/* Template */}
+      <TemplatePopover templateId={templateId} onSelect={onTemplateChange} hasOverrides={hasStyleOverrides} onResetStyle={onResetStyle} />
+
       {/* Font family */}
-      <select value={fontFamily} onChange={(e) => onFontFamilyChange(e.target.value)}
+      <select value={fontFamily} onChange={(e) => onFontFamilyChange(e.target.value)} aria-label="Font"
         className="bg-surface-container-low border border-outline-variant/50 rounded-lg text-xs px-2 py-1.5 focus:ring-1 focus:ring-primary max-w-[120px]"
       >
-        <option value="'Inter', sans-serif">Inter</option>
-        <option value="'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans</option>
-        <option value="Arial, sans-serif">Arial</option>
-        <option value="'Times New Roman', serif">Times New Roman</option>
-        <option value="Roboto, sans-serif">Roboto</option>
+        {!fontKnown && <option value={fontFamily}>{resolveCvFont(fontFamily).label} (template)</option>}
+        {FONT_OPTIONS.map((o) => (
+          <option key={o.value} value={o.value}>{o.label}</option>
+        ))}
       </select>
 
       {/* Font size */}

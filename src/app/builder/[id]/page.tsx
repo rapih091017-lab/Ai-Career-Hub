@@ -168,6 +168,11 @@ export default function BuilderPage() {
     setSectionOrder((prev) => (prev.includes(key) ? prev : [...prev, key]));
   };
 
+  // CV tanpa layout memakai nilai lama builder (Inter 11pt), jadi dianggap punya override.
+  const hasStyleOverrides =
+    !cvData.layout ||
+    ["fontFamily", "fontSize", "textAlign", "primaryColor"].some((k) => cvData.layout?.[k as keyof typeof cvData.layout] !== undefined);
+
   /* ── Kelola section: hapus (dengan Urungkan), pakai lagi, tambah kustom ── */
   const unusedSections = unusedBuiltinSections(cvData);
   const isSectionUnused = (key: string) => unusedSections.includes(key);
@@ -722,6 +727,18 @@ export default function BuilderPage() {
               onOpenDisplaySettings={() => setShowDisplaySettings(true)}
               onNavigateToCheckout={() => router.push(`/cv/${cvId}/checkout`)}
               onExportPdf={handleExportPdf}
+              templateId={selectedTemplateId}
+              onTemplateChange={setSelectedTemplateId}
+              hasStyleOverrides={hasStyleOverrides}
+              onResetStyle={() =>
+                setConfirm({
+                  title: "Kembalikan ke gaya template?",
+                  message: "Font, ukuran huruf, rata teks, dan warna pilihanmu dihapus lalu mengikuti template. Urutan, spasi, margin, dan isi CV tidak berubah.",
+                  confirmLabel: "Kembalikan",
+                  cancelLabel: "Batal",
+                  onConfirm: format.resetToTemplateStyle,
+                })
+              }
             />
 
             {/* ── PREVIEW AREA, scrollable continuous with page break indicators ── */}
