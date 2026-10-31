@@ -22,6 +22,7 @@ import { WorkCard } from "@/components/builder/WorkCard";
 import { EducationCard } from "@/components/builder/EducationCard";
 import { OrgCard } from "@/components/builder/OrgCard";
 import { FormatToolbar } from "@/components/builder/FormatToolbar";
+import { FitA4 } from "@/components/builder/FitA4";
 import { DisplaySettingsModal } from "@/components/builder/DisplaySettingsModal";
 import { ReviewStep } from "@/components/builder/ReviewStep";
 import { SectionOrderModal } from "@/components/builder/SectionOrderModal";
@@ -610,7 +611,7 @@ export default function BuilderPage() {
 
             {/* ── PREVIEW AREA, scrollable continuous with page break indicators ── */}
             <div className="flex-1 flex flex-col items-center bg-surface-dim/20 custom-scrollbar" style={{ minHeight: 0, overflowY: 'auto' }}>
-              <div className="w-full max-w-[210mm] px-[15mm] py-4 md:py-6">
+              <div className="w-full max-w-[calc(210mm+30mm)] px-2 sm:px-4 lg:px-[15mm] py-4 md:py-6">
                 {/* Page count badge */}
                 {allPageCount > 1 && (
                   <div className="mb-3 flex items-center gap-2 text-[11px] font-medium text-on-surface-variant bg-surface-container-lowest/80 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-outline-variant/40 shadow-sm w-fit">
@@ -619,11 +620,11 @@ export default function BuilderPage() {
                   </div>
                 )}
                 {/* Halaman A4 nyata: ukuran pt/mm sama dengan PDF */}
-                <div className="a4-preview origin-top scale-[0.85] lg:scale-100 max-w-full shrink-0" style={{ margin: "0 auto", width: "210mm" }}>
+                <FitA4>
                   <CvPagedPreview pageCount={allPageCount} marginMm={marginPadding} measureRef={contentRef}>
                     {previewContent}
                   </CvPagedPreview>
-                </div>
+                </FitA4>
               </div>
 
               {/* ATS Score Insight */}
