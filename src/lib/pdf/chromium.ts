@@ -77,7 +77,14 @@ export async function printStandaloneHtml(html: string): Promise<Uint8Array> {
       else void req.abort();
     });
     await page.setContent(html, { waitUntil: "load", timeout: 45_000 });
-    await page.evaluate(() => document.fonts.ready);
+    // page.evaluate memakai CDP Runtime.evaluate, tetap jalan walau JS halaman
+    // dimatikan (diuji: fonts.status "loaded", font CV tertanam di PDF).
+    // Dicek juga bahwa tidak ada font yang gagal dimuat.
+    const failed = await page.evaluate(async () => {
+      await document.fonts.ready;
+      return [...document.fonts].filter((f) => f.status === "error").map((f) => f.family);
+    });
+    if (failed.length > 0) throw new Error(`Font gagal dimuat: ${failed.join(", ")}`);
     return await page.pdf({ printBackground: true, preferCSSPageSize: true });
   } finally {
     // Selalu tutup browser, di serverless instance menggantung = memori bocor
