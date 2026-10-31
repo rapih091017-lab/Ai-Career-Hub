@@ -737,6 +737,37 @@ a:focus-visible {
   transition: background-color 0.15s ease;
 }
 
+/* Pratinjau: tombol tambah/hapus garis di celah atas section (melayang, tidak menggeser isi) */
+.a4-preview .cv-divider-toggle {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -60%);
+  z-index: 2;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid rgb(var(--c-outline-variant));
+  background: rgb(var(--c-surface-container-lowest));
+  color: rgb(var(--c-on-surface-variant));
+  font: 600 11px/1.4 system-ui, sans-serif;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+.a4-preview [data-cv-section]:hover > .cv-divider-toggle,
+.a4-preview .cv-divider-toggle:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.a4-preview .cv-divider-toggle:hover {
+  color: rgb(var(--c-primary));
+  border-color: rgb(var(--c-primary));
+}
+@media (hover: none) {
+  /* Layar sentuh tanpa hover: garis diatur lewat modal Urutan Section. */
+  .a4-preview .cv-divider-toggle { display: none; }
+}
+
 /* Hide scrollbar for scrollable tag clouds */
 .hide-scrollbar {
   -ms-overflow-style: none;

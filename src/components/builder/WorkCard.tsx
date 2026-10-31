@@ -30,6 +30,8 @@ interface WorkCardProps {
   onAIRevise: (title: string, original: string, versions: any, explanation: string, tip: string, onAccept: (text: string) => void) => void;
   onError: (message: string) => void;
   onUpdateDescription: (index: number, text: string) => void;
+  /** Tombol seret dari SortableList. */
+  dragHandle?: React.ReactNode;
 }
 
 export function WorkCard({
@@ -51,6 +53,7 @@ export function WorkCard({
   onAIRevise,
   onError,
   onUpdateDescription,
+  dragHandle,
 }: WorkCardProps) {
   const [aiSuggestLoading, setAiSuggestLoading] = useState(false);
   const [aiReviseLoading, setAiReviseLoading] = useState(false);
@@ -147,10 +150,7 @@ export function WorkCard({
     <div className={`bg-surface-container-lowest rounded-xl p-6 shadow-soft relative group transition-opacity duration-200 ${isHidden ? "opacity-50" : ""}`}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2 flex-1 min-w-0">
-          {/* Penanda urutan (urutan diubah lewat tombol panah, bukan drag) */}
-          <div className="shrink-0 text-outline-variant/60 p-1" aria-hidden="true">
-            <span className="material-symbols-outlined text-[16px]">swap_vert</span>
-          </div>
+          {dragHandle}
           <button
             type="button"
             onClick={() => onToggleCollapse(work.id)}

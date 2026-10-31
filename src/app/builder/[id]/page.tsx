@@ -26,6 +26,23 @@ import { FitA4 } from "@/components/builder/FitA4";
 import { DisplaySettingsModal } from "@/components/builder/DisplaySettingsModal";
 import { ReviewStep } from "@/components/builder/ReviewStep";
 import { SectionOrderModal } from "@/components/builder/SectionOrderModal";
+import { SortableList } from "@/components/builder/SortableList";
+import { AddSectionPanel } from "@/components/builder/AddSectionPanel";
+import { CustomSectionCard, RemoveSectionButton, UnusedSectionCard } from "@/components/builder/SectionControls";
+import { HiddenSectionNotice } from "@/components/builder/SkillSection";
+import { ConfirmModal, type ConfirmAction } from "@/components/ui/confirm-modal";
+import { arrayMove } from "@dnd-kit/sortable";
+import {
+  LAINNYA_ID,
+  addCustomSection,
+  isRemovableSection,
+  removeSection,
+  restoreBuiltinSection,
+  sectionLabel,
+  undoRemoveSection,
+  unusedBuiltinSections,
+  updateCustomSection,
+} from "@/lib/section-manager";
 import { AtsScoreInsight } from "@/components/builder/AtsScoreInsight";
 import { BuilderLoadingSkeleton, BuilderErrorState } from "@/components/builder/BuilderSkeleton";
 import { useTranslation } from "@/lib/i18n";
@@ -58,6 +75,7 @@ export default function BuilderPage() {
   const { t } = useTranslation();
   const steps = STEP_KEYS.map((k) => t(k));
   const [collapsedWorkIds, setCollapsedWorkIds] = useState<Set<string>>(new Set());
+  const [confirm, setConfirm] = useState<ConfirmAction | null>(null);
   const { addToast } = useToast();
 
   /* ── Data Fetch ── */
@@ -126,7 +144,7 @@ export default function BuilderPage() {
     setOrgPresent,
     addSkill, updateSkill, removeSkill,
     addCertification, updateCertification, removeCertification,
-    updateLainnyaContent, moveSectionUp, moveSectionDown,
+    updateLainnyaContent,
   } = helpers;
 
   const {
@@ -138,6 +156,7 @@ export default function BuilderPage() {
     showDisplaySettings, setShowDisplaySettings, showSectionOrderModal, setShowSectionOrderModal,
     isPdfExporting, setIsPdfExporting, marginPadding,
     showSkillLevel, setShowSkillLevel,
+    dividers, toggleDivider,
   } = format;
 
   /* ── Section tersembunyi ── */
@@ -149,9 +168,46 @@ export default function BuilderPage() {
     setSectionOrder((prev) => (prev.includes(key) ? prev : [...prev, key]));
   };
 
+  /* ── Kelola section: hapus (dengan Urungkan), pakai lagi, tambah kustom ── */
+  const unusedSections = unusedBuiltinSections(cvData);
+  const isSectionUnused = (key: string) => unusedSections.includes(key);
+  const labelOf = (key: string) => sectionLabel(cvData, key);
+  const requestRemoveSection = (key: string) => {
+    const label = labelOf(key);
+    setConfirm({
+      title: `Hapus bagian ${label}?`,
+      message: "Isi bagian ini dikosongkan dan bagian ini keluar dari CV. Kamu masih bisa mengurungkannya sesaat setelah menghapus.",
+      confirmLabel: "Hapus bagian",
+      cancelLabel: "Batal",
+      variant: "danger",
+      onConfirm: () => {
+        const res = removeSection(cvData, key);
+        if (!res) return;
+        setCvData((prev) => removeSection(prev, key)?.cv ?? prev);
+        addToast({
+          type: "info",
+          message: `Bagian ${label} dihapus.`,
+          duration: 8000,
+          action: { label: "Urungkan", onClick: () => setCvData((prev) => undoRemoveSection(prev, res.removed)) },
+        });
+      },
+    });
+  };
+  const restoreSection = (key: string) => setCvData((prev) => restoreBuiltinSection(prev, key));
+  const addCustom = (title: string) => setCvData((prev) => addCustomSection(prev, title)?.cv ?? prev);
+  const customOnly = customSections.filter((c) => c.id !== LAINNYA_ID);
+  const unusedForPanel = unusedSections.map((key) => ({ key, label: labelOf(key) }));
+  const moveSection = (from: number, to: number) =>
+    setSectionOrder((prev) => (to < 0 || to >= prev.length ? prev : arrayMove(prev, from, to)));
+  // "Semua garis" aktif bila setiap section (selain yang pertama) bergaris.
+  const hasDivider = (key: string) => dividers[key] ?? showDividers;
+  const allDividers = sectionOrder.length > 1 && sectionOrder.slice(1).every(hasDivider);
+  const moveEntry = (list: "workHistory" | "education" | "organisations") => (from: number, to: number) =>
+    setCvData((prev) => ({ ...prev, [list]: arrayMove(prev[list] as unknown[], from, to) }));
+
   const {
     aiJdKeywords, setAiJdKeywords, reducedMotion, computeAtsScore,
-    sectionCompletion, cvCompleteness, aiModal, setAiModal, SECTION_LABEL_MAP,
+    sectionCompletion, cvCompleteness, aiModal, setAiModal,
   } = ai;
 
 
@@ -173,7 +229,8 @@ export default function BuilderPage() {
       lainnya: 5,
       organizations: 4,
     };
-    const step = sectionStepMap[sectionKey];
+    // Section kustom diisi di langkah Keahlian & Lainnya.
+    const step = sectionStepMap[sectionKey] ?? 5;
     if (step !== undefined) setActiveStep(step);
   }, []);
 
@@ -181,8 +238,8 @@ export default function BuilderPage() {
   // bukan saat status autosave, modal, dsb. berubah.
   const previewContent = useMemo(() => {
     const { marginMm: _marginMm, ...renderProps } = cvRenderProps(cvData, printFormat, selectedTemplateId);
-    return <AtsBaseRenderer {...renderProps} onSectionClick={handlePreviewSectionClick} />;
-  }, [cvData, printFormat, selectedTemplateId, handlePreviewSectionClick]);
+    return <AtsBaseRenderer {...renderProps} onSectionClick={handlePreviewSectionClick} onToggleDivider={toggleDivider} />;
+  }, [cvData, printFormat, selectedTemplateId, handlePreviewSectionClick, toggleDivider]);
 
   const handleExportPdf = async () => {
     setIsPdfExporting(true);
@@ -435,8 +492,15 @@ export default function BuilderPage() {
 
               {activeStep === 2 && (
                 <div className="space-y-4">
-                  {cvData.workHistory.map((work, i) => (<WorkCard
+                  <SortableList
+                    ids={cvData.workHistory.map((w) => w.id)}
+                    onMove={moveEntry("workHistory")}
+                    itemLabel={(_id, i) => cvData.workHistory[i]?.position || `Pengalaman ${i + 1}`}
+                    className="space-y-4"
+                  >
+                  {(_id, i, handle) => { const work = cvData.workHistory[i]; return (<WorkCard
   key={work.id}
+  dragHandle={handle}
   work={work}
   index={i}
   totalItems={cvData.workHistory.length}
@@ -485,7 +549,8 @@ export default function BuilderPage() {
                         });
                       }}
                     />
-                  ))}
+                  ); }}
+                  </SortableList>
                   <button type="button" onClick={addWork}
                     className="w-full border-2 border-dashed border-outline/30 rounded-xl py-4 flex items-center justify-center gap-2 text-body-md text-on-surface-variant hover:border-green-deep hover:text-green-deep transition-colors duration-200"
                   >
@@ -505,8 +570,15 @@ export default function BuilderPage() {
 
               {activeStep === 3 && (
                 <div className="space-y-4">
-                  {cvData.education.map((edu, i) => (<EducationCard
+                  <SortableList
+                    ids={cvData.education.map((e) => e.id)}
+                    onMove={moveEntry("education")}
+                    itemLabel={(_id, i) => cvData.education[i]?.institution || `Pendidikan ${i + 1}`}
+                    className="space-y-4"
+                  >
+                  {(_id, i, handle) => { const edu = cvData.education[i]; return (<EducationCard
   key={edu.id}
+  dragHandle={handle}
   edu={edu}
   index={i}
   totalItems={cvData.education.length}
@@ -519,7 +591,8 @@ export default function BuilderPage() {
                       onMoveDown={moveEduDown}
                       onToggleVisibility={toggleEduVisible}
                     />
-                  ))}
+                  ); }}
+                  </SortableList>
                   <button type="button" onClick={addEducation}
                     className="w-full border-2 border-dashed border-outline/30 rounded-xl py-4 flex items-center justify-center gap-2 text-body-md text-on-surface-variant hover:border-green-deep hover:text-green-deep transition-colors duration-200"
                   >
@@ -528,10 +601,22 @@ export default function BuilderPage() {
                 </div>
               )}
 
-              {activeStep === 4 && (
+              {activeStep === 4 && (isSectionUnused("organizations") ? (
+                <UnusedSectionCard label="Organisasi" onRestore={() => restoreSection("organizations")} />
+              ) : (
                 <div className="space-y-4">
-                  {cvData.organisations.map((org, i) => (<OrgCard
+                  <div className="flex items-center">
+                    <RemoveSectionButton label="Organisasi" onRemove={() => requestRemoveSection("organizations")} />
+                  </div>
+                  <SortableList
+                    ids={cvData.organisations.map((o) => o.id)}
+                    onMove={moveEntry("organisations")}
+                    itemLabel={(_id, i) => cvData.organisations[i]?.name || `Organisasi ${i + 1}`}
+                    className="space-y-4"
+                  >
+                  {(_id, i, handle) => { const org = cvData.organisations[i]; return (<OrgCard
   key={org.id}
+  dragHandle={handle}
   org={org}
   index={i}
   totalItems={cvData.organisations.length}
@@ -551,14 +636,15 @@ export default function BuilderPage() {
                       onMoveDown={moveOrgDown}
                       onToggleVisibility={toggleOrgVisible}
                     />
-                  ))}
+                  ); }}
+                  </SortableList>
                   <button type="button" onClick={addOrganization}
                     className="w-full border-2 border-dashed border-outline/30 rounded-xl py-4 flex items-center justify-center gap-2 text-body-md text-on-surface-variant hover:border-green-deep hover:text-green-deep transition-colors duration-200"
                   >
                     <span className="material-symbols-outlined text-lg">add</span> {t("builder.add-org")}
                   </button>
                 </div>
-              )}
+              ))}
 
               {activeStep === 5 && (
                 <SkillSection
@@ -578,7 +664,32 @@ export default function BuilderPage() {
                   onSelfEvaluationChange={(v) => updateField("selfEvaluation", v)}
                   isSectionHidden={isSectionHidden}
                   onShowSection={showSection}
+                  isSectionUnused={isSectionUnused}
+                  onRemoveSection={requestRemoveSection}
+                  onRestoreSection={restoreSection}
                 />
+              )}
+              {activeStep === 5 && customOnly.map((cs) => (
+                <CustomSectionCard
+                  key={cs.id}
+                  section={cs}
+                  onChange={(patch) => setCvData((prev) => updateCustomSection(prev, cs.id, patch))}
+                  onRemove={() => requestRemoveSection(cs.id)}
+                  hiddenNotice={cs.content.trim() && isSectionHidden(cs.id) ? <HiddenSectionNotice onShow={() => showSection(cs.id)} /> : null}
+                />
+              ))}
+              {activeStep === 5 && (
+                <div className="rounded-xl bg-surface-container-lowest p-6 shadow-soft">
+                  <h3 className="mb-1 font-label-bold text-on-surface">Tambah bagian</h3>
+                  <p className="mb-3 text-xs text-on-surface-variant">Bagian tambahan muncul di CV setelah diisi, dan bisa diurutkan lewat Urutan Section.</p>
+                  <AddSectionPanel
+                    unused={unusedForPanel}
+                    onRestore={restoreSection}
+                    onAddCustom={addCustom}
+                    customCount={customSections.length}
+                    existingTitles={customSections.map((c) => c.title)}
+                  />
+                </div>
               )}
 
               {activeStep === 6 && (
@@ -600,13 +711,13 @@ export default function BuilderPage() {
               fontFamily={fontFamily}
               fontSize={fontSize}
               textAlign={textAlign}
-              showDividers={showDividers}
+              showDividers={allDividers}
               reducedMotion={reducedMotion}
               isPdfExporting={isPdfExporting}
               onFontFamilyChange={setFontFamily}
               onFontSizeChange={(v) => setFontSize(v)}
               onTextAlignChange={setTextAlign}
-              onDividersToggle={() => setShowDividers((d) => !d)}
+              onDividersToggle={() => setShowDividers(!allDividers)}
               onOpenSectionOrder={() => setShowSectionOrderModal(true)}
               onOpenDisplaySettings={() => setShowDisplaySettings(true)}
               onNavigateToCheckout={() => router.push(`/cv/${cvId}/checkout`)}
@@ -658,10 +769,22 @@ export default function BuilderPage() {
           onClose={() => setShowSectionOrderModal(false)}
           sectionOrder={sectionOrder}
           sectionVisibility={sectionVisibility}
-          SECTION_LABEL_MAP={SECTION_LABEL_MAP}
-          onMoveUp={moveSectionUp}
-          onMoveDown={moveSectionDown}
+          labelOf={labelOf}
+          onMove={moveSection}
+          hasDivider={hasDivider}
+          onToggleDivider={toggleDivider}
+          allDividers={allDividers}
+          onAllDividersChange={setShowDividers}
+          isRemovable={(key) => isRemovableSection(cvData, key)}
+          onRemove={requestRemoveSection}
+          unused={unusedForPanel}
+          onRestore={restoreSection}
+          onAddCustom={addCustom}
+          customCount={customSections.length}
+          customTitles={customSections.map((c) => c.title)}
         />
+
+        <ConfirmModal confirm={confirm} onClose={() => setConfirm(null)} />
 
         {/* ── DISPLAY SETTINGS MODAL ── */}
         <DisplaySettingsModal

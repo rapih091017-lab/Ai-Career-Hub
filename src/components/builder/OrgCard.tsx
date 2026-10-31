@@ -20,19 +20,18 @@ interface OrgCardProps {
   onMoveUp: (index: number) => void;
   onMoveDown: (index: number) => void;
   onToggleVisibility: (index: number) => void;
+  /** Tombol seret dari SortableList. */
+  dragHandle?: React.ReactNode;
 }
 
-export function OrgCard({ org, index, totalItems, jobTitle, skills, jobDescription, onUpdate, onSetPresent, onRemove, onMoveUp, onMoveDown, onToggleVisibility }: OrgCardProps) {
+export function OrgCard({ org, index, totalItems, jobTitle, skills, jobDescription, onUpdate, onSetPresent, onRemove, onMoveUp, onMoveDown, onToggleVisibility, dragHandle }: OrgCardProps) {
   const isHidden = org.visible === false;
 
   return (
     <div className={`bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4 relative transition-opacity duration-200 ${isHidden ? "opacity-50" : ""}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {/* Drag handle */}
-          <div className="shrink-0 cursor-grab active:cursor-grabbing text-outline-variant hover:text-on-surface transition-colors p-1 rounded">
-            <span className="material-symbols-outlined text-[16px]">drag_indicator</span>
-          </div>
+          {dragHandle}
           <h3 className="font-label-bold text-on-surface">Organisasi {index + 1}</h3>
         </div>
         <div className="flex items-center gap-1">

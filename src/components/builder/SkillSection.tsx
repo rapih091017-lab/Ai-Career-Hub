@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { BulletEditor } from "./BulletEditor";
+import { RemoveSectionButton, UnusedSectionCard } from "./SectionControls";
 import type { SkillEntry, CertificationEntry } from "@/components/cv-templates";
 
 interface SkillSectionProps {
@@ -23,6 +24,10 @@ interface SkillSectionProps {
   /** true bila section tidak ikut tampil di CV (disembunyikan / tidak ada di urutan). */
   isSectionHidden?: (key: string) => boolean;
   onShowSection?: (key: string) => void;
+  /** Section opsional yang sudah dihapus (tidak dipakai di CV). */
+  isSectionUnused?: (key: string) => boolean;
+  onRemoveSection?: (key: string) => void;
+  onRestoreSection?: (key: string) => void;
 }
 
 export const SKILL_LEVEL_OPTIONS = [
@@ -75,7 +80,13 @@ export function SkillSection({
   onSelfEvaluationChange,
   isSectionHidden,
   onShowSection,
+  isSectionUnused,
+  onRemoveSection,
+  onRestoreSection,
 }: SkillSectionProps) {
+  const unused = (key: string) => !!isSectionUnused?.(key) && !!onRestoreSection;
+  const removeBtn = (key: string, label: string) =>
+    onRemoveSection ? <RemoveSectionButton label={label} onRemove={() => onRemoveSection(key)} /> : null;
   const hiddenNotice = (key: string, hasData: boolean) =>
     hasData && isSectionHidden?.(key) ? (
       <HiddenSectionNotice onShow={onShowSection ? () => onShowSection(key) : undefined} />
@@ -160,6 +171,9 @@ export function SkillSection({
       </div>
 
       {/* ── Sertifikasi & Lisensi ── */}
+      {unused("certifications") ? (
+        <UnusedSectionCard label="Sertifikasi" onRestore={() => onRestoreSection!("certifications")} />
+      ) : (
       <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
         <div className="flex items-center gap-3 pb-2">
           <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
@@ -169,6 +183,7 @@ export function SkillSection({
             <h3 className="font-label-bold text-on-surface">Sertifikasi & Lisensi</h3>
             <p className="text-xs text-on-surface-variant">Sertifikasi profesional, kursus, atau lisensi yang dimiliki</p>
           </div>
+          {removeBtn("certifications", "Sertifikasi")}
         </div>
         {hiddenNotice("certifications", certifications.some((c) => c.name.trim()))}
 
@@ -221,8 +236,12 @@ export function SkillSection({
           </button>
         </div>
       </div>
+      )}
 
       {/* ── Self Evaluation / Evaluasi Diri ── */}
+      {unused("selfEvaluation") ? (
+        <UnusedSectionCard label="Evaluasi Diri" onRestore={() => onRestoreSection!("selfEvaluation")} />
+      ) : (
       <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
         <div className="flex items-center gap-3 pb-2">
           <div className="w-10 h-10 rounded-xl bg-green/10 flex items-center justify-center shrink-0">
@@ -232,6 +251,7 @@ export function SkillSection({
             <h3 className="font-label-bold text-on-surface">Evaluasi Diri</h3>
             <p className="text-xs text-on-surface-variant">Tuliskan kekuatan utama, motivasi, atau tujuan kariermu (opsional)</p>
           </div>
+          {removeBtn("selfEvaluation", "Evaluasi Diri")}
         </div>
         {hiddenNotice("selfEvaluation", !!selfEvaluation.trim())}
         {onSelfEvaluationChange ? (
@@ -252,8 +272,12 @@ export function SkillSection({
           />
         )}
       </div>
+      )}
 
       {/* ── Lainnya ── */}
+      {unused("lainnya") ? (
+        <UnusedSectionCard label="Lainnya" onRestore={() => onRestoreSection!("lainnya")} />
+      ) : (
       <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
@@ -263,6 +287,7 @@ export function SkillSection({
             <h3 className="font-label-bold text-on-surface">Lainnya</h3>
             <p className="text-xs text-on-surface-variant">Key achievements, penghargaan, atau apapun yang ingin ditambahkan</p>
           </div>
+          {removeBtn("lainnya", "Lainnya")}
         </div>
         {hiddenNotice("lainnya", !!lainnyaContent.trim())}
         <BulletEditor
@@ -275,6 +300,7 @@ export function SkillSection({
           maxLength={5000}
         />
       </div>
+      )}
     </>
   );
 }
