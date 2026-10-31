@@ -50,6 +50,9 @@ export function pasteAt(
   pasted: string,
 ): { lines: string[]; focus: number; caret: number } {
   const parts = bulletList(pasted);
+  // Baris baru di awal/akhir teks tempel berarti mulai/akhiri poin baru, bukan disambung.
+  if (parts.length > 0 && /^[ \t]*\r?\n/.test(pasted)) parts.unshift("");
+  if (parts.length > 0 && /\r?\n[ \t]*$/.test(pasted)) parts.push("");
   const text = lines[index] ?? "";
   const before = text.slice(0, selStart);
   const after = text.slice(selEnd);

@@ -26,6 +26,10 @@ describe("bullet-editor-ops", () => {
     expect(pasteAt(["Xy"], 0, 1, 1, "• a\n- b\n3. c")).toEqual({ lines: ["Xa", "b", "cy"], focus: 2, caret: 1 });
     expect(pasteAt(["hapus"], 0, 0, 5, "- satu\n- dua")).toEqual({ lines: ["satu", "dua"], focus: 1, caret: 3 });
     expect(pasteAt(["ab"], 0, 1, 1, "\n\n")).toEqual({ lines: ["ab"], focus: 0, caret: 1 });
+    // Baris baru di awal: poin tempel tidak menyambung ke teks sebelumnya.
+    expect(pasteAt(["ab"], 0, 2, 2, "\n• x\n• y")).toEqual({ lines: ["ab", "x", "y"], focus: 2, caret: 1 });
+    // Baris baru di akhir: sisa teks setelah kursor jadi poin sendiri.
+    expect(pasteAt(["ab"], 0, 1, 1, "x\ny\n")).toEqual({ lines: ["ax", "y", "b"], focus: 2, caret: 0 });
   });
 
   it("pindah dan hapus poin", () => {
