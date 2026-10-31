@@ -9,15 +9,19 @@ import { NextResponse } from "next/server";
  */
 interface WindowEntry {
   timestamps: number[];
+  /** Panjang jendela entri ini; pembersihan berkala memakai nilai ini. */
+  windowMs: number;
 }
 
 const stores = new Map<string, WindowEntry>();
 
-// Periodic cleanup every 60 seconds to evict stale entries
+// Periodic cleanup every 60 seconds to evict stale entries.
+// Dulu selalu memangkas >60 dtk, sehingga jendela lebih dari 1 menit
+// (mis. batas per jam) ikut terhapus dan tidak pernah membatasi.
 setInterval(() => {
   const now = Date.now();
   for (const [key, entry] of stores) {
-    entry.timestamps = entry.timestamps.filter((t) => now - t < 60_000);
+    entry.timestamps = entry.timestamps.filter((t) => now - t < entry.windowMs);
     if (entry.timestamps.length === 0) {
       stores.delete(key);
     }
@@ -54,10 +58,11 @@ export function checkRateLimit({
 
   let entry = stores.get(key);
   if (!entry) {
-    entry = { timestamps: [] };
+    entry = { timestamps: [], windowMs };
     stores.set(key, entry);
   }
 
+  entry.windowMs = windowMs;
   // Prune timestamps outside the window
   entry.timestamps = entry.timestamps.filter((t) => now - t < windowMs);
 
