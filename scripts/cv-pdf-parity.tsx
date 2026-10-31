@@ -42,9 +42,29 @@ const longCv: CvData = {
   })),
 };
 
+// Mode paragraf: deskripsi multi-baris dirender sebagai <p> pre-line, bukan <ul>.
+const paragraphCv: CvData = {
+  ...sampleCv,
+  workHistory: sampleCv.workHistory.map((w, i) =>
+    i === 0
+      ? { ...w, descriptionType: "paragraph" as const, description: "Memimpin migrasi aplikasi ke Next.js bersama tim kecil\nMeningkatkan skor Lighthouse dari 62 ke 95 dalam satu kuartal." }
+      : w,
+  ),
+  organisations: sampleCv.organisations.map((o) => ({ ...o, descriptionType: "paragraph" as const })),
+};
+
 const fixtures: { name: string; data: CvData; format: CvPrintFormat }[] = [
   { name: "1-halaman", data: sampleCv, format: { fontFamily: "'CV Inter', sans-serif", fontSize: 9, marginMode: "tight", spacingMode: "compact" } },
   { name: "multi-halaman-entri-terbelah", data: longCv, format: { fontFamily: "Arial, sans-serif", fontSize: 11, showDividers: true } },
+  {
+    name: "mode-paragraf",
+    data: paragraphCv,
+    format: {
+      fontFamily: "'CV Inter', sans-serif",
+      fontSize: 10,
+      customSections: [{ id: "lainnya", title: "Lainnya", content: "Juara 1 lomba inovasi tingkat nasional\nRelawan pengajar coding akhir pekan", contentType: "paragraph" }],
+    },
+  },
   { name: "serif-margin-mepet", data: longCv, format: { fontFamily: "'Times New Roman', serif", fontSize: 11, marginMode: "tight", templateId: "executive-serif" } },
 ];
 

@@ -1,6 +1,19 @@
 import { cvFontStack } from "@/lib/cv-fonts";
 import { formatCertification, formatSkill, groupNamedSkills, namedCertifications } from "@/lib/cv-sections";
 
+/**
+ * Teks mode paragraf: baris yang diketik user dipertahankan (white-space:
+ * pre-line), baris kosong dan spasi tepi dibuang. Tidak menambah tanda baca,
+ * jadi teks di CV persis seperti yang ditulis.
+ */
+function paragraphText(text: string): string {
+  return text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .join("\n");
+}
+
 /* ───────── shared types ───────── */
 
 export interface WorkEntry {
@@ -390,8 +403,8 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                   </p>
                 )}
                 {work.description && (work.descriptionType === "paragraph" ? (
-                  <p style={{ margin: "0 0 8pt 0", color: "#111111", lineHeight: lineHeightProp ?? 1.5, textAlign }}>
-                    {work.description}
+                  <p style={{ margin: "0 0 8pt 0", color: "#111111", lineHeight: lineHeightProp ?? 1.5, textAlign, whiteSpace: "pre-line" }}>
+                    {paragraphText(work.description)}
                   </p>
                 ) : (
                   <ul style={{ margin: "0 0 8pt 0", paddingLeft: pt(20), listStyle: "disc" }}>
@@ -542,8 +555,8 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
                   {org.position || "-"}
                 </p>
                 {org.description && (org.descriptionType === "paragraph" ? (
-                  <p style={{ margin: "0 0 8pt 0", color: "#111111", lineHeight: lineHeightProp ?? 1.5, textAlign }}>
-                    {org.description}
+                  <p style={{ margin: "0 0 8pt 0", color: "#111111", lineHeight: lineHeightProp ?? 1.5, textAlign, whiteSpace: "pre-line" }}>
+                    {paragraphText(org.description)}
                   </p>
                 ) : (
                   <ul style={{ margin: "0 0 8pt 0", paddingLeft: pt(20), listStyle: "disc" }}>
@@ -666,8 +679,8 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, lang:
               <>
                 <SectionHeader title={customSection.title} style={style} />
                 {customSection.contentType === "paragraph" ? (
-                  <p style={{ margin: 0, color: "#111111", lineHeight: lineHeightProp ?? 1.5, textAlign: style.textAlign || "left" }}>
-                    {customSection.content}
+                  <p style={{ margin: 0, color: "#111111", lineHeight: lineHeightProp ?? 1.5, textAlign: style.textAlign || "left", whiteSpace: "pre-line" }}>
+                    {paragraphText(customSection.content)}
                   </p>
                 ) : (
                   <ul style={{ margin: "0 0 8pt 0", paddingLeft: pt(20), listStyle: "disc" }}>

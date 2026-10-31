@@ -28,8 +28,8 @@ describe("descriptionType deskripsi kerja/organisasi", () => {
   it("paragraph dirender sebagai <p>, bukan <ul>", () => {
     const { markup } = html("paragraph");
     expect(markup).not.toMatch(/<li[^>]*>Satu<\/li>/);
-    expect(markup).toMatch(/<p[^>]*>Satu\nDua<\/p>/);
-    expect(markup).toMatch(/<p[^>]*>Tiga\nEmpat<\/p>/);
+    expect(markup).toMatch(/<p[^>]*white-space:pre-line[^>]*>Satu\nDua<\/p>/);
+    expect(markup).toMatch(/<p[^>]*white-space:pre-line[^>]*>Tiga\nEmpat<\/p>/);
   });
 
   it("nilai invalid dibuang, bukan diganti default", () => {
