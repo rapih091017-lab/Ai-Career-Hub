@@ -195,7 +195,7 @@ export default function BuilderPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${cvData.fullName || "CV"}_AI_Career_Hub.pdf`;
+      a.download = fileNameFromDisposition(res.headers.get("Content-Disposition")) ?? "CV.pdf";
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -669,4 +669,17 @@ export default function BuilderPage() {
   );
 }
 
-
+/** Nama file dari header Content-Disposition server (satu sumber penamaan). */
+function fileNameFromDisposition(header: string | null): string | null {
+  if (!header) return null;
+  const star = /filename\*=UTF-8''([^;]+)/i.exec(header);
+  if (star) {
+    try {
+      return decodeURIComponent(star[1].trim());
+    } catch {
+      return null;
+    }
+  }
+  const plain = /filename="([^"]+)"/i.exec(header);
+  return plain ? plain[1] : null;
+}
