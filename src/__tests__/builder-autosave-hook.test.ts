@@ -175,3 +175,30 @@ describe("useAutoSave — konflik & penolakan", () => {
     expect(result.current.errorMessage).toMatch(/200KB/);
   });
 });
+
+describe("useAutoSave — tutup tab dengan perubahan besar", () => {
+  afterEach(() => vi.unstubAllGlobals());
+  it("body > 60KB: tidak pakai keepalive, beforeunload memperingatkan", () => {
+    const fetchMock = vi.fn(async () => ({ ok: true }) as Response);
+    vi.stubGlobal("fetch", fetchMock);
+    const { rerender } = renderHook(({ d }) => useAutoSave("x", d, true), { initialProps: { d: cv("A") } });
+    rerender({ d: cv("B".repeat(70_000)) });
+    const ev = new Event("beforeunload", { cancelable: true });
+    window.dispatchEvent(ev);
+    expect(ev.defaultPrevented).toBe(true);
+    window.dispatchEvent(new Event("pagehide"));
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("perubahan kecil: tidak ada prompt, keepalive dipakai", () => {
+    const fetchMock = vi.fn(async () => ({ ok: true }) as Response);
+    vi.stubGlobal("fetch", fetchMock);
+    const { rerender } = renderHook(({ d }) => useAutoSave("x", d, true), { initialProps: { d: cv("A") } });
+    rerender({ d: cv("B") });
+    const ev = new Event("beforeunload", { cancelable: true });
+    window.dispatchEvent(ev);
+    expect(ev.defaultPrevented).toBe(false);
+    window.dispatchEvent(new Event("pagehide"));
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+});

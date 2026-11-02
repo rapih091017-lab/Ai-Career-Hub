@@ -29,6 +29,9 @@ interface UseAutoSaveReturn {
 }
 
 const DEBOUNCE_MS = 2000;
+/** fetch keepalive dibatasi ±64KB oleh peramban; di atas ini flush saat tutup tab tidak bisa diandalkan. */
+export const KEEPALIVE_MAX_BYTES = 60_000;
+const byteLength = (s: string) => new TextEncoder().encode(s).byteLength;
 /** Jeda sebelum percobaan ulang ke-1, ke-2, ke-3. */
 export const AUTOSAVE_RETRY_DELAYS_MS = [2000, 4000, 8000];
 
@@ -190,6 +193,8 @@ export function useAutoSave(
     const flush = () => {
       const body = latestJson.current;
       if (!cvId || blocked.current || body === null || savedJson.current === null || body === savedJson.current) return;
+      // Body besar: keepalive akan ditolak peramban; beforeunload sudah memperingatkan user.
+      if (byteLength(body) > KEEPALIVE_MAX_BYTES) return;
       try {
         // Baseline baru diperbarui setelah respons OK; kalau gagal,
         // perubahan tetap dianggap belum tersimpan (flush/ekspor akan mencoba lagi).
@@ -209,9 +214,20 @@ export function useAutoSave(
         /* peramban menolak keepalive (mis. body terlalu besar) */
       }
     };
+    // Peringatan sebelum menutup tab bila ada perubahan yang tidak bisa dikirim saat tab ditutup:
+    // body terlalu besar untuk keepalive, atau simpan sedang tertahan (konflik/ditolak/gagal).
+    const warn = (e: BeforeUnloadEvent) => {
+      const body = latestJson.current;
+      if (!cvId || body === null || savedJson.current === null || body === savedJson.current) return;
+      if (!blocked.current && body !== rejectedJson.current && byteLength(body) <= KEEPALIVE_MAX_BYTES) return;
+      e.preventDefault();
+      e.returnValue = "";
+    };
     window.addEventListener("pagehide", flush);
+    window.addEventListener("beforeunload", warn);
     return () => {
       window.removeEventListener("pagehide", flush);
+      window.removeEventListener("beforeunload", warn);
       flush();
       alive.current = false;
     };
