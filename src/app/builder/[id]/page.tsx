@@ -11,7 +11,7 @@ import { LINE_HEIGHT, cvPrintFormatFromData, cvRenderProps } from "@/lib/cv-prin
 import { cvFontValue, resolveCvFont } from "@/lib/cv-fonts";
 import { useInlineEditable } from "@/hooks/useInlineEditable";
 import { EditableText, keepCaretVisible } from "@/components/cv-templates/EditableText";
-import { focusableIn, formTargetFor, setCvPath, stepForPath } from "@/lib/cv-edit-path";
+import { focusableIn, formTargetFor, getCvPath, setCvPath, stepForPath } from "@/lib/cv-edit-path";
 import type { CvEditBindings } from "@/components/cv-templates";
 import type { BlockStyleControls } from "@/components/builder/FormatToolbar";
 import { aiSkillNames } from "@/lib/cv-normalize";
@@ -296,6 +296,33 @@ export default function BuilderPage() {
   /* ── Edit langsung di pratinjau ── */
   // Riwayat perubahan dari pratinjau (per sesi edit), untuk Ctrl+Z / Ctrl+Shift+Z di luar field.
   const editHistory = useRef<{ undo: PreviewEdit[]; redo: PreviewEdit[] }>({ undo: [], redo: [] });
+  const cvDataRef = useRef(cvData);
+  cvDataRef.current = cvData;
+  // Riwayat dibuang saat konflik antartab (409), dan per path saat field itu diubah di luar pratinjau.
+  useEffect(() => {
+    if (saveStatus === "conflict") editHistory.current = { undo: [], redo: [] };
+  }, [saveStatus]);
+  useEffect(() => {
+    const h = editHistory.current;
+    const stale = new Set<string>();
+    const latest = (list: PreviewEdit[], path: string) => list.findLast((x) => x.path === path);
+    // Field yang sedang diedit di pratinjau berubah karena ketikan sendiri; entrinya menyusul saat blur.
+    const editing = (document.activeElement as HTMLElement | null)?.getAttribute("data-cv-edit") !== null
+      ? document.activeElement?.getAttribute("data-cv-path")
+      : null;
+    for (const path of new Set([...h.undo, ...h.redo].map((x) => x.path))) {
+      if (path === editing) continue;
+      const cur = getCvPath(cvData, path);
+      const u = latest(h.undo, path);
+      const r = latest(h.redo, path);
+      // Nilai sekarang harus sama dengan "sesudah" entri undo terakhir atau "sebelum" entri redo terakhir.
+      if (!(u && cur === u.after) && !(r && cur === r.before)) stale.add(path);
+    }
+    if (stale.size) {
+      h.undo = h.undo.filter((x) => !stale.has(x.path));
+      h.redo = h.redo.filter((x) => !stale.has(x.path));
+    }
+  }, [cvData]);
   const onPreviewEdit = useCallback((path: string, value: string) => setCvData((prev) => setCvPath(prev, path, value)), [setCvData]);
   const onPreviewSession = useCallback((path: string, before: string, after: string) => {
     const h = editHistory.current;
@@ -514,9 +541,16 @@ export default function BuilderPage() {
       if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z' || e.key === 'y')) {
         const h = editHistory.current;
         const redo = e.key === 'y' || e.shiftKey;
-        const item = redo ? h.redo.pop() : h.undo.pop();
+        const item = redo ? h.redo.at(-1) : h.undo.at(-1);
         if (!item) return;
+        // Hanya bila field masih berisi nilai hasil edit itu; kalau sudah diubah di tempat lain, riwayat basi.
+        if (getCvPath(cvDataRef.current, item.path) !== (redo ? item.before : item.after)) {
+          h.undo = [];
+          h.redo = [];
+          return;
+        }
         e.preventDefault();
+        (redo ? h.redo : h.undo).pop();
         (redo ? h.undo : h.redo).push(item);
         setCvData((prev) => setCvPath(prev, item.path, redo ? item.after : item.before));
         return;
