@@ -221,7 +221,7 @@ export default function BuilderPage() {
   const restoreUnused = (key: string) => setCvData((prev) => restoreSection(prev, key));
   const addCustom = (title: string) => setCvData((prev) => addCustomSection(prev, title)?.cv ?? prev);
   const customOnly = customSections.filter((c) => c.id !== LAINNYA_ID);
-  const unusedForPanel = unusedSections.map((key) => ({ key, label: labelOf(key) }));
+  const unusedForPanel = unusedSections.map((key) => ({ key, label: labelOf(key), hasContent: sectionHasSavedContent(cvData, key) }));
   const moveSection = (from: number, to: number) =>
     setSectionOrder((prev) => (to < 0 || to >= prev.length ? prev : arrayMove(prev, from, to)));
   // "Semua garis" aktif bila setiap section (selain yang pertama) bergaris.

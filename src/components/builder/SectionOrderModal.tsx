@@ -21,7 +21,7 @@ interface SectionOrderModalProps {
   onAllDividersChange: (on: boolean) => void;
   isRemovable: (key: string) => boolean;
   onRemove: (key: string) => void;
-  unused: { key: string; label: string }[];
+  unused: { key: string; label: string; hasContent?: boolean }[];
   onRestore: (key: string) => void;
   onAddCustom: (title: string) => void;
   customCount: number;

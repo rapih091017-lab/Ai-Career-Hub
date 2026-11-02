@@ -6,7 +6,7 @@ import { MAX_CUSTOM_SECTIONS } from "@/lib/builder-format";
 
 interface AddSectionPanelProps {
   /** Section bawaan yang sedang tidak dipakai: [key, label]. */
-  unused: { key: string; label: string }[];
+  unused: { key: string; label: string; hasContent?: boolean }[];
   onRestore: (key: string) => void;
   onAddCustom: (title: string) => void;
   customCount: number;
@@ -38,12 +38,14 @@ export function AddSectionPanel({ unused, onRestore, onAddCustom, customCount, e
     <div className="space-y-3">
       {unused.length > 0 && (
         <div>
-          <p className="mb-1.5 text-xs font-semibold text-on-surface-variant">Pakai lagi</p>
+          <p className="mb-1.5 text-xs font-semibold text-on-surface-variant">Belum dipakai di CV</p>
           <div className="flex flex-wrap gap-2">
             {unused.map((u) => (
               <button key={u.key} type="button" className={chip} onClick={() => onRestore(u.key)}>
-                <span className="material-symbols-outlined text-[16px]" aria-hidden="true">undo</span>
+                <span className="material-symbols-outlined text-[16px]" aria-hidden="true">{u.hasContent ? "undo" : "add"}</span>
                 {u.label}
+                {/* Hanya bagian yang benar-benar punya isi yang ditandai; bagian kosong bukan data hilang. */}
+                {u.hasContent && <span className="text-xs font-normal text-on-surface-variant">· isi tersimpan</span>}
               </button>
             ))}
           </div>
