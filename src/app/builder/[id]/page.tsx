@@ -148,6 +148,12 @@ export default function BuilderPage() {
     const n = Number((e.target as HTMLElement).closest("[data-cv-page]")?.getAttribute("data-cv-page"));
     if (n > 0) setFocusPage(n);
   }, []);
+  // Fokus pindah di dalam pratinjau: halaman aktif diatur oleh focusin berikutnya, bukan direset.
+  const onPreviewBlur = useCallback((e: React.FocusEvent) => {
+    const next = e.relatedTarget as Node | null;
+    if (next && previewRef.current?.contains(next)) return;
+    setFocusPage(1);
+  }, []);
 
   /* ── AI & Scoring Hook ── */
   const ai = useBuilderAI({ cvData, setCvData, cvId, activeStep, setActiveStep, addToast });
@@ -1013,7 +1019,7 @@ export default function BuilderPage() {
                   </div>
                 )}
                 {/* Halaman A4 nyata: ukuran pt/mm sama dengan PDF */}
-                <div ref={previewRef} className="relative" onFocus={onPreviewFocus} onBlur={() => setFocusPage(1)} onClick={onPreviewClick} onMouseEnter={onPreviewEnter}>
+                <div ref={previewRef} className="relative" onFocus={onPreviewFocus} onBlur={onPreviewBlur} onClick={onPreviewClick} onMouseEnter={onPreviewEnter}>
                 {editHint && (
                   <div role="status" className="pointer-events-none absolute left-1/2 top-3 z-10 -translate-x-1/2 rounded-full bg-inverse-surface px-3 py-1.5 text-xs font-medium text-inverse-on-surface shadow-md">
                     Klik teks untuk mengedit
