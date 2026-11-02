@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { AtsScoreRing } from "@/components/builder/AtsScoreRing";
 import MagneticButton from "@/components/MagneticButton";
@@ -61,6 +62,8 @@ interface FormatToolbarProps {
   onTemplateChange: (id: string) => void;
   hasStyleOverrides: boolean;
   onResetStyle: () => void;
+  /** Layar < lg: tombol kembali dari pratinjau penuh ke form. */
+  onCloseMobilePreview?: () => void;
 }
 
 export function FormatToolbar({
@@ -73,7 +76,6 @@ export function FormatToolbar({
   fontSize,
   textAlign,
   showDividers,
-  reducedMotion,
   isPdfExporting,
   onFontFamilyChange,
   onFontSizeChange,
@@ -87,103 +89,56 @@ export function FormatToolbar({
   onTemplateChange,
   hasStyleOverrides,
   onResetStyle,
+  onCloseMobilePreview,
 }: FormatToolbarProps) {
-  // Font dari template (bukan salah satu pilihan) tetap ditampilkan apa adanya.
   const sectionMode = block.target !== null;
   const fontOptions = sectionMode ? BLOCK_FONT_OPTIONS : FONT_OPTIONS;
+  // Font dari template (bukan salah satu pilihan) tetap ditampilkan apa adanya.
   const fontKnown = fontOptions.some((o) => o.value === fontFamily);
   const sizeMin = sectionMode ? 8 : 9;
   const sizeMax = sectionMode ? 14 : 12;
   const targetLabel = block.targets.find((x) => x.key === block.target)?.label ?? "";
   const { t } = useTranslation();
-  return (
-    <div className="relative h-auto px-3 md:px-4 py-2 border-b border-outline-variant/50 flex flex-wrap items-center gap-2 bg-surface-container-lowest shadow-sm z-20 shrink-0">
-      {/* CV Completeness Bar */}
-      <div className="flex items-center gap-1.5 shrink-0" title={`CV ${cvCompleteness}% ${t("builder.complete")}`}>
-        <div className="w-12 h-1.5 bg-outline-variant/30 rounded-full overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-[width,background-color] duration-500 ${
-              cvCompleteness >= 100 ? "bg-green/100" : cvCompleteness >= 50 ? "bg-primary" : "bg-amber-500"
-            }`}
-            style={{ width: `${cvCompleteness}%` }}
-          />
-        </div>
-        <span className="text-[9px] font-bold text-on-surface-variant w-6 text-right">{cvCompleteness}%</span>
-      </div>
+  const [sheetOpen, setSheetOpen] = useState(false);
 
-      {/* Auto-save status */}
-      <AnimatePresence>
-        {saveStatus !== "idle" && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, x: -8 }}
-            animate={{ opacity: 1, scale: 1, x: 0 }}
-            exit={{ opacity: 0, scale: 0.9, x: 8 }}
-            transition={{ type: "spring", stiffness: 400, damping: 25 }}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[11px] font-semibold shrink-0 shadow-sm ${
-              saveStatus === "saving" ? "text-amber-700 bg-amber-50 border border-amber-200" :
-              saveStatus === "saved" ? "text-green-deep bg-green/10 border border-green/25" :
-              "text-on-error-container bg-error-container border border-error/30 animate-[shake_0.3s_ease-in-out]"
-            }`}
-          >
-            <span className={`material-symbols-outlined text-[14px] ${saveStatus === "saving" ? "animate-spin" : ""}`}>
-              {saveStatus === "saving" ? "sync" : saveStatus === "saved" ? "check_circle" : "error"}
-            </span>
-            <span>
-              {saveStatus === "saving" ? t("builder.saving-short") : saveStatus === "saved" ? t("builder.saved") : t("builder.save-error")}
-            </span>
-            {saveStatus === "saved" && lastSaved && (
-              <span className="text-[9px] text-green-600/60 font-normal ml-0.5">
-                {lastSaved.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
-              </span>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+  const selectCls = "bg-surface-container-low border border-outline-variant/50 rounded-lg text-xs px-2 py-1.5 min-h-9 focus:ring-1 focus:ring-primary";
 
-      {/* ATS Score */}
-      <AtsScoreRing score={computeAtsScore} />
-
-      {/* Template */}
-      <TemplatePopover templateId={templateId} onSelect={onTemplateChange} hasOverrides={hasStyleOverrides} onResetStyle={onResetStyle} />
-
-      {/* Pilih bagian: tanpa pilihan = gaya global. Juga satu-satunya cara memilih di layar sentuh. */}
-      <label className="flex items-center gap-1 text-xs text-on-surface-variant">
-        <span className="whitespace-nowrap">Atur bagian:</span>
-        <select
-          value={block.target ?? ""}
-          onChange={(e) => block.onTargetChange(e.target.value || null)}
-          className="bg-surface-container-low border border-outline-variant/50 rounded-lg text-xs px-2 py-1.5 focus:ring-1 focus:ring-primary max-w-[150px]"
-        >
-          <option value="">Semua</option>
-          {block.targets.map((x) => (
-            <option key={x.key} value={x.key}>{x.label}</option>
-          ))}
-        </select>
-      </label>
-
-      {/* Font family */}
-      <select value={fontFamily} onChange={(e) => onFontFamilyChange(e.target.value)} aria-label="Font"
-        className="bg-surface-container-low border border-outline-variant/50 rounded-lg text-xs px-2 py-1.5 focus:ring-1 focus:ring-primary max-w-[120px]"
+  const targetSelect = (
+    <label className="flex items-center gap-1 text-xs text-on-surface-variant">
+      <span className="whitespace-nowrap">Atur bagian</span>
+      <select
+        value={block.target ?? ""}
+        onChange={(e) => block.onTargetChange(e.target.value || null)}
+        className={`${selectCls} max-w-[160px] ${sectionMode ? "border-primary text-on-surface font-semibold" : ""}`}
       >
+        <option value="">Semua bagian</option>
+        {block.targets.map((x) => (
+          <option key={x.key} value={x.key}>{x.label}</option>
+        ))}
+      </select>
+    </label>
+  );
+
+  const fontControls = (
+    <>
+      <select value={fontFamily} onChange={(e) => onFontFamilyChange(e.target.value)} aria-label="Font" className={`${selectCls} max-w-[140px]`}>
         {!fontKnown && <option value={fontFamily}>{resolveCvFont(fontFamily).label}{sectionMode ? "" : " (template)"}</option>}
         {fontOptions.map((o) => (
           <option key={o.value} value={o.value}>{o.label}</option>
         ))}
       </select>
 
-      {/* Font size */}
       <div className="flex items-center gap-1 bg-surface-container-low rounded-lg px-1.5 py-1">
-        <button onClick={() => onFontSizeChange(Math.max(sizeMin, fontSize - 1))} className="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant" aria-label={t("builder.font-small")}>
-          <span className="material-symbols-outlined text-sm">remove</span>
+        <button onClick={() => onFontSizeChange(Math.max(sizeMin, fontSize - 1))} disabled={fontSize <= sizeMin} className="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant disabled:opacity-40" aria-label={t("builder.font-small")}>
+          <span className="material-symbols-outlined text-sm" aria-hidden="true">remove</span>
         </button>
-        <span className="text-xs font-bold w-6 text-center select-none">{fontSize}pt</span>
-        <button onClick={() => onFontSizeChange(Math.min(sizeMax, fontSize + 1))} className="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant" aria-label={t("builder.font-large")}>
-          <span className="material-symbols-outlined text-sm">add</span>
+        <span className="text-xs font-bold w-8 text-center select-none" aria-live="polite">{fontSize}pt</span>
+        <button onClick={() => onFontSizeChange(Math.min(sizeMax, fontSize + 1))} disabled={fontSize >= sizeMax} className="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant disabled:opacity-40" aria-label={t("builder.font-large")}>
+          <span className="material-symbols-outlined text-sm" aria-hidden="true">add</span>
         </button>
       </div>
 
-      {/* Text alignment */}
-      <div className="flex items-center bg-surface-container-low rounded-lg p-0.5 gap-0.5">
+      <div className="flex items-center bg-surface-container-low rounded-lg p-0.5 gap-0.5" role="group" aria-label="Rata teks">
         {(["left", "center", "right", "justify"] as const).map((align) => {
           const label =
             align === "left"
@@ -194,91 +149,155 @@ export function FormatToolbar({
                   ? t("builder.align-right")
                   : t("builder.align-justify");
           return (
-            <button key={align} onClick={() => onTextAlignChange(align)}
+            <button key={align} onClick={() => onTextAlignChange(align)} aria-pressed={textAlign === align}
               className={`p-1.5 rounded ${textAlign === align ? "bg-surface-container-lowest shadow-sm" : "hover:bg-surface-container-highest/60"}`}
               title={label}
               aria-label={label}
             >
-              <span className="material-symbols-outlined text-sm">{align === "left" ? "format_align_left" : align === "center" ? "format_align_center" : align === "right" ? "format_align_right" : "format_align_justify"}</span>
+              <span className="material-symbols-outlined text-sm" aria-hidden="true">{align === "left" ? "format_align_left" : align === "center" ? "format_align_center" : align === "right" ? "format_align_right" : "format_align_justify"}</span>
             </button>
           );
         })}
       </div>
+    </>
+  );
 
+  // Kontrol yang jarang dipakai: di desktop masuk menu "Lainnya", di layar kecil ada di sheet Format.
+  const moreItems = (close: () => void) => (
+    <>
       {sectionMode && (
         <>
-          <select
-            value={String(block.lineHeight)}
-            onChange={(e) => block.onLineHeightChange(Number(e.target.value))}
-            aria-label="Jarak baris bagian ini"
-            title="Jarak baris"
-            className="bg-surface-container-low border border-outline-variant/50 rounded-lg text-xs px-2 py-1.5 focus:ring-1 focus:ring-primary"
-          >
-            {!LINE_HEIGHT_OPTIONS.includes(block.lineHeight) && <option value={String(block.lineHeight)}>{block.lineHeight}</option>}
-            {LINE_HEIGHT_OPTIONS.map((v) => (
-              <option key={v} value={String(v)}>Baris {v}</option>
-            ))}
-          </select>
-          <label className="flex items-center gap-1 text-xs text-on-surface-variant" title="Warna judul bagian">
-            <input
-              type="color"
-              value={block.titleColor}
-              onChange={(e) => block.onTitleColorChange(e.target.value)}
-              aria-label="Warna judul bagian ini"
-              className="h-7 w-7 cursor-pointer rounded border border-outline-variant/50 bg-transparent p-0"
-            />
+          <label className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
+            <span>Jarak baris bagian ini</span>
+            <select value={String(block.lineHeight)} onChange={(e) => block.onLineHeightChange(Number(e.target.value))} className={selectCls}>
+              {!LINE_HEIGHT_OPTIONS.includes(block.lineHeight) && <option value={String(block.lineHeight)}>{block.lineHeight}</option>}
+              {LINE_HEIGHT_OPTIONS.map((v) => (
+                <option key={v} value={String(v)}>{v}</option>
+              ))}
+            </select>
           </label>
+          <label className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
+            <span>Warna judul bagian ini</span>
+            <input type="color" value={block.titleColor} onChange={(e) => block.onTitleColorChange(e.target.value)}
+              className="h-8 w-8 cursor-pointer rounded border border-outline-variant/50 bg-transparent p-0" />
+          </label>
+          <hr className="my-1 border-outline-variant/40" />
         </>
       )}
+      <MenuItem icon="horizontal_rule" onClick={() => { onDividersToggle(); close(); }} pressed={showDividers}>
+        {showDividers ? "Hapus semua garis bagian" : "Garis di antara bagian"}
+      </MenuItem>
+      <MenuItem icon="reorder" onClick={() => { onOpenSectionOrder(); close(); }}>{t("builder.section-order-tip")}</MenuItem>
+      <MenuItem icon="palette" onClick={() => { onOpenDisplaySettings(); close(); }}>{t("builder.display-tip")}</MenuItem>
+    </>
+  );
 
-      {/* Divider toggle */}
-      <button onClick={onDividersToggle}
-        className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-medium transition-colors ${showDividers ? "bg-primary/10 text-primary" : "bg-surface-container-low text-on-surface-variant hover:bg-surface-variant"}`}
-        title={t("builder.dividers-tip")}
-      >
-        <span className="material-symbols-outlined text-sm">horizontal_rule</span>
-        <span className="hidden sm:inline">{t("builder.dividers")}</span>
-      </button>
-
-      {/* Section order */}
-      <button onClick={onOpenSectionOrder}
-        className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-medium bg-surface-container-low text-on-surface-variant hover:bg-surface-variant transition-colors"
-        title={t("builder.section-order-tip")}
-      >
-        <span className="material-symbols-outlined text-sm">reorder</span>
-        <span className="hidden sm:inline">{t("builder.section-order")}</span>
-      </button>
-
-      {/* Display Settings */}
-      <button onClick={onOpenDisplaySettings}
-        className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-medium bg-surface-container-low text-on-surface-variant hover:bg-surface-variant transition-colors"
-        title={t("builder.display-tip")}
-      >
-        <span className="material-symbols-outlined text-sm">palette</span>
-        <span className="hidden sm:inline">{t("builder.display")}</span>
-      </button>
-
-      {/* AI Revision, FAB Style */}
-      <MagneticButton>
-        <button onClick={onNavigateToCheckout}
-          className="relative flex min-h-[36px] items-center gap-1.5 px-3 py-1.5 rounded-full border-[2.5px] border-ink bg-lime text-xs font-bold text-on-light shadow-[0_2px_0_rgb(var(--c-ink))] overflow-hidden"
-          title={t("builder.ai-opt-tip")}
+  const saveBadge = (
+    <AnimatePresence>
+      {saveStatus !== "idle" && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, x: -8 }}
+          animate={{ opacity: 1, scale: 1, x: 0 }}
+          exit={{ opacity: 0, scale: 0.9, x: 8 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[11px] font-semibold shrink-0 shadow-sm ${
+            saveStatus === "saving" ? "text-amber-700 bg-amber-50 border border-amber-200" :
+            saveStatus === "saved" ? "text-green-deep bg-green/10 border border-green/25" :
+            "text-on-error-container bg-error-container border border-error/30 animate-[shake_0.3s_ease-in-out]"
+          }`}
         >
-          <span className="material-symbols-outlined text-sm relative z-10" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
-          <span className="relative z-10 hidden sm:inline">{t("builder.ai-opt")}</span>
-        </button>
-      </MagneticButton>
+          <span className={`material-symbols-outlined text-[14px] ${saveStatus === "saving" ? "animate-spin" : ""}`} aria-hidden="true">
+            {saveStatus === "saving" ? "sync" : saveStatus === "saved" ? "check_circle" : "error"}
+          </span>
+          <span>
+            {saveStatus === "saving" ? t("builder.saving-short") : saveStatus === "saved" ? t("builder.saved") : t("builder.save-error")}
+          </span>
+          {saveStatus === "saved" && lastSaved && (
+            <span className="text-[9px] text-green-600/60 font-normal ml-0.5 hidden sm:inline">
+              {lastSaved.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
+            </span>
+          )}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 
-      {/* Export PDF, using shared PdfExportButton */}
-      <div className="ml-auto">
-        <PdfExportButton
-          targetRef={{ current: null }}
-          mode="builder"
-          onBuilderExport={onExportPdf}
-          externalLoading={isPdfExporting}
-          label="PDF"
-          fileName="CV.pdf"
-        />
+  const aiButton = (
+    <MagneticButton>
+      <button onClick={onNavigateToCheckout}
+        className="relative flex min-h-[36px] items-center gap-1.5 px-3 py-1.5 rounded-full border-[2.5px] border-ink bg-lime text-xs font-bold text-on-light shadow-[0_2px_0_rgb(var(--c-ink))] overflow-hidden"
+        title="Buka halaman pembelian revisi CV oleh AI"
+        aria-label="Revisi CV dengan AI (berbayar)"
+      >
+        <span className="material-symbols-outlined text-sm relative z-10" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">auto_awesome</span>
+        <span className="relative z-10 hidden sm:inline">Revisi dengan AI</span>
+      </button>
+    </MagneticButton>
+  );
+
+  const pdfButton = (
+    <PdfExportButton
+      targetRef={{ current: null }}
+      mode="builder"
+      onBuilderExport={onExportPdf}
+      externalLoading={isPdfExporting}
+      label="PDF"
+      fileName="CV.pdf"
+    />
+  );
+
+  return (
+    <div className="relative h-auto px-3 md:px-4 py-2 border-b border-outline-variant/50 flex flex-wrap items-center gap-2 bg-surface-container-lowest shadow-sm z-20 shrink-0">
+      {/* ── Layar kecil: satu baris ringkas ── */}
+      <div className="flex w-full items-center gap-2 lg:hidden">
+        {onCloseMobilePreview && (
+          <button type="button" onClick={onCloseMobilePreview} className="flex min-h-11 items-center gap-1 rounded-lg px-2 text-sm font-semibold text-on-surface hover:bg-surface-container">
+            <span className="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_back</span>
+            Form
+          </button>
+        )}
+        <button type="button" onClick={() => setSheetOpen(true)} aria-haspopup="dialog"
+          className="flex min-h-11 items-center gap-1 rounded-lg bg-surface-container-low px-3 text-sm font-semibold text-on-surface hover:bg-surface-variant"
+        >
+          <span className="material-symbols-outlined text-[18px]" aria-hidden="true">text_format</span>
+          Format
+        </button>
+        {saveBadge}
+        <div className="ml-auto flex items-center gap-2">
+          {aiButton}
+          {pdfButton}
+        </div>
+      </div>
+
+      {/* ── Desktop ── */}
+      <div className="hidden lg:contents">
+        <div className="flex items-center gap-1.5 shrink-0" title={`Kelengkapan CV: ${cvCompleteness}%`}>
+          <div className="w-12 h-1.5 bg-outline-variant/30 rounded-full overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-[width,background-color] duration-500 ${
+                cvCompleteness >= 100 ? "bg-green/100" : cvCompleteness >= 50 ? "bg-primary" : "bg-amber-500"
+              }`}
+              style={{ width: `${cvCompleteness}%` }}
+            />
+          </div>
+          <span className="text-[10px] font-bold text-on-surface-variant whitespace-nowrap">Lengkap {cvCompleteness}%</span>
+        </div>
+
+        {saveBadge}
+
+        <AtsScoreRing score={computeAtsScore} />
+
+        <TemplatePopover templateId={templateId} onSelect={onTemplateChange} hasOverrides={hasStyleOverrides} onResetStyle={onResetStyle} />
+
+        {targetSelect}
+        {fontControls}
+
+        <MoreMenu>{moreItems}</MoreMenu>
+
+        <div className="ml-auto flex items-center gap-2">
+          {aiButton}
+          {pdfButton}
+        </div>
       </div>
 
       {sectionMode && (
@@ -304,6 +323,90 @@ export function FormatToolbar({
           </div>
         </div>
       )}
+
+      {/* ── Sheet Format (layar kecil) ── */}
+      {sheetOpen && (
+        <FormatSheet onClose={() => setSheetOpen(false)}>
+          <div className="space-y-3">
+            <TemplatePopover templateId={templateId} onSelect={onTemplateChange} hasOverrides={hasStyleOverrides} onResetStyle={onResetStyle} />
+            {targetSelect}
+            <div className="flex flex-wrap items-center gap-2">{fontControls}</div>
+            <div className="rounded-xl border border-outline-variant/50">{moreItems(() => setSheetOpen(false))}</div>
+            <p className="text-xs text-on-surface-variant">Kelengkapan CV: {cvCompleteness}% · Kecocokan kata kunci: {computeAtsScore > 0 ? `${computeAtsScore}%` : "isi deskripsi lowongan dulu"}</p>
+          </div>
+        </FormatSheet>
+      )}
+    </div>
+  );
+}
+
+function MenuItem({ icon, onClick, pressed, children }: { icon: string; onClick: () => void; pressed?: boolean; children: ReactNode }) {
+  return (
+    <button type="button" role={pressed === undefined ? "menuitem" : "menuitemcheckbox"} onClick={onClick} aria-checked={pressed}
+      className="flex w-full min-h-11 items-center gap-2 px-3 text-left text-sm text-on-surface hover:bg-surface-container focus-visible:bg-surface-container focus-visible:outline-none"
+    >
+      <span className="material-symbols-outlined text-[18px] text-on-surface-variant" aria-hidden="true">{icon}</span>
+      {children}
+    </button>
+  );
+}
+
+/** Menu "Lainnya" (desktop): tutup dengan klik di luar atau Escape. */
+function MoreMenu({ children }: { children: (close: () => void) => ReactNode }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: MouseEvent) => {
+      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+  return (
+    <div ref={ref} className="relative">
+      <button type="button" onClick={() => setOpen((v) => !v)} aria-haspopup="menu" aria-expanded={open}
+        className="flex min-h-9 items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-surface-container-low text-on-surface-variant hover:bg-surface-variant"
+      >
+        Lainnya
+        <span className="material-symbols-outlined text-sm" aria-hidden="true">expand_more</span>
+      </button>
+      {open && (
+        <div role="menu" className="absolute left-0 top-full z-30 mt-1 w-64 rounded-xl border border-outline-variant/50 bg-surface-container-lowest py-1 shadow-lg">
+          {children(() => setOpen(false))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Sheet bawah untuk kontrol format di layar kecil. */
+function FormatSheet({ onClose, children }: { onClose: () => void; children: ReactNode }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
+  return (
+    <div className="fixed inset-0 z-[60] flex items-end bg-black/40 lg:hidden" onClick={onClose}>
+      <div role="dialog" aria-modal="true" aria-label="Format CV" onClick={(e) => e.stopPropagation()}
+        className="max-h-[80dvh] w-full overflow-y-auto rounded-t-2xl bg-surface-container-lowest p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
+      >
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-on-surface">Format CV</h2>
+          <button type="button" onClick={onClose} className="min-h-11 rounded-lg px-3 text-sm font-semibold text-primary">Selesai</button>
+        </div>
+        {children}
+      </div>
     </div>
   );
 }

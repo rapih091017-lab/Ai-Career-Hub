@@ -182,6 +182,8 @@ export default function BuilderPage() {
   /* ── Gaya per bagian: bagian yang sedang diatur (null = global) ── */
   const [styleTarget, setStyleTarget] = useState<string | null>(null);
   const inlineEditable = useInlineEditable();
+  // Layar < lg: pratinjau penuh (overlay) terbuka.
+  const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
 
   /* ── Section tersembunyi ── */
   // Section dianggap tersembunyi bila dimatikan di pengaturan tampilan atau
@@ -267,6 +269,8 @@ export default function BuilderPage() {
   // Klik section di pratinjau → pilih bagian untuk diatur gayanya (layar lebar) dan lompat ke langkah form terkait.
   const handlePreviewSectionClick = useCallback((sectionKey: string) => {
     if (inlineEditableRef.current) setStyleTarget(sectionKey);
+    // Layar kecil: tap di pratinjau = kembali ke form di langkah yang sesuai.
+    else if (!window.matchMedia("(min-width: 1024px)").matches) setMobilePreviewOpen(false);
     const sectionStepMap: Record<string, number> = {
       header: 0,
       summary: 0,
@@ -316,6 +320,7 @@ export default function BuilderPage() {
 
   /** Lompat ke langkah form untuk path, lalu scroll & fokus ke field/entrinya. */
   const jumpToField = useCallback((path: string) => {
+    setMobilePreviewOpen(false);
     setActiveStep(stepForPath(path));
     const [head, id] = path.split(".");
     if (head === "workHistory" && id) setCollapsedWorkIds((prev) => (prev.has(id) ? new Set([...prev].filter((x) => x !== id)) : prev));
@@ -588,7 +593,7 @@ export default function BuilderPage() {
           style={{ "--left-w": `${leftPct}%` } as React.CSSProperties}
         >
           {/* ── LEFT PANEL ── (lebar diatur splitter di lg ke atas) */}
-          <div className="w-full lg:w-[var(--left-w)] lg:shrink-0 bg-background border-b lg:border-b-0 border-outline-variant/50 overflow-y-auto custom-scrollbar">
+          <div className="w-full flex-1 min-h-0 lg:flex-none lg:w-[var(--left-w)] lg:shrink-0 bg-background border-b lg:border-b-0 border-outline-variant/50 overflow-y-auto custom-scrollbar">
             <div className="px-6 pt-8 pb-4 flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                 <span className="material-symbols-outlined text-green-deep text-xl" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">{sectionMeta[activeStep].icon}</span>
@@ -915,7 +920,11 @@ export default function BuilderPage() {
           <PanelSplitter value={leftPct} onChange={setLeftPct} containerRef={workspaceRef} />
 
           {/* ── RIGHT PANEL ── */}
-          <div className="w-full lg:w-auto lg:flex-1 lg:min-w-0 flex flex-col bg-surface-dim/20 relative overflow-hidden h-full">
+          {/* Layar < lg: pratinjau dibuka penuh lewat tombol "Lihat CV", bukan strip sempit di bawah form. */}
+          <div
+            className={`${mobilePreviewOpen ? "fixed inset-0 z-50 flex bg-background" : "hidden"} lg:static lg:z-auto lg:flex lg:bg-surface-dim/20 w-full lg:w-auto lg:flex-1 lg:min-w-0 flex-col overflow-hidden h-full`}
+            {...(mobilePreviewOpen ? { role: "dialog", "aria-modal": true, "aria-label": "Pratinjau CV" } : {})}
+          >
             {/* ── FORMATTING TOOLBAR ── */}
             <FormatToolbar
               cvCompleteness={cvCompleteness}
@@ -943,6 +952,7 @@ export default function BuilderPage() {
                 setSelectedTemplateId(id);
               }}
               hasStyleOverrides={hasStyleOverrides}
+              onCloseMobilePreview={() => setMobilePreviewOpen(false)}
               onResetStyle={() =>
                 setConfirm({
                   title: "Kembalikan ke gaya template?",
@@ -1042,6 +1052,17 @@ export default function BuilderPage() {
             setSectionVisibility((prev) => ({ ...prev, [key]: visible }))
           }
         />
+
+        {!mobilePreviewOpen && (
+          <button
+            type="button"
+            onClick={() => setMobilePreviewOpen(true)}
+            className="fixed bottom-24 right-4 z-40 flex min-h-12 items-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-on-primary shadow-lg lg:hidden"
+          >
+            <span className="material-symbols-outlined text-[18px]" aria-hidden="true">description</span>
+            Lihat CV
+          </button>
+        )}
 
         {/* ── BOTTOM NAV ── */}
         <BottomNav steps={steps} activeStep={activeStep} setActiveStep={setActiveStep} sectionCompletion={sectionCompletion} sectionMeta={sectionMeta} handleSave={handleSave} isSaving={isSaving} />
