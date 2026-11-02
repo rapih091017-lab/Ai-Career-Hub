@@ -384,17 +384,32 @@ export default function BuilderPage() {
     hintChecked.current = true;
     try {
       if (localStorage.getItem(EDIT_HINT_KEY)) return;
-      localStorage.setItem(EDIT_HINT_KEY, "1");
     } catch {
       /* storage tidak bisa diakses: petunjuk tetap tampil sekali di sesi ini */
     }
     setEditHint(true);
   }, []);
+  const markHintSeen = useCallback(() => {
+    try {
+      localStorage.setItem(EDIT_HINT_KEY, "1");
+    } catch {
+      /* storage tidak bisa diakses */
+    }
+  }, []);
+  const closeHint = useCallback(() => {
+    markHintSeen();
+    setEditHint(false);
+  }, [markHintSeen]);
+  // Dianggap sudah dilihat setelah tampil ≥ 2 detik (atau ditutup); hilang sendiri setelah 6 detik.
   useEffect(() => {
     if (!editHint) return;
-    const t = setTimeout(() => setEditHint(false), 5000);
-    return () => clearTimeout(t);
-  }, [editHint]);
+    const seen = setTimeout(markHintSeen, 2000);
+    const hide = setTimeout(() => setEditHint(false), 6000);
+    return () => {
+      clearTimeout(seen);
+      clearTimeout(hide);
+    };
+  }, [editHint, markHintSeen]);
 
   // Klik teks non-edit di pratinjau (poin, tanggal, skill, …) → field form-nya.
   const onPreviewClick = useCallback(
@@ -1021,8 +1036,19 @@ export default function BuilderPage() {
                 {/* Halaman A4 nyata: ukuran pt/mm sama dengan PDF */}
                 <div ref={previewRef} className="relative" onFocus={onPreviewFocus} onBlur={onPreviewBlur} onClick={onPreviewClick} onMouseEnter={onPreviewEnter}>
                 {editHint && (
-                  <div role="status" className="pointer-events-none absolute left-1/2 top-3 z-10 -translate-x-1/2 rounded-full bg-inverse-surface px-3 py-1.5 text-xs font-medium text-inverse-on-surface shadow-md">
+                  <div role="status" className="absolute left-1/2 top-3 z-10 flex -translate-x-1/2 items-center gap-1 rounded-full bg-inverse-surface py-1 pl-3 pr-1 text-xs font-medium text-inverse-on-surface shadow-md">
                     Klik teks untuk mengedit
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        closeHint();
+                      }}
+                      aria-label="Tutup petunjuk"
+                      className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-white/15"
+                    >
+                      <span className="material-symbols-outlined text-[16px]" aria-hidden="true">close</span>
+                    </button>
                   </div>
                 )}
                 <FitA4>
