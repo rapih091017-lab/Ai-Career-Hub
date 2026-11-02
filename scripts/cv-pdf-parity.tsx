@@ -16,6 +16,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { createCanvas, loadImage } from "@napi-rs/canvas";
 import { AtsBaseRenderer, type CvData } from "@/components/cv-templates";
 import { CvPagedPreview } from "@/components/cv-templates/print";
+import { EditableText } from "@/components/cv-templates/EditableText";
 import { cvRenderProps, type CvPrintFormat } from "@/lib/cv-print-format";
 import { buildCvPdfHtml, embeddedFontCss } from "@/lib/pdf/cv-html";
 import { launchPdfBrowser, printStandaloneHtml } from "@/lib/pdf/chromium";
@@ -82,7 +83,27 @@ const fixtures: { name: string; data: CvData; format: CvPrintFormat }[] = [
       ],
     },
   },
+  {
+    // Gaya per bagian: Ringkasan justify, Pengalaman rata kiri dengan font & ukuran sendiri, header kiri.
+    name: "gaya-per-bagian",
+    data: longCv,
+    format: {
+      fontFamily: "'CV Inter', sans-serif",
+      fontSize: 10,
+      textAlign: "left",
+      sectionStyles: {
+        header: { textAlign: "left", titleColor: "#1e3a5f", fontSize: 11 },
+        summary: { textAlign: "justify", lineHeight: 1.8 },
+        experience: { fontFamily: "'CV Tinos', serif", fontSize: 9, textAlign: "left", titleColor: "#0d9488", lineHeight: 1.2 },
+        education: { fontSize: 12 },
+      },
+    },
+  },
 ];
+
+// Pratinjau diuji dalam mode edit (span per field, data-cv-path). editable=false
+// merender teks statis; DOM edit hanya menambah atribut pada span yang sama.
+const PREVIEW_EDIT = { Text: EditableText, editable: false, onEdit: () => {}, onSession: () => {} };
 
 // Sebagian preflight Tailwind + gaya aplikasi, supaya pratinjau diuji di
 // lingkungan yang mirip aplikasi (reset .cv-print harus menetralkannya).
@@ -205,10 +226,11 @@ async function main() {
       const pdfPages = await rasterizePdf(pdf);
 
       // Pratinjau: font yang sama (byte identik) + simulasi halaman.
-      const fontCss = await embeddedFontCss([resolveCvFont(props.style.bodyFont)]);
+      const blockFonts = Object.values(props.sectionStyles ?? {}).flatMap((st) => (st.fontFamily ? [resolveCvFont(st.fontFamily)] : []));
+      const fontCss = await embeddedFontCss([resolveCvFont(props.style.bodyFont), ...blockFonts]);
       const markup = renderToStaticMarkup(
         <CvPagedPreview pageCount={pdfPages.length + 1} marginMm={marginMm} pageGapPx={0}>
-          <AtsBaseRenderer {...props} onSectionClick={() => {}} />
+          <AtsBaseRenderer {...props} onSectionClick={() => {}} edit={PREVIEW_EDIT} />
         </CvPagedPreview>,
       );
       const page = await browser.newPage();
