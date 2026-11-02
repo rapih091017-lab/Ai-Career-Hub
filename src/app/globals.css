@@ -729,22 +729,22 @@ a:focus-visible {
 }
 
 /* Preview section hover — click to edit */
-.a4-preview .cv-section-hover:hover {
+.cv-preview-canvas .cv-section-hover:hover {
   background-color: rgba(13, 115, 119, 0.04);
   cursor: pointer;
 }
-.a4-preview .cv-section-hover {
+.cv-preview-canvas .cv-section-hover {
   transition: background-color 0.15s ease;
 }
 
 /* Pratinjau: bagian yang sedang diatur gayanya + penanda bagian bergaya khusus (tidak ikut PDF) */
-.a4-preview [data-cv-selected] > section,
-.a4-preview header[data-cv-selected] {
+.cv-preview-canvas [data-cv-selected] > section,
+.cv-preview-canvas header[data-cv-selected] {
   outline: 2px solid rgb(var(--c-primary));
   outline-offset: 2px;
   border-radius: 4px;
 }
-.a4-preview .cv-style-dot {
+.cv-preview-canvas .cv-style-dot {
   position: absolute;
   /* Di dalam padding kiri section; kolom halaman memotong apa pun di luar area konten. */
   top: 4px;
@@ -757,33 +757,33 @@ a:focus-visible {
 }
 
 /* Pratinjau: teks yang bisa diedit / diklik (tidak ikut PDF: mode cetak tanpa atribut ini) */
-.a4-preview [data-cv-path] {
+.cv-preview-canvas [data-cv-path] {
   cursor: pointer;
 }
-.a4-preview [data-cv-edit][contenteditable] {
+.cv-preview-canvas [data-cv-edit][contenteditable] {
   cursor: text;
   border-radius: 2px;
   outline: none;
 }
-.a4-preview [data-cv-edit][contenteditable]:hover {
+.cv-preview-canvas [data-cv-edit][contenteditable]:hover {
   box-shadow: 0 0 0 1px rgb(var(--c-primary) / 0.45);
 }
-.a4-preview [data-cv-edit][contenteditable]:focus {
+.cv-preview-canvas [data-cv-edit][contenteditable]:focus {
   box-shadow: 0 0 0 2px rgb(var(--c-primary));
   background: rgb(var(--c-primary) / 0.05);
 }
-.a4-preview [data-cv-edit][contenteditable]:empty::before {
+.cv-preview-canvas [data-cv-edit][contenteditable]:empty::before {
   content: attr(data-placeholder);
   color: #9ca3af;
 }
-.a4-preview li[data-cv-path]:hover,
-.a4-preview p[data-cv-path]:hover,
-.a4-preview span[data-cv-path]:not([contenteditable]):hover {
+.cv-preview-canvas li[data-cv-path]:hover,
+.cv-preview-canvas p[data-cv-path]:hover,
+.cv-preview-canvas span[data-cv-path]:not([contenteditable]):hover {
   text-decoration: underline dotted rgb(var(--c-primary));
 }
 
 /* Pratinjau: tombol tambah/hapus garis di celah atas section (melayang, tidak menggeser isi) */
-.a4-preview .cv-divider-toggle {
+.cv-preview-canvas .cv-divider-toggle {
   position: absolute;
   top: 0;
   left: 50%;
@@ -799,18 +799,18 @@ a:focus-visible {
   pointer-events: none;
   transition: opacity 0.12s ease;
 }
-.a4-preview [data-cv-section]:hover > .cv-divider-toggle,
-.a4-preview .cv-divider-toggle:focus-visible {
+.cv-preview-canvas [data-cv-section]:hover > .cv-divider-toggle,
+.cv-preview-canvas .cv-divider-toggle:focus-visible {
   opacity: 1;
   pointer-events: auto;
 }
-.a4-preview .cv-divider-toggle:hover {
+.cv-preview-canvas .cv-divider-toggle:hover {
   color: rgb(var(--c-primary));
   border-color: rgb(var(--c-primary));
 }
 @media (hover: none) {
   /* Layar sentuh tanpa hover: garis diatur lewat modal Urutan Section. */
-  .a4-preview .cv-divider-toggle { display: none; }
+  .cv-preview-canvas .cv-divider-toggle { display: none; }
 }
 
 /* Hide scrollbar for scrollable tag clouds */

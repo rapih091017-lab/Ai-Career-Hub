@@ -49,7 +49,7 @@ export function FitA4({ children }: { children: ReactNode }) {
     >
       <div
         ref={innerRef}
-        className="a4-preview"
+        className="cv-preview-canvas"
         style={{ width: "210mm", transform: scale < 1 ? `scale(${scale})` : undefined, transformOrigin: "top left" }}
       >
         {children}
