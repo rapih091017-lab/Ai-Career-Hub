@@ -61,9 +61,11 @@ export function SortableList({ ids, onMove, itemLabel, children, className }: So
         },
         announcements: {
           onDragStart: ({ active }) => `${nameOf(active.id)} diangkat.`,
-          onDragOver: ({ over }) => (over ? `Di posisi ${posOf(over.id)}.` : "Di luar daftar."),
-          onDragEnd: ({ active, over }) => (over ? `${nameOf(active.id)} diletakkan di posisi ${posOf(over.id)}.` : "Dilepas."),
-          onDragCancel: () => "Pemindahan dibatalkan.",
+          onDragOver: ({ active, over }) =>
+            over ? `${nameOf(active.id)} di posisi ${posOf(over.id)} dari ${ids.length}.` : `${nameOf(active.id)} di luar daftar.`,
+          onDragEnd: ({ active, over }) =>
+            over ? `${nameOf(active.id)} diletakkan di posisi ${posOf(over.id)} dari ${ids.length}.` : `${nameOf(active.id)} dilepas.`,
+          onDragCancel: ({ active }) => `Pemindahan ${nameOf(active.id)} dibatalkan.`,
         },
       }}
     >
@@ -81,7 +83,11 @@ export function SortableList({ ids, onMove, itemLabel, children, className }: So
 }
 
 function SortableItem({ id, label, children }: { id: string; label: string; children: (handle: ReactNode) => ReactNode }) {
-  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({ id });
+  // roleDescription dnd-kit bawaan ("sortable") diganti deskripsi yang benar untuk tombol pegangan.
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+    attributes: { roleDescription: "pegangan seret" },
+  });
   const handle = (
     <button
       type="button"
@@ -89,7 +95,6 @@ function SortableItem({ id, label, children }: { id: string; label: string; chil
       {...attributes}
       {...listeners}
       aria-label={`Seret ${label}`}
-      aria-roledescription="item yang bisa diurutkan"
       className="inline-flex h-11 w-9 shrink-0 cursor-grab touch-none items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary active:cursor-grabbing sm:h-9"
     >
       <span className="material-symbols-outlined text-[20px]" aria-hidden="true">drag_indicator</span>
