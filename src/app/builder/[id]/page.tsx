@@ -77,6 +77,8 @@ export default function BuilderPage() {
   const steps = STEP_KEYS.map((k) => t(k));
   const [collapsedWorkIds, setCollapsedWorkIds] = useState<Set<string>>(new Set());
   const [confirm, setConfirm] = useState<ConfirmAction | null>(null);
+  // templateId baru ikut autosave setelah user benar-benar memilih template.
+  const [templateTouched, setTemplateTouched] = useState(false);
   const [leftPct, setLeftPct] = usePanelSplit();
   const workspaceRef = useRef<HTMLDivElement>(null);
   const { addToast } = useToast();
@@ -85,7 +87,7 @@ export default function BuilderPage() {
   const { cvData, isLoading, fetchError, selectedTemplateId, loadedUpdatedAt, setCvData, setSelectedTemplateId } = useFetchCvData(cvId);
 
   /* ── Auto-Save ── */
-  const { saveStatus, lastSaved, flush: flushAutoSave, getUpdatedAt, errorMessage: saveErrorMessage, overwrite: overwriteServer } = useAutoSave(cvId, cvData, !isLoading && !fetchError, loadedUpdatedAt, selectedTemplateId);
+  const { saveStatus, lastSaved, flush: flushAutoSave, getUpdatedAt, errorMessage: saveErrorMessage, overwrite: overwriteServer } = useAutoSave(cvId, cvData, !isLoading && !fetchError, loadedUpdatedAt, templateTouched ? selectedTemplateId : undefined);
 
   /* ── Format Settings Hook ── */
   const format = useBuilderFormat({
@@ -794,7 +796,10 @@ export default function BuilderPage() {
               onNavigateToCheckout={() => router.push(`/cv/${cvId}/checkout`)}
               onExportPdf={handleExportPdf}
               templateId={selectedTemplateId}
-              onTemplateChange={setSelectedTemplateId}
+              onTemplateChange={(id) => {
+                setTemplateTouched(true);
+                setSelectedTemplateId(id);
+              }}
               hasStyleOverrides={hasStyleOverrides}
               onResetStyle={() =>
                 setConfirm({

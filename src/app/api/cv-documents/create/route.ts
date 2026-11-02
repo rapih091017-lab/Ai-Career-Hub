@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { masterProfiles, cvDocuments } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { DEFAULT_TEMPLATE_ID } from "@/lib/templates";
+import { TEMPLATE_STYLES } from "@/components/cv-templates";
 import { callAI, MODELS } from "@/lib/ai/adapter";
 import { GENERATOR_PROMPT_V2 } from "@/lib/ai/prompts/generator-v2";
 import { checkQuota, logUsage } from "@/lib/api-utils";
@@ -21,6 +22,12 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json();
   const { jobTitle, jobDescription, templateId, useProfile = true, rawText, targetLanguage } = body;
+
+  // templateId harus salah satu template yang ada (sama dengan PUT).
+  if (templateId !== undefined && templateId !== null && templateId !== "" &&
+      !(typeof templateId === "string" && Object.prototype.hasOwnProperty.call(TEMPLATE_STYLES, templateId.trim()))) {
+    return NextResponse.json({ error: "INVALID_INPUT", message: "Template tidak dikenal." }, { status: 400 });
+  }
 
   // Generate CV memanggil model AI berbayar dan sebelumnya tidak pernah
   // dibatasi. free tier punya jatah 2/bulan, paket satuan punya kuota sendiri.
