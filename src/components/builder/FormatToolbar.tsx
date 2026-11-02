@@ -5,7 +5,7 @@ import { AtsScoreRing } from "@/components/builder/AtsScoreRing";
 import MagneticButton from "@/components/MagneticButton";
 import { PdfExportButton } from "@/components/checker/PdfExportButton";
 import { useTranslation } from "@/lib/i18n";
-import { resolveCvFont } from "@/lib/cv-fonts";
+import { CV_FONTS, cvFontValue, resolveCvFont } from "@/lib/cv-fonts";
 import { TemplatePopover } from "@/components/builder/TemplatePopover";
 
 const FONT_OPTIONS = [
@@ -16,7 +16,29 @@ const FONT_OPTIONS = [
   { value: "Roboto, sans-serif", label: "Roboto" },
 ];
 
+/** Pilihan font untuk gaya per bagian: hanya font CV (sesuai sanitasi). */
+const BLOCK_FONT_OPTIONS = CV_FONTS.map((f) => ({ value: cvFontValue(f), label: f.label }));
+
+const LINE_HEIGHT_OPTIONS = [1, 1.15, 1.3, 1.5, 1.8, 2];
+
+/** Konteks toolbar: tanpa bagian terpilih = gaya global. */
+export interface BlockStyleControls {
+  targets: { key: string; label: string }[];
+  /** Bagian yang sedang diatur; null = semua (global). */
+  target: string | null;
+  onTargetChange: (key: string | null) => void;
+  /** Bagian terpilih punya gaya sendiri. */
+  hasStyle: boolean;
+  lineHeight: number;
+  titleColor: string;
+  onLineHeightChange: (v: number | undefined) => void;
+  onTitleColorChange: (v: string | undefined) => void;
+  onApplyAll: () => void;
+  onReset: () => void;
+}
+
 interface FormatToolbarProps {
+  block: BlockStyleControls;
   cvCompleteness: number;
   saveStatus: "idle" | "saving" | "saved" | "error";
   lastSaved: Date | null;
@@ -42,6 +64,7 @@ interface FormatToolbarProps {
 }
 
 export function FormatToolbar({
+  block,
   cvCompleteness,
   saveStatus,
   lastSaved,
@@ -66,7 +89,12 @@ export function FormatToolbar({
   onResetStyle,
 }: FormatToolbarProps) {
   // Font dari template (bukan salah satu pilihan) tetap ditampilkan apa adanya.
-  const fontKnown = FONT_OPTIONS.some((o) => o.value === fontFamily);
+  const sectionMode = block.target !== null;
+  const fontOptions = sectionMode ? BLOCK_FONT_OPTIONS : FONT_OPTIONS;
+  const fontKnown = fontOptions.some((o) => o.value === fontFamily);
+  const sizeMin = sectionMode ? 8 : 9;
+  const sizeMax = sectionMode ? 14 : 12;
+  const targetLabel = block.targets.find((x) => x.key === block.target)?.label ?? "";
   const { t } = useTranslation();
   return (
     <div className="relative h-auto px-3 md:px-4 py-2 border-b border-outline-variant/50 flex flex-wrap items-center gap-2 bg-surface-container-lowest shadow-sm z-20 shrink-0">
@@ -118,23 +146,38 @@ export function FormatToolbar({
       {/* Template */}
       <TemplatePopover templateId={templateId} onSelect={onTemplateChange} hasOverrides={hasStyleOverrides} onResetStyle={onResetStyle} />
 
+      {/* Pilih bagian: tanpa pilihan = gaya global. Juga satu-satunya cara memilih di layar sentuh. */}
+      <label className="flex items-center gap-1 text-xs text-on-surface-variant">
+        <span className="whitespace-nowrap">Atur bagian:</span>
+        <select
+          value={block.target ?? ""}
+          onChange={(e) => block.onTargetChange(e.target.value || null)}
+          className="bg-surface-container-low border border-outline-variant/50 rounded-lg text-xs px-2 py-1.5 focus:ring-1 focus:ring-primary max-w-[150px]"
+        >
+          <option value="">Semua</option>
+          {block.targets.map((x) => (
+            <option key={x.key} value={x.key}>{x.label}</option>
+          ))}
+        </select>
+      </label>
+
       {/* Font family */}
       <select value={fontFamily} onChange={(e) => onFontFamilyChange(e.target.value)} aria-label="Font"
         className="bg-surface-container-low border border-outline-variant/50 rounded-lg text-xs px-2 py-1.5 focus:ring-1 focus:ring-primary max-w-[120px]"
       >
-        {!fontKnown && <option value={fontFamily}>{resolveCvFont(fontFamily).label} (template)</option>}
-        {FONT_OPTIONS.map((o) => (
+        {!fontKnown && <option value={fontFamily}>{resolveCvFont(fontFamily).label}{sectionMode ? "" : " (template)"}</option>}
+        {fontOptions.map((o) => (
           <option key={o.value} value={o.value}>{o.label}</option>
         ))}
       </select>
 
       {/* Font size */}
       <div className="flex items-center gap-1 bg-surface-container-low rounded-lg px-1.5 py-1">
-        <button onClick={() => onFontSizeChange(Math.max(9, fontSize - 1))} className="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant" aria-label={t("builder.font-small")}>
+        <button onClick={() => onFontSizeChange(Math.max(sizeMin, fontSize - 1))} className="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant" aria-label={t("builder.font-small")}>
           <span className="material-symbols-outlined text-sm">remove</span>
         </button>
         <span className="text-xs font-bold w-6 text-center select-none">{fontSize}pt</span>
-        <button onClick={() => onFontSizeChange(Math.min(12, fontSize + 1))} className="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant" aria-label={t("builder.font-large")}>
+        <button onClick={() => onFontSizeChange(Math.min(sizeMax, fontSize + 1))} className="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant" aria-label={t("builder.font-large")}>
           <span className="material-symbols-outlined text-sm">add</span>
         </button>
       </div>
@@ -161,6 +204,32 @@ export function FormatToolbar({
           );
         })}
       </div>
+
+      {sectionMode && (
+        <>
+          <select
+            value={String(block.lineHeight)}
+            onChange={(e) => block.onLineHeightChange(Number(e.target.value))}
+            aria-label="Jarak baris bagian ini"
+            title="Jarak baris"
+            className="bg-surface-container-low border border-outline-variant/50 rounded-lg text-xs px-2 py-1.5 focus:ring-1 focus:ring-primary"
+          >
+            {!LINE_HEIGHT_OPTIONS.includes(block.lineHeight) && <option value={String(block.lineHeight)}>{block.lineHeight}</option>}
+            {LINE_HEIGHT_OPTIONS.map((v) => (
+              <option key={v} value={String(v)}>Baris {v}</option>
+            ))}
+          </select>
+          <label className="flex items-center gap-1 text-xs text-on-surface-variant" title="Warna judul bagian">
+            <input
+              type="color"
+              value={block.titleColor}
+              onChange={(e) => block.onTitleColorChange(e.target.value)}
+              aria-label="Warna judul bagian ini"
+              className="h-7 w-7 cursor-pointer rounded border border-outline-variant/50 bg-transparent p-0"
+            />
+          </label>
+        </>
+      )}
 
       {/* Divider toggle */}
       <button onClick={onDividersToggle}
@@ -211,6 +280,30 @@ export function FormatToolbar({
           fileName="CV.pdf"
         />
       </div>
+
+      {sectionMode && (
+        <div className="flex w-full flex-wrap items-center gap-2 border-t border-outline-variant/40 pt-2 text-xs">
+          <span className="font-semibold text-on-surface">Mengatur: {targetLabel}</span>
+          <span className="text-on-surface-variant">{block.hasStyle ? "Gaya khusus bagian ini" : "Masih ikut gaya global"}</span>
+          <div className="ml-auto flex flex-wrap gap-2">
+            <button type="button" onClick={block.onApplyAll} disabled={!block.hasStyle}
+              className="min-h-9 rounded-lg bg-surface-container-low px-2.5 font-medium text-on-surface hover:bg-surface-variant disabled:opacity-50"
+            >
+              Terapkan ke semua
+            </button>
+            <button type="button" onClick={block.onReset} disabled={!block.hasStyle}
+              className="min-h-9 rounded-lg bg-surface-container-low px-2.5 font-medium text-on-surface hover:bg-surface-variant disabled:opacity-50"
+            >
+              Reset bagian ini
+            </button>
+            <button type="button" onClick={() => block.onTargetChange(null)}
+              className="min-h-9 rounded-lg px-2.5 font-medium text-on-surface-variant hover:bg-surface-variant"
+            >
+              Selesai
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

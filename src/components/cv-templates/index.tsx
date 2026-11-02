@@ -325,6 +325,8 @@ interface RendererProps {
   showSkillLevel?: boolean;
   /** Gaya per bagian (layout.sectionStyles). */
   sectionStyles?: Record<string, BlockStyle>;
+  /** Pratinjau saja: bagian yang sedang diatur gayanya (diberi outline). */
+  selectedSection?: string | null;
 }
 
 const CV_LABELS: Record<string, { id: string; en: string }> = {
@@ -340,7 +342,7 @@ const CV_LABELS: Record<string, { id: string; en: string }> = {
   namePlaceholder: { id: "NAMA LENGKAP ANDA", en: "YOUR FULL NAME" },
 };
 
-export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, dividers, onToggleDivider, lang: langProp, sectionLabels: customLabels, headerLayout, lineHeight: lineHeightProp, onSectionClick, showSkillLevel = false, sectionStyles }: RendererProps & { sectionLabels?: Record<SectionKey, string>; headerLayout?: "centered" | "left"; lineHeight?: number }) {
+export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, dividers, onToggleDivider, lang: langProp, sectionLabels: customLabels, headerLayout, lineHeight: lineHeightProp, onSectionClick, showSkillLevel = false, sectionStyles, selectedSection }: RendererProps & { sectionLabels?: Record<SectionKey, string>; headerLayout?: "centered" | "left"; lineHeight?: number }) {
   const lang = langProp || data.cvLang || "id";
   const contactItems = [
     data.address,
@@ -683,7 +685,14 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, divid
       }}
     >
       {/* ── HEADER ── */}
-      <header style={{ textAlign: headerAlign, marginBottom: pt(25), ...blockCss(header.o) }}>
+      <header
+        style={{ textAlign: headerAlign, marginBottom: pt(25), ...blockCss(header.o), ...(onSectionClick ? { position: "relative", cursor: "pointer" } : {}) }}
+        // Atribut pratinjau saja; mode cetak tetap HTML yang sama seperti sebelumnya.
+        {...(onSectionClick
+          ? { "data-cv-section": "header", "data-cv-selected": selectedSection === "header" ? "" : undefined, onClick: () => onSectionClick("header") }
+          : {})}
+      >
+        {onSectionClick && header.o && <span className="cv-style-dot" aria-hidden="true" title="Bagian ini punya gaya sendiri" />}
         <h1
           style={{
             fontSize: pt(Math.round(hs.bodySize * 2.2)),
@@ -798,8 +807,10 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, divid
             {...(onSectionClick
               ? { onClick: () => onSectionClick(key), title: "Klik untuk edit section ini" }
               : {})}
-            style={{ cursor: onSectionClick ? "pointer" : undefined, position: onToggleDivider ? "relative" : undefined }}
+            {...(onSectionClick && selectedSection === key ? { "data-cv-selected": "" } : {})}
+            style={{ cursor: onSectionClick ? "pointer" : undefined, position: onToggleDivider || onSectionClick ? "relative" : undefined }}
           >
+            {onSectionClick && sectionStyles?.[key] && <span className="cv-style-dot" aria-hidden="true" title="Bagian ini punya gaya sendiri" />}
             {onToggleDivider && idx > 0 && (
               // Tombol melayang (absolute) agar tidak menggeser tata letak pratinjau.
               <button

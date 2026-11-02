@@ -7,7 +7,10 @@ import AppHeader from "@/components/AppHeader";
 import AuthGuard from "@/components/AuthGuard";
 import { AtsBaseRenderer, TEMPLATE_STYLES, type CvData } from "@/components/cv-templates";
 import { CvPagedPreview, measurePageCount } from "@/components/cv-templates/print";
-import { cvPrintFormatFromData, cvRenderProps } from "@/lib/cv-print-format";
+import { LINE_HEIGHT, cvPrintFormatFromData, cvRenderProps } from "@/lib/cv-print-format";
+import { cvFontValue, resolveCvFont } from "@/lib/cv-fonts";
+import { useInlineEditable } from "@/hooks/useInlineEditable";
+import type { BlockStyleControls } from "@/components/builder/FormatToolbar";
 import { aiSkillNames } from "@/lib/cv-normalize";
 import dynamic from "next/dynamic";
 const AIProposalModal = dynamic(() => import("@/components/AIProposalModal"), { ssr: false });
@@ -162,7 +165,12 @@ export default function BuilderPage() {
     isPdfExporting, setIsPdfExporting, marginPadding,
     showSkillLevel, setShowSkillLevel,
     dividers, toggleDivider,
+    sectionStyles, setSectionStyle, resetSectionStyle, applySectionStyleToAll,
   } = format;
+
+  /* ── Gaya per bagian: bagian yang sedang diatur (null = global) ── */
+  const [styleTarget, setStyleTarget] = useState<string | null>(null);
+  const inlineEditable = useInlineEditable();
 
   /* ── Section tersembunyi ── */
   // Section dianggap tersembunyi bila dimatikan di pengaturan tampilan atau
@@ -176,7 +184,7 @@ export default function BuilderPage() {
   // CV tanpa layout memakai nilai lama builder (Inter 11pt), jadi dianggap punya override.
   const hasStyleOverrides =
     !cvData.layout ||
-    ["fontFamily", "fontSize", "textAlign", "primaryColor"].some((k) => cvData.layout?.[k as keyof typeof cvData.layout] !== undefined);
+    ["fontFamily", "fontSize", "textAlign", "primaryColor", "sectionStyles"].some((k) => cvData.layout?.[k as keyof typeof cvData.layout] !== undefined);
 
   /* ── Kelola section: hapus (dengan Urungkan), pakai lagi, tambah kustom ── */
   const unusedSections = unusedBuiltinSections(cvData);
@@ -243,9 +251,13 @@ export default function BuilderPage() {
   // Format tampilan dari cvData.layout; server PDF membentuknya dengan fungsi yang sama dari DB.
   const printFormat = useMemo(() => cvPrintFormatFromData(cvData, selectedTemplateId), [cvData, selectedTemplateId]);
 
-  // Klik section di pratinjau → lompat ke langkah form terkait.
+  const inlineEditableRef = useRef(inlineEditable);
+  inlineEditableRef.current = inlineEditable;
+  // Klik section di pratinjau → pilih bagian untuk diatur gayanya (layar lebar) dan lompat ke langkah form terkait.
   const handlePreviewSectionClick = useCallback((sectionKey: string) => {
+    if (inlineEditableRef.current) setStyleTarget(sectionKey);
     const sectionStepMap: Record<string, number> = {
+      header: 0,
       summary: 0,
       experience: 2,
       education: 3,
@@ -262,10 +274,40 @@ export default function BuilderPage() {
 
   // Elemen pratinjau di-memo: render ulang hanya saat data/format CV berubah,
   // bukan saat status autosave, modal, dsb. berubah.
-  const previewContent = useMemo(() => {
-    const { marginMm: _marginMm, ...renderProps } = cvRenderProps(cvData, printFormat, selectedTemplateId);
-    return <AtsBaseRenderer {...renderProps} onSectionClick={handlePreviewSectionClick} onToggleDivider={toggleDivider} />;
-  }, [cvData, printFormat, selectedTemplateId, handlePreviewSectionClick, toggleDivider]);
+  const renderProps = useMemo(() => {
+    const { marginMm: _marginMm, ...rest } = cvRenderProps(cvData, printFormat, selectedTemplateId);
+    return rest;
+  }, [cvData, printFormat, selectedTemplateId]);
+  const previewContent = useMemo(
+    () => <AtsBaseRenderer {...renderProps} onSectionClick={handlePreviewSectionClick} onToggleDivider={toggleDivider} selectedSection={styleTarget} />,
+    [renderProps, handlePreviewSectionClick, toggleDivider, styleTarget],
+  );
+
+  /* ── Toolbar: konteks global atau satu bagian ── */
+  const styleTargets = useMemo(
+    () => [{ key: "header", label: "Header & kontak" }, ...renderProps.sectionOrder.map((key) => ({ key, label: sectionLabel(cvData, key) }))],
+    [renderProps.sectionOrder, cvData],
+  );
+  // Bagian yang sudah tidak tampil (dihapus/disembunyikan) tidak bisa tetap terpilih.
+  const activeTarget = styleTarget && styleTargets.some((x) => x.key === styleTarget) ? styleTarget : null;
+  const targetStyle = activeTarget ? sectionStyles[activeTarget] : undefined;
+  const effFont = activeTarget ? targetStyle?.fontFamily ?? cvFontValue(resolveCvFont(fontFamily)) : fontFamily;
+  const effSize = activeTarget ? targetStyle?.fontSize ?? fontSize : fontSize;
+  const effAlign = activeTarget
+    ? targetStyle?.textAlign ?? (activeTarget === "header" ? (headerLayout === "left" ? "left" : "center") : textAlign)
+    : textAlign;
+  const blockControls: BlockStyleControls = {
+    targets: styleTargets,
+    target: activeTarget,
+    onTargetChange: setStyleTarget,
+    hasStyle: !!targetStyle,
+    lineHeight: targetStyle?.lineHeight ?? LINE_HEIGHT[spacingMode],
+    titleColor: targetStyle?.titleColor ?? (activeTarget === "header" ? "#111111" : renderProps.style.sectionTitle),
+    onLineHeightChange: (v) => activeTarget && setSectionStyle(activeTarget, { lineHeight: v }),
+    onTitleColorChange: (v) => activeTarget && setSectionStyle(activeTarget, { titleColor: v }),
+    onApplyAll: () => activeTarget && applySectionStyleToAll(activeTarget, styleTargets.map((x) => x.key)),
+    onReset: () => activeTarget && resetSectionStyle(activeTarget),
+  };
 
   const handleExportPdf = async () => {
     setIsPdfExporting(true);
@@ -781,15 +823,16 @@ export default function BuilderPage() {
               saveStatus={saveStatus === "conflict" || saveStatus === "rejected" ? "error" : saveStatus}
               lastSaved={lastSaved}
               computeAtsScore={computeAtsScore}
-              fontFamily={fontFamily}
-              fontSize={fontSize}
-              textAlign={textAlign}
+              block={blockControls}
+              fontFamily={effFont}
+              fontSize={effSize}
+              textAlign={effAlign}
               showDividers={allDividers}
               reducedMotion={reducedMotion}
               isPdfExporting={isPdfExporting}
-              onFontFamilyChange={setFontFamily}
-              onFontSizeChange={(v) => setFontSize(v)}
-              onTextAlignChange={setTextAlign}
+              onFontFamilyChange={(v) => (activeTarget ? setSectionStyle(activeTarget, { fontFamily: v }) : setFontFamily(v))}
+              onFontSizeChange={(v) => (activeTarget ? setSectionStyle(activeTarget, { fontSize: v }) : setFontSize(v))}
+              onTextAlignChange={(v) => (activeTarget ? setSectionStyle(activeTarget, { textAlign: v }) : setTextAlign(v))}
               onDividersToggle={() => setShowDividers(!allDividers)}
               onOpenSectionOrder={() => setShowSectionOrderModal(true)}
               onOpenDisplaySettings={() => setShowDisplaySettings(true)}
@@ -804,7 +847,7 @@ export default function BuilderPage() {
               onResetStyle={() =>
                 setConfirm({
                   title: "Kembalikan ke gaya template?",
-                  message: "Font, ukuran huruf, rata teks, dan warna pilihanmu dihapus lalu mengikuti template. Urutan, spasi, margin, dan isi CV tidak berubah.",
+                  message: "Font, ukuran huruf, rata teks, warna, dan gaya per bagian pilihanmu dihapus lalu mengikuti template. Urutan, spasi, margin, dan isi CV tidak berubah.",
                   confirmLabel: "Kembalikan",
                   cancelLabel: "Batal",
                   onConfirm: format.resetToTemplateStyle,

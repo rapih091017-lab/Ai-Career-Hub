@@ -737,6 +737,25 @@ a:focus-visible {
   transition: background-color 0.15s ease;
 }
 
+/* Pratinjau: bagian yang sedang diatur gayanya + penanda bagian bergaya khusus (tidak ikut PDF) */
+.a4-preview [data-cv-selected] > section,
+.a4-preview header[data-cv-selected] {
+  outline: 2px solid rgb(var(--c-primary));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.a4-preview .cv-style-dot {
+  position: absolute;
+  /* Di dalam padding kiri section; kolom halaman memotong apa pun di luar area konten. */
+  top: 4px;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgb(var(--c-primary));
+  pointer-events: none;
+}
+
 /* Pratinjau: tombol tambah/hapus garis di celah atas section (melayang, tidak menggeser isi) */
 .a4-preview .cv-divider-toggle {
   position: absolute;

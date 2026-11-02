@@ -11,7 +11,7 @@ import {
   sectionHasContent,
 } from "@/lib/builder-format";
 import { DEFAULT_SECTION_ORDER, TEMPLATE_STYLES } from "@/components/cv-templates";
-import type { CvData, CvLayout, SectionKey, CustomSectionEntry } from "@/components/cv-templates";
+import type { BlockStyle, CvData, CvLayout, SectionKey, CustomSectionEntry } from "@/components/cv-templates";
 
 /* ───────── Format & Display Settings ───────── */
 
@@ -173,14 +173,61 @@ export function useBuilderFormat({ cvId, cvData, setCvData, ready, templateId, f
     [setCvData],
   );
 
-  /** Hapus override global (font, ukuran, rata, warna) → kembali ke gaya template. */
+  /** Hapus override global (font, ukuran, rata, warna) dan gaya per bagian → kembali ke gaya template. */
   const resetToTemplateStyle = useCallback(
     () =>
       setCvData((prev) => {
-        const { fontFamily: _f, fontSize: _s, textAlign: _t, primaryColor: _c, ...rest } = prev.layout ?? { ...LEGACY_LAYOUT };
+        const { fontFamily: _f, fontSize: _s, textAlign: _t, primaryColor: _c, sectionStyles: _b, ...rest } = prev.layout ?? { ...LEGACY_LAYOUT };
         return { ...prev, layout: rest };
       }),
     [setCvData],
+  );
+
+  /* ── Gaya per bagian (layout.sectionStyles) ── */
+  const sectionStyles = useMemo(() => layout.sectionStyles ?? {}, [layout.sectionStyles]);
+
+  /** Ubah semua gaya bagian sekaligus; gaya kosong dihapus, objek kosong dibuang. */
+  const writeSectionStyles = useCallback(
+    (fn: (cur: Record<string, BlockStyle>) => Record<string, BlockStyle>) =>
+      setCvData((prev) => {
+        const l = prev.layout ?? { ...LEGACY_LAYOUT };
+        const next: Record<string, BlockStyle> = {};
+        for (const [k, v] of Object.entries(fn(l.sectionStyles ?? {}))) {
+          const clean = Object.fromEntries(Object.entries(v).filter(([, x]) => x !== undefined)) as BlockStyle;
+          if (Object.keys(clean).length) next[k] = clean;
+        }
+        const { sectionStyles: _old, ...rest } = l;
+        return { ...prev, layout: Object.keys(next).length ? { ...rest, sectionStyles: next } : rest };
+      }),
+    [setCvData],
+  );
+
+  /** Gabungkan perubahan ke gaya satu bagian; nilai undefined = ikut global lagi. */
+  const setSectionStyle = useCallback(
+    (key: string, patch: Partial<BlockStyle>) => writeSectionStyles((cur) => ({ ...cur, [key]: { ...cur[key], ...patch } })),
+    [writeSectionStyles],
+  );
+
+  const resetSectionStyle = useCallback(
+    (key: string) =>
+      writeSectionStyles((cur) => {
+        const { [key]: _removed, ...rest } = cur;
+        return rest;
+      }),
+    [writeSectionStyles],
+  );
+
+  /** Salin gaya satu bagian ke semua bagian di `keys`. */
+  const applySectionStyleToAll = useCallback(
+    (key: string, keys: string[]) =>
+      writeSectionStyles((cur) => {
+        const src = cur[key];
+        if (!src) return cur;
+        const next = { ...cur };
+        for (const k of keys) next[k] = { ...src };
+        return next;
+      }),
+    [writeSectionStyles],
   );
 
   /* ── Modal states ── */
@@ -254,6 +301,10 @@ export function useBuilderFormat({ cvId, cvData, setCvData, ready, templateId, f
     setDividers,
     toggleDivider,
     resetToTemplateStyle,
+    sectionStyles,
+    setSectionStyle,
+    resetSectionStyle,
+    applySectionStyleToAll,
     // Color
     customPrimaryColor,
     setCustomPrimaryColor,
