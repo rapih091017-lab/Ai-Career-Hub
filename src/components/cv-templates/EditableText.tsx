@@ -44,6 +44,8 @@ export const EditableText = memo(function EditableText({ path, value, placeholde
   const ref = useRef<HTMLSpanElement>(null);
   const focused = useRef(false);
   const composing = useRef(false);
+  // Waktu compositionend terakhir: Safari mengirim keydown Enter (konfirmasi IME) sesudahnya.
+  const composedAt = useRef(0);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const valueRef = useRef(value);
   valueRef.current = value;
@@ -154,10 +156,16 @@ export const EditableText = memo(function EditableText({ path, value, placeholde
       }}
       onCompositionEnd={() => {
         composing.current = false;
+        composedAt.current = performance.now();
         schedule();
       }}
       onKeyDown={(e) => {
-        if (e.nativeEvent.isComposing || composing.current) return;
+        // keyCode 229 = tombol diproses IME; Enter < 1 frame setelah compositionend = konfirmasi IME (Safari).
+        if (e.nativeEvent.isComposing || composing.current || e.keyCode === 229) return;
+        if (e.key === "Enter" && performance.now() - composedAt.current < 20) {
+          e.preventDefault();
+          return;
+        }
         if (e.key === "Enter") {
           e.preventDefault();
           ref.current?.blur();
