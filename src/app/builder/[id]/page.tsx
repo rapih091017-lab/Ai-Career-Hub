@@ -334,6 +334,26 @@ export default function BuilderPage() {
     requestAnimationFrame(tick);
   }, []);
 
+  // Petunjuk sekali saja saat pertama kali hover pratinjau (hanya bila bisa edit langsung).
+  const [editHint, setEditHint] = useState(false);
+  const hintChecked = useRef(false);
+  const onPreviewEnter = useCallback(() => {
+    if (hintChecked.current || !inlineEditableRef.current) return;
+    hintChecked.current = true;
+    try {
+      if (localStorage.getItem(EDIT_HINT_KEY)) return;
+      localStorage.setItem(EDIT_HINT_KEY, "1");
+    } catch {
+      /* storage tidak bisa diakses: petunjuk tetap tampil sekali di sesi ini */
+    }
+    setEditHint(true);
+  }, []);
+  useEffect(() => {
+    if (!editHint) return;
+    const t = setTimeout(() => setEditHint(false), 5000);
+    return () => clearTimeout(t);
+  }, [editHint]);
+
   // Klik teks non-edit di pratinjau (poin, tanggal, skill, …) → field form-nya.
   const onPreviewClick = useCallback(
     (e: React.MouseEvent) => {
@@ -945,7 +965,12 @@ export default function BuilderPage() {
                   </div>
                 )}
                 {/* Halaman A4 nyata: ukuran pt/mm sama dengan PDF */}
-                <div ref={previewRef} onFocus={onPreviewFocus} onBlur={() => setFocusPage(1)} onClick={onPreviewClick}>
+                <div ref={previewRef} className="relative" onFocus={onPreviewFocus} onBlur={() => setFocusPage(1)} onClick={onPreviewClick} onMouseEnter={onPreviewEnter}>
+                {editHint && (
+                  <div role="status" className="pointer-events-none absolute left-1/2 top-3 z-10 -translate-x-1/2 rounded-full bg-inverse-surface px-3 py-1.5 text-xs font-medium text-inverse-on-surface shadow-md">
+                    Klik teks untuk mengedit
+                  </div>
+                )}
                 <FitA4>
                   <CvPagedPreview pageCount={allPageCount} marginMm={marginPadding} measureRef={contentRef} activePage={focusPage}>
                     {previewContent}
@@ -1032,6 +1057,7 @@ interface PreviewEdit {
   after: string;
 }
 const EDIT_HISTORY_MAX = 50;
+const EDIT_HINT_KEY = "cv_builder_edit_hint_seen";
 
 /** Nama file dari header Content-Disposition server (satu sumber penamaan). */
 function fileNameFromDisposition(header: string | null): string | null {
