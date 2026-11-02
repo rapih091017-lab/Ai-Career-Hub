@@ -28,7 +28,7 @@ export function OrgCard({ org, index, totalItems, jobTitle, skills, jobDescripti
   const isHidden = org.visible === false;
 
   return (
-    <div className={`bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4 relative transition-opacity duration-200 ${isHidden ? "opacity-50" : ""}`}>
+    <div data-cv-entry={`organisations.${org.id}`} className={`bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4 relative transition-opacity duration-200 ${isHidden ? "opacity-50" : ""}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {dragHandle}
@@ -73,10 +73,10 @@ export function OrgCard({ org, index, totalItems, jobTitle, skills, jobDescripti
           </button>
         </div>
       </div>
-      <Field label="Nama Organisasi" value={org.name} onChange={(v) => onUpdate(index, "name", v)} enableAiPolish fieldName="nama organisasi" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
-      <Field label="Posisi / Jabatan" value={org.position} onChange={(v) => onUpdate(index, "position", v)} enableAiPolish fieldName="posisi organisasi" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
+      <Field cvField="name" label="Nama Organisasi" value={org.name} onChange={(v) => onUpdate(index, "name", v)} enableAiPolish fieldName="nama organisasi" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
+      <Field cvField="position" label="Posisi / Jabatan" value={org.position} onChange={(v) => onUpdate(index, "position", v)} enableAiPolish fieldName="posisi organisasi" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
       <div className="grid grid-cols-2 gap-4">
-        <Field label="Tanggal Mulai" type="month" value={org.startDate} onChange={(v) => onUpdate(index, "startDate", v)} />
+        <Field cvField="startDate" label="Tanggal Mulai" type="month" value={org.startDate} onChange={(v) => onUpdate(index, "startDate", v)} />
         {org.isPresent ? (
           <div>
             <label className="block text-label-bold text-on-surface mb-1.5">Tanggal Selesai</label>
@@ -101,6 +101,7 @@ export function OrgCard({ org, index, totalItems, jobTitle, skills, jobDescripti
         <span className="text-xs text-on-surface-variant">Sampai Sekarang</span>
       </label>
       <BulletEditor
+        cvField="description"
         label="Deskripsi Kegiatan"
         value={org.description}
         onChange={(v) => onUpdate(index, "description", v)}

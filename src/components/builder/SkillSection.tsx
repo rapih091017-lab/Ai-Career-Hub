@@ -107,7 +107,7 @@ export function SkillSection({
   return (
     <>
       {/* ── Skills with Category ── */}
-      <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
+      <div data-cv-field="skills" className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
         <div className="flex items-center gap-3 pb-2">
           <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
             <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>psychology</span>
@@ -186,7 +186,7 @@ export function SkillSection({
       {unused("certifications") ? (
         unusedCard("certifications", "Sertifikasi")
       ) : (
-      <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
+      <div data-cv-field="certifications" className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
         <div className="flex items-center gap-3 pb-2">
           <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
             <span className="material-symbols-outlined text-amber-600" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
@@ -254,7 +254,7 @@ export function SkillSection({
       {unused("selfEvaluation") ? (
         unusedCard("selfEvaluation", "Evaluasi Diri")
       ) : (
-      <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
+      <div data-cv-field="selfEvaluation" className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
         <div className="flex items-center gap-3 pb-2">
           <div className="w-10 h-10 rounded-xl bg-green/10 flex items-center justify-center shrink-0">
             <span className="material-symbols-outlined text-green" style={{ fontVariationSettings: "'FILL' 1" }}>badge</span>
@@ -290,7 +290,7 @@ export function SkillSection({
       {unused("lainnya") ? (
         unusedCard("lainnya", "Lainnya")
       ) : (
-      <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
+      <div data-cv-field="customSections.lainnya" className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
             <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>more_horiz</span>

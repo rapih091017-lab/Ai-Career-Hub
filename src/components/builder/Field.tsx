@@ -21,6 +21,8 @@ interface FieldProps {
   jobTitle?: string;
   skills?: string[];
   jobDescription?: string;
+  /** Penanda untuk lompat dari pratinjau ke field ini (lihat cv-edit-path). */
+  cvField?: string;
 }
 
 export function Field({
@@ -36,6 +38,7 @@ export function Field({
   jobTitle,
   skills,
   jobDescription,
+  cvField,
 }: FieldProps) {
   const isEmpty = required && !value;
   const isFilled = !!value && !disabled;
@@ -49,7 +52,7 @@ export function Field({
   );
 
   return (
-    <div>
+    <div data-cv-field={cvField}>
       <label className="block text-label-bold text-on-surface mb-1.5">
         {label}
         {required && <span className="text-error ml-0.5">*</span>}

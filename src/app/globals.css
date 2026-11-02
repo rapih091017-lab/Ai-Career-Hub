@@ -756,6 +756,32 @@ a:focus-visible {
   pointer-events: none;
 }
 
+/* Pratinjau: teks yang bisa diedit / diklik (tidak ikut PDF: mode cetak tanpa atribut ini) */
+.a4-preview [data-cv-path] {
+  cursor: pointer;
+}
+.a4-preview [data-cv-edit][contenteditable] {
+  cursor: text;
+  border-radius: 2px;
+  outline: none;
+}
+.a4-preview [data-cv-edit][contenteditable]:hover {
+  box-shadow: 0 0 0 1px rgb(var(--c-primary) / 0.45);
+}
+.a4-preview [data-cv-edit][contenteditable]:focus {
+  box-shadow: 0 0 0 2px rgb(var(--c-primary));
+  background: rgb(var(--c-primary) / 0.05);
+}
+.a4-preview [data-cv-edit][contenteditable]:empty::before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+}
+.a4-preview li[data-cv-path]:hover,
+.a4-preview p[data-cv-path]:hover,
+.a4-preview span[data-cv-path]:not([contenteditable]):hover {
+  text-decoration: underline dotted rgb(var(--c-primary));
+}
+
 /* Pratinjau: tombol tambah/hapus garis di celah atas section (melayang, tidak menggeser isi) */
 .a4-preview .cv-divider-toggle {
   position: absolute;

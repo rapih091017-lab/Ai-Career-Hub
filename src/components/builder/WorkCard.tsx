@@ -164,7 +164,7 @@ export function WorkCard({
   const isHidden = work.visible === false;
 
   return (
-    <div className={`bg-surface-container-lowest rounded-xl p-6 shadow-soft relative group transition-opacity duration-200 ${isHidden ? "opacity-50" : ""}`}>
+    <div data-cv-entry={`workHistory.${work.id}`} className={`bg-surface-container-lowest rounded-xl p-6 shadow-soft relative group transition-opacity duration-200 ${isHidden ? "opacity-50" : ""}`}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2 flex-1 min-w-0">
           {dragHandle}
@@ -236,20 +236,20 @@ export function WorkCard({
             className="overflow-hidden"
           >
             <div className="space-y-4">
-              <Field label="Posisi Jabatan" value={work.position} onChange={(v) => onUpdate(index, "position", v)} enableAiPolish fieldName="position" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
-              <Field label="Perusahaan" value={work.company} onChange={(v) => onUpdate(index, "company", v)} enableAiPolish fieldName="company" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
-              <Field label="Deskripsi Perusahaan (opsional)" value={work.companyDescription || ""} onChange={(v) => onUpdate(index, "companyDescription", v)} />
-              <Field label="Lokasi" value={work.location} onChange={(v) => onUpdate(index, "location", v)} />
-              <Field label="Link Proyek / Portofolio (opsional)" value={work.projectUrl || ""} onChange={(v) => onUpdate(index, "projectUrl", v)} placeholder="https://github.com/..." />
+              <Field cvField="position" label="Posisi Jabatan" value={work.position} onChange={(v) => onUpdate(index, "position", v)} enableAiPolish fieldName="position" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
+              <Field cvField="company" label="Perusahaan" value={work.company} onChange={(v) => onUpdate(index, "company", v)} enableAiPolish fieldName="company" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
+              <Field cvField="companyDescription" label="Deskripsi Perusahaan (opsional)" value={work.companyDescription || ""} onChange={(v) => onUpdate(index, "companyDescription", v)} />
+              <Field cvField="location" label="Lokasi" value={work.location} onChange={(v) => onUpdate(index, "location", v)} />
+              <Field cvField="projectUrl" label="Link Proyek / Portofolio (opsional)" value={work.projectUrl || ""} onChange={(v) => onUpdate(index, "projectUrl", v)} placeholder="https://github.com/..." />
               <div className="bg-primary/5 border border-primary/10 rounded-xl p-3">
-                <Field label="Pencapaian Utama (opsional)" value={work.achievement || ""} onChange={(v) => onUpdate(index, "achievement", v)} placeholder="Contoh: Meningkatkan penjualan 30% dalam 6 bulan" enableAiPolish fieldName="achievement" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
+                <Field cvField="achievement" label="Pencapaian Utama (opsional)" value={work.achievement || ""} onChange={(v) => onUpdate(index, "achievement", v)} placeholder="Contoh: Meningkatkan penjualan 30% dalam 6 bulan" enableAiPolish fieldName="achievement" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
                 <p className="text-[10px] text-on-surface-variant mt-1 flex items-center gap-1">
                   <span className="material-symbols-outlined text-xs" aria-hidden="true">info</span>
                   Soroti pencapaian dengan angka/metrik · ini yang paling dilihat HR!
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <Field label="Mulai" type="month" value={work.startDate} onChange={(v) => onUpdate(index, "startDate", v)} />
+                <Field cvField="startDate" label="Mulai" type="month" value={work.startDate} onChange={(v) => onUpdate(index, "startDate", v)} />
                 <Field label="Selesai" type="month" value={work.endDate} onChange={(v) => onUpdate(index, "endDate", v)} disabled={work.isCurrent} />
               </div>
               <label className="relative flex items-center gap-2.5 cursor-pointer select-none mt-2 group">
@@ -286,6 +286,7 @@ export function WorkCard({
                     )}
                   </AnimatePresence>
                   <BulletEditor
+                    cvField="description"
                     label="Deskripsi"
                     value={work.description}
                     onChange={(v) => onUpdate(index, "description", v)}

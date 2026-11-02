@@ -73,7 +73,7 @@ interface CustomSectionCardProps {
 export function CustomSectionCard({ section, onChange, onRemove, hiddenNotice }: CustomSectionCardProps) {
   const label = section.title.trim() || "Bagian tanpa judul";
   return (
-    <div className="space-y-4 rounded-xl bg-surface-container-lowest p-6 shadow-soft" data-custom-section={section.id}>
+    <div className="space-y-4 rounded-xl bg-surface-container-lowest p-6 shadow-soft" data-custom-section={section.id} data-cv-field={`customSections.${section.id}`}>
       <div className="flex items-start gap-3">
         <div className="min-w-0 flex-1">
           <label className="mb-1 block text-xs font-semibold text-on-surface-variant" htmlFor={`cs-title-${section.id}`}>

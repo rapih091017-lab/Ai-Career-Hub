@@ -45,6 +45,8 @@ interface BulletEditorProps {
   disabled?: boolean;
   /** Slot di kanan judul (mis. tombol Poles AI). */
   headerAction?: React.ReactNode;
+  /** Penanda untuk lompat dari pratinjau (poin ke-n = textarea[data-index=n]). */
+  cvField?: string;
 }
 
 interface Focus {
@@ -173,6 +175,7 @@ export function BulletEditor({
   maxLength,
   disabled,
   headerAction,
+  cvField,
 }: BulletEditorProps) {
   const labelId = useId();
   const [lines, setLines] = useState<string[]>(() => linesFromValue(value));
@@ -393,7 +396,7 @@ export function BulletEditor({
   const posOf = (id: string | number) => ids.indexOf(String(id)) + 1;
 
   return (
-    <div>
+    <div data-cv-field={cvField}>
       <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
         <span id={labelId} className="block text-label-bold text-on-surface">{label}</span>
         <div className="flex items-center gap-2">

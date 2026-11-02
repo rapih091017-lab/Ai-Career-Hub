@@ -24,7 +24,7 @@ export function EducationCard({ edu, index, totalItems, jobTitle, skills, jobDes
   const isHidden = edu.visible === false;
 
   return (
-    <div className={`bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4 relative transition-opacity duration-200 ${isHidden ? "opacity-50" : ""}`}>
+    <div data-cv-entry={`education.${edu.id}`} className={`bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4 relative transition-opacity duration-200 ${isHidden ? "opacity-50" : ""}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {dragHandle}
@@ -69,14 +69,14 @@ export function EducationCard({ edu, index, totalItems, jobTitle, skills, jobDes
           </button>
         </div>
       </div>
-      <Field label="Nama Institusi" value={edu.institution} onChange={(v) => onUpdate(index, "institution", v)} enableAiPolish fieldName="institution" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
-      <Field label="Jenjang / Gelar" value={edu.degree} onChange={(v) => onUpdate(index, "degree", v)} enableAiPolish fieldName="degree" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
-      <Field label="Bidang Studi" value={edu.field} onChange={(v) => onUpdate(index, "field", v)} enableAiPolish fieldName="field" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
+      <Field cvField="institution" label="Nama Institusi" value={edu.institution} onChange={(v) => onUpdate(index, "institution", v)} enableAiPolish fieldName="institution" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
+      <Field cvField="degree" label="Jenjang / Gelar" value={edu.degree} onChange={(v) => onUpdate(index, "degree", v)} enableAiPolish fieldName="degree" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
+      <Field cvField="field" label="Bidang Studi" value={edu.field} onChange={(v) => onUpdate(index, "field", v)} enableAiPolish fieldName="field" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
       <div className="grid grid-cols-2 gap-4">
-        <Field label="Tahun Mulai" type="month" value={edu.startDate} onChange={(v) => onUpdate(index, "startDate", v)} />
+        <Field cvField="startDate" label="Tahun Mulai" type="month" value={edu.startDate} onChange={(v) => onUpdate(index, "startDate", v)} />
         <Field label="Tahun Selesai" type="month" value={edu.endDate} onChange={(v) => onUpdate(index, "endDate", v)} />
       </div>
-      <Field label="IPK / GPA (opsional)" value={edu.gpa || ""} onChange={(v) => onUpdate(index, "gpa", v)} placeholder="Contoh: 3.75 / 4.00" />
+      <Field cvField="gpa" label="IPK / GPA (opsional)" value={edu.gpa || ""} onChange={(v) => onUpdate(index, "gpa", v)} placeholder="Contoh: 3.75 / 4.00" />
     </div>
   );
 }

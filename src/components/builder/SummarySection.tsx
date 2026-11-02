@@ -157,7 +157,7 @@ export function SummarySection({
   return (
     <div className="space-y-5">
       {/* Employment Status */}
-      <div>
+      <div data-cv-field="employmentStatus">
         <label className="block text-label-bold text-on-surface mb-1.5">Status Pekerjaan</label>
         <select
           value={employmentStatus}
@@ -172,7 +172,7 @@ export function SummarySection({
       </div>
 
       {/* Summary */}
-      <div className="relative">
+      <div className="relative" data-cv-field="summary">
         <label className="block text-label-bold text-on-surface mb-1.5">Ringkasan Profesional</label>
         
         {/* Textarea container with loading overlay */}

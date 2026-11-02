@@ -10,6 +10,9 @@ import { CvPagedPreview, measurePageCount, untabSecondaryPages } from "@/compone
 import { LINE_HEIGHT, cvPrintFormatFromData, cvRenderProps } from "@/lib/cv-print-format";
 import { cvFontValue, resolveCvFont } from "@/lib/cv-fonts";
 import { useInlineEditable } from "@/hooks/useInlineEditable";
+import { EditableText, keepCaretVisible } from "@/components/cv-templates/EditableText";
+import { focusableIn, formTargetFor, setCvPath, stepForPath } from "@/lib/cv-edit-path";
+import type { CvEditBindings } from "@/components/cv-templates";
 import type { BlockStyleControls } from "@/components/builder/FormatToolbar";
 import { aiSkillNames } from "@/lib/cv-normalize";
 import dynamic from "next/dynamic";
@@ -286,9 +289,60 @@ export default function BuilderPage() {
     const { marginMm: _marginMm, ...rest } = cvRenderProps(cvData, printFormat, selectedTemplateId);
     return rest;
   }, [cvData, printFormat, selectedTemplateId]);
+  /* ── Edit langsung di pratinjau ── */
+  // Riwayat perubahan dari pratinjau (per sesi edit), untuk Ctrl+Z / Ctrl+Shift+Z di luar field.
+  const editHistory = useRef<{ undo: PreviewEdit[]; redo: PreviewEdit[] }>({ undo: [], redo: [] });
+  const onPreviewEdit = useCallback((path: string, value: string) => setCvData((prev) => setCvPath(prev, path, value)), [setCvData]);
+  const onPreviewSession = useCallback((path: string, before: string, after: string) => {
+    const h = editHistory.current;
+    h.undo.push({ path, before, after });
+    if (h.undo.length > EDIT_HISTORY_MAX) h.undo.shift();
+    h.redo = [];
+  }, []);
+  const editBindings = useMemo<CvEditBindings>(
+    () => ({ Text: EditableText, editable: inlineEditable, onEdit: onPreviewEdit, onSession: onPreviewSession }),
+    [inlineEditable, onPreviewEdit, onPreviewSession],
+  );
+
   const previewContent = useMemo(
-    () => <AtsBaseRenderer {...renderProps} onSectionClick={handlePreviewSectionClick} onToggleDivider={toggleDivider} selectedSection={styleTarget} />,
-    [renderProps, handlePreviewSectionClick, toggleDivider, styleTarget],
+    () => <AtsBaseRenderer {...renderProps} onSectionClick={handlePreviewSectionClick} onToggleDivider={toggleDivider} selectedSection={styleTarget} edit={editBindings} />,
+    [renderProps, handlePreviewSectionClick, toggleDivider, styleTarget, editBindings],
+  );
+
+  // Jumlah halaman berubah saat mengetik: pastikan caret tetap di salinan yang terlihat.
+  useEffect(() => {
+    keepCaretVisible();
+  }, [allPageCount]);
+
+  /** Lompat ke langkah form untuk path, lalu scroll & fokus ke field/entrinya. */
+  const jumpToField = useCallback((path: string) => {
+    setActiveStep(stepForPath(path));
+    const [head, id] = path.split(".");
+    if (head === "workHistory" && id) setCollapsedWorkIds((prev) => (prev.has(id) ? new Set([...prev].filter((x) => x !== id)) : prev));
+    // Langkah form beranimasi masuk; tunggu sampai field ada (maks ±2,5 dtk).
+    const started = performance.now();
+    const tick = () => {
+      const target = formTargetFor(path);
+      const exact = target?.matches("input, textarea, select") || !!target?.getAttribute("data-cv-field");
+      if (target && (exact || performance.now() - started > 600)) {
+        target.scrollIntoView({ block: "center", behavior: "smooth" });
+        focusableIn(target)?.focus({ preventScroll: true });
+        return;
+      }
+      if (performance.now() - started < 2500) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, []);
+
+  // Klik teks non-edit di pratinjau (poin, tanggal, skill, …) → field form-nya.
+  const onPreviewClick = useCallback(
+    (e: React.MouseEvent) => {
+      const t = e.target as HTMLElement;
+      if (t.closest("[data-cv-edit][contenteditable]")) return;
+      const path = t.closest("[data-cv-path]")?.getAttribute("data-cv-path");
+      if (path) jumpToField(path);
+    },
+    [jumpToField],
   );
 
   // Setelah tiap render pratinjau: tombol/teks di halaman 2+ keluar dari urutan Tab.
@@ -427,6 +481,18 @@ export default function BuilderPage() {
           target.isContentEditable);
       if (typing) return;
 
+      // Urungkan/ulangi edit dari pratinjau. Di dalam field, undo bawaan peramban yang dipakai.
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z' || e.key === 'y')) {
+        const h = editHistory.current;
+        const redo = e.key === 'y' || e.shiftKey;
+        const item = redo ? h.redo.pop() : h.undo.pop();
+        if (!item) return;
+        e.preventDefault();
+        (redo ? h.undo : h.redo).push(item);
+        setCvData((prev) => setCvPath(prev, item.path, redo ? item.after : item.before));
+        return;
+      }
+
       // Ctrl+ArrowLeft → Previous step
       if (e.ctrlKey && e.key === 'ArrowLeft') {
         e.preventDefault();
@@ -440,7 +506,7 @@ export default function BuilderPage() {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, []);
+  }, [setCvData]);
 
   /* ── loading / error ── */
 
@@ -545,13 +611,13 @@ export default function BuilderPage() {
             >
               {activeStep === 0 && (
                 <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-5">
-                  <Field label={t("builder.field-fullname")} value={cvData.fullName} onChange={(v) => updateField("fullName", v)} />
-                  <Field label={t("builder.field-phone")} type="tel" value={cvData.phone} onChange={(v) => updateField("phone", v)} />
-                  <Field label={t("builder.field-email")} type="email" value={cvData.email} onChange={(v) => updateField("email", v)} />
-                  <Field label={t("builder.field-address")} value={cvData.address} onChange={(v) => updateField("address", v)} />
-                  <Field label={t("builder.field-linkedin")} value={cvData.linkedin} onChange={(v) => updateField("linkedin", v)} />
-                  <Field label={t("builder.field-portfolio")} type="url" value={cvData.portfolioUrl || ""} onChange={(v) => updateField("portfolioUrl", v)} />
-                  <Field label={t("builder.field-motto")} value={cvData.professionalTitle || ""} onChange={(v) => updateField("professionalTitle", v)} />
+                  <Field cvField="fullName" label={t("builder.field-fullname")} value={cvData.fullName} onChange={(v) => updateField("fullName", v)} />
+                  <Field cvField="phone" label={t("builder.field-phone")} type="tel" value={cvData.phone} onChange={(v) => updateField("phone", v)} />
+                  <Field cvField="email" label={t("builder.field-email")} type="email" value={cvData.email} onChange={(v) => updateField("email", v)} />
+                  <Field cvField="address" label={t("builder.field-address")} value={cvData.address} onChange={(v) => updateField("address", v)} />
+                  <Field cvField="linkedin" label={t("builder.field-linkedin")} value={cvData.linkedin} onChange={(v) => updateField("linkedin", v)} />
+                  <Field cvField="portfolioUrl" label={t("builder.field-portfolio")} type="url" value={cvData.portfolioUrl || ""} onChange={(v) => updateField("portfolioUrl", v)} />
+                  <Field cvField="professionalTitle" label={t("builder.field-motto")} value={cvData.professionalTitle || ""} onChange={(v) => updateField("professionalTitle", v)} />
                   
                   <SummarySection
                     employmentStatus={cvData.employmentStatus || ""}
@@ -879,7 +945,7 @@ export default function BuilderPage() {
                   </div>
                 )}
                 {/* Halaman A4 nyata: ukuran pt/mm sama dengan PDF */}
-                <div ref={previewRef} onFocus={onPreviewFocus} onBlur={() => setFocusPage(1)}>
+                <div ref={previewRef} onFocus={onPreviewFocus} onBlur={() => setFocusPage(1)} onClick={onPreviewClick}>
                 <FitA4>
                   <CvPagedPreview pageCount={allPageCount} marginMm={marginPadding} measureRef={contentRef} activePage={focusPage}>
                     {previewContent}
@@ -958,6 +1024,14 @@ export default function BuilderPage() {
     </AuthGuard>
   );
 }
+
+/** Satu perubahan dari pratinjau (sesi fokus → blur). */
+interface PreviewEdit {
+  path: string;
+  before: string;
+  after: string;
+}
+const EDIT_HISTORY_MAX = 50;
 
 /** Nama file dari header Content-Disposition server (satu sumber penamaan). */
 function fileNameFromDisposition(header: string | null): string | null {
