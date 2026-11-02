@@ -153,6 +153,8 @@ export interface CvLayout {
   showSkillLevel?: boolean;
   /** Garis di atas section tertentu (true = ada, false = tidak ada). */
   dividers?: Record<string, boolean>;
+  /** Bagian yang dihapus dari CV; isinya tetap tersimpan untuk "Pakai lagi". */
+  removedSections?: string[];
 }
 
 /* ───────── template style config ───────── */

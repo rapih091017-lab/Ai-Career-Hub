@@ -228,15 +228,21 @@ export function sanitizeLayout(
   const dividers = boolRecord(r.dividers);
   if (dividers) out.dividers = dividers;
 
+  const removed = Array.isArray(r.removedSections)
+    ? [...new Set(r.removedSections.filter((k): k is string => typeof k === "string" && k.length <= KEY_MAX))]
+    : undefined;
+  if (removed) out.removedSections = removed;
+  const isRemoved = (k: string) => !!removed?.includes(k);
+
   if (Array.isArray(r.sectionOrder)) {
     const customIds = new Set(ctx.customSections.map((c) => c.id));
     const order: string[] = [];
     for (const k of r.sectionOrder) {
-      if (typeof k !== "string" || order.includes(k)) continue;
+      if (typeof k !== "string" || order.includes(k) || isRemoved(k)) continue;
       if (BUILTIN.has(k) || customIds.has(k)) order.push(k);
     }
     DEFAULT_SECTION_ORDER.forEach((key, i) => {
-      if (order.includes(key)) return;
+      if (order.includes(key) || isRemoved(key)) return;
       if (!REQUIRED_SECTIONS.includes(key) && !ctx.hasContent(key)) return;
       let pos = 0;
       for (let j = i - 1; j >= 0; j--) {
@@ -249,7 +255,7 @@ export function sanitizeLayout(
       order.splice(pos, 0, key);
     });
     for (const c of ctx.customSections) {
-      if (!order.includes(c.id) && c.content.trim()) order.push(c.id);
+      if (!order.includes(c.id) && !isRemoved(c.id) && c.content.trim()) order.push(c.id);
     }
     out.sectionOrder = order;
   }

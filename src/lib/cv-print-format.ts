@@ -19,6 +19,7 @@ export interface CvPrintFormat {
   marginMode?: "tight" | "normal" | "wide";
   sectionOrder?: string[];
   sectionVisibility?: Record<string, boolean>;
+  removedSections?: string[];
   customSections?: CustomSectionEntry[];
   showSkillLevel?: boolean;
 }
@@ -43,6 +44,7 @@ export function cvPrintFormatFromData(data: CvData, templateId?: string): CvPrin
     marginMode: l.marginMode,
     sectionOrder: l.sectionOrder,
     sectionVisibility: l.sectionVisibility,
+    removedSections: l.removedSections,
     customSections: data.customSections ?? DEFAULT_CUSTOM_SECTIONS,
     showSkillLevel: l.showSkillLevel,
   };
@@ -85,7 +87,8 @@ export function cvRenderProps(data: CvData, format: CvPrintFormat, fallbackTempl
       ...(format.customPrimaryColor ? { primary: format.customPrimaryColor, sectionTitle: format.customPrimaryColor } : {}),
     },
     sectionOrder: (format.sectionOrder ?? [...DEFAULT_SECTION_ORDER, "lainnya"]).filter(
-      (key) => visibility[key] !== false,
+      // Bagian yang dihapus tidak dirender walau isinya masih tersimpan.
+      (key) => visibility[key] !== false && !format.removedSections?.includes(key),
     ),
     showDividers: format.showDividers ?? false,
     dividers: format.dividers,

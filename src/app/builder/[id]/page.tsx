@@ -37,10 +37,11 @@ import {
   LAINNYA_ID,
   addCustomSection,
   isRemovableSection,
+  purgeSectionContent,
   removeSection,
-  restoreBuiltinSection,
+  restoreSection,
+  sectionHasSavedContent,
   sectionLabel,
-  undoRemoveSection,
   unusedBuiltinSections,
   updateCustomSection,
 } from "@/lib/section-manager";
@@ -183,25 +184,41 @@ export default function BuilderPage() {
   const requestRemoveSection = (key: string) => {
     const label = labelOf(key);
     setConfirm({
-      title: `Hapus bagian ${label}?`,
-      message: "Isi bagian ini dikosongkan dan bagian ini keluar dari CV. Kamu masih bisa mengurungkannya sesaat setelah menghapus.",
-      confirmLabel: "Hapus bagian",
+      title: `Hapus bagian ${label} dari CV?`,
+      message: "Bagian ini tidak tampil lagi di CV dan PDF. Isinya tetap tersimpan, jadi bisa dipakai lagi kapan saja lewat \"Pakai lagi\".",
+      confirmLabel: "Hapus dari CV",
       cancelLabel: "Batal",
-      variant: "danger",
       onConfirm: () => {
-        const res = removeSection(cvData, key);
-        if (!res) return;
-        setCvData((prev) => removeSection(prev, key)?.cv ?? prev);
+        // Posisi dihitung dari state terbaru di dalam updater, bukan dari closure render.
+        const pos = { index: -1 };
+        setCvData((prev) => {
+          const res = removeSection(prev, key);
+          if (!res) return prev;
+          pos.index = res.orderIndex;
+          return res.cv;
+        });
         addToast({
           type: "info",
-          message: `Bagian ${label} dihapus.`,
+          message: `Bagian ${label} dihapus dari CV. Isinya tetap tersimpan.`,
           duration: 8000,
-          action: { label: "Urungkan", onClick: () => setCvData((prev) => undoRemoveSection(prev, res.removed)) },
+          // Urungkan hanya mengembalikan urutan; isi tidak pernah dihapus, jadi editan baru aman.
+          action: { label: "Urungkan", onClick: () => setCvData((prev) => restoreSection(prev, key, pos.index)) },
         });
       },
     });
   };
-  const restoreSection = (key: string) => setCvData((prev) => restoreBuiltinSection(prev, key));
+  const requestPurgeSection = (key: string) => {
+    const label = labelOf(key);
+    setConfirm({
+      title: `Hapus permanen isi ${label}?`,
+      message: "Semua isi bagian ini dihapus dan tidak bisa dikembalikan.",
+      confirmLabel: "Hapus permanen",
+      cancelLabel: "Batal",
+      variant: "danger",
+      onConfirm: () => setCvData((prev) => purgeSectionContent(prev, key)),
+    });
+  };
+  const restoreUnused = (key: string) => setCvData((prev) => restoreSection(prev, key));
   const addCustom = (title: string) => setCvData((prev) => addCustomSection(prev, title)?.cv ?? prev);
   const customOnly = customSections.filter((c) => c.id !== LAINNYA_ID);
   const unusedForPanel = unusedSections.map((key) => ({ key, label: labelOf(key) }));
@@ -614,7 +631,7 @@ export default function BuilderPage() {
               )}
 
               {activeStep === 4 && (isSectionUnused("organizations") ? (
-                <UnusedSectionCard label="Organisasi" onRestore={() => restoreSection("organizations")} />
+                <UnusedSectionCard label="Organisasi" onRestore={() => restoreUnused("organizations")} hasContent={sectionHasSavedContent(cvData, "organizations")} onPurge={() => requestPurgeSection("organizations")} />
               ) : (
                 <div className="space-y-4">
                   <div className="flex items-center">
@@ -678,10 +695,20 @@ export default function BuilderPage() {
                   onShowSection={showSection}
                   isSectionUnused={isSectionUnused}
                   onRemoveSection={requestRemoveSection}
-                  onRestoreSection={restoreSection}
+                  onRestoreSection={restoreUnused}
+                  hasSavedContent={(k) => sectionHasSavedContent(cvData, k)}
+                  onPurgeSection={requestPurgeSection}
                 />
               )}
-              {activeStep === 5 && customOnly.map((cs) => (
+              {activeStep === 5 && customOnly.map((cs) => isSectionUnused(cs.id) ? (
+                <UnusedSectionCard
+                  key={cs.id}
+                  label={labelOf(cs.id)}
+                  hasContent={!!cs.content.trim()}
+                  onRestore={() => restoreUnused(cs.id)}
+                  onPurge={() => requestPurgeSection(cs.id)}
+                />
+              ) : (
                 <CustomSectionCard
                   key={cs.id}
                   section={cs}
@@ -696,7 +723,7 @@ export default function BuilderPage() {
                   <p className="mb-3 text-xs text-on-surface-variant">Bagian tambahan muncul di CV setelah diisi, dan bisa diurutkan lewat Urutan Section.</p>
                   <AddSectionPanel
                     unused={unusedForPanel}
-                    onRestore={restoreSection}
+                    onRestore={restoreUnused}
                     onAddCustom={addCustom}
                     customCount={customSections.length}
                     existingTitles={customSections.map((c) => c.title)}
@@ -804,7 +831,7 @@ export default function BuilderPage() {
           isRemovable={(key) => isRemovableSection(cvData, key)}
           onRemove={requestRemoveSection}
           unused={unusedForPanel}
-          onRestore={restoreSection}
+          onRestore={restoreUnused}
           onAddCustom={addCustom}
           customCount={customSections.length}
           customTitles={customSections.map((c) => c.title)}

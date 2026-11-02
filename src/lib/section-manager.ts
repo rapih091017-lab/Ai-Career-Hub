@@ -41,100 +41,111 @@ export function sectionLabel(cv: CvData, key: string): string {
   return BUILTIN_LABELS[key] ?? key;
 }
 
-function withLayout(cv: CvData, patch: { sectionOrder?: string[]; dividers?: Record<string, boolean>; sectionVisibility?: Record<string, boolean> }): CvData {
+type LayoutPatch = { sectionOrder?: string[]; dividers?: Record<string, boolean>; sectionVisibility?: Record<string, boolean>; removedSections?: string[] };
+
+function withLayout(cv: CvData, patch: LayoutPatch): CvData {
   const base = cv.layout ?? { ...LEGACY_LAYOUT };
   return { ...cv, layout: { ...base, ...patch } };
 }
 
-/** Data yang disimpan untuk Urungkan setelah section dihapus. */
-export interface RemovedSection {
-  key: string;
-  orderIndex: number;
-  divider?: boolean;
-  /** Isi section bawaan sebelum dikosongkan. */
-  data?: Partial<Pick<CvData, "organisations" | "certifications" | "selfEvaluation">>;
-  /** Entri section kustom beserta posisinya. */
-  custom?: { entry: CustomSectionEntry; index: number };
-}
+export const removedSectionsOf = (cv: CvData): string[] => cv.layout?.removedSections ?? [];
 
-/** Hapus section opsional: data dikosongkan dan keluar dari urutan. */
-export function removeSection(cv: CvData, key: string): { cv: CvData; removed: RemovedSection } | null {
+/**
+ * Hapus bagian = keluarkan dari urutan dan tandai di layout.removedSections.
+ * Isi TIDAK dihapus, jadi "Pakai lagi" memulihkannya. Dihitung dari state
+ * terbaru (dipakai di dalam updater setCvData).
+ */
+export function removeSection(cv: CvData, key: string): { cv: CvData; orderIndex: number } | null {
   if (!isRemovableSection(cv, key)) return null;
   const order = orderOf(cv);
-  const removed: RemovedSection = { key, orderIndex: order.indexOf(key), divider: cv.layout?.dividers?.[key] };
-  let next: CvData = { ...cv };
-  if (key === "organizations") {
-    removed.data = { organisations: cv.organisations };
-    next.organisations = [];
-  } else if (key === "certifications") {
-    removed.data = { certifications: cv.certifications };
-    next.certifications = [];
-  } else if (key === "selfEvaluation") {
-    removed.data = { selfEvaluation: cv.selfEvaluation };
-    next.selfEvaluation = "";
-  } else {
-    const list = customSectionsOf(cv);
-    const index = list.findIndex((c) => c.id === key);
-    removed.custom = { entry: list[index], index };
-    next.customSections = list.filter((c) => c.id !== key);
-  }
-  const { [key]: _gone, ...dividers } = cv.layout?.dividers ?? {};
-  next = withLayout(next, { sectionOrder: order.filter((k) => k !== key), dividers });
-  return { cv: next, removed };
+  const removed = removedSectionsOf(cv);
+  return {
+    cv: withLayout(cv, {
+      sectionOrder: order.filter((k) => k !== key),
+      removedSections: removed.includes(key) ? removed : [...removed, key],
+    }),
+    orderIndex: order.indexOf(key),
+  };
 }
 
-/** Kembalikan section yang baru dihapus (tombol Urungkan). */
-export function undoRemoveSection(cv: CvData, removed: RemovedSection): CvData {
-  let next: CvData = { ...cv, ...(removed.data ?? {}) };
-  if (removed.custom) {
-    const list = customSectionsOf(cv).filter((c) => c.id !== removed.key);
-    list.splice(Math.min(removed.custom.index, list.length), 0, removed.custom.entry);
-    next.customSections = list;
-  }
-  const order = orderOf(cv).filter((k) => k !== removed.key);
-  order.splice(removed.orderIndex < 0 ? order.length : Math.min(removed.orderIndex, order.length), 0, removed.key);
-  const dividers = { ...(cv.layout?.dividers ?? {}) };
-  if (removed.divider !== undefined) dividers[removed.key] = removed.divider;
-  next = withLayout(next, { sectionOrder: order, dividers });
-  return next;
-}
-
-/** Section bawaan opsional (dan "Lainnya") yang sedang tidak dipakai. */
+/** Section yang sedang tidak dipakai (dihapus dari CV, isinya mungkin masih ada). */
 export function unusedBuiltinSections(cv: CvData): string[] {
   const order = orderOf(cv);
-  const out: string[] = OPTIONAL_SECTIONS.filter((k) => !order.includes(k));
-  if (!customSectionsOf(cv).some((c) => c.id === LAINNYA_ID)) out.push(LAINNYA_ID);
+  const customIds = new Set(customSectionsOf(cv).map((c) => c.id));
+  const out = removedSectionsOf(cv).filter((k) => isBuiltin(k) || customIds.has(k));
+  // Data lama (sebelum removedSections): bagian opsional yang tidak ada di urutan.
+  for (const k of OPTIONAL_SECTIONS) if (!order.includes(k) && !out.includes(k)) out.push(k);
+  if (!customIds.has(LAINNYA_ID) && !out.includes(LAINNYA_ID)) out.push(LAINNYA_ID);
   return out;
 }
 
-/** Pakai lagi section bawaan opsional: masuk urutan di posisi bawaannya & ditampilkan. */
-export function restoreBuiltinSection(cv: CvData, key: string): CvData {
+/** Apakah bagian yang tidak dipakai masih punya isi tersimpan. */
+export function sectionHasSavedContent(cv: CvData, key: string): boolean {
+  if (key === "organizations") return cv.organisations.length > 0;
+  if (key === "certifications") return (cv.certifications?.length ?? 0) > 0;
+  if (key === "selfEvaluation") return !!cv.selfEvaluation?.trim();
+  return !!customSectionsOf(cv).find((c) => c.id === key)?.content.trim();
+}
+
+/**
+ * Pakai lagi bagian: keluar dari removedSections, masuk urutan (di
+ * `orderIndex` bila diberikan, mis. dari Urungkan; selain itu posisi bawaan
+ * atau akhir), dan ditampilkan. Isi yang tersimpan muncul lagi.
+ */
+export function restoreSection(cv: CvData, key: string, orderIndex?: number): CvData {
   let next = { ...cv };
-  if (key === LAINNYA_ID) {
-    if (!customSectionsOf(cv).some((c) => c.id === LAINNYA_ID)) {
-      next.customSections = [...customSectionsOf(cv), { id: LAINNYA_ID, title: "Lainnya", content: "", contentType: "bullets" }];
-    }
-  } else if (!isBuiltin(key)) {
+  if (key === LAINNYA_ID && !customSectionsOf(cv).some((c) => c.id === LAINNYA_ID)) {
+    next.customSections = [...customSectionsOf(cv), { id: LAINNYA_ID, title: "Lainnya", content: "", contentType: "bullets" }];
+  } else if (!isBuiltin(key) && !customSectionsOf(cv).some((c) => c.id === key)) {
     return cv;
   }
   const order = orderOf(cv);
   if (!order.includes(key)) {
-    const di = (DEFAULT_SECTION_ORDER as string[]).indexOf(key);
     let pos = order.length;
-    if (di >= 0) {
-      pos = 0;
-      for (let j = di - 1; j >= 0; j--) {
-        const at = order.indexOf(DEFAULT_SECTION_ORDER[j]);
-        if (at !== -1) {
-          pos = at + 1;
-          break;
+    if (orderIndex !== undefined && orderIndex >= 0) {
+      pos = Math.min(orderIndex, order.length);
+    } else {
+      const di = (DEFAULT_SECTION_ORDER as string[]).indexOf(key);
+      if (di >= 0) {
+        pos = 0;
+        for (let j = di - 1; j >= 0; j--) {
+          const at = order.indexOf(DEFAULT_SECTION_ORDER[j]);
+          if (at !== -1) {
+            pos = at + 1;
+            break;
+          }
         }
       }
     }
     order.splice(pos, 0, key);
   }
   const visibility = { ...(cv.layout?.sectionVisibility ?? {}), [key]: true };
-  next = withLayout(next, { sectionOrder: order, sectionVisibility: visibility });
+  next = withLayout(next, {
+    sectionOrder: order,
+    sectionVisibility: visibility,
+    removedSections: removedSectionsOf(cv).filter((k) => k !== key),
+  });
+  return next;
+}
+
+/** Nama lama, dipertahankan untuk pemanggil yang ada. */
+export const restoreBuiltinSection = (cv: CvData, key: string) => restoreSection(cv, key);
+
+/**
+ * Hapus permanen isi bagian yang sudah tidak dipakai. Bagian bawaan tetap
+ * tercatat tidak dipakai (kosong); bagian kustom dihapus seluruhnya.
+ */
+export function purgeSectionContent(cv: CvData, key: string): CvData {
+  if (!unusedBuiltinSections(cv).includes(key)) return cv;
+  let next: CvData = { ...cv };
+  if (key === "organizations") next.organisations = [];
+  else if (key === "certifications") next.certifications = [];
+  else if (key === "selfEvaluation") next.selfEvaluation = "";
+  else {
+    next.customSections = customSectionsOf(cv).filter((c) => c.id !== key);
+    const { [key]: _gone, ...dividers } = cv.layout?.dividers ?? {};
+    next = withLayout(next, { removedSections: removedSectionsOf(cv).filter((k) => k !== key), dividers });
+  }
   return next;
 }
 

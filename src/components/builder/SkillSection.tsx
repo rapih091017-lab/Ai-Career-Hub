@@ -28,6 +28,8 @@ interface SkillSectionProps {
   isSectionUnused?: (key: string) => boolean;
   onRemoveSection?: (key: string) => void;
   onRestoreSection?: (key: string) => void;
+  hasSavedContent?: (key: string) => boolean;
+  onPurgeSection?: (key: string) => void;
 }
 
 export const SKILL_LEVEL_OPTIONS = [
@@ -83,7 +85,17 @@ export function SkillSection({
   isSectionUnused,
   onRemoveSection,
   onRestoreSection,
+  hasSavedContent,
+  onPurgeSection,
 }: SkillSectionProps) {
+  const unusedCard = (key: string, label: string) => (
+    <UnusedSectionCard
+      label={label}
+      onRestore={() => onRestoreSection!(key)}
+      hasContent={!!hasSavedContent?.(key)}
+      onPurge={onPurgeSection ? () => onPurgeSection(key) : undefined}
+    />
+  );
   const unused = (key: string) => !!isSectionUnused?.(key) && !!onRestoreSection;
   const removeBtn = (key: string, label: string) =>
     onRemoveSection ? <RemoveSectionButton label={label} onRemove={() => onRemoveSection(key)} /> : null;
@@ -172,7 +184,7 @@ export function SkillSection({
 
       {/* ── Sertifikasi & Lisensi ── */}
       {unused("certifications") ? (
-        <UnusedSectionCard label="Sertifikasi" onRestore={() => onRestoreSection!("certifications")} />
+        unusedCard("certifications", "Sertifikasi")
       ) : (
       <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
         <div className="flex items-center gap-3 pb-2">
@@ -240,7 +252,7 @@ export function SkillSection({
 
       {/* ── Self Evaluation / Evaluasi Diri ── */}
       {unused("selfEvaluation") ? (
-        <UnusedSectionCard label="Evaluasi Diri" onRestore={() => onRestoreSection!("selfEvaluation")} />
+        unusedCard("selfEvaluation", "Evaluasi Diri")
       ) : (
       <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
         <div className="flex items-center gap-3 pb-2">
@@ -276,7 +288,7 @@ export function SkillSection({
 
       {/* ── Lainnya ── */}
       {unused("lainnya") ? (
-        <UnusedSectionCard label="Lainnya" onRestore={() => onRestoreSection!("lainnya")} />
+        unusedCard("lainnya", "Lainnya")
       ) : (
       <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
         <div className="flex items-center gap-3">
