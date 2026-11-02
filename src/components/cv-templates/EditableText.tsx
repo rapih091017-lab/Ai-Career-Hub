@@ -40,13 +40,17 @@ const readText = (el: HTMLElement) => (el.textContent ?? "").replace(/\r?\n/g, "
 const sessionStart = new Map<string, string>();
 let transferring = false;
 
-export const EditableText = memo(function EditableText({ path, value, placeholder, editable, onEdit, onSession }: CvEditTextProps) {
+export const EditableText = memo(function EditableText({ path, value, placeholder, editable, onEdit, onSession, onConflict }: CvEditTextProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const focused = useRef(false);
   const composing = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const valueRef = useRef(value);
   valueRef.current = value;
+  // Nilai terakhir yang dikirim/diketahui komponen ini selama fokus. Nilai
+  // lain yang datang saat fokus berarti diubah dari luar (form, undo, AI).
+  const known = useRef(value);
+  const external = useRef(false);
 
   // Sinkron dari data hanya saat tidak fokus.
   useLayoutEffect(() => {
@@ -54,6 +58,8 @@ export const EditableText = memo(function EditableText({ path, value, placeholde
     if (!el) return;
     if (!focused.current) {
       if (el.textContent !== value) el.textContent = value;
+    } else if (value !== known.current) {
+      external.current = true;
     } else {
       // Data baru dari ketikan sendiri: periksa apakah caret masih terlihat setelah reflow.
       requestAnimationFrame(keepCaretVisible);
@@ -75,9 +81,14 @@ export const EditableText = memo(function EditableText({ path, value, placeholde
     clearTimeout(timer.current);
     const el = ref.current;
     if (!el) return;
+    // Data sudah diubah dari luar: teks lama di sini tidak boleh menimpanya.
+    if (external.current) return;
     const text = readText(el);
     if (!final && !text.trim()) return;
-    if (text !== valueRef.current) onEdit(path, text);
+    if (text !== valueRef.current) {
+      known.current = text;
+      onEdit(path, text);
+    }
   };
   const schedule = () => {
     clearTimeout(timer.current);
@@ -97,11 +108,22 @@ export const EditableText = memo(function EditableText({ path, value, placeholde
       aria-label={placeholder ? `Edit ${placeholder}` : "Edit teks"}
       onFocus={() => {
         focused.current = true;
+        known.current = valueRef.current;
+        external.current = false;
         if (!sessionStart.has(path)) sessionStart.set(path, valueRef.current);
       }}
       onBlur={() => {
         commit(true);
         focused.current = false;
+        if (external.current) {
+          // Pakai nilai baru dari luar; ketikan di pratinjau dibuang.
+          external.current = false;
+          if (!transferring) sessionStart.delete(path);
+          const el = ref.current;
+          if (el) el.textContent = valueRef.current;
+          if (!transferring) onConflict?.(path);
+          return;
+        }
         if (transferring) return;
         const before = sessionStart.get(path);
         sessionStart.delete(path);

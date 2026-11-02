@@ -318,6 +318,8 @@ export interface CvEditTextProps {
   onEdit: (path: string, value: string) => void;
   /** Satu sesi edit selesai (blur) dengan nilai berubah; untuk undo. */
   onSession: (path: string, before: string, after: string) => void;
+  /** Data field ini diubah dari luar selama diedit; ketikan di pratinjau dibuang. */
+  onConflict?: (path: string) => void;
 }
 
 /**
@@ -330,6 +332,7 @@ export interface CvEditBindings {
   editable: boolean;
   onEdit: CvEditTextProps["onEdit"];
   onSession: CvEditTextProps["onSession"];
+  onConflict?: CvEditTextProps["onConflict"];
 }
 
 interface RendererProps {
@@ -389,7 +392,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, divid
    */
   const T = (path: string, value: string | undefined, fallback?: string, placeholder?: string): React.ReactNode =>
     edit ? (
-      <edit.Text path={path} value={value ?? ""} placeholder={placeholder ?? fallback} editable={edit.editable} onEdit={edit.onEdit} onSession={edit.onSession} />
+      <edit.Text path={path} value={value ?? ""} placeholder={placeholder ?? fallback} editable={edit.editable} onEdit={edit.onEdit} onSession={edit.onSession} onConflict={edit.onConflict} />
     ) : fallback !== undefined ? (
       value || fallback
     ) : (

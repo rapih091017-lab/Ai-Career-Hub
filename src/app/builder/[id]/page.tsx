@@ -303,9 +303,13 @@ export default function BuilderPage() {
     if (h.undo.length > EDIT_HISTORY_MAX) h.undo.shift();
     h.redo = [];
   }, []);
+  const onPreviewConflict = useCallback(
+    () => addToast({ type: "info", message: "Teks ini baru saja diubah di tempat lain. Isi terbaru yang dipakai; ketikan di pratinjau tidak disimpan." }),
+    [addToast],
+  );
   const editBindings = useMemo<CvEditBindings>(
-    () => ({ Text: EditableText, editable: inlineEditable, onEdit: onPreviewEdit, onSession: onPreviewSession }),
-    [inlineEditable, onPreviewEdit, onPreviewSession],
+    () => ({ Text: EditableText, editable: inlineEditable, onEdit: onPreviewEdit, onSession: onPreviewSession, onConflict: onPreviewConflict }),
+    [inlineEditable, onPreviewEdit, onPreviewSession, onPreviewConflict],
   );
 
   const previewContent = useMemo(
