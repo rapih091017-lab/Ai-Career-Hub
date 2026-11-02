@@ -76,7 +76,8 @@ export function TemplatePopover({ templateId, onSelect, hasOverrides, onResetSty
           id="template-popover"
           role="dialog"
           aria-label="Pilih template"
-          className="absolute left-2 right-2 top-full z-30 mt-1 max-h-[70vh] max-w-[640px] overflow-y-auto rounded-2xl border border-outline-variant/50 bg-surface-container-lowest p-3 shadow-2xl"
+          // Layar kecil: lembar bawah fixed (toolbar ada di dekat bawah layar, panel bisa terpotong).
+          className="fixed inset-x-2 bottom-2 z-[95] max-h-[75vh] overflow-y-auto lg:absolute lg:inset-x-auto lg:left-2 lg:right-2 lg:bottom-auto lg:top-full lg:mt-1 lg:max-h-[70vh] lg:max-w-[640px] rounded-2xl border border-outline-variant/50 bg-surface-container-lowest p-3 shadow-2xl"
         >
           <p className="mb-2 px-1 text-xs text-on-surface-variant">
             Ganti template mengubah warna dan gaya judul. Font, ukuran, dan warna yang sudah kamu pilih tetap dipakai.
