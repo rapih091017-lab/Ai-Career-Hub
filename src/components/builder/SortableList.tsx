@@ -95,7 +95,7 @@ function SortableItem({ id, label, children }: { id: string; label: string; chil
       {...attributes}
       {...listeners}
       aria-label={`Seret ${label}`}
-      className="inline-flex h-11 w-9 shrink-0 cursor-grab touch-none items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary active:cursor-grabbing sm:h-9"
+      className="inline-flex h-11 w-11 shrink-0 cursor-grab touch-none items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary active:cursor-grabbing"
     >
       <span className="material-symbols-outlined text-[20px]" aria-hidden="true">drag_indicator</span>
     </button>
