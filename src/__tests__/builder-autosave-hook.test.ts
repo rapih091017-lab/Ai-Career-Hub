@@ -132,3 +132,46 @@ describe("useAutoSave", () => {
     expect(result.current.getUpdatedAt()).toBe("2026-10-31T10:00:00.000Z");
   });
 });
+
+describe("useAutoSave — konflik & penolakan", () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  });
+
+  it("kirim expectedUpdatedAt; 409 menghentikan autosave tanpa retry; timpa mengirim tanpa cek", async () => {
+    const fetchMock = vi.fn(async (_u: string, _i: RequestInit) => ({ ok: false, status: 409 }) as Response);
+    vi.stubGlobal("fetch", fetchMock);
+    const { rerender, result } = renderHook(({ d }) => useAutoSave("x", d, true, "2026-10-31T09:00:00.000Z"), {
+      initialProps: { d: cv("A") },
+    });
+    rerender({ d: cv("B") });
+    await advance(20000);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(String(fetchMock.mock.calls[0][1].body)).expectedUpdatedAt).toBe("2026-10-31T09:00:00.000Z");
+    expect(result.current.saveStatus).toBe("conflict");
+    rerender({ d: cv("C") });
+    await advance(5000);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    fetchMock.mockImplementation(async () => ({ ok: true, status: 200, json: async () => ({ updatedAt: "2026-11-01T00:00:00.000Z" }) }) as unknown as Response);
+    let ok = false;
+    await act(async () => {
+      ok = await result.current.overwrite();
+    });
+    expect(ok).toBe(true);
+    expect(JSON.parse(String(fetchMock.mock.calls[1][1].body)).expectedUpdatedAt).toBeUndefined();
+    expect(result.current.saveStatus).toBe("saved");
+  });
+
+  it("413 tidak di-retry dan memberi pesan ukuran", async () => {
+    const fetchMock = vi.fn(async (_u: string, _i: RequestInit) => ({ ok: false, status: 413 }) as Response);
+    vi.stubGlobal("fetch", fetchMock);
+    const { rerender, result } = renderHook(({ d }) => useAutoSave("x", d, true), { initialProps: { d: cv("A") } });
+    rerender({ d: cv("B") });
+    await advance(20000);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(result.current.saveStatus).toBe("rejected");
+    expect(result.current.errorMessage).toMatch(/200KB/);
+  });
+});

@@ -14,7 +14,8 @@ describe("buildCvSaveBody", () => {
 
   it("dipakai handleSave di halaman builder", () => {
     const src = readFileSync(path.join(process.cwd(), "src/app/builder/[id]/page.tsx"), "utf8");
-    expect(src).toContain("body: buildCvSaveBody(cvData, selectedTemplateId)");
+    // Simpan manual lewat autosave (yang memakai buildCvSaveBody + cek konflik).
+    expect(src).toContain("await flushAutoSave()");
     expect(src).not.toMatch(/body:\s*JSON\.stringify\(cvData\)/);
   });
 });

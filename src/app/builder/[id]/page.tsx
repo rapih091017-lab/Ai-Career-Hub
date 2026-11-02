@@ -8,7 +8,6 @@ import AuthGuard from "@/components/AuthGuard";
 import { AtsBaseRenderer, TEMPLATE_STYLES, type CvData } from "@/components/cv-templates";
 import { CvPagedPreview, measurePageCount } from "@/components/cv-templates/print";
 import { cvPrintFormatFromData, cvRenderProps } from "@/lib/cv-print-format";
-import { buildCvSaveBody } from "@/lib/builder-save";
 import { aiSkillNames } from "@/lib/cv-normalize";
 import dynamic from "next/dynamic";
 const AIProposalModal = dynamic(() => import("@/components/AIProposalModal"), { ssr: false });
@@ -86,7 +85,7 @@ export default function BuilderPage() {
   const { cvData, isLoading, fetchError, selectedTemplateId, loadedUpdatedAt, setCvData, setSelectedTemplateId } = useFetchCvData(cvId);
 
   /* ── Auto-Save ── */
-  const { saveStatus, lastSaved, flush: flushAutoSave, getUpdatedAt } = useAutoSave(cvId, cvData, !isLoading && !fetchError, loadedUpdatedAt, selectedTemplateId);
+  const { saveStatus, lastSaved, flush: flushAutoSave, getUpdatedAt, errorMessage: saveErrorMessage, overwrite: overwriteServer } = useAutoSave(cvId, cvData, !isLoading && !fetchError, loadedUpdatedAt, selectedTemplateId);
 
   /* ── Format Settings Hook ── */
   const format = useBuilderFormat({
@@ -315,22 +314,17 @@ export default function BuilderPage() {
 
   /* ── save ── */
 
+  // Simpan manual lewat autosave (cek konflik, tanpa kirim ulang yang ditolak).
   const handleSave = useCallback(async () => {
     setIsSaving(true);
     try {
-      const res = await fetch(`/api/cv-documents/${cvId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: buildCvSaveBody(cvData, selectedTemplateId),
-      });
-      if (!res.ok) throw new Error(`${t("builder.save-failed")} (${res.status})`);
-      addToast({ type: "success", message: t("builder.save-success") });
-    } catch (err: any) {
-      addToast({ type: "error", message: err.message });
+      const ok = await flushAutoSave();
+      if (ok) addToast({ type: "success", message: t("builder.save-success") });
+      else addToast({ type: "error", message: t("builder.save-failed") });
     } finally {
       setIsSaving(false);
     }
-  }, [cvId, cvData, selectedTemplateId, addToast, t]);
+  }, [flushAutoSave, addToast, t]);
 
   /* ── section title helper ── */
 
@@ -407,6 +401,42 @@ export default function BuilderPage() {
         <div className="w-full bg-surface-container-lowest border-b border-outline-variant/50 py-4 md:py-5 px-3 md:px-8 overflow-x-auto shrink-0">
           <StepperSteps steps={steps} activeStep={activeStep} setActiveStep={setActiveStep} sectionCompletion={sectionCompletion} sectionMeta={sectionMeta} />
         </div>
+
+        {saveStatus === "conflict" && (
+          <div role="alert" className="flex flex-wrap items-center gap-3 border-b border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950 shrink-0">
+            <span className="flex-1 min-w-[16rem]">
+              <strong>CV ini diubah di tab atau perangkat lain.</strong> Penyimpanan otomatis dihentikan agar tidak saling menimpa.
+            </span>
+            <button type="button" onClick={() => window.location.reload()} className="min-h-11 rounded-lg bg-amber-900 px-3 font-semibold text-white hover:bg-amber-950 sm:min-h-9">
+              Muat versi terbaru
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                setConfirm({
+                  title: "Timpa dengan versi di sini?",
+                  message: "Perubahan yang dibuat di tab atau perangkat lain akan hilang dan diganti isi CV di tab ini.",
+                  confirmLabel: "Timpa",
+                  cancelLabel: "Batal",
+                  variant: "danger",
+                  onConfirm: () => {
+                    void overwriteServer().then((ok) =>
+                      addToast(ok ? { type: "success", message: "Versi di tab ini sudah disimpan." } : { type: "error", message: "Gagal menyimpan. Coba lagi." }),
+                    );
+                  },
+                })
+              }
+              className="min-h-11 rounded-lg border border-amber-900 px-3 font-semibold text-amber-950 hover:bg-amber-100 sm:min-h-9"
+            >
+              Timpa dengan versi di sini
+            </button>
+          </div>
+        )}
+        {saveStatus === "rejected" && saveErrorMessage && (
+          <div role="alert" className="border-b border-error/30 bg-error-container px-4 py-2.5 text-sm text-on-error-container shrink-0">
+            {saveErrorMessage}
+          </div>
+        )}
 
         {/* ── WORKSPACE LAYOUT ── */}
         <div
@@ -746,7 +776,7 @@ export default function BuilderPage() {
             {/* ── FORMATTING TOOLBAR ── */}
             <FormatToolbar
               cvCompleteness={cvCompleteness}
-              saveStatus={saveStatus}
+              saveStatus={saveStatus === "conflict" || saveStatus === "rejected" ? "error" : saveStatus}
               lastSaved={lastSaved}
               computeAtsScore={computeAtsScore}
               fontFamily={fontFamily}

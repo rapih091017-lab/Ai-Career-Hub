@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { cvDocuments } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, lt, or, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { apiHandler, errorResponse, noCache } from "@/lib/api-utils";
 import { TEMPLATE_STYLES } from "@/components/cv-templates";
@@ -17,7 +17,18 @@ const PutSchema = z.object({
     .string()
     .refine((id) => Object.prototype.hasOwnProperty.call(TEMPLATE_STYLES, id), "Template tidak dikenal")
     .optional(),
+  /** updatedAt versi yang dilihat klien. Ada + DB lebih baru → 409. Tidak ada = klien lama (tanpa cek). */
+  expectedUpdatedAt: z.string().datetime({ offset: true }).optional(),
 });
+
+/**
+ * Batas atas updatedAt yang masih dianggap "versi yang sama". Date JS hanya
+ * milidetik, kolom DB bisa mikrodetik (defaultNow), jadi diberi +1 ms.
+ */
+const notNewerThan = (iso: string) => new Date(new Date(iso).getTime() + 1);
+
+const conflict = () =>
+  errorResponse("CV_CONFLICT", "CV ini sudah diubah di tab atau perangkat lain.", 409);
 
 async function authenticate(request: NextRequest, params: Promise<{ id: string }>) {
   const session = await auth();
@@ -100,7 +111,7 @@ export const PUT = apiHandler(async (request: NextRequest, { params }: { params:
   if (!parsed.success) {
     return errorResponse("INVALID_INPUT", "Data CV tidak valid.", 400);
   }
-  const { tailoredContent, templateId } = parsed.data;
+  const { tailoredContent, templateId, expectedUpdatedAt } = parsed.data;
 
   const [existing] = await db
     .select()
@@ -115,6 +126,10 @@ export const PUT = apiHandler(async (request: NextRequest, { params }: { params:
     );
   }
 
+  if (expectedUpdatedAt && existing.updatedAt && new Date(existing.updatedAt) >= notNewerThan(expectedUpdatedAt)) {
+    return conflict();
+  }
+
   const updateData: Partial<typeof cvDocuments.$inferInsert> = {};
   // Bentuk isi divalidasi longgar (passthrough); kolom jsonb menerima objek apa pun.
   if (tailoredContent !== undefined) updateData.tailoredContent = tailoredContent as typeof cvDocuments.$inferInsert["tailoredContent"];
@@ -124,8 +139,16 @@ export const PUT = apiHandler(async (request: NextRequest, { params }: { params:
   const [updated] = await db
     .update(cvDocuments)
     .set(updateData)
-    .where(and(eq(cvDocuments.id, id), eq(cvDocuments.userId, userId)))
+    .where(
+      and(
+        eq(cvDocuments.id, id),
+        eq(cvDocuments.userId, userId),
+        // Cek ulang di UPDATE agar dua simpan bersamaan tidak sama-sama lolos.
+        expectedUpdatedAt ? or(isNull(cvDocuments.updatedAt), lt(cvDocuments.updatedAt, notNewerThan(expectedUpdatedAt))) : undefined,
+      ),
+    )
     .returning();
 
+  if (!updated) return conflict();
   return NextResponse.json(updated, { status: 200 });
 });

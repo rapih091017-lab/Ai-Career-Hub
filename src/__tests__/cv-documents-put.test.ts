@@ -60,4 +60,11 @@ describe("PUT /api/cv-documents/[id]", () => {
     rows.current = [];
     expect((await put(JSON.stringify({ templateId: "clean-slate" }))).status).toBe(404);
   });
+
+  it("expectedUpdatedAt lebih lama dari DB → 409; sama → 200; tanpa field → 200", async () => {
+    rows.current = [{ id: "cv1", updatedAt: new Date("2026-11-01T10:00:00.000Z") }];
+    expect((await put(JSON.stringify({ templateId: "clean-slate", expectedUpdatedAt: "2026-11-01T09:00:00.000Z" }))).status).toBe(409);
+    expect((await put(JSON.stringify({ templateId: "clean-slate", expectedUpdatedAt: "2026-11-01T10:00:00.000Z" }))).status).toBe(200);
+    expect((await put(JSON.stringify({ templateId: "clean-slate" }))).status).toBe(200);
+  });
 });

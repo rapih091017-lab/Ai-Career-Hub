@@ -4,7 +4,16 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import type { CvData } from "@/components/cv-templates";
 import { buildCvSaveBody } from "@/lib/builder-save";
 
-type SaveStatus = "idle" | "saving" | "saved" | "error";
+/** conflict = CV diubah di tab/perangkat lain (409); rejected = server menolak isi (4xx). */
+export type SaveStatus = "idle" | "saving" | "saved" | "error" | "conflict" | "rejected";
+
+export const TOO_LARGE_MESSAGE = "CV terlalu besar untuk disimpan (maks ±200KB). Kurangi isi bagian yang panjang.";
+
+/** Tambahkan updatedAt versi yang dilihat tab ini ke body PUT. */
+function withExpected(body: string, expected: string | null): string {
+  if (!expected) return body;
+  return JSON.stringify({ ...JSON.parse(body), expectedUpdatedAt: expected });
+}
 
 interface UseAutoSaveReturn {
   saveStatus: SaveStatus;
@@ -13,6 +22,10 @@ interface UseAutoSaveReturn {
   flush: () => Promise<boolean>;
   /** updatedAt CV versi yang terakhir dimuat/disimpan tab ini (ISO), untuk deteksi 409. */
   getUpdatedAt: () => string | null;
+  /** Pesan untuk status error/rejected. */
+  errorMessage: string | null;
+  /** Setelah konflik dan konfirmasi user: simpan versi tab ini menimpa versi server. */
+  overwrite: () => Promise<boolean>;
 }
 
 const DEBOUNCE_MS = 2000;
@@ -43,6 +56,11 @@ export function useAutoSave(
 ): UseAutoSaveReturn {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  // Konflik 409: autosave berhenti sampai user memilih muat ulang atau timpa.
+  const blocked = useRef(false);
+  // Body yang ditolak server (400/413): tidak dikirim ulang sampai isinya berubah.
+  const rejectedJson = useRef<string | null>(null);
 
   const latestJson = useRef<string | null>(null);
   const savedJson = useRef<string | null>(null);
@@ -69,40 +87,52 @@ export function useAutoSave(
     if (!enabled) savedJson.current = null;
   }, [enabled, cvId]);
 
+  type PutResult = "ok" | "conflict" | "rejected" | "retry";
   const putOnce = useCallback(
-    async (body: string) => {
+    async (body: string, check = true): Promise<PutResult> => {
       const res = await fetch(`/api/cv-documents/${cvId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body,
+        body: check ? withExpected(body, updatedAt.current) : body,
       });
-      if (res.ok) await rememberUpdatedAt(res);
-      return res.ok;
+      if (res.ok) {
+        await rememberUpdatedAt(res);
+        return "ok";
+      }
+      if (res.status === 409) return "conflict";
+      // 4xx lain (400/413) tidak akan berhasil bila dikirim ulang apa adanya.
+      if (res.status >= 400 && res.status < 500 && res.status !== 408 && res.status !== 429) {
+        setErrorMessage(res.status === 413 ? TOO_LARGE_MESSAGE : "Data CV ditolak server dan belum tersimpan.");
+        return "rejected";
+      }
+      return "retry";
     },
     [cvId, rememberUpdatedAt],
   );
 
   const runSave = useCallback(async () => {
     for (let attempt = 0; attempt <= AUTOSAVE_RETRY_DELAYS_MS.length; attempt++) {
-      if (!alive.current) return;
+      if (!alive.current || blocked.current) return;
       // Selalu kirim versi terbaru; kalau sudah tersimpan, tidak ada yang dikirim.
       const body = latestJson.current;
-      if (body === null || body === savedJson.current) return;
+      if (body === null || body === savedJson.current || body === rejectedJson.current) return;
       if (attempt > 0) await wait(AUTOSAVE_RETRY_DELAYS_MS[attempt - 1]);
-      if (!alive.current) return;
+      if (!alive.current || blocked.current) return;
       const current = latestJson.current;
-      if (current === null || current === savedJson.current) return;
+      if (current === null || current === savedJson.current || current === rejectedJson.current) return;
       // Status error tetap tampil sampai ada simpan yang berhasil.
-      setSaveStatus((s) => (s === "error" ? "error" : "saving"));
-      let ok = false;
+      setSaveStatus((s) => (s === "error" || s === "rejected" ? s : "saving"));
+      let result: PutResult = "retry";
       try {
-        ok = await putOnce(current);
+        result = await putOnce(current);
       } catch {
-        ok = false;
+        result = "retry";
       }
       if (!alive.current) return;
-      if (ok) {
+      if (result === "ok") {
         savedJson.current = current;
+        rejectedJson.current = null;
+        setErrorMessage(null);
         setSaveStatus("saved");
         setLastSaved(new Date());
         setTimeout(() => {
@@ -110,8 +140,38 @@ export function useAutoSave(
         }, 2000);
         return;
       }
+      if (result === "conflict") {
+        blocked.current = true;
+        setSaveStatus("conflict");
+        return;
+      }
+      if (result === "rejected") {
+        rejectedJson.current = current;
+        setSaveStatus("rejected");
+        return;
+      }
     }
-    if (alive.current) setSaveStatus("error");
+    if (alive.current) {
+      setErrorMessage("Perubahan belum tersimpan. Periksa koneksi; kami akan mencoba lagi saat kamu mengedit.");
+      setSaveStatus("error");
+    }
+  }, [putOnce]);
+
+  const overwrite = useCallback(async () => {
+    const body = latestJson.current;
+    if (body === null) return false;
+    let result: PutResult = "retry";
+    try {
+      result = await putOnce(body, false);
+    } catch {
+      result = "retry";
+    }
+    if (result !== "ok") return false;
+    blocked.current = false;
+    savedJson.current = body;
+    setSaveStatus("saved");
+    setLastSaved(new Date());
+    return true;
   }, [putOnce]);
 
   const json = latestJson.current;
@@ -129,14 +189,14 @@ export function useAutoSave(
     alive.current = true;
     const flush = () => {
       const body = latestJson.current;
-      if (!cvId || body === null || savedJson.current === null || body === savedJson.current) return;
+      if (!cvId || blocked.current || body === null || savedJson.current === null || body === savedJson.current) return;
       try {
         // Baseline baru diperbarui setelah respons OK; kalau gagal,
         // perubahan tetap dianggap belum tersimpan (flush/ekspor akan mencoba lagi).
         fetch(`/api/cv-documents/${cvId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body,
+          body: withExpected(body, updatedAt.current),
           keepalive: true,
         })
           .then((res) => {
@@ -165,5 +225,5 @@ export function useAutoSave(
 
   const getUpdatedAt = useCallback(() => updatedAt.current, []);
 
-  return { saveStatus, lastSaved, flush: flushNow, getUpdatedAt };
+  return { saveStatus, lastSaved, flush: flushNow, getUpdatedAt, errorMessage, overwrite };
 }
