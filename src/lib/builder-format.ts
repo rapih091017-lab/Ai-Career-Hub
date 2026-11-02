@@ -263,8 +263,9 @@ export function sanitizeLayout(
 }
 
 /** Format localStorage lama → layout server (dipakai sekali saat migrasi). */
-export function layoutFromSavedFormat(saved: SavedFormat): CvLayout {
-  const out: CvLayout = { ...LEGACY_LAYOUT };
+export function layoutFromSavedFormat(saved: SavedFormat, seedLegacy = true): CvLayout {
+  // seedLegacy=false: hanya field yang benar-benar ada di format lokal.
+  const out: CvLayout = seedLegacy ? { ...LEGACY_LAYOUT } : {};
   if (saved.fontFamily) out.fontFamily = saved.fontFamily;
   if (saved.fontSize) out.fontSize = saved.fontSize;
   if (saved.textAlign) out.textAlign = saved.textAlign;
@@ -277,4 +278,38 @@ export function layoutFromSavedFormat(saved: SavedFormat): CvLayout {
   if (saved.sectionVisibility) out.sectionVisibility = saved.sectionVisibility;
   if (saved.showSkillLevel !== undefined) out.showSkillLevel = saved.showSkillLevel;
   return out;
+}
+
+const sameJson = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
+
+/**
+ * Gabungkan format lama di localStorage ke data CV dari server.
+ *
+ * Aturan (server menang bila sama-sama punya nilai yang disengaja):
+ * - field layout dipakai dari lokal bila di server tidak ada ATAU masih
+ *   sama dengan nilai LEGACY_LAYOUT (nilai itu bisa berasal dari setter
+ *   yang mengawali layout dari LEGACY_LAYOUT, bukan pilihan user);
+ * - section kustom lokal dipakai bila server belum punya section kustom
+ *   berisi.
+ * Mengembalikan null bila tidak ada yang perlu dipindah (tanpa PUT).
+ */
+export function mergeLocalFormat(cv: CvData, saved: SavedFormat): CvData | null {
+  const local = layoutFromSavedFormat(saved, false);
+  const server = cv.layout;
+  const legacy = LEGACY_LAYOUT as Record<string, unknown>;
+  const merged: Record<string, unknown> = { ...(server ?? LEGACY_LAYOUT) };
+  for (const [k, v] of Object.entries(local)) {
+    if (v === undefined) continue;
+    const cur = merged[k];
+    if (cur === undefined || (k in legacy && sameJson(cur, legacy[k]))) merged[k] = v;
+  }
+  const serverHasCustom = (cv.customSections ?? []).some((c) => c.content.trim());
+  const localHasCustom = (saved.customSections ?? []).some((c) => c.content.trim());
+  const customSections = !serverHasCustom && localHasCustom ? saved.customSections : cv.customSections;
+  const baseLayout = server ?? LEGACY_LAYOUT;
+  const layoutChanged = !sameJson(merged, baseLayout);
+  if (!layoutChanged && customSections === cv.customSections) return null;
+  const cs = customSections ?? DEFAULT_CUSTOM_SECTIONS;
+  const layout = sanitizeLayout(merged, { customSections: cs, hasContent: (k) => sectionHasContent(cv, k) });
+  return { ...cv, customSections: cs, layout };
 }

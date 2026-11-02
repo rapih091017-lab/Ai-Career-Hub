@@ -77,3 +77,31 @@ describe("useBuilderFormat — layout di cvData", () => {
     expect(result.current.format.fontFamily).toContain("CV Carlito");
   });
 });
+
+import { mergeLocalFormat } from "@/lib/builder-format";
+
+describe("mergeLocalFormat", () => {
+  it("server tanpa layout + lokal kosong/default → tidak ada migrasi", () => {
+    expect(mergeLocalFormat({ ...sampleCv, layout: undefined }, {})).toBeNull();
+    expect(mergeLocalFormat({ ...sampleCv, layout: undefined }, { fontSize: 11, marginMode: "normal" })).toBeNull();
+  });
+
+  it("server punya layout: field yang tidak ada / masih nilai lama diisi dari lokal, pilihan server menang", () => {
+    const out = mergeLocalFormat(
+      { ...sampleCv, layout: { fontSize: 11, marginMode: "tight" } },
+      { fontSize: 14, marginMode: "wide", headerLayout: "left" },
+    )!;
+    expect(out.layout?.fontSize).toBe(14); // 11 = nilai lama → lokal dipakai
+    expect(out.layout?.marginMode).toBe("tight"); // pilihan server
+    expect(out.layout?.headerLayout).toBe("left"); // tidak ada di server
+    expect(out.layout?.fontFamily).toBeUndefined(); // tidak diisi nilai lama
+  });
+
+  it("isi Lainnya lokal dipakai bila server belum punya section kustom berisi", () => {
+    const out = mergeLocalFormat(
+      { ...sampleCv, layout: { marginMode: "tight" }, customSections: undefined },
+      { customSections: [{ id: "lainnya", title: "Lainnya", content: "Juara 1" }] },
+    )!;
+    expect(out.customSections?.[0].content).toBe("Juara 1");
+  });
+});

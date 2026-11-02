@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import {
   DEFAULT_CUSTOM_SECTIONS,
   LEGACY_LAYOUT,
-  layoutFromSavedFormat,
+  mergeLocalFormat,
   migrateSavedFormat,
   readSavedFormat,
   sanitizeLayout,
@@ -200,8 +200,10 @@ export function useBuilderFormat({ cvId, cvData, setCvData, ready, templateId, f
     const key = legacyFormatKey(cvId);
     const raw = readSavedFormat(key);
     if (!raw) return;
-    if (cvData.layout) {
-      // Layout sudah ada di server (mis. dimigrasi di perangkat lain): server yang dipakai.
+    const saved = migrateSavedFormat(raw);
+    const merged = mergeLocalFormat(cvData, saved);
+    if (!merged) {
+      // Tidak ada yang perlu dipindah (sudah sama dengan server): buang key tanpa PUT.
       try {
         localStorage.removeItem(key);
       } catch {
@@ -209,15 +211,8 @@ export function useBuilderFormat({ cvId, cvData, setCvData, ready, templateId, f
       }
       return;
     }
-    const saved = migrateSavedFormat(raw);
-    setCvData((prev) => {
-      const customSections = prev.customSections ?? saved.customSections ?? DEFAULT_CUSTOM_SECTIONS;
-      const layout = sanitizeLayout(layoutFromSavedFormat(saved), {
-        customSections,
-        hasContent: (k) => sectionHasContent(prev, k),
-      });
-      return { ...prev, customSections, layout };
-    });
+    // Dihitung ulang dari state terbaru di updater; server menang untuk nilai yang sudah dipilih.
+    setCvData((prev) => mergeLocalFormat(prev, saved) ?? prev);
     setPendingKeyRemoval(key);
     // cvData sengaja tidak jadi dependensi: migrasi hanya sekali per CV.
     // eslint-disable-next-line react-hooks/exhaustive-deps
