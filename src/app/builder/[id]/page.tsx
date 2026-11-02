@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "motion/react";
 import AppHeader from "@/components/AppHeader";
 import AuthGuard from "@/components/AuthGuard";
 import { AtsBaseRenderer, TEMPLATE_STYLES, type CvData } from "@/components/cv-templates";
-import { CvPagedPreview, measurePageCount } from "@/components/cv-templates/print";
+import { CvPagedPreview, measurePageCount, untabSecondaryPages } from "@/components/cv-templates/print";
 import { LINE_HEIGHT, cvPrintFormatFromData, cvRenderProps } from "@/lib/cv-print-format";
 import { cvFontValue, resolveCvFont } from "@/lib/cv-fonts";
 import { useInlineEditable } from "@/hooks/useInlineEditable";
@@ -137,6 +137,14 @@ export default function BuilderPage() {
       mo.disconnect();
     };
   }, [format.marginPadding, contentMounted]);
+
+  // Halaman pratinjau yang memegang fokus: hanya halaman ini yang dibaca pembaca layar.
+  const [focusPage, setFocusPage] = useState(1);
+  const previewRef = useRef<HTMLDivElement>(null);
+  const onPreviewFocus = useCallback((e: React.FocusEvent) => {
+    const n = Number((e.target as HTMLElement).closest("[data-cv-page]")?.getAttribute("data-cv-page"));
+    if (n > 0) setFocusPage(n);
+  }, []);
 
   /* ── AI & Scoring Hook ── */
   const ai = useBuilderAI({ cvData, setCvData, cvId, activeStep, setActiveStep, addToast });
@@ -282,6 +290,11 @@ export default function BuilderPage() {
     () => <AtsBaseRenderer {...renderProps} onSectionClick={handlePreviewSectionClick} onToggleDivider={toggleDivider} selectedSection={styleTarget} />,
     [renderProps, handlePreviewSectionClick, toggleDivider, styleTarget],
   );
+
+  // Setelah tiap render pratinjau: tombol/teks di halaman 2+ keluar dari urutan Tab.
+  useEffect(() => {
+    if (previewRef.current) untabSecondaryPages(previewRef.current);
+  }, [previewContent, allPageCount]);
 
   /* ── Toolbar: konteks global atau satu bagian ── */
   const styleTargets = useMemo(
@@ -866,11 +879,13 @@ export default function BuilderPage() {
                   </div>
                 )}
                 {/* Halaman A4 nyata: ukuran pt/mm sama dengan PDF */}
+                <div ref={previewRef} onFocus={onPreviewFocus} onBlur={() => setFocusPage(1)}>
                 <FitA4>
-                  <CvPagedPreview pageCount={allPageCount} marginMm={marginPadding} measureRef={contentRef}>
+                  <CvPagedPreview pageCount={allPageCount} marginMm={marginPadding} measureRef={contentRef} activePage={focusPage}>
                     {previewContent}
                   </CvPagedPreview>
                 </FitA4>
+                </div>
               </div>
 
               {/* ATS Score Insight */}

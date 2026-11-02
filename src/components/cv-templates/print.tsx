@@ -37,6 +37,8 @@ interface PagedPreviewProps {
   measureRef?: Ref<HTMLDivElement>;
   /** Jarak antar halaman di layar. */
   pageGapPx?: number;
+  /** Halaman (1-based) yang dibaca pembaca layar; halaman lain aria-hidden. */
+  activePage?: number;
 }
 
 /**
@@ -46,11 +48,16 @@ interface PagedPreviewProps {
  * (297mm − 2×margin). Chromium memecah multikolom dengan mesin fragmentasi
  * yang sama dengan cetak, jadi `break-inside: avoid` dan `break-after: avoid`
  * berlaku sama seperti di PDF. Halaman ke-k menampilkan kolom ke-k lewat
- * translateX. Tiap halaman merender alur yang sama; halaman selain pertama
- * diberi inert + aria-hidden agar isi ganda tidak bisa difokus atau dibaca.
- * Klik edit section hanya bekerja di halaman pertama.
+ * translateX. Tiap halaman merender alur yang sama.
+ *
+ * Interaksi di semua halaman: halaman tidak diberi inert, jadi klik/tap dan
+ * edit langsung bekerja pada salinan yang terlihat di halaman mana pun.
+ * Pembaca layar hanya membaca satu salinan: semua halaman selain
+ * `activePage` (halaman yang memegang fokus, bawaan 1) diberi aria-hidden.
+ * Urutan Tab tetap di halaman 1: pemanggil memberi tabindex=-1 pada elemen
+ * fokus di halaman lain (lihat `untabSecondaryPages`).
  */
-export function CvPagedPreview({ pageCount, marginMm, children, measureRef, pageGapPx = 16 }: PagedPreviewProps) {
+export function CvPagedPreview({ pageCount, marginMm, children, measureRef, pageGapPx = 16, activePage = 1 }: PagedPreviewProps) {
   const w = contentWidthMm(marginMm);
   const h = contentHeightMm(marginMm);
   return (
@@ -60,9 +67,8 @@ export function CvPagedPreview({ pageCount, marginMm, children, measureRef, page
         <div
           key={k}
           data-cv-page={k + 1}
-          // Halaman k>0 hanya salinan visual: tidak bisa difokus/diklik, tidak dibaca pembaca layar.
-          aria-hidden={k > 0 ? true : undefined}
-          inert={k > 0 ? true : undefined}
+          // Salinan di halaman lain tidak dibaca dua kali oleh pembaca layar.
+          aria-hidden={k + 1 !== activePage ? true : undefined}
           style={{
             width: `${A4_W_MM}mm`,
             height: `${A4_H_MM}mm`,
@@ -95,6 +101,18 @@ export function CvPagedPreview({ pageCount, marginMm, children, measureRef, page
       ))}
     </div>
   );
+}
+
+/**
+ * Elemen yang bisa difokus di halaman selain pertama dikeluarkan dari urutan
+ * Tab (klik/tap tetap bisa), supaya Tab tidak melewati isi yang sama dua kali.
+ */
+export function untabSecondaryPages(root: ParentNode) {
+  root
+    .querySelectorAll<HTMLElement>('[data-cv-page]:not([data-cv-page="1"]) :is(button, [contenteditable], [tabindex="0"])')
+    .forEach((el) => {
+      if (el.tabIndex !== -1) el.tabIndex = -1;
+    });
 }
 
 /** Jumlah halaman dari kontainer multikolom hasil `CvPagedPreview`. */
