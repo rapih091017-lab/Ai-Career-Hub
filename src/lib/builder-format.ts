@@ -1,5 +1,6 @@
 import { DEFAULT_SECTION_ORDER } from "@/components/cv-templates";
-import type { CustomSectionEntry, CvData, CvLayout, SectionKey } from "@/components/cv-templates";
+import type { BlockStyle, CustomSectionEntry, CvData, CvLayout, SectionKey } from "@/components/cv-templates";
+import { CV_FONTS, cvFontValue } from "@/lib/cv-fonts";
 
 /**
  * Baca format builder tersimpan (`cv_fmt_<id>`) dari localStorage.
@@ -196,6 +197,37 @@ const boolRecord = (v: unknown): Record<string, boolean> | undefined => {
   return out;
 };
 
+/** Nilai font yang boleh dipakai gaya per bagian: hanya font CV. */
+const BLOCK_FONTS = new Set(CV_FONTS.map(cvFontValue));
+export const BLOCK_FONT_SIZE = { min: 8, max: 14 } as const;
+export const BLOCK_LINE_HEIGHT = { min: 1, max: 2 } as const;
+
+/** Rapikan satu gaya bagian; field invalid dibuang. Null bila kosong. */
+export function sanitizeBlockStyle(raw: unknown): BlockStyle | null {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  const r = raw as Record<string, unknown>;
+  const out: BlockStyle = {};
+  if (typeof r.fontFamily === "string" && BLOCK_FONTS.has(r.fontFamily)) out.fontFamily = r.fontFamily;
+  if (typeof r.fontSize === "number" && r.fontSize >= BLOCK_FONT_SIZE.min && r.fontSize <= BLOCK_FONT_SIZE.max) out.fontSize = r.fontSize;
+  const textAlign = oneOf(r.textAlign, ["left", "center", "right", "justify"] as const);
+  if (textAlign) out.textAlign = textAlign;
+  if (typeof r.lineHeight === "number" && r.lineHeight >= BLOCK_LINE_HEIGHT.min && r.lineHeight <= BLOCK_LINE_HEIGHT.max) out.lineHeight = r.lineHeight;
+  if (typeof r.titleColor === "string" && HEX_COLOR.test(r.titleColor)) out.titleColor = r.titleColor;
+  return Object.keys(out).length ? out : null;
+}
+
+/** Gaya per bagian: kunci terlalu panjang dan gaya kosong dibuang. */
+export function sanitizeSectionStyles(raw: unknown): Record<string, BlockStyle> | undefined {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return undefined;
+  const out: Record<string, BlockStyle> = {};
+  for (const [k, v] of Object.entries(raw)) {
+    if (!k || k.length > KEY_MAX) continue;
+    const st = sanitizeBlockStyle(v);
+    if (st) out[k] = st;
+  }
+  return out;
+}
+
 /**
  * Rapikan `layout` dari DB. Nilai invalid dibuang (bukan diganti default).
  * Urutan section: id tak dikenal & duplikat dibuang; section bawaan yang
@@ -227,6 +259,8 @@ export function sanitizeLayout(
   if (vis) out.sectionVisibility = vis;
   const dividers = boolRecord(r.dividers);
   if (dividers) out.dividers = dividers;
+  const sectionStyles = sanitizeSectionStyles(r.sectionStyles);
+  if (sectionStyles && Object.keys(sectionStyles).length) out.sectionStyles = sectionStyles;
 
   const removed = Array.isArray(r.removedSections)
     ? [...new Set(r.removedSections.filter((k): k is string => typeof k === "string" && k.length <= KEY_MAX))]

@@ -28,6 +28,8 @@ export async function embeddedFontCss(fonts: CvFont[]): Promise<string> {
 export async function buildCvPdfHtml(props: CvRenderProps, marginMm: number): Promise<string> {
   const { renderToStaticMarkup } = await import("react-dom/server");
   const body = renderToStaticMarkup(<AtsBaseRenderer {...props} />);
-  const fontCss = await embeddedFontCss([resolveCvFont(props.style.bodyFont), resolveCvFont(props.style.headingFont)]);
+  // Font gaya per bagian ikut disematkan, kalau tidak PDF jatuh ke font cadangan.
+  const blockFonts = Object.values(props.sectionStyles ?? {}).flatMap((s) => (s.fontFamily ? [resolveCvFont(s.fontFamily)] : []));
+  const fontCss = await embeddedFontCss([resolveCvFont(props.style.bodyFont), resolveCvFont(props.style.headingFont), ...blockFonts]);
   return cvPrintHtml({ body, marginMm, fontCss, title: props.data.fullName || "CV" });
 }

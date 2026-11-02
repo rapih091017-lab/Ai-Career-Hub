@@ -155,6 +155,24 @@ export interface CvLayout {
   dividers?: Record<string, boolean>;
   /** Bagian yang dihapus dari CV; isinya tetap tersimpan untuk "Pakai lagi". */
   removedSections?: string[];
+  /**
+   * Gaya per bagian. Kunci: "header", kunci section bawaan, atau id section
+   * kustom. Field yang tidak ada mengikuti gaya global.
+   */
+  sectionStyles?: Record<string, BlockStyle>;
+}
+
+/** Gaya satu bagian CV; menimpa gaya global untuk bagian itu saja. */
+export interface BlockStyle {
+  /** Nilai `cvFontValue` dari daftar font CV. */
+  fontFamily?: string;
+  /** pt, 8–14. */
+  fontSize?: number;
+  textAlign?: "left" | "center" | "right" | "justify";
+  /** 1–2. */
+  lineHeight?: number;
+  /** Warna judul bagian (hex). Untuk header: warna nama. */
+  titleColor?: string;
 }
 
 /* ───────── template style config ───────── */
@@ -305,6 +323,8 @@ interface RendererProps {
   onSectionClick?: (sectionKey: string) => void;
   /** Tampilkan level di belakang nama skill, mis. "React (Mahir)". */
   showSkillLevel?: boolean;
+  /** Gaya per bagian (layout.sectionStyles). */
+  sectionStyles?: Record<string, BlockStyle>;
 }
 
 const CV_LABELS: Record<string, { id: string; en: string }> = {
@@ -320,10 +340,8 @@ const CV_LABELS: Record<string, { id: string; en: string }> = {
   namePlaceholder: { id: "NAMA LENGKAP ANDA", en: "YOUR FULL NAME" },
 };
 
-export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, dividers, onToggleDivider, lang: langProp, sectionLabels: customLabels, headerLayout, lineHeight: lineHeightProp, onSectionClick, showSkillLevel = false }: RendererProps & { sectionLabels?: Record<SectionKey, string>; headerLayout?: "centered" | "left"; lineHeight?: number }) {
+export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, dividers, onToggleDivider, lang: langProp, sectionLabels: customLabels, headerLayout, lineHeight: lineHeightProp, onSectionClick, showSkillLevel = false, sectionStyles }: RendererProps & { sectionLabels?: Record<SectionKey, string>; headerLayout?: "centered" | "left"; lineHeight?: number }) {
   const lang = langProp || data.cvLang || "id";
-  const bodyFontSize = style.bodySize;
-  const textAlign = style.textAlign || "left";
   const contactItems = [
     data.address,
     data.phone,
@@ -355,7 +373,38 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, divid
   const visibleEducation = data.education.filter((e) => e.visible !== false);
   const visibleOrgs = data.organisations.filter((o) => o.visible !== false);
 
+  /* ── Gaya efektif per bagian: template → global → layout.sectionStyles[key] ── */
+  const globalStyle = style;
+  const globalLineHeight = lineHeightProp;
+  const styleOf = (key: string): { st: TemplateStyle; lh: number | undefined; o: BlockStyle | undefined } => {
+    const o = sectionStyles?.[key];
+    if (!o) return { st: globalStyle, lh: globalLineHeight, o };
+    return {
+      st: {
+        ...globalStyle,
+        ...(o.fontSize !== undefined ? { bodySize: o.fontSize } : {}),
+        ...(o.fontFamily ? { bodyFont: o.fontFamily, headingFont: o.fontFamily } : {}),
+        ...(o.textAlign ? { textAlign: o.textAlign } : {}),
+        ...(o.titleColor ? { sectionTitle: o.titleColor } : {}),
+      },
+      lh: o.lineHeight ?? globalLineHeight,
+      o,
+    };
+  };
+  /** Gaya turunan (font/ukuran/spasi) di pembungkus bagian; kosong bila tidak ada override. */
+  const blockCss = (o: BlockStyle | undefined): React.CSSProperties =>
+    o
+      ? {
+          ...(o.fontFamily ? { fontFamily: cvFontStack(o.fontFamily) } : {}),
+          ...(o.fontSize !== undefined ? { fontSize: pt(o.fontSize) } : {}),
+          ...(o.lineHeight !== undefined ? { lineHeight: o.lineHeight } : {}),
+        }
+      : {};
+
   /* ── section renderers map ── */
+  const buildRenderers = (style: TemplateStyle, lineHeightProp: number | undefined) => {
+  const bodyFontSize = style.bodySize;
+  const textAlign = style.textAlign || "left";
   const sectionRenderers: Record<SectionKey, { render: () => React.ReactNode; label: string }> = {
     summary: {
       label: L("summary"),
@@ -617,27 +666,33 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, divid
         ) : null,
     },
   };
+  return sectionRenderers;
+  };
+
+  const header = styleOf("header");
+  const hs = header.st;
+  const headerAlign = header.o?.textAlign ?? (headerLayout === "left" ? "left" : "center");
 
   return (
     <div
       style={{
         fontFamily: cvFontStack(style.bodyFont),
         color: "#111111",
-        fontSize: pt(bodyFontSize),
+        fontSize: pt(style.bodySize),
         lineHeight: lineHeightProp ?? 1.5,
       }}
     >
       {/* ── HEADER ── */}
-      <header style={{ textAlign: headerLayout === "left" ? "left" : "center", marginBottom: pt(25) }}>
+      <header style={{ textAlign: headerAlign, marginBottom: pt(25), ...blockCss(header.o) }}>
         <h1
           style={{
-            fontSize: pt(Math.round(bodyFontSize * 2.2)),
+            fontSize: pt(Math.round(hs.bodySize * 2.2)),
             fontWeight: 700,
             textTransform: "uppercase",
             letterSpacing: pt(0.5),
             margin: "0 0 5pt 0",
-            color: "#111111",
-            fontFamily: cvFontStack(style.headingFont),
+            color: header.o?.titleColor ?? "#111111",
+            fontFamily: cvFontStack(hs.headingFont),
           }}
         >
           {data.fullName || "NAMA LENGKAP ANDA"}
@@ -646,11 +701,11 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, divid
         {data.professionalTitle && (
           <p
             style={{
-              fontSize: pt(bodyFontSize + 2),
+              fontSize: pt(hs.bodySize + 2),
               fontWeight: 700,
               color: "#333333",
               margin: "0 0 8pt 0",
-              fontFamily: cvFontStack(style.headingFont),
+              fontFamily: cvFontStack(hs.headingFont),
             }}
           >
             {data.professionalTitle}
@@ -660,7 +715,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, divid
         {data.employmentStatus && (
           <p
             style={{
-              fontSize: pt(bodyFontSize - 1),
+              fontSize: pt(hs.bodySize - 1),
               color: "#666666",
               margin: "0 0 6pt 0",
               fontStyle: "italic",
@@ -672,7 +727,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, divid
         {contactItems.length > 0 && (
           <p
             style={{
-              fontSize: pt(bodyFontSize - 1),
+              fontSize: pt(hs.bodySize - 1),
               color: "#555555",
               margin: 0,
             }}
@@ -684,7 +739,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, divid
         {data.customFields && data.customFields.length > 0 && (
           <p
             style={{
-              fontSize: pt(bodyFontSize - 1),
+              fontSize: pt(hs.bodySize - 1),
               color: "#555555",
               margin: "4pt 0 0 0",
             }}
@@ -697,11 +752,12 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, divid
       {/* ── DYNAMIC SECTIONS (ordered by sectionOrder) ── */}
       {order
         .map((key) => {
-        const isPredefined = key in sectionRenderers;
+        const isPredefined = (DEFAULT_SECTION_ORDER as string[]).includes(key);
         let content: React.ReactNode = null;
 
+        const { st: style, lh: lineHeightProp } = styleOf(key);
         if (isPredefined) {
-          const sr = sectionRenderers[key as SectionKey];
+          const sr = buildRenderers(style, lineHeightProp)[key as SectionKey];
           content = sr?.render() ?? null;
         } else {
           // Custom section, look up by ID
@@ -773,6 +829,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, divid
                 marginBottom: pt(20),
                 padding: "2pt 4pt",
                 borderRadius: pt(4),
+                ...blockCss(sectionStyles?.[key]),
               }}
               className={onSectionClick ? "cv-section-hover" : undefined}
             >

@@ -1,4 +1,4 @@
-import { DEFAULT_SECTION_ORDER, TEMPLATE_STYLES, type CvData, type CustomSectionEntry, type SectionKey, type TemplateStyle } from "@/components/cv-templates";
+import { DEFAULT_SECTION_ORDER, TEMPLATE_STYLES, type BlockStyle, type CvData, type CustomSectionEntry, type SectionKey, type TemplateStyle } from "@/components/cv-templates";
 import { DEFAULT_CUSTOM_SECTIONS, LEGACY_LAYOUT } from "@/lib/builder-format";
 
 /**
@@ -22,6 +22,7 @@ export interface CvPrintFormat {
   removedSections?: string[];
   customSections?: CustomSectionEntry[];
   showSkillLevel?: boolean;
+  sectionStyles?: Record<string, BlockStyle>;
 }
 
 /**
@@ -47,6 +48,7 @@ export function cvPrintFormatFromData(data: CvData, templateId?: string): CvPrin
     removedSections: l.removedSections,
     customSections: data.customSections ?? DEFAULT_CUSTOM_SECTIONS,
     showSkillLevel: l.showSkillLevel,
+    sectionStyles: l.sectionStyles,
   };
 }
 
@@ -63,6 +65,7 @@ export interface CvRenderProps {
   lineHeight: number;
   lang: "id" | "en";
   showSkillLevel: boolean;
+  sectionStyles?: Record<string, BlockStyle>;
 }
 
 /**
@@ -96,6 +99,7 @@ export function cvRenderProps(data: CvData, format: CvPrintFormat, fallbackTempl
     lineHeight: LINE_HEIGHT[format.spacingMode ?? "normal"],
     lang: data.cvLang === "en" ? "en" : "id",
     showSkillLevel: format.showSkillLevel ?? false,
+    ...(format.sectionStyles && Object.keys(format.sectionStyles).length ? { sectionStyles: format.sectionStyles } : {}),
     marginMm: MARGIN_MM[format.marginMode ?? "normal"],
   };
 }
