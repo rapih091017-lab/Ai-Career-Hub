@@ -70,8 +70,17 @@ export const EditableText = memo(function EditableText({ path, value, placeholde
     const el = ref.current;
     // Salinan di halaman 2+ tidak masuk urutan Tab; klik tetap bisa.
     if (el && el.closest("[data-cv-page]")?.getAttribute("data-cv-page") !== "1") el.tabIndex = -1;
-    return () => clearTimeout(timer.current);
-  }, []);
+    // Fallback contentEditable=true menerima Ctrl+B/I/U dan format lain; teks CV harus polos.
+    const block = (e: InputEvent) => {
+      if (e.inputType.startsWith("format") || e.inputType === "insertParagraph" || e.inputType === "insertFromDrop") e.preventDefault();
+    };
+    el?.addEventListener("beforeinput", block);
+    return () => {
+      clearTimeout(timer.current);
+      el?.removeEventListener("beforeinput", block);
+    };
+    // editable: elemen edit baru dipasang saat mode edit aktif.
+  }, [editable]);
 
   if (!editable) {
     return <span data-cv-path={path}>{value || placeholder}</span>;
