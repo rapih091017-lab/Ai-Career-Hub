@@ -10,7 +10,7 @@ import { CvPagedPreview, measurePageCount, untabSecondaryPages } from "@/compone
 import { LINE_HEIGHT, cvPrintFormatFromData, cvRenderProps } from "@/lib/cv-print-format";
 import { cvFontValue, resolveCvFont } from "@/lib/cv-fonts";
 import { useInlineEditable } from "@/hooks/useInlineEditable";
-import { EditableText, keepCaretVisible } from "@/components/cv-templates/EditableText";
+import { EditableText, scheduleCaretCheck } from "@/components/cv-templates/EditableText";
 import { focusableIn, formTargetFor, getCvPath, setCvPath, stepForPath } from "@/lib/cv-edit-path";
 import type { CvEditBindings } from "@/components/cv-templates";
 import type { BlockStyleControls } from "@/components/builder/FormatToolbar";
@@ -352,7 +352,7 @@ export default function BuilderPage() {
 
   // Jumlah halaman berubah saat mengetik: pastikan caret tetap di salinan yang terlihat.
   useEffect(() => {
-    keepCaretVisible();
+    scheduleCaretCheck();
   }, [allPageCount]);
 
   /** Lompat ke langkah form untuk path, lalu scroll & fokus ke field/entrinya. */

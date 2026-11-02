@@ -64,7 +64,7 @@ export const EditableText = memo(function EditableText({ path, value, placeholde
       external.current = true;
     } else {
       // Data baru dari ketikan sendiri: periksa apakah caret masih terlihat setelah reflow.
-      requestAnimationFrame(keepCaretVisible);
+      scheduleCaretCheck();
     }
   }, [value, editable]);
 
@@ -246,6 +246,16 @@ function caretVisible(el: HTMLElement, offset: number): boolean {
   return rect.left >= box.left - 1 && rect.left <= box.right + 1 && midY >= box.top && midY <= box.bottom;
 }
 
+let caretFrame = 0;
+/** Satu rAF untuk semua pemicu (commit ketikan, jumlah halaman berubah) per frame. */
+export function scheduleCaretCheck() {
+  if (caretFrame) return;
+  caretFrame = requestAnimationFrame(() => {
+    caretFrame = 0;
+    keepCaretVisible();
+  });
+}
+
 /**
  * Bila teks yang sedang diketik mengalir ke halaman lain, caret di salinan
  * yang fokus jadi terpotong. Fokus dipindah ke salinan di halaman tempat
@@ -255,6 +265,7 @@ export function keepCaretVisible() {
   const el = document.activeElement as HTMLElement | null;
   if (!el || !el.hasAttribute("data-cv-edit")) return;
   const offset = caretOffset(el);
+  // Kasus umum (caret terlihat) selesai di sini tanpa mencari salinan di DOM.
   if (offset === null || caretVisible(el, offset)) return;
   const path = el.getAttribute("data-cv-path") ?? "";
   const copies = document.querySelectorAll<HTMLElement>(`[data-cv-edit][data-cv-path="${CSS.escape(path)}"]`);
