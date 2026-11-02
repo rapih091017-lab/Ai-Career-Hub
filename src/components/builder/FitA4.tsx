@@ -43,7 +43,8 @@ export function FitA4({ children }: { children: ReactNode }) {
         width: A4_PX * scale,
         height: innerH ? innerH * scale : undefined,
         margin: "0 auto",
-        overflow: "hidden",
+        // clip: tidak bisa digulir oleh fokus di dalam pratinjau.
+        overflow: "clip",
       }}
     >
       <div

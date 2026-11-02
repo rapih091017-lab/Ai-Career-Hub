@@ -76,11 +76,13 @@ export function CvPagedPreview({ pageCount, marginMm, children, measureRef, page
             boxSizing: "border-box",
             background: "#ffffff",
             boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
-            overflow: "hidden",
+            // clip, bukan hidden: kotak hidden bisa digulir oleh fokus/caret
+            // (scrollIntoView), sehingga halaman menampilkan kolom yang salah.
+            overflow: "clip",
             flexShrink: 0,
           }}
         >
-          <div style={{ width: `${w}mm`, height: `${h}mm`, overflow: "hidden" }}>
+          <div style={{ width: `${w}mm`, height: `${h}mm`, overflow: "clip" }}>
             <div
               ref={k === 0 ? measureRef : undefined}
               className="cv-print"
