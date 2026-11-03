@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Field } from "@/components/builder/Field";
 import { AIPolishButton } from "@/components/ai/AIPolishDialog";
+import { TargetMissingNote } from "@/components/builder/TargetHint";
 import { AiLoadingOverlay } from "./AiLoadingOverlay";
 import { BulletEditor } from "./BulletEditor";
 import { useToast } from "@/components/ui/toast";
@@ -363,6 +364,7 @@ export function WorkCard({
                       </motion.button>
                     </div>
                   </div>
+                  <TargetMissingNote className="mt-1.5 text-right" />
                 </div>
               </div>
             </div>

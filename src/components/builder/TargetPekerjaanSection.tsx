@@ -49,7 +49,7 @@ export function TargetPekerjaanSection({
           )}
         </p>
       </div>
-      <Field label="Judul posisi yang dilamar" placeholder="Contoh: Staf Administrasi Keuangan" value={jobTitle} onChange={onJobTitleChange} enableAiPolish fieldName="judul posisi" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
+      <Field cvField="jobTitle" label="Judul posisi yang dilamar" placeholder="Contoh: Staf Administrasi Keuangan" value={jobTitle} onChange={onJobTitleChange} enableAiPolish fieldName="judul posisi" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
       <div>
         <label className="block text-label-bold text-on-surface mb-1.5">Deskripsi Pekerjaan</label>
         <div className="relative">

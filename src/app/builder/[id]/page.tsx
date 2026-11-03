@@ -50,6 +50,7 @@ import {
   unusedBuiltinSections,
   updateCustomSection,
 } from "@/lib/section-manager";
+import { TargetHintProvider } from "@/components/builder/TargetHint";
 import { AtsScoreInsight } from "@/components/builder/AtsScoreInsight";
 import { BuilderLoadingSkeleton, BuilderErrorState } from "@/components/builder/BuilderSkeleton";
 import { useTranslation } from "@/lib/i18n";
@@ -364,6 +365,12 @@ export default function BuilderPage() {
     requestAnimationFrame(tick);
   }, []);
 
+  // Catatan "Isi sekarang" di dekat tombol AI saat judul posisi target kosong.
+  const targetHint = useMemo(
+    () => ({ missing: !cvData.jobTitle?.trim(), goToTarget: () => jumpToField("jobTitle") }),
+    [cvData.jobTitle, jumpToField],
+  );
+
   // Petunjuk sekali saja saat pertama kali hover pratinjau (hanya bila bisa edit langsung).
   const [editHint, setEditHint] = useState(false);
   const hintChecked = useRef(false);
@@ -577,6 +584,7 @@ export default function BuilderPage() {
 
   return (
     <AuthGuard>
+      <TargetHintProvider value={targetHint}>
       <div className="h-[100dvh] flex flex-col bg-background">
         <AppHeader />
 
@@ -1114,6 +1122,7 @@ export default function BuilderPage() {
         {/* ── BOTTOM NAV ── */}
         <BottomNav steps={steps} activeStep={activeStep} setActiveStep={setActiveStep} sectionCompletion={sectionCompletion} sectionMeta={sectionMeta} handleSave={handleSave} isSaving={isSaving} />
       </div>
+      </TargetHintProvider>
     </AuthGuard>
   );
 }

@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { AiLoadingOverlay } from "./AiLoadingOverlay";
 import { Field } from "@/components/builder/Field";
 import { AIPolishButton } from "@/components/ai/AIPolishDialog";
+import { TargetMissingNote } from "@/components/builder/TargetHint";
 import type { CustomFieldEntry } from "@/components/cv-templates";
 
 interface SummarySectionProps {
@@ -274,6 +275,7 @@ export function SummarySection({
                 </span>
               </motion.button>
             </div>
+            <TargetMissingNote className="text-right" />
           </div>
         )}
         {!summary && (
