@@ -188,7 +188,7 @@ export function useBuilderAI({
     skills: "Keahlian",
     certifications: "Sertifikasi",
     organizations: "Organisasi",
-    lainnya: "Lainnya (Key Achievements, dll.)",
+    lainnya: "Bagian Tambahan",
   };
 
   return {

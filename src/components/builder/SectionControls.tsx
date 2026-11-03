@@ -2,6 +2,7 @@
 
 import { BulletEditor } from "./BulletEditor";
 import type { CustomSectionEntry } from "@/components/cv-templates";
+import { extraSectionPlaceholder } from "@/lib/builder-help";
 
 /** Tombol "Hapus bagian" di kartu section opsional. Konfirmasi diurus pemanggil. */
 export function RemoveSectionButton({ label, onRemove }: { label: string; onRemove: () => void }) {
@@ -97,6 +98,7 @@ export function CustomSectionCard({ section, onChange, onRemove, hiddenNotice }:
         onChange={(content) => onChange({ content })}
         mode={section.contentType === "paragraph" ? "paragraph" : "bullets"}
         onModeChange={(contentType) => onChange({ contentType })}
+        placeholder={extraSectionPlaceholder(section.title)}
         maxLength={5000}
       />
     </div>

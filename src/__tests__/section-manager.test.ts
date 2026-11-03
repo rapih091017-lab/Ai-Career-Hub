@@ -12,8 +12,11 @@ import {
   restoreBuiltinSection,
   restoreSection,
   sectionHasSavedContent,
+  sectionLabel,
   unusedBuiltinSections,
+  updateCustomSection,
 } from "@/lib/section-manager";
+import { extraSectionPlaceholder } from "@/lib/builder-help";
 import { cvPrintFormatFromData, cvRenderProps } from "@/lib/cv-print-format";
 import { sanitizeLayout, sectionHasContent } from "@/lib/builder-format";
 import { sampleCv } from "./cv-pdf.fixture";
@@ -104,5 +107,41 @@ describe("kelola section", () => {
       }),
     );
     expect(html).not.toContain("Lainnya");
+  });
+});
+
+describe("Bagian Tambahan (id lainnya)", () => {
+  const withLainnya = (title: string): CvData => ({
+    ...sampleCv,
+    customSections: [{ id: "lainnya", title, content: "Poin", contentType: "bullets" }],
+  });
+
+  it("data lama tetap berjudul Lainnya di label dan CV", () => {
+    const cv = withLainnya("Lainnya");
+    expect(sectionLabel(cv, "lainnya")).toBe("Lainnya");
+    const { marginMm: _m, ...props } = cvRenderProps(cv, cvPrintFormatFromData(cv, "ats-classic"), "ats-classic");
+    expect(renderToStaticMarkup(createElement(AtsBaseRenderer, props))).toContain("Lainnya");
+  });
+
+  it("judul bisa diubah dan ikut tercetak", () => {
+    const cv = updateCustomSection(withLainnya("Lainnya"), "lainnya", { title: "Bahasa" });
+    expect(sectionLabel(cv, "lainnya")).toBe("Bahasa");
+    const { marginMm: _m, ...props } = cvRenderProps(cv, cvPrintFormatFromData(cv, "ats-classic"), "ats-classic");
+    const html = renderToStaticMarkup(createElement(AtsBaseRenderer, props));
+    expect(html).toContain("Bahasa");
+    expect(html).not.toContain(">Lainnya<");
+  });
+
+  it("judul kosong memakai nama Bagian Tambahan di form", () => {
+    expect(sectionLabel(withLainnya("  "), "lainnya")).toBe("Bagian Tambahan");
+  });
+
+  it("contoh per judul memakai placeholder, tanpa angka karangan", () => {
+    for (const t of ["Penghargaan", "Proyek", "Publikasi", "Bahasa", "Kegiatan Sukarela", "Pelatihan", "Seminar"]) {
+      const ex = extraSectionPlaceholder(t);
+      expect(ex).toMatch(/\[/);
+      expect(ex.replace(/\[[^\]]+\]/g, "")).not.toMatch(/\d|—/);
+    }
+    expect(extraSectionPlaceholder("bahasa")).toContain("Inggris");
   });
 });

@@ -926,7 +926,10 @@ export default function BuilderPage() {
                 <SkillSection
                   skills={cvData.skills}
                   certifications={cvData.certifications || []}
-                  lainnyaContent={customSections.find(cs => cs.id === "lainnya")?.content || ""}
+                  lainnyaContent={customSections.find(cs => cs.id === LAINNYA_ID)?.content || ""}
+                  lainnyaTitle={customSections.find(cs => cs.id === LAINNYA_ID)?.title ?? "Lainnya"}
+                  onLainnyaTitleChange={(title) => setCvData((prev) => updateCustomSection(prev, LAINNYA_ID, { title }))}
+                  otherSectionTitles={customOnly.map((c) => c.title)}
                   lainnyaContentType={customSections.find(cs => cs.id === "lainnya")?.contentType === "paragraph" ? "paragraph" : "bullets"}
                   onLainnyaContentTypeChange={helpers.updateLainnyaContentType}
                   selfEvaluation={cvData.selfEvaluation || ""}
@@ -966,8 +969,8 @@ export default function BuilderPage() {
               ))}
               {activeStep === STEP.SKILLS && (
                 <div className="rounded-xl bg-surface-container-lowest p-6 shadow-soft">
-                  <h3 className="mb-1 font-label-bold text-on-surface">Tambah bagian</h3>
-                  <p className="mb-3 text-xs text-on-surface-variant">Bagian tambahan muncul di CV setelah diisi, dan bisa diurutkan lewat Urutan Section.</p>
+                  <h3 className="mb-1 font-label-bold text-on-surface">Tambah bagian lain</h3>
+                  <p className="mb-3 text-xs text-on-surface-variant">Butuh lebih dari satu Bagian Tambahan? Pilih judul di bawah. Bagian baru muncul di CV setelah diisi, dan urutannya bisa diatur lewat Atur urutan section.</p>
                   <AddSectionPanel
                     unused={unusedForPanel}
                     onRestore={restoreUnused}

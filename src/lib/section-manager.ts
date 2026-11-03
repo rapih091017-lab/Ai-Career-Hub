@@ -21,7 +21,8 @@ export const BUILTIN_LABELS: Record<string, string> = {
   skills: "Keahlian",
   certifications: "Sertifikasi",
   organizations: "Organisasi",
-  lainnya: "Lainnya",
+  // Kartu form "Lainnya" kini bernama Bagian Tambahan; judul di CV tetap dari customSections.
+  lainnya: "Bagian Tambahan",
 };
 
 export const orderOf = (cv: CvData): string[] => cv.layout?.sectionOrder ?? [...DEFAULT_SECTION_ORDER, LAINNYA_ID];
@@ -38,6 +39,8 @@ export function isRemovableSection(cv: CvData, key: string): boolean {
 export function sectionLabel(cv: CvData, key: string): string {
   const custom = customSectionsOf(cv).find((c) => c.id === key);
   if (custom && key !== LAINNYA_ID) return custom.title.trim() || "Bagian tanpa judul";
+  // Bagian Tambahan memakai judul yang tercetak (data lama: "Lainnya").
+  if (custom) return custom.title.trim() || BUILTIN_LABELS[key];
   return BUILTIN_LABELS[key] ?? key;
 }
 

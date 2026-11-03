@@ -115,3 +115,19 @@ export const BUILDER_HELP = {
 } satisfies Record<string, FieldHelpContent>;
 
 export type BuilderHelpKey = keyof typeof BUILDER_HELP;
+
+/** Contoh isi (placeholder) per judul bagian tambahan. Fakta diganti [placeholder]. */
+const EXTRA_SECTION_EXAMPLES: Record<string, string> = {
+  penghargaan: "Contoh: Juara [peringkat] Lomba [nama lomba] tingkat [provinsi/nasional], [tahun]",
+  proyek: "Contoh: Sistem absensi web untuk [nama organisasi]: merancang database dan halaman admin",
+  publikasi: "Contoh: [Judul tulisan], [nama jurnal atau media], [tahun]",
+  bahasa: "Contoh: Inggris: aktif (TOEFL ITP [skor])",
+  "kegiatan sukarela": "Contoh: Relawan pengajar di [nama komunitas], [tahun]",
+  pelatihan: "Contoh: Pelatihan [nama pelatihan], [penyelenggara], [tahun]",
+};
+
+const EXTRA_SECTION_FALLBACK = "Contoh: Juara [peringkat] Lomba [nama lomba], [tahun]";
+
+export function extraSectionPlaceholder(title: string): string {
+  return EXTRA_SECTION_EXAMPLES[title.trim().toLowerCase()] ?? EXTRA_SECTION_FALLBACK;
+}

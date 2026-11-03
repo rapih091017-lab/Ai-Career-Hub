@@ -27,7 +27,7 @@ const SECTION_LABELS: Record<string, string> = {
   skills: "Keahlian",
   certifications: "Sertifikasi",
   organizations: "Organisasi",
-  lainnya: "Lainnya",
+  lainnya: "Bagian Tambahan",
 };
 
 const SPACING_OPTIONS = [

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { FieldHelp } from "@/components/builder/FieldHelp";
+import { extraSectionPlaceholder } from "@/lib/builder-help";
+import { QUICK_CUSTOM_TITLES } from "@/lib/section-manager";
 import { BulletEditor } from "./BulletEditor";
 import { RemoveSectionButton, UnusedSectionCard } from "./SectionControls";
 import type { SkillEntry, CertificationEntry } from "@/components/cv-templates";
@@ -10,6 +12,11 @@ interface SkillSectionProps {
   skills: SkillEntry[];
   certifications: CertificationEntry[];
   lainnyaContent: string;
+  /** Judul Bagian Tambahan di CV (data lama: "Lainnya"). */
+  lainnyaTitle?: string;
+  onLainnyaTitleChange?: (title: string) => void;
+  /** Judul bagian kustom lain, agar pilihan cepat tidak dobel. */
+  otherSectionTitles?: string[];
   /** Bentuk isi "Lainnya"; default poin. */
   lainnyaContentType?: "bullets" | "paragraph";
   onLainnyaContentTypeChange?: (mode: "bullets" | "paragraph") => void;
@@ -70,6 +77,9 @@ export function SkillSection({
   skills,
   certifications,
   lainnyaContent,
+  lainnyaTitle = "Lainnya",
+  onLainnyaTitleChange,
+  otherSectionTitles = [],
   lainnyaContentType = "bullets",
   onLainnyaContentTypeChange,
   selfEvaluation = "",
@@ -98,6 +108,7 @@ export function SkillSection({
     />
   );
   const unused = (key: string) => !!isSectionUnused?.(key) && !!onRestoreSection;
+  const takenTitles = new Set(otherSectionTitles.map((x) => x.trim().toLowerCase()));
   const removeBtn = (key: string, label: string) =>
     onRemoveSection ? <RemoveSectionButton label={label} onRemove={() => onRemoveSection(key)} /> : null;
   const hiddenNotice = (key: string, hasData: boolean) =>
@@ -287,9 +298,9 @@ export function SkillSection({
       </div>
       )}
 
-      {/* ── Lainnya ── */}
+      {/* ── Bagian Tambahan (id "lainnya") ── */}
       {unused("lainnya") ? (
-        unusedCard("lainnya", "Lainnya")
+        unusedCard("lainnya", lainnyaTitle.trim() || "Bagian Tambahan")
       ) : (
       <div data-cv-field="customSections.lainnya" className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
         <div className="flex items-center gap-3">
@@ -297,19 +308,52 @@ export function SkillSection({
             <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>more_horiz</span>
           </div>
           <div>
-            <h3 className="flex items-center gap-1 font-label-bold text-on-surface">Lainnya<FieldHelp topic="extraSection" /></h3>
-            <p className="text-xs text-on-surface-variant">Key achievements, penghargaan, atau apapun yang ingin ditambahkan</p>
+            <h3 className="flex items-center gap-1 font-label-bold text-on-surface">Bagian Tambahan<FieldHelp topic="extraSection" /></h3>
+            <p className="text-xs text-on-surface-variant">Untuk hal penting yang tidak masuk bagian lain.</p>
           </div>
-          {removeBtn("lainnya", "Lainnya")}
+          {removeBtn("lainnya", lainnyaTitle.trim() || "Bagian Tambahan")}
         </div>
         {hiddenNotice("lainnya", !!lainnyaContent.trim())}
+        {onLainnyaTitleChange && (
+          <div>
+            <label htmlFor="extra-section-title" className="mb-1 block text-xs font-semibold text-on-surface-variant">
+              Judul di CV
+            </label>
+            <input
+              id="extra-section-title"
+              value={lainnyaTitle}
+              maxLength={100}
+              onChange={(e) => onLainnyaTitleChange(e.target.value)}
+              placeholder="Mis. Penghargaan"
+              className="w-full rounded-lg border-none bg-surface-container-low px-3 py-2 font-label-bold text-on-surface focus:ring-2 focus:ring-primary"
+            />
+            <div className="mt-2 flex flex-wrap gap-1.5" role="group" aria-label="Pilihan cepat judul">
+              {QUICK_CUSTOM_TITLES.filter((q) => !takenTitles.has(q.toLowerCase())).map((q) => {
+                const active = lainnyaTitle.trim().toLowerCase() === q.toLowerCase();
+                return (
+                  <button
+                    key={q}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => onLainnyaTitleChange(q)}
+                    className={`inline-flex min-h-11 items-center rounded-full border px-3 text-xs font-medium sm:min-h-8 ${
+                      active ? "border-primary bg-primary/10 text-primary" : "border-outline-variant/60 text-on-surface hover:border-primary hover:text-primary"
+                    }`}
+                  >
+                    {q}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
         <BulletEditor
-          label="Isi bagian Lainnya"
+          label={`Isi bagian ${lainnyaTitle.trim() || "Bagian Tambahan"}`}
           value={lainnyaContent}
           onChange={onLainnyaChange}
           mode={lainnyaContentType}
           onModeChange={onLainnyaContentTypeChange}
-          placeholder="Contoh: Juara 1 Lomba Inovasi Teknologi Tingkat Nasional"
+          placeholder={extraSectionPlaceholder(lainnyaTitle)}
           maxLength={5000}
         />
       </div>
