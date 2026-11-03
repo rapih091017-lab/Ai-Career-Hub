@@ -1791,7 +1791,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "builder.step-experience": { id: "Pengalaman Kerja", en: "Work Experience" },
   "builder.step-education": { id: "Pendidikan", en: "Education" },
   "builder.step-org": { id: "Organisasi", en: "Organizations" },
-  "builder.step-skills": { id: "Skill & Lainnya", en: "Skills & Others" },
+  "builder.step-skills": { id: "Skill & Tambahan", en: "Skills & Extras" },
   "builder.step-review": { id: "Review", en: "Review" },
   "builder.desc-personal": { id: "Lengkapi informasi diri kamu untuk memulai CV.", en: "Complete your personal information to start your CV." },
   "builder.desc-target": { id: "Masukkan posisi yang dilamar dan deskripsi pekerjaan.", en: "Enter the applied position and job description." },
