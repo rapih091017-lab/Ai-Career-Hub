@@ -57,7 +57,7 @@ export function TargetPekerjaanSection({
             rows={5}
             value={jobDescription}
             onChange={(e) => onJobDescriptionChange(e.target.value)}
-            className="w-full bg-surface-container-low border-none rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary resize-none text-body-md pr-10"
+            className="w-full bg-surface-container-low border-none rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary resize-none text-body-md pr-24"
             placeholder="Tempelkan deskripsi pekerjaan yang dilamar..."
             maxLength={3000}
           />

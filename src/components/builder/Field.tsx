@@ -66,7 +66,7 @@ export function Field({
           placeholder={placeholder}
           className={`w-full bg-surface-container-low border-none rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary text-body-md disabled:opacity-50 disabled:cursor-not-allowed transition-shadow duration-200 ${
             isEmpty ? "ring-2 ring-red-300 bg-red-50" : ""
-          } ${enableAiPolish && !disabled ? "pr-10" : ""}`}
+          } ${enableAiPolish && !disabled ? "pr-24" : ""}`}
         />
         
         {/* AI Polish Button, inline, one-click */}
