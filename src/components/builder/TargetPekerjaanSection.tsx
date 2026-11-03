@@ -10,6 +10,8 @@ interface TargetPekerjaanSectionProps {
   skills?: string[];
   onJobTitleChange: (value: string) => void;
   onJobDescriptionChange: (value: string) => void;
+  /** Pindah ke langkah Data Diri (untuk mengisi Jabatan profesional). */
+  onGoToPersonal?: () => void;
 }
 
 export function TargetPekerjaanSection({
@@ -19,6 +21,7 @@ export function TargetPekerjaanSection({
   skills,
   onJobTitleChange,
   onJobDescriptionChange,
+  onGoToPersonal,
 }: TargetPekerjaanSectionProps) {
   return (
     <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-5">
@@ -28,10 +31,25 @@ export function TargetPekerjaanSection({
         </div>
         <div>
           <h3 className="font-headline-md text-[18px] text-on-surface">Posisi yang Dilamar</h3>
-          <p className="text-body-md text-on-surface-variant mt-0.5">Masukkan posisi target dan deskripsi pekerjaan agar AI bisa menyesuaikan konten CV-mu.</p>
+          <p className="text-body-md text-on-surface-variant mt-0.5">Isi posisi yang kamu incar dulu. Semua fitur AI di builder memakai bagian ini sebagai acuan.</p>
         </div>
       </div>
-      <Field label="Judul Posisi" value={jobTitle} onChange={onJobTitleChange} enableAiPolish fieldName="judul posisi" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
+      <div className="rounded-xl border border-outline-variant/60 bg-surface-container-low p-4 text-sm text-on-surface-variant space-y-1.5">
+        <p className="font-semibold text-on-surface">Bagian ini tidak dicetak di CV</p>
+        <p>Judul posisi dan deskripsi lowongan hanya dipakai AI untuk menyesuaikan saran, kata kunci, dan Poles AI dengan lowongan yang kamu lamar.</p>
+        <p>
+          Teks di bawah nama pada CV diisi lewat <strong className="font-semibold text-on-surface">Jabatan profesional</strong> di Data Diri.
+          {onGoToPersonal && (
+            <>
+              {" "}
+              <button type="button" onClick={onGoToPersonal} className="font-semibold text-green-deep underline underline-offset-2 hover:text-primary">
+                Buka Data Diri
+              </button>
+            </>
+          )}
+        </p>
+      </div>
+      <Field label="Judul posisi yang dilamar" placeholder="Contoh: Staf Administrasi Keuangan" value={jobTitle} onChange={onJobTitleChange} enableAiPolish fieldName="judul posisi" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
       <div>
         <label className="block text-label-bold text-on-surface mb-1.5">Deskripsi Pekerjaan</label>
         <div className="relative">

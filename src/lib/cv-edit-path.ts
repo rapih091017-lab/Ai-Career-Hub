@@ -1,4 +1,5 @@
 import type { CvData } from "@/components/cv-templates";
+import { STEP, stepForSection } from "@/lib/builder-steps";
 
 /**
  * Path teks CV di pratinjau (atribut `data-cv-path`), mis. "fullName",
@@ -59,36 +60,29 @@ export function setCvPath(cv: CvData, path: string, value: string): CvData {
   return { ...cv, [head]: value };
 }
 
-const SECTION_STEP: Record<string, number> = {
-  header: 0,
-  summary: 0,
-  experience: 2,
-  education: 3,
-  organizations: 4,
-  skills: 5,
-  certifications: 5,
-  selfEvaluation: 5,
-};
-
 /** Langkah form (indeks stepper) untuk sebuah path atau kunci section. */
 export function stepForPath(path: string): number {
   const [head, id] = path.split(".");
   switch (head) {
     case "workHistory":
-      return 2;
+      return STEP.EXPERIENCE;
     case "education":
-      return 3;
+      return STEP.EDUCATION;
     case "organisations":
-      return 4;
+      return STEP.ORGANIZATIONS;
     case "skills":
     case "certifications":
     case "selfEvaluation":
     case "customSections":
-      return 5;
+      return STEP.SKILLS;
     case "sectionLabels":
-      return SECTION_STEP[id] ?? 5;
+      return stepForSection(id ?? "");
+    case "jobTitle":
+    case "jobDescription":
+      return STEP.TARGET;
     default:
-      return SECTION_STEP[head] ?? 0;
+      // Field header (nama, kontak, motto) dan ringkasan ada di Data Diri.
+      return STEP.PERSONAL;
   }
 }
 

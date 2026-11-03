@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { AtsBaseRenderer, TEMPLATE_STYLES, type CvEditTextProps } from "@/components/cv-templates";
+import { STEP } from "@/lib/builder-steps";
 import { getCvPath, isInlineEditablePath, setCvPath, stepForPath } from "@/lib/cv-edit-path";
 import { sampleCv } from "./cv-pdf.fixture";
 
@@ -29,12 +30,16 @@ describe("path edit pratinjau", () => {
   });
 
   it("langkah form untuk path", () => {
-    expect(stepForPath("fullName")).toBe(0);
-    expect(stepForPath("workHistory.w1.description.2")).toBe(2);
-    expect(stepForPath("education.e1.startDate")).toBe(3);
-    expect(stepForPath("organisations.o1.name")).toBe(4);
-    expect(stepForPath("skills")).toBe(5);
-    expect(stepForPath("sectionLabels.education")).toBe(3);
+    expect(stepForPath("fullName")).toBe(STEP.PERSONAL);
+    expect(stepForPath("summary")).toBe(STEP.PERSONAL);
+    expect(stepForPath("workHistory.w1.description.2")).toBe(STEP.EXPERIENCE);
+    expect(stepForPath("education.e1.startDate")).toBe(STEP.EDUCATION);
+    expect(stepForPath("organisations.o1.name")).toBe(STEP.ORGANIZATIONS);
+    expect(stepForPath("skills")).toBe(STEP.SKILLS);
+    expect(stepForPath("sectionLabels.education")).toBe(STEP.EDUCATION);
+    expect(stepForPath("sectionLabels.header")).toBe(STEP.PERSONAL);
+    expect(stepForPath("jobTitle")).toBe(STEP.TARGET);
+    expect(STEP.TARGET).toBe(0);
   });
 });
 

@@ -58,17 +58,8 @@ import { useBuilderAI } from "@/hooks/useBuilderAI";
 import { useBuilderFormat } from "@/hooks/useBuilderFormat";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import { useFetchCvData } from "@/hooks/useFetchCvData";
+import { LAST_STEP, STEP, STEP_IDS, STEP_META, stepForSection } from "@/lib/builder-steps";
 
-
-const STEP_KEYS = [
-  "builder.step-personal",
-  "builder.step-target",
-  "builder.step-experience",
-  "builder.step-education",
-  "builder.step-org",
-  "builder.step-skills",
-  "builder.step-review",
-];
 
 /* ───────── component ───────── */
 
@@ -77,10 +68,12 @@ export default function BuilderPage() {
   const router = useRouter();
   const cvId = params.id as string;
 
-  const [activeStep, setActiveStep] = useState(0);
+  // Selama memuat: Data Diri. Pindah dari Target ke langkah lain memicu analisis AI
+  // (useBuilderAI), jadi langkah awal tidak boleh berawal dari Target lalu pindah sendiri.
+  const [activeStep, setActiveStep] = useState<number>(STEP.PERSONAL);
   const [isSaving, setIsSaving] = useState(false);
   const { t } = useTranslation();
-  const steps = STEP_KEYS.map((k) => t(k));
+  const steps = STEP_IDS.map((id) => t(STEP_META[id].title));
   const [collapsedWorkIds, setCollapsedWorkIds] = useState<Set<string>>(new Set());
   const [confirm, setConfirm] = useState<ConfirmAction | null>(null);
   // templateId baru ikut autosave setelah user benar-benar memilih template.
@@ -91,6 +84,14 @@ export default function BuilderPage() {
 
   /* ── Data Fetch ── */
   const { cvData, isLoading, fetchError, selectedTemplateId, loadedUpdatedAt, setCvData, setSelectedTemplateId } = useFetchCvData(cvId);
+
+  // Langkah awal ditentukan sekali setelah data dimuat: Target bila judul posisi masih kosong.
+  const initialStepSet = useRef(false);
+  useEffect(() => {
+    if (isLoading || fetchError || initialStepSet.current) return;
+    initialStepSet.current = true;
+    if (!cvData.jobTitle?.trim()) setActiveStep(STEP.TARGET);
+  }, [isLoading, fetchError, cvData.jobTitle]);
 
   /* ── Auto-Save ── */
   const { saveStatus, lastSaved, flush: flushAutoSave, getUpdatedAt, errorMessage: saveErrorMessage, overwrite: overwriteServer } = useAutoSave(cvId, cvData, !isLoading && !fetchError, loadedUpdatedAt, templateTouched ? selectedTemplateId : undefined);
@@ -277,20 +278,7 @@ export default function BuilderPage() {
     if (inlineEditableRef.current) setStyleTarget(sectionKey);
     // Layar kecil: tap di pratinjau = kembali ke form di langkah yang sesuai.
     else if (!window.matchMedia("(min-width: 1024px)").matches) setMobilePreviewOpen(false);
-    const sectionStepMap: Record<string, number> = {
-      header: 0,
-      summary: 0,
-      experience: 2,
-      education: 3,
-      skills: 5,
-      certifications: 5,
-      selfEvaluation: 5,
-      lainnya: 5,
-      organizations: 4,
-    };
-    // Section kustom diisi di langkah Keahlian & Lainnya.
-    const step = sectionStepMap[sectionKey] ?? 5;
-    if (step !== undefined) setActiveStep(step);
+    setActiveStep(stepForSection(sectionKey));
   }, []);
 
   // Elemen pratinjau di-memo: render ulang hanya saat data/format CV berubah,
@@ -516,19 +504,7 @@ export default function BuilderPage() {
 
   /* ── section title helper ── */
 
-  const sectionMeta = [
-    { title: t("builder.step-personal"), desc: t("builder.desc-personal"), icon: "person" },
-    { title: t("builder.step-target"), desc: t("builder.desc-target"), icon: "work_history" },
-    { title: t("builder.step-experience"), desc: t("builder.desc-experience"), icon: "work" },
-    { title: t("builder.step-education"), desc: t("builder.desc-education"), icon: "school" },
-    { title: t("builder.step-org"), desc: t("builder.desc-org"), icon: "groups" },
-    { title: t("builder.step-skills"), desc: t("builder.desc-skills"), icon: "star" },
-    { title: t("builder.step-review"), desc: t("builder.desc-review"), icon: "visibility" },
-  ];
-
-
-
-
+  const sectionMeta = STEP_IDS.map((id) => ({ title: t(STEP_META[id].title), desc: t(STEP_META[id].desc), icon: STEP_META[id].icon }));
 
   /* ── Keyboard Shortcuts ── */
   const handleSaveRef = useRef(handleSave);
@@ -585,7 +561,7 @@ export default function BuilderPage() {
       // Ctrl+ArrowRight → Next step
       if (e.ctrlKey && e.key === 'ArrowRight') {
         e.preventDefault();
-        setActiveStep((s) => Math.min(6, s + 1));
+        setActiveStep((s) => Math.min(LAST_STEP, s + 1));
       }
     };
     window.addEventListener('keydown', handler);
@@ -667,7 +643,7 @@ export default function BuilderPage() {
               </div>
             </div>
             {/* ── AI Keyword Suggestions Banner ── */}
-            {aiJdKeywords && aiJdKeywords.length > 0 && activeStep !== 1 && activeStep !== 6 && (
+            {aiJdKeywords && aiJdKeywords.length > 0 && activeStep !== STEP.TARGET && activeStep !== STEP.REVIEW && (
               <div className="flex flex-wrap items-center gap-2 px-1 py-2 mb-2 bg-primary/5 border border-primary/10 rounded-xl">
                 <div className="flex items-center gap-1.5 text-[11px] font-semibold text-green-deep shrink-0">
                   <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">travel_explore</span>
@@ -693,7 +669,7 @@ export default function BuilderPage() {
               transition={{ type: "spring", stiffness: 300, damping: 28 }}
               className="px-4 md:px-6 pb-32 space-y-6"
             >
-              {activeStep === 0 && (
+              {activeStep === STEP.PERSONAL && (
                 <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-5">
                   <Field cvField="fullName" label={t("builder.field-fullname")} value={cvData.fullName} onChange={(v) => updateField("fullName", v)} />
                   <Field cvField="phone" label={t("builder.field-phone")} type="tel" value={cvData.phone} onChange={(v) => updateField("phone", v)} />
@@ -756,7 +732,7 @@ export default function BuilderPage() {
                 </div>
               )}
 
-              {activeStep === 2 && (
+              {activeStep === STEP.EXPERIENCE && (
                 <div className="space-y-4">
                   <SortableList
                     ids={cvData.workHistory.map((w) => w.id)}
@@ -824,17 +800,18 @@ export default function BuilderPage() {
                   </button>
                 </div>
               )}
-              {activeStep === 1 && (<TargetPekerjaanSection
+              {activeStep === STEP.TARGET && (<TargetPekerjaanSection
   jobTitle={cvData.jobTitle}
   jobDescription={cvData.jobDescription}
   aiKeywords={aiJdKeywords}
   skills={aiSkillNames(cvData.skills)}
   onJobTitleChange={(v) => updateField("jobTitle", v)}
+  onGoToPersonal={() => setActiveStep(STEP.PERSONAL)}
                   onJobDescriptionChange={(v) => updateField("jobDescription", v)}
                 />
               )}
 
-              {activeStep === 3 && (
+              {activeStep === STEP.EDUCATION && (
                 <div className="space-y-4">
                   <SortableList
                     ids={cvData.education.map((e) => e.id)}
@@ -867,7 +844,7 @@ export default function BuilderPage() {
                 </div>
               )}
 
-              {activeStep === 4 && (isSectionUnused("organizations") ? (
+              {activeStep === STEP.ORGANIZATIONS && (isSectionUnused("organizations") ? (
                 <UnusedSectionCard label="Organisasi" onRestore={() => restoreUnused("organizations")} hasContent={sectionHasSavedContent(cvData, "organizations")} onPurge={() => requestPurgeSection("organizations")} />
               ) : (
                 <div className="space-y-4">
@@ -912,7 +889,7 @@ export default function BuilderPage() {
                 </div>
               ))}
 
-              {activeStep === 5 && (
+              {activeStep === STEP.SKILLS && (
                 <SkillSection
                   skills={cvData.skills}
                   certifications={cvData.certifications || []}
@@ -937,7 +914,7 @@ export default function BuilderPage() {
                   onPurgeSection={requestPurgeSection}
                 />
               )}
-              {activeStep === 5 && customOnly.map((cs) => isSectionUnused(cs.id) ? (
+              {activeStep === STEP.SKILLS && customOnly.map((cs) => isSectionUnused(cs.id) ? (
                 <UnusedSectionCard
                   key={cs.id}
                   label={labelOf(cs.id)}
@@ -954,7 +931,7 @@ export default function BuilderPage() {
                   hiddenNotice={cs.content.trim() && isSectionHidden(cs.id) ? <HiddenSectionNotice onShow={() => showSection(cs.id)} /> : null}
                 />
               ))}
-              {activeStep === 5 && (
+              {activeStep === STEP.SKILLS && (
                 <div className="rounded-xl bg-surface-container-lowest p-6 shadow-soft">
                   <h3 className="mb-1 font-label-bold text-on-surface">Tambah bagian</h3>
                   <p className="mb-3 text-xs text-on-surface-variant">Bagian tambahan muncul di CV setelah diisi, dan bisa diurutkan lewat Urutan Section.</p>
@@ -968,7 +945,7 @@ export default function BuilderPage() {
                 </div>
               )}
 
-              {activeStep === 6 && (
+              {activeStep === STEP.REVIEW && (
                 <ReviewStep cvData={cvData} sectionCompletion={sectionCompletion} customSections={customSections} cvId={cvId} />
               )}
 

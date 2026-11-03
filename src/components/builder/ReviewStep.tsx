@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { CvData } from "@/components/cv-templates";
 import { useCoverLetterQuota } from "@/hooks/useCoverLetterQuota";
+import { CONTENT_STEPS, STEP_IDS } from "@/lib/builder-steps";
 
 interface ReviewStepProps {
   cvData: CvData;
@@ -20,17 +21,17 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
           <h3 className="font-label-bold text-on-surface">Ringkasan CV</h3>
           <div className="flex items-center gap-1.5">
             <div className="flex">
-              {[0, 1, 2, 3, 4, 5].map((idx) => (
+              {CONTENT_STEPS.map((id) => (
                 <div
-                  key={idx}
+                  key={id}
                   className={`w-5 h-1 rounded-full transition-colors duration-500 ${
-                    sectionCompletion[idx] ? "bg-primary" : "bg-outline-variant/50"
+                    sectionCompletion[STEP_IDS.indexOf(id)] ? "bg-primary" : "bg-outline-variant/50"
                   } ml-0.5 first:ml-0`}
                 />
               ))}
             </div>
             <span className="text-[10px] font-bold text-primary">
-              {sectionCompletion.filter(Boolean).length}/6
+              {CONTENT_STEPS.filter((id) => sectionCompletion[STEP_IDS.indexOf(id)]).length}/{CONTENT_STEPS.length}
             </span>
           </div>
         </div>

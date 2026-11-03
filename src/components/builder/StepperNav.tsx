@@ -80,7 +80,6 @@ export function BottomNav({
   sectionMeta,
 }: StepperProps & { handleSave: () => void; isSaving: boolean }) {
   const { t } = useTranslation();
-  const iconNames = ["person", "work_history", "work", "school", "groups", "star", "visibility"];
 
   return (
     <div className="sticky bottom-0 bg-surface-container-lowest border-t border-outline-variant/50 shadow-[0_-4px_12px_rgba(0,0,0,0.04)] z-30">
@@ -102,7 +101,7 @@ export function BottomNav({
                 }`}
               >
                 <span className={`material-symbols-outlined text-[14px] ${isFilled && !isActive ? "text-green" : ""}`} style={{ fontVariationSettings: "'FILL' 1" }}>
-                  {isFilled ? "check_circle" : iconNames[i]}
+                  {isFilled ? "check_circle" : sectionMeta[i]?.icon}
                 </span>
                 <span className="hidden md:inline">{label}</span>
               </button>
