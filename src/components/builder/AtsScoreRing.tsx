@@ -1,5 +1,7 @@
 "use client";
 
+import { Tooltip } from "@/components/ui/popover";
+
 /**
  * Persentase kata kunci deskripsi lowongan yang ditemukan di CV. 0 bila
  * deskripsi lowongan belum diisi, jadi angkanya diganti tanda "–".
@@ -13,7 +15,8 @@ export function AtsScoreRing({ score }: { score: number }) {
     : `Kecocokan kata kunci dengan deskripsi lowongan: ${score}%`;
 
   return (
-    <div className="flex items-center gap-1.5 bg-primary/5 border border-primary/20 rounded-lg px-2 py-1 shrink-0" title={tip} aria-label={tip} role="img">
+    <Tooltip text={tip}>
+    <div tabIndex={0} className="flex items-center gap-1.5 bg-primary/5 border border-primary/20 rounded-lg px-2 py-1 shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary" aria-label={tip} role="img">
       <div className="relative w-6 h-6">
         <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
           <circle className="stroke-current text-primary/20" cx="18" cy="18" fill="none" r="16" strokeWidth="3" />
@@ -29,5 +32,6 @@ export function AtsScoreRing({ score }: { score: number }) {
       </div>
       <span className="text-[10px] font-semibold text-on-surface-variant whitespace-nowrap">Kata kunci</span>
     </div>
+    </Tooltip>
   );
 }

@@ -8,6 +8,7 @@ import { PdfExportButton } from "@/components/checker/PdfExportButton";
 import { useTranslation } from "@/lib/i18n";
 import { CV_FONTS, cvFontValue, resolveCvFont } from "@/lib/cv-fonts";
 import { TemplatePopover } from "@/components/builder/TemplatePopover";
+import { Tooltip } from "@/components/ui/popover";
 
 const FONT_OPTIONS = [
   { value: "'Inter', sans-serif", label: "Inter" },
@@ -104,6 +105,7 @@ export function FormatToolbar({
   const selectCls = "bg-surface-container-low border border-outline-variant/50 rounded-lg text-xs px-2 py-1.5 min-h-9 focus:ring-1 focus:ring-primary";
 
   const targetSelect = (
+    <Tooltip text={t("builder.tip-target")}>
     <label className="flex items-center gap-1 text-xs text-on-surface-variant">
       <span className="whitespace-nowrap">Atur bagian</span>
       <select
@@ -117,17 +119,21 @@ export function FormatToolbar({
         ))}
       </select>
     </label>
+    </Tooltip>
   );
 
   const fontControls = (
     <>
+      <Tooltip text={t("builder.tip-font")}>
       <select value={fontFamily} onChange={(e) => onFontFamilyChange(e.target.value)} aria-label="Font" className={`${selectCls} max-w-[140px]`}>
         {!fontKnown && <option value={fontFamily}>{resolveCvFont(fontFamily).label}{sectionMode ? "" : " (template)"}</option>}
         {fontOptions.map((o) => (
           <option key={o.value} value={o.value}>{o.label}</option>
         ))}
       </select>
+      </Tooltip>
 
+      <Tooltip text={t("builder.tip-size")}>
       <div className="flex items-center gap-1 bg-surface-container-low rounded-lg px-1.5 py-1">
         <button onClick={() => onFontSizeChange(Math.max(sizeMin, fontSize - 1))} disabled={fontSize <= sizeMin} className="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant disabled:opacity-40" aria-label={t("builder.font-small")}>
           <span className="material-symbols-outlined text-sm" aria-hidden="true">remove</span>
@@ -137,7 +143,9 @@ export function FormatToolbar({
           <span className="material-symbols-outlined text-sm" aria-hidden="true">add</span>
         </button>
       </div>
+      </Tooltip>
 
+      <Tooltip text={t("builder.tip-align")}>
       <div className="flex items-center bg-surface-container-low rounded-lg p-0.5 gap-0.5" role="group" aria-label="Rata teks">
         {(["left", "center", "right", "justify"] as const).map((align) => {
           const label =
@@ -151,7 +159,6 @@ export function FormatToolbar({
           return (
             <button key={align} onClick={() => onTextAlignChange(align)} aria-pressed={textAlign === align}
               className={`p-1.5 rounded ${textAlign === align ? "bg-surface-container-lowest shadow-sm" : "hover:bg-surface-container-highest/60"}`}
-              title={label}
               aria-label={label}
             >
               <span className="material-symbols-outlined text-sm" aria-hidden="true">{align === "left" ? "format_align_left" : align === "center" ? "format_align_center" : align === "right" ? "format_align_right" : "format_align_justify"}</span>
@@ -159,6 +166,7 @@ export function FormatToolbar({
           );
         })}
       </div>
+      </Tooltip>
     </>
   );
 
@@ -223,19 +231,21 @@ export function FormatToolbar({
   );
 
   const aiButton = (
+    <Tooltip text={t("builder.tip-revise")}>
     <MagneticButton>
       <button onClick={onNavigateToCheckout}
         className="relative flex min-h-[36px] items-center gap-1.5 px-3 py-1.5 rounded-full border-[2.5px] border-ink bg-lime text-xs font-bold text-on-light shadow-[0_2px_0_rgb(var(--c-ink))] overflow-hidden"
-        title="Buka halaman pembelian revisi CV oleh AI"
         aria-label="Revisi CV dengan AI (berbayar)"
       >
         <span className="material-symbols-outlined text-sm relative z-10" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">auto_awesome</span>
         <span className="relative z-10 hidden sm:inline">Revisi dengan AI</span>
       </button>
     </MagneticButton>
+    </Tooltip>
   );
 
   const pdfButton = (
+    <Tooltip text={t("builder.tip-pdf")}>
     <PdfExportButton
       targetRef={{ current: null }}
       mode="builder"
@@ -244,6 +254,7 @@ export function FormatToolbar({
       label="PDF"
       fileName="CV.pdf"
     />
+    </Tooltip>
   );
 
   return (
@@ -256,12 +267,14 @@ export function FormatToolbar({
             Form
           </button>
         )}
+        <Tooltip text={t("builder.tip-format")}>
         <button type="button" onClick={() => setSheetOpen(true)} aria-haspopup="dialog"
           className="flex min-h-11 items-center gap-1 rounded-lg bg-surface-container-low px-3 text-sm font-semibold text-on-surface hover:bg-surface-variant"
         >
           <span className="material-symbols-outlined text-[18px]" aria-hidden="true">text_format</span>
           Format
         </button>
+        </Tooltip>
         {saveBadge}
         <div className="ml-auto flex items-center gap-2">
           {aiButton}
@@ -287,12 +300,16 @@ export function FormatToolbar({
 
         <AtsScoreRing score={computeAtsScore} />
 
-        <TemplatePopover templateId={templateId} onSelect={onTemplateChange} hasOverrides={hasStyleOverrides} onResetStyle={onResetStyle} />
+        <Tooltip text={t("builder.tip-template")}>
+          <span className="inline-flex">
+            <TemplatePopover templateId={templateId} onSelect={onTemplateChange} hasOverrides={hasStyleOverrides} onResetStyle={onResetStyle} />
+          </span>
+        </Tooltip>
 
         {targetSelect}
         {fontControls}
 
-        <MoreMenu>{moreItems}</MoreMenu>
+        <MoreMenu tip={t("builder.tip-more")}>{moreItems}</MoreMenu>
 
         <div className="ml-auto flex items-center gap-2">
           {aiButton}
@@ -352,7 +369,7 @@ function MenuItem({ icon, onClick, pressed, children }: { icon: string; onClick:
 }
 
 /** Menu "Lainnya" (desktop): tutup dengan klik di luar atau Escape. */
-function MoreMenu({ children }: { children: (close: () => void) => ReactNode }) {
+function MoreMenu({ children, tip }: { children: (close: () => void) => ReactNode; tip: string }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -372,12 +389,14 @@ function MoreMenu({ children }: { children: (close: () => void) => ReactNode }) 
   }, [open]);
   return (
     <div ref={ref} className="relative">
+      <Tooltip text={tip}>
       <button type="button" onClick={() => setOpen((v) => !v)} aria-haspopup="menu" aria-expanded={open}
         className="flex min-h-9 items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-surface-container-low text-on-surface-variant hover:bg-surface-variant"
       >
         Lainnya
         <span className="material-symbols-outlined text-sm" aria-hidden="true">expand_more</span>
       </button>
+      </Tooltip>
       {open && (
         <div role="menu" className="absolute left-0 top-full z-30 mt-1 w-64 rounded-xl border border-outline-variant/50 bg-surface-container-lowest py-1 shadow-lg">
           {children(() => setOpen(false))}

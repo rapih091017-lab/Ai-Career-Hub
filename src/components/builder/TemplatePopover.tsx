@@ -62,7 +62,7 @@ export function TemplatePopover({ templateId, onSelect, hasOverrides, onResetSty
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-controls="template-popover"
-        title={`Template: ${current}`}
+        aria-label={`Template: ${current}`}
         className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-medium transition-colors ${
           open ? "bg-primary/10 text-primary" : "bg-surface-container-low text-on-surface-variant hover:bg-surface-variant"
         }`}
