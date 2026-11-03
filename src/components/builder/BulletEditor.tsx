@@ -1,6 +1,8 @@
 "use client";
 
 import { memo, useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { FieldHelp } from "@/components/builder/FieldHelp";
+import type { BuilderHelpKey } from "@/lib/builder-help";
 import {
   DndContext,
   KeyboardSensor,
@@ -47,6 +49,8 @@ interface BulletEditorProps {
   headerAction?: React.ReactNode;
   /** Penanda untuk lompat dari pratinjau (poin ke-n = textarea[data-index=n]). */
   cvField?: string;
+  /** Ikon (i) bantuan di samping label. */
+  help?: BuilderHelpKey;
 }
 
 interface Focus {
@@ -176,6 +180,7 @@ export function BulletEditor({
   disabled,
   headerAction,
   cvField,
+  help,
 }: BulletEditorProps) {
   const labelId = useId();
   const [lines, setLines] = useState<string[]>(() => linesFromValue(value));
@@ -398,7 +403,10 @@ export function BulletEditor({
   return (
     <div data-cv-field={cvField}>
       <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
-        <span id={labelId} className="block text-label-bold text-on-surface">{label}</span>
+        <span className="flex items-center gap-1">
+          <span id={labelId} className="block text-label-bold text-on-surface">{label}</span>
+          {help && <FieldHelp topic={help} />}
+        </span>
         <div className="flex items-center gap-2">
           {onModeChange && (
             <div role="group" aria-label="Bentuk penulisan" className="inline-flex rounded-lg bg-surface-container-low p-0.5 text-xs font-semibold">

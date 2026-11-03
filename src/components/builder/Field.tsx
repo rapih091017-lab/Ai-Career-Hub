@@ -1,7 +1,9 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useId } from "react";
 import { AIPolishButton } from "@/components/ai/AIPolishDialog";
+import { FieldHelp } from "@/components/builder/FieldHelp";
+import type { BuilderHelpKey } from "@/lib/builder-help";
 
 /* ───────── Field Component ───────── */
 
@@ -23,6 +25,8 @@ interface FieldProps {
   jobDescription?: string;
   /** Penanda untuk lompat dari pratinjau ke field ini (lihat cv-edit-path). */
   cvField?: string;
+  /** Ikon (i) bantuan di samping label. */
+  help?: BuilderHelpKey;
 }
 
 export function Field({
@@ -39,7 +43,9 @@ export function Field({
   skills,
   jobDescription,
   cvField,
+  help,
 }: FieldProps) {
+  const inputId = useId();
   const isEmpty = required && !value;
   const isFilled = !!value && !disabled;
 
@@ -53,12 +59,16 @@ export function Field({
 
   return (
     <div data-cv-field={cvField}>
-      <label className="block text-label-bold text-on-surface mb-1.5">
-        {label}
-        {required && <span className="text-error ml-0.5">*</span>}
-      </label>
+      <div className="mb-1.5 flex items-center gap-1">
+        <label htmlFor={inputId} className="block text-label-bold text-on-surface">
+          {label}
+          {required && <span className="text-error ml-0.5">*</span>}
+        </label>
+        {help && <FieldHelp topic={help} />}
+      </div>
       <div className="relative">
         <input
+          id={inputId}
           type={type}
           value={value}
           onChange={(e) => onChange(e.target.value)}

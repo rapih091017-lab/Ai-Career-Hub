@@ -76,7 +76,7 @@ export function EducationCard({ edu, index, totalItems, jobTitle, skills, jobDes
         <Field cvField="startDate" label="Tahun Mulai" type="month" value={edu.startDate} onChange={(v) => onUpdate(index, "startDate", v)} />
         <Field label="Tahun Selesai" type="month" value={edu.endDate} onChange={(v) => onUpdate(index, "endDate", v)} />
       </div>
-      <Field cvField="gpa" label="IPK / GPA (opsional)" value={edu.gpa || ""} onChange={(v) => onUpdate(index, "gpa", v)} placeholder="Contoh: 3.75 / 4.00" />
+      <Field cvField="gpa" label="IPK / GPA (opsional)" help="gpa" value={edu.gpa || ""} onChange={(v) => onUpdate(index, "gpa", v)} placeholder="Contoh: [angka] / 4,00" />
     </div>
   );
 }

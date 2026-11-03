@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { AiLoadingOverlay } from "./AiLoadingOverlay";
 import { Field } from "@/components/builder/Field";
 import { AIPolishButton } from "@/components/ai/AIPolishDialog";
+import { FieldHelp } from "@/components/builder/FieldHelp";
 import { TargetMissingNote } from "@/components/builder/TargetHint";
 import type { CustomFieldEntry } from "@/components/cv-templates";
 
@@ -159,8 +160,12 @@ export function SummarySection({
     <div className="space-y-5">
       {/* Employment Status */}
       <div data-cv-field="employmentStatus">
-        <label className="block text-label-bold text-on-surface mb-1.5">Status Pekerjaan</label>
+        <div className="mb-1.5 flex items-center gap-1">
+          <label htmlFor="cv-employment-status" className="block text-label-bold text-on-surface">Status Pekerjaan</label>
+          <FieldHelp topic="employmentStatus" />
+        </div>
         <select
+          id="cv-employment-status"
           value={employmentStatus}
           onChange={(e) => onEmploymentStatusChange?.(e.target.value)}
           className="w-full bg-surface-container-low border-none rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary text-body-md"
@@ -174,7 +179,10 @@ export function SummarySection({
 
       {/* Summary */}
       <div className="relative" data-cv-field="summary">
-        <label className="block text-label-bold text-on-surface mb-1.5">Ringkasan Profesional</label>
+        <div className="mb-1.5 flex items-center gap-1">
+          <label htmlFor="cv-summary" className="block text-label-bold text-on-surface">Ringkasan Profesional</label>
+          <FieldHelp topic="summary" />
+        </div>
         
         {/* Textarea container with loading overlay */}
         <div className="relative">
@@ -193,6 +201,7 @@ export function SummarySection({
             )}
           </AnimatePresence>
           <textarea
+            id="cv-summary"
             rows={4}
             value={summary}
             onChange={(e) => onChange(e.target.value)}
@@ -300,7 +309,7 @@ export function SummarySection({
               <span className="material-symbols-outlined text-indigo-600" style={{ fontVariationSettings: "'FILL' 1" }}>tune</span>
             </div>
             <div>
-              <h3 className="font-label-bold text-on-surface">Field Kustom</h3>
+              <h3 className="flex items-center gap-1 font-label-bold text-on-surface">Field Kustom<FieldHelp topic="customFields" /></h3>
               <p className="text-xs text-on-surface-variant">Tambahkan info tambahan (GitHub, Website, dll)</p>
             </div>
           </div>

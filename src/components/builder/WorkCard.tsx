@@ -239,11 +239,11 @@ export function WorkCard({
             <div className="space-y-4">
               <Field cvField="position" label="Posisi Jabatan" value={work.position} onChange={(v) => onUpdate(index, "position", v)} enableAiPolish fieldName="position" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
               <Field cvField="company" label="Perusahaan" value={work.company} onChange={(v) => onUpdate(index, "company", v)} enableAiPolish fieldName="company" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
-              <Field cvField="companyDescription" label="Deskripsi Perusahaan (opsional)" value={work.companyDescription || ""} onChange={(v) => onUpdate(index, "companyDescription", v)} />
+              <Field cvField="companyDescription" label="Deskripsi Perusahaan (opsional)" help="companyDescription" value={work.companyDescription || ""} onChange={(v) => onUpdate(index, "companyDescription", v)} />
               <Field cvField="location" label="Lokasi" value={work.location} onChange={(v) => onUpdate(index, "location", v)} />
               <Field cvField="projectUrl" label="Link Proyek / Portofolio (opsional)" value={work.projectUrl || ""} onChange={(v) => onUpdate(index, "projectUrl", v)} placeholder="https://github.com/..." />
               <div className="bg-primary/5 border border-primary/10 rounded-xl p-3">
-                <Field cvField="achievement" label="Pencapaian Utama (opsional)" value={work.achievement || ""} onChange={(v) => onUpdate(index, "achievement", v)} placeholder="Contoh: Meningkatkan penjualan 30% dalam 6 bulan" enableAiPolish fieldName="achievement" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
+                <Field cvField="achievement" label="Pencapaian Utama (opsional)" help="achievement" value={work.achievement || ""} onChange={(v) => onUpdate(index, "achievement", v)} placeholder="Contoh: Mempercepat rekap stok dari [angka] menjadi [angka] hari" enableAiPolish fieldName="achievement" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
                 <p className="text-[10px] text-on-surface-variant mt-1 flex items-center gap-1">
                   <span className="material-symbols-outlined text-xs" aria-hidden="true">info</span>
                   Soroti pencapaian dengan angka/metrik · ini yang paling dilihat HR!
@@ -289,6 +289,7 @@ export function WorkCard({
                   <BulletEditor
                     cvField="description"
                     label="Deskripsi"
+                    help="workDescription"
                     value={work.description}
                     onChange={(v) => onUpdate(index, "description", v)}
                     mode={work.descriptionType ?? "bullets"}

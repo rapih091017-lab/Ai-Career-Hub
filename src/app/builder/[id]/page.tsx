@@ -685,7 +685,7 @@ export default function BuilderPage() {
                   <Field cvField="address" label={t("builder.field-address")} value={cvData.address} onChange={(v) => updateField("address", v)} />
                   <Field cvField="linkedin" label={t("builder.field-linkedin")} value={cvData.linkedin} onChange={(v) => updateField("linkedin", v)} />
                   <Field cvField="portfolioUrl" label={t("builder.field-portfolio")} type="url" value={cvData.portfolioUrl || ""} onChange={(v) => updateField("portfolioUrl", v)} />
-                  <Field cvField="professionalTitle" label={t("builder.field-motto")} value={cvData.professionalTitle || ""} onChange={(v) => updateField("professionalTitle", v)} />
+                  <Field cvField="professionalTitle" help="professionalTitle" label={t("builder.field-motto")} value={cvData.professionalTitle || ""} onChange={(v) => updateField("professionalTitle", v)} />
                   
                   <SummarySection
                     employmentStatus={cvData.employmentStatus || ""}

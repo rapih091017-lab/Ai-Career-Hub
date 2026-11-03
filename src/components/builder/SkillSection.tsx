@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FieldHelp } from "@/components/builder/FieldHelp";
 import { BulletEditor } from "./BulletEditor";
 import { RemoveSectionButton, UnusedSectionCard } from "./SectionControls";
 import type { SkillEntry, CertificationEntry } from "@/components/cv-templates";
@@ -113,7 +114,7 @@ export function SkillSection({
             <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>psychology</span>
           </div>
           <div>
-            <h3 className="font-label-bold text-on-surface">Keahlian</h3>
+            <h3 className="flex items-center gap-1 font-label-bold text-on-surface">Keahlian<FieldHelp topic="skills" /></h3>
             <p className="text-xs text-on-surface-variant">Kelompokkan skill berdasarkan kategori agar CV lebih profesional</p>
           </div>
         </div>
@@ -192,7 +193,7 @@ export function SkillSection({
             <span className="material-symbols-outlined text-amber-600" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
           </div>
           <div>
-            <h3 className="font-label-bold text-on-surface">Sertifikasi & Lisensi</h3>
+            <h3 className="flex items-center gap-1 font-label-bold text-on-surface">Sertifikasi & Lisensi<FieldHelp topic="certifications" /></h3>
             <p className="text-xs text-on-surface-variant">Sertifikasi profesional, kursus, atau lisensi yang dimiliki</p>
           </div>
           {removeBtn("certifications", "Sertifikasi")}
@@ -260,7 +261,7 @@ export function SkillSection({
             <span className="material-symbols-outlined text-green" style={{ fontVariationSettings: "'FILL' 1" }}>badge</span>
           </div>
           <div>
-            <h3 className="font-label-bold text-on-surface">Evaluasi Diri</h3>
+            <h3 className="flex items-center gap-1 font-label-bold text-on-surface">Evaluasi Diri<FieldHelp topic="selfEvaluation" /></h3>
             <p className="text-xs text-on-surface-variant">Tuliskan kekuatan utama, motivasi, atau tujuan kariermu (opsional)</p>
           </div>
           {removeBtn("selfEvaluation", "Evaluasi Diri")}
@@ -272,7 +273,7 @@ export function SkillSection({
             onChange={(e) => onSelfEvaluationChange(e.target.value)}
             className="w-full bg-surface-container-low border-none rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary resize-none text-body-md"
             rows={3}
-            placeholder="Contoh: Pengembang front-end yang bersemangat dengan 3+ tahun pengalaman membangun aplikasi web yang scalable. Terbiasa bekerja dalam tim agile dan berkomitmen pada kode yang bersih dan teruji."
+            placeholder="Contoh: Teliti dalam pekerjaan angka: terbiasa mengecek ulang laporan sebelum dikirim ke atasan."
           />
         ) : (
           <textarea
@@ -296,7 +297,7 @@ export function SkillSection({
             <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>more_horiz</span>
           </div>
           <div>
-            <h3 className="font-label-bold text-on-surface">Lainnya</h3>
+            <h3 className="flex items-center gap-1 font-label-bold text-on-surface">Lainnya<FieldHelp topic="extraSection" /></h3>
             <p className="text-xs text-on-surface-variant">Key achievements, penghargaan, atau apapun yang ingin ditambahkan</p>
           </div>
           {removeBtn("lainnya", "Lainnya")}
