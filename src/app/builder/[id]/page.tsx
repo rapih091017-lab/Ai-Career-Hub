@@ -530,9 +530,13 @@ export default function BuilderPage() {
   handleSaveRef.current = handleSave;
   const isSavingRef = useRef(isSaving);
   isSavingRef.current = isSaving;
+  const tourOpenRef = useRef(tourOpen);
+  tourOpenRef.current = tourOpen;
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      // Tur terbuka: shortcut builder dimatikan agar tidak mengubah langkah/menyimpan di balik dialog.
+      if (tourOpenRef.current) return;
       // Ctrl+Enter → Save (with guard against double-save)
       if (e.ctrlKey && e.key === 'Enter') {
         e.preventDefault();
