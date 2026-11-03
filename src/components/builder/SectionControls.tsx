@@ -11,10 +11,11 @@ export function RemoveSectionButton({ label, onRemove }: { label: string; onRemo
       type="button"
       onClick={onRemove}
       aria-label={`Hapus bagian ${label} dari CV`}
-      className="ml-auto inline-flex min-h-11 shrink-0 items-center gap-1 rounded-lg px-2.5 text-xs font-semibold text-on-surface-variant hover:bg-error/5 hover:text-error focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-error sm:min-h-8"
+      className="ml-auto inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1 rounded-lg px-2.5 text-xs font-semibold text-on-surface-variant hover:bg-error/5 hover:text-error focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-error sm:min-h-8 sm:min-w-0"
     >
       <span className="material-symbols-outlined text-[16px]" aria-hidden="true">delete</span>
-      Hapus dari CV
+      {/* Layar kecil: ikon saja (nama dari aria-label) agar judul kartu tidak terbungkus. */}
+      <span className="hidden sm:inline">Hapus dari CV</span>
     </button>
   );
 }
