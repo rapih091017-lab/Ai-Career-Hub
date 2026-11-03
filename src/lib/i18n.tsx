@@ -1868,6 +1868,8 @@ const DICT: Record<string, { id: string; en: string }> = {
   "builder.tip-more": { id: "Garis antarbagian, urutan bagian, serta warna, spasi, dan margin.", en: "Section dividers, section order, plus color, spacing, and margins." },
   "builder.tip-pdf": { id: "Unduh CV sebagai file PDF untuk dikirim ke lowongan.", en: "Download the CV as a PDF file to send with applications." },
   "builder.tip-revise": { id: "Buka layanan berbayar: AI merevisi seluruh CV untuk lowongan targetmu.", en: "Open the paid service: AI revises your whole CV for your target job." },
+  "builder.guide": { id: "Panduan", en: "Guide" },
+  "builder.guide-tip": { id: "Buka lagi tur singkat cara memakai builder.", en: "Reopen the short tour of the builder." },
   "builder.tip-format": { id: "Buka pengaturan template, font, ukuran, rata, dan tampilan.", en: "Open template, font, size, alignment, and display settings." },
   "builder.ai-opt": { id: "AI Rev", en: "AI Rev" },
   "builder.ai-opt-tip": { id: "Optimalkan CV dengan AI", en: "Optimize CV with AI" },

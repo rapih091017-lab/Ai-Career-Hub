@@ -246,6 +246,7 @@ export function FormatToolbar({
 
   const pdfButton = (
     <Tooltip text={t("builder.tip-pdf")}>
+    <span data-tour="pdf" className="inline-flex">
     <PdfExportButton
       targetRef={{ current: null }}
       mode="builder"
@@ -254,11 +255,12 @@ export function FormatToolbar({
       label="PDF"
       fileName="CV.pdf"
     />
+    </span>
     </Tooltip>
   );
 
   return (
-    <div className="relative h-auto px-3 md:px-4 py-2 border-b border-outline-variant/50 flex flex-wrap items-center gap-2 bg-surface-container-lowest shadow-sm z-20 shrink-0">
+    <div data-tour="toolbar" className="relative h-auto px-3 md:px-4 py-2 border-b border-outline-variant/50 flex flex-wrap items-center gap-2 bg-surface-container-lowest shadow-sm z-20 shrink-0">
       {/* ── Layar kecil: satu baris ringkas ── */}
       <div className="flex w-full items-center gap-2 lg:hidden">
         {onCloseMobilePreview && (

@@ -51,6 +51,8 @@ import {
   updateCustomSection,
 } from "@/lib/section-manager";
 import { TargetHintProvider } from "@/components/builder/TargetHint";
+import { BuilderTour, tourSeen } from "@/components/builder/BuilderTour";
+import { Tooltip } from "@/components/ui/popover";
 import { AtsScoreInsight } from "@/components/builder/AtsScoreInsight";
 import { BuilderLoadingSkeleton, BuilderErrorState } from "@/components/builder/BuilderSkeleton";
 import { useTranslation } from "@/lib/i18n";
@@ -365,6 +367,16 @@ export default function BuilderPage() {
     requestAnimationFrame(tick);
   }, []);
 
+  // Tur singkat: otomatis sekali untuk user baru, bisa dibuka lagi lewat tombol Panduan.
+  const [tourOpen, setTourOpen] = useState(false);
+  const tourChecked = useRef(false);
+  useEffect(() => {
+    if (isLoading || fetchError || tourChecked.current) return;
+    tourChecked.current = true;
+    if (!tourSeen()) setTourOpen(true);
+  }, [isLoading, fetchError]);
+  const closeTour = useCallback(() => setTourOpen(false), []);
+
   // Catatan "Isi sekarang" di dekat tombol AI saat judul posisi target kosong.
   const targetHint = useMemo(
     () => ({ missing: !cvData.jobTitle?.trim(), goToTarget: () => jumpToField("jobTitle") }),
@@ -589,8 +601,21 @@ export default function BuilderPage() {
         <AppHeader />
 
         {/* ── STEPPER (connector lines style) ── */}
-        <div className="w-full bg-surface-container-lowest border-b border-outline-variant/50 py-4 md:py-5 px-3 md:px-8 overflow-x-auto shrink-0">
-          <StepperSteps steps={steps} activeStep={activeStep} setActiveStep={setActiveStep} sectionCompletion={sectionCompletion} sectionMeta={sectionMeta} />
+        <div className="w-full bg-surface-container-lowest border-b border-outline-variant/50 flex items-center gap-2 pr-3 md:pr-6 shrink-0">
+          <div className="min-w-0 flex-1 overflow-x-auto py-4 md:py-5 pl-3 md:pl-8">
+            <StepperSteps steps={steps} activeStep={activeStep} setActiveStep={setActiveStep} sectionCompletion={sectionCompletion} sectionMeta={sectionMeta} stepIds={STEP_IDS} />
+          </div>
+          <Tooltip text={t("builder.guide-tip")}>
+            <button
+              type="button"
+              onClick={() => setTourOpen(true)}
+              className="flex min-h-11 shrink-0 items-center gap-1 rounded-lg border border-outline-variant/60 px-2.5 text-sm font-medium text-on-surface hover:bg-surface-container sm:min-h-9"
+            >
+              <span className="material-symbols-outlined text-[18px]" aria-hidden="true">help</span>
+              <span className="hidden sm:inline">{t("builder.guide")}</span>
+              <span className="sr-only sm:hidden">{t("builder.guide")}</span>
+            </button>
+          </Tooltip>
         </div>
 
         {saveStatus === "conflict" && (
@@ -636,7 +661,7 @@ export default function BuilderPage() {
           style={{ "--left-w": `${leftPct}%` } as React.CSSProperties}
         >
           {/* ── LEFT PANEL ── (lebar diatur splitter di lg ke atas) */}
-          <div className="w-full flex-1 min-h-0 lg:flex-none lg:w-[var(--left-w)] lg:shrink-0 bg-background border-b lg:border-b-0 border-outline-variant/50 overflow-y-auto custom-scrollbar">
+          <div data-tour="form" className="w-full flex-1 min-h-0 lg:flex-none lg:w-[var(--left-w)] lg:shrink-0 bg-background border-b lg:border-b-0 border-outline-variant/50 overflow-y-auto custom-scrollbar">
             <div className="px-6 pt-8 pb-4 flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                 <span className="material-symbols-outlined text-green-deep text-xl" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">{sectionMeta[activeStep].icon}</span>
@@ -1019,7 +1044,7 @@ export default function BuilderPage() {
                   </div>
                 )}
                 {/* Halaman A4 nyata: ukuran pt/mm sama dengan PDF */}
-                <div ref={previewRef} className="relative" onFocus={onPreviewFocus} onBlur={onPreviewBlur} onClick={onPreviewClick} onMouseEnter={onPreviewEnter}>
+                <div ref={previewRef} data-tour="preview" className="relative" onFocus={onPreviewFocus} onBlur={onPreviewBlur} onClick={onPreviewClick} onMouseEnter={onPreviewEnter}>
                 {editHint && (
                   <div role="status" className="absolute left-1/2 top-3 z-10 flex -translate-x-1/2 items-center gap-1 rounded-full bg-inverse-surface py-1 pl-3 pr-1 text-xs font-medium text-inverse-on-surface shadow-md">
                     Klik teks untuk mengedit
@@ -1088,6 +1113,8 @@ export default function BuilderPage() {
 
         <ConfirmModal confirm={confirm} onClose={() => setConfirm(null)} />
 
+        <BuilderTour open={tourOpen} onClose={closeTour} />
+
         {/* ── DISPLAY SETTINGS MODAL ── */}
         <DisplaySettingsModal
           open={showDisplaySettings}
@@ -1112,6 +1139,7 @@ export default function BuilderPage() {
           <button
             type="button"
             onClick={() => setMobilePreviewOpen(true)}
+            data-tour="preview-open"
             className="fixed bottom-24 right-4 z-40 flex min-h-12 items-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-on-primary shadow-lg lg:hidden"
           >
             <span className="material-symbols-outlined text-[18px]" aria-hidden="true">description</span>
