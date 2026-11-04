@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import LocalizedText from "@/components/ui/LocalizedText";
+import { useToast } from "@/components/ui/toast";
+import { UNDO_BLOCKED_MESSAGE, useUndoGuard } from "@/hooks/useUndoGuard";
 import type { CvData } from "@/components/cv-templates";
 import {
   type AutoFixSuggestion,
-  applyApprovedFixes,
+  applyApprovedFixesWithReport,
 } from "@/lib/auto-fix";
 
 interface AutoFixPanelProps {
@@ -28,6 +29,8 @@ function targetLabel(s: AutoFixSuggestion): string {
 
 export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
   const [enabled, setEnabled] = useState(false);
+  const { addToast } = useToast();
+  const undoGuard = useUndoGuard(cvData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [suggestions, setSuggestions] = useState<AutoFixSuggestion[]>([]);
@@ -35,6 +38,7 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
   const [edits, setEdits] = useState<Record<string, string>>({});
   const [copiedId, setCopiedId] = useState("");
   const [appliedCount, setAppliedCount] = useState(0);
+  const [skippedCount, setSkippedCount] = useState(0);
 
   const editedValue = (s: AutoFixSuggestion) =>
     edits[s.id] ?? (s.type === "replace_text" ? s.replacement : s.name);
@@ -43,6 +47,7 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
     setLoading(true);
     setError("");
     setAppliedCount(0);
+      setSkippedCount(0);
     try {
       const res = await fetch(`/api/cv-documents/${cvId}/auto-fix`, {
         method: "POST",
@@ -102,8 +107,30 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
       else fixes.push({ ...s, name: value });
     }
     if (fixes.length === 0) return;
-    onApply(applyApprovedFixes(cvData, fixes));
-    setAppliedCount(fixes.length);
+    const before = cvData;
+    const report = applyApprovedFixesWithReport(cvData, fixes);
+    onApply(report.cv);
+    if (report.applied > 0) {
+      const unchanged = undoGuard.markApplied();
+      addToast({
+        type: "success",
+        message: `${report.applied} perbaikan diterapkan.`,
+        duration: 8000,
+        action: {
+          label: "Urungkan",
+          onClick: () => {
+            // Urungkan mengembalikan seluruh CV; batalkan bila CV sudah diedit lagi.
+            if (!unchanged()) {
+              addToast({ type: "info", message: "CV sudah diubah setelah perbaikan, urungkan dibatalkan." });
+              return;
+            }
+            onApply(before);
+          },
+        },
+      });
+    }
+    setAppliedCount(report.applied);
+    setSkippedCount(report.skipped.length);
     setSuggestions([]);
     setDecisions({});
     setEdits({});
@@ -124,10 +151,10 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
           </div>
           <div>
             <h3 className="font-label-bold text-on-surface">
-              <LocalizedText text="Cek & perbaiki otomatis" />
+              Cek & perbaiki otomatis
             </h3>
             <p className="text-sm text-on-surface-variant">
-              <LocalizedText text="AI memeriksa bahasa, bullet pengalaman, dan kata kunci — kamu setujui tiap saran sebelum diterapkan." />
+              AI memeriksa bahasa, bullet pengalaman, dan kata kunci — kamu setujui tiap saran sebelum diterapkan.
             </p>
           </div>
         </div>
@@ -151,7 +178,7 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
           {loading && (
             <p className="text-sm text-on-surface-variant flex items-center gap-2">
               <span className="material-symbols-outlined animate-spin text-base" aria-hidden="true">sync</span>
-              <LocalizedText text="AI sedang memeriksa CV-mu..." />
+              AI sedang memeriksa CV-mu...
             </p>
           )}
 
@@ -165,7 +192,7 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
                   onClick={() => void fetchSuggestions()}
                   className="text-xs font-bold text-red-700 underline mt-1"
                 >
-                  <LocalizedText text="Coba lagi" />
+                  Coba lagi
                 </button>
               </div>
             </div>
@@ -176,22 +203,38 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
               <span className="material-symbols-outlined text-green-600 text-base shrink-0" aria-hidden="true">check_circle</span>
               <div className="flex-1">
                 <p className="text-sm text-green-800">
-                  <LocalizedText text={`${appliedCount} saran diterapkan. Tinjau hasilnya di pratinjau kanan.`} />
+                  {`${appliedCount} saran diterapkan. Tinjau hasilnya di pratinjau kanan.`}
                 </p>
                 <button
                   type="button"
                   onClick={() => void fetchSuggestions()}
                   className="text-xs font-bold text-green-800 underline mt-1"
                 >
-                  <LocalizedText text="Cek lagi" />
+                  Cek lagi
                 </button>
               </div>
             </div>
           )}
 
-          {!loading && !error && suggestions.length === 0 && appliedCount === 0 && (
+          {!loading && !error && skippedCount > 0 && suggestions.length === 0 && (
+            <div role="status" className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2">
+              <span className="material-symbols-outlined text-amber-700 text-base shrink-0" aria-hidden="true">warning</span>
+              <div className="flex-1">
+                <p className="text-sm text-amber-900">
+                  {`${skippedCount} perbaikan tidak bisa diterapkan karena teks aslinya sudah berubah.`}
+                </p>
+                {appliedCount === 0 && (
+                  <button type="button" onClick={() => void fetchSuggestions()} className="text-xs font-bold text-amber-900 underline mt-1">
+                    Cek lagi
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {!loading && !error && suggestions.length === 0 && appliedCount === 0 && skippedCount === 0 && (
             <p className="text-sm text-on-surface-variant">
-              <LocalizedText text="Tidak ada saran perbaikan — CV-mu sudah rapi. Kerja bagus!" />
+              Tidak ada saran perbaikan — CV-mu sudah rapi. Kerja bagus!
             </p>
           )}
 
@@ -250,7 +293,7 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
                     }`}
                   >
                     <span className="material-symbols-outlined text-[14px]" aria-hidden="true">check</span>
-                    <LocalizedText text="Terima" />
+                    Terima
                   </button>
                   <button
                     type="button"
@@ -260,7 +303,7 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
                     }`}
                   >
                     <span className="material-symbols-outlined text-[14px]" aria-hidden="true">close</span>
-                    <LocalizedText text="Tolak" />
+                    Tolak
                   </button>
                   <button
                     type="button"
@@ -270,7 +313,7 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
                     <span className="material-symbols-outlined text-[14px]" aria-hidden="true">
                       {copiedId === s.id ? "check" : "content_copy"}
                     </span>
-                    <LocalizedText text={copiedId === s.id ? "Disalin" : "Salin"} />
+                    {copiedId === s.id ? "Disalin" : "Salin"}
                   </button>
                 </div>
               </div>
@@ -284,7 +327,7 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
               className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary/90 active:scale-[0.99] transition-all"
             >
               <span className="material-symbols-outlined text-base" aria-hidden="true">auto_fix_high</span>
-              <LocalizedText text={`Terapkan ${accepted.length} saran yang disetujui`} />
+              {`Terapkan ${accepted.length} saran yang disetujui`}
             </button>
           )}
         </div>

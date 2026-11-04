@@ -805,7 +805,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                       value={formData.heroBio} onChange={update("heroBio")} />
                     {formData.heroBio && (
                       <span className="absolute right-2 top-8">
-                        <AIPolishButton content={formData.heroBio} onApply={(v) => setFormData(prev => ({ ...prev, heroBio: v }))} field="bio hero" size="sm" />
+                        <AIPolishButton content={formData.heroBio} onApply={(v) => setFormData(prev => ({ ...prev, heroBio: v }))} field="bio hero" size="icon" />
                       </span>
                     )}
                     <CharCounter value={formData.heroBio} max={500} />
@@ -824,7 +824,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                       value={formData.aboutText} onChange={update("aboutText")} />
                     {formData.aboutText && (
                       <span className="absolute right-2 top-8">
-                        <AIPolishButton content={formData.aboutText} onApply={(v) => setFormData(prev => ({ ...prev, aboutText: v }))} field="tentang saya" size="sm" />
+                        <AIPolishButton content={formData.aboutText} onApply={(v) => setFormData(prev => ({ ...prev, aboutText: v }))} field="tentang saya" size="icon" />
                       </span>
                     )}
                     <CharCounter value={formData.aboutText} max={1500} />
@@ -870,7 +870,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                             value={p.description} onChange={e => setProjects(prev => prev.map(x => x.id === p.id ? {...x, description: e.target.value} : x))} />
                           {p.description && (
                             <span className="absolute right-2 top-8">
-                              <AIPolishButton content={p.description} onApply={(text) => setProjects(prev => prev.map(x => x.id === p.id ? {...x, description: text} : x))} field={`deskripsi project ${p.name || idx + 1}`} size="sm" />
+                              <AIPolishButton content={p.description} onApply={(text) => setProjects(prev => prev.map(x => x.id === p.id ? {...x, description: text} : x))} field={`deskripsi project ${p.name || idx + 1}`} size="icon" />
                             </span>
                           )}
                           <CharCounter value={p.description} max={500} />
@@ -967,7 +967,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                             value={e.description} onChange={ev => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, description: ev.target.value} : x))} />
                           {e.description && (
                             <span className="absolute right-2 top-8">
-                              <AIPolishButton content={e.description} onApply={(text) => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, description: text} : x))} field={`deskripsi pengalaman ${e.position || idx + 1}`} size="sm" />
+                              <AIPolishButton content={e.description} onApply={(text) => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, description: text} : x))} field={`deskripsi pengalaman ${e.position || idx + 1}`} size="icon" />
                             </span>
                           )}
                           <CharCounter value={e.description} max={1000} />
@@ -1189,7 +1189,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                                 value={item.testimonial} onChange={updateTestimonial(item.id, "testimonial")} />
                               {item.testimonial && (
                                 <span className="absolute right-2 top-2">
-                                  <AIPolishButton content={item.testimonial} onApply={(v) => { const ev = { target: { value: v } } as any; updateTestimonial(item.id, "testimonial")(ev); }} field="testimoni" size="sm" />
+                                  <AIPolishButton content={item.testimonial} onApply={(v) => { const ev = { target: { value: v } } as any; updateTestimonial(item.id, "testimonial")(ev); }} field="testimoni" size="icon" />
                                 </span>
                               )}
                             </div>

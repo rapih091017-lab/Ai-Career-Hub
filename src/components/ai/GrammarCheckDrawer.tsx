@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { useToast } from "@/components/ui/toast";
+import { aiErrorMessage } from "@/components/ai/ai-error-message";
 
 /**
  * Grammar Error Interface
@@ -77,8 +78,7 @@ export function GrammarCheckDrawer({
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Gagal memeriksa grammar");
+        throw new Error(await aiErrorMessage(response, "Gagal memeriksa grammar"));
       }
 
       const data = await response.json();

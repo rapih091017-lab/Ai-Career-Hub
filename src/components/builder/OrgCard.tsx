@@ -2,6 +2,8 @@
 
 import { Field } from "@/components/builder/Field";
 import { AIPolishButton } from "@/components/ai/AIPolishDialog";
+import { BulletEditor } from "./BulletEditor";
+import { aiTextForField } from "@/lib/bullet-lines";
 import type { OrganizationEntry } from "@/components/cv-templates";
 
 interface OrgCardProps {
@@ -18,19 +20,18 @@ interface OrgCardProps {
   onMoveUp: (index: number) => void;
   onMoveDown: (index: number) => void;
   onToggleVisibility: (index: number) => void;
+  /** Tombol seret dari SortableList. */
+  dragHandle?: React.ReactNode;
 }
 
-export function OrgCard({ org, index, totalItems, jobTitle, skills, jobDescription, onUpdate, onSetPresent, onRemove, onMoveUp, onMoveDown, onToggleVisibility }: OrgCardProps) {
+export function OrgCard({ org, index, totalItems, jobTitle, skills, jobDescription, onUpdate, onSetPresent, onRemove, onMoveUp, onMoveDown, onToggleVisibility, dragHandle }: OrgCardProps) {
   const isHidden = org.visible === false;
 
   return (
-    <div className={`bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4 relative transition-opacity duration-200 ${isHidden ? "opacity-50" : ""}`}>
+    <div data-cv-entry={`organisations.${org.id}`} className={`bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4 relative transition-opacity duration-200 ${isHidden ? "opacity-50" : ""}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {/* Drag handle */}
-          <div className="shrink-0 cursor-grab active:cursor-grabbing text-outline-variant hover:text-on-surface transition-colors p-1 rounded">
-            <span className="material-symbols-outlined text-[16px]">drag_indicator</span>
-          </div>
+          {dragHandle}
           <h3 className="font-label-bold text-on-surface">Organisasi {index + 1}</h3>
         </div>
         <div className="flex items-center gap-1">
@@ -72,10 +73,10 @@ export function OrgCard({ org, index, totalItems, jobTitle, skills, jobDescripti
           </button>
         </div>
       </div>
-      <Field label="Nama Organisasi" value={org.name} onChange={(v) => onUpdate(index, "name", v)} enableAiPolish fieldName="nama organisasi" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
-      <Field label="Posisi / Jabatan" value={org.position} onChange={(v) => onUpdate(index, "position", v)} enableAiPolish fieldName="posisi organisasi" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
+      <Field cvField="name" label="Nama Organisasi" value={org.name} onChange={(v) => onUpdate(index, "name", v)} enableAiPolish fieldName="nama organisasi" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
+      <Field cvField="position" label="Posisi / Jabatan" value={org.position} onChange={(v) => onUpdate(index, "position", v)} enableAiPolish fieldName="posisi organisasi" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
       <div className="grid grid-cols-2 gap-4">
-        <Field label="Tanggal Mulai" type="month" value={org.startDate} onChange={(v) => onUpdate(index, "startDate", v)} />
+        <Field cvField="startDate" label="Tanggal Mulai" type="month" value={org.startDate} onChange={(v) => onUpdate(index, "startDate", v)} />
         {org.isPresent ? (
           <div>
             <label className="block text-label-bold text-on-surface mb-1.5">Tanggal Selesai</label>
@@ -99,31 +100,30 @@ export function OrgCard({ org, index, totalItems, jobTitle, skills, jobDescripti
         </div>
         <span className="text-xs text-on-surface-variant">Sampai Sekarang</span>
       </label>
-      <div>
-        <label className="block text-label-bold text-on-surface mb-1.5">Deskripsi Kegiatan</label>
-        <div className="relative">
-          <textarea
-            rows={3}
-            value={org.description}
-            onChange={(e) => onUpdate(index, "description", e.target.value)}
-            className="w-full bg-surface-container-low border-none rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary resize-none text-body-md pr-10"
-            placeholder="Jelaskan kegiatan dan kontribusimu...&#10;Tip: Gunakan bullet points (satu poin per baris)"
-          />
-          {org.description && (
-            <span className="absolute right-2 top-2">
-              <AIPolishButton
-                content={org.description}
-                onApply={(text) => onUpdate(index, "description", text)}
-                jobTitle={jobTitle}
-                skills={skills}
-                jobDescription={jobDescription}
-                field="deskripsi organisasi"
-                size="sm"
-              />
-            </span>
-          )}
-        </div>
-      </div>
+      <BulletEditor
+        cvField="description"
+        label="Deskripsi Kegiatan"
+        value={org.description}
+        onChange={(v) => onUpdate(index, "description", v)}
+        mode={org.descriptionType ?? "bullets"}
+        onModeChange={(m) => onUpdate(index, "descriptionType", m)}
+        placeholder="Contoh: Mengoordinasi acara seminar kampus"
+        headerAction={
+          org.description ? (
+            <AIPolishButton
+              content={org.description}
+              onApply={(text) => onUpdate(index, "description", aiTextForField(text, org.descriptionType))}
+              jobTitle={jobTitle}
+              skills={skills}
+              jobDescription={jobDescription}
+              field="deskripsi organisasi"
+              format={org.descriptionType ?? "bullets"}
+              onRevert={(text) => onUpdate(index, "description", text)}
+              size="sm"
+            />
+          ) : null
+        }
+      />
     </div>
   );
 }

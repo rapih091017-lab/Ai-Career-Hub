@@ -729,12 +729,88 @@ a:focus-visible {
 }
 
 /* Preview section hover — click to edit */
-.a4-preview .cv-section-hover:hover {
+.cv-preview-canvas .cv-section-hover:hover {
   background-color: rgba(13, 115, 119, 0.04);
   cursor: pointer;
 }
-.a4-preview .cv-section-hover {
+.cv-preview-canvas .cv-section-hover {
   transition: background-color 0.15s ease;
+}
+
+/* Pratinjau: bagian yang sedang diatur gayanya + penanda bagian bergaya khusus (tidak ikut PDF) */
+.cv-preview-canvas [data-cv-selected] > section,
+.cv-preview-canvas header[data-cv-selected] {
+  outline: 2px solid rgb(var(--c-primary));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.cv-preview-canvas .cv-style-dot {
+  position: absolute;
+  /* Di dalam padding kiri section; kolom halaman memotong apa pun di luar area konten. */
+  top: 4px;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgb(var(--c-primary));
+  pointer-events: none;
+}
+
+/* Pratinjau: teks yang bisa diedit / diklik (tidak ikut PDF: mode cetak tanpa atribut ini) */
+.cv-preview-canvas [data-cv-path] {
+  cursor: pointer;
+}
+.cv-preview-canvas [data-cv-edit][contenteditable] {
+  cursor: text;
+  border-radius: 2px;
+  outline: none;
+}
+.cv-preview-canvas [data-cv-edit][contenteditable]:hover {
+  box-shadow: 0 0 0 1px rgb(var(--c-primary) / 0.45);
+}
+.cv-preview-canvas [data-cv-edit][contenteditable]:focus {
+  box-shadow: 0 0 0 2px rgb(var(--c-primary));
+  background: rgb(var(--c-primary) / 0.05);
+}
+.cv-preview-canvas [data-cv-edit][contenteditable]:empty::before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+}
+.cv-preview-canvas li[data-cv-path]:hover,
+.cv-preview-canvas p[data-cv-path]:hover,
+.cv-preview-canvas span[data-cv-path]:not([contenteditable]):hover {
+  text-decoration: underline dotted rgb(var(--c-primary));
+}
+
+/* Pratinjau: tombol tambah/hapus garis di celah atas section (melayang, tidak menggeser isi) */
+.cv-preview-canvas .cv-divider-toggle {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -60%);
+  z-index: 2;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid rgb(var(--c-outline-variant));
+  background: rgb(var(--c-surface-container-lowest));
+  color: rgb(var(--c-on-surface-variant));
+  font: 600 11px/1.4 system-ui, sans-serif;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+.cv-preview-canvas [data-cv-section]:hover > .cv-divider-toggle,
+.cv-preview-canvas .cv-divider-toggle:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.cv-preview-canvas .cv-divider-toggle:hover {
+  color: rgb(var(--c-primary));
+  border-color: rgb(var(--c-primary));
+}
+@media (hover: none) {
+  /* Layar sentuh tanpa hover: garis diatur lewat modal Urutan Section. */
+  .cv-preview-canvas .cv-divider-toggle { display: none; }
 }
 
 /* Hide scrollbar for scrollable tag clouds */

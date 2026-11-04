@@ -1,12 +1,20 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useToast } from "@/components/ui/toast";
+import { Popover } from "@/components/ui/popover";
+import { UNDO_BLOCKED_MESSAGE, useUndoGuard } from "@/hooks/useUndoGuard";
+import { aiErrorMessage } from "@/components/ai/ai-error-message";
+import { TargetMissingNote } from "@/components/builder/TargetHint";
+
+export const POLISH_EXPLANATION =
+  "Poles AI merapikan kalimat di kolom ini agar lebih jelas dan sesuai target pekerjaan. Fakta dan angka tidak ditambah.";
+
+const MIN_LENGTH = 10;
 
 /**
- * AI Polish Button, Inline one-click polish
- * Klik → polish → apply. Tanpa dialog, tanpa side-by-side.
- * Menerima CV context untuk hasil lebih relevan.
+ * Tombol "Poles AI": klik membuka panel berisi penjelasan, lalu hasil sebelum/sesudah.
+ * Teks baru dipakai hanya setelah user menekan "Pakai"; setelah itu masih bisa diurungkan.
  */
 interface AIPolishButtonProps {
   content: string;
@@ -15,9 +23,20 @@ interface AIPolishButtonProps {
   skills?: string[];
   jobDescription?: string;
   field?: string;
+  /** Bentuk field deskripsi; menentukan format keluaran AI (poin per baris / satu paragraf). */
+  format?: "bullets" | "paragraph";
   disabled?: boolean;
-  size?: "sm" | "md";
+  /** "sm": ikon + label kecil. "icon": hanya ikon (kolom sempit), penjelasan tetap di panel. */
+  size?: "sm" | "md" | "icon";
+  /** Mengembalikan teks sebelum dipoles (tombol Urungkan di toast). Default: onApply. */
+  onRevert?: (original: string) => void;
 }
+
+type PolishState =
+  | { kind: "idle" }
+  | { kind: "loading" }
+  | { kind: "result"; original: string; polished: string }
+  | { kind: "error"; message: string };
 
 export function AIPolishButton({
   content,
@@ -26,84 +45,155 @@ export function AIPolishButton({
   skills,
   jobDescription,
   field,
+  format,
+  onRevert,
   disabled = false,
   size = "sm",
 }: AIPolishButtonProps) {
-  const [isPolishing, setIsPolishing] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [state, setState] = useState<PolishState>({ kind: "idle" });
   const { addToast } = useToast();
+  const undoGuard = useUndoGuard(content);
+  // Permintaan yang masih berjalan saat panel ditutup diabaikan hasilnya.
+  const requestId = useRef(0);
 
-  const handlePolish = useCallback(async () => {
-    if (!content || content.trim().length < 10) {
-      addToast({ type: "error", message: "Teks terlalu pendek untuk dioptimasi" });
-      return;
+  const tooShort = !content || content.trim().length < MIN_LENGTH;
+
+  const handleOpenChange = useCallback((v: boolean) => {
+    setOpen(v);
+    if (!v) {
+      requestId.current++;
+      setState({ kind: "idle" });
     }
+  }, []);
 
-    setIsPolishing(true);
-
+  const runPolish = useCallback(async () => {
+    if (tooShort) return;
+    const id = ++requestId.current;
+    const original = content;
+    setState({ kind: "loading" });
     try {
       const response = await fetch("/api/ai/polish", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          content: content.trim(),
+          content: original.trim(),
           jobTitle,
-          skills,
-          jobDescription,
+          // Batas server: maks 50 skill; JD hanya dipakai 500 karakter pertama.
+          skills: skills?.slice(0, 50),
+          jobDescription: jobDescription?.slice(0, 500),
           field,
+          format,
         }),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Gagal memoles teks");
-      }
-
+      if (!response.ok) throw new Error(await aiErrorMessage(response, "Gagal memoles teks"));
       const data = await response.json();
-
-      if (data.success && data.polished) {
-        onApply(data.polished);
-        addToast({ type: "success", message: "Teks berhasil dioptimasi!" });
-      } else {
-        throw new Error("Response tidak valid");
-      }
+      if (!data.success || typeof data.polished !== "string" || !data.polished.trim()) throw new Error("Hasil Poles AI kosong. Coba lagi.");
+      if (id !== requestId.current) return;
+      setState({ kind: "result", original, polished: data.polished });
     } catch (error) {
+      if (id !== requestId.current) return;
       console.error("Polish error:", error);
-      addToast({
-        type: "error",
-        message: error instanceof Error ? error.message : "Gagal memoles teks",
-      });
-    } finally {
-      setIsPolishing(false);
+      setState({ kind: "error", message: error instanceof Error ? error.message : "Gagal memoles teks" });
     }
-  }, [content, jobTitle, skills, jobDescription, field, onApply, addToast]);
+  }, [tooShort, content, jobTitle, skills, jobDescription, field, format]);
 
-  const iconSize = size === "sm" ? "text-[14px]" : "text-[18px]";
-  const padding = size === "sm" ? "p-1" : "p-1.5";
+  const accept = (original: string, polished: string) => {
+    // Kolom diubah selama panel terbuka: hasil berdasar teks lama, jangan menimpa.
+    if (content !== original) {
+      addToast({ type: "info", message: "Teks di kolom sudah berubah. Poles ulang agar hasilnya sesuai." });
+      handleOpenChange(false);
+      return;
+    }
+    onApply(polished);
+    const unchanged = undoGuard.markApplied();
+    handleOpenChange(false);
+    addToast({
+      type: "success",
+      message: "Hasil Poles AI dipakai.",
+      duration: 8000,
+      action: {
+        label: "Urungkan",
+        onClick: () => {
+          // Teks sudah diedit lagi setelah dipoles: jangan ditimpa.
+          if (!unchanged()) {
+            addToast({ type: "info", message: UNDO_BLOCKED_MESSAGE });
+            return;
+          }
+          (onRevert ?? onApply)(original);
+        },
+      },
+    });
+  };
+
+  const iconOnly = size === "icon";
+  const loading = state.kind === "loading";
 
   return (
-    <button
-      type="button"
-      onClick={handlePolish}
-      disabled={disabled || isPolishing || !content || content.trim().length < 10}
-      className={`${padding} rounded-lg transition-all ${
-        disabled || isPolishing || !content || content.trim().length < 10
-          ? "text-on-surface-variant/50 cursor-not-allowed"
-          : "text-green-deep hover:text-primary hover:bg-lime/15 cursor-pointer"
-      }`}
-      title={
-        disabled || !content || content.trim().length < 10
-          ? "Isi teks minimal 10 karakter"
-          : isPolishing
-          ? "Memproses..."
-          : "Optimasi dengan AI"
-      }
+    <Popover
+      label="Poles AI"
+      open={open}
+      onOpenChange={handleOpenChange}
+      trigger={(props) => (
+        <button
+          type="button"
+          {...props}
+          disabled={disabled}
+          aria-label={iconOnly ? "Poles AI" : undefined}
+          className={`inline-flex min-h-7 items-center gap-1 rounded-lg px-1.5 text-[11px] font-semibold transition-colors ${
+            disabled ? "cursor-not-allowed text-on-surface-variant/50" : "text-green-deep hover:bg-lime/15 hover:text-primary"
+          } ${open ? "bg-lime/20" : ""}`}
+        >
+          <span className={`material-symbols-outlined ${size === "md" ? "text-[18px]" : "text-[15px]"} ${loading ? "animate-spin" : ""}`} aria-hidden="true">
+            {loading ? "sync" : "edit_note"}
+          </span>
+          {!iconOnly && <span className="whitespace-nowrap">Poles AI</span>}
+        </button>
+      )}
     >
-      <span
-        className={`material-symbols-outlined ${iconSize} ${isPolishing ? "animate-spin" : ""}`}
-        style={{ fontVariationSettings: "'FILL' 1" }}
-      >
-        auto_awesome
-      </span>
-    </button>
+      <div className="space-y-3">
+        <p className="text-xs leading-relaxed text-on-surface-variant">{POLISH_EXPLANATION}</p>
+
+        {state.kind === "result" ? (
+          <div className="space-y-2" aria-live="polite">
+            <div>
+              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-on-surface-variant">Sebelum</p>
+              <p className="max-h-32 overflow-y-auto whitespace-pre-wrap rounded-lg bg-surface-container-low p-2 text-xs text-on-surface-variant">{state.original}</p>
+            </div>
+            <div>
+              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-green-deep">Sesudah</p>
+              <p className="max-h-40 overflow-y-auto whitespace-pre-wrap rounded-lg border border-green-deep/30 bg-lime/10 p-2 text-xs text-on-surface">{state.polished}</p>
+            </div>
+            <div className="flex justify-end gap-2 pt-1">
+              <button type="button" onClick={() => handleOpenChange(false)} className="min-h-9 rounded-lg px-3 text-sm font-medium text-on-surface-variant hover:bg-surface-container">
+                Batal
+              </button>
+              <button type="button" onClick={() => accept(state.original, state.polished)} className="min-h-9 rounded-lg bg-primary px-4 text-sm font-semibold text-on-primary hover:brightness-110">
+                Pakai
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
+            {state.kind === "error" && (
+              <p role="alert" className="rounded-lg bg-error-container px-2 py-1.5 text-xs text-on-error-container">{state.message}</p>
+            )}
+            {tooShort ? (
+              <p className="text-xs font-medium text-on-surface">Tulis minimal {MIN_LENGTH} karakter dulu, lalu poles.</p>
+            ) : (
+              <button
+                type="button"
+                onClick={runPolish}
+                disabled={loading}
+                className="flex min-h-9 w-full items-center justify-center gap-1.5 rounded-lg bg-primary px-3 text-sm font-semibold text-on-primary hover:brightness-110 disabled:opacity-60"
+              >
+                {loading ? "Memoles..." : state.kind === "error" ? "Coba lagi" : "Poles teks ini"}
+              </button>
+            )}
+            <TargetMissingNote />
+          </>
+        )}
+      </div>
+    </Popover>
   );
 }

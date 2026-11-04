@@ -1,7 +1,9 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useId } from "react";
 import { AIPolishButton } from "@/components/ai/AIPolishDialog";
+import { FieldHelp } from "@/components/builder/FieldHelp";
+import type { BuilderHelpKey } from "@/lib/builder-help";
 
 /* ───────── Field Component ───────── */
 
@@ -21,6 +23,10 @@ interface FieldProps {
   jobTitle?: string;
   skills?: string[];
   jobDescription?: string;
+  /** Penanda untuk lompat dari pratinjau ke field ini (lihat cv-edit-path). */
+  cvField?: string;
+  /** Ikon (i) bantuan di samping label. */
+  help?: BuilderHelpKey;
 }
 
 export function Field({
@@ -36,7 +42,10 @@ export function Field({
   jobTitle,
   skills,
   jobDescription,
+  cvField,
+  help,
 }: FieldProps) {
+  const inputId = useId();
   const isEmpty = required && !value;
   const isFilled = !!value && !disabled;
 
@@ -49,13 +58,17 @@ export function Field({
   );
 
   return (
-    <div>
-      <label className="block text-label-bold text-on-surface mb-1.5">
-        {label}
-        {required && <span className="text-error ml-0.5">*</span>}
-      </label>
+    <div data-cv-field={cvField}>
+      <div className="mb-1.5 flex items-center gap-1">
+        <label htmlFor={inputId} className="block text-label-bold text-on-surface">
+          {label}
+          {required && <span className="text-error ml-0.5">*</span>}
+        </label>
+        {help && <FieldHelp topic={help} />}
+      </div>
       <div className="relative">
         <input
+          id={inputId}
           type={type}
           value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -63,7 +76,7 @@ export function Field({
           placeholder={placeholder}
           className={`w-full bg-surface-container-low border-none rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary text-body-md disabled:opacity-50 disabled:cursor-not-allowed transition-shadow duration-200 ${
             isEmpty ? "ring-2 ring-red-300 bg-red-50" : ""
-          } ${enableAiPolish && !disabled ? "pr-10" : ""}`}
+          } ${enableAiPolish && !disabled ? "pr-24" : ""}`}
         />
         
         {/* AI Polish Button, inline, one-click */}

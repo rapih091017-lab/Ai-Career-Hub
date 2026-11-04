@@ -2,8 +2,33 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { cvDocuments } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
-import { apiHandler, staleWhileRevalidate } from "@/lib/api-utils";
+import { eq, and, lt, or, isNull } from "drizzle-orm";
+import { z } from "zod";
+import { apiHandler, errorResponse, noCache } from "@/lib/api-utils";
+import { TEMPLATE_STYLES } from "@/components/cv-templates";
+
+/** Batas body PUT. CV teks + layout jauh di bawah ini; lebih besar = salah kirim atau penyalahgunaan. */
+const CV_PUT_MAX_BYTES = 200 * 1024;
+
+const PutSchema = z.object({
+  // Isi CV dirapikan saat muat (normalizeCvDocument); di sini cukup pastikan objek.
+  tailoredContent: z.object({}).passthrough().optional(),
+  templateId: z
+    .string()
+    .refine((id) => Object.prototype.hasOwnProperty.call(TEMPLATE_STYLES, id), "Template tidak dikenal")
+    .optional(),
+  /** updatedAt versi yang dilihat klien. Ada + DB lebih baru → 409. Tidak ada = klien lama (tanpa cek). */
+  expectedUpdatedAt: z.string().datetime({ offset: true }).optional(),
+});
+
+/**
+ * Batas atas updatedAt yang masih dianggap "versi yang sama". Date JS hanya
+ * milidetik, kolom DB bisa mikrodetik (defaultNow), jadi diberi +1 ms.
+ */
+const notNewerThan = (iso: string) => new Date(new Date(iso).getTime() + 1);
+
+const conflict = () =>
+  errorResponse("CV_CONFLICT", "CV ini sudah diubah di tab atau perangkat lain.", 409);
 
 async function authenticate(request: NextRequest, params: Promise<{ id: string }>) {
   const session = await auth();
@@ -35,7 +60,7 @@ export const DELETE = apiHandler(async (request: NextRequest, { params }: { para
     );
   }
 
-  await db.delete(cvDocuments).where(eq(cvDocuments.id, id));
+  await db.delete(cvDocuments).where(and(eq(cvDocuments.id, id), eq(cvDocuments.userId, userId)));
   return NextResponse.json({ success: true }, { status: 200 });
 });
 
@@ -59,7 +84,7 @@ export const GET = apiHandler(async (request: NextRequest, { params }: { params:
 
   return NextResponse.json(doc, {
     status: 200,
-    headers: staleWhileRevalidate(30),
+    headers: noCache(),
   });
 });
 
@@ -68,8 +93,25 @@ export const PUT = apiHandler(async (request: NextRequest, { params }: { params:
   if ('error' in ctx) return ctx.error;
   const { userId, id } = ctx;
 
-  const body = await request.json();
-  const { tailoredContent, templateId } = body;
+  const declared = Number(request.headers.get("content-length") ?? 0);
+  if (declared > CV_PUT_MAX_BYTES) {
+    return errorResponse("PAYLOAD_TOO_LARGE", "Data CV terlalu besar untuk disimpan.", 413);
+  }
+  const text = await request.text();
+  if (new TextEncoder().encode(text).byteLength > CV_PUT_MAX_BYTES) {
+    return errorResponse("PAYLOAD_TOO_LARGE", "Data CV terlalu besar untuk disimpan.", 413);
+  }
+  let raw: unknown;
+  try {
+    raw = JSON.parse(text);
+  } catch {
+    return errorResponse("INVALID_JSON", "Data yang dikirim bukan JSON yang valid.", 400);
+  }
+  const parsed = PutSchema.safeParse(raw);
+  if (!parsed.success) {
+    return errorResponse("INVALID_INPUT", "Data CV tidak valid.", 400);
+  }
+  const { tailoredContent, templateId, expectedUpdatedAt } = parsed.data;
 
   const [existing] = await db
     .select()
@@ -84,16 +126,29 @@ export const PUT = apiHandler(async (request: NextRequest, { params }: { params:
     );
   }
 
-  const updateData: Record<string, any> = {};
-  if (tailoredContent !== undefined) updateData.tailoredContent = tailoredContent;
+  if (expectedUpdatedAt && existing.updatedAt && new Date(existing.updatedAt) >= notNewerThan(expectedUpdatedAt)) {
+    return conflict();
+  }
+
+  const updateData: Partial<typeof cvDocuments.$inferInsert> = {};
+  // Bentuk isi divalidasi longgar (passthrough); kolom jsonb menerima objek apa pun.
+  if (tailoredContent !== undefined) updateData.tailoredContent = tailoredContent as typeof cvDocuments.$inferInsert["tailoredContent"];
   if (templateId !== undefined) updateData.templateId = templateId;
   updateData.updatedAt = new Date();
 
   const [updated] = await db
     .update(cvDocuments)
     .set(updateData)
-    .where(eq(cvDocuments.id, id))
+    .where(
+      and(
+        eq(cvDocuments.id, id),
+        eq(cvDocuments.userId, userId),
+        // Cek ulang di UPDATE agar dua simpan bersamaan tidak sama-sama lolos.
+        expectedUpdatedAt ? or(isNull(cvDocuments.updatedAt), lt(cvDocuments.updatedAt, notNewerThan(expectedUpdatedAt))) : undefined,
+      ),
+    )
     .returning();
 
+  if (!updated) return conflict();
   return NextResponse.json(updated, { status: 200 });
 });

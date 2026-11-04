@@ -17,6 +17,8 @@ export interface Toast {
   message: string;
   type: "success" | "error" | "info" | "warning";
   duration?: number;
+  /** Tombol aksi opsional (mis. "Urungkan"); toast tertutup setelah diklik. */
+  action?: { label: string; onClick: () => void };
 }
 
 interface ToastContextValue {
@@ -105,6 +107,18 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 {ICONS[t.type]}
               </span>
               <p className="text-sm font-medium flex-1">{t.message}</p>
+              {t.action && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    t.action?.onClick();
+                    removeToast(t.id);
+                  }}
+                  className="shrink-0 -my-1 min-h-9 rounded-md px-2 text-sm font-bold underline underline-offset-2 hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current"
+                >
+                  {t.action.label}
+                </button>
+              )}
               <button
                 onClick={() => removeToast(t.id)}
                 className="shrink-0 p-0.5 rounded opacity-60 hover:opacity-100 transition-opacity"

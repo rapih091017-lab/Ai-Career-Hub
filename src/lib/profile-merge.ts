@@ -43,7 +43,8 @@ export interface ImportedOrganisation {
 export interface ImportedSkill {
   id: string;
   name: string;
-  level: "beginner" | "intermediate" | "advanced";
+  /** "" = level belum dipilih. */
+  level: "beginner" | "intermediate" | "advanced" | "";
 }
 
 export interface ImportedCertification {
@@ -227,7 +228,7 @@ export function normalizeImportedProfile(raw: ImportedProfile): ImportedProfile 
     .map((item, index) => ({
       id: item.id || `s${index + 1}`,
       name: clean(item.name),
-      level: item.level ?? "intermediate",
+      level: item.level ?? "",
     }))
     .filter((item) => item.name)
     .filter((item) => {

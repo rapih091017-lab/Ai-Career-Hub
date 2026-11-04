@@ -4,9 +4,12 @@ import { db } from "@/db";
 import { masterProfiles, cvDocuments } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { DEFAULT_TEMPLATE_ID } from "@/lib/templates";
+import { TEMPLATE_STYLES } from "@/components/cv-templates";
 import { callAI, MODELS } from "@/lib/ai/adapter";
 import { GENERATOR_PROMPT_V2 } from "@/lib/ai/prompts/generator-v2";
 import { checkQuota, logUsage } from "@/lib/api-utils";
+import { normalizeSkillLevel } from "@/lib/cv-normalize";
+import type { SkillEntry } from "@/components/cv-templates";
 
 export async function POST(request: NextRequest) {
   const session = await auth();
@@ -19,6 +22,12 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json();
   const { jobTitle, jobDescription, templateId, useProfile = true, rawText, targetLanguage } = body;
+
+  // templateId harus salah satu template yang ada (sama dengan PUT).
+  if (templateId !== undefined && templateId !== null && templateId !== "" &&
+      !(typeof templateId === "string" && Object.prototype.hasOwnProperty.call(TEMPLATE_STYLES, templateId.trim()))) {
+    return NextResponse.json({ error: "INVALID_INPUT", message: "Template tidak dikenal." }, { status: 400 });
+  }
 
   // Generate CV memanggil model AI berbayar dan sebelumnya tidak pernah
   // dibatasi. free tier punya jatah 2/bulan, paket satuan punya kuota sendiri.
@@ -106,16 +115,16 @@ export async function POST(request: NextRequest) {
     }));
 
     // skills bisa array [{name}] ATAU objek {technical, soft, languages}
-    // level di-default "intermediate", konsisten dengan builder (useFetchCvData)
+    // Level yang tidak ada/invalid dibiarkan kosong (tidak dirender), bukan dipaksa "intermediate".
     const rawSkills = ai.skills;
-    const skills: { name: string; level: "beginner" | "intermediate" | "advanced"; category?: "technical" | "soft" | "tools" }[] = [];
+    const skills: { name: string; level: SkillEntry["level"]; category?: "technical" | "soft" | "tools" }[] = [];
     if (Array.isArray(rawSkills)) {
       for (const s of rawSkills) {
         if (!s) continue;
         if (typeof s === "string") {
-          if (s.trim()) skills.push({ name: s.trim(), level: "intermediate" });
+          if (s.trim()) skills.push({ name: s.trim(), level: "" });
         } else if (s.name?.trim()) {
-          skills.push({ name: s.name.trim(), level: s.level || "intermediate", category: s.category || s.type || undefined });
+          skills.push({ name: s.name.trim(), level: normalizeSkillLevel(s.level), category: s.category || s.type || undefined });
         }
       }
     } else if (rawSkills && typeof rawSkills === "object") {
@@ -129,9 +138,9 @@ export async function POST(request: NextRequest) {
         for (const s of list) {
           if (!s) continue;
           if (typeof s === "string") {
-            if (s.trim()) skills.push({ name: s.trim(), level: "intermediate", category });
+            if (s.trim()) skills.push({ name: s.trim(), level: "", category });
           } else if (s.name?.trim()) {
-            skills.push({ name: s.name.trim(), level: s.level || "intermediate", category });
+            skills.push({ name: s.name.trim(), level: normalizeSkillLevel(s.level), category });
           }
         }
       }
@@ -215,7 +224,13 @@ export async function POST(request: NextRequest) {
 
   // Catat pemakaian setelah CV berhasil dibuat, supaya kuota terpakai untuk
   // generate yang benar-benar terjadi dan HPP bisa dilacak.
-  await logUsage(session.user.id, "cv_build").catch(() => {});
+  // CV sudah tersimpan, jadi gagal mencatat tidak boleh menggagalkan respons.
+  // Tetap dicatat ke log supaya kuota yang bocor bisa dilacak.
+  try {
+    await logUsage(session.user.id, "cv_build");
+  } catch (err) {
+    console.error("[cv-documents/create] gagal mencatat pemakaian cv_build", err);
+  }
 
   return NextResponse.json({ ...newDoc, consolidationSuggestion: aiNote }, { status: 201 });
 }

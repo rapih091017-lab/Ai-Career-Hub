@@ -1,7 +1,9 @@
 "use client";
 
+import { aiSkillNames } from "@/lib/cv-normalize";
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import type { CvData } from "@/components/cv-templates";
+import { CONTENT_STEPS, STEP, STEP_IDS, type StepId } from "@/lib/builder-steps";
 
 /* ───────── AI & Scoring Logic ───────── */
 
@@ -41,21 +43,19 @@ export function useBuilderAI({
 
   /* ── Reset AI trigger when Target Pekerjaan data changes ── */
   useEffect(() => {
-    if (aiJdTriggered && (activeStep === 1 || prevActiveStep.current === 1)) {
+    if (aiJdTriggered && (activeStep === STEP.TARGET || prevActiveStep.current === STEP.TARGET)) {
       setAiJdTriggered(false);
     }
   }, [cvData.jobTitle, cvData.jobDescription, aiJdTriggered, activeStep]);
 
   /* ── AI Trigger: generate suggestions after Target Pekerjaan filled ── */
   useEffect(() => {
-    const justLeftTargetPekerjaan = prevActiveStep.current === 1 && activeStep > 1;
+    const justLeftTargetPekerjaan = prevActiveStep.current === STEP.TARGET && activeStep !== STEP.TARGET;
     const hasTargetData = cvData.jobTitle || cvData.jobDescription;
 
     if (justLeftTargetPekerjaan && hasTargetData && !aiJdTriggered) {
       setAiJdTriggered(true);
-      const skills = cvData.skills
-        .filter((s) => s.level === "advanced" || s.level === "intermediate")
-        .map((s) => s.name);
+      const skills = aiSkillNames(cvData.skills);
 
       fetch(`/api/cv-documents/${cvId}/revise`, {
         method: "POST",
@@ -144,28 +144,24 @@ export function useBuilderAI({
 
   /* ── Section Completion ── */
   const sectionCompletion = useMemo((): boolean[] => {
-    return [
-      // 0: Data Pribadi
-      !!cvData.fullName && (!!cvData.email || !!cvData.phone),
-      // 1: Target Pekerjaan
-      !!cvData.jobTitle || !!cvData.jobDescription,
-      // 2: Pengalaman Kerja
-      cvData.workHistory.some((w) => !!w.position || !!w.company),
-      // 3: Pendidikan
-      cvData.education.some((e) => !!e.institution || !!e.degree),
-      // 4: Organisasi
-      cvData.organisations.some((o) => !!o.name),
-      // 5: Skill
-      cvData.skills.some((s) => !!s.name),
-      // 6: Review, always accessible
-      true,
-    ];
+    const done: Record<StepId, boolean> = {
+      target: !!cvData.jobTitle || !!cvData.jobDescription,
+      personal: !!cvData.fullName && (!!cvData.email || !!cvData.phone),
+      experience: cvData.workHistory.some((w) => !!w.position || !!w.company),
+      education: cvData.education.some((e) => !!e.institution || !!e.degree),
+      organizations: cvData.organisations.some((o) => !!o.name),
+      skills: cvData.skills.some((s) => !!s.name),
+      // Review selalu bisa dibuka.
+      review: true,
+    };
+    // Urutan array mengikuti urutan stepper.
+    return STEP_IDS.map((id) => done[id]);
   }, [cvData]);
 
   /* ── CV Completeness percentage ── */
   const cvCompleteness = useMemo((): number => {
-    const filled = sectionCompletion.slice(0, 6).filter(Boolean).length;
-    return Math.round((filled / 6) * 100);
+    const filled = CONTENT_STEPS.filter((id) => sectionCompletion[STEP_IDS.indexOf(id)]).length;
+    return Math.round((filled / CONTENT_STEPS.length) * 100);
   }, [sectionCompletion]);
 
   /* ── AI Modal state ── */
@@ -178,17 +174,21 @@ export function useBuilderAI({
     versions?: { conservative: string; improved: string; bold: string };
     explanation?: string;
     tip?: string;
-    onAccept: (text: string) => void;
+    /** Tampilkan versi sebagai daftar poin (field deskripsi). */
+    asBullets?: boolean;
+    onAccept: (text: string, mode?: "append" | "replace") => void;
   }>({ open: false, mode: "suggest", title: "", onAccept: () => {} });
 
   /* ── Section label map for modals ── */
   const SECTION_LABEL_MAP: Record<string, string> = {
     summary: "Ringkasan Profesional",
+    selfEvaluation: "Evaluasi Diri",
     experience: "Pengalaman Kerja",
     education: "Pendidikan",
-    skills: "Keahlian & Sertifikasi",
+    skills: "Keahlian",
+    certifications: "Sertifikasi",
     organizations: "Organisasi",
-    lainnya: "Lainnya (Key Achievements, dll.)",
+    lainnya: "Bagian Tambahan",
   };
 
   return {

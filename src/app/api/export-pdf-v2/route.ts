@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { errorResponse, apiHandler, checkQuota, logUsage } from "@/lib/api-utils";
 import { isPrivateUrl } from "@/lib/private-url";
+import { launchPdfBrowser } from "@/lib/pdf/chromium";
 
 export const runtime = "nodejs";
 // Cold start: ekstraksi binary Chromium + launch butuh waktu. Warm: ~2-4s.
@@ -45,26 +46,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
 
   // ── 2. Render HTML → PDF via lokal headless Chromium ──
   try {
-    const [{ default: puppeteer }, chromiumMod] = await Promise.all([
-      import("puppeteer-core"),
-      import("@sparticuz/chromium"),
-    ]);
-    const chromium = chromiumMod.default;
-
-    // Di Vercel/Linux, @sparticuz/chromium mengekstrak binary Lambda-nya.
-    // Di dev Windows/macOS, binari itu tidak bisa jalan; pakai browser lokal
-    // yang terpasang (Edge/Chrome) supaya hasilnya sama-sama PDF teks.
-    // PENTING: args @sparticuz (single-process dsb) membuat Chromium desktop
-    // crash "Target closed" saat printToPDF, jadi browser lokal memakai args
-    // minimal miliknya sendiri.
-    const localBrowserPath = await resolveLocalBrowserPath();
-    const browser = await puppeteer.launch({
-      args: localBrowserPath
-        ? ["--no-sandbox", "--disable-gpu", "--font-render-hinting=none"]
-        : [...chromium.args, "--font-render-hinting=none"],
-      executablePath: localBrowserPath ?? (await chromium.executablePath()),
-      headless: true,
-    });
+    const browser = await launchPdfBrowser();
 
     try {
       const page = await browser.newPage();
@@ -138,38 +120,6 @@ export const POST = apiHandler(async (request: NextRequest) => {
 });
 
 /** Parse margin string ("20mm" | "10mm") → page.pdf margin object. */
-/** Cari browser Chromium lokal untuk mode pengembangan (non-Vercel).
- * Urutan: env PDF_CHROME_PATH → Edge → Chrome. Return null di Linux agar
- * jalur @sparticuz/chromium tetap dipakai di Vercel. */
-async function resolveLocalBrowserPath(): Promise<string | null> {
-  if (process.env.PDF_CHROME_PATH) return process.env.PDF_CHROME_PATH;
-  if (process.platform !== "win32" && process.platform !== "darwin") return null;
-
-  const { access } = await import("node:fs/promises");
-  const candidates =
-    process.platform === "win32"
-      ? [
-          "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
-          "C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe",
-          "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
-          "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
-        ]
-      : [
-          "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-          "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
-        ];
-
-  for (const candidate of candidates) {
-    try {
-      await access(candidate);
-      return candidate;
-    } catch {
-      // lanjut ke kandidat berikutnya
-    }
-  }
-  return null;
-}
-
 function parseMargin(margin?: string): {
   top: string; bottom: string; left: string; right: string;
 } {

@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { usageLogs, payments, cvDocuments } from "@/db/schema";
 import { eq, and, count, gte, sql } from "drizzle-orm";
 import { getUserAccess } from "@/lib/access";
-import { apiHandler } from "@/lib/api-utils";
+import { apiHandler, startOfMonthUtc } from "@/lib/api-utils";
 
 export const GET = apiHandler(async () => {
   const session = await auth();
@@ -35,9 +35,7 @@ export const GET = apiHandler(async () => {
   const premiumExpiresAt = expiryRow?.expiresAt ?? null;
 
   // ── 1. Hitung usage per action type (bulan ini) ──────────────────
-  const firstOfMonth = new Date();
-  firstOfMonth.setDate(1);
-  firstOfMonth.setHours(0, 0, 0, 0);
+  const firstOfMonth = startOfMonthUtc();
 
   const actionTypes = ["checker_check", "ai_revision", "ai_suggestion", "cv_build", "cover_letter_generate"] as const;
   const usageMap: Record<string, number> = {};

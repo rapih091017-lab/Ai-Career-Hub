@@ -8,9 +8,11 @@ interface StepperProps {
   setActiveStep: (step: number) => void;
   sectionCompletion: boolean[];
   sectionMeta: { title: string; desc: string; icon: string }[];
+  /** Id langkah (untuk penanda tur `data-tour="step-<id>"`). */
+  stepIds?: readonly string[];
 }
 
-export function StepperSteps({ steps, activeStep, setActiveStep, sectionCompletion, sectionMeta }: StepperProps) {
+export function StepperSteps({ steps, activeStep, setActiveStep, sectionCompletion, sectionMeta, stepIds }: StepperProps) {
   return (
     <div className="flex items-center min-w-max mx-auto" style={{ maxWidth: 960 }}>
       {steps.map((label, i) => {
@@ -30,6 +32,9 @@ export function StepperSteps({ steps, activeStep, setActiveStep, sectionCompleti
             )}
             {/* Step circle + label */}
             <button
+              type="button"
+              data-tour={stepIds ? `step-${stepIds[i]}` : undefined}
+              aria-current={isActive ? "step" : undefined}
               onClick={() => setActiveStep(i)}
               title={sectionMeta[i]?.desc || ""}
               className="flex items-center gap-1.5 md:gap-2 px-1.5 md:px-2 py-1 rounded-lg transition-colors shrink-0 hover:bg-surface-container-low"
@@ -80,7 +85,6 @@ export function BottomNav({
   sectionMeta,
 }: StepperProps & { handleSave: () => void; isSaving: boolean }) {
   const { t } = useTranslation();
-  const iconNames = ["person", "work_history", "work", "school", "groups", "star", "visibility"];
 
   return (
     <div className="sticky bottom-0 bg-surface-container-lowest border-t border-outline-variant/50 shadow-[0_-4px_12px_rgba(0,0,0,0.04)] z-30">
@@ -102,7 +106,7 @@ export function BottomNav({
                 }`}
               >
                 <span className={`material-symbols-outlined text-[14px] ${isFilled && !isActive ? "text-green" : ""}`} style={{ fontVariationSettings: "'FILL' 1" }}>
-                  {isFilled ? "check_circle" : iconNames[i]}
+                  {isFilled ? "check_circle" : sectionMeta[i]?.icon}
                 </span>
                 <span className="hidden md:inline">{label}</span>
               </button>

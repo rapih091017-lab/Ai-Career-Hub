@@ -16,6 +16,10 @@
       "memory": 1024,
       "maxDuration": 60
     },
+    "src/app/api/cv-documents/[id]/pdf/route.ts": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
     "src/app/api/pdf-test-save/route.ts": {
       "memory": 1024,
       "maxDuration": 60

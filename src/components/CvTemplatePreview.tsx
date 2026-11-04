@@ -79,13 +79,15 @@ export default function CvTemplatePreview({ templateId = "industrial-pro" }: CvT
       className="relative w-full overflow-hidden rounded-lg bg-surface-container-lowest"
       style={{ aspectRatio: "210 / 297" /* A4 ratio */ }}
     >
-      {/* Clipped container that shows only the top portion */}
+      {/* Clipped container that shows only the top portion.
+          Renderer memakai pt (1pt = 4/3px), jadi kotak diperlebar 4/3 dan
+          skala dikali 3/4: tampilan kartu sama seperti sebelum satuan pt. */}
       <div
         className="absolute top-0 left-0"
         style={{
-          width: 400,
-          height: 400,
-          transform: "scale(0.35)",
+          width: (400 * 4) / 3,
+          height: (400 * 4) / 3,
+          transform: `scale(${0.35 * 0.75})`,
           transformOrigin: "top left",
           pointerEvents: "none",
           userSelect: "none",

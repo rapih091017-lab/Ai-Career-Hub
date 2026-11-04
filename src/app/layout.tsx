@@ -1,4 +1,5 @@
 ﻿import type { Metadata } from "next";
+import { CvFontFaces } from "@/components/cv-templates/CvFontFaces";
 import { SessionProvider } from "next-auth/react";
 import { Analytics } from "@vercel/analytics/react";
 import ScrollProgress from "@/components/ScrollProgress";
@@ -64,6 +65,8 @@ export default function RootLayout({
     <html lang="id" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
+        {/* @font-face font CV dipasang sekali; berkas baru diunduh saat dipakai pratinjau. */}
+        <CvFontFaces />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

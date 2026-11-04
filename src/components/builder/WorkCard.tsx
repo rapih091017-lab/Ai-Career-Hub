@@ -1,10 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Field } from "@/components/builder/Field";
 import { AIPolishButton } from "@/components/ai/AIPolishDialog";
+import { TargetMissingNote } from "@/components/builder/TargetHint";
 import { AiLoadingOverlay } from "./AiLoadingOverlay";
+import { BulletEditor } from "./BulletEditor";
+import { useToast } from "@/components/ui/toast";
+import { UNDO_BLOCKED_MESSAGE, useUndoGuard } from "@/hooks/useUndoGuard";
+import { aiTextForField, applyAiBullets } from "@/lib/bullet-lines";
 import type { WorkEntry } from "@/components/cv-templates";
 
 interface WorkCardProps {
@@ -23,10 +28,12 @@ interface WorkCardProps {
   onMoveUp: (index: number) => void;
   onMoveDown: (index: number) => void;
   onToggleVisibility: (index: number) => void;
-  onAISuggest: (title: string, suggestions: any[], onAccept: (text: string) => void) => void;
+  onAISuggest: (title: string, suggestions: any[], onAccept: (text: string, mode?: "append" | "replace") => void) => void;
   onAIRevise: (title: string, original: string, versions: any, explanation: string, tip: string, onAccept: (text: string) => void) => void;
   onError: (message: string) => void;
   onUpdateDescription: (index: number, text: string) => void;
+  /** Tombol seret dari SortableList. */
+  dragHandle?: React.ReactNode;
 }
 
 export function WorkCard({
@@ -48,9 +55,37 @@ export function WorkCard({
   onAIRevise,
   onError,
   onUpdateDescription,
+  dragHandle,
 }: WorkCardProps) {
   const [aiSuggestLoading, setAiSuggestLoading] = useState(false);
   const [aiReviseLoading, setAiReviseLoading] = useState(false);
+  const { addToast } = useToast();
+
+  const undoGuard = useUndoGuard(work.description);
+  // Indeks bisa bergeser bila entri diurutkan ulang sebelum Urungkan diklik.
+  const indexRef = useRef(index);
+  indexRef.current = index;
+
+  // Hasil AI menimpa deskripsi: beri kesempatan mengembalikan teks lama,
+  // kecuali deskripsi sudah diedit lagi setelah hasil AI diterima.
+  const offerUndo = (message: string, before: string) => {
+    const unchanged = undoGuard.markApplied();
+    addToast({
+      type: "success",
+      message,
+      duration: 8000,
+      action: {
+        label: "Urungkan",
+        onClick: () => {
+          if (!unchanged()) {
+            addToast({ type: "info", message: UNDO_BLOCKED_MESSAGE });
+            return;
+          }
+          onUpdate(indexRef.current, "description", before);
+        },
+      },
+    });
+  };
 
   const handleSuggest = async () => {
     setAiSuggestLoading(true);
@@ -75,8 +110,10 @@ export function WorkCard({
           onAISuggest(
             `Saran AI · ${work.position || "Posisi " + (index + 1)}`,
             data.suggestions,
-            (text: string) => {
-              onUpdate(index, "description", text);
+            (text: string, mode: "append" | "replace" = "replace") => {
+              const before = work.description;
+              onUpdate(index, "description", applyAiBullets(before, text, mode));
+              offerUndo(mode === "append" ? "Poin saran ditambahkan." : "Deskripsi diganti dengan saran AI.", before);
             }
           );
         }
@@ -112,7 +149,9 @@ export function WorkCard({
           data.explanation,
           data.tip,
           (text: string) => {
-            onUpdateDescription(index, text);
+            const before = work.description;
+            onUpdateDescription(index, aiTextForField(text, work.descriptionType));
+            offerUndo("Deskripsi diganti dengan versi yang dioptimalkan.", before);
           }
         );
       }
@@ -126,13 +165,10 @@ export function WorkCard({
   const isHidden = work.visible === false;
 
   return (
-    <div className={`bg-surface-container-lowest rounded-xl p-6 shadow-soft relative group transition-opacity duration-200 ${isHidden ? "opacity-50" : ""}`}>
+    <div data-cv-entry={`workHistory.${work.id}`} className={`bg-surface-container-lowest rounded-xl p-6 shadow-soft relative group transition-opacity duration-200 ${isHidden ? "opacity-50" : ""}`}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2 flex-1 min-w-0">
-          {/* Penanda urutan (urutan diubah lewat tombol panah, bukan drag) */}
-          <div className="shrink-0 text-outline-variant/60 p-1" aria-hidden="true">
-            <span className="material-symbols-outlined text-[16px]">swap_vert</span>
-          </div>
+          {dragHandle}
           <button
             type="button"
             onClick={() => onToggleCollapse(work.id)}
@@ -201,20 +237,20 @@ export function WorkCard({
             className="overflow-hidden"
           >
             <div className="space-y-4">
-              <Field label="Posisi Jabatan" value={work.position} onChange={(v) => onUpdate(index, "position", v)} enableAiPolish fieldName="position" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
-              <Field label="Perusahaan" value={work.company} onChange={(v) => onUpdate(index, "company", v)} enableAiPolish fieldName="company" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
-              <Field label="Deskripsi Perusahaan (opsional)" value={work.companyDescription || ""} onChange={(v) => onUpdate(index, "companyDescription", v)} />
-              <Field label="Lokasi" value={work.location} onChange={(v) => onUpdate(index, "location", v)} />
-              <Field label="Link Proyek / Portofolio (opsional)" value={work.projectUrl || ""} onChange={(v) => onUpdate(index, "projectUrl", v)} placeholder="https://github.com/..." />
+              <Field cvField="position" label="Posisi Jabatan" value={work.position} onChange={(v) => onUpdate(index, "position", v)} enableAiPolish fieldName="position" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
+              <Field cvField="company" label="Perusahaan" value={work.company} onChange={(v) => onUpdate(index, "company", v)} enableAiPolish fieldName="company" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
+              <Field cvField="companyDescription" label="Deskripsi Perusahaan (opsional)" help="companyDescription" value={work.companyDescription || ""} onChange={(v) => onUpdate(index, "companyDescription", v)} />
+              <Field cvField="location" label="Lokasi" value={work.location} onChange={(v) => onUpdate(index, "location", v)} />
+              <Field cvField="projectUrl" label="Link Proyek / Portofolio (opsional)" value={work.projectUrl || ""} onChange={(v) => onUpdate(index, "projectUrl", v)} placeholder="https://github.com/..." />
               <div className="bg-primary/5 border border-primary/10 rounded-xl p-3">
-                <Field label="Pencapaian Utama (opsional)" value={work.achievement || ""} onChange={(v) => onUpdate(index, "achievement", v)} placeholder="Contoh: Meningkatkan penjualan 30% dalam 6 bulan" enableAiPolish fieldName="achievement" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
+                <Field cvField="achievement" label="Pencapaian Utama (opsional)" help="achievement" value={work.achievement || ""} onChange={(v) => onUpdate(index, "achievement", v)} placeholder="Contoh: Mempercepat rekap stok dari [angka] menjadi [angka] hari" enableAiPolish fieldName="achievement" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
                 <p className="text-[10px] text-on-surface-variant mt-1 flex items-center gap-1">
                   <span className="material-symbols-outlined text-xs" aria-hidden="true">info</span>
                   Soroti pencapaian dengan angka/metrik · ini yang paling dilihat HR!
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <Field label="Mulai" type="month" value={work.startDate} onChange={(v) => onUpdate(index, "startDate", v)} />
+                <Field cvField="startDate" label="Mulai" type="month" value={work.startDate} onChange={(v) => onUpdate(index, "startDate", v)} />
                 <Field label="Selesai" type="month" value={work.endDate} onChange={(v) => onUpdate(index, "endDate", v)} disabled={work.isCurrent} />
               </div>
               <label className="relative flex items-center gap-2.5 cursor-pointer select-none mt-2 group">
@@ -235,7 +271,6 @@ export function WorkCard({
                 <span className="text-body-md text-on-surface-variant group-hover:text-on-surface transition-colors">Saya masih bekerja di sini</span>
               </label>
               <div>
-                <label className="block text-label-bold text-on-surface mb-1.5">Deskripsi</label>
                 <div className="relative">
                   <AnimatePresence>
                     {(aiSuggestLoading || aiReviseLoading) && (
@@ -251,39 +286,37 @@ export function WorkCard({
                       </motion.div>
                     )}
                   </AnimatePresence>
-                  <textarea
-                    rows={3}
+                  <BulletEditor
+                    cvField="description"
+                    label="Deskripsi"
+                    help="workDescription"
                     value={work.description}
-                    onChange={(e) => onUpdate(index, "description", e.target.value)}
-                    className="w-full bg-surface-container-low border-none rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary resize-none text-body-md transition-all duration-300 pr-10"
-                    placeholder="Jelaskan tanggung jawab dan pencapaianmu...&#10;Tip: Gunakan bullet points (satu poin per baris)"
+                    onChange={(v) => onUpdate(index, "description", v)}
+                    mode={work.descriptionType ?? "bullets"}
+                    onModeChange={(m) => onUpdate(index, "descriptionType", m)}
+                    placeholder="Contoh: Menyusun laporan stok mingguan untuk 3 gudang"
                     maxLength={2500}
                     disabled={aiSuggestLoading || aiReviseLoading}
+                    headerAction={
+                      work.description && !aiSuggestLoading && !aiReviseLoading ? (
+                        <AIPolishButton
+                          content={work.description}
+                          onApply={(text) => onUpdate(index, "description", aiTextForField(text, work.descriptionType))}
+                          jobTitle={jobTitle}
+                          skills={skills}
+                          jobDescription={jobDescription}
+                          field="deskripsi pengalaman kerja"
+                          format={work.descriptionType ?? "bullets"}
+                          onRevert={(text) => onUpdate(index, "description", text)}
+                          size="sm"
+                        />
+                      ) : null
+                    }
                   />
-                  {/* AI Polish inline button */}
-                  {work.description && !aiSuggestLoading && !aiReviseLoading && (
-                    <span className="absolute right-2 top-2">
-                      <AIPolishButton
-                        content={work.description}
-                        onApply={(text) => onUpdate(index, "description", text)}
-                        jobTitle={jobTitle}
-                        skills={skills}
-                        jobDescription={jobDescription}
-                        field="deskripsi pengalaman kerja"
-                        size="sm"
-                      />
-                    </span>
-                  )}
-                  {work.description && !aiSuggestLoading && !aiReviseLoading && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="absolute bottom-3 left-3"
-                    >
-                      <span className={`text-[10px] font-medium ${work.description.length > 2300 ? "text-amber-600" : "text-on-surface-variant"}`}>
-                        {work.description.length}/2500 | {work.description.split(/\s+/).filter(Boolean).length} kata
-                      </span>
-                    </motion.div>
+                  {work.description && (
+                    <p className={`mt-1 text-[10px] font-medium ${work.description.length > 2300 ? "text-amber-700" : "text-on-surface-variant"}`}>
+                      {work.description.length}/2500 | {work.description.split(/\s+/).filter(Boolean).length} kata
+                    </p>
                   )}
                   <div className="flex justify-end mt-2.5">
                     <div className="flex items-center gap-1.5">
@@ -321,17 +354,18 @@ export function WorkCard({
                         } disabled:opacity-40`}
                         title="Optimalkan teks dengan AI"
                       >
-                        <span className={`material-symbols-outlined text-[14px] transition-all duration-500 ${
-                          aiReviseLoading ? "animate-spin" : ""
-                        }`} style={{ fontVariationSettings: "'FILL' 1" }}>
-                          {aiReviseLoading ? "sync" : "spark"}
-                        </span>
+                        {aiReviseLoading && (
+                          <span className="material-symbols-outlined text-[14px] animate-spin" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">
+                            sync
+                          </span>
+                        )}
                         <span>
                           {aiReviseLoading ? "Mengoptimalkan..." : "Optimalkan"}
                         </span>
                       </motion.button>
                     </div>
                   </div>
+                  <TargetMissingNote className="mt-1.5 text-right" />
                 </div>
               </div>
             </div>
