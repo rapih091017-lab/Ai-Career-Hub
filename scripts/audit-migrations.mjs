@@ -9,7 +9,7 @@
 // dijalankan di CI. Ini yang menahan migrasi yang tidak ikut ter-commit.
 
 import postgres from "postgres";
-import { readFileSync, readdirSync, writeFileSync } from "fs";
+import { existsSync, readFileSync, readdirSync, writeFileSync } from "fs";
 import { resolve, dirname, join } from "path";
 import { fileURLToPath } from "url";
 
@@ -19,7 +19,9 @@ const root = resolve(__dirname, "..");
 const checkFilesOnly = process.argv.includes("--check-files");
 const outPath = process.argv.find((a) => !a.startsWith("--") && a.endsWith(".json"));
 
-const envContent = readFileSync(join(root, ".env"), "utf-8");
+// .env tidak ada di CI; --check-files memang tidak butuh env, jadi file ini opsional.
+const envPath = join(root, ".env");
+const envContent = existsSync(envPath) ? readFileSync(envPath, "utf-8") : "";
 const envVars = {};
 envContent.split("\n").forEach((line) => {
   const trimmed = line.trim();
@@ -89,7 +91,7 @@ if (checkFilesOnly) {
   process.exit(problems === 0 ? 0 : 1);
 }
 
-const sql = postgres(envVars.DATABASE_URL, { ssl: "require" });
+const sql = postgres(envVars.DATABASE_URL ?? process.env.DATABASE_URL, { ssl: "require" });
 
 const existingTables = new Set(
   (await sql`
