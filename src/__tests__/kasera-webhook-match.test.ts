@@ -58,6 +58,7 @@ describe("parsePayloadAmount", () => {
     expect(parsePayloadAmount(50000)).toBe(50000);
     expect(parsePayloadAmount("50000")).toBe(50000);
     expect(parsePayloadAmount("50000.00")).toBe(50000);
+    expect(parsePayloadAmount("50000.0")).toBe(50000);
   });
   it("menolak nilai yang tidak terbaca", async () => {
     const { parsePayloadAmount } = await import("@/lib/kasera-webhook");

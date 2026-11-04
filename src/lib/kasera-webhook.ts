@@ -127,6 +127,6 @@ export function parsePayloadAmount(value: number | string | undefined): number |
   if (typeof value === "number") return Number.isFinite(value) ? value : null;
   if (typeof value !== "string") return null;
   const trimmed = value.trim();
-  if (!/^\d+(\.00)?$/.test(trimmed)) return null;
+  if (!/^\d+(\.00?)?$/.test(trimmed)) return null;
   return Number(trimmed.split(".")[0]);
 }
