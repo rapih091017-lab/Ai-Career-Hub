@@ -41,7 +41,8 @@ describe("baca dokumen lebih cepat dan lebih terstruktur", () => {
 describe("pengukuran", () => {
   it("berkas uji masih ada untuk perbandingan", () => {
     expect(
-      existsSync(join(process.cwd(), "public/M_Teguh_Surya_Susanto_CV_Process_Improvement_Support.pdf")),
+      // Berkas di public/*.pdf diabaikan git, jadi pakai fixture yang ikut repo.
+      existsSync(join(process.cwd(), "test-upload.pdf")),
     ).toBe(true);
   });
 });
