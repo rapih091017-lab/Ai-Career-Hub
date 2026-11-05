@@ -193,6 +193,23 @@ export default function BuilderPage() {
   /* ── Gaya per bagian: bagian yang sedang diatur (null = global) ── */
   const [styleTarget, setStyleTarget] = useState<string | null>(null);
   const inlineEditable = useInlineEditable();
+  // Zoom pratinjau: preferensi per pengguna di localStorage (bukan data CV).
+  const [previewZoom, setPreviewZoom] = useState<"fit" | "actual">("fit");
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(PREVIEW_ZOOM_KEY) === "actual") setPreviewZoom("actual");
+    } catch {
+      /* storage tidak bisa diakses: pakai Pas lebar */
+    }
+  }, []);
+  const changePreviewZoom = useCallback((z: "fit" | "actual") => {
+    setPreviewZoom(z);
+    try {
+      localStorage.setItem(PREVIEW_ZOOM_KEY, z);
+    } catch {
+      /* storage tidak bisa diakses */
+    }
+  }, []);
   // Layar < lg: pratinjau penuh (overlay) terbuka.
   const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
 
@@ -213,6 +230,8 @@ export default function BuilderPage() {
   /* ── Kelola section: hapus (dengan Urungkan), pakai lagi, tambah kustom ── */
   const unusedSections = unusedBuiltinSections(cvData);
   const isSectionUnused = (key: string) => unusedSections.includes(key);
+  // Langkah yang seluruh bagiannya dihapus (saat ini hanya Organisasi) tampil "Tidak dipakai".
+  const unusedSteps = STEP_IDS.map((id) => id === "organizations" && isSectionUnused("organizations"));
   const labelOf = (key: string) => sectionLabel(cvData, key);
   const requestRemoveSection = (key: string) => {
     const label = labelOf(key);
@@ -670,7 +689,7 @@ export default function BuilderPage() {
         {/* ── STEPPER (connector lines style) ── */}
         <div className="w-full bg-surface-container-lowest border-b border-outline-variant/50 flex items-center gap-2 pr-3 md:pr-6 shrink-0">
           <div className="min-w-0 flex-1 overflow-x-auto py-4 md:py-5 pl-3 md:pl-8">
-            <StepperSteps steps={steps} activeStep={activeStep} setActiveStep={setActiveStep} sectionCompletion={sectionCompletion} sectionMeta={sectionMeta} stepIds={STEP_IDS} />
+            <StepperSteps steps={steps} activeStep={activeStep} setActiveStep={setActiveStep} sectionCompletion={sectionCompletion} sectionMeta={sectionMeta} stepIds={STEP_IDS} unusedSteps={unusedSteps} />
           </div>
           <Tooltip text={t("builder.guide-tip")}>
             <button
@@ -1106,13 +1125,29 @@ export default function BuilderPage() {
             {/* ── PREVIEW AREA, scrollable continuous with page break indicators ── */}
             <div className="flex-1 flex flex-col items-center bg-surface-dim/20 custom-scrollbar" style={{ minHeight: 0, overflowY: 'auto' }}>
               <div className="w-full max-w-[calc(210mm+30mm)] px-2 sm:px-4 lg:px-[15mm] py-4 md:py-6">
+                <div className="mb-3 flex flex-wrap items-center gap-2">
                 {/* Page count badge */}
                 {allPageCount > 1 && (
-                  <div className="mb-3 flex items-center gap-2 text-[11px] font-medium text-on-surface-variant bg-surface-container-lowest/80 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-outline-variant/40 shadow-sm w-fit">
+                  <div className="flex items-center gap-2 text-[11px] font-medium text-on-surface-variant bg-surface-container-lowest/80 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-outline-variant/40 shadow-sm w-fit">
                     <span className="material-symbols-outlined text-sm">description</span>
                     {t("builder.page-badge").replace("{pages}", String(allPageCount)).replace("{margin}", marginMode === "tight" ? "10" : marginMode === "normal" ? "20" : "30")}
                   </div>
                 )}
+                {/* Zoom pratinjau: pas lebar panel atau ukuran asli A4 */}
+                <div role="group" aria-label={t("builder.zoom-label")} className="ml-auto flex items-center rounded-lg border border-outline-variant/40 bg-surface-container-lowest/80 p-0.5 text-[11px] font-medium shadow-sm">
+                  {(["fit", "actual"] as const).map((z) => (
+                    <button
+                      key={z}
+                      type="button"
+                      aria-pressed={previewZoom === z}
+                      onClick={() => changePreviewZoom(z)}
+                      className={`min-h-[28px] rounded-md px-2.5 transition-colors ${previewZoom === z ? "bg-primary text-on-primary" : "text-on-surface-variant hover:bg-surface-container-high"}`}
+                    >
+                      {t(z === "fit" ? "builder.zoom-fit" : "builder.zoom-100")}
+                    </button>
+                  ))}
+                </div>
+                </div>
                 {/* Halaman A4 nyata: ukuran pt/mm sama dengan PDF */}
                 <div ref={previewRef} data-tour="preview" className="relative" onFocus={onPreviewFocus} onBlur={onPreviewBlur} onClick={onPreviewClick} onMouseEnter={onPreviewEnter}>
                 {editHint && (
@@ -1131,11 +1166,14 @@ export default function BuilderPage() {
                     </button>
                   </div>
                 )}
-                <FitA4>
+                {/* 100%: halaman lebih lebar dari panel digulir horizontal di sini, bukan di halaman. */}
+                <div style={previewZoom === "actual" ? { overflowX: "auto", maxWidth: "100%" } : undefined}>
+                <FitA4 fit={previewZoom === "fit"}>
                   <CvPagedPreview pageCount={allPageCount} marginMm={marginPadding} measureRef={contentRef} activePage={focusPage}>
                     {previewContent}
                   </CvPagedPreview>
                 </FitA4>
+                </div>
                 </div>
               </div>
 
@@ -1218,7 +1256,7 @@ export default function BuilderPage() {
         )}
 
         {/* ── BOTTOM NAV ── */}
-        <BottomNav steps={steps} activeStep={activeStep} setActiveStep={setActiveStep} sectionCompletion={sectionCompletion} sectionMeta={sectionMeta} handleSave={handleSave} isSaving={isSaving} />
+        <BottomNav steps={steps} activeStep={activeStep} setActiveStep={setActiveStep} sectionCompletion={sectionCompletion} sectionMeta={sectionMeta} handleSave={handleSave} isSaving={isSaving} unusedSteps={unusedSteps} />
       </div>
       </TargetHintProvider>
     </AuthGuard>
@@ -1233,6 +1271,7 @@ interface PreviewEdit {
 }
 const EDIT_HISTORY_MAX = 50;
 const EDIT_HINT_KEY = "cv_builder_edit_hint_seen";
+const PREVIEW_ZOOM_KEY = "cv_builder_preview_zoom";
 
 /** Nama file dari header Content-Disposition server (satu sumber penamaan). */
 function fileNameFromDisposition(header: string | null): string | null {

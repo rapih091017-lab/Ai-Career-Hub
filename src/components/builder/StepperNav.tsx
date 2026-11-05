@@ -10,15 +10,19 @@ interface StepperProps {
   sectionMeta: { title: string; desc: string; icon: string }[];
   /** Id langkah (untuk penanda tur `data-tour="step-<id>"`). */
   stepIds?: readonly string[];
+  /** true = bagian langkah ini dihapus dari CV; langkah tetap ada, berstatus "Tidak dipakai". */
+  unusedSteps?: boolean[];
 }
 
-export function StepperSteps({ steps, activeStep, setActiveStep, sectionCompletion, sectionMeta, stepIds }: StepperProps) {
+export function StepperSteps({ steps, activeStep, setActiveStep, sectionCompletion, sectionMeta, stepIds, unusedSteps }: StepperProps) {
+  const { t } = useTranslation();
   return (
     <div className="flex items-center min-w-max mx-auto" style={{ maxWidth: 960 }}>
       {steps.map((label, i) => {
         const isPast = i < activeStep;
         const isActive = i === activeStep;
-        const isCompleted = (sectionCompletion[i] ?? false) && !isActive;
+        const isUnused = !!unusedSteps?.[i];
+        const isCompleted = (sectionCompletion[i] ?? false) && !isActive && !isUnused;
 
         return (
           <div key={label} className="flex items-center">
@@ -36,12 +40,14 @@ export function StepperSteps({ steps, activeStep, setActiveStep, sectionCompleti
               data-tour={stepIds ? `step-${stepIds[i]}` : undefined}
               aria-current={isActive ? "step" : undefined}
               onClick={() => setActiveStep(i)}
-              title={sectionMeta[i]?.desc || ""}
+              title={isUnused ? `${label}: ${t("builder.step-unused")}` : sectionMeta[i]?.desc || ""}
               className="flex items-center gap-1.5 md:gap-2 px-1.5 md:px-2 py-1 rounded-lg transition-colors shrink-0 hover:bg-surface-container-low"
             >
               <div
                 className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs md:text-sm font-semibold shrink-0 transition-all ${
-                  isCompleted
+                  isUnused && !isActive
+                    ? "border border-dashed border-outline-variant text-on-surface-variant/70"
+                    : isCompleted
                     ? "bg-primary text-on-primary shadow-sm"
                     : isActive
                     ? "bg-primary text-on-primary shadow-md scale-110"
@@ -66,6 +72,7 @@ export function StepperSteps({ steps, activeStep, setActiveStep, sectionCompleti
                 } hidden sm:inline`}
               >
                 {label}
+                {isUnused && <span className="ml-1 font-normal text-on-surface-variant/80">· {t("builder.step-unused")}</span>}
               </span>
             </button>
           </div>
@@ -83,6 +90,7 @@ export function BottomNav({
   handleSave,
   isSaving,
   sectionMeta,
+  unusedSteps,
 }: StepperProps & { handleSave: () => void; isSaving: boolean }) {
   const { t } = useTranslation();
 
@@ -92,21 +100,23 @@ export function BottomNav({
         {/* Section Quick-Jump Dock */}
         <div className="hidden sm:flex items-center justify-center gap-1 mb-3">
           {steps.map((label, i) => {
-            const isFilled = sectionCompletion[i];
+            const isUnused = !!unusedSteps?.[i];
+            const isFilled = sectionCompletion[i] && !isUnused;
             const isActive = i === activeStep;
             return (
               <button
                 key={label}
                 onClick={() => setActiveStep(i)}
-                title={label}
+                title={isUnused ? `${label}: ${t("builder.step-unused")}` : label}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${
                   isActive ? "bg-primary text-on-primary shadow-sm" :
                   isFilled ? "bg-green/10 text-green-deep hover:bg-green/20" :
+                  isUnused ? "border border-dashed border-outline-variant text-on-surface-variant/70 hover:bg-surface-container-low" :
                   "bg-surface-container-low text-on-surface-variant hover:bg-surface-container"
                 }`}
               >
                 <span className={`material-symbols-outlined text-[14px] ${isFilled && !isActive ? "text-green" : ""}`} style={{ fontVariationSettings: "'FILL' 1" }}>
-                  {isFilled ? "check_circle" : sectionMeta[i]?.icon}
+                  {isFilled ? "check_circle" : isUnused ? "remove_circle_outline" : sectionMeta[i]?.icon}
                 </span>
                 <span className="hidden md:inline">{label}</span>
               </button>

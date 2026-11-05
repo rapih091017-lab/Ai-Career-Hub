@@ -11,7 +11,7 @@ const A4_PX = (210 * 96) / 25.4;
  * kotak luar diberi lebar & tinggi hasil skala secara eksplisit. Ukuran asli
  * isi (mm/pt) tidak berubah, jadi pemenggalan halaman tetap sama dengan PDF.
  */
-export function FitA4({ children }: { children: ReactNode }) {
+export function FitA4({ children, fit = true }: { children: ReactNode; /** false = ukuran asli (100%). */ fit?: boolean }) {
   const outerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
@@ -26,7 +26,7 @@ export function FitA4({ children }: { children: ReactNode }) {
       const parent = outer.parentElement ?? outer;
       const cs = getComputedStyle(parent);
       const avail = parent.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-      setScale(avail > 0 ? Math.min(1, avail / A4_PX) : 1);
+      setScale(fit && avail > 0 ? Math.min(1, avail / A4_PX) : 1);
       setInnerH(inner.offsetHeight);
     };
     update();
@@ -34,7 +34,7 @@ export function FitA4({ children }: { children: ReactNode }) {
     if (outer.parentElement) ro.observe(outer.parentElement);
     ro.observe(inner);
     return () => ro.disconnect();
-  }, []);
+  }, [fit]);
 
   return (
     <div
