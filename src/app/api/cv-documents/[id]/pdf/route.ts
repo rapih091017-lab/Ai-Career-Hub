@@ -4,7 +4,7 @@ import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { cvDocuments } from "@/db/schema";
-import { apiHandler, errorResponse } from "@/lib/api-utils";
+import { apiHandler, errorResponse, consumeHourlyLimit } from "@/lib/api-utils";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limiter";
 import { normalizeCvDocument } from "@/lib/cv-normalize";
 import { cvPrintFormatFromData, cvRenderProps } from "@/lib/cv-print-format";
@@ -22,11 +22,10 @@ const BodySchema = z.object({
   expectedUpdatedAt: z.string().datetime({ offset: true }).optional(),
 });
 
-/** Batas anti-penyalahgunaan per user (bukan kuota paket). */
-const LIMITS = [
-  { suffix: "m", maxRequests: 6, windowSeconds: 60 },
-  { suffix: "h", maxRequests: 60, windowSeconds: 3600 },
-];
+/** Batas anti-penyalahgunaan per user (bukan kuota paket), per instance. */
+const LIMITS = [{ suffix: "m", maxRequests: 6, windowSeconds: 60 }];
+/** Batas per jam lintas instance, dihitung dari usage_logs "pdf_builder". */
+const PDF_BUILDER_HOURLY_MAX = 60;
 
 /**
  * Render yang sedang berjalan per user (per instance). Chromium berat;
@@ -87,6 +86,11 @@ export const POST = apiHandler(async (request: NextRequest, { params }: { params
   if (rendering.has(userId)) {
     return errorResponse("PDF_BUSY", "PDF sebelumnya masih dibuat. Tunggu sampai selesai lalu coba lagi.", 429);
   }
+  // Batas per jam berbasis DB sekaligus mencatat log render. Dicek setelah
+  // validasi supaya permintaan yang ditolak tidak memakan jatah.
+  const hourly = await consumeHourlyLimit(userId, "pdf_builder", PDF_BUILDER_HOURLY_MAX, id);
+  if (!hourly.allowed) return rateLimitResponse(hourly.resetInSeconds);
+
   rendering.add(userId);
   try {
     const html = await buildCvPdfHtml(props, marginMm);

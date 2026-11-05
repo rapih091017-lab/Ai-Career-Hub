@@ -8,8 +8,18 @@ const rows: { current: unknown[] } = { current: [] };
 const printMock = vi.fn(async (_html: string) => new Uint8Array([37, 80, 68, 70]));
 
 vi.mock("@/lib/auth", () => ({ auth: () => authMock() }));
+// Jumlah log pdf_builder dalam satu jam terakhir (batas per jam berbasis DB).
+const hourly = { count: 0, logged: 0 };
 vi.mock("@/db", () => ({
-  db: { select: () => ({ from: () => ({ where: () => ({ limit: async () => rows.current }) }) }) },
+  db: {
+    select: () => ({ from: () => ({ where: () => ({ limit: async () => rows.current }) }) }),
+    transaction: (fn: (tx: unknown) => unknown) =>
+      fn({
+        execute: async () => undefined,
+        select: () => ({ from: () => ({ where: async () => [{ value: hourly.count, oldest: new Date() }] }) }),
+        insert: () => ({ values: async () => { hourly.logged++; } }),
+      }),
+  },
 }));
 vi.mock("@/lib/pdf/chromium", () => ({ printStandaloneHtml: (html: string) => printMock(html) }));
 
@@ -125,5 +135,18 @@ describe("POST /api/cv-documents/[id]/pdf", () => {
     const statuses = [];
     for (let i = 0; i < 6; i++) statuses.push((await POST(req({}), ctx)).status);
     expect(statuses).toContain(429);
+  });
+
+  it("batas per jam lintas instance dari usage_logs pdf_builder → 429 tanpa render", async () => {
+    authMock.mockResolvedValue({ user: { id: "u-jam" } });
+    rows.current = [{ id: "cv1", tailoredContent: sampleCv, templateId: null, updatedAt: new Date() }];
+    hourly.count = 60;
+    const before = printMock.mock.calls.length;
+    const loggedBefore = hourly.logged;
+    const res = await POST(req({}), ctx);
+    hourly.count = 0;
+    expect(res.status).toBe(429);
+    expect(printMock.mock.calls.length).toBe(before);
+    expect(hourly.logged).toBe(loggedBefore);
   });
 });

@@ -315,6 +315,41 @@ export async function reserveQuota(
   };
 }
 
+/* ─── Batas per jam lintas instance (anti-penyalahgunaan, bukan kuota) ─── */
+
+/**
+ * Hitung baris usage_logs `actionType` milik user dalam satu jam terakhir dan,
+ * bila masih di bawah `max`, catat satu baris baru dalam transaksi yang sama.
+ * Berbasis DB supaya batasnya berlaku di semua instance serverless, tidak
+ * hanya di memori satu proses.
+ */
+export async function consumeHourlyLimit(
+  userId: string,
+  actionType: string,
+  max: number,
+  resourceId?: string,
+): Promise<{ allowed: true } | { allowed: false; resetInSeconds: number }> {
+  const windowStart = new Date(Date.now() - 3600_000);
+  return db.transaction(async (tx) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`hourly:${userId}:${actionType}`}))`);
+    const [row] = await tx
+      .select({ value: countFn(), oldest: sql<Date | string | null>`min(${usageLogs.createdAt})` })
+      .from(usageLogs)
+      .where(and(eq(usageLogs.userId, userId), eq(usageLogs.actionType, actionType), gte(usageLogs.createdAt, windowStart)));
+    if (row.value >= max) {
+      const oldest = row.oldest ? new Date(row.oldest).getTime() : Date.now();
+      const resetInSeconds = Math.max(1, Math.ceil((oldest + 3600_000 - Date.now()) / 1000));
+      return { allowed: false as const, resetInSeconds };
+    }
+    await tx.insert(usageLogs).values({
+      userId,
+      actionType,
+      resourceId: resourceId && UUID_RE.test(resourceId) ? resourceId : null,
+    });
+    return { allowed: true as const };
+  });
+}
+
 /* ─── Log usage ─── */
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
