@@ -10,8 +10,9 @@ import { CvPagedPreview, measurePageCount, untabSecondaryPages } from "@/compone
 import { LINE_HEIGHT, cvPrintFormatFromData, cvRenderProps } from "@/lib/cv-print-format";
 import { cvFontValue, resolveCvFont } from "@/lib/cv-fonts";
 import { useInlineEditable } from "@/hooks/useInlineEditable";
-import { EditableText, scheduleCaretCheck } from "@/components/cv-templates/EditableText";
-import { focusableIn, formTargetFor, getCvPath, setCvPath, stepForPath } from "@/lib/cv-edit-path";
+import { EditableText, keepCaretVisible, scheduleCaretCheck } from "@/components/cv-templates/EditableText";
+import { EditableDate } from "@/components/cv-templates/EditableDate";
+import { focusableIn, formTargetFor, getCvPath, removeBullet, setCvPath, splitBullet, stepForPath } from "@/lib/cv-edit-path";
 import type { CvEditBindings } from "@/components/cv-templates";
 import type { BlockStyleControls } from "@/components/builder/FormatToolbar";
 import { aiSkillNames } from "@/lib/cv-normalize";
@@ -331,9 +332,70 @@ export default function BuilderPage() {
     () => addToast({ type: "info", message: "Teks ini baru saja diubah di tempat lain. Isi terbaru yang dipakai; ketikan di pratinjau tidak disimpan." }),
     [addToast],
   );
+  // Poin di pratinjau: Enter/Backspace mengubah struktur, lalu fokus pindah ke poin tujuan.
+  const pendingFocus = useRef<{ path: string; caret: "start" | "end" } | null>(null);
+  const onPreviewSplit = useCallback(
+    (path: string, after: string) =>
+      setCvData((prev) => {
+        const r = splitBullet(prev, path, after);
+        if (!r) return prev;
+        pendingFocus.current = { path: r.focusPath, caret: "start" };
+        return r.cv;
+      }),
+    [setCvData],
+  );
+  const onPreviewRemoveBullet = useCallback(
+    (path: string) =>
+      setCvData((prev) => {
+        const r = removeBullet(prev, path);
+        if (!r) return prev;
+        pendingFocus.current = r.focusPath ? { path: r.focusPath, caret: "end" } : null;
+        return r.cv;
+      }),
+    [setCvData],
+  );
+  useEffect(() => {
+    if (!pendingFocus.current) return;
+    let frames = 0;
+    let raf = 0;
+    const tryFocus = () => {
+      const want = pendingFocus.current;
+      if (!want) return;
+      const el = previewRef.current?.querySelector<HTMLElement>(`[data-cv-edit][data-cv-path="${CSS.escape(want.path)}"]`);
+      if (!el) {
+        // Paginasi bisa butuh beberapa frame sebelum poin baru ada di DOM.
+        if (++frames < 20) raf = requestAnimationFrame(tryFocus);
+        else pendingFocus.current = null;
+        return;
+      }
+      pendingFocus.current = null;
+      el.focus({ preventScroll: true });
+      const sel = window.getSelection();
+      if (sel) {
+        const r = document.createRange();
+        r.selectNodeContents(el);
+        r.collapse(want.caret === "start");
+        sel.removeAllRanges();
+        sel.addRange(r);
+      }
+      el.scrollIntoView({ block: "nearest" });
+      keepCaretVisible();
+    };
+    raf = requestAnimationFrame(tryFocus);
+    return () => cancelAnimationFrame(raf);
+  }, [cvData]);
   const editBindings = useMemo<CvEditBindings>(
-    () => ({ Text: EditableText, editable: inlineEditable, onEdit: onPreviewEdit, onSession: onPreviewSession, onConflict: onPreviewConflict }),
-    [inlineEditable, onPreviewEdit, onPreviewSession, onPreviewConflict],
+    () => ({
+      Text: EditableText,
+      editable: inlineEditable,
+      onEdit: onPreviewEdit,
+      onSession: onPreviewSession,
+      onConflict: onPreviewConflict,
+      onSplit: onPreviewSplit,
+      onRemoveEmpty: onPreviewRemoveBullet,
+      DateField: EditableDate,
+    }),
+    [inlineEditable, onPreviewEdit, onPreviewSession, onPreviewConflict, onPreviewSplit, onPreviewRemoveBullet],
   );
 
   const previewContent = useMemo(
@@ -422,7 +484,8 @@ export default function BuilderPage() {
   const onPreviewClick = useCallback(
     (e: React.MouseEvent) => {
       const t = e.target as HTMLElement;
-      if (t.closest("[data-cv-edit][contenteditable]")) return;
+      // Teks yang bisa diedit langsung dan tanggal (input bulan) tidak lompat ke form.
+      if (t.closest("[data-cv-edit][contenteditable], [data-cv-date]")) return;
       const path = t.closest("[data-cv-path]")?.getAttribute("data-cv-path");
       if (path) jumpToField(path);
     },

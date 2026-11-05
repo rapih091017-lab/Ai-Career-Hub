@@ -14,6 +14,8 @@ import type { CvEditTextProps } from "@/components/cv-templates";
  * - Nilai kosong baru dikirim saat blur: kalau dikirim saat mengetik,
  *   bagian yang kosong hilang dari pratinjau bersama node yang sedang fokus.
  * - Enter = selesai (blur), Escape = batal ke nilai sebelum fokus.
+ * - Poin (onSplit ada): Enter memecah poin di caret; Backspace di poin
+ *   kosong menghapusnya (onRemoveEmpty). Struktur diubah oleh pratinjau.
  * - Paste selalu teks polos.
  */
 
@@ -40,7 +42,7 @@ const readText = (el: HTMLElement) => (el.textContent ?? "").replace(/\r?\n/g, "
 const sessionStart = new Map<string, string>();
 let transferring = false;
 
-export const EditableText = memo(function EditableText({ path, value, placeholder, editable, onEdit, onSession, onConflict }: CvEditTextProps) {
+export const EditableText = memo(function EditableText({ path, value, placeholder, editable, onEdit, onSession, onConflict, onSplit, onRemoveEmpty }: CvEditTextProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const focused = useRef(false);
   const composing = useRef(false);
@@ -168,7 +170,21 @@ export const EditableText = memo(function EditableText({ path, value, placeholde
         }
         if (e.key === "Enter") {
           e.preventDefault();
-          ref.current?.blur();
+          const el = ref.current;
+          if (el && onSplit && !external.current) {
+            // Teks sebelum caret tetap di poin ini (dikomit saat blur), sisanya ke poin baru.
+            const text = readText(el);
+            const at = Math.min(caretOffset(el) ?? text.length, text.length);
+            el.textContent = text.slice(0, at);
+            el.blur();
+            onSplit(path, text.slice(at));
+            return;
+          }
+          el?.blur();
+        } else if (e.key === "Backspace" && onRemoveEmpty && ref.current && readText(ref.current) === "") {
+          e.preventDefault();
+          ref.current.blur();
+          onRemoveEmpty(path);
         } else if (e.key === "Escape") {
           e.preventDefault();
           e.stopPropagation();

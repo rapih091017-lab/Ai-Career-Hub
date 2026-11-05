@@ -25,8 +25,46 @@ export function isInlineEditablePath(path: string): boolean {
   return !!LIST_TEXT[head] && !!id && LIST_TEXT[head].includes(field);
 }
 
+/** Daftar yang deskripsinya bisa berupa poin (path "<daftar>.<id>.description.<n>"). */
+const BULLET_LISTS = ["workHistory", "organisations"] as const;
+/** Field tanggal (nilai "YYYY-MM" atau kosong) per daftar. */
+const DATE_FIELDS: Record<string, readonly string[]> = {
+  workHistory: ["startDate", "endDate"],
+  education: ["startDate", "endDate"],
+  organisations: ["startDate", "endDate"],
+};
+const MONTH_RE = /^\d{4}-(0[1-9]|1[0-2])$/;
+
+/** Path satu poin deskripsi; n = indeks baris mentah (termasuk baris kosong). */
+export function isBulletPath(path: string): boolean {
+  const [head, id, field, index, ...rest] = path.split(".");
+  return !rest.length && (BULLET_LISTS as readonly string[]).includes(head) && !!id && field === "description" && /^\d+$/.test(index ?? "");
+}
+
+/** Path tanggal mulai/selesai sebuah entri. */
+export function isDatePath(path: string): boolean {
+  const [head, id, field, ...rest] = path.split(".");
+  return !rest.length && !!id && !!DATE_FIELDS[head]?.includes(field);
+}
+
+type Entry = { id: string } & Record<string, unknown>;
+function entryOf(cv: CvData, head: string, id: string): Entry | undefined {
+  return (cv[head as keyof CvData] as Entry[] | undefined)?.find((e) => e.id === id);
+}
+function withEntry(cv: CvData, head: string, id: string, patch: Record<string, unknown>): CvData {
+  const list = cv[head as keyof CvData] as Entry[];
+  return { ...cv, [head]: list.map((e) => (e.id === id ? { ...e, ...patch } : e)) };
+}
+const rawLines = (text: unknown) => String(text ?? "").replace(/\r\n?/g, "\n").split("\n");
+
 /** Baca nilai teks di path; undefined bila path tidak dikenal atau entri tidak ada. */
 export function getCvPath(cv: CvData, path: string): string | undefined {
+  if (isBulletPath(path) || isDatePath(path)) {
+    const [head, id, field, index] = path.split(".");
+    const entry = entryOf(cv, head, id);
+    if (!entry) return undefined;
+    return index === undefined ? String(entry[field] ?? "") : rawLines(entry.description)[Number(index)];
+  }
   if (!isInlineEditablePath(path)) return undefined;
   const [head, id, field] = path.split(".");
   if (head === "sectionLabels") return cv.sectionLabels?.[id] ?? "";
@@ -40,6 +78,21 @@ export function getCvPath(cv: CvData, path: string): string | undefined {
 
 /** Tulis nilai teks ke path. Path tak dikenal / entri hilang → data tidak berubah. */
 export function setCvPath(cv: CvData, path: string, value: string): CvData {
+  if (isBulletPath(path)) {
+    const [head, id, , index] = path.split(".");
+    const entry = entryOf(cv, head, id);
+    const lines = rawLines(entry?.description);
+    const i = Number(index);
+    if (!entry || i >= lines.length) return cv;
+    lines[i] = value.replace(/\r?\n/g, " ");
+    return withEntry(cv, head, id, { description: lines.join("\n") });
+  }
+  if (isDatePath(path)) {
+    const [head, id, field] = path.split(".");
+    // Nilai tidak valid dibuang, bukan diganti default.
+    if (!entryOf(cv, head, id) || (value !== "" && !MONTH_RE.test(value))) return cv;
+    return withEntry(cv, head, id, { [field]: value });
+  }
   if (!isInlineEditablePath(path)) return cv;
   const [head, id, field] = path.split(".");
   if (head === "sectionLabels") {
@@ -115,4 +168,37 @@ export function formTargetFor(path: string, root: ParentNode = document): HTMLEl
 export function focusableIn(el: HTMLElement): HTMLElement | null {
   if (el.matches("input, textarea, select, [contenteditable]")) return el;
   return el.querySelector<HTMLElement>("input:not([type=hidden]):not([disabled]), textarea:not([disabled]), select, [contenteditable]");
+}
+
+/**
+ * Enter di poin pratinjau: sisipkan poin baru berisi `after` tepat setelah
+ * poin di path. Mengembalikan path poin baru untuk difokus.
+ */
+export function splitBullet(cv: CvData, path: string, after: string): { cv: CvData; focusPath: string } | null {
+  if (!isBulletPath(path)) return null;
+  const [head, id, , index] = path.split(".");
+  const entry = entryOf(cv, head, id);
+  const lines = rawLines(entry?.description);
+  const i = Number(index);
+  if (!entry || i >= lines.length) return null;
+  lines.splice(i + 1, 0, after.replace(/\r?\n/g, " "));
+  return { cv: withEntry(cv, head, id, { description: lines.join("\n") }), focusPath: `${head}.${id}.description.${i + 1}` };
+}
+
+/**
+ * Backspace di poin kosong: hapus poin itu. Fokus pindah ke poin sebelumnya
+ * (null bila yang dihapus poin pertama).
+ */
+export function removeBullet(cv: CvData, path: string): { cv: CvData; focusPath: string | null } | null {
+  if (!isBulletPath(path)) return null;
+  const [head, id, , index] = path.split(".");
+  const entry = entryOf(cv, head, id);
+  const lines = rawLines(entry?.description);
+  const i = Number(index);
+  if (!entry || i >= lines.length || lines[i].trim() !== "") return null;
+  lines.splice(i, 1);
+  return {
+    cv: withEntry(cv, head, id, { description: lines.join("\n") }),
+    focusPath: i > 0 ? `${head}.${id}.description.${i - 1}` : null,
+  };
 }

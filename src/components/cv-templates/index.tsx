@@ -320,6 +320,21 @@ export interface CvEditTextProps {
   onSession: (path: string, before: string, after: string) => void;
   /** Data field ini diubah dari luar selama diedit; ketikan di pratinjau dibuang. */
   onConflict?: (path: string) => void;
+  /** Khusus poin: Enter memecah poin; `after` = teks setelah caret untuk poin baru. */
+  onSplit?: (path: string, after: string) => void;
+  /** Khusus poin: Backspace di poin kosong menghapusnya. */
+  onRemoveEmpty?: (path: string) => void;
+}
+
+/** Props tanggal yang bisa diubah di pratinjau (klik → input bulan). */
+export interface CvEditDateProps {
+  path: string;
+  /** Nilai tersimpan, "YYYY-MM" atau kosong. */
+  value: string;
+  /** Teks tampilan (sama dengan mode cetak). */
+  display: React.ReactNode;
+  onEdit: (path: string, value: string) => void;
+  onSession: (path: string, before: string, after: string) => void;
 }
 
 /**
@@ -333,6 +348,11 @@ export interface CvEditBindings {
   onEdit: CvEditTextProps["onEdit"];
   onSession: CvEditTextProps["onSession"];
   onConflict?: CvEditTextProps["onConflict"];
+  /** Ada = poin deskripsi bisa diedit langsung (Enter/Backspace mengatur poin). */
+  onSplit?: CvEditTextProps["onSplit"];
+  onRemoveEmpty?: CvEditTextProps["onRemoveEmpty"];
+  /** Ada = tanggal bisa diklik untuk diubah. */
+  DateField?: ComponentType<CvEditDateProps>;
 }
 
 interface RendererProps {
@@ -400,6 +420,29 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, divid
     );
   /** Atribut target klik (lompat ke form); kosong di mode cetak. */
   const P = (path: string): Record<string, string> => (edit ? { "data-cv-path": path } : {});
+
+  /** Poin deskripsi bisa diedit langsung (hanya bila pratinjau menyediakannya). */
+  const inlineBullets = !!(edit?.editable && edit.onSplit);
+  /**
+   * Baris poin dengan indeks baris mentah (dipakai di path). Mode cetak dan
+   * mode klik membuang baris kosong seperti sebelumnya; mode edit langsung
+   * menampilkannya supaya poin baru (masih kosong) bisa diketik.
+   */
+  const bulletLines = (description: string) =>
+    description.split("\n").map((line, j) => ({ line, j })).filter((x) => x.line || inlineBullets);
+  const B = (path: string, line: string): React.ReactNode =>
+    edit && inlineBullets ? (
+      <edit.Text path={path} value={line} placeholder="Poin" editable onEdit={edit.onEdit} onSession={edit.onSession} onConflict={edit.onConflict} onSplit={edit.onSplit} onRemoveEmpty={edit.onRemoveEmpty} />
+    ) : (
+      line
+    );
+  /** Tanggal: mode cetak = teks; pratinjau yang bisa diedit = klik untuk ubah. */
+  const D = (path: string, value: string | undefined, display: string): React.ReactNode =>
+    edit?.DateField && edit.editable && display ? (
+      <edit.DateField path={path} value={value ?? ""} display={display} onEdit={edit.onEdit} onSession={edit.onSession} />
+    ) : (
+      display
+    );
 
   const order = sectionOrder ?? DEFAULT_SECTION_ORDER;
 
@@ -504,9 +547,9 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, divid
                       marginLeft: pt(8),
                     }}
                   >
-                    {formatDate(work.startDate)}
+                    {D(`workHistory.${work.id}.startDate`, work.startDate, formatDate(work.startDate))}
                     {work.startDate && (work.endDate || work.isCurrent) ? " - " : ""}
-                    {work.isCurrent ? L("present") : formatDate(work.endDate)}
+                    {work.isCurrent ? L("present") : D(`workHistory.${work.id}.endDate`, work.endDate, formatDate(work.endDate))}
                   </span>
                 </div>
                 {/* Position, italic, smaller, below company */}
@@ -549,9 +592,9 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, divid
                   </p>
                 ) : (
                   <ul style={{ margin: "0 0 8pt 0", paddingLeft: pt(20), listStyle: "disc" }}>
-                    {work.description.split("\n").filter(Boolean).map((line, j) => (
+                    {bulletLines(work.description).map(({ line, j }) => (
                       <li key={j} {...P(`workHistory.${work.id}.description.${j}`)} style={{ marginBottom: pt(4), color: "#111111", textAlign }}>
-                        {line}
+                        {B(`workHistory.${work.id}.description.${j}`, line)}
                       </li>
                     ))}
                   </ul>
@@ -601,9 +644,9 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, divid
                       marginLeft: pt(8),
                     }}
                   >
-                    {formatDate(edu.startDate)}
+                    {D(`education.${edu.id}.startDate`, edu.startDate, formatDate(edu.startDate))}
                     {edu.startDate && edu.endDate ? " - " : ""}
-                    {formatDate(edu.endDate)}
+                    {D(`education.${edu.id}.endDate`, edu.endDate, formatDate(edu.endDate))}
                   </span>
                 </div>
                 <p
@@ -688,9 +731,9 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, divid
                       marginLeft: pt(8),
                     }}
                   >
-                    {formatDate(org.startDate)}
+                    {D(`organisations.${org.id}.startDate`, org.startDate, formatDate(org.startDate))}
                     {org.startDate && org.endDate ? " – " : ""}
-                    {formatDate(org.endDate)}
+                    {D(`organisations.${org.id}.endDate`, org.endDate, formatDate(org.endDate))}
                   </span>
                 </div>
                 {/* Position, italic, smaller, below org name */}
@@ -710,9 +753,9 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, divid
                   </p>
                 ) : (
                   <ul style={{ margin: "0 0 8pt 0", paddingLeft: pt(20), listStyle: "disc" }}>
-                    {org.description.split("\n").filter(Boolean).map((line, j) => (
+                    {bulletLines(org.description).map(({ line, j }) => (
                       <li key={j} {...P(`organisations.${org.id}.description.${j}`)} style={{ marginBottom: pt(4), color: "#111111", textAlign }}>
-                        {line}
+                        {B(`organisations.${org.id}.description.${j}`, line)}
                       </li>
                     ))}
                   </ul>
