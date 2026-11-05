@@ -7,7 +7,7 @@ import { DEFAULT_TEMPLATE_ID } from "@/lib/templates";
 import { TEMPLATE_STYLES } from "@/components/cv-templates";
 import { callAI, MODELS } from "@/lib/ai/adapter";
 import { GENERATOR_PROMPT_V2 } from "@/lib/ai/prompts/generator-v2";
-import { checkQuota, logUsage } from "@/lib/api-utils";
+import { reserveQuota } from "@/lib/api-utils";
 import { normalizeSkillLevel } from "@/lib/cv-normalize";
 import type { SkillEntry } from "@/components/cv-templates";
 
@@ -29,11 +29,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "INVALID_INPUT", message: "Template tidak dikenal." }, { status: 400 });
   }
 
-  // Generate CV memanggil model AI berbayar dan sebelumnya tidak pernah
-  // dibatasi. free tier punya jatah 2/bulan, paket satuan punya kuota sendiri.
-  const quota = await checkQuota(session.user.id, "cv_build");
-  if (quota instanceof NextResponse) return quota;
-
   // Always fetch profile to get a valid FK id (masterProfileId is NOT NULL in schema)
   const [masterProfile] = await db
     .select()
@@ -49,6 +44,12 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Reservasi kuota setelah validasi murah, sebelum panggilan AI. Reservasi
+  // mencatat pemakaian secara atomik; bila pembuatan gagal, kuota dikembalikan.
+  const reservation = await reserveQuota(session.user.id, "cv_build");
+  if (reservation instanceof NextResponse) return reservation;
+
+  try {
   // Only copy profile content when useProfile=true
   const tailoredContent: any = useProfile
     ? {
@@ -222,15 +223,12 @@ export async function POST(request: NextRequest) {
     })
     .returning();
 
-  // Catat pemakaian setelah CV berhasil dibuat, supaya kuota terpakai untuk
-  // generate yang benar-benar terjadi dan HPP bisa dilacak.
-  // CV sudah tersimpan, jadi gagal mencatat tidak boleh menggagalkan respons.
-  // Tetap dicatat ke log supaya kuota yang bocor bisa dilacak.
-  try {
-    await logUsage(session.user.id, "cv_build");
-  } catch (err) {
-    console.error("[cv-documents/create] gagal mencatat pemakaian cv_build", err);
-  }
+  await reservation.attach(newDoc.id);
 
   return NextResponse.json({ ...newDoc, consolidationSuggestion: aiNote }, { status: 201 });
+  } catch (err) {
+    console.error("[cv-documents/create] gagal membuat CV, kuota dikembalikan", err);
+    await reservation.refund();
+    throw err;
+  }
 }

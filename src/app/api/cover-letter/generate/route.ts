@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withAuth, apiHandler, errorResponse, checkQuota, logUsage } from "@/lib/api-utils";
+import { withAuth, apiHandler, errorResponse, reserveQuota } from "@/lib/api-utils";
 import { db } from "@/db";
 import { cvDocuments, coverLetters } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
@@ -65,8 +65,11 @@ export const POST = apiHandler(async (request: NextRequest) => {
   }
 
   // ── 1. CEK KUOTA ──
-  const quota = await checkQuota(userId, "cover_letter_generate");
-  if (quota instanceof NextResponse) return quota;
+  // Reservasi atomik: dua permintaan paralel tidak bisa sama-sama lolos.
+  const reservation = await reserveQuota(userId, "cover_letter_generate");
+  if (reservation instanceof NextResponse) return reservation;
+
+  try {
 
   // ── 2. AMBIL DATA (dari CV atau data manual) ──
   let position = "";
@@ -86,6 +89,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
       .limit(1);
 
     if (!cvDoc) {
+      await reservation.refund();
       return errorResponse("CV_NOT_FOUND", "CV tidak ditemukan", 404);
     }
 
@@ -210,8 +214,8 @@ export const POST = apiHandler(async (request: NextRequest) => {
     })
     .returning();
 
-  // ── 5. CATAT PEMAKAIAN ──
-  await logUsage(userId, "cover_letter_generate", letter.id);
+  // ── 5. TAUTKAN PEMAKAIAN KE SURAT ──
+  await reservation.attach(letter.id);
 
   return NextResponse.json(
     {
@@ -230,4 +234,9 @@ export const POST = apiHandler(async (request: NextRequest) => {
     },
     { status: 201 },
   );
+  } catch (err) {
+    // Gagal (CV tidak ada, AI gangguan, simpan gagal): kuota dikembalikan.
+    await reservation.refund();
+    throw err;
+  }
 });

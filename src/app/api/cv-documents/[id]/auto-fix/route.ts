@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { cvDocuments, usageLogs } from "@/db/schema";
-import { eq, and, count } from "drizzle-orm";
+import { cvDocuments } from "@/db/schema";
+import { eq, and } from "drizzle-orm";
 import { callAI, MODELS, buildUserContext } from "@/lib/ai/adapter";
-import { getUserAccess } from "@/lib/access";
+import { reserveQuota, type QuotaReservation } from "@/lib/api-utils";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limiter";
 import { AUTO_FIX_PROMPT_V1 } from "@/lib/ai/prompts/auto-fix-v1";
 import { parseAutoFixSuggestions } from "@/lib/auto-fix";
@@ -24,6 +24,7 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  let reservation: QuotaReservation | null = null;
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -59,36 +60,6 @@ export async function POST(
       );
     }
 
-    // ── 1. KUOTA (pakai jatah AI Suggestion) ─────────────────────
-    const access = await getUserAccess(session.user.id);
-    const suggestLimit = access.limits.ai_suggestion;
-
-    if (suggestLimit === false) {
-      return NextResponse.json(
-        { error: "FEATURE_NOT_AVAILABLE", message: "Perbaikan otomatis tidak tersedia di paket kamu." },
-        { status: 403 }
-      );
-    }
-
-    if (suggestLimit !== "unlimited") {
-      const [usageCount] = await db
-        .select({ count: count() })
-        .from(usageLogs)
-        .where(
-          and(
-            eq(usageLogs.userId, session.user.id),
-            eq(usageLogs.actionType, "ai_suggestion")
-          )
-        );
-
-      if (usageCount.count >= suggestLimit) {
-        return NextResponse.json(
-          { error: "QUOTA_EXCEEDED", message: `Batas gratis AI Suggestions sudah terpakai (${suggestLimit}/${suggestLimit}). Upgrade ke Premium untuk unlimited.` },
-          { status: 403 }
-        );
-      }
-    }
-
     // ── 2. AMBIL DRAF CV ─────────────────────────────────────────
     // Utamakan draf terbaru dari client (state Review), fallback ke
     // data tersimpan kalau client tidak mengirim.
@@ -120,6 +91,12 @@ export async function POST(
       experienceLevel: cv?.experienceLevel ?? undefined,
     });
 
+    // ── 1. KUOTA (jatah AI Suggestion) ──────────────────────────
+    // Kuota dicek dan dicatat atomik (reserveQuota); gagal → dikembalikan di catch.
+    const reserved = await reserveQuota(session.user.id, "ai_suggestion", id);
+    if (reserved instanceof NextResponse) return reserved;
+    reservation = reserved;
+
     // ── 3. PANGGIL AI ────────────────────────────────────────────
     const userPrompt = JSON.stringify({
       summary,
@@ -144,14 +121,9 @@ export async function POST(
     // Validasi manual: saran yang tidak valid dibuang, bukan diganti default.
     const suggestions = parseAutoFixSuggestions(aiResult).slice(0, 10);
 
-    await db.insert(usageLogs).values({
-      userId: session.user.id,
-      actionType: "ai_suggestion",
-      resourceId: id,
-    });
-
     return NextResponse.json({ suggestions }, { status: 200 });
   } catch (error) {
+    await reservation?.refund();
     console.error("AutoFix Error:", error);
     return NextResponse.json(
       { error: "AI_SERVICE_ERROR", message: "Layanan AI sedang gangguan. Silakan coba lagi beberapa saat." },

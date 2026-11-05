@@ -36,8 +36,9 @@ describe("batas wajar model mendalam", () => {
   it("generate CV sekarang berbatas dan tercatat", () => {
     // Sebelumnya tanpa gate sama sekali: siapa pun bisa memakai model AI
     // tanpa jejak dan tanpa kuota.
-    expect(createCvSrc).toContain('checkQuota(session.user.id, "cv_build")');
-    expect(createCvSrc).toContain('logUsage(session.user.id, "cv_build")');
+    // Kuota dicek dan dicatat atomik lewat reserveQuota.
+    expect(createCvSrc).toContain('reserveQuota(session.user.id, "cv_build")');
+    expect(createCvSrc).toContain("reservation.refund()");
   });
 });
 

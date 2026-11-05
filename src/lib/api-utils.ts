@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { adminUsers, usageLogs } from "@/db/schema";
-import { eq, and, count as countFn, gte } from "drizzle-orm";
+import { eq, and, count as countFn, gte, sql } from "drizzle-orm";
 import { getUserAccess } from "@/lib/access";
 
 /* ─── Error response shape ─── */
@@ -151,40 +151,33 @@ export function startOfMonthUtc(now: Date = new Date()): Date {
 }
 
 /* ─── Quota check helper ─── */
-export async function checkQuota(
-  userId: string,
-  actionType: "ai_suggestion" | "ai_revision" | "checker_check" | "cv_build" | "portfolio_generate" | "pdf_export" | "cover_letter_generate",
-): Promise<{ allowed: true } | NextResponse> {
-  const access = await getUserAccess(userId);
-  // Determine the limit key based on action type
-  let limitKey: string;
-  switch (actionType) {
-    case "ai_suggestion":
-      limitKey = "ai_suggestion";
-      break;
-    case "ai_revision":
-      limitKey = "ai_revision";
-      break;
-    case "checker_check":
-      limitKey = "cv_analyzer";
-      break;
-    case "portfolio_generate":
-      limitKey = "portfolio_web";
-      break;
-    case "pdf_export":
-      limitKey = "pdf_export";
-      break;
-    case "cover_letter_generate":
-      limitKey = "cover_letter";
-      break;
-    case "cv_build":
-      // Paket menjual fitur ini sebagai ai_cv_generate; log tetap "cv_build".
-      limitKey = "ai_cv_generate";
-      break;
-    default:
-      limitKey = actionType;
-  }
+export type QuotaAction =
+  | "ai_suggestion"
+  | "ai_revision"
+  | "checker_check"
+  | "cv_build"
+  | "portfolio_generate"
+  | "pdf_export"
+  | "cover_letter_generate";
 
+const QUOTA_LIMIT_KEY: Record<QuotaAction, string> = {
+  ai_suggestion: "ai_suggestion",
+  ai_revision: "ai_revision",
+  checker_check: "cv_analyzer",
+  portfolio_generate: "portfolio_web",
+  pdf_export: "pdf_export",
+  cover_letter_generate: "cover_letter",
+  // Paket menjual fitur ini sebagai ai_cv_generate; log tetap "cv_build".
+  cv_build: "ai_cv_generate",
+};
+
+/** Ambil limit paket untuk aksi; respons 403 bila fitur tidak tersedia. */
+async function resolveQuotaLimit(
+  userId: string,
+  actionType: QuotaAction,
+): Promise<{ limit: number | "unlimited"; label: string; isPremium: boolean } | NextResponse> {
+  const access = await getUserAccess(userId);
+  const limitKey = QUOTA_LIMIT_KEY[actionType] ?? actionType;
   const limit = (access.limits as Record<string, number | "unlimited" | false>)[limitKey];
   const label = FEATURE_NOT_AVAILABLE_LABEL[actionType] ?? actionType;
 
@@ -212,36 +205,114 @@ export async function checkQuota(
     ) as NextResponse;
   }
 
-  if (limit !== "unlimited") {
-    const firstOfMonth = startOfMonthUtc();
+  return { limit, label, isPremium: access.isPremium };
+}
 
+function quotaExceededResponse(label: string, limit: number, isPremium: boolean): NextResponse {
+  // Dua kasus yang perlu kalimat berbeda: pengguna yang belum bayar, dan
+  // pengguna yang sudah membayar lalu kehabisan kuota. Memberi tahu orang
+  // yang sudah beli "upgrade" adalah cara tercepat jadi tiket kecewa.
+  const extra = isPremium
+    ? `Kuotanya habis bulan ini, sudah termasuk dalam paket yang kamu beli.`
+    : `Kuota paketmu bulan ini sudah habis.`;
+  return errorResponse(
+    "QUOTA_EXCEEDED",
+    `${label} sudah terpakai ${limit}/${limit}. ${extra} Bisa dipakai lagi tanggal 1, atau naik paket lewat halaman tagihan.`,
+    403,
+  ) as NextResponse;
+}
+
+function monthlyUsageWhere(userId: string, actionType: string) {
+  return and(
+    eq(usageLogs.userId, userId),
+    eq(usageLogs.actionType, actionType),
+    gte(usageLogs.createdAt, startOfMonthUtc()),
+  );
+}
+
+export async function checkQuota(
+  userId: string,
+  actionType: QuotaAction,
+): Promise<{ allowed: true } | NextResponse> {
+  const resolved = await resolveQuotaLimit(userId, actionType);
+  if (resolved instanceof NextResponse) return resolved;
+  const { limit, label, isPremium } = resolved;
+
+  if (limit !== "unlimited") {
     const [usageRow] = await db
       .select({ value: countFn() })
       .from(usageLogs)
-      .where(
-        and(
-          eq(usageLogs.userId, userId),
-          eq(usageLogs.actionType, actionType),
-          gte(usageLogs.createdAt, firstOfMonth),
-        ),
-      );
+      .where(monthlyUsageWhere(userId, actionType));
 
     if (usageRow.value >= limit) {
-      // Dua kasus yang perlu kalimat berbeda: pengguna yang belum bayar, dan
-      // pengguna yang sudah membayar lalu kehabisan kuota. Memberi tahu orang
-      // yang sudah beli "upgrade" adalah cara tercepat jadi tiket kecewa.
-      const extra = access.isPremium
-        ? `Kuotanya habis bulan ini, sudah termasuk dalam paket yang kamu beli.`
-        : `Kuota paketmu bulan ini sudah habis.`;
-      return errorResponse(
-        "QUOTA_EXCEEDED",
-        `${label} sudah terpakai ${limit}/${limit}. ${extra} Bisa dipakai lagi tanggal 1, atau naik paket lewat halaman tagihan.`,
-        403,
-      ) as NextResponse;
+      return quotaExceededResponse(label, limit, isPremium);
     }
   }
 
   return { allowed: true };
+}
+
+/* ─── Reservasi kuota (anti-race) ─── */
+export interface QuotaReservation {
+  /** Kembalikan kuota bila pekerjaan gagal (hapus baris reservasi). */
+  refund(): Promise<void>;
+  /** Tautkan baris reservasi ke resource yang berhasil dibuat (opsional). */
+  attach(resourceId: string): Promise<void>;
+}
+
+/**
+ * Cek kuota dan langsung mencatat pemakaian dalam satu transaksi.
+ *
+ * checkQuota + logUsage terpisah membuka celah: dua permintaan paralel sama-sama
+ * lolos hitung sebelum salah satunya mencatat. Di sini advisory lock per
+ * (user, aksi) membuat hitung-lalu-insert berjalan bergantian, dan baris yang
+ * di-insert berfungsi sebagai reservasi. Bila pekerjaan gagal, panggil refund().
+ */
+export async function reserveQuota(
+  userId: string,
+  actionType: QuotaAction,
+  resourceId?: string,
+): Promise<QuotaReservation | NextResponse> {
+  const resolved = await resolveQuotaLimit(userId, actionType);
+  if (resolved instanceof NextResponse) return resolved;
+  const { limit, label, isPremium } = resolved;
+  const normalizedResource = resourceId && UUID_RE.test(resourceId) ? resourceId : null;
+
+  const reservedId = await db.transaction(async (tx) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`quota:${userId}:${actionType}`}))`);
+    if (limit !== "unlimited") {
+      const [usageRow] = await tx
+        .select({ value: countFn() })
+        .from(usageLogs)
+        .where(monthlyUsageWhere(userId, actionType));
+      if (usageRow.value >= limit) return null;
+    }
+    const [row] = await tx
+      .insert(usageLogs)
+      .values({ userId, actionType, resourceId: normalizedResource })
+      .returning({ id: usageLogs.id });
+    return row.id;
+  });
+
+  if (!reservedId) return quotaExceededResponse(label, limit as number, isPremium);
+
+  return {
+    async refund() {
+      try {
+        await db.delete(usageLogs).where(eq(usageLogs.id, reservedId));
+      } catch (err) {
+        console.error(`[reserveQuota] gagal mengembalikan kuota ${actionType}`, err);
+      }
+    },
+    async attach(id: string) {
+      if (!UUID_RE.test(id)) return;
+      try {
+        await db.update(usageLogs).set({ resourceId: id }).where(eq(usageLogs.id, reservedId));
+      } catch (err) {
+        console.error(`[reserveQuota] gagal menautkan resource ${actionType}`, err);
+      }
+    },
+  };
 }
 
 /* ─── Log usage ─── */

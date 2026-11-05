@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { cvDocuments, usageLogs } from "@/db/schema";
-import { eq, and, count } from "drizzle-orm";
+import { cvDocuments } from "@/db/schema";
+import { eq, and } from "drizzle-orm";
 import { callAI, MODELS, buildUserContext } from "@/lib/ai/adapter";
-import { getUserAccess } from "@/lib/access";
+import { reserveQuota, type QuotaReservation } from "@/lib/api-utils";
 import { REVISION_PROMPT_V2 } from "@/lib/ai/prompts/revision-v2";
 import { SUGGESTION_PROMPT_V2 } from "@/lib/ai/prompts/suggestion-v2";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limiter";
@@ -15,6 +15,7 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  let reservation: QuotaReservation | null = null;
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -59,34 +60,10 @@ export async function POST(
 
     // ── Mode: SUGGEST, Summary ──
     if (mode === "suggest" && section === "summary") {
-      const access = await getUserAccess(session.user.id);
-      const suggestLimit = access.limits.ai_suggestion;
-
-      if (suggestLimit === false) {
-        return NextResponse.json(
-          { error: "FEATURE_NOT_AVAILABLE", message: "AI Suggestion tidak tersedia di paket kamu." },
-          { status: 403 }
-        );
-      }
-
-      if (suggestLimit !== "unlimited") {
-        const [usageCount] = await db
-          .select({ count: count() })
-          .from(usageLogs)
-          .where(
-            and(
-              eq(usageLogs.userId, session.user.id),
-              eq(usageLogs.actionType, "ai_suggestion")
-            )
-          );
-
-        if (usageCount.count >= suggestLimit) {
-          return NextResponse.json(
-            { error: "QUOTA_EXCEEDED", message: `Batas gratis AI Suggestions sudah terpakai (${suggestLimit}/${suggestLimit}). Upgrade ke Premium untuk unlimited.` },
-            { status: 403 }
-          );
-        }
-      }
+      // Kuota dicek dan dicatat atomik (reserveQuota); gagal → dikembalikan di catch.
+      const reserved = await reserveQuota(session.user.id, "ai_suggestion", id);
+      if (reserved instanceof NextResponse) return reserved;
+      reservation = reserved;
 
       const userPrompt = JSON.stringify({
         currentText: body.currentText || "",
@@ -110,11 +87,6 @@ export async function POST(
       });
 
 
-      await db.insert(usageLogs).values({
-        userId: session.user.id,
-        actionType: "ai_suggestion",
-        resourceId: id,
-      });
 
       return NextResponse.json(aiResult, { status: 200 });
     }
@@ -128,35 +100,10 @@ export async function POST(
         );
       }
 
-      // Cek kuota suggestion, menggunakan getUserAccess
-      const access = await getUserAccess(session.user.id);
-      const suggestLimit = access.limits.ai_suggestion;
-
-      if (suggestLimit === false) {
-        return NextResponse.json(
-          { error: "FEATURE_NOT_AVAILABLE", message: "AI Suggestion tidak tersedia di paket kamu." },
-          { status: 403 }
-        );
-      }
-
-      if (suggestLimit !== "unlimited") {
-        const [usageCount] = await db
-          .select({ count: count() })
-          .from(usageLogs)
-          .where(
-            and(
-              eq(usageLogs.userId, session.user.id),
-              eq(usageLogs.actionType, "ai_suggestion")
-            )
-          );
-
-        if (usageCount.count >= suggestLimit) {
-          return NextResponse.json(
-            { error: "QUOTA_EXCEEDED", message: `Batas gratis AI Suggestions sudah terpakai (${suggestLimit}/${suggestLimit}). Upgrade ke Premium untuk unlimited.` },
-            { status: 403 }
-          );
-        }
-      }
+      // Kuota dicek dan dicatat atomik (reserveQuota); gagal → dikembalikan di catch.
+      const reserved = await reserveQuota(session.user.id, "ai_suggestion", id);
+      if (reserved instanceof NextResponse) return reserved;
+      reservation = reserved;
 
       const userPrompt = JSON.stringify({
         position: body.position || body.jobTitle,
@@ -177,53 +124,23 @@ export async function POST(
       });
 
 
-      await db.insert(usageLogs).values({
-        userId: session.user.id,
-        actionType: "ai_suggestion",
-        resourceId: id,
-      });
 
       return NextResponse.json(aiResult, { status: 200 });
     }
 
     // ── Mode: REVISE, Summary ──
     if (mode === "revise" && section === "summary") {
-      // Cek Kuota Revision
-      const access = await getUserAccess(session.user.id);
-      const revisionLimit = access.limits.ai_revision;
-
-      if (revisionLimit === false) {
-        return NextResponse.json(
-          { error: "FEATURE_NOT_AVAILABLE", message: "AI Smart Revision tidak tersedia di paket kamu." },
-          { status: 403 }
-        );
-      }
-
-      if (revisionLimit !== "unlimited") {
-        const [usageCount] = await db
-          .select({ count: count() })
-          .from(usageLogs)
-          .where(
-            and(
-              eq(usageLogs.userId, session.user.id),
-              eq(usageLogs.actionType, "ai_revision")
-            )
-          );
-
-        if (usageCount.count >= revisionLimit) {
-          return NextResponse.json(
-            { error: "QUOTA_EXCEEDED", message: `Batas gratis AI Smart Revision sudah terpakai (${revisionLimit}/${revisionLimit}). Upgrade ke Premium untuk unlimited.` },
-            { status: 403 }
-          );
-        }
-      }
-
       if (!cvDoc) {
         return NextResponse.json(
           { error: "CV_NOT_FOUND", message: "CV tidak ditemukan" },
           { status: 404 }
         );
       }
+
+      // Kuota dicek dan dicatat atomik (reserveQuota); gagal → dikembalikan di catch.
+      const reserved = await reserveQuota(session.user.id, "ai_revision", id);
+      if (reserved instanceof NextResponse) return reserved;
+      reservation = reserved;
 
       const userPrompt = JSON.stringify({
         currentText: body.currentText || "",
@@ -246,11 +163,6 @@ export async function POST(
         userContext: userCtx,
       });
 
-      await db.insert(usageLogs).values({
-        userId: session.user.id,
-        actionType: "ai_revision",
-        resourceId: id,
-      });
 
       return NextResponse.json(aiResult, { status: 200 });
     }
@@ -263,42 +175,17 @@ export async function POST(
       );
     }
 
-    // 1. Cek Kuota Revision
-    const access = await getUserAccess(session.user.id);
-    const revisionLimit = access.limits.ai_revision;
-
-    if (revisionLimit === false) {
-      return NextResponse.json(
-        { error: "FEATURE_NOT_AVAILABLE", message: "AI Smart Revision tidak tersedia di paket kamu." },
-        { status: 403 }
-      );
-    }
-
-    if (revisionLimit !== "unlimited") {
-      const [usageCount] = await db
-        .select({ count: count() })
-        .from(usageLogs)
-        .where(
-          and(
-            eq(usageLogs.userId, session.user.id),
-            eq(usageLogs.actionType, "ai_revision")
-          )
-        );
-
-      if (usageCount.count >= revisionLimit) {
-        return NextResponse.json(
-          { error: "QUOTA_EXCEEDED", message: `Batas gratis AI Smart Revision sudah terpakai (${revisionLimit}/${revisionLimit}). Upgrade ke Premium untuk unlimited.` },
-          { status: 403 }
-        );
-      }
-    }
-
     if (!cvDoc) {
       return NextResponse.json(
         { error: "CV_NOT_FOUND", message: "CV tidak ditemukan" },
         { status: 404 }
       );
     }
+
+    // Kuota dicek dan dicatat atomik (reserveQuota); gagal → dikembalikan di catch.
+    const reserved = await reserveQuota(session.user.id, "ai_revision", id);
+    if (reserved instanceof NextResponse) return reserved;
+    reservation = reserved;
 
     // 2. Filter Keyword Sederhana
     const jdWords = cvDoc.jobDescription
@@ -335,16 +222,11 @@ export async function POST(
       userContext: userCtx,
     });
 
-    // 4. Catat Pemakaian
-    await db.insert(usageLogs).values({
-      userId: session.user.id,
-      actionType: "ai_revision",
-      resourceId: id,
-    });
 
     // 5. Return hasil
     return NextResponse.json(aiResult, { status: 200 });
   } catch (error) {
+    await reservation?.refund();
     console.error("Revise Error:", error);
     return NextResponse.json(
       { error: "AI_SERVICE_ERROR", message: "Layanan AI sedang gangguan. Silakan coba lagi beberapa saat." },
