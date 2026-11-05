@@ -4,7 +4,7 @@ import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { cvDocuments } from "@/db/schema";
-import { apiHandler, errorResponse, consumeHourlyLimit } from "@/lib/api-utils";
+import { apiHandler, errorResponse, consumeHourlyLimit, deleteUsageLog } from "@/lib/api-utils";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limiter";
 import { normalizeCvDocument } from "@/lib/cv-normalize";
 import { cvPrintFormatFromData, cvRenderProps } from "@/lib/cv-print-format";
@@ -107,6 +107,8 @@ export const POST = apiHandler(async (request: NextRequest, { params }: { params
     });
   } catch (error) {
     console.error("[cv-pdf] render error:", error instanceof Error ? error.message : error);
+    // Render gagal tidak memakan jatah per jam.
+    await deleteUsageLog(hourly.logId);
     return errorResponse("PDF_SERVER_ERROR", "Gagal membuat PDF di server. Coba lagi sebentar lagi.", 500);
   } finally {
     rendering.delete(userId);

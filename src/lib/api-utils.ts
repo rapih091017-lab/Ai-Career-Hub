@@ -357,7 +357,7 @@ export async function consumeHourlyLimit(
   actionType: string,
   max: number,
   resourceId?: string,
-): Promise<{ allowed: true } | { allowed: false; resetInSeconds: number }> {
+): Promise<{ allowed: true; logId: string } | { allowed: false; resetInSeconds: number }> {
   const windowStart = new Date(Date.now() - 3600_000);
   return db.transaction(async (tx) => {
     await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`hourly:${userId}:${actionType}`}))`);
@@ -370,13 +370,25 @@ export async function consumeHourlyLimit(
       const resetInSeconds = Math.max(1, Math.ceil((oldest + 3600_000 - Date.now()) / 1000));
       return { allowed: false as const, resetInSeconds };
     }
-    await tx.insert(usageLogs).values({
-      userId,
-      actionType,
-      resourceId: resourceId && UUID_RE.test(resourceId) ? resourceId : null,
-    });
-    return { allowed: true as const };
+    const [logged] = await tx
+      .insert(usageLogs)
+      .values({
+        userId,
+        actionType,
+        resourceId: resourceId && UUID_RE.test(resourceId) ? resourceId : null,
+      })
+      .returning({ id: usageLogs.id });
+    return { allowed: true as const, logId: logged.id };
   });
+}
+
+/** Hapus satu baris usage_logs (mis. render gagal tidak memakan jatah per jam). */
+export async function deleteUsageLog(id: string): Promise<void> {
+  try {
+    await db.delete(usageLogs).where(eq(usageLogs.id, id));
+  } catch (err) {
+    console.error("[deleteUsageLog] gagal menghapus log", err);
+  }
 }
 
 /* ─── Log usage ─── */
