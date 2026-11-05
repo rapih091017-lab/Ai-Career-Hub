@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { withAdmin, apiHandler } from "@/lib/api-utils";
 import { db } from "@/db";
 import { checkerResults, coverLetters, cvDocuments, payments, trackedJobs, usageLogs, users } from "@/db/schema";
-import { count, countDistinct, desc, eq, gte, sql } from "drizzle-orm";
+import { and, count, countDistinct, desc, eq, gte, ne, sql } from "drizzle-orm";
 
 /** GET /api/admin/insights: aktivitas fitur, tren registrasi, dan funnel user. */
 export const GET = apiHandler(async () => {
@@ -15,7 +15,9 @@ export const GET = apiHandler(async () => {
   const featureUsage = await db
     .select({ action: usageLogs.actionType, total: count() })
     .from(usageLogs)
-    .where(gte(usageLogs.createdAt, thirtyDaysAgo))
+    // pdf_builder = log rate limit unduh PDF (bukan pemakaian fitur AI); dikecualikan
+    // supaya statistik fitur tidak membengkak.
+    .where(and(gte(usageLogs.createdAt, thirtyDaysAgo), ne(usageLogs.actionType, "pdf_builder")))
     .groupBy(usageLogs.actionType)
     .orderBy(desc(count()))
     .limit(15);
