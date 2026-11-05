@@ -152,3 +152,53 @@ export function applyApprovedFixesWithReport(cv: CvData, fixes: AutoFixSuggestio
 export function applyApprovedFixes(cv: CvData, fixes: AutoFixSuggestion[]): CvData {
   return applyApprovedFixesWithReport(cv, fixes).cv;
 }
+
+/* ─── Validasi body POST /auto-fix ─── */
+
+/** Batas ukuran body mentah (byte). Draf CV wajar jauh di bawah ini. */
+export const AUTO_FIX_MAX_BODY_BYTES = 200_000;
+
+const optText = (max: number) => z.string().max(max).nullish();
+
+/**
+ * Draf CV dari client hanya diambil field yang dipakai prompt, dengan batas
+ * panjang. Field lain dibuang (zod strip), jadi isi body mentah tidak pernah
+ * diteruskan ke AI apa adanya.
+ */
+export const AutoFixRequestSchema = z.object({
+  cv: z
+    .object({
+      summary: optText(5_000),
+      workHistory: z
+        .array(
+          z.object({
+            position: optText(300),
+            company: optText(300),
+            description: optText(8_000),
+          }),
+        )
+        .max(40)
+        .nullish(),
+      skills: z.array(z.object({ name: optText(200) })).max(150).nullish(),
+      cvLang: optText(10),
+      experienceLevel: optText(50),
+    })
+    .nullish(),
+  jobDescription: optText(20_000),
+});
+export type AutoFixRequest = z.infer<typeof AutoFixRequestSchema>;
+
+/** Parse body mentah; null bila terlalu besar, bukan JSON, atau tidak valid. */
+export function parseAutoFixRequest(raw: string): AutoFixRequest | null {
+  if (new TextEncoder().encode(raw).length > AUTO_FIX_MAX_BODY_BYTES) return null;
+  let json: unknown = {};
+  if (raw.trim()) {
+    try {
+      json = JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  }
+  const parsed = AutoFixRequestSchema.safeParse(json);
+  return parsed.success ? parsed.data : null;
+}

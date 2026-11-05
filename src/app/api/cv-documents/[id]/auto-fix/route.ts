@@ -7,7 +7,7 @@ import { callAI, MODELS, buildUserContext } from "@/lib/ai/adapter";
 import { reserveQuota, type QuotaReservation } from "@/lib/api-utils";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limiter";
 import { AUTO_FIX_PROMPT_V1 } from "@/lib/ai/prompts/auto-fix-v1";
-import { parseAutoFixSuggestions } from "@/lib/auto-fix";
+import { parseAutoFixSuggestions, parseAutoFixRequest } from "@/lib/auto-fix";
 
 /**
  * POST /api/cv-documents/[id]/auto-fix
@@ -20,6 +20,8 @@ import { parseAutoFixSuggestions } from "@/lib/auto-fix";
  * Body: { cv?: {...}, jobDescription?: string }
  * Respons: { suggestions: AutoFixSuggestion[] }
  */
+const EXPERIENCE_LEVELS = ["entry", "mid", "senior", "lead"] as const;
+
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -61,10 +63,24 @@ export async function POST(
     }
 
     // ── 2. AMBIL DRAF CV ─────────────────────────────────────────
-    // Utamakan draf terbaru dari client (state Review), fallback ke
-    // data tersimpan kalau client tidak mengirim.
-    const body = await request.json();
-    const cv = body.cv ?? cvDoc.tailoredContent;
+    // Draf terbaru dari client dipakai (state Review bisa belum tersimpan),
+    // tapi hanya lewat skema berbatas; tanpa draf, pakai data di DB milik
+    // user ini.
+    const body = parseAutoFixRequest(await request.text());
+    if (!body) {
+      return NextResponse.json(
+        { error: "INVALID_REQUEST", message: "Data CV tidak valid atau terlalu besar." },
+        { status: 400 }
+      );
+    }
+    const stored = (cvDoc.tailoredContent ?? {}) as Record<string, unknown>;
+    const cv = (body.cv ?? stored) as {
+      summary?: unknown;
+      workHistory?: unknown;
+      skills?: unknown;
+      cvLang?: unknown;
+      experienceLevel?: string | null;
+    };
     const jobDescription =
       typeof body.jobDescription === "string"
         ? body.jobDescription
@@ -88,7 +104,7 @@ export async function POST(
       jobTitle: cvDoc.jobTitle || "",
       industry: undefined,
       cvLang,
-      experienceLevel: cv?.experienceLevel ?? undefined,
+      experienceLevel: EXPERIENCE_LEVELS.find((l) => l === cv?.experienceLevel),
     });
 
     // ── 1. KUOTA (jatah AI Suggestion) ──────────────────────────
