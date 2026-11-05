@@ -69,3 +69,11 @@ describe("cv-documents/create logUsage", () => {
     expect(src).toContain("console.error");
   });
 });
+
+describe("/api/usage cv_build", () => {
+  it("dihitung dari usage_logs, sama dengan checkQuota", () => {
+    const src = readFileSync(join(process.cwd(), "src/app/api/usage/route.ts"), "utf8");
+    expect(src).not.toContain("cvDocuments");
+    expect(src).toMatch(/actionTypes = \[[^\]]*"cv_build"/);
+  });
+});

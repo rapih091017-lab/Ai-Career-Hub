@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { usageLogs, payments, cvDocuments } from "@/db/schema";
+import { usageLogs, payments } from "@/db/schema";
 import { eq, and, count, gte, sql } from "drizzle-orm";
 import { getUserAccess } from "@/lib/access";
 import { apiHandler, startOfMonthUtc } from "@/lib/api-utils";
@@ -53,17 +53,9 @@ export const GET = apiHandler(async () => {
     usageMap[action] = row.value;
   }
 
-  // Hitung CV builds dari tabel cvDocuments
-  const [cvCount] = await db
-    .select({ value: count() })
-    .from(cvDocuments)
-    .where(
-      and(
-        eq(cvDocuments.userId, userId),
-        gte(cvDocuments.createdAt, firstOfMonth),
-      ),
-    );
-  usageMap["cv_build"] = cvCount.value;
+  // cv_build dihitung dari usage_logs, sumber yang sama dengan checkQuota/
+  // reserveQuota. Menghitung tabel cv_documents membuat angka di halaman
+  // tagihan berbeda dari yang ditegakkan (CV kosong/duplikat ikut terhitung).
 
   // ── 2. Ambil riwayat pembayaran sukses ───────────────────────────
   const paymentHistory = await db
