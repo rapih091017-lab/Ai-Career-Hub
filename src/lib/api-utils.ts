@@ -208,7 +208,15 @@ async function resolveQuotaLimit(
   return { limit, label, isPremium: access.isPremium };
 }
 
-function quotaExceededResponse(label: string, limit: number, isPremium: boolean): NextResponse {
+function quotaExceededResponse(label: string, limit: number, isPremium: boolean, period: QuotaPeriod = "month"): NextResponse {
+  if (period === "lifetime") {
+    // Jatah seumur akun: tidak pulih tanggal 1.
+    return errorResponse(
+      "QUOTA_EXCEEDED",
+      `Batas ${label} sudah terpakai (${limit}/${limit}). Naik paket lewat halaman tagihan untuk menambah jatah.`,
+      403,
+    ) as NextResponse;
+  }
   // Dua kasus yang perlu kalimat berbeda: pengguna yang belum bayar, dan
   // pengguna yang sudah membayar lalu kehabisan kuota. Memberi tahu orang
   // yang sudah beli "upgrade" adalah cara tercepat jadi tiket kecewa.
@@ -222,18 +230,37 @@ function quotaExceededResponse(label: string, limit: number, isPremium: boolean)
   ) as NextResponse;
 }
 
-function monthlyUsageWhere(userId: string, actionType: string) {
-  return and(
-    eq(usageLogs.userId, userId),
-    eq(usageLogs.actionType, actionType),
-    gte(usageLogs.createdAt, startOfMonthUtc()),
-  );
+/** Periode hitung kuota: "month" = sejak tanggal 1 (UTC), "lifetime" = seumur akun. */
+export type QuotaPeriod = "month" | "lifetime";
+export interface QuotaOptions {
+  period?: QuotaPeriod;
+}
+
+/**
+ * Periode yang ditegakkan per aksi. ai_suggestion & ai_revision sengaja
+ * seumur akun (menekan biaya AI); /api/usage memakai peta yang sama.
+ */
+export const QUOTA_PERIOD: Record<QuotaAction, QuotaPeriod> = {
+  ai_suggestion: "lifetime",
+  ai_revision: "lifetime",
+  checker_check: "month",
+  cv_build: "month",
+  portfolio_generate: "month",
+  pdf_export: "month",
+  cover_letter_generate: "month",
+};
+
+function usageWhere(userId: string, actionType: string, period: QuotaPeriod) {
+  const base = [eq(usageLogs.userId, userId), eq(usageLogs.actionType, actionType)];
+  return period === "lifetime" ? and(...base) : and(...base, gte(usageLogs.createdAt, startOfMonthUtc()));
 }
 
 export async function checkQuota(
   userId: string,
   actionType: QuotaAction,
+  opts: QuotaOptions = {},
 ): Promise<{ allowed: true } | NextResponse> {
+  const period = opts.period ?? "month";
   const resolved = await resolveQuotaLimit(userId, actionType);
   if (resolved instanceof NextResponse) return resolved;
   const { limit, label, isPremium } = resolved;
@@ -242,10 +269,10 @@ export async function checkQuota(
     const [usageRow] = await db
       .select({ value: countFn() })
       .from(usageLogs)
-      .where(monthlyUsageWhere(userId, actionType));
+      .where(usageWhere(userId, actionType, period));
 
     if (usageRow.value >= limit) {
-      return quotaExceededResponse(label, limit, isPremium);
+      return quotaExceededResponse(label, limit, isPremium, period);
     }
   }
 
@@ -272,7 +299,9 @@ export async function reserveQuota(
   userId: string,
   actionType: QuotaAction,
   resourceId?: string,
+  opts: QuotaOptions = {},
 ): Promise<QuotaReservation | NextResponse> {
+  const period = opts.period ?? "month";
   const resolved = await resolveQuotaLimit(userId, actionType);
   if (resolved instanceof NextResponse) return resolved;
   const { limit, label, isPremium } = resolved;
@@ -284,7 +313,7 @@ export async function reserveQuota(
       const [usageRow] = await tx
         .select({ value: countFn() })
         .from(usageLogs)
-        .where(monthlyUsageWhere(userId, actionType));
+        .where(usageWhere(userId, actionType, period));
       if (usageRow.value >= limit) return null;
     }
     const [row] = await tx
@@ -294,7 +323,7 @@ export async function reserveQuota(
     return row.id;
   });
 
-  if (!reservedId) return quotaExceededResponse(label, limit as number, isPremium);
+  if (!reservedId) return quotaExceededResponse(label, limit as number, isPremium, period);
 
   return {
     async refund() {

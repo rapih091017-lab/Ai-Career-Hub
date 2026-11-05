@@ -335,12 +335,12 @@ export default function SettingsBillingPage() {
                   total={limits.checkerChecks}
                 />
                 <UsageBar
-                  label="AI Smart Revision"
+                  label={`AI Smart Revision (${t("billing.lifetime-note")})`}
                   used={data?.usage.aiRevisions ?? 0}
                   total={limits.aiRevisions}
                 />
                 <UsageBar
-                  label="AI Suggestions"
+                  label={`AI Suggestions (${t("billing.lifetime-note")})`}
                   used={data?.usage.aiSuggestions ?? 0}
                   total={limits.aiSuggestions}
                 />

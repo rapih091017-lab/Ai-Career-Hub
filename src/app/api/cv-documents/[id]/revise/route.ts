@@ -60,8 +60,8 @@ export async function POST(
 
     // ── Mode: SUGGEST, Summary ──
     if (mode === "suggest" && section === "summary") {
-      // Kuota dicek dan dicatat atomik (reserveQuota); gagal → dikembalikan di catch.
-      const reserved = await reserveQuota(session.user.id, "ai_suggestion", id);
+      // Kuota seumur akun (sengaja, menekan biaya AI), dicek & dicatat atomik; gagal → refund di catch.
+      const reserved = await reserveQuota(session.user.id, "ai_suggestion", id, { period: "lifetime" });
       if (reserved instanceof NextResponse) return reserved;
       reservation = reserved;
 
@@ -100,8 +100,8 @@ export async function POST(
         );
       }
 
-      // Kuota dicek dan dicatat atomik (reserveQuota); gagal → dikembalikan di catch.
-      const reserved = await reserveQuota(session.user.id, "ai_suggestion", id);
+      // Kuota seumur akun (sengaja, menekan biaya AI), dicek & dicatat atomik; gagal → refund di catch.
+      const reserved = await reserveQuota(session.user.id, "ai_suggestion", id, { period: "lifetime" });
       if (reserved instanceof NextResponse) return reserved;
       reservation = reserved;
 
@@ -137,8 +137,8 @@ export async function POST(
         );
       }
 
-      // Kuota dicek dan dicatat atomik (reserveQuota); gagal → dikembalikan di catch.
-      const reserved = await reserveQuota(session.user.id, "ai_revision", id);
+      // Kuota seumur akun (sengaja, menekan biaya AI), dicek & dicatat atomik; gagal → refund di catch.
+      const reserved = await reserveQuota(session.user.id, "ai_revision", id, { period: "lifetime" });
       if (reserved instanceof NextResponse) return reserved;
       reservation = reserved;
 
@@ -182,8 +182,8 @@ export async function POST(
       );
     }
 
-    // Kuota dicek dan dicatat atomik (reserveQuota); gagal → dikembalikan di catch.
-    const reserved = await reserveQuota(session.user.id, "ai_revision", id);
+    // Kuota seumur akun (sengaja, menekan biaya AI), dicek & dicatat atomik; gagal → refund di catch.
+    const reserved = await reserveQuota(session.user.id, "ai_revision", id, { period: "lifetime" });
     if (reserved instanceof NextResponse) return reserved;
     reservation = reserved;
 

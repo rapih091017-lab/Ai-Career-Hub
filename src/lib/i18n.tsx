@@ -951,6 +951,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "billing.this-month": { id: "Bulan ini", en: "This month" },
   "billing.total-spent": { id: "Total Pengeluaran", en: "Total Spent" },
   "billing.all-time": { id: "Semua waktu", en: "All time" },
+  "billing.lifetime-note": { id: "total sejak akun dibuat", en: "total since sign-up" },
   "billing.usage-title": { id: "Penggunaan Bulan Ini", en: "Monthly Usage" },
   "billing.cv-created": { id: "CV Dibuat", en: "CVs Created" },
   "billing.checker-checks": { id: "Cek CV (Checker)", en: "CV Checks (Checker)" },

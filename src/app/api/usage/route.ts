@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { usageLogs, payments } from "@/db/schema";
 import { eq, and, count, gte, sql } from "drizzle-orm";
 import { getUserAccess } from "@/lib/access";
-import { apiHandler, startOfMonthUtc } from "@/lib/api-utils";
+import { apiHandler, startOfMonthUtc, QUOTA_PERIOD } from "@/lib/api-utils";
 
 export const GET = apiHandler(async () => {
   const session = await auth();
@@ -34,22 +34,19 @@ export const GET = apiHandler(async () => {
 
   const premiumExpiresAt = expiryRow?.expiresAt ?? null;
 
-  // ── 1. Hitung usage per action type (bulan ini) ──────────────────
+  // ── 1. Hitung usage per action type (periode sesuai QUOTA_PERIOD) ──
   const firstOfMonth = startOfMonthUtc();
 
   const actionTypes = ["checker_check", "ai_revision", "ai_suggestion", "cv_build", "cover_letter_generate"] as const;
   const usageMap: Record<string, number> = {};
   for (const action of actionTypes) {
+    // Periode sama dengan yang ditegakkan (QUOTA_PERIOD): revisi/saran AI seumur akun.
+    const where = [eq(usageLogs.userId, userId), eq(usageLogs.actionType, action)];
+    if (QUOTA_PERIOD[action] === "month") where.push(gte(usageLogs.createdAt, firstOfMonth));
     const [row] = await db
       .select({ value: count() })
       .from(usageLogs)
-      .where(
-        and(
-          eq(usageLogs.userId, userId),
-          eq(usageLogs.actionType, action),
-          gte(usageLogs.createdAt, firstOfMonth),
-        ),
-      );
+      .where(and(...where));
     usageMap[action] = row.value;
   }
 

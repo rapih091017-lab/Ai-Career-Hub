@@ -70,3 +70,34 @@ describe("reserveQuota", () => {
     expect(rows).toHaveLength(0);
   });
 });
+
+describe("reserveQuota/checkQuota periode", () => {
+  it("lifetime: batas tercapai ditolak dengan pesan tanpa reset tanggal 1", async () => {
+    accessMock.mockResolvedValue({ tierName: "Gratis", limits: { ai_suggestion: 1 }, isPremium: false });
+    expect(await reserveQuota("u1", "ai_suggestion", undefined, { period: "lifetime" })).not.toBeInstanceOf(NextResponse);
+    const r = (await reserveQuota("u1", "ai_suggestion", undefined, { period: "lifetime" })) as NextResponse;
+    expect(r.status).toBe(403);
+    const body = await r.json();
+    expect(body.message).not.toContain("tanggal 1");
+  });
+
+  it("month (default): pesan menyebut reset tanggal 1", async () => {
+    await reserveQuota("u1", "cover_letter_generate");
+    const r = (await reserveQuota("u1", "cover_letter_generate")) as NextResponse;
+    expect((await r.json()).message).toContain("tanggal 1");
+  });
+
+  it("revise & auto-fix memakai lifetime, /api/usage memakai QUOTA_PERIOD", async () => {
+    const { readFileSync } = await import("node:fs");
+    const { QUOTA_PERIOD } = await import("@/lib/api-utils");
+    expect(QUOTA_PERIOD.ai_suggestion).toBe("lifetime");
+    expect(QUOTA_PERIOD.ai_revision).toBe("lifetime");
+    for (const f of ["src/app/api/cv-documents/[id]/revise/route.ts", "src/app/api/cv-documents/[id]/auto-fix/route.ts"]) {
+      const src = readFileSync(f, "utf8");
+      const calls = src.match(/reserveQuota\([^)]*\)/g) ?? [];
+      expect(calls.length).toBeGreaterThan(0);
+      for (const c of calls) expect(c).toContain('period: "lifetime"');
+    }
+    expect(readFileSync("src/app/api/usage/route.ts", "utf8")).toContain("QUOTA_PERIOD[action]");
+  });
+});

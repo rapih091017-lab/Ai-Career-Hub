@@ -108,8 +108,8 @@ export async function POST(
     });
 
     // ── 1. KUOTA (jatah AI Suggestion) ──────────────────────────
-    // Kuota dicek dan dicatat atomik (reserveQuota); gagal → dikembalikan di catch.
-    const reserved = await reserveQuota(session.user.id, "ai_suggestion", id);
+    // Kuota seumur akun (sengaja, menekan biaya AI), dicek & dicatat atomik; gagal → refund di catch.
+    const reserved = await reserveQuota(session.user.id, "ai_suggestion", id, { period: "lifetime" });
     if (reserved instanceof NextResponse) return reserved;
     reservation = reserved;
 
