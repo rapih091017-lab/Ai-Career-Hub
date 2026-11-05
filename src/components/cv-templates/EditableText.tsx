@@ -55,6 +55,8 @@ export const EditableText = memo(function EditableText({ path, value, placeholde
   // lain yang datang saat fokus berarti diubah dari luar (form, undo, AI).
   const known = useRef(value);
   const external = useRef(false);
+  // Pecah/hapus poin dicatat pratinjau sebagai satu entri riwayat deskripsi; sesi teks poin tidak dicatat.
+  const skipSession = useRef(false);
 
   // Sinkron dari data hanya saat tidak fokus.
   useLayoutEffect(() => {
@@ -140,10 +142,12 @@ export const EditableText = memo(function EditableText({ path, value, placeholde
         if (transferring) return;
         const before = sessionStart.get(path);
         sessionStart.delete(path);
+        const skip = skipSession.current;
+        skipSession.current = false;
         const el = ref.current;
         if (el) {
           const after = readText(el);
-          if (before !== undefined && before !== after) onSession(path, before, after);
+          if (!skip && before !== undefined && before !== after) onSession(path, before, after);
           // Setelah blur, tampilkan nilai yang tersimpan (mis. paste yang dirapikan).
           if (el.textContent !== after) el.textContent = after;
         }
@@ -176,13 +180,15 @@ export const EditableText = memo(function EditableText({ path, value, placeholde
             const text = readText(el);
             const at = Math.min(caretOffset(el) ?? text.length, text.length);
             el.textContent = text.slice(0, at);
+            skipSession.current = true;
             el.blur();
-            onSplit(path, text.slice(at));
+            onSplit(path, text.slice(0, at), text.slice(at));
             return;
           }
           el?.blur();
         } else if (e.key === "Backspace" && onRemoveEmpty && ref.current && readText(ref.current) === "") {
           e.preventDefault();
+          skipSession.current = true;
           ref.current.blur();
           onRemoveEmpty(path);
         } else if (e.key === "Escape") {

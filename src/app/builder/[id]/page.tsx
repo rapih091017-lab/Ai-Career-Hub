@@ -12,7 +12,7 @@ import { cvFontValue, resolveCvFont } from "@/lib/cv-fonts";
 import { useInlineEditable } from "@/hooks/useInlineEditable";
 import { EditableText, keepCaretVisible, scheduleCaretCheck } from "@/components/cv-templates/EditableText";
 import { EditableDate } from "@/components/cv-templates/EditableDate";
-import { focusableIn, formTargetFor, getCvPath, removeBullet, setCvPath, splitBullet, stepForPath } from "@/lib/cv-edit-path";
+import { descriptionPathOf, focusableIn, formTargetFor, getCvPath, removeBullet, setCvPath, splitBullet, stepForPath } from "@/lib/cv-edit-path";
 import type { CvEditBindings } from "@/components/cv-templates";
 import type { BlockStyleControls } from "@/components/builder/FormatToolbar";
 import { aiSkillNames } from "@/lib/cv-normalize";
@@ -353,25 +353,39 @@ export default function BuilderPage() {
   );
   // Poin di pratinjau: Enter/Backspace mengubah struktur, lalu fokus pindah ke poin tujuan.
   const pendingFocus = useRef<{ path: string; caret: "start" | "end" } | null>(null);
+  /** Satu entri riwayat untuk seluruh deskripsi, supaya Ctrl+Z mengembalikan keadaan sebelum pecah/hapus. */
+  const pushDescriptionEdit = useCallback((bulletPath: string, before: CvData, after: CvData) => {
+    const path = descriptionPathOf(bulletPath);
+    const b = getCvPath(before, path);
+    const a = getCvPath(after, path);
+    if (b === undefined || a === undefined || b === a) return;
+    const h = editHistory.current;
+    h.undo.push({ path, before: b, after: a });
+    if (h.undo.length > EDIT_HISTORY_MAX) h.undo.shift();
+    h.redo = [];
+  }, []);
   const onPreviewSplit = useCallback(
-    (path: string, after: string) =>
-      setCvData((prev) => {
-        const r = splitBullet(prev, path, after);
-        if (!r) return prev;
-        pendingFocus.current = { path: r.focusPath, caret: "start" };
-        return r.cv;
-      }),
-    [setCvData],
+    (path: string, before: string, after: string) => {
+      const cur = cvDataRef.current;
+      const r = splitBullet(setCvPath(cur, path, before), path, after);
+      if (!r) return;
+      // "Sebelum" = poin utuh (ketikan terakhir mungkin belum dikomit ke cvData).
+      pushDescriptionEdit(path, setCvPath(cur, path, before + after), r.cv);
+      pendingFocus.current = { path: r.focusPath, caret: "start" };
+      setCvData((prev) => splitBullet(setCvPath(prev, path, before), path, after)?.cv ?? prev);
+    },
+    [setCvData, pushDescriptionEdit],
   );
   const onPreviewRemoveBullet = useCallback(
-    (path: string) =>
-      setCvData((prev) => {
-        const r = removeBullet(prev, path);
-        if (!r) return prev;
-        pendingFocus.current = r.focusPath ? { path: r.focusPath, caret: "end" } : null;
-        return r.cv;
-      }),
-    [setCvData],
+    (path: string) => {
+      const cur = setCvPath(cvDataRef.current, path, "");
+      const r = removeBullet(cur, path);
+      if (!r) return;
+      pushDescriptionEdit(path, cur, r.cv);
+      pendingFocus.current = r.focusPath ? { path: r.focusPath, caret: "end" } : null;
+      setCvData((prev) => removeBullet(setCvPath(prev, path, ""), path)?.cv ?? prev);
+    },
+    [setCvData, pushDescriptionEdit],
   );
   useEffect(() => {
     if (!pendingFocus.current) return;

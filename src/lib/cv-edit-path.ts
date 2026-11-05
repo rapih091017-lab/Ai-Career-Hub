@@ -41,6 +41,12 @@ export function isBulletPath(path: string): boolean {
   return !rest.length && (BULLET_LISTS as readonly string[]).includes(head) && !!id && field === "description" && /^\d+$/.test(index ?? "");
 }
 
+/** Path seluruh deskripsi poin sebuah entri (untuk riwayat undo pecah/hapus poin). */
+export function isDescriptionPath(path: string): boolean {
+  const [head, id, field, ...rest] = path.split(".");
+  return !rest.length && (BULLET_LISTS as readonly string[]).includes(head) && !!id && field === "description";
+}
+
 /** Path tanggal mulai/selesai sebuah entri. */
 export function isDatePath(path: string): boolean {
   const [head, id, field, ...rest] = path.split(".");
@@ -59,7 +65,7 @@ const rawLines = (text: unknown) => String(text ?? "").replace(/\r\n?/g, "\n").s
 
 /** Baca nilai teks di path; undefined bila path tidak dikenal atau entri tidak ada. */
 export function getCvPath(cv: CvData, path: string): string | undefined {
-  if (isBulletPath(path) || isDatePath(path)) {
+  if (isBulletPath(path) || isDatePath(path) || isDescriptionPath(path)) {
     const [head, id, field, index] = path.split(".");
     const entry = entryOf(cv, head, id);
     if (!entry) return undefined;
@@ -86,6 +92,11 @@ export function setCvPath(cv: CvData, path: string, value: string): CvData {
     if (!entry || i >= lines.length) return cv;
     lines[i] = value.replace(/\r?\n/g, " ");
     return withEntry(cv, head, id, { description: lines.join("\n") });
+  }
+  if (isDescriptionPath(path)) {
+    const [head, id] = path.split(".");
+    if (!entryOf(cv, head, id)) return cv;
+    return withEntry(cv, head, id, { description: value });
   }
   if (isDatePath(path)) {
     const [head, id, field] = path.split(".");
@@ -202,3 +213,6 @@ export function removeBullet(cv: CvData, path: string): { cv: CvData; focusPath:
     focusPath: i > 0 ? `${head}.${id}.description.${i - 1}` : null,
   };
 }
+
+/** Path deskripsi penuh dari path poin ("a.b.description.2" → "a.b.description"). */
+export const descriptionPathOf = (bulletPath: string) => bulletPath.split(".").slice(0, 3).join(".");

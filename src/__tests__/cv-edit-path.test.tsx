@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { AtsBaseRenderer, TEMPLATE_STYLES, type CvEditDateProps, type CvEditTextProps } from "@/components/cv-templates";
 import { STEP } from "@/lib/builder-steps";
-import { getCvPath, isBulletPath, isDatePath, isInlineEditablePath, removeBullet, setCvPath, splitBullet, stepForPath } from "@/lib/cv-edit-path";
+import { descriptionPathOf, getCvPath, isBulletPath, isDatePath, isInlineEditablePath, removeBullet, setCvPath, splitBullet, stepForPath } from "@/lib/cv-edit-path";
 import { sampleCv } from "./cv-pdf.fixture";
 
 describe("path edit pratinjau", () => {
@@ -19,7 +19,9 @@ describe("path edit pratinjau", () => {
     expect(next.workHistory.slice(1)).toEqual(sampleCv.workHistory.slice(1));
     expect(getCvPath(next, "workHistory.w1.company")).toBe("PT Baru");
     expect(setCvPath(sampleCv, "workHistory.tidakada.company", "x")).toBe(sampleCv);
-    expect(setCvPath(sampleCv, "workHistory.w1.description", "x")).toBe(sampleCv);
+    // Deskripsi penuh hanya dipakai riwayat undo pecah/hapus poin.
+    expect(setCvPath(sampleCv, "workHistory.w1.description", "x").workHistory[0].description).toBe("x");
+    expect(setCvPath(sampleCv, "education.e1.description", "x")).toBe(sampleCv);
     expect(setCvPath(sampleCv, "fullName", "Ani").fullName).toBe("Ani");
   });
 
@@ -106,5 +108,18 @@ describe("poin & tanggal di pratinjau (issue 10)", () => {
     const print = renderToStaticMarkup(<AtsBaseRenderer data={data} style={style} />);
     expect(print).toContain("<li");
     expect(print.match(/<li /g)?.length).toBe(renderToStaticMarkup(<AtsBaseRenderer data={{ ...data, workHistory: [{ ...data.workHistory[0], description: "Satu\nDua" }] }} style={style} />).match(/<li /g)?.length);
+  });
+});
+
+describe("undo pecah poin (satu entri deskripsi)", () => {
+  it("mengembalikan deskripsi sebelum pecah tanpa teks dobel", () => {
+    const p = "workHistory.w1.description.0";
+    const desc = descriptionPathOf(p);
+    const before = getCvPath(sampleCv, desc)!;
+    const split = splitBullet(setCvPath(sampleCv, p, "Memimpin migrasi"), p, " aplikasi ke Next.js")!.cv;
+    const after = getCvPath(split, desc)!;
+    expect(after.split("\n")).toHaveLength(3);
+    const undone = setCvPath(split, desc, before);
+    expect(undone.workHistory[0].description).toBe(sampleCv.workHistory[0].description);
   });
 });

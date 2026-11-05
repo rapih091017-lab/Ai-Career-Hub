@@ -320,8 +320,8 @@ export interface CvEditTextProps {
   onSession: (path: string, before: string, after: string) => void;
   /** Data field ini diubah dari luar selama diedit; ketikan di pratinjau dibuang. */
   onConflict?: (path: string) => void;
-  /** Khusus poin: Enter memecah poin; `after` = teks setelah caret untuk poin baru. */
-  onSplit?: (path: string, after: string) => void;
+  /** Khusus poin: Enter memecah poin; `before`/`after` = teks sebelum/sesudah caret. */
+  onSplit?: (path: string, before: string, after: string) => void;
   /** Khusus poin: Backspace di poin kosong menghapusnya. */
   onRemoveEmpty?: (path: string) => void;
 }
