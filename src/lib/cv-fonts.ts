@@ -72,17 +72,26 @@ export const CV_FONT_VARIANTS = [
 export const cvFontFile = (f: CvFont, v: (typeof CV_FONT_VARIANTS)[number]) =>
   `${f.id}-latin-${v.weight}-${v.style}.woff2`;
 
-/** Aturan @font-face; `src(file)` menentukan URL (path publik atau data: URI). */
-export function cvFontFaceCss(fonts: readonly CvFont[], src: (file: string) => string): string {
+/**
+ * Aturan @font-face; `src(file)` menentukan URL (path publik atau data: URI).
+ * `display`: "block" untuk HTML PDF (Chromium menunggu font, tidak ada teks
+ * pengganti di PDF); "swap" untuk halaman web supaya teks tidak kosong
+ * selama font diunduh.
+ */
+export function cvFontFaceCss(
+  fonts: readonly CvFont[],
+  src: (file: string) => string,
+  display: "block" | "swap" = "block",
+): string {
   return fonts
     .flatMap((f) =>
       CV_FONT_VARIANTS.map(
         (v) =>
-          `@font-face{font-family:'${f.family}';font-style:${v.style};font-weight:${v.weight};font-display:block;src:url(${src(cvFontFile(f, v))}) format('woff2');}`,
+          `@font-face{font-family:'${f.family}';font-style:${v.style};font-weight:${v.weight};font-display:${display};src:url(${src(cvFontFile(f, v))}) format('woff2');}`,
       ),
     )
     .join("\n");
 }
 
 /** CSS untuk pratinjau di peramban: semua font dari /fonts/cv. */
-export const CV_FONT_FACE_CSS_PUBLIC = cvFontFaceCss(CV_FONTS, (file) => `/fonts/cv/${file}`);
+export const CV_FONT_FACE_CSS_PUBLIC = cvFontFaceCss(CV_FONTS, (file) => `/fonts/cv/${file}`, "swap");
