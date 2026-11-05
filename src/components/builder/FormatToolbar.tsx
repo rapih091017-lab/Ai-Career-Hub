@@ -274,7 +274,7 @@ export function FormatToolbar({
           className="flex min-h-11 items-center gap-1 rounded-lg bg-surface-container-low px-3 text-sm font-semibold text-on-surface hover:bg-surface-variant"
         >
           <span className="material-symbols-outlined text-[18px]" aria-hidden="true">text_format</span>
-          Format
+          {t("builder.format-btn")}
         </button>
         </Tooltip>
         {saveBadge}
@@ -311,7 +311,7 @@ export function FormatToolbar({
         {targetSelect}
         {fontControls}
 
-        <MoreMenu tip={t("builder.tip-more")}>{moreItems}</MoreMenu>
+        <MoreMenu tip={t("builder.tip-more")} label={t("builder.more")}>{moreItems}</MoreMenu>
 
         <div className="ml-auto flex items-center gap-2">
           {aiButton}
@@ -371,7 +371,7 @@ function MenuItem({ icon, onClick, pressed, children }: { icon: string; onClick:
 }
 
 /** Menu "Lainnya" (desktop): tutup dengan klik di luar atau Escape. */
-function MoreMenu({ children, tip }: { children: (close: () => void) => ReactNode; tip: string }) {
+function MoreMenu({ children, tip, label }: { children: (close: () => void) => ReactNode; tip: string; label: string }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -395,7 +395,7 @@ function MoreMenu({ children, tip }: { children: (close: () => void) => ReactNod
       <button type="button" onClick={() => setOpen((v) => !v)} aria-haspopup="menu" aria-expanded={open}
         className="flex min-h-9 items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-surface-container-low text-on-surface-variant hover:bg-surface-variant"
       >
-        Lainnya
+        {label}
         <span className="material-symbols-outlined text-sm" aria-hidden="true">expand_more</span>
       </button>
       </Tooltip>

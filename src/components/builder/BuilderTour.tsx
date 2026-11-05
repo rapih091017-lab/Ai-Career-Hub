@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useTranslation } from "@/lib/i18n";
 
 export const TOUR_SEEN_KEY = "cv_builder_tour_seen";
 
@@ -21,6 +22,7 @@ function markTourSeen() {
   }
 }
 
+/** title/body/narrow berisi kunci i18n. */
 interface TourStep {
   title: string;
   body: string;
@@ -32,31 +34,31 @@ interface TourStep {
 
 const STEPS: TourStep[] = [
   {
-    title: "Mulai dari Target Pekerjaan",
-    body: "Tulis posisi yang kamu lamar dan tempel teks lowongannya. Bagian ini tidak dicetak di CV, tapi jadi acuan semua saran AI.",
+    title: "builder.tour.target-title",
+    body: "builder.tour.target-body",
     anchors: ["step-target"],
   },
   {
-    title: "Isi form langkah demi langkah",
-    body: "Lanjutkan ke Data Diri, Pengalaman, Pendidikan, dan seterusnya. Ikon (i) di samping kolom berisi contoh isian. Semua perubahan tersimpan otomatis.",
+    title: "builder.tour.form-title",
+    body: "builder.tour.form-body",
     anchors: ["form"],
   },
   {
-    title: "Edit langsung di pratinjau",
-    body: "Klik teks di pratinjau untuk mengubahnya di tempat. Klik bagian lain untuk lompat ke kolomnya di form.",
-    narrow: "Ketuk Lihat CV untuk melihat hasilnya. Ketuk teks di pratinjau untuk lompat ke kolomnya di form.",
+    title: "builder.tour.preview-title",
+    body: "builder.tour.preview-body",
+    narrow: "builder.tour.preview-narrow",
     anchors: ["preview", "preview-open"],
   },
   {
-    title: "Atur tampilan dan template",
-    body: "Ganti template, font, ukuran, dan rata teks dari toolbar. Menu Lainnya berisi urutan bagian, warna, spasi, dan margin.",
-    narrow: "Di layar pratinjau, ketuk Format untuk mengganti template, font, ukuran, urutan bagian, dan warna.",
+    title: "builder.tour.style-title",
+    body: "builder.tour.style-body",
+    narrow: "builder.tour.style-narrow",
     anchors: ["toolbar", "preview-open"],
   },
   {
-    title: "Unduh PDF",
-    body: "Kalau sudah rapi, tekan PDF untuk mengunduh CV. Buka panduan ini lagi kapan saja lewat tombol Panduan.",
-    narrow: "Tombol PDF ada di layar pratinjau. Buka panduan ini lagi kapan saja lewat tombol Panduan.",
+    title: "builder.tour.pdf-title",
+    body: "builder.tour.pdf-body",
+    narrow: "builder.tour.pdf-narrow",
     anchors: ["pdf", "preview-open"],
   },
 ];
@@ -73,6 +75,7 @@ function visibleAnchor(names: string[]): HTMLElement | null {
 
 /** Tur singkat builder: dialog modal (fokus terkurung, Escape = lewati) + sorotan elemen terkait. */
 export function BuilderTour({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useTranslation();
   const [index, setIndex] = useState(0);
   const [rect, setRect] = useState<DOMRect | null>(null);
   const [wide, setWide] = useState(true);
@@ -172,15 +175,15 @@ export function BuilderTour({ open, onClose }: { open: boolean; onClose: () => v
         className="fixed inset-x-4 bottom-4 mx-auto max-w-md rounded-2xl bg-surface-container-lowest p-5 shadow-xl sm:inset-x-auto sm:right-6 sm:bottom-6 sm:w-[24rem] pb-[max(1.25rem,env(safe-area-inset-bottom))]"
       >
         <p className="text-xs font-semibold text-on-surface-variant">
-          Panduan {index + 1} dari {STEPS.length}
+          {t("builder.tour.progress").replace("{n}", String(index + 1)).replace("{total}", String(STEPS.length))}
         </p>
-        <h2 id="builder-tour-title" className="mt-1 text-base font-semibold text-on-surface">{step.title}</h2>
+        <h2 id="builder-tour-title" className="mt-1 text-base font-semibold text-on-surface">{t(step.title)}</h2>
         <p id="builder-tour-body" className="mt-1.5 text-sm leading-relaxed text-on-surface-variant">
-          {wide ? step.body : step.narrow ?? step.body}
+          {t(wide ? step.body : step.narrow ?? step.body)}
         </p>
         <div className="mt-4 flex items-center gap-2">
           <button type="button" onClick={finish} className="min-h-11 rounded-lg px-3 text-sm font-medium text-on-surface-variant hover:bg-surface-container sm:min-h-9">
-            Lewati
+            {t("builder.tour.skip")}
           </button>
           <div className="ml-auto flex gap-2">
             {index > 0 && (
@@ -194,7 +197,7 @@ export function BuilderTour({ open, onClose }: { open: boolean; onClose: () => v
               onClick={() => (last ? finish() : setIndex(index + 1))}
               className="min-h-11 rounded-lg bg-primary px-4 text-sm font-semibold text-on-primary hover:brightness-110 sm:min-h-9"
             >
-              {last ? "Selesai" : "Berikutnya"}
+              {last ? t("builder.tour.done") : t("builder.tour.next")}
             </button>
           </div>
         </div>

@@ -1251,7 +1251,7 @@ export default function BuilderPage() {
             className="fixed bottom-24 right-4 z-40 flex min-h-12 items-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-on-primary shadow-lg lg:hidden"
           >
             <span className="material-symbols-outlined text-[18px]" aria-hidden="true">description</span>
-            Lihat CV
+            {t("builder.view-cv")}
           </button>
         )}
 
