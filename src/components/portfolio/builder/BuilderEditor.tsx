@@ -19,6 +19,8 @@ import { DEFAULT_SECTION_ORDER } from "@/components/portfolio/themes";
 import { FONT_SIZES, SECTION_IDS, type FontSize, type SectionId, type TextAlignment } from "@/components/portfolio/types";
 import { isSectionVisible } from "@/components/portfolio/sectionVisibility";
 import { StepperSteps } from "@/components/builder/StepperNav";
+import { FieldHelp } from "@/components/builder/FieldHelp";
+import { PORTFOLIO_HELP, type PortfolioHelpKey } from "@/lib/portfolio-help";
 import { PORTFOLIO_STEP_IDS, PORTFOLIO_STEP_META, isTypingTarget, portfolioStepCompletion } from "@/components/portfolio/builder/steps";
 
 type AccordionKey = "hero" | "about" | "projects" | "skills" | "experience" | "education" | "certifications" | "organizations" | "hobbies" | "testimonials" | "contact";
@@ -828,11 +830,11 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
               {stepId === "hero" && (
               <StepCard>
                 <div className="px-6 space-y-4">
-                  <Field label={t("build.hero-subheadline")}>
+                  <Field label={t("build.hero-subheadline")} help="heroSubHeadline">
                     <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Frontend Developer & UI/UX Enthusiast"
                       value={formData.heroSubHeadline} onChange={update("heroSubHeadline")} />
                   </Field>
-                  <Field label={t("build.hero-job-title")}>
+                  <Field label={t("build.hero-job-title")} help="heroHeadline">
                     <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Frontend Web Developer"
                       value={formData.heroHeadline} onChange={update("heroHeadline")} />
                   </Field>
@@ -853,7 +855,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                   </div>
                   <div className="relative">
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-label-sm text-on-surface-variant uppercase tracking-wider">{t("build.hero-bio")}</label>
+                      <span className="flex items-center gap-1"><label className="text-label-sm text-on-surface-variant uppercase tracking-wider">{t("build.hero-bio")}</label><FieldHelp topic={PORTFOLIO_HELP.heroBio} /></span>
                     </div>
                     <textarea className="w-full px-4 py-3 pr-12 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={3} placeholder="Ceritakan sedikit tentang dirimu..." maxLength={500}
                       value={formData.heroBio} onChange={update("heroBio")} />
@@ -873,7 +875,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                 <div className="px-6 space-y-4">
                   <div className="relative">
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-label-sm text-on-surface-variant uppercase tracking-wider">{t("build.about-text")}</label>
+                      <span className="flex items-center gap-1"><label className="text-label-sm text-on-surface-variant uppercase tracking-wider">{t("build.about-text")}</label><FieldHelp topic={PORTFOLIO_HELP.aboutText} /></span>
                     </div>
                     <textarea className="w-full px-4 py-3 pr-12 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={5} placeholder="Tulis cerita tentang perjalanan kariermu..." maxLength={1500}
                       value={formData.aboutText} onChange={update("aboutText")} />
@@ -901,7 +903,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
               </StepCard>
               <StepCard title={t("build.skill")}>
                 <div className="px-6 space-y-4">
-                  <Field label={t("build.skills-main")}>
+                  <Field label={t("build.skills-main")} help="skillsMain">
                     <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="React, TypeScript, Node.js, Tailwind CSS..."
                       value={formData.skillsMain} onChange={update("skillsMain")} />
                   </Field>
@@ -982,7 +984,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="md:col-span-2">
-                          <label className="block text-label-sm text-on-surface-variant mb-1">{t("live.form.project-name")}</label>
+                          <span className="mb-1 flex items-center gap-1"><label className="block text-label-sm text-on-surface-variant">{t("live.form.project-name")}</label><FieldHelp topic={PORTFOLIO_HELP.projectName} /></span>
                           <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Nama project"
                             value={p.name} onChange={e => setProjects(prev => prev.map(x => x.id === p.id ? {...x, name: e.target.value} : x))} />
                         </div>
@@ -997,7 +999,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                           )}
                           <CharCounter value={p.description} max={500} />
                         </div>
-                        <Field label={t("live.form.tech-stack")}>
+                        <Field label={t("live.form.tech-stack")} help="techStack">
                           <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="React, Node.js, PostgreSQL"
                             value={p.techStack} onChange={e => setProjects(prev => prev.map(x => x.id === p.id ? {...x, techStack: e.target.value} : x))} />
                         </Field>
@@ -1231,7 +1233,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                                 value={item.position} onChange={updateTestimonial(item.id, "position")} />
                             </Field>
                           </div>
-                          <Field label={t("live.form.testimonial")}>
+                          <Field label={t("live.form.testimonial")} help="testimonial">
                             <div className="relative">
                               <textarea className="w-full px-4 py-3 pr-12 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={2} placeholder="Apa yang mereka katakan tentangmu?" maxLength={500}
                                 value={item.testimonial} onChange={updateTestimonial(item.id, "testimonial")} />
@@ -1830,10 +1832,13 @@ function StepCard({ title, children }: { title?: string; children: React.ReactNo
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, help, children }: { label: string; help?: PortfolioHelpKey; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-label-sm text-on-surface-variant uppercase tracking-wider">{label}</label>
+      <span className="flex items-center gap-1">
+        <label className="text-label-sm text-on-surface-variant uppercase tracking-wider">{label}</label>
+        {help && <FieldHelp topic={PORTFOLIO_HELP[help]} />}
+      </span>
       {children}
     </div>
   );
