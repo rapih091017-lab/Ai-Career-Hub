@@ -11,6 +11,8 @@ import { readFileSync } from "node:fs";
  * guard di JSX — kalau guard salah satu halaman dihapus, langsung ketahuan.
  */
 const PAGES = ["src/app/checker/page.tsx", "src/app/checker/[id]/page.tsx"];
+/** Render hasil kedua halaman ada di satu komponen bersama. */
+const VIEW = "src/components/checker/CheckerResultView.tsx";
 
 const GUARDS = [
   // breakdown kosong total → blok section disembunyikan, jangan judul tanpa kartu
@@ -27,11 +29,15 @@ const GUARDS = [
 
 describe("penjaga breakdown paritas antara /checker dan /checker/[id]", () => {
   for (const file of PAGES) {
-    it(`${file} memakai semua penjaga breakdown`, () => {
-      const source = readFileSync(file, "utf8");
-      for (const guard of GUARDS) {
-        expect(source, `guard hilang: ${guard}`).toContain(guard);
-      }
+    it(`${file} merender hasil lewat CheckerResultView`, () => {
+      expect(readFileSync(file, "utf8")).toContain("<CheckerResultView");
     });
   }
+
+  it("CheckerResultView memakai semua penjaga breakdown", () => {
+    const source = readFileSync(VIEW, "utf8");
+    for (const guard of GUARDS) {
+      expect(source, `guard hilang: ${guard}`).toContain(guard);
+    }
+  });
 });

@@ -1,23 +1,15 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import SiteHeader from "@/components/nav/SiteHeader";
 import AppFooter from "@/components/AppFooter";
 import { useTranslation } from "@/lib/i18n";
 import MagneticButton from "@/components/MagneticButton";
 import { UploadZone } from "@/components/checker/UploadZone";
-import { ScoreDonut } from "@/components/checker/ScoreDonut";
-import { SectionScoreCard } from "@/components/checker/SectionScoreCard";
-import { ImpactForecastCard } from "@/components/checker/ImpactForecastCard";
-import HrPointOfView from "@/components/checker/HrPointOfView";
-import { KeywordChip, BulletReviewCard, SectionKicker } from "@/components/checker/ResultComponents";
-import { ImprovementChecklist } from "@/components/checker/ImprovementChecklist";
-import { QuickSummaryCard } from "@/components/checker/QuickSummaryCard";
-import { MissingSectionsCard } from "@/components/checker/MissingSectionsCard";
-import { KeywordEvidenceBadge, KeywordExtrasBlock, KeywordSourceLine } from "@/components/checker/KeywordAnalysisExtras";
-import { scoreColor, gradeColor, atsBadgeColor, atsReadinessLabel, fitLabelMeta, ROLE_CATEGORY_OPTIONS, type AnalysisResult, type ExperienceSection, type SkillsSection } from "@/components/checker/types";
+import { SectionKicker } from "@/components/checker/ResultComponents";
+import { CheckerResultView } from "@/components/checker/CheckerResultView";
+import { ROLE_CATEGORY_OPTIONS, type AnalysisResult } from "@/components/checker/types";
 import { anonIdHeaders } from "@/lib/anon-id";
 import { extractPdfTextClient, renderPdfPagesToBlobs } from "@/lib/pdf-extract-client";
 import { runClientOcr, type OcrMsgs } from "@/lib/ocr-client";
@@ -713,39 +705,7 @@ export default function CheckerPage() {
   /* ================================================================ */
   if (!result) return null;
 
-  const {
-    scores,
-    summary,
-    fitLabel,
-    grade,
-    atsPrediction,
-    breakdown,
-    keywordAnalysis,
-    narrativeFeedback,
-    actionPlan,
-    bulletReview,
-    missingSections,
-    weightsApplied,
-    impactForecast,
-    aiModel,
-    quickSummary,
-  } = result;
-
-  const color = scoreColor(scores.overall);
-  const gc = gradeColor(grade);
-  const atsBadge = atsBadgeColor(atsPrediction);
-  const fitMeta = fitLabelMeta(fitLabel, t);
-
-  // v4, chip "X% terkuantifikasi" pada kartu Experience (kalau AI mengirimnya)
-  const quantPct = (breakdown?.experience as ExperienceSection | undefined)?.quantification_pct;
-  const quantChip = typeof quantPct === "number"
-    ? {
-        label: t("checker.quant-label"),
-        value: `${quantPct}% ${t("checker.quant-label").toLowerCase()}`,
-        hint: t("checker.quant-hint").replace("{pct}", String(quantPct)),
-        tone: (quantPct >= 50 ? "green" : quantPct >= 25 ? "amber" : "red") as "green" | "amber" | "red",
-      }
-    : undefined;
+  const scores = result.scores;
 
   return (
     <div className="flex min-h-screen flex-col bg-desk text-ink">
@@ -789,303 +749,7 @@ export default function CheckerPage() {
           </div>
         </div>
 
-        <div ref={resultsRef} className="space-y-10">
-
-        {/* ============================================================ */}
-        {/*  0. SISI HR, di atas skor. Orang yang membuka hasil baru tahu   */}
-        {/*     sudah dihentikan atau diteruskan baca; angkanya menyusul.  */}
-        {/* ============================================================ */}
-        {/* Ringkasan 10 detik di paling atas. Baris lama tidak punya field ini
-            di fullResult, jadi mapper menghasilkan null dan kartu tidak muncul. */}
-        {quickSummary && <QuickSummaryCard analysis={result} summary={quickSummary} />}
-
-        {/* Anchor "Lihat" di kartu ringkasan; wrapper selalu ada supaya id stabil. */}
-        <div id="section-hr" className="scroll-mt-24">
-          <HrPointOfView result={result} />
-        </div>
-
-        {/* ============================================================ */}
-        {/*  1. SCORE OVERVIEW                                            */}
-        {/* ============================================================ */}
-        <section className="flex flex-col items-center">
-          <div ref={donutRef}>
-            <ScoreDonut score={scores.overall} color={color} label={t("checker.score-label")} />
-          </div>
-
-          <h1 className="mb-2 text-center font-display text-headline-lg font-bold text-ink">{t("checker.result-title")}</h1>
-          <p className="mb-5 max-w-[52ch] text-center text-body-md leading-relaxed text-ink-soft">{summary || t("checker.result-subtitle")}</p>
-
-          {/* Grade + ATS Prediction + Fit Label */}
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            {grade && (
-              <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold border ${gc.bg} ${gc.text} ${gc.border}`}>
-                <span className="text-lg">Grade {grade}</span>
-              </div>
-            )}
-            {atsPrediction && (
-              <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold ${atsBadge.bg} ${atsBadge.text}`}>
-                <span className={`w-2 h-2 rounded-full ${atsBadge.dot}`} />
-                {/* Enum di data tidak diubah — hanya tampilan (prompt 3). */}
-                {atsReadinessLabel(atsPrediction)}
-              </div>
-            )}
-            {fitMeta.desc && (
-              <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold ${fitMeta.bg} ${fitMeta.text}`}>
-                <span className="material-symbols-outlined text-lg select-none">{fitMeta.icon}</span>
-                {fitLabel}{fitMeta.desc ? ` · ${fitMeta.desc.split(",")[0]}` : ""}
-              </div>
-            )}
-            {aiModel && (
-              <div
-                className={`inline-flex items-center gap-1.5 rounded-full border-[1.5px] px-3 py-1.5 text-sm font-semibold ${
-                  aiModel === "V4 Pro"
-                    ? "border-green-deep/40 bg-primary-fixed text-on-primary-fixed"
-                    : "border-ink/20 bg-surface-container-low text-ink"
-                }`}
-                title={aiModel === "V4 Pro" ? t("checker.model-v4pro") : t("checker.model-v4flash")}
-              >
-                <span className="material-symbols-outlined select-none text-lg">{aiModel === "V4 Pro" ? "auto_awesome" : "bolt"}</span>
-                {aiModel === "V4 Pro" ? "DeepSeek V4 Pro" : "DeepSeek V4 Flash"}
-              </div>
-            )}
-          </div>
-
-          {/* Keterangan kesiapan dibaca: estimasi, bukan skor ATS resmi. */}
-          {atsPrediction && (
-            <p className="mt-3 text-center text-xs text-ink-soft">
-              Kesiapan dibaca HR &amp; mesin: estimasi, bukan skor ATS resmi; tiap perusahaan memakai sistem berbeda.
-            </p>
-          )}
-
-          {/* Transparansi bobot penilaian (role category) */}
-          {weightsApplied && weightsApplied.role_category !== "general" && (
-            <p className="mt-3 flex flex-wrap items-center justify-center gap-1 text-center text-xs text-ink-soft">
-              <span className="material-symbols-outlined select-none text-[13px]">tune</span>
-              {t("checker.weights-note")
-                .replace("{cat}", weightsApplied.role_category.replace("_", " "))
-                .replace("{ex}", String(Math.round((weightsApplied.experience_weight || 0) * 100)))
-                .replace("{sk}", String(Math.round((weightsApplied.skills_weight || 0) * 100)))
-                .replace("{ed}", String(Math.round((weightsApplied.education_weight || 0) * 100)))}
-            </p>
-          )}
-        </section>
-
-        {/* ============================================================ */}
-        {/*  1b. IMPACT FORECAST (v4), proyeksi skor                    */}
-        {/* ============================================================ */}
-        {impactForecast && <ImpactForecastCard forecast={impactForecast} />}
-
-        {/* ============================================================ */}
-        {/*  2. PER-SECTION BREAKDOWN                                     */}
-        {/* ============================================================ */}
-        {/* Penjaga sama persis dengan /checker/[id]: kartu hanya dirender
-            untuk section yang benar-benar ada, supaya hasil segar dan hasil
-            tersimpan terbaca identik — termasuk saat breakdown kosong total. */}
-        {breakdown && Object.keys(breakdown).length > 0 && (
-          <motion.section
-            id="section-skor"
-            className="space-y-3 scroll-mt-24"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.15 }}
-          >
-            <div className="px-1">
-              <SectionKicker>{t("checker.kicker-breakdown")}</SectionKicker>
-              <h2 className="font-display text-headline-md font-bold text-ink">{t("checker.sec-title")}</h2>
-            </div>
-            {breakdown.summary && (
-              <SectionScoreCard title={t("checker.sec-summary")} score={breakdown.summary.score} issues={breakdown.summary.issues} suggestions={breakdown.summary.suggestions} delay={0.2} sectionKey="summary" analysis={result} />
-            )}
-            {breakdown.experience && (
-              <SectionScoreCard title={t("checker.sec-experience")} score={breakdown.experience.score} issues={breakdown.experience.issues} suggestions={breakdown.experience.suggestions} delay={0.25} statChip={quantChip} sectionKey="experience" analysis={result} />
-            )}
-            {breakdown.skills && (
-              <SectionScoreCard title={t("checker.sec-skills")} score={breakdown.skills.score} issues={(breakdown.skills as SkillsSection).missing_skills} suggestions={(breakdown.skills as SkillsSection).recommendations} delay={0.3} sectionKey="skills" analysis={result} />
-            )}
-            {breakdown.education && (
-              // relevance bisa kosong di baris lama; tanpa penjaga, SectionScoreCard
-              // menampilkan bullet ISSUES tanpa teks apa pun.
-              <SectionScoreCard title={t("checker.sec-education")} score={breakdown.education.score} issues={breakdown.education.relevance ? [breakdown.education.relevance] : []} suggestions={breakdown.education.suggestions} delay={0.35} sectionKey="education" analysis={result} />
-            )}
-            {breakdown.format_ats && (
-              <SectionScoreCard title={t("checker.sec-format")} score={breakdown.format_ats.score} issues={breakdown.format_ats.issues} suggestions={breakdown.format_ats.tips} delay={0.4} sectionKey="format_ats" analysis={result} />
-            )}
-          </motion.section>
-        )}
-
-        {/* Section yang belum ada (prompt 4): kartu tampil hanya bila ada isinya. */}
-        <MissingSectionsCard items={missingSections} />
-
-        {/* ============================================================ */}
-        {/*  3. NARRATIVE FEEDBACK                                        */}
-        {/* ============================================================ */}
-        {narrativeFeedback && (
-          <motion.section
-            className="space-y-5 rounded-[18px] border-[2.5px] border-ink bg-paper p-6 shadow-hard"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.3 }}
-          >
-            <SectionKicker>{t("checker.kicker-narrative")}</SectionKicker>
-            <h2 className="font-display text-headline-md font-bold text-ink">{t("checker.ai-review")}</h2>
-
-            {/* Overall assessment */}
-            <div className="rounded-xl border-[2.5px] border-ink bg-lime/25 p-4">
-              <p className="text-sm leading-relaxed text-ink">{narrativeFeedback.overall_assessment}</p>
-            </div>
-
-            {/* Kolom Kelebihan dan Perlu Diperbaiki dihapus: isinya sama
-                dengan panel Sisi HR di atas, jadi kalau dibiarkan kelemahannya
-                tampil dua kali dalam satu halaman. Panelnya juga membawa
-                kutipan asli CV, yang tidak pernah ada di sini. */}
-
-            {/* ATS Recommendations */}
-            {narrativeFeedback.ats_recommendations.length > 0 && (
-              <div className="rounded-xl border-[1.5px] border-ink/15 bg-surface-container-low p-4">
-                <h3 className="mb-2 flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-[0.06em] text-green-deep">
-                  <span className="material-symbols-outlined select-none text-sm">description</span>
-                  {t("checker.ats-recs")}
-                </h3>
-                <ul className="space-y-1">
-                  {narrativeFeedback.ats_recommendations.map((r, i) => (
-                    <li key={i} className="flex items-start gap-2 text-xs leading-relaxed text-ink-soft">
-                      <span className="mt-0.5 select-none text-green-deep">→</span>
-                      {r}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </motion.section>
-        )}
-
-        {/* ============================================================ */}
-        {/*  4. KEYWORD ANALYSIS                                          */}
-        {/* ============================================================ */}
-        {keywordAnalysis && (
-          <motion.section
-            id="section-keyword"
-            className="space-y-5 scroll-mt-24 rounded-[18px] border-[2.5px] border-ink bg-paper p-6 shadow-hard"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.35 }}
-          >
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <SectionKicker>{t("checker.kicker-keyword")}</SectionKicker>
-                <h2 className="font-display text-headline-md font-bold text-ink">{t("checker.kw-title")}</h2>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="font-display text-sm font-bold text-ink">{keywordAnalysis.match_rate_pct}%</span>
-                <div className="h-2 w-16 overflow-hidden rounded-full bg-ink/10">
-                  <motion.div
-                    className="h-full rounded-full"
-                    style={{ background: "linear-gradient(90deg, rgb(var(--c-green)), rgb(var(--c-lime)))" }}
-                    initial={{ width: "0%" }}
-                    animate={{ width: `${keywordAnalysis.match_rate_pct}%` }}
-                    transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Sumber daftar + keterangan (prompt 5); muncul hanya bila source ada. */}
-            <KeywordSourceLine analysis={keywordAnalysis} />
-
-            <div className="space-y-4">
-              {/* Matched */}
-              {keywordAnalysis.matched.length > 0 && (
-                <div>
-                  <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.06em] text-green-deep">{t("checker.kw-found").replace("{n}", String(keywordAnalysis.matched.length))}</p>
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    {keywordAnalysis.matched.map((kw, i) => (
-                      <span key={i} className="inline-flex flex-wrap items-center gap-1">
-                        <KeywordChip text={kw} variant="found" />
-                        <KeywordEvidenceBadge analysis={keywordAnalysis} keyword={kw} />
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Missing critical */}
-              {keywordAnalysis.missing_critical.length > 0 && (
-                <div>
-                  <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.06em] text-error">{t("checker.kw-critical").replace("{n}", String(keywordAnalysis.missing_critical.length))}</p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {keywordAnalysis.missing_critical.map((kw, i) => (
-                      <KeywordChip key={i} text={kw} variant="missing" />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Missing nice-to-have */}
-              {keywordAnalysis.missing_nice_to_have.length > 0 && (
-                <div>
-                  <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.06em] text-tertiary">{t("checker.kw-nice").replace("{n}", String(keywordAnalysis.missing_nice_to_have.length))}</p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {keywordAnalysis.missing_nice_to_have.map((kw, i) => (
-                      <KeywordChip key={i} text={kw} variant="nice" />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Synonym suggestions */}
-              {keywordAnalysis.synonym_suggestions.length > 0 && (
-                <div className="rounded-xl border-[1.5px] border-ink/15 bg-surface-container-low p-4">
-                  <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.06em] text-ink-soft">{t("checker.kw-synonym")}</p>
-                  <ul className="space-y-1">
-                    {keywordAnalysis.synonym_suggestions.map((s, i) => (
-                      <li key={i} className="flex items-start gap-2 text-xs leading-relaxed text-ink-soft">
-                        <span className="mt-0.5 select-none text-green-deep">→</span>
-                        {s}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-
-            {/* Kartu penempatan + tabel syarat (prompt 5); null bila tidak ada data. */}
-            <KeywordExtrasBlock analysis={keywordAnalysis} />
-          </motion.section>
-        )}
-
-        {/* ============================================================ */}
-        {/*  5. IMPROVEMENT CHECKLIST, langkah perbaikan interaktif      */}
-        {/* ============================================================ */}
-        <div id="section-checklist" className="scroll-mt-24">
-          <ImprovementChecklist
-            actionPlan={actionPlan}
-            missingSections={missingSections}
-            keywordAnalysis={keywordAnalysis}
-          />
-        </div>
-
-        {/* ============================================================ */}
-        {/*  6. BULLET REVIEW                                             */}
-        {/* ============================================================ */}
-        {bulletReview && bulletReview.length > 0 && (
-          <motion.section
-            className="space-y-3"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.45 }}
-          >
-            <div className="px-1">
-              <SectionKicker>{t("checker.kicker-bullet")}</SectionKicker>
-              <h2 className="font-display text-headline-md font-bold text-ink">{t("checker.bullet-title").replace("{n}", String(bulletReview.length))}</h2>
-            </div>
-            <div className="space-y-2">
-              {bulletReview.map((item, i) => (
-                <BulletReviewCard key={i} item={item} index={i} />
-              ))}
-            </div>
-          </motion.section>
-        )}
-
+        <CheckerResultView result={result} variant="fresh" donutRef={donutRef} resultsRef={resultsRef}>
         {/* ============================================================ */}
         {/*  7. CTA BANNER, score-based routing                          */}
         {/* ============================================================ */}
@@ -1137,7 +801,7 @@ export default function CheckerPage() {
           );
         })()}
 
-        </div>{/* end resultsRef */}
+        </CheckerResultView>
       </main>
 
       <AppFooter bordered />
