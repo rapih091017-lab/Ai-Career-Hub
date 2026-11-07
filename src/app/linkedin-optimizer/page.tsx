@@ -8,6 +8,7 @@ import AppFooter from "@/components/AppFooter";
 import { useTranslation } from "@/lib/i18n";
 import { extractPdfTextClient } from "@/lib/pdf-extract-client";
 import { anonIdHeaders } from "@/lib/anon-id";
+import { StepNumber } from "@/components/checker/InputSteps";
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
 
@@ -40,6 +41,8 @@ export default function LinkedInOptimizerPage() {
   const [branding, setBranding] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [pasted, setPasted] = useState("");
+  // Sumber resume: satu tab aktif, jadi tidak ada lagi "teks menimpa PDF" diam-diam.
+  const [source, setSource] = useState<"upload" | "paste">("upload");
   const [dragActive, setDragActive] = useState(false);
   const [stage, setStage] = useState<"idle" | "reading" | "submitting">("idle");
   const [error, setError] = useState("");
@@ -87,9 +90,14 @@ export default function LinkedInOptimizerPage() {
         return;
       }
 
-      let resumeText = pasted.trim();
+      let resumeText = source === "paste" ? pasted.trim() : "";
 
-      if (!resumeText) {
+      if (source === "paste" && !resumeText) {
+        setError(t("lo.form.resume-required"));
+        return;
+      }
+
+      if (source === "upload") {
         if (!file) {
           setError(t("lo.form.resume-required"));
           return;
@@ -134,7 +142,7 @@ export default function LinkedInOptimizerPage() {
         setError(t("lo.form.error"));
       }
     },
-    [branding, busy, file, lang, pasted, router, t],
+    [branding, busy, file, lang, pasted, router, source, t],
   );
 
   return (
@@ -156,7 +164,8 @@ export default function LinkedInOptimizerPage() {
         >
           {/* Arah branding */}
           <div>
-            <label htmlFor="lo-branding" className="block text-sm font-extrabold text-ink">
+            <label htmlFor="lo-branding" className="flex items-center gap-2 text-sm font-extrabold text-ink">
+              <StepNumber n={1} />
               {t("lo.form.branding-label")}
             </label>
             <p className="mt-1 text-xs leading-relaxed text-ink-soft">
@@ -172,84 +181,112 @@ export default function LinkedInOptimizerPage() {
             />
           </div>
 
-          {/* Resume */}
-          <div>
-            <p className="text-sm font-extrabold text-ink">{t("lo.form.file-label")}</p>
-            <p className="mt-1 text-xs text-ink-soft">{t("lo.form.file-hint")}</p>
-
-            <div
-              onDragOver={(event) => {
-                event.preventDefault();
-                setDragActive(true);
-              }}
-              onDragLeave={() => setDragActive(false)}
-              onDrop={(event) => {
-                event.preventDefault();
-                setDragActive(false);
-                pickFile(event.dataTransfer.files?.[0] ?? null);
-              }}
-              className={`mt-2.5 rounded-xl border-2 border-dashed p-5 text-center transition-colors ${
-                dragActive ? "border-green-deep bg-lime/10" : "border-edge/50 bg-surface-container-low/40"
-              }`}
-            >
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="application/pdf,.pdf"
-                className="sr-only"
-                onChange={(event) => pickFile(event.target.files?.[0] ?? null)}
-              />
-              {file ? (
-                <div className="flex flex-wrap items-center justify-center gap-2.5">
-                  <span className="material-symbols-outlined select-none text-[20px] text-green-deep" aria-hidden="true">
-                    description
-                  </span>
-                  <span className="max-w-full truncate text-sm font-semibold text-ink">{file.name}</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setFile(null);
-                      if (fileInputRef.current) fileInputRef.current.value = "";
-                    }}
-                    className="rounded-full border border-ink/20 px-2 py-0.5 text-xs font-bold text-ink transition-colors hover:border-ink hover:bg-surface-container-low"
-                  >
-                    {t("lo.form.remove", "Ganti file")}
-                  </button>
-                </div>
-              ) : (
+          {/* Resume: tab Unggah PDF | Tempel teks */}
+          <fieldset className="min-w-0">
+            <legend className="flex items-center gap-2 text-sm font-extrabold text-ink">
+              <StepNumber n={2} />
+              {t("lo.form.resume-step")}
+            </legend>
+            <div role="tablist" aria-label={t("lo.form.resume-step")} className="mt-2.5 inline-flex w-full rounded-full border-2 border-edge/60 bg-surface-container-low/40 p-1 sm:w-auto">
+              {(["upload", "paste"] as const).map((mode) => (
                 <button
+                  key={mode}
+                  id={`lo-tab-${mode}`}
                   type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="inline-flex flex-col items-center gap-1.5 text-sm font-semibold text-ink"
+                  role="tab"
+                  aria-selected={source === mode}
+                  aria-controls={`lo-panel-${mode}`}
+                  tabIndex={source === mode ? 0 : -1}
+                  onClick={() => setSource(mode)}
+                  onKeyDown={(event) => {
+                    if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+                      event.preventDefault();
+                      const next = mode === "upload" ? "paste" : "upload";
+                      setSource(next);
+                      document.getElementById(`lo-tab-${next}`)?.focus();
+                    }
+                  }}
+                  className={`min-h-[40px] flex-1 rounded-full px-4 text-sm font-bold transition-colors sm:flex-none ${
+                    source === mode ? "bg-ink text-paper" : "text-ink-soft hover:text-ink"
+                  }`}
                 >
-                  <span className="material-symbols-outlined select-none text-[26px] text-ink-soft" aria-hidden="true">
-                    upload_file
-                  </span>
-                  {t("lo.form.drop")}
+                  {t(mode === "upload" ? "lo.form.tab-upload" : "lo.form.tab-paste")}
                 </button>
-              )}
+              ))}
             </div>
-          </div>
 
-          {/* Tempel teks */}
-          <div>
-            <label htmlFor="lo-paste" className="block text-sm font-extrabold text-ink">
-              {t("lo.form.paste-label")}
-            </label>
-            <textarea
-              id="lo-paste"
-              value={pasted}
-              onChange={(event) => setPasted(event.target.value)}
-              rows={5}
-              placeholder={t("lo.form.paste-placeholder")}
-              className="mt-2 w-full resize-y rounded-xl border-2 border-edge/60 bg-paper px-3.5 py-3 text-sm leading-relaxed text-ink outline-none transition-colors placeholder:text-ink-soft/70 focus:border-green-deep"
-            />
-            {pasted.trim() ? (
-              <p className="mt-1 text-xs font-semibold text-green-deep">
-                {t("lo.form.paste-used", "Teks yang ditempel dipakai, PDF di atas diabaikan.")}
-              </p>
-            ) : null}
-          </div>
+            {source === "upload" ? (
+              <div id="lo-panel-upload" role="tabpanel" aria-labelledby="lo-tab-upload" className="mt-3">
+                <p className="text-xs text-ink-soft">{t("lo.form.file-hint")}</p>
+                <div
+                  onDragOver={(event) => {
+                    event.preventDefault();
+                    setDragActive(true);
+                  }}
+                  onDragLeave={() => setDragActive(false)}
+                  onDrop={(event) => {
+                    event.preventDefault();
+                    setDragActive(false);
+                    pickFile(event.dataTransfer.files?.[0] ?? null);
+                  }}
+                  className={`mt-2.5 rounded-xl border-2 border-dashed p-5 text-center transition-colors ${
+                    dragActive ? "border-green-deep bg-lime/10" : "border-edge/50 bg-surface-container-low/40"
+                  }`}
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="application/pdf,.pdf"
+                    className="sr-only"
+                    onChange={(event) => pickFile(event.target.files?.[0] ?? null)}
+                  />
+                  {file ? (
+                    <div className="flex flex-wrap items-center justify-center gap-2.5">
+                      <span className="material-symbols-outlined select-none text-[20px] text-green-deep" aria-hidden="true">
+                        description
+                      </span>
+                      <span className="max-w-full truncate text-sm font-semibold text-ink">{file.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFile(null);
+                          if (fileInputRef.current) fileInputRef.current.value = "";
+                        }}
+                        className="rounded-full border border-ink/20 px-2 py-0.5 text-xs font-bold text-ink transition-colors hover:border-ink hover:bg-surface-container-low"
+                      >
+                        {t("lo.form.remove", "Ganti file")}
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="inline-flex flex-col items-center gap-1.5 text-sm font-semibold text-ink"
+                    >
+                      <span className="material-symbols-outlined select-none text-[26px] text-ink-soft" aria-hidden="true">
+                        upload_file
+                      </span>
+                      {t("lo.form.drop")}
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div id="lo-panel-paste" role="tabpanel" aria-labelledby="lo-tab-paste" className="mt-3">
+                <label htmlFor="lo-paste" className="block text-xs text-ink-soft">
+                  {t("lo.form.paste-hint")}
+                </label>
+                <textarea
+                  id="lo-paste"
+                  value={pasted}
+                  onChange={(event) => setPasted(event.target.value)}
+                  rows={8}
+                  placeholder={t("lo.form.paste-placeholder")}
+                  className="mt-2 w-full resize-y rounded-xl border-2 border-edge/60 bg-paper px-3.5 py-3 text-sm leading-relaxed text-ink outline-none transition-colors placeholder:text-ink-soft/70 focus:border-green-deep"
+                />
+              </div>
+            )}
+          </fieldset>
 
           {error ? (
             <p role="alert" className="rounded-xl border-[1.5px] border-error/50 bg-error-container px-3.5 py-2.5 text-sm font-semibold text-on-error-container">
