@@ -9,6 +9,7 @@ import MagneticButton from "@/components/MagneticButton";
 import { UploadZone } from "@/components/checker/UploadZone";
 import { SectionKicker } from "@/components/checker/ResultComponents";
 import { CheckerResultView } from "@/components/checker/CheckerResultView";
+import { AnalyzeProgress, StepNumber, type AnalyzePhase } from "@/components/checker/InputSteps";
 import { ROLE_CATEGORY_OPTIONS, type AnalysisResult } from "@/components/checker/types";
 import { anonIdHeaders } from "@/lib/anon-id";
 import { extractPdfTextClient, renderPdfPagesToBlobs } from "@/lib/pdf-extract-client";
@@ -39,6 +40,10 @@ export default function CheckerPage() {
   const [ocrLoading, setOcrLoading] = useState(false);
   const [ocrProgress, setOcrProgress] = useState("");
   const [processNote, setProcessNote] = useState("");
+  // Tab input CV: unggah file atau tempel teks; keduanya selalu tersedia.
+  const [inputMode, setInputMode] = useState<"upload" | "paste">("upload");
+  // Tahap proses yang sedang berjalan, untuk indikator 3 langkah.
+  const [phase, setPhase] = useState<AnalyzePhase>("read");
   const shareTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const donutRef = useRef<HTMLDivElement>(null);
@@ -95,11 +100,14 @@ export default function CheckerPage() {
     setOcrLoading(false);
     setOcrProgress("");
     setProcessNote("");
+    setInputMode("upload");
+    setPhase("read");
     extractedTextRef.current = null;
   }, []);
 
   /* ---- Analyze (dengan retry support) ---- */
   const doAnalyze = useCallback(async (extractedText: string) => {
+    setPhase("analyze");
     const res = await fetch("/api/checker/analyze", {
       method: "POST",
       headers: {
@@ -136,6 +144,7 @@ export default function CheckerPage() {
   const handleBrowserOcr = useCallback(async () => {
     if (!file) return;
     setOcrLoading(true);
+    setPhase("extract");
     setOcrProgress(t("checker.ocr.reading-file"));
     setError("");
     setShowPasteFallback(false);
@@ -198,7 +207,7 @@ export default function CheckerPage() {
       setOcrLoading(false);
       setOcrProgress("");
       setError(err.message || t("checker.ocr.failed"));
-      setShowPasteFallback(true);
+      { setShowPasteFallback(true); setInputMode("paste"); }
     }
   }, [file, doAnalyze, ocrMsgs, t]);
 
@@ -212,6 +221,7 @@ export default function CheckerPage() {
 
     // 1) Teks dibaca di perangkat: file besar tidak pernah kena batas body
     //    serverless karena tidak perlu diunggah dulu.
+    setPhase("read");
     setProcessNote(t("checker.extract.reading-file"));
     let clientText = "";
     try {
@@ -226,6 +236,7 @@ export default function CheckerPage() {
 
     // 2) Tidak ada lapisan teks (scan/gambar) → OCR otomatis tanpa klik.
     try {
+      setPhase("extract");
       setProcessNote(t("checker.extract.auto-ocr"));
       const pageBlobs = await renderPdfPagesToBlobs(file, 5);
       if (pageBlobs.length > 0) {
@@ -256,11 +267,11 @@ export default function CheckerPage() {
         return data.extractedText as string;
       }
 
-      setShowPasteFallback(true);
+      { setShowPasteFallback(true); setInputMode("paste"); }
       setShowOcrButton(true);
       setError(data?.message || t("checker.error-failed"));
     } catch {
-      setShowPasteFallback(true);
+      { setShowPasteFallback(true); setInputMode("paste"); }
       setError(t("checker.error-failed"));
     }
     setProcessNote("");
@@ -269,14 +280,9 @@ export default function CheckerPage() {
 
   const handlePasteAnalyze = useCallback(async () => {
     if (!pastedText.trim()) {
-      setError("Teks CV tidak boleh kosong");
+      setError(t("checker.paste.empty"));
       return;
     }
-    if (!jdText.trim()) {
-      setError(t("checker.error-jd"));
-      return;
-    }
-
     setError("");
     setLoading(true);
     const trimmedText = pastedText.trim();
@@ -290,18 +296,20 @@ export default function CheckerPage() {
     } finally {
       setLoading(false);
     }
-  }, [pastedText, jdText, doAnalyze, t]);
+  }, [pastedText, doAnalyze, t]);
 
   const handleAnalyze = async () => {
+    // Lowongan opsional: tanpa lowongan, API menilai format, bullet, dan
+    // bagian yang kurang tanpa mencocokkan kata kunci lowongan.
+    if (inputMode === "paste") {
+      await handlePasteAnalyze();
+      return;
+    }
     setError("");
     setUploadError("");
     setShowPasteFallback(false);
     if (!file) {
       setError(t("checker.error-upload"));
-      return;
-    }
-    if (!jdText.trim()) {
-      setError(t("checker.error-jd"));
       return;
     }
 
@@ -314,6 +322,7 @@ export default function CheckerPage() {
       if (isImageFile && !extractedTextRef.current) {
         setLoading(false);
         setOcrLoading(true);
+        setPhase("extract");
         try {
           setOcrProgress(t("checker.ocr.reading-image"));
           const imgText = await runClientOcr([file], setOcrProgress, ocrMsgs);
@@ -321,7 +330,7 @@ export default function CheckerPage() {
           setOcrLoading(false);
           if (imgText.length < 20) {
             setError(t("checker.ocr.img-empty-paste"));
-            setShowPasteFallback(true);
+            { setShowPasteFallback(true); setInputMode("paste"); }
             return;
           }
           extractedTextRef.current = imgText;
@@ -332,7 +341,7 @@ export default function CheckerPage() {
           setOcrLoading(false);
           setOcrProgress("");
           setError(err.message || t("checker.ocr.failed"));
-          setShowPasteFallback(true);
+          { setShowPasteFallback(true); setInputMode("paste"); }
         }
         return;
       }
@@ -356,6 +365,7 @@ export default function CheckerPage() {
           extractedTextRef.current = extractedText; // cache untuk retry
         } else {
           // DOCX: ekstraksi di server (mammoth).
+          setPhase("extract");
           const formData = new FormData();
           formData.append("file", file);
           const extractRes = await fetch("/api/checker/extract", {
@@ -371,14 +381,14 @@ export default function CheckerPage() {
 
           if (!extractRes.ok) {
             if (extractData?.suggestOcr) setShowOcrButton(true);
-            if (extractData?.suggestPaste) setShowPasteFallback(true);
+            if (extractData?.suggestPaste) { setShowPasteFallback(true); setInputMode("paste"); }
             setError(extractData?.message || t("checker.error-failed"));
             setLoading(false);
             return;
           }
 
           if (!extractData?.extractedText) {
-            setShowPasteFallback(true);
+            { setShowPasteFallback(true); setInputMode("paste"); }
             setError(t("checker.error-failed"));
             setLoading(false);
             return;
@@ -447,10 +457,7 @@ export default function CheckerPage() {
                 </div>
               ))}
             </div>
-            <p className="flex items-center justify-center gap-1 text-center text-sm text-ink-soft">
-              <span className="material-symbols-outlined select-none align-middle text-lg animate-spin">sync</span>
-              {processNote || t("checker.analyzing-full")}
-            </p>
+            <AnalyzeProgress phase={phase} note={processNote || t("checker.analyzing-full")} />
           </main>
           <AppFooter />
         </div>
@@ -480,49 +487,131 @@ export default function CheckerPage() {
             </div>
 
             <div className="flex flex-col gap-7 rounded-[18px] border-[2.5px] border-ink bg-paper p-6 shadow-hard md:p-8">
-              <UploadZone
-                file={file}
-                dragActive={dragActive}
-                onFileChange={(f) => { setFile(f); extractedTextRef.current = null; setUploadError(""); }}
-                onDragStateChange={setDragActive}
-                label={t("checker.upload-label")}
-                hint={t("checker.upload-hint")}
-                loading={loading}
-                error={uploadError}
-              />
+              {/* ── Langkah 1: CV (unggah atau tempel teks, dua-duanya selalu terlihat) ── */}
+              <fieldset className="flex min-w-0 flex-col gap-3">
+                <legend className="mb-3 flex items-center gap-2 font-display text-base font-bold text-ink">
+                  <StepNumber n={1} />
+                  {t("checker.step-cv")}
+                </legend>
+                <div role="tablist" aria-label={t("checker.step-cv")} className="inline-flex w-full rounded-full border-2 border-ink/20 bg-desk/60 p-1 sm:w-auto">
+                  {(["upload", "paste"] as const).map((mode) => (
+                    <button
+                      key={mode}
+                      id={`cv-tab-${mode}`}
+                      type="button"
+                      role="tab"
+                      aria-selected={inputMode === mode}
+                      aria-controls={`cv-panel-${mode}`}
+                      tabIndex={inputMode === mode ? 0 : -1}
+                      onClick={() => setInputMode(mode)}
+                      onKeyDown={(e) => {
+                        if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+                          e.preventDefault();
+                          const next = mode === "upload" ? "paste" : "upload";
+                          setInputMode(next);
+                          document.getElementById(`cv-tab-${next}`)?.focus();
+                        }
+                      }}
+                      className={`min-h-[40px] flex-1 rounded-full px-4 text-sm font-bold transition-colors sm:flex-none ${
+                        inputMode === mode ? "bg-ink text-paper" : "text-ink-soft hover:text-ink"
+                      }`}
+                    >
+                      {t(mode === "upload" ? "checker.input-tab-upload" : "checker.input-tab-paste")}
+                    </button>
+                  ))}
+                </div>
 
-              <div className="flex flex-col gap-2">
-                <label className="text-xs font-extrabold uppercase tracking-[0.06em] text-ink-soft">
+                {inputMode === "upload" ? (
+                  <div id="cv-panel-upload" role="tabpanel" aria-labelledby="cv-tab-upload">
+                    <UploadZone
+                      file={file}
+                      dragActive={dragActive}
+                      onFileChange={(f) => { setFile(f); extractedTextRef.current = null; setUploadError(""); }}
+                      onDragStateChange={setDragActive}
+                      label={t("checker.upload-label")}
+                      hint={t("checker.upload-hint")}
+                      loading={loading}
+                      error={uploadError}
+                    />
+                  </div>
+                ) : (
+                  <div id="cv-panel-paste" role="tabpanel" aria-labelledby="cv-tab-paste" className="flex flex-col gap-2">
+                    {/* Muncul saat file gagal dibaca dan pengguna dipindah ke tab ini. */}
+                    {showPasteFallback && (
+                      <p className="text-xs leading-relaxed text-ink-soft">{t("checker.paste.desc")}</p>
+                    )}
+                    <label htmlFor="cv-paste" className="sr-only">{t("checker.paste.title")}</label>
+                    <textarea
+                      id="cv-paste"
+                      className="w-full resize-y rounded-xl border-2 border-ink/20 bg-desk/60 p-4 text-sm text-ink placeholder:text-ink-soft/80 transition-[border-color]"
+                      rows={8}
+                      placeholder={t("checker.paste.placeholder")}
+                      value={pastedText}
+                      onChange={(e) => { setPastedText(e.target.value); extractedTextRef.current = null; }}
+                    />
+                  </div>
+                )}
+              </fieldset>
+
+              {/* ── Langkah 2: lowongan, opsional ── */}
+              <fieldset className="flex min-w-0 flex-col gap-2">
+                <legend className="mb-3 flex items-center gap-2 font-display text-base font-bold text-ink">
+                  <StepNumber n={2} />
+                  {t("checker.step-jd")}
+                </legend>
+                <label htmlFor="checker-jd" className="text-xs font-extrabold uppercase tracking-[0.06em] text-ink-soft">
                   {t("checker.jd-label")}
                 </label>
+                <p id="checker-jd-hint" className="text-xs leading-relaxed text-ink-soft">{t("checker.jd-optional-hint")}</p>
                 <textarea
-                  className="w-full resize-none rounded-xl border-2 border-ink/20 bg-desk/60 p-4 text-base text-ink placeholder:text-ink-soft/80 transition-[border-color]"
+                  id="checker-jd"
+                  aria-describedby="checker-jd-hint checker-jd-count"
+                  className="w-full resize-y rounded-xl border-2 border-ink/20 bg-desk/60 p-4 text-base text-ink placeholder:text-ink-soft/80 transition-[border-color]"
                   rows={6}
                   placeholder={t("checker.jd-placeholder")}
                   value={jdText}
                   onChange={(e) => setJdText(e.target.value)}
                 />
-              </div>
-
-              {/* Kategori posisi → bobot penilaian per-section (transparansi skor) */}
-              <div className="flex flex-col gap-2">
-                <label className="text-xs font-extrabold uppercase tracking-[0.06em] text-ink-soft">
-                  {t("checker.role-label")}
-                </label>
-                <select
-                  value={roleCategory}
-                  onChange={(e) => setRoleCategory(e.target.value)}
-                  className="w-full rounded-xl border-2 border-ink/20 bg-desk/60 px-3 py-3 text-base text-ink transition-[border-color]"
-                >
-                  {ROLE_CATEGORY_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {t(opt.labelKey)} · {t(opt.descKey)}
-                    </option>
-                  ))}
-                </select>
-                <p className="text-xs text-ink-soft">
-                  {t("checker.role-hint")}
+                <p id="checker-jd-count" className="text-right text-xs tabular-nums text-ink-soft">
+                  {jdText.trim()
+                    ? t("checker.jd-count").replace("{n}", jdText.trim().length.toLocaleString(lang === "en" ? "en-US" : "id-ID"))
+                    : t("checker.jd-empty")}
                 </p>
+              </fieldset>
+
+              {/* Kategori posisi → bobot penilaian per-section. Nilai yang
+                  dikirim ke API sama dengan dropdown lama. */}
+              <div className="flex flex-col gap-2">
+                <span id="checker-role-label" className="text-xs font-extrabold uppercase tracking-[0.06em] text-ink-soft">
+                  {t("checker.role-label")}
+                </span>
+                <div role="radiogroup" aria-labelledby="checker-role-label" className="flex flex-wrap gap-2">
+                  {ROLE_CATEGORY_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      role="radio"
+                      aria-checked={roleCategory === opt.value}
+                      onClick={() => setRoleCategory(opt.value)}
+                      className={`min-h-[40px] rounded-full border-2 px-3.5 text-sm font-semibold transition-colors ${
+                        roleCategory === opt.value
+                          ? "border-ink bg-lime/25 text-ink shadow-[0_2px_0_rgb(var(--c-ink))]"
+                          : "border-ink/20 text-ink-soft hover:border-ink/50 hover:text-ink"
+                      }`}
+                    >
+                      {t(opt.labelKey)}
+                    </button>
+                  ))}
+                </div>
+                {/* Deskripsi hanya untuk pilihan aktif. */}
+                {(() => {
+                  const active = ROLE_CATEGORY_OPTIONS.find((opt) => opt.value === roleCategory);
+                  return active ? (
+                    <p className="text-xs text-ink-soft" aria-live="polite">
+                      <span className="font-semibold text-ink">{t(active.descKey)}</span>. {t("checker.role-hint")}
+                    </p>
+                  ) : null;
+                })()}
               </div>
 
               {/* Kecepatan analisis: pilihan nyata, bukan janji kecepatan. */}
@@ -599,59 +688,8 @@ export default function CheckerPage() {
 
               {/* ── OCR Loading State ── */}
               {ocrLoading && (
-                <div className="space-y-3 rounded-xl border-2 border-dashed border-ink/25 bg-desk/60 p-4">
-                  <div className="flex items-center gap-3">
-                    <svg className="h-5 w-5 animate-spin text-green-deep" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
-                    <span className="text-sm font-semibold text-ink">{ocrProgress || t("checker.ocr.processing")}</span>
-                  </div>
-                  <div className="h-2 w-full overflow-hidden rounded-full bg-ink/10">
-                    <div className="h-2 w-2/3 rounded-full bg-lime" />
-                  </div>
-                </div>
-              )}
-
-              {/* ── Paste text fallback (when PDF parsing fails) ── */}
-              {showPasteFallback && (
-                <div className="space-y-3 rounded-xl border-2 border-dashed border-ink/25 bg-desk/60 p-4">
-                  <div className="flex items-start gap-3">
-                    <span className="material-symbols-outlined mt-0.5 select-none text-sm text-green-deep">content_paste</span>
-                    <div>
-                      <p className="text-sm font-bold text-ink">{t("checker.paste.title")}</p>
-                      <p className="mt-0.5 text-xs leading-relaxed text-ink-soft">{t("checker.paste.desc")}</p>
-                    </div>
-                  </div>
-                  <textarea
-                    className="w-full resize-none rounded-xl border-2 border-ink/20 bg-paper p-4 text-sm text-ink placeholder:text-ink-soft/80 transition-[border-color]"
-                    rows={8}
-                    placeholder={t("checker.paste.placeholder")}
-                    value={pastedText}
-                    onChange={(e) => setPastedText(e.target.value)}
-                  />
-                  <div className="flex justify-end">
-                    <button
-                      onClick={handlePasteAnalyze}
-                      disabled={loading || !pastedText.trim()}
-                      className="inline-flex items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-5 py-2.5 text-sm font-bold text-on-light shadow-[0_3px_0_rgb(var(--c-ink))] transition-transform hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50 disabled:hover:translate-y-0"
-                    >
-                      {loading ? (
-                        <>
-                          <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                          </svg>
-                          {t("checker.paste.analyzing")}
-                        </>
-                      ) : (
-                        <>
-                          <span className="material-symbols-outlined text-sm select-none">auto_awesome</span>
-                          {t("checker.paste.analyze-btn")}
-                        </>
-                      )}
-                    </button>
-                  </div>
+                <div className="rounded-xl border-2 border-dashed border-ink/25 bg-desk/60 p-4">
+                  <AnalyzeProgress phase={phase} note={ocrProgress || t("checker.ocr.processing")} />
                 </div>
               )}
 
