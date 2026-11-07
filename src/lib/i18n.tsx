@@ -2201,6 +2201,9 @@ const DICT: Record<string, { id: string; en: string }> = {
   "lo.section.issue": { id: "Masalah", en: "Issues" },
   "lo.section.suggestion": { id: "Langkah perbaikan", en: "Fix this first" },
   "lo.section.none": { id: "Tidak ada catatan untuk bagian ini.", en: "No notes for this section." },
+  "ui.section-nav.label": { id: "Daftar isi", en: "Contents" },
+  "ui.section-nav.open": { id: "Daftar isi", en: "Contents" },
+  "ui.section-nav.close": { id: "Tutup daftar isi", en: "Close contents" },
   "dashboard.linkedin-history": { id: "Riwayat LinkedIn", en: "LinkedIn history" },
 };
 
