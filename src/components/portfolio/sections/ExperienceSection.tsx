@@ -1,5 +1,6 @@
 "use client";
 
+import { DescriptionText } from "../render/DescriptionText";
 import { motion } from "motion/react";
 import type { ExperienceItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
@@ -80,7 +81,7 @@ function GlassExperience({ items }: { items: ExperienceItem[] }) {
                       </div>
                       {exp.description && (
                         <p className="text-sm leading-relaxed" style={{ color: theme.colors.textMuted }}>
-                          {exp.description}
+                          <DescriptionText text={exp.description} />
                         </p>
                       )}
                     </div>
@@ -161,7 +162,7 @@ function BrutalExperience({ items }: { items: ExperienceItem[] }) {
                         </div>
                         {exp.description && (
                           <p className="text-sm leading-relaxed" style={{ color: theme.colors.textSecondary }}>
-                            {exp.description}
+                            <DescriptionText text={exp.description} />
                           </p>
                         )}
                       </div>
@@ -233,7 +234,7 @@ function LuxeExperience({ items }: { items: ExperienceItem[] }) {
                 )}
                 {exp.description && (
                   <p className="text-sm leading-relaxed mt-2" style={{ color: theme.colors.textMuted }}>
-                    {exp.description}
+                    <DescriptionText text={exp.description} />
                   </p>
                 )}
               </div>
@@ -306,7 +307,7 @@ function MinimalistExperience({ items }: { items: ExperienceItem[] }) {
                 </div>
                 {e.description ? (
                   <p style={{ fontSize: 14, lineHeight: 1.7, color: theme.colors.textSecondary, margin: "8px 0 0", maxWidth: 620 }}>
-                    {e.description}
+                    <DescriptionText text={e.description} />
                   </p>
                 ) : null}
               </div>
@@ -368,7 +369,7 @@ function WorkbenchExperience({ items }: { items: ExperienceItem[] }) {
 
                   {exp.description ? (
                     <p style={{ margin: "8px 0 0", maxWidth: 640, fontSize: 14.5, lineHeight: 1.7, color: theme.colors.textSecondary }}>
-                      {exp.description}
+                      <DescriptionText text={exp.description} />
                     </p>
                   ) : null}
 
@@ -414,7 +415,7 @@ function DecalExperience({ items }: { items: ExperienceItem[] }) {
                 <div style={{ padding: "18px 22px", background: theme.colors.surface, border: `2.5px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
                   <h3 style={{ ...wbHeading(theme, "clamp(17px, 2vw, 20px)"), margin: 0 }}>{e.position}</h3>
                   {e.company ? <p style={{ margin: "4px 0 0", fontSize: 14, fontWeight: 700, color: theme.colors.secondary }}>{e.company}</p> : null}
-                  {e.description ? <p style={{ margin: "10px 0 0", fontSize: 14, lineHeight: 1.65, color: theme.colors.textSecondary }}>{e.description}</p> : null}
+                  {e.description ? <p style={{ margin: "10px 0 0", fontSize: 14, lineHeight: 1.65, color: theme.colors.textSecondary }}><DescriptionText text={e.description} /></p> : null}
                 </div>
               </div>
             </Reveal>
@@ -446,7 +447,7 @@ function CrayonExperience({ items }: { items: ExperienceItem[] }) {
                 <div style={{ padding: "18px 22px", background: theme.colors.surface, border: `3px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
                   <h3 style={{ fontFamily: theme.typography.display, fontSize: "clamp(20px, 2.4vw, 24px)", fontWeight: 800, margin: 0, color: theme.colors.primary }}>{e.position}</h3>
                   <p style={{ margin: "4px 0 0", fontWeight: 700, fontSize: 14, color: theme.colors.secondary }}>{e.company}</p>
-                  {e.description ? <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.65, color: theme.colors.textSecondary }}>{e.description}</p> : null}
+                  {e.description ? <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.65, color: theme.colors.textSecondary }}><DescriptionText text={e.description} /></p> : null}
                 </div>
               </div>
             </Reveal>
@@ -478,7 +479,7 @@ function ScrapbookExperience({ items }: { items: ExperienceItem[] }) {
                 <div style={{ padding: "16px 20px", background: theme.colors.surface, border: `2px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
                   <h3 style={{ ...wbHeading(theme, "clamp(20px, 2.4vw, 24px)"), margin: 0, color: theme.colors.primary }}>{e.position}</h3>
                   <p style={{ margin: "4px 0 0", fontWeight: 700, fontSize: 14, color: theme.colors.secondary }}>{e.company}</p>
-                  {e.description ? <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.65, color: theme.colors.textSecondary }}>{e.description}</p> : null}
+                  {e.description ? <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.65, color: theme.colors.textSecondary }}><DescriptionText text={e.description} /></p> : null}
                 </div>
               </div>
             </Reveal>
@@ -505,7 +506,7 @@ function InterstellaExperience({ items }: { items: ExperienceItem[] }) {
           </div>
           <div style={{ flex: "2 1 280px" }}>
             <h3 style={{ margin: 0, fontFamily: theme.typography.display, fontSize: "clamp(1.4rem, 3vw, 2rem)", fontWeight: 700, color: theme.colors.text }}>{e.position}</h3>
-            {e.description && <p style={{ margin: "12px 0 0", maxWidth: "65ch", whiteSpace: "pre-line", lineHeight: 1.75, color: theme.colors.textSecondary }}>{e.description}</p>}
+            {e.description && <p style={{ margin: "12px 0 0", maxWidth: "65ch", whiteSpace: "pre-line", lineHeight: 1.75, color: theme.colors.textSecondary }}><DescriptionText text={e.description} /></p>}
           </div>
         </article>)}
       </div>
@@ -524,7 +525,7 @@ function SherbetExperience({ items }: { items: ExperienceItem[] }) {
         <ol style={{ padding: 0, margin: 0, listStyle: "none", display: "grid", gap: 20 }}>{filtered.map((e) => <li key={e.id} style={{ background: theme.colors.surface, padding: "clamp(20px, 4vw, 32px)", borderRadius: theme.radii.card }}>
           <article style={{ display: "flex", flexWrap: "wrap", gap: "16px 40px" }}>
             <header style={{ flex: "1 1 220px", minWidth: 0 }}><h3 style={{ margin: 0, fontSize: 24, color: theme.colors.text }}>{e.position || e.company}</h3>{e.position && <p style={{ margin: "8px 0 0", fontWeight: 600, color: theme.colors.textSecondary }}>{e.company}</p>}<p style={{ margin: "12px 0 0", fontSize: 14, color: theme.colors.textMuted }}>{[e.startDate, e.isPresent ? "Sekarang" : e.endDate].filter(Boolean).join(" – ")}</p></header>
-            {e.description && <p style={{ flex: "2 1 260px", margin: 0, maxWidth: "65ch", lineHeight: 1.75, whiteSpace: "pre-line", color: theme.colors.textSecondary }}>{e.description}</p>}
+            {e.description && <p style={{ flex: "2 1 260px", margin: 0, maxWidth: "65ch", lineHeight: 1.75, whiteSpace: "pre-line", color: theme.colors.textSecondary }}><DescriptionText text={e.description} /></p>}
           </article>
         </li>)}</ol>
       </div>

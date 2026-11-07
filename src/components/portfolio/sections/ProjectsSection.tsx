@@ -1,5 +1,6 @@
 "use client";
 
+import { DescriptionText } from "../render/DescriptionText";
 import { motion } from "motion/react";
 import { safeUrlUnescaped } from "@/lib/portfolio-safety";
 import type { ProjectItem } from "../../portfolio-templates/types";
@@ -83,7 +84,7 @@ function GlassProjects({ items }: { items: ProjectItem[] }) {
                       </h3>
                       {p.description && (
                         <p className="text-sm leading-relaxed flex-1" style={{ color: theme.colors.textMuted }}>
-                          {p.description}
+                          <DescriptionText text={p.description} />
                         </p>
                       )}
                       {p.techStack && (
@@ -163,7 +164,7 @@ function BrutalProjects({ items }: { items: ProjectItem[] }) {
                     <div className="flex items-start justify-between gap-4 flex-wrap">
                       <div className="flex-1">
                         <h3 className="font-bold text-lg mb-2" style={{ color: theme.colors.text }}>{p.name}</h3>
-                        {p.description && <p className="text-sm leading-relaxed" style={{ color: theme.colors.textMuted }}>{p.description}</p>}
+                        {p.description && <p className="text-sm leading-relaxed" style={{ color: theme.colors.textMuted }}><DescriptionText text={p.description} /></p>}
                       </div>
                       <span className="text-xs font-bold px-3 py-1" style={{ background: theme.colors.primary, color: theme.colors.onPrimary }}>
                         {String(i + 1).padStart(2, "0")}
@@ -262,7 +263,7 @@ function LuxeProjects({ items }: { items: ProjectItem[] }) {
                       <div>
                         {p.description && (
                           <p className="text-sm leading-relaxed mb-4" style={{ color: theme.colors.textMuted }}>
-                            {p.description}
+                            <DescriptionText text={p.description} />
                           </p>
                         )}
                         {p.techStack && (
@@ -348,7 +349,7 @@ function MinimalistProjects({ items }: { items: ProjectItem[] }) {
                 <div>
                   {p.description ? (
                     <p style={{ fontSize: 14, lineHeight: 1.7, color: theme.colors.textSecondary, margin: 0, maxWidth: 620 }}>
-                      {p.description}
+                      <DescriptionText text={p.description} />
                     </p>
                   ) : null}
                   {p.techStack ? (
@@ -442,7 +443,7 @@ function WorkbenchProjects({ items }: { items: ProjectItem[] }) {
 
                   <h3 style={{ ...wbHeading(theme, "clamp(18px, 2.2vw, 21px)"), margin: 0 }}>{p.name}</h3>
                   {p.description ? (
-                    <p style={{ margin: 0, fontSize: 14, lineHeight: 1.65, color: theme.colors.textSecondary, flex: 1 }}>{p.description}</p>
+                    <p style={{ margin: 0, fontSize: 14, lineHeight: 1.65, color: theme.colors.textSecondary, flex: 1 }}><DescriptionText text={p.description} /></p>
                   ) : null}
 
                   {p.techStack ? (
@@ -490,7 +491,7 @@ function DecalProjects({ items }: { items: ProjectItem[] }) {
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   <h3 style={{ ...wbHeading(theme, "clamp(18px, 2.2vw, 22px)"), margin: 0 }}>{p.name}</h3>
-                  {p.description ? <p style={{ margin: 0, fontSize: 14, lineHeight: 1.65, color: theme.colors.textSecondary, flex: 1 }}>{p.description}</p> : null}
+                  {p.description ? <p style={{ margin: 0, fontSize: 14, lineHeight: 1.65, color: theme.colors.textSecondary, flex: 1 }}><DescriptionText text={p.description} /></p> : null}
                   {p.techStack ? (
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                       {p.techStack.split(",").map((tech, idx) => (
@@ -533,7 +534,7 @@ function CrayonProjects({ items }: { items: ProjectItem[] }) {
               <div style={{ padding: 22, background: theme.colors.surface, border: `3px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
                 <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 44, height: 44, borderRadius: 999, background: fills[i % fills.length], color: i % 3 === 2 ? theme.colors.text : theme.colors.onPrimary, fontFamily: theme.typography.display, fontWeight: 800, fontSize: 18 }}>{String(i + 1).padStart(2, "0")}</span>
                 <h3 style={{ fontFamily: theme.typography.display, fontSize: "clamp(20px, 2.4vw, 24px)", fontWeight: 800, margin: "12px 0 0", color: theme.colors.primary }}>{p.name}</h3>
-                {p.description ? <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: theme.colors.textSecondary }}>{p.description}</p> : null}
+                {p.description ? <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: theme.colors.textSecondary }}><DescriptionText text={p.description} /></p> : null}
                 {p.techStack ? <p style={{ margin: "10px 0 0", fontSize: 12, fontWeight: 800, color: theme.colors.textMuted }}>{p.techStack}</p> : null}
               </div>
             </Reveal>
@@ -561,7 +562,7 @@ function ScrapbookProjects({ items }: { items: ProjectItem[] }) {
               <div style={{ padding: 20, background: theme.colors.surface, border: `2px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, transform: `rotate(${i % 2 ? 1 : -1.2}deg)` }}>
                 <span style={{ fontFamily: theme.typography.display, fontSize: 34, color: theme.colors.secondary }}>{String(i + 1).padStart(2, "0")}</span>
                 <h3 style={{ ...wbHeading(theme, "clamp(20px, 2.4vw, 24px)"), margin: "4px 0 0", color: theme.colors.primary }}>{p.name}</h3>
-                {p.description ? <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: theme.colors.textSecondary }}>{p.description}</p> : null}
+                {p.description ? <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: theme.colors.textSecondary }}><DescriptionText text={p.description} /></p> : null}
                 {p.techStack ? <p style={{ margin: "10px 0 0", fontSize: 12, fontWeight: 800, color: theme.colors.textMuted }}>{p.techStack}</p> : null}
               </div>
             </Reveal>
@@ -592,7 +593,7 @@ function InterstellaProjects({ items }: { items: ProjectItem[] }) {
                   {p.role && <p style={{ margin: "8px 0 0", color: theme.colors.textMuted }}>{p.role}</p>}
                 </div>
                 <div style={{ flex: "1 1 260px" }}>
-                  {p.description && <p style={{ margin: 0, lineHeight: 1.75, color: theme.colors.textSecondary }}>{p.description}</p>}
+                  {p.description && <p style={{ margin: 0, lineHeight: 1.75, color: theme.colors.textSecondary }}><DescriptionText text={p.description} /></p>}
                   {p.techStack && <p style={{ margin: "12px 0 0", fontSize: 14, color: theme.colors.textMuted }}>{p.techStack}</p>}
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 24 }}>{links.map((l) => <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ display: "inline-flex", alignItems: "center", minHeight: 44, marginTop: 8, color: theme.colors.primary, textUnderlineOffset: 5 }}>{l.label}<span className="sr-only">: {p.name}</span></a>)}</div>
                 </div>
@@ -619,7 +620,7 @@ function SherbetProjects({ items }: { items: ProjectItem[] }) {
             {p.imageUrl && <img src={p.imageUrl} alt={p.name} loading="lazy" style={{ width: "100%", aspectRatio: "4 / 5", objectFit: "cover", display: "block", marginBottom: 20, borderRadius: theme.radii.image }} />}
             <h3 style={{ margin: 0, fontFamily: theme.typography.display, fontSize: 28, fontWeight: 700, lineHeight: 1.2, color: theme.colors.text }}>{p.name}</h3>
             {p.role && <p style={{ margin: "8px 0 0", fontWeight: 600, color: theme.colors.textMuted }}>{p.role}</p>}
-            {p.description && <p style={{ margin: "12px 0 0", lineHeight: 1.75, color: theme.colors.textSecondary }}>{p.description}</p>}
+            {p.description && <p style={{ margin: "12px 0 0", lineHeight: 1.75, color: theme.colors.textSecondary }}><DescriptionText text={p.description} /></p>}
             {p.techStack && <p style={{ margin: "12px 0 0", fontSize: 14, color: theme.colors.textMuted }}>{p.techStack}</p>}
             <div style={{ display: "flex", flexWrap: "wrap", gap: 20 }}>{links.map((l) => <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ display: "inline-flex", alignItems: "center", minHeight: 44, color: theme.colors.primary, fontWeight: 700, textUnderlineOffset: 5 }}>{l.label}<span className="sr-only">: {p.name}</span></a>)}</div>
           </article>;
