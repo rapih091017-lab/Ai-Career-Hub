@@ -20,6 +20,7 @@ import { FONT_SIZES, SECTION_IDS, type FontSize, type SectionId, type TextAlignm
 import { isSectionVisible } from "@/components/portfolio/sectionVisibility";
 import { StepperSteps } from "@/components/builder/StepperNav";
 import { FieldHelp } from "@/components/builder/FieldHelp";
+import { BulletEditor } from "@/components/builder/BulletEditor";
 import { PORTFOLIO_HELP, type PortfolioHelpKey } from "@/lib/portfolio-help";
 import { PORTFOLIO_STEP_IDS, PORTFOLIO_STEP_META, isTypingTarget, portfolioStepCompletion } from "@/components/portfolio/builder/steps";
 
@@ -988,15 +989,21 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                           <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Nama project"
                             value={p.name} onChange={e => setProjects(prev => prev.map(x => x.id === p.id ? {...x, name: e.target.value} : x))} />
                         </div>
-                        <div className="md:col-span-2 relative">
-                          <label className="block text-label-sm text-on-surface-variant mb-1">{t("live.form.description")}</label>
-                          <textarea className="w-full px-4 py-3 pr-12 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={2} placeholder="Deskripsi singkat project..." maxLength={500}
-                            value={p.description} onChange={e => setProjects(prev => prev.map(x => x.id === p.id ? {...x, description: e.target.value} : x))} />
-                          {p.description && (
-                            <span className="absolute right-2 top-8">
-                              <AIPolishButton content={p.description} onApply={(text) => setProjects(prev => prev.map(x => x.id === p.id ? {...x, description: text} : x))} field={`deskripsi project ${p.name || idx + 1}`} size="icon" />
-                            </span>
-                          )}
+                        <div className="md:col-span-2">
+                          {/* Satu poin per baris; deskripsi lama (paragraf) terbaca sebagai satu poin. */}
+                          <BulletEditor
+                            label={t("live.form.description")}
+                            help={PORTFOLIO_HELP.projectDescription}
+                            value={p.description}
+                            onChange={(v) => setProjects(prev => prev.map(x => x.id === p.id ? {...x, description: v} : x))}
+                            placeholder="Contoh: Merancang alur pemesanan untuk pengguna baru"
+                            maxLength={500}
+                            headerAction={
+                              p.description ? (
+                                <AIPolishButton content={p.description} onApply={(text) => setProjects(prev => prev.map(x => x.id === p.id ? {...x, description: text} : x))} field={`deskripsi project ${p.name || idx + 1}`} size="icon" />
+                              ) : null
+                            }
+                          />
                           <CharCounter value={p.description} max={500} />
                         </div>
                         <Field label={t("live.form.tech-stack")} help="techStack">
@@ -1051,15 +1058,21 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                               value={e.endDate} onChange={ev => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, endDate: ev.target.value} : x))} />
                           </div>
                         </div>
-                        <div className="md:col-span-2 relative">
-                          <label className="block text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">{t("live.form.description")}</label>
-                          <textarea className="w-full px-4 py-3 pr-12 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={3} placeholder="Jelaskan tanggung jawab dan pencapaian..." maxLength={1000}
-                            value={e.description} onChange={ev => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, description: ev.target.value} : x))} />
-                          {e.description && (
-                            <span className="absolute right-2 top-8">
-                              <AIPolishButton content={e.description} onApply={(text) => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, description: text} : x))} field={`deskripsi pengalaman ${e.position || idx + 1}`} size="icon" />
-                            </span>
-                          )}
+                        <div className="md:col-span-2">
+                          {/* Satu poin per baris; deskripsi lama (paragraf) terbaca sebagai satu poin. */}
+                          <BulletEditor
+                            label={t("live.form.description")}
+                            help={PORTFOLIO_HELP.experienceDescription}
+                            value={e.description}
+                            onChange={(v) => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, description: v} : x))}
+                            placeholder="Contoh: Menyusun laporan mingguan untuk [jumlah] cabang"
+                            maxLength={1000}
+                            headerAction={
+                              e.description ? (
+                                <AIPolishButton content={e.description} onApply={(text) => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, description: text} : x))} field={`deskripsi pengalaman ${e.position || idx + 1}`} size="icon" />
+                              ) : null
+                            }
+                          />
                           <CharCounter value={e.description} max={1000} />
                         </div>
                       </div>
