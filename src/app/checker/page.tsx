@@ -711,7 +711,7 @@ export default function CheckerPage() {
     <div className="flex min-h-screen flex-col bg-desk text-ink">
       <SiteHeader variant="pill" />
 
-      <main className="mx-auto w-full max-w-[680px] space-y-10 px-5 pb-12 pt-24 md:px-6">
+      <main className="mx-auto w-full max-w-[680px] space-y-10 lg:max-w-[960px] px-5 pb-12 pt-24 md:px-6">
         {/* ── Top Bar: Back + Share + Download ── */}
         <div className="flex items-center justify-between gap-2">
           <button

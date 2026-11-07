@@ -5,6 +5,7 @@ import { CopyButton } from "./CopyButton";
 import { SectionKicker } from "./ResultComponents";
 import { buildChangePack } from "@/lib/checker/copy";
 import { useTranslation } from "@/lib/i18n";
+import { scrollToSection } from "@/components/ui/SectionNav";
 import {
   gradeColor,
   type QuickFix,
@@ -28,16 +29,6 @@ const IMPACT_CHIP: Record<QuickFix["impact"], string> = {
   Sedang: "border-tertiary/50 bg-tertiary-container text-on-tertiary-container",
   Rendah: "border-green-deep/40 bg-primary-fixed text-on-primary-fixed",
 };
-
-/** Scroll halus ke anchor section, kecuali pengguna meminta reduced motion. */
-function scrollToSection(id: string) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const reduceMotion =
-    typeof window.matchMedia === "function" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  el.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
-}
 
 interface QuickSummaryCardProps {
   /** Dipakai untuk badge grade dan menghitung "Salin semua perubahan". */

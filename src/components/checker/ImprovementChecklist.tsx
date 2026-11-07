@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { useTranslation } from "@/lib/i18n";
 import { SectionKicker } from "./ResultComponents";
 import type { ActionPlan, KeywordAnalysis, MissingSection } from "./types";
+import type { DoneState } from "@/lib/useDoneState";
 
 /**
  * ImprovementChecklist, mengubah rekomendasi analisis CV menjadi langkah
@@ -19,6 +20,8 @@ interface ImprovementChecklistProps {
   /** Objek sejak prompt 4; mapper menormalkan string lama jadi { name }. */
   missingSections?: MissingSection[];
   keywordAnalysis?: KeywordAnalysis | null;
+  /** Status centang bersama (tersimpan per id hasil). Tanpa ini centang hanya di memori. */
+  done?: DoneState;
 }
 
 type ChecklistItem = {
@@ -37,28 +40,41 @@ const GROUP_KEYS: Record<ChecklistItem["group"], { label: string; short: string;
   keyword: { label: "checker.detail.group-keyword", short: "checker.detail.group-keyword-short", chip: "border-error/50 bg-error-container text-on-error-container", icon: "key" },
 };
 
-export function ImprovementChecklist({ actionPlan, missingSections, keywordAnalysis }: ImprovementChecklistProps) {
+/** Daftar langkah checklist; dipakai juga untuk badge jumlah di daftar isi. */
+export function buildChecklistItems(
+  actionPlan?: ActionPlan | null,
+  missingSections?: MissingSection[],
+  keywordAnalysis?: KeywordAnalysis | null,
+): ChecklistItem[] {
+  const out: ChecklistItem[] = [];
+  const push = (group: ChecklistItem["group"], list: string[] | undefined) => {
+    (list ?? []).forEach((text, i) => {
+      if (text.trim()) out.push({ id: `${group}-${i}`, text: text.trim(), group });
+    });
+  };
+  push("quick", actionPlan?.quick_wins);
+  push("short", actionPlan?.short_term);
+  push("long", actionPlan?.long_term);
+  // Bentuk objek (prompt 4): hanya namanya yang masuk daftar langkah.
+  push("section", (missingSections ?? []).map((section) => section?.name ?? ""));
+  push("keyword", keywordAnalysis?.missing_critical);
+  return out;
+}
+
+/** Prefix id centang checklist di penyimpanan bersama. */
+export const CHECKLIST_DONE_PREFIX = "list:";
+
+export function ImprovementChecklist({ actionPlan, missingSections, keywordAnalysis, done: shared }: ImprovementChecklistProps) {
   const [checked, setChecked] = useState<Set<string>>(new Set());
   const [copied, setCopied] = useState(false);
   const { t } = useTranslation();
 
-  const items = useMemo<ChecklistItem[]>(() => {
-    const out: ChecklistItem[] = [];
-    const push = (group: ChecklistItem["group"], list: string[] | undefined) => {
-      (list ?? []).forEach((text, i) => {
-        if (text.trim()) out.push({ id: `${group}-${i}`, text: text.trim(), group });
-      });
-    };
-    push("quick", actionPlan?.quick_wins);
-    push("short", actionPlan?.short_term);
-    push("long", actionPlan?.long_term);
-    // Bentuk objek (prompt 4): hanya namanya yang masuk daftar langkah.
-    push("section", (missingSections ?? []).map((section) => section?.name ?? ""));
-    push("keyword", keywordAnalysis?.missing_critical);
-    return out;
-  }, [actionPlan, missingSections, keywordAnalysis]);
+  const items = useMemo<ChecklistItem[]>(
+    () => buildChecklistItems(actionPlan, missingSections, keywordAnalysis),
+    [actionPlan, missingSections, keywordAnalysis],
+  );
 
-  const toggle = useCallback((id: string) => {
+  const localToggle = useCallback((id: string) => {
     setChecked((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -67,7 +83,10 @@ export function ImprovementChecklist({ actionPlan, missingSections, keywordAnaly
     });
   }, []);
 
-  const done = checked.size;
+  const isChecked = (id: string) => (shared ? shared.isDone(CHECKLIST_DONE_PREFIX + id) : checked.has(id));
+  const toggle = (id: string) => (shared ? shared.toggle(CHECKLIST_DONE_PREFIX + id) : localToggle(id));
+
+  const done = items.filter((it) => isChecked(it.id)).length;
   const pct = Math.round((done / items.length) * 100);
 
   const copyAll = useCallback(async () => {
@@ -136,27 +155,27 @@ export function ImprovementChecklist({ actionPlan, missingSections, keywordAnaly
               </p>
               <ul className="space-y-1.5">
                 {groupItems.map((item) => {
-                  const isChecked = checked.has(item.id);
+                  const itemChecked = isChecked(item.id);
                   return (
                     <li key={item.id}>
                       <button
                         onClick={() => toggle(item.id)}
                         role="checkbox"
-                        aria-checked={isChecked}
+                        aria-checked={itemChecked}
                         className={`flex w-full items-start gap-3 rounded-xl border-[1.5px] px-3 py-2.5 text-left transition-all active:scale-[0.99] ${
-                          isChecked
+                          itemChecked
                             ? "border-green-deep/40 bg-primary-fixed/50"
                             : "border-transparent hover:border-ink/15 hover:bg-surface-container-low"
                         }`}
                       >
                         <span
                           className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all ${
-                            isChecked
+                            itemChecked
                               ? "border-ink bg-lime text-on-light"
                               : "border-ink/30 bg-paper"
                           }`}
                         >
-                          {isChecked && (
+                          {itemChecked && (
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                               <polyline points="20 6 9 17 4 12" />
                             </svg>
@@ -164,7 +183,7 @@ export function ImprovementChecklist({ actionPlan, missingSections, keywordAnaly
                         </span>
                         <span
                           className={`text-sm leading-relaxed ${
-                            isChecked ? "text-ink-soft line-through" : "text-ink"
+                            itemChecked ? "text-ink-soft line-through" : "text-ink"
                           }`}
                         >
                           {item.text}

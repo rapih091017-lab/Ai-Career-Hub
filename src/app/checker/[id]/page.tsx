@@ -128,7 +128,7 @@ export default function CheckerDetailPage() {
     <div className="flex min-h-screen flex-col bg-desk text-ink">
       <SiteHeader variant="pill" />
 
-      <main className="mx-auto w-full max-w-[680px] space-y-10 px-5 pb-12 pt-24 md:px-6">
+      <main className="mx-auto w-full max-w-[680px] space-y-10 lg:max-w-[960px] px-5 pb-12 pt-24 md:px-6">
         {/* ── Top Bar ── */}
         <div className="flex items-center justify-between gap-2">
           <button
@@ -145,7 +145,7 @@ export default function CheckerDetailPage() {
           </div>
         </div>
 
-        <CheckerResultView result={result} variant="stored" resultsRef={resultsRef} wrapperId="checker-results-detail">
+        <CheckerResultView result={result} variant="stored" resultId={id} resultsRef={resultsRef} wrapperId="checker-results-detail">
         {/* ============================================================ */}
         {/*  6. CTA, Surat Lamaran / Motivation Letter                  */}
         {/* ============================================================ */}

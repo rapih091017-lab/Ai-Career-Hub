@@ -16,13 +16,18 @@ describe("panel sisi HR terpasang di hasil cek CV", () => {
     });
   }
 
-  it("CheckerResultView merender panel Sisi HR sebelum skor", () => {
+  it("CheckerResultView merender skor ringkas dulu, panel Sisi HR menyusul dalam lipatan", () => {
+    // Urutan baru: skor di atas, lalu "Mulai dari sini"; panel HR dilipat
+    // dengan wrapper id section-hr supaya tombol "Lihat" tetap punya tujuan.
     const source = readFileSync(VIEW, "utf8");
     const panel = source.indexOf("<HrPointOfView");
     const score = source.indexOf("{t(L.title)}");
+    const start = source.indexOf("<StartHereCard");
     expect(panel).toBeGreaterThan(-1);
     expect(score).toBeGreaterThan(-1);
-    expect(panel).toBeLessThan(score);
+    expect(score).toBeLessThan(start);
+    expect(start).toBeLessThan(panel);
+    expect(source).toContain('<Collapsible id="section-hr"');
   });
 
   it("tidak lagi menampilkan kolom yang isinya sudah ada di panel", () => {

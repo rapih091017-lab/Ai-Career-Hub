@@ -19,10 +19,19 @@ interface SectionNavProps {
   label?: string;
 }
 
-/** Scroll ke section, tanpa animasi bila pengguna meminta reduced motion. */
-function scrollToId(id: string) {
+/**
+ * Scroll ke section, tanpa animasi bila pengguna meminta reduced motion.
+ * Section yang ada di dalam <details> tertutup dibuka dulu supaya tujuan
+ * lompatan tidak tersembunyi.
+ */
+export function scrollToSection(id: string) {
   const el = document.getElementById(id);
   if (!el) return;
+  let node: HTMLElement | null = el;
+  while (node) {
+    if (node instanceof HTMLDetailsElement && !node.open) node.open = true;
+    node = node.parentElement;
+  }
   const reduce =
     typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
@@ -122,7 +131,7 @@ export function SectionNav({ items, children, label }: SectionNavProps) {
     setActive(id);
     setSheetOpen(false);
     // Tunggu sheet tertutup supaya fokus tidak direbut kembali ke tombol pembuka.
-    requestAnimationFrame(() => scrollToId(id));
+    requestAnimationFrame(() => scrollToSection(id));
   }, []);
 
   const badge = (count: number | undefined, isActive: boolean) =>
