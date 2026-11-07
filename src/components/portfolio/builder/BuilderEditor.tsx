@@ -21,6 +21,7 @@ import { isSectionVisible } from "@/components/portfolio/sectionVisibility";
 import { StepperSteps } from "@/components/builder/StepperNav";
 import { FieldHelp } from "@/components/builder/FieldHelp";
 import { BulletEditor } from "@/components/builder/BulletEditor";
+import { aiTextForField } from "@/lib/bullet-lines";
 import { PORTFOLIO_HELP, type PortfolioHelpKey } from "@/lib/portfolio-help";
 import { PORTFOLIO_STEP_IDS, PORTFOLIO_STEP_META, isTypingTarget, portfolioStepCompletion } from "@/components/portfolio/builder/steps";
 
@@ -857,14 +858,20 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                   <div className="relative">
                     <div className="flex items-center justify-between mb-1">
                       <span className="flex items-center gap-1"><label className="text-label-sm text-on-surface-variant uppercase tracking-wider">{t("build.hero-bio")}</label><FieldHelp topic={PORTFOLIO_HELP.heroBio} /></span>
+                      {formData.heroBio && (
+                        <AIPolishButton
+                          jobTitle={formData.heroHeadline || undefined}
+                          content={formData.heroBio}
+                          onApply={(v) => setFormData(prev => ({ ...prev, heroBio: aiTextForField(v, "paragraph") }))}
+                          onRevert={(v) => setFormData(prev => ({ ...prev, heroBio: v }))}
+                          field="bio hero"
+                          format="paragraph"
+                          size="sm"
+                        />
+                      )}
                     </div>
-                    <textarea className="w-full px-4 py-3 pr-12 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={3} placeholder="Ceritakan sedikit tentang dirimu..." maxLength={500}
+                    <textarea className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={3} placeholder="Ceritakan sedikit tentang dirimu..." maxLength={500}
                       value={formData.heroBio} onChange={update("heroBio")} />
-                    {formData.heroBio && (
-                      <span className="absolute right-2 top-8">
-                        <AIPolishButton content={formData.heroBio} onApply={(v) => setFormData(prev => ({ ...prev, heroBio: v }))} field="bio hero" size="icon" />
-                      </span>
-                    )}
                     <CharCounter value={formData.heroBio} max={500} />
                   </div>
                 </div>
@@ -877,14 +884,20 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                   <div className="relative">
                     <div className="flex items-center justify-between mb-1">
                       <span className="flex items-center gap-1"><label className="text-label-sm text-on-surface-variant uppercase tracking-wider">{t("build.about-text")}</label><FieldHelp topic={PORTFOLIO_HELP.aboutText} /></span>
+                      {formData.aboutText && (
+                        <AIPolishButton
+                          jobTitle={formData.heroHeadline || undefined}
+                          content={formData.aboutText}
+                          onApply={(v) => setFormData(prev => ({ ...prev, aboutText: aiTextForField(v, "paragraph") }))}
+                          onRevert={(v) => setFormData(prev => ({ ...prev, aboutText: v }))}
+                          field="tentang saya"
+                          format="paragraph"
+                          size="sm"
+                        />
+                      )}
                     </div>
-                    <textarea className="w-full px-4 py-3 pr-12 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={5} placeholder="Tulis cerita tentang perjalanan kariermu..." maxLength={1500}
+                    <textarea className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={5} placeholder="Tulis cerita tentang perjalanan kariermu..." maxLength={1500}
                       value={formData.aboutText} onChange={update("aboutText")} />
-                    {formData.aboutText && (
-                      <span className="absolute right-2 top-8">
-                        <AIPolishButton content={formData.aboutText} onApply={(v) => setFormData(prev => ({ ...prev, aboutText: v }))} field="tentang saya" size="icon" />
-                      </span>
-                    )}
                     <CharCounter value={formData.aboutText} max={1500} />
                   </div>
                   <div className="grid grid-cols-3 gap-4">                      <Field label={t("build.about-years")}>
@@ -1000,7 +1013,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                             maxLength={500}
                             headerAction={
                               p.description ? (
-                                <AIPolishButton content={p.description} onApply={(text) => setProjects(prev => prev.map(x => x.id === p.id ? {...x, description: text} : x))} field={`deskripsi project ${p.name || idx + 1}`} size="icon" />
+                                <AIPolishButton jobTitle={formData.heroHeadline || undefined} content={p.description} onApply={(text) => setProjects(prev => prev.map(x => x.id === p.id ? {...x, description: aiTextForField(text, "bullets")} : x))} onRevert={(text) => setProjects(prev => prev.map(x => x.id === p.id ? {...x, description: text} : x))} format="bullets" field={`deskripsi project ${p.name || idx + 1}`} size="sm" />
                               ) : null
                             }
                           />
@@ -1069,7 +1082,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                             maxLength={1000}
                             headerAction={
                               e.description ? (
-                                <AIPolishButton content={e.description} onApply={(text) => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, description: text} : x))} field={`deskripsi pengalaman ${e.position || idx + 1}`} size="icon" />
+                                <AIPolishButton jobTitle={formData.heroHeadline || undefined} content={e.description} onApply={(text) => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, description: aiTextForField(text, "bullets")} : x))} onRevert={(text) => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, description: text} : x))} format="bullets" field={`deskripsi pengalaman ${e.position || idx + 1}`} size="sm" />
                               ) : null
                             }
                           />
@@ -1248,13 +1261,8 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                           </div>
                           <Field label={t("live.form.testimonial")} help="testimonial">
                             <div className="relative">
-                              <textarea className="w-full px-4 py-3 pr-12 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={2} placeholder="Apa yang mereka katakan tentangmu?" maxLength={500}
+                              <textarea className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={2} placeholder="Apa yang mereka katakan tentangmu?" maxLength={500}
                                 value={item.testimonial} onChange={updateTestimonial(item.id, "testimonial")} />
-                              {item.testimonial && (
-                                <span className="absolute right-2 top-2">
-                                  <AIPolishButton content={item.testimonial} onApply={(v) => { const ev = { target: { value: v } } as any; updateTestimonial(item.id, "testimonial")(ev); }} field="testimoni" size="icon" />
-                                </span>
-                              )}
                             </div>
                             <CharCounter value={item.testimonial} max={500} />
                           </Field>
