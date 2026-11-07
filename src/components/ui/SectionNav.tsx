@@ -184,10 +184,14 @@ export function SectionNav({ items, children, label }: SectionNavProps) {
         </div>
       </nav>
 
-      {/* ── Mobile: baris chip sticky + tombol sheet ── */}
+      {/* ── Mobile: baris chip sticky + tombol sheet ──
+          Header pill (SiteHeader) saat halaman sudah digulir berakhir di 49px
+          (<768px) dan 58px (≥768px, melayang top-2), diukur di Chromium.
+          Section memakai scroll-mt-32 (128px) > header + baris chip (±106px).
+          Desktop: header berakhir di 66px, kolom kiri sticky di top-28. */}
       <nav
         aria-label={navLabel}
-        className="sticky top-16 z-30 -mx-5 mb-6 border-b border-ink/10 bg-desk/95 backdrop-blur md:-mx-6 lg:hidden"
+        className="sticky top-12 z-30 -mx-5 md:top-[60px] mb-6 border-b border-ink/10 bg-desk/95 backdrop-blur md:-mx-6 lg:hidden"
       >
         <div className="flex items-center gap-2 py-2 pl-5 pr-2 md:pl-6">
           <button
