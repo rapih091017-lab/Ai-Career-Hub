@@ -921,6 +921,16 @@ const DICT: Record<string, { id: string; en: string }> = {
   "build.preview-panel-note": { id: "Tema bawaan. Pilih tema lain di halaman Simpan & Pratinjau.", en: "Default theme. Pick another theme on the Save & Preview page." },
   "build.preview-close": { id: "Kembali mengisi", en: "Back to editing" },
   "build.view-portfolio": { id: "Lihat portofolio", en: "View portfolio" },
+  "build.guide-tip": { id: "Buka lagi tur singkat cara mengisi portofolio.", en: "Reopen the short tour of the portfolio builder." },
+  "build.tour.steps-title": { id: "Isi per langkah", en: "Fill it step by step" },
+  "build.tour.steps-body": { id: "Portofolio dibagi jadi beberapa langkah. Tanda centang muncul saat langkah sudah terisi. Pindah langkah dengan klik atau Ctrl + panah.", en: "Your portfolio is split into steps. A check mark appears once a step is filled. Switch steps by clicking or with Ctrl + arrow keys." },
+  "build.tour.form-title": { id: "Isian dan bantuan", en: "Fields and help" },
+  "build.tour.form-body": { id: "Ikon (i) di samping label berisi contoh isian. Isian tersimpan otomatis, termasuk di langkah yang sedang tidak tampil.", en: "The (i) icon next to a label shows examples. Everything saves automatically, including steps you are not viewing." },
+  "build.tour.preview-title": { id: "Pratinjau langsung", en: "Live preview" },
+  "build.tour.preview-body": { id: "Panel kanan menampilkan portofolio dengan tema bawaan dan ikut berubah saat kamu mengetik.", en: "The right panel shows your portfolio in the default theme and updates as you type." },
+  "build.tour.preview-narrow": { id: "Ketuk Lihat portofolio untuk melihat hasilnya, lalu Kembali mengisi.", en: "Tap View portfolio to see the result, then Back to editing." },
+  "build.tour.save-title": { id: "Pilih tema dan terbitkan", en: "Choose a theme and publish" },
+  "build.tour.save-body": { id: "Tombol ini menyimpan perubahan terakhir lalu membuka halaman pratinjau untuk memilih tema dan menerbitkan.", en: "This button saves your latest changes and opens the preview page, where you pick a theme and publish." },
   "build.add-link": { id: "Tambah Link Lain (Twitter, Dribbble, etc.)", en: "Add Other Link (Twitter, Dribbble, etc.)" },
 
   /* Portfolio Preview */

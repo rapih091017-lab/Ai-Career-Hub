@@ -20,6 +20,7 @@ import PortfolioDocument from "@/components/portfolio/render/PortfolioDocument";
 import ThemeFonts from "@/components/portfolio/render/ThemeFonts";
 import { alignmentToSectionStyle } from "@/components/portfolio/alignment-style";
 import { PanelSplitter, usePanelSplit } from "@/components/builder/PanelSplitter";
+import { BuilderTour, tourSeen, type TourStep } from "@/components/builder/BuilderTour";
 import { FONT_SIZES, SECTION_IDS, type FontSize, type SectionId, type TextAlignment, type ThemeId } from "@/components/portfolio/types";
 import { isSectionVisible } from "@/components/portfolio/sectionVisibility";
 import { StepperSteps } from "@/components/builder/StepperNav";
@@ -145,6 +146,16 @@ const DEFAULT_FORM: PortfolioFormData = {
   contactLinkedin: "",
   contactGithub: "",
 };
+
+const PORTFOLIO_TOUR_KEY = "portfolio_builder_tour_seen";
+
+/** Tur singkat builder portofolio (kunci i18n). */
+const PORTFOLIO_TOUR: TourStep[] = [
+  { title: "build.tour.steps-title", body: "build.tour.steps-body", anchors: ["steps"] },
+  { title: "build.tour.form-title", body: "build.tour.form-body", anchors: ["form"] },
+  { title: "build.tour.preview-title", body: "build.tour.preview-body", narrow: "build.tour.preview-narrow", anchors: ["preview", "preview-open"] },
+  { title: "build.tour.save-title", body: "build.tour.save-body", anchors: ["save-preview"] },
+];
 
 const genId = () => Math.random().toString(36).slice(2, 9);
 
@@ -289,6 +300,8 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
   const [generatingFromCv, setGeneratingFromCv] = useState<string | null>(null);
   const [creatingDraft, setCreatingDraft] = useState(false);
   const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
+  const tourChecked = useRef(false);
   const [leftPct, setLeftPct] = usePanelSplit("portfolio_builder_split_pct");
   const workspaceRef = useRef<HTMLElement>(null);
 
@@ -335,6 +348,13 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
     if (isDraftEmpty(portfolio)) setShowSourcePicker(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Tur otomatis sekali untuk user baru, setelah pemilih sumber ditutup.
+  useEffect(() => {
+    if (showSourcePicker || tourChecked.current) return;
+    tourChecked.current = true;
+    if (!tourSeen(PORTFOLIO_TOUR_KEY)) setTourOpen(true);
+  }, [showSourcePicker]);
 
   // Sinkronkan stack editor ke draft server setiap perubahan.
   // Muat awal dilewati supaya tidak menyimpan ulang data yang baru dibaca.
@@ -855,7 +875,8 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
             </section>
 
             {/* Stepper langkah */}
-            <nav aria-label={t("build.steps-label")} className="-mx-1 overflow-x-auto rounded-2xl bg-surface-container-lowest px-1 py-3 shadow-soft border border-outline-variant/50">
+            <div className="flex items-center gap-2 rounded-2xl bg-surface-container-lowest pr-2 shadow-soft border border-outline-variant/50">
+            <nav data-tour="steps" aria-label={t("build.steps-label")} className="min-w-0 flex-1 overflow-x-auto px-1 py-3">
               <StepperSteps
                 steps={stepLabels}
                 activeStep={activeStep}
@@ -865,6 +886,17 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                 stepIds={PORTFOLIO_STEP_IDS}
               />
             </nav>
+              <button
+                type="button"
+                onClick={() => setTourOpen(true)}
+                title={t("build.guide-tip")}
+                className="flex min-h-11 shrink-0 items-center gap-1 rounded-lg border border-outline-variant/60 px-2.5 text-sm font-medium text-on-surface hover:bg-surface-container sm:min-h-9"
+              >
+                <span className="material-symbols-outlined text-[18px]" aria-hidden="true">help</span>
+                <span className="hidden sm:inline">{t("builder.guide")}</span>
+                <span className="sr-only sm:hidden">{t("builder.guide")}</span>
+              </button>
+            </div>
 
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
@@ -1723,6 +1755,8 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
       </div>
 
       <ConfirmModal confirm={confirmAction} onClose={() => setConfirmAction(null)} />
+
+      <BuilderTour open={tourOpen} onClose={() => setTourOpen(false)} steps={PORTFOLIO_TOUR} storageKey={PORTFOLIO_TOUR_KEY} />
 
       {/* ── Source Picker Popup ── */}
       <Modal open={showSourcePicker} onClose={() => setShowSourcePicker(false)} title="Buat Portfolio Baru" size="max-w-lg">
