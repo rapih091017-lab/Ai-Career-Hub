@@ -917,6 +917,10 @@ const DICT: Record<string, { id: string; en: string }> = {
   "build.step.contact-desc": { id: "Cara pengunjung menghubungimu.", en: "How visitors can reach you." },
   "build.step.appearance": { id: "Tampilan", en: "Appearance" },
   "build.step.appearance-desc": { id: "Urutan section, ukuran teks, dan perataan.", en: "Section order, text size, and alignment." },
+  "build.preview-panel": { id: "Pratinjau", en: "Preview" },
+  "build.preview-panel-note": { id: "Tema bawaan. Pilih tema lain di halaman Simpan & Pratinjau.", en: "Default theme. Pick another theme on the Save & Preview page." },
+  "build.preview-close": { id: "Kembali mengisi", en: "Back to editing" },
+  "build.view-portfolio": { id: "Lihat portofolio", en: "View portfolio" },
   "build.add-link": { id: "Tambah Link Lain (Twitter, Dribbble, etc.)", en: "Add Other Link (Twitter, Dribbble, etc.)" },
 
   /* Portfolio Preview */

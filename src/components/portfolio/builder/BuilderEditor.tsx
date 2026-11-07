@@ -15,8 +15,12 @@ import { useUndoStack } from "@/lib/portfolio/useUndoStack";
 import type { UsePortfolioDraftResult } from "@/lib/portfolio/usePortfolioDraft";
 import { portfolioDataSchema, type ValidatedPortfolioData } from "@/lib/portfolio/schema";
 import type { PortfolioData } from "@/components/portfolio-templates/types";
-import { DEFAULT_SECTION_ORDER } from "@/components/portfolio/themes";
-import { FONT_SIZES, SECTION_IDS, type FontSize, type SectionId, type TextAlignment } from "@/components/portfolio/types";
+import { DEFAULT_SECTION_ORDER, DEFAULT_THEME_ID } from "@/components/portfolio/themes";
+import PortfolioDocument from "@/components/portfolio/render/PortfolioDocument";
+import ThemeFonts from "@/components/portfolio/render/ThemeFonts";
+import { alignmentToSectionStyle } from "@/components/portfolio/alignment-style";
+import { PanelSplitter, usePanelSplit } from "@/components/builder/PanelSplitter";
+import { FONT_SIZES, SECTION_IDS, type FontSize, type SectionId, type TextAlignment, type ThemeId } from "@/components/portfolio/types";
 import { isSectionVisible } from "@/components/portfolio/sectionVisibility";
 import { StepperSteps } from "@/components/builder/StepperNav";
 import { FieldHelp } from "@/components/builder/FieldHelp";
@@ -284,6 +288,9 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
   const [cvLoading, setCvLoading] = useState(false);
   const [generatingFromCv, setGeneratingFromCv] = useState<string | null>(null);
   const [creatingDraft, setCreatingDraft] = useState(false);
+  const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
+  const [leftPct, setLeftPct] = usePanelSplit("portfolio_builder_split_pct");
+  const workspaceRef = useRef<HTMLElement>(null);
 
   /** Draft baru: /portfolio/build selalu mengarahkan ke draft terbaru yang
    *  sudah ada, jadi awal yang benar-benar kosong dibuat dari sini. */
@@ -641,6 +648,8 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
     return [...stored, ...missing];
   }, [portfolio.sectionOrder]);
 
+  const previewSectionStyle = useMemo(() => alignmentToSectionStyle(portfolio.alignment), [portfolio.alignment]);
+
   const fontSizeValue: FontSize = portfolio.fontSize ?? "medium";
 
   const moveSection = (index: number, delta: number) => {
@@ -727,11 +736,52 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
     return Math.round((filled / total) * 100);
   }, [formData, projects, experiences, educations]);
 
+  // Status autosave: tampil di bar bawah dan di kepala panel pratinjau.
+  const saveStatusNode = (
+    <span className="inline-flex items-center gap-1.5" data-testid="save-status">
+      {draft.offline && saveStatus !== "saving" && saveStatus !== "error" ? (
+        <>
+          <span className="material-symbols-outlined text-amber-600 text-lg">cloud_off</span>
+          <span className="text-label-sm text-amber-700" role="status">
+            {t("build.offline")}
+          </span>
+        </>
+      ) : saveStatus === "saving" ? (
+        <>
+          <span className="material-symbols-outlined text-amber-500 text-lg animate-spin">sync</span>
+          <span className="text-label-sm text-amber-600">{t("build.saving")}</span>
+        </>
+      ) : saveStatus === "error" ? (
+        <button
+          type="button"
+          onClick={() => draft.retry()}
+          className="inline-flex items-center gap-1.5 text-label-sm text-error hover:underline"
+        >
+          <span className="material-symbols-outlined text-lg">error</span>
+          {draft.error ?? "Belum tersimpan. Ketuk untuk coba lagi."}
+        </button>
+      ) : saveStatus === "saved" ? (
+        <>
+          <span className="material-symbols-outlined text-primary text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+          <span className="text-label-sm text-primary">{t("build.saved")}</span>
+        </>
+      ) : (
+        <span className="text-label-sm text-on-surface-variant">{t("build.unsaved")}</span>
+      )}
+    </span>
+  );
+
   return (
     <>
       <div className="min-h-screen bg-background text-on-background pb-24">
         <AppHeader />
-        <main className="pt-24 px-margin-mobile md:px-gutter flex justify-center">
+        {/* Dua panel di lg ke atas: isian (kiri) dan pratinjau (kanan), lebar diatur splitter. */}
+        <main
+          ref={workspaceRef}
+          className="pt-24 lg:flex"
+          style={{ "--left-w": `${leftPct}%` } as React.CSSProperties}
+        >
+          <div className="w-full px-margin-mobile md:px-gutter lg:px-8 lg:w-[var(--left-w)] lg:shrink-0 flex justify-center">
           <div className="w-full max-w-[800px] flex flex-col gap-6">
             {/* Progress */}
             <section className="bg-surface-container-lowest rounded-2xl p-6 shadow-premium-sm border-t-4 border-primary">
@@ -1502,11 +1552,69 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
               </div>
             </a>
           </div>
+          </div>
+
+          <div className="hidden lg:flex lg:sticky lg:top-24 lg:h-[calc(100dvh-12rem)]">
+            <PanelSplitter value={leftPct} onChange={setLeftPct} containerRef={workspaceRef} />
+          </div>
+
+          {/* Pratinjau. Layar < lg: dibuka penuh lewat tombol "Lihat portofolio". */}
+          <aside
+            data-tour="preview"
+            className={`${mobilePreviewOpen ? "fixed inset-0 z-[60] flex" : "hidden"} lg:sticky lg:top-24 lg:z-auto lg:flex lg:h-[calc(100dvh-12rem)] lg:flex-1 lg:min-w-0 flex-col bg-surface-container-low lg:mr-6 lg:rounded-2xl lg:border lg:border-outline-variant/50 overflow-hidden`}
+            {...(mobilePreviewOpen ? { role: "dialog", "aria-modal": true, "aria-label": t("build.preview-panel") } : { "aria-label": t("build.preview-panel") })}
+          >
+            <div className="flex items-center gap-3 border-b border-outline-variant/50 bg-surface-container-lowest px-4 py-2.5 shrink-0">
+              <span className="font-label-bold text-on-surface">{t("build.preview-panel")}</span>
+              <span className="text-label-sm">{saveStatusNode}</span>
+              {mobilePreviewOpen && (
+                <button
+                  type="button"
+                  onClick={() => setMobilePreviewOpen(false)}
+                  className="ml-auto flex min-h-11 items-center gap-1 rounded-lg px-3 text-sm font-medium text-on-surface hover:bg-surface-container lg:hidden"
+                >
+                  <span className="material-symbols-outlined text-[18px]" aria-hidden="true">close</span>
+                  {t("build.preview-close")}
+                </button>
+              )}
+            </div>
+            <p className="px-4 pt-2 text-xs text-on-surface-variant shrink-0">{t("build.preview-panel-note")}</p>
+            <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3">
+              <div className="overflow-hidden rounded-xl bg-white shadow-soft">
+                {/* Di panel lebar diperkecil supaya tata letak desktop portofolio tetap utuh. */}
+                <div className="lg:[zoom:0.5]">
+                  <ThemeFonts themeId={DEFAULT_THEME_ID} />
+                  <PortfolioDocument
+                    data={portfolio}
+                    themeId={DEFAULT_THEME_ID as ThemeId}
+                    mode="editor"
+                    sectionOrder={order}
+                    sectionVisibility={portfolio.sectionVisibility}
+                    fontSize={portfolio.fontSize}
+                    sectionStyle={previewSectionStyle}
+                    sectionIdPrefix="builder-preview-"
+                  />
+                </div>
+              </div>
+            </div>
+          </aside>
         </main>
+
+        {!mobilePreviewOpen && (
+          <button
+            type="button"
+            onClick={() => setMobilePreviewOpen(true)}
+            data-tour="preview-open"
+            className="fixed bottom-24 right-4 z-40 flex min-h-12 items-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-on-primary shadow-lg lg:hidden"
+          >
+            <span className="material-symbols-outlined text-[18px]" aria-hidden="true">web</span>
+            {t("build.view-portfolio")}
+          </button>
+        )}
 
         {/* Bottom Nav */}
         <footer className="fixed bottom-0 left-0 w-full z-50 bg-surface-container-highest shadow-[0_-8px_24px_rgba(0,0,0,0.06)] py-4 px-margin-mobile md:px-margin-desktop">
-          <div className="max-w-[800px] mx-auto flex justify-between items-center">
+          <div className="max-w-[800px] lg:max-w-none mx-auto flex justify-between items-center gap-2">
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1 border-r border-outline-variant/50 pr-3">
                 <button
@@ -1528,35 +1636,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                   <span className="material-symbols-outlined text-lg">redo</span>
                 </button>
               </div>
-              {draft.offline && saveStatus !== "saving" && saveStatus !== "error" ? (
-                <>
-                  <span className="material-symbols-outlined text-amber-600 text-lg">cloud_off</span>
-                  <span className="text-label-sm text-amber-700" role="status">
-                    {t("build.offline")}
-                  </span>
-                </>
-              ) : saveStatus === "saving" ? (
-                <>
-                  <span className="material-symbols-outlined text-amber-500 text-lg animate-spin">sync</span>
-                  <span className="text-label-sm text-amber-600">{t("build.saving")}</span>
-                </>
-              ) : saveStatus === "error" ? (
-                <button
-                  type="button"
-                  onClick={() => draft.retry()}
-                  className="inline-flex items-center gap-1.5 text-label-sm text-error hover:underline"
-                >
-                  <span className="material-symbols-outlined text-lg">error</span>
-                  {draft.error ?? "Belum tersimpan. Ketuk untuk coba lagi."}
-                </button>
-              ) : saveStatus === "saved" ? (
-                <>
-                  <span className="material-symbols-outlined text-primary text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                  <span className="text-label-sm text-primary">{t("build.saved")}</span>
-                </>
-              ) : (
-                <span className="text-label-sm text-on-surface-variant">{t("build.unsaved")}</span>
-              )}
+              {saveStatusNode}
             </div>
             <div className="flex items-center gap-2 md:gap-4">
               {activeStep > 0 && (
@@ -1625,12 +1705,13 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                   }
                 }}
                 disabled={saving}
-                className="bg-primary text-on-primary font-label-bold rounded-lg px-8 py-3 hover:-translate-y-0.5 active:scale-95 duration-200 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                data-tour="save-preview"
+                className="bg-primary text-on-primary font-label-bold rounded-lg min-h-11 px-4 sm:px-8 py-3 hover:-translate-y-0.5 active:scale-95 duration-200 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {saving ? (
                   <><span className="material-symbols-outlined text-lg animate-spin">sync</span> {t("build.saving")}</>
                 ) : (
-                  <><span className="material-symbols-outlined text-lg">preview</span>                {t("build.save-preview")}</>
+                  <><span className="material-symbols-outlined text-lg" aria-hidden="true">open_in_new</span><span className="hidden sm:inline">{t("build.save-preview")}</span><span className="sr-only sm:hidden">{t("build.save-preview")}</span></>
                 )}
               </button>
             </div>

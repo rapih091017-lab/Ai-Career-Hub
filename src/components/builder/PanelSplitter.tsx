@@ -9,27 +9,27 @@ const STORAGE_KEY = "builder_split_pct";
 
 export const clampSplit = (v: number) => Math.min(SPLIT_MAX, Math.max(SPLIT_MIN, Math.round(v * 10) / 10));
 
-/** Lebar panel kiri (%) yang diingat per peramban; bukan data CV. */
-export function usePanelSplit() {
+/** Lebar panel kiri (%) yang diingat per peramban; bukan data CV. Kunci bawaan = builder CV. */
+export function usePanelSplit(storageKey: string = STORAGE_KEY) {
   const [pct, setPct] = useState(SPLIT_DEFAULT);
   const loaded = useRef(false);
   useEffect(() => {
     try {
-      const v = Number(localStorage.getItem(STORAGE_KEY));
+      const v = Number(localStorage.getItem(storageKey));
       if (Number.isFinite(v) && v >= SPLIT_MIN && v <= SPLIT_MAX) setPct(v);
     } catch {
       /* storage tidak bisa diakses: pakai 50% */
     }
     loaded.current = true;
-  }, []);
+  }, [storageKey]);
   useEffect(() => {
     if (!loaded.current) return;
     try {
-      localStorage.setItem(STORAGE_KEY, String(pct));
+      localStorage.setItem(storageKey, String(pct));
     } catch {
       /* abaikan */
     }
-  }, [pct]);
+  }, [pct, storageKey]);
   return [pct, setPct] as const;
 }
 
