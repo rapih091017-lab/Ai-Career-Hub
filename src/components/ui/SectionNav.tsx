@@ -40,6 +40,9 @@ export function scrollToSection(id: string) {
   el.focus({ preventScroll: true });
 }
 
+/** Garis acuan section aktif, sedikit di bawah header + scroll-mt. */
+const LINE = 200;
+
 /**
  * Daftar isi untuk halaman hasil yang panjang. Layar lebar: kolom kiri sticky.
  * Mobile: baris chip sticky yang bisa digeser plus tombol "Daftar isi" yang
@@ -65,23 +68,26 @@ export function SectionNav({ items, children, label }: SectionNavProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [itemKey]);
 
-  // Tandai section aktif: yang paling atas di pita tengah atas layar.
+  // Tandai section aktif (aria-current).
   useEffect(() => {
     if (typeof IntersectionObserver === "undefined" || present.length === 0) return;
-    const visible = new Map<string, number>();
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) visible.set(e.target.id, e.boundingClientRect.top);
-          else visible.delete(e.target.id);
-        }
-        if (visible.size === 0) return;
-        const order = present.map((p) => p.id);
-        const first = [...visible.keys()].sort((a, b) => order.indexOf(a) - order.indexOf(b))[0];
-        setActive(first);
-      },
-      { rootMargin: "-120px 0px -55% 0px", threshold: 0 },
-    );
+    // Observer hanya pemicu; section aktif dihitung dari posisi: section
+    // terakhir yang bagian atasnya sudah melewati garis 200px dari atas (sedikit
+    // di bawah header + scroll-mt). Kalau belum
+    // ada (paling atas halaman), item pertama yang aktif.
+    const pick = () => {
+      const line = LINE;
+      let current = present[0]?.id ?? null;
+      for (const p of present) {
+        const el = document.getElementById(p.id);
+        if (el && el.getBoundingClientRect().top <= line) current = p.id;
+      }
+      setActive(current);
+    };
+    // Pita setebal 1px di garis LINE: callback jalan tepat saat tepi section melewatinya.
+    const bottom = Math.max(0, window.innerHeight - LINE - 1);
+    const observer = new IntersectionObserver(pick, { rootMargin: `-${LINE}px 0px -${bottom}px 0px`, threshold: 0 });
+    pick();
     present.forEach((p) => {
       const el = document.getElementById(p.id);
       if (el) observer.observe(el);
