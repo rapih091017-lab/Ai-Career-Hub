@@ -2,8 +2,7 @@
 
 import { useCallback, useId } from "react";
 import { AIPolishButton } from "@/components/ai/AIPolishDialog";
-import { FieldHelp } from "@/components/builder/FieldHelp";
-import type { BuilderHelpKey } from "@/lib/builder-help";
+import { FieldHelp, type FieldHelpSource } from "@/components/builder/FieldHelp";
 
 /* ───────── Field Component ───────── */
 
@@ -26,7 +25,7 @@ interface FieldProps {
   /** Penanda untuk lompat dari pratinjau ke field ini (lihat cv-edit-path). */
   cvField?: string;
   /** Ikon (i) bantuan di samping label. */
-  help?: BuilderHelpKey;
+  help?: FieldHelpSource;
 }
 
 export function Field({

@@ -5,25 +5,25 @@ import { useTranslation } from "@/lib/i18n";
 
 export const TOUR_SEEN_KEY = "cv_builder_tour_seen";
 
-export function tourSeen(): boolean {
+export function tourSeen(storageKey: string = TOUR_SEEN_KEY): boolean {
   try {
-    return localStorage.getItem(TOUR_SEEN_KEY) === "1";
+    return localStorage.getItem(storageKey) === "1";
   } catch {
     // Storage tidak bisa diakses: anggap sudah dilihat agar tur tidak muncul tiap kali dibuka.
     return true;
   }
 }
 
-function markTourSeen() {
+function markTourSeen(storageKey: string) {
   try {
-    localStorage.setItem(TOUR_SEEN_KEY, "1");
+    localStorage.setItem(storageKey, "1");
   } catch {
     /* storage tidak bisa diakses */
   }
 }
 
 /** title/body/narrow berisi kunci i18n. */
-interface TourStep {
+export interface TourStep {
   title: string;
   body: string;
   /** Teks untuk layar < lg bila berbeda (pratinjau & toolbar ada di layar terpisah). */
@@ -32,7 +32,7 @@ interface TourStep {
   anchors: string[];
 }
 
-const STEPS: TourStep[] = [
+const CV_STEPS: TourStep[] = [
   {
     title: "builder.tour.target-title",
     body: "builder.tour.target-body",
@@ -73,8 +73,17 @@ function visibleAnchor(names: string[]): HTMLElement | null {
   return null;
 }
 
+interface BuilderTourProps {
+  open: boolean;
+  onClose: () => void;
+  /** Langkah tur; bawaan = tur builder CV. */
+  steps?: TourStep[];
+  /** Kunci localStorage penanda tur sudah dilihat; bawaan = builder CV. */
+  storageKey?: string;
+}
+
 /** Tur singkat builder: dialog modal (fokus terkurung, Escape = lewati) + sorotan elemen terkait. */
-export function BuilderTour({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function BuilderTour({ open, onClose, steps: STEPS = CV_STEPS, storageKey = TOUR_SEEN_KEY }: BuilderTourProps) {
   const { t } = useTranslation();
   const [index, setIndex] = useState(0);
   const [rect, setRect] = useState<DOMRect | null>(null);
@@ -84,9 +93,9 @@ export function BuilderTour({ open, onClose }: { open: boolean; onClose: () => v
   const returnFocus = useRef<HTMLElement | null>(null);
 
   const finish = useCallback(() => {
-    markTourSeen();
+    markTourSeen(storageKey);
     onClose();
-  }, [onClose]);
+  }, [onClose, storageKey]);
 
   // Buka: mulai dari langkah pertama, simpan fokus untuk dikembalikan saat ditutup.
   useEffect(() => {
@@ -102,7 +111,7 @@ export function BuilderTour({ open, onClose }: { open: boolean; onClose: () => v
     setWide(window.matchMedia("(min-width: 1024px)").matches);
     const el = visibleAnchor(STEPS[index].anchors);
     setRect(el ? el.getBoundingClientRect() : null);
-  }, [index]);
+  }, [index, STEPS]);
 
   useLayoutEffect(() => {
     if (!open) return;

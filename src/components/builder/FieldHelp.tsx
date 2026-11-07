@@ -1,11 +1,14 @@
 "use client";
 
 import { Popover } from "@/components/ui/popover";
-import { BUILDER_HELP, type BuilderHelpKey } from "@/lib/builder-help";
+import { BUILDER_HELP, type BuilderHelpKey, type FieldHelpContent } from "@/lib/builder-help";
+
+/** Bantuan untuk field: kunci BUILDER_HELP (builder CV) atau isi langsung (mis. portofolio). */
+export type FieldHelpSource = BuilderHelpKey | FieldHelpContent;
 
 /** Ikon (i) di samping label: popover berisi apa itu, contoh baik, dan contoh kurang. */
-export function FieldHelp({ topic }: { topic: BuilderHelpKey }) {
-  const h = BUILDER_HELP[topic];
+export function FieldHelp({ topic }: { topic: FieldHelpSource }) {
+  const h = typeof topic === "string" ? BUILDER_HELP[topic] : topic;
   return (
     <Popover
       label={`Bantuan: ${h.title}`}
@@ -14,7 +17,7 @@ export function FieldHelp({ topic }: { topic: BuilderHelpKey }) {
           type="button"
           {...props}
           aria-label={`Bantuan: ${h.title}`}
-          data-field-help={topic}
+          data-field-help={typeof topic === "string" ? topic : h.title}
           // Area sentuh 32px walau ikonnya kecil.
           className="-my-1.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full align-middle text-on-surface-variant hover:bg-surface-container hover:text-on-surface aria-expanded:bg-surface-container aria-expanded:text-on-surface"
         >

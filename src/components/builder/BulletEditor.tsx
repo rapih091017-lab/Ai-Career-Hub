@@ -1,8 +1,7 @@
 "use client";
 
 import { memo, useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
-import { FieldHelp } from "@/components/builder/FieldHelp";
-import type { BuilderHelpKey } from "@/lib/builder-help";
+import { FieldHelp, type FieldHelpSource } from "@/components/builder/FieldHelp";
 import {
   DndContext,
   KeyboardSensor,
@@ -50,7 +49,7 @@ interface BulletEditorProps {
   /** Penanda untuk lompat dari pratinjau (poin ke-n = textarea[data-index=n]). */
   cvField?: string;
   /** Ikon (i) bantuan di samping label. */
-  help?: BuilderHelpKey;
+  help?: FieldHelpSource;
 }
 
 interface Focus {

@@ -15,9 +15,20 @@ import { useUndoStack } from "@/lib/portfolio/useUndoStack";
 import type { UsePortfolioDraftResult } from "@/lib/portfolio/usePortfolioDraft";
 import { portfolioDataSchema, type ValidatedPortfolioData } from "@/lib/portfolio/schema";
 import type { PortfolioData } from "@/components/portfolio-templates/types";
-import { DEFAULT_SECTION_ORDER } from "@/components/portfolio/themes";
-import { FONT_SIZES, SECTION_IDS, type FontSize, type SectionId, type TextAlignment } from "@/components/portfolio/types";
+import { DEFAULT_SECTION_ORDER, DEFAULT_THEME_ID } from "@/components/portfolio/themes";
+import PortfolioDocument from "@/components/portfolio/render/PortfolioDocument";
+import ThemeFonts from "@/components/portfolio/render/ThemeFonts";
+import { alignmentToSectionStyle } from "@/components/portfolio/alignment-style";
+import { PanelSplitter, usePanelSplit } from "@/components/builder/PanelSplitter";
+import { BuilderTour, tourSeen, type TourStep } from "@/components/builder/BuilderTour";
+import { FONT_SIZES, SECTION_IDS, type FontSize, type SectionId, type TextAlignment, type ThemeId } from "@/components/portfolio/types";
 import { isSectionVisible } from "@/components/portfolio/sectionVisibility";
+import { StepperSteps } from "@/components/builder/StepperNav";
+import { FieldHelp } from "@/components/builder/FieldHelp";
+import { BulletEditor } from "@/components/builder/BulletEditor";
+import { aiTextForField } from "@/lib/bullet-lines";
+import { PORTFOLIO_HELP, type PortfolioHelpKey } from "@/lib/portfolio-help";
+import { PORTFOLIO_STEP_IDS, PORTFOLIO_STEP_META, isTypingTarget, portfolioStepCompletion } from "@/components/portfolio/builder/steps";
 
 type AccordionKey = "hero" | "about" | "projects" | "skills" | "experience" | "education" | "certifications" | "organizations" | "hobbies" | "testimonials" | "contact";
 
@@ -136,6 +147,16 @@ const DEFAULT_FORM: PortfolioFormData = {
   contactGithub: "",
 };
 
+const PORTFOLIO_TOUR_KEY = "portfolio_builder_tour_seen";
+
+/** Tur singkat builder portofolio (kunci i18n). */
+const PORTFOLIO_TOUR: TourStep[] = [
+  { title: "build.tour.steps-title", body: "build.tour.steps-body", anchors: ["steps"] },
+  { title: "build.tour.form-title", body: "build.tour.form-body", anchors: ["form"] },
+  { title: "build.tour.preview-title", body: "build.tour.preview-body", narrow: "build.tour.preview-narrow", anchors: ["preview", "preview-open"] },
+  { title: "build.tour.save-title", body: "build.tour.save-body", anchors: ["save-preview"] },
+];
+
 const genId = () => Math.random().toString(36).slice(2, 9);
 
 const SAVE_FAILED_MESSAGE = "Gagal menyimpan data. Silakan coba lagi.";
@@ -212,7 +233,15 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
   const { t } = useTranslation();
   const { addToast } = useToast();
   const router = useRouter();
-  const [activeSection, setActiveSection] = useState<AccordionKey | "">("hero");
+  // Di dalam langkah Pengalaman, sub-bagian masih berupa accordion.
+  const [activeSection, setActiveSection] = useState<AccordionKey | "">("experience");
+  const [activeStep, setActiveStepRaw] = useState(0);
+  const lastStep = PORTFOLIO_STEP_IDS.length - 1;
+  const setActiveStep = (i: number) => {
+    setActiveStepRaw(Math.min(lastStep, Math.max(0, i)));
+    if (typeof window !== "undefined") window.scrollTo({ top: 0 });
+  };
+  const stepId = PORTFOLIO_STEP_IDS[activeStep];
 
   const { setData: draftSetData } = draft;
   const seed = useMemo(() => seedFrom(draft.data!), [draft.data]);
@@ -270,6 +299,11 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
   const [cvLoading, setCvLoading] = useState(false);
   const [generatingFromCv, setGeneratingFromCv] = useState<string | null>(null);
   const [creatingDraft, setCreatingDraft] = useState(false);
+  const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
+  const tourChecked = useRef(false);
+  const [leftPct, setLeftPct] = usePanelSplit("portfolio_builder_split_pct");
+  const workspaceRef = useRef<HTMLElement>(null);
 
   /** Draft baru: /portfolio/build selalu mengarahkan ke draft terbaru yang
    *  sudah ada, jadi awal yang benar-benar kosong dibuat dari sini. */
@@ -314,6 +348,13 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
     if (isDraftEmpty(portfolio)) setShowSourcePicker(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Tur otomatis sekali untuk user baru, setelah pemilih sumber ditutup.
+  useEffect(() => {
+    if (showSourcePicker || tourChecked.current) return;
+    tourChecked.current = true;
+    if (!tourSeen(PORTFOLIO_TOUR_KEY)) setTourOpen(true);
+  }, [showSourcePicker]);
 
   // Sinkronkan stack editor ke draft server setiap perubahan.
   // Muat awal dilewati supaya tidak menyimpan ulang data yang baru dibaca.
@@ -627,6 +668,8 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
     return [...stored, ...missing];
   }, [portfolio.sectionOrder]);
 
+  const previewSectionStyle = useMemo(() => alignmentToSectionStyle(portfolio.alignment), [portfolio.alignment]);
+
   const fontSizeValue: FontSize = portfolio.fontSize ?? "medium";
 
   const moveSection = (index: number, delta: number) => {
@@ -660,6 +703,27 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
     }));
   };
 
+  const stepCompletion = useMemo(() => portfolioStepCompletion(portfolio), [portfolio]);
+  const stepMeta = PORTFOLIO_STEP_IDS.map((id) => ({
+    title: t(PORTFOLIO_STEP_META[id].title),
+    desc: t(PORTFOLIO_STEP_META[id].desc),
+    icon: PORTFOLIO_STEP_META[id].icon,
+  }));
+  const stepLabels = stepMeta.map((m) => m.title);
+
+  // Ctrl+panah kiri/kanan pindah langkah, kecuali saat fokus di kolom isian
+  // (di sana kombinasi ini dipakai untuk lompat kata).
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (!e.ctrlKey || (e.key !== "ArrowLeft" && e.key !== "ArrowRight")) return;
+      if (isTypingTarget(e.target)) return;
+      e.preventDefault();
+      setActiveStepRaw((s) => Math.min(lastStep, Math.max(0, s + (e.key === "ArrowRight" ? 1 : -1))));
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [lastStep]);
+
   // Progress berdasarkan actual field completeness (lebih akurat)
   const progressPct = useMemo(() => {
     let filled = 0;
@@ -692,11 +756,52 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
     return Math.round((filled / total) * 100);
   }, [formData, projects, experiences, educations]);
 
+  // Status autosave: tampil di bar bawah dan di kepala panel pratinjau.
+  const saveStatusNode = (
+    <span className="inline-flex items-center gap-1.5" data-testid="save-status">
+      {draft.offline && saveStatus !== "saving" && saveStatus !== "error" ? (
+        <>
+          <span className="material-symbols-outlined text-amber-600 text-lg">cloud_off</span>
+          <span className="text-label-sm text-amber-700" role="status">
+            {t("build.offline")}
+          </span>
+        </>
+      ) : saveStatus === "saving" ? (
+        <>
+          <span className="material-symbols-outlined text-amber-500 text-lg animate-spin">sync</span>
+          <span className="text-label-sm text-amber-600">{t("build.saving")}</span>
+        </>
+      ) : saveStatus === "error" ? (
+        <button
+          type="button"
+          onClick={() => draft.retry()}
+          className="inline-flex items-center gap-1.5 text-label-sm text-error hover:underline"
+        >
+          <span className="material-symbols-outlined text-lg">error</span>
+          {draft.error ?? "Belum tersimpan. Ketuk untuk coba lagi."}
+        </button>
+      ) : saveStatus === "saved" ? (
+        <>
+          <span className="material-symbols-outlined text-primary text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+          <span className="text-label-sm text-primary">{t("build.saved")}</span>
+        </>
+      ) : (
+        <span className="text-label-sm text-on-surface-variant">{t("build.unsaved")}</span>
+      )}
+    </span>
+  );
+
   return (
     <>
       <div className="min-h-screen bg-background text-on-background pb-24">
         <AppHeader />
-        <main className="pt-24 px-margin-mobile md:px-gutter flex justify-center">
+        {/* Dua panel di lg ke atas: isian (kiri) dan pratinjau (kanan), lebar diatur splitter. */}
+        <main
+          ref={workspaceRef}
+          className="pt-24 lg:flex"
+          style={{ "--left-w": `${leftPct}%` } as React.CSSProperties}
+        >
+          <div className="w-full px-margin-mobile md:px-gutter lg:px-8 lg:w-[var(--left-w)] lg:shrink-0 flex justify-center">
           <div className="w-full max-w-[800px] flex flex-col gap-6">
             {/* Progress */}
             <section className="bg-surface-container-lowest rounded-2xl p-6 shadow-premium-sm border-t-4 border-primary">
@@ -769,16 +874,51 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
               </div>
             </section>
 
-            {/* Accordions */}
-            <div className="flex flex-col gap-4">
-              {/* 1. Hero & Branding */}
-              <AccordionItem id="hero" icon="palette" title={t("build.hero-title")} isOpen={activeSection === "hero"} onToggle={toggleSection}>
+            {/* Stepper langkah */}
+            <div className="flex items-center gap-2 rounded-2xl bg-surface-container-lowest pr-2 shadow-soft border border-outline-variant/50">
+            <nav data-tour="steps" aria-label={t("build.steps-label")} className="min-w-0 flex-1 overflow-x-auto px-1 py-3">
+              <StepperSteps
+                steps={stepLabels}
+                activeStep={activeStep}
+                setActiveStep={setActiveStep}
+                sectionCompletion={stepCompletion}
+                sectionMeta={stepMeta}
+                stepIds={PORTFOLIO_STEP_IDS}
+              />
+            </nav>
+              <button
+                type="button"
+                onClick={() => setTourOpen(true)}
+                title={t("build.guide-tip")}
+                className="flex min-h-11 shrink-0 items-center gap-1 rounded-lg border border-outline-variant/60 px-2.5 text-sm font-medium text-on-surface hover:bg-surface-container sm:min-h-9"
+              >
+                <span className="material-symbols-outlined text-[18px]" aria-hidden="true">help</span>
+                <span className="hidden sm:inline">{t("builder.guide")}</span>
+                <span className="sr-only sm:hidden">{t("builder.guide")}</span>
+              </button>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                <span className="material-symbols-outlined text-primary text-xl" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">{stepMeta[activeStep].icon}</span>
+              </div>
+              <div>
+                <h2 className="font-headline-md text-on-surface">{stepMeta[activeStep].title}</h2>
+                <p className="text-body-md text-on-surface-variant mt-0.5">{stepMeta[activeStep].desc}</p>
+              </div>
+            </div>
+
+            {/* Isi langkah aktif. Semua nilai ada di state draft (undo stack),
+                jadi langkah yang tidak tampil tidak kehilangan isian. */}
+            <div data-tour="form" className="flex flex-col gap-4">
+              {stepId === "hero" && (
+              <StepCard>
                 <div className="px-6 space-y-4">
-                  <Field label={t("build.hero-subheadline")}>
+                  <Field label={t("build.hero-subheadline")} help="heroSubHeadline">
                     <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Frontend Developer & UI/UX Enthusiast"
                       value={formData.heroSubHeadline} onChange={update("heroSubHeadline")} />
                   </Field>
-                  <Field label={t("build.hero-job-title")}>
+                  <Field label={t("build.hero-job-title")} help="heroHeadline">
                     <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Frontend Web Developer"
                       value={formData.heroHeadline} onChange={update("heroHeadline")} />
                   </Field>
@@ -799,34 +939,47 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                   </div>
                   <div className="relative">
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-label-sm text-on-surface-variant uppercase tracking-wider">{t("build.hero-bio")}</label>
+                      <span className="flex items-center gap-1"><label className="text-label-sm text-on-surface-variant uppercase tracking-wider">{t("build.hero-bio")}</label><FieldHelp topic={PORTFOLIO_HELP.heroBio} /></span>
+                      {formData.heroBio && (
+                        <AIPolishButton
+                          jobTitle={formData.heroHeadline || undefined}
+                          content={formData.heroBio}
+                          onApply={(v) => setFormData(prev => ({ ...prev, heroBio: aiTextForField(v, "paragraph") }))}
+                          onRevert={(v) => setFormData(prev => ({ ...prev, heroBio: v }))}
+                          field="bio hero"
+                          format="paragraph"
+                          size="sm"
+                        />
+                      )}
                     </div>
-                    <textarea className="w-full px-4 py-3 pr-12 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={3} placeholder="Ceritakan sedikit tentang dirimu..." maxLength={500}
+                    <textarea className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={3} placeholder="Ceritakan sedikit tentang dirimu..." maxLength={500}
                       value={formData.heroBio} onChange={update("heroBio")} />
-                    {formData.heroBio && (
-                      <span className="absolute right-2 top-8">
-                        <AIPolishButton content={formData.heroBio} onApply={(v) => setFormData(prev => ({ ...prev, heroBio: v }))} field="bio hero" size="icon" />
-                      </span>
-                    )}
                     <CharCounter value={formData.heroBio} max={500} />
                   </div>
                 </div>
-              </AccordionItem>
-
-              {/* 2. About */}
-              <AccordionItem id="about" icon="person" title={t("build.about")} isOpen={activeSection === "about"} onToggle={toggleSection}>
+              </StepCard>
+              )}
+              {stepId === "about" && (
+                <>
+              <StepCard>
                 <div className="px-6 space-y-4">
                   <div className="relative">
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-label-sm text-on-surface-variant uppercase tracking-wider">{t("build.about-text")}</label>
+                      <span className="flex items-center gap-1"><label className="text-label-sm text-on-surface-variant uppercase tracking-wider">{t("build.about-text")}</label><FieldHelp topic={PORTFOLIO_HELP.aboutText} /></span>
+                      {formData.aboutText && (
+                        <AIPolishButton
+                          jobTitle={formData.heroHeadline || undefined}
+                          content={formData.aboutText}
+                          onApply={(v) => setFormData(prev => ({ ...prev, aboutText: aiTextForField(v, "paragraph") }))}
+                          onRevert={(v) => setFormData(prev => ({ ...prev, aboutText: v }))}
+                          field="tentang saya"
+                          format="paragraph"
+                          size="sm"
+                        />
+                      )}
                     </div>
-                    <textarea className="w-full px-4 py-3 pr-12 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={5} placeholder="Tulis cerita tentang perjalanan kariermu..." maxLength={1500}
+                    <textarea className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={5} placeholder="Tulis cerita tentang perjalanan kariermu..." maxLength={1500}
                       value={formData.aboutText} onChange={update("aboutText")} />
-                    {formData.aboutText && (
-                      <span className="absolute right-2 top-8">
-                        <AIPolishButton content={formData.aboutText} onApply={(v) => setFormData(prev => ({ ...prev, aboutText: v }))} field="tentang saya" size="icon" />
-                      </span>
-                    )}
                     <CharCounter value={formData.aboutText} max={1500} />
                   </div>
                   <div className="grid grid-cols-3 gap-4">                      <Field label={t("build.about-years")}>
@@ -843,61 +996,10 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                     </Field>
                   </div>
                 </div>
-              </AccordionItem>
-
-              {/* 3. Projects */}
-              <AccordionItem id="projects" icon="folder" title={t("build.project")} isOpen={activeSection === "projects"} onToggle={toggleSection}>
-                <div className="px-6 space-y-6">
-                  {projects.map((p, idx) => (
-                    <div key={p.id} className="p-4 rounded-xl border border-outline-variant bg-surface-container-low">
-                      <div className="flex justify-between items-start mb-3">
-                        <h4 className="font-label-bold text-primary">Project {idx + 1}</h4>
-                        <button className="text-error hover:bg-error-container/30 p-1 rounded transition-colors"
-                          onClick={() => setProjects(prev => prev.filter(x => x.id !== p.id))}
-                          aria-label="Hapus project">
-                          <span className="material-symbols-outlined select-none" aria-hidden="true">delete</span>
-                        </button>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="md:col-span-2">
-                          <label className="block text-label-sm text-on-surface-variant mb-1">{t("live.form.project-name")}</label>
-                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Nama project"
-                            value={p.name} onChange={e => setProjects(prev => prev.map(x => x.id === p.id ? {...x, name: e.target.value} : x))} />
-                        </div>
-                        <div className="md:col-span-2 relative">
-                          <label className="block text-label-sm text-on-surface-variant mb-1">{t("live.form.description")}</label>
-                          <textarea className="w-full px-4 py-3 pr-12 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={2} placeholder="Deskripsi singkat project..." maxLength={500}
-                            value={p.description} onChange={e => setProjects(prev => prev.map(x => x.id === p.id ? {...x, description: e.target.value} : x))} />
-                          {p.description && (
-                            <span className="absolute right-2 top-8">
-                              <AIPolishButton content={p.description} onApply={(text) => setProjects(prev => prev.map(x => x.id === p.id ? {...x, description: text} : x))} field={`deskripsi project ${p.name || idx + 1}`} size="icon" />
-                            </span>
-                          )}
-                          <CharCounter value={p.description} max={500} />
-                        </div>
-                        <Field label={t("live.form.tech-stack")}>
-                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="React, Node.js, PostgreSQL"
-                            value={p.techStack} onChange={e => setProjects(prev => prev.map(x => x.id === p.id ? {...x, techStack: e.target.value} : x))} />
-                        </Field>
-                        <Field label={t("live.form.link-optional")}>
-                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="https://github.com/..."
-                            value={p.link} onChange={e => setProjects(prev => prev.map(x => x.id === p.id ? {...x, link: e.target.value} : x))} />
-                        </Field>
-                      </div>
-                    </div>
-                  ))}
-                  <button onClick={() => setProjects(prev => [...prev, { id: genId(), name: "", description: "", techStack: "", link: "" }])}
-                    className="w-full py-3 rounded-xl border-2 border-dashed border-outline-variant text-on-surface-variant font-label-bold flex items-center justify-center gap-2 hover:bg-surface-container-low hover:border-primary/50 transition-all">
-                    <span className="material-symbols-outlined">add</span>
-                    {t("live.form.add-project")}
-                  </button>
-                </div>
-              </AccordionItem>
-
-              {/* 4. Skills */}
-              <AccordionItem id="skills" icon="stars" title={t("build.skill")} isOpen={activeSection === "skills"} onToggle={toggleSection}>
+              </StepCard>
+              <StepCard title={t("build.skill")}>
                 <div className="px-6 space-y-4">
-                  <Field label={t("build.skills-main")}>
+                  <Field label={t("build.skills-main")} help="skillsMain">
                     <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="React, TypeScript, Node.js, Tailwind CSS..."
                       value={formData.skillsMain} onChange={update("skillsMain")} />
                   </Field>
@@ -927,9 +1029,99 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                       value={formData.skillsLanguages} onChange={update("skillsLanguages")} />
                   </div>
                 </div>
+              </StepCard>
+              <AccordionItem id="hobbies" icon="favorite" title={t("build.hobbies")} isOpen={activeSection === "hobbies"} onToggle={toggleSection}>
+                <div className="px-6 space-y-4">
+                  {hobbies.map((hobby, idx) => (
+                    <div key={hobby.id} className="p-4 rounded-xl border border-outline-variant bg-surface-container-low">
+                      <div className="flex justify-between items-start mb-3">
+                        <h4 className="font-label-bold text-primary">{t("live.form.hobby")} {idx + 1}</h4>
+                        {hobbies.length > 1 && (
+                          <button className="text-error hover:bg-error-container/30 p-1 rounded transition-colors"
+                            onClick={() => setHobbies(prev => prev.filter(x => x.id !== hobby.id))}
+                            aria-label="Hapus hobi">
+                            <span className="material-symbols-outlined select-none" aria-hidden="true">delete</span>
+                          </button>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Field label={t("live.form.hobby-name")}>
+                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Fotografi"
+                            value={hobby.name} onChange={e => setHobbies(prev => prev.map(x => x.id === hobby.id ? {...x, name: e.target.value} : x))} />
+                        </Field>
+                        <Field label={t("live.form.hobby-desc")}>
+                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Street photography & landscape"
+                            value={hobby.description} onChange={e => setHobbies(prev => prev.map(x => x.id === hobby.id ? {...x, description: e.target.value} : x))} />
+                        </Field>
+                      </div>
+                    </div>
+                  ))}
+                  <button onClick={() => setHobbies(prev => [...prev, { id: genId(), name: "", description: "" }])}
+                    className="w-full py-3 rounded-xl border-2 border-dashed border-outline-variant text-on-surface-variant font-label-bold flex items-center justify-center gap-2 hover:bg-surface-container-low hover:border-primary/50 transition-all">
+                    <span className="material-symbols-outlined">add</span>
+                    {t("live.form.add-hobby")}
+                  </button>
+                </div>
               </AccordionItem>
-
-              {/* 5. Experience */}
+                </>
+              )}
+              {stepId === "projects" && (
+              <StepCard>
+                <div className="px-6 space-y-6">
+                  {projects.map((p, idx) => (
+                    <div key={p.id} className="p-4 rounded-xl border border-outline-variant bg-surface-container-low">
+                      <div className="flex justify-between items-start mb-3">
+                        <h4 className="font-label-bold text-primary">Project {idx + 1}</h4>
+                        <button className="text-error hover:bg-error-container/30 p-1 rounded transition-colors"
+                          onClick={() => setProjects(prev => prev.filter(x => x.id !== p.id))}
+                          aria-label="Hapus project">
+                          <span className="material-symbols-outlined select-none" aria-hidden="true">delete</span>
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="md:col-span-2">
+                          <span className="mb-1 flex items-center gap-1"><label className="block text-label-sm text-on-surface-variant">{t("live.form.project-name")}</label><FieldHelp topic={PORTFOLIO_HELP.projectName} /></span>
+                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Nama project"
+                            value={p.name} onChange={e => setProjects(prev => prev.map(x => x.id === p.id ? {...x, name: e.target.value} : x))} />
+                        </div>
+                        <div className="md:col-span-2">
+                          {/* Satu poin per baris; deskripsi lama (paragraf) terbaca sebagai satu poin. */}
+                          <BulletEditor
+                            label={t("live.form.description")}
+                            help={PORTFOLIO_HELP.projectDescription}
+                            value={p.description}
+                            onChange={(v) => setProjects(prev => prev.map(x => x.id === p.id ? {...x, description: v} : x))}
+                            placeholder="Contoh: Merancang alur pemesanan untuk pengguna baru"
+                            maxLength={500}
+                            headerAction={
+                              p.description ? (
+                                <AIPolishButton jobTitle={formData.heroHeadline || undefined} content={p.description} onApply={(text) => setProjects(prev => prev.map(x => x.id === p.id ? {...x, description: aiTextForField(text, "bullets")} : x))} onRevert={(text) => setProjects(prev => prev.map(x => x.id === p.id ? {...x, description: text} : x))} format="bullets" field={`deskripsi project ${p.name || idx + 1}`} size="sm" />
+                              ) : null
+                            }
+                          />
+                          <CharCounter value={p.description} max={500} />
+                        </div>
+                        <Field label={t("live.form.tech-stack")} help="techStack">
+                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="React, Node.js, PostgreSQL"
+                            value={p.techStack} onChange={e => setProjects(prev => prev.map(x => x.id === p.id ? {...x, techStack: e.target.value} : x))} />
+                        </Field>
+                        <Field label={t("live.form.link-optional")}>
+                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="https://github.com/..."
+                            value={p.link} onChange={e => setProjects(prev => prev.map(x => x.id === p.id ? {...x, link: e.target.value} : x))} />
+                        </Field>
+                      </div>
+                    </div>
+                  ))}
+                  <button onClick={() => setProjects(prev => [...prev, { id: genId(), name: "", description: "", techStack: "", link: "" }])}
+                    className="w-full py-3 rounded-xl border-2 border-dashed border-outline-variant text-on-surface-variant font-label-bold flex items-center justify-center gap-2 hover:bg-surface-container-low hover:border-primary/50 transition-all">
+                    <span className="material-symbols-outlined">add</span>
+                    {t("live.form.add-project")}
+                  </button>
+                </div>
+              </StepCard>
+              )}
+              {stepId === "experience" && (
+                <>
               <AccordionItem id="experience" icon="work" title={t("build.experience")} isOpen={activeSection === "experience"} onToggle={toggleSection}>
                 <div className="px-6 space-y-6">
                   {experiences.map((e, idx) => (
@@ -961,15 +1153,21 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                               value={e.endDate} onChange={ev => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, endDate: ev.target.value} : x))} />
                           </div>
                         </div>
-                        <div className="md:col-span-2 relative">
-                          <label className="block text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">{t("live.form.description")}</label>
-                          <textarea className="w-full px-4 py-3 pr-12 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={3} placeholder="Jelaskan tanggung jawab dan pencapaian..." maxLength={1000}
-                            value={e.description} onChange={ev => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, description: ev.target.value} : x))} />
-                          {e.description && (
-                            <span className="absolute right-2 top-8">
-                              <AIPolishButton content={e.description} onApply={(text) => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, description: text} : x))} field={`deskripsi pengalaman ${e.position || idx + 1}`} size="icon" />
-                            </span>
-                          )}
+                        <div className="md:col-span-2">
+                          {/* Satu poin per baris; deskripsi lama (paragraf) terbaca sebagai satu poin. */}
+                          <BulletEditor
+                            label={t("live.form.description")}
+                            help={PORTFOLIO_HELP.experienceDescription}
+                            value={e.description}
+                            onChange={(v) => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, description: v} : x))}
+                            placeholder="Contoh: Menyusun laporan mingguan untuk [jumlah] cabang"
+                            maxLength={1000}
+                            headerAction={
+                              e.description ? (
+                                <AIPolishButton jobTitle={formData.heroHeadline || undefined} content={e.description} onApply={(text) => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, description: aiTextForField(text, "bullets")} : x))} onRevert={(text) => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, description: text} : x))} format="bullets" field={`deskripsi pengalaman ${e.position || idx + 1}`} size="sm" />
+                              ) : null
+                            }
+                          />
                           <CharCounter value={e.description} max={1000} />
                         </div>
                       </div>
@@ -982,8 +1180,6 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                   </button>
                 </div>
               </AccordionItem>
-
-              {/* 6. Education */}
               <AccordionItem id="education" icon="school" title={t("build.education")} isOpen={activeSection === "education"} onToggle={toggleSection}>
                 <div className="px-6 space-y-6">
                   {educations.map((e, idx) => (
@@ -1031,8 +1227,6 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                   </button>
                 </div>
               </AccordionItem>
-
-              {/* 6b. Certifications */}
               <AccordionItem id="certifications" icon="workspace_premium" title={t("build.certifications")} isOpen={activeSection === "certifications"} onToggle={toggleSection}>
                 <div className="px-6 space-y-6">
                   {certifications.map((cert, idx) => (
@@ -1072,8 +1266,6 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                   </button>
                 </div>
               </AccordionItem>
-
-              {/* 6c. Organizations */}
               <AccordionItem id="organizations" icon="groups" title={t("build.organizations")} isOpen={activeSection === "organizations"} onToggle={toggleSection}>
                 <div className="px-6 space-y-6">
                   {organizations.map((org, idx) => (
@@ -1114,44 +1306,10 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                   </button>
                 </div>
               </AccordionItem>
-
-              {/* 6d. Hobbies */}
-              <AccordionItem id="hobbies" icon="favorite" title={t("build.hobbies")} isOpen={activeSection === "hobbies"} onToggle={toggleSection}>
-                <div className="px-6 space-y-4">
-                  {hobbies.map((hobby, idx) => (
-                    <div key={hobby.id} className="p-4 rounded-xl border border-outline-variant bg-surface-container-low">
-                      <div className="flex justify-between items-start mb-3">
-                        <h4 className="font-label-bold text-primary">{t("live.form.hobby")} {idx + 1}</h4>
-                        {hobbies.length > 1 && (
-                          <button className="text-error hover:bg-error-container/30 p-1 rounded transition-colors"
-                            onClick={() => setHobbies(prev => prev.filter(x => x.id !== hobby.id))}
-                            aria-label="Hapus hobi">
-                            <span className="material-symbols-outlined select-none" aria-hidden="true">delete</span>
-                          </button>
-                        )}
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Field label={t("live.form.hobby-name")}>
-                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Fotografi"
-                            value={hobby.name} onChange={e => setHobbies(prev => prev.map(x => x.id === hobby.id ? {...x, name: e.target.value} : x))} />
-                        </Field>
-                        <Field label={t("live.form.hobby-desc")}>
-                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Street photography & landscape"
-                            value={hobby.description} onChange={e => setHobbies(prev => prev.map(x => x.id === hobby.id ? {...x, description: e.target.value} : x))} />
-                        </Field>
-                      </div>
-                    </div>
-                  ))}
-                  <button onClick={() => setHobbies(prev => [...prev, { id: genId(), name: "", description: "" }])}
-                    className="w-full py-3 rounded-xl border-2 border-dashed border-outline-variant text-on-surface-variant font-label-bold flex items-center justify-center gap-2 hover:bg-surface-container-low hover:border-primary/50 transition-all">
-                    <span className="material-symbols-outlined">add</span>
-                    {t("live.form.add-hobby")}
-                  </button>
-                </div>
-              </AccordionItem>
-
-              {/* 7. Testimonials */}
-              <AccordionItem id="testimonials" icon="format_quote" title={t("build.testimonial")} isOpen={activeSection === "testimonials"} onToggle={toggleSection}>
+                </>
+              )}
+              {stepId === "testimonials" && (
+              <StepCard>
                 <div className="px-6 space-y-4">
                   {testimonials.map((item, i) => (
                     <div key={item.id} className="p-4 rounded-xl border border-outline-variant bg-surface">
@@ -1183,15 +1341,10 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                                 value={item.position} onChange={updateTestimonial(item.id, "position")} />
                             </Field>
                           </div>
-                          <Field label={t("live.form.testimonial")}>
+                          <Field label={t("live.form.testimonial")} help="testimonial">
                             <div className="relative">
-                              <textarea className="w-full px-4 py-3 pr-12 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={2} placeholder="Apa yang mereka katakan tentangmu?" maxLength={500}
+                              <textarea className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={2} placeholder="Apa yang mereka katakan tentangmu?" maxLength={500}
                                 value={item.testimonial} onChange={updateTestimonial(item.id, "testimonial")} />
-                              {item.testimonial && (
-                                <span className="absolute right-2 top-2">
-                                  <AIPolishButton content={item.testimonial} onApply={(v) => { const ev = { target: { value: v } } as any; updateTestimonial(item.id, "testimonial")(ev); }} field="testimoni" size="icon" />
-                                </span>
-                              )}
                             </div>
                             <CharCounter value={item.testimonial} max={500} />
                           </Field>
@@ -1205,10 +1358,10 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                     {t("live.form.add-testimonial")}
                   </button>
                 </div>
-              </AccordionItem>
-
-              {/* 8. Contact */}
-              <AccordionItem id="contact" icon="contact_support" title={t("build.contact")} isOpen={activeSection === "contact"} onToggle={toggleSection}>
+              </StepCard>
+              )}
+              {stepId === "contact" && (
+              <StepCard>
                 <div className="px-6 space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <ValidatedField label="Email" error={!validateEmail(formData.contactEmail) ? "Format email tidak valid" : undefined}>
@@ -1263,10 +1416,9 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                     </div>
                   </div>
                 </div>
-              </AccordionItem>
-            </div>
-
-            {/* Panel Tampilan: urutan & visibilitas section, ukuran teks, perataan */}
+              </StepCard>
+              )}
+              {stepId === "appearance" && (
             <section
               data-testid="appearance-panel"
               className="bg-surface-container-lowest rounded-2xl p-6 shadow-soft border border-outline-variant/50 space-y-5"
@@ -1387,6 +1539,9 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                 </ul>
               </div>
             </section>
+              )}
+            </div>
+
 
             {/* Changes list from AI */}
             {aiChanges.length > 0 && (
@@ -1429,11 +1584,69 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
               </div>
             </a>
           </div>
+          </div>
+
+          <div className="hidden lg:flex lg:sticky lg:top-24 lg:h-[calc(100dvh-12rem)]">
+            <PanelSplitter value={leftPct} onChange={setLeftPct} containerRef={workspaceRef} />
+          </div>
+
+          {/* Pratinjau. Layar < lg: dibuka penuh lewat tombol "Lihat portofolio". */}
+          <aside
+            data-tour="preview"
+            className={`${mobilePreviewOpen ? "fixed inset-0 z-[60] flex" : "hidden"} lg:sticky lg:top-24 lg:z-auto lg:flex lg:h-[calc(100dvh-12rem)] lg:flex-1 lg:min-w-0 flex-col bg-surface-container-low lg:mr-6 lg:rounded-2xl lg:border lg:border-outline-variant/50 overflow-hidden`}
+            {...(mobilePreviewOpen ? { role: "dialog", "aria-modal": true, "aria-label": t("build.preview-panel") } : { "aria-label": t("build.preview-panel") })}
+          >
+            <div className="flex items-center gap-3 border-b border-outline-variant/50 bg-surface-container-lowest px-4 py-2.5 shrink-0">
+              <span className="font-label-bold text-on-surface">{t("build.preview-panel")}</span>
+              <span className="text-label-sm">{saveStatusNode}</span>
+              {mobilePreviewOpen && (
+                <button
+                  type="button"
+                  onClick={() => setMobilePreviewOpen(false)}
+                  className="ml-auto flex min-h-11 items-center gap-1 rounded-lg px-3 text-sm font-medium text-on-surface hover:bg-surface-container lg:hidden"
+                >
+                  <span className="material-symbols-outlined text-[18px]" aria-hidden="true">close</span>
+                  {t("build.preview-close")}
+                </button>
+              )}
+            </div>
+            <p className="px-4 pt-2 text-xs text-on-surface-variant shrink-0">{t("build.preview-panel-note")}</p>
+            <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3">
+              <div className="overflow-hidden rounded-xl bg-white shadow-soft">
+                {/* Di panel lebar diperkecil supaya tata letak desktop portofolio tetap utuh. */}
+                <div className="lg:[zoom:0.5]">
+                  <ThemeFonts themeId={DEFAULT_THEME_ID} />
+                  <PortfolioDocument
+                    data={portfolio}
+                    themeId={DEFAULT_THEME_ID as ThemeId}
+                    mode="editor"
+                    sectionOrder={order}
+                    sectionVisibility={portfolio.sectionVisibility}
+                    fontSize={portfolio.fontSize}
+                    sectionStyle={previewSectionStyle}
+                    sectionIdPrefix="builder-preview-"
+                  />
+                </div>
+              </div>
+            </div>
+          </aside>
         </main>
+
+        {!mobilePreviewOpen && (
+          <button
+            type="button"
+            onClick={() => setMobilePreviewOpen(true)}
+            data-tour="preview-open"
+            className="fixed bottom-24 right-4 z-40 flex min-h-12 items-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-on-primary shadow-lg lg:hidden"
+          >
+            <span className="material-symbols-outlined text-[18px]" aria-hidden="true">web</span>
+            {t("build.view-portfolio")}
+          </button>
+        )}
 
         {/* Bottom Nav */}
         <footer className="fixed bottom-0 left-0 w-full z-50 bg-surface-container-highest shadow-[0_-8px_24px_rgba(0,0,0,0.06)] py-4 px-margin-mobile md:px-margin-desktop">
-          <div className="max-w-[800px] mx-auto flex justify-between items-center">
+          <div className="max-w-[800px] lg:max-w-none mx-auto flex justify-between items-center gap-2">
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1 border-r border-outline-variant/50 pr-3">
                 <button
@@ -1455,37 +1668,31 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                   <span className="material-symbols-outlined text-lg">redo</span>
                 </button>
               </div>
-              {draft.offline && saveStatus !== "saving" && saveStatus !== "error" ? (
-                <>
-                  <span className="material-symbols-outlined text-amber-600 text-lg">cloud_off</span>
-                  <span className="text-label-sm text-amber-700" role="status">
-                    {t("build.offline")}
-                  </span>
-                </>
-              ) : saveStatus === "saving" ? (
-                <>
-                  <span className="material-symbols-outlined text-amber-500 text-lg animate-spin">sync</span>
-                  <span className="text-label-sm text-amber-600">{t("build.saving")}</span>
-                </>
-              ) : saveStatus === "error" ? (
+              {saveStatusNode}
+            </div>
+            <div className="flex items-center gap-2 md:gap-4">
+              {activeStep > 0 && (
                 <button
                   type="button"
-                  onClick={() => draft.retry()}
-                  className="inline-flex items-center gap-1.5 text-label-sm text-error hover:underline"
+                  onClick={() => setActiveStep(activeStep - 1)}
+                  className="flex min-h-11 items-center gap-1.5 px-3 rounded-xl border border-outline/30 text-sm font-medium text-on-surface hover:bg-surface-container-high transition-colors"
                 >
-                  <span className="material-symbols-outlined text-lg">error</span>
-                  {draft.error ?? "Belum tersimpan. Ketuk untuk coba lagi."}
+                  <span className="material-symbols-outlined text-base" aria-hidden="true">chevron_left</span>
+                  <span className="hidden sm:inline">{t("builder.prev")}</span>
+                  <kbd className="hidden md:inline-flex text-[8px] font-bold text-on-surface-variant bg-outline-variant/20 px-1 py-0.5 rounded ml-1 border border-outline-variant/50">Ctrl+←</kbd>
                 </button>
-              ) : saveStatus === "saved" ? (
-                <>
-                  <span className="material-symbols-outlined text-primary text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                  <span className="text-label-sm text-primary">{t("build.saved")}</span>
-                </>
-              ) : (
-                <span className="text-label-sm text-on-surface-variant">{t("build.unsaved")}</span>
               )}
-            </div>
-            <div className="flex items-center gap-4">
+              {activeStep < lastStep && (
+                <button
+                  type="button"
+                  onClick={() => setActiveStep(activeStep + 1)}
+                  className="flex min-h-11 items-center gap-1.5 px-3 rounded-xl border border-primary/40 text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
+                >
+                  <span className="hidden sm:inline">{t("builder.next")}</span>
+                  <kbd className="hidden md:inline-flex text-[8px] font-bold text-on-surface-variant bg-outline-variant/20 px-1 py-0.5 rounded ml-1 border border-outline-variant/50">Ctrl+→</kbd>
+                  <span className="material-symbols-outlined text-base" aria-hidden="true">chevron_right</span>
+                </button>
+              )}
               <button className="hidden md:block text-on-surface-variant font-label-bold hover:text-primary transition-colors px-4 py-2"
                 onClick={() => {
                   setConfirmAction({
@@ -1530,12 +1737,13 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                   }
                 }}
                 disabled={saving}
-                className="bg-primary text-on-primary font-label-bold rounded-lg px-8 py-3 hover:-translate-y-0.5 active:scale-95 duration-200 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                data-tour="save-preview"
+                className="bg-primary text-on-primary font-label-bold rounded-lg min-h-11 px-4 sm:px-8 py-3 hover:-translate-y-0.5 active:scale-95 duration-200 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {saving ? (
                   <><span className="material-symbols-outlined text-lg animate-spin">sync</span> {t("build.saving")}</>
                 ) : (
-                  <><span className="material-symbols-outlined text-lg">preview</span>                {t("build.save-preview")}</>
+                  <><span className="material-symbols-outlined text-lg" aria-hidden="true">open_in_new</span><span className="hidden sm:inline">{t("build.save-preview")}</span><span className="sr-only sm:hidden">{t("build.save-preview")}</span></>
                 )}
               </button>
             </div>
@@ -1547,6 +1755,8 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
       </div>
 
       <ConfirmModal confirm={confirmAction} onClose={() => setConfirmAction(null)} />
+
+      <BuilderTour open={tourOpen} onClose={() => setTourOpen(false)} steps={PORTFOLIO_TOUR} storageKey={PORTFOLIO_TOUR_KEY} />
 
       {/* ── Source Picker Popup ── */}
       <Modal open={showSourcePicker} onClose={() => setShowSourcePicker(false)} title="Buat Portfolio Baru" size="max-w-lg">
@@ -1748,10 +1958,23 @@ export function AccordionItem({ id, icon, title, isOpen, onToggle, children }: {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+/** Kartu pembungkus isi satu langkah. */
+function StepCard({ title, children }: { title?: string; children: React.ReactNode }) {
+  return (
+    <div className="bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/50 py-6">
+      {title && <h3 className="px-6 pb-4 font-label-bold text-on-surface">{title}</h3>}
+      {children}
+    </div>
+  );
+}
+
+function Field({ label, help, children }: { label: string; help?: PortfolioHelpKey; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-label-sm text-on-surface-variant uppercase tracking-wider">{label}</label>
+      <span className="flex items-center gap-1">
+        <label className="text-label-sm text-on-surface-variant uppercase tracking-wider">{label}</label>
+        {help && <FieldHelp topic={PORTFOLIO_HELP[help]} />}
+      </span>
       {children}
     </div>
   );

@@ -16,29 +16,31 @@ export default function BuilderPage({
   const router = useRouter();
   const draft = usePortfolioDraft(draftId);
 
-  if (draft.loading) return <PortfolioSkeleton message="Memuat draft" />;
+  // AuthGuard membungkus semua cabang: status login dicek dulu, baru
+  // skeleton atau "tidak ditemukan" (tamu tidak melihat isi halaman draft).
+  return <AuthGuard>{body()}</AuthGuard>;
 
-  if (!draft.data) {
-    return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 bg-background">
-        <span className="material-symbols-outlined text-6xl text-outline" aria-hidden="true">
-          description
-        </span>
-        <p className="text-sm text-on-surface-variant">Draft tidak ditemukan.</p>
-        <button
-          type="button"
-          onClick={() => router.replace("/portfolio/build")}
-          className="min-h-11 rounded-xl bg-primary px-5 text-sm font-bold text-on-primary"
-        >
-          Mulai draft baru
-        </button>
-      </div>
-    );
+  function body() {
+    if (draft.loading) return <PortfolioSkeleton message="Memuat draft" />;
+
+    if (!draft.data) {
+      return (
+        <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 bg-background">
+          <span className="material-symbols-outlined text-6xl text-outline" aria-hidden="true">
+            description
+          </span>
+          <p className="text-sm text-on-surface-variant">Draft tidak ditemukan.</p>
+          <button
+            type="button"
+            onClick={() => router.replace("/portfolio/build")}
+            className="min-h-11 rounded-xl bg-primary px-5 text-sm font-bold text-on-primary"
+          >
+            Mulai draft baru
+          </button>
+        </div>
+      );
+    }
+
+    return <BuilderEditor draft={draft} />;
   }
-
-  return (
-    <AuthGuard>
-      <BuilderEditor draft={draft} />
-    </AuthGuard>
-  );
 }
