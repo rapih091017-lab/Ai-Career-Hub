@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { LanguageProvider } from "@/lib/i18n";
 import { LinkedInResultView } from "@/components/linkedin/LinkedInResultView";
 import { buildLinkedInResult } from "@/lib/linkedin-optimizer/result";
@@ -54,7 +54,8 @@ describe("LinkedInResultView", () => {
     expect(screen.getAllByText("Headline").length).toBeGreaterThanOrEqual(1);
     // Headline dan deskripsi pengalaman sama-sama berbobot 25%.
     expect(screen.getAllByText("Bobot 25%")).toHaveLength(2);
-    expect(screen.getByText("Deskripsi pengalaman")).toBeInTheDocument();
+    // Muncul juga di "Mulai dari sini" karena skornya termasuk tiga terendah.
+    expect(screen.getAllByText("Deskripsi pengalaman").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("Bobot 15%")).toBeInTheDocument();
   });
 
@@ -71,5 +72,51 @@ describe("LinkedInResultView", () => {
     expect(screen.getAllByRole("button", { name: /Salin/ }).length).toBeGreaterThanOrEqual(4);
     // Placeholder di About diperingatkan, bukan disalin diam-diam.
     expect(screen.getByText(/Masih ada bagian \[angka\]/)).toBeInTheDocument();
+  });
+});
+
+describe("LinkedInResultView: daftar isi, mulai dari sini, centang", () => {
+  const result = buildLinkedInResult({
+    ...fixture,
+    experience: [
+      { company: "PT Maju", title: "Data Analyst", period: "", bullets: ["Satu", "Dua", "Tiga", "Empat", "Lima"] },
+    ],
+  })!;
+
+  it("menampilkan 3 bagian skor terendah dengan label, tanpa menit", () => {
+    render(
+      <LanguageProvider>
+        <LinkedInResultView result={result} branding="" resultId="lo1" />
+      </LanguageProvider>,
+    );
+    const start = document.getElementById("lo-mulai")!;
+    const items = start.querySelectorAll("li");
+    expect(items).toHaveLength(3);
+    // education 4, experience_descriptions 5, about 6
+    expect(items[0].textContent).toContain("Pendidikan");
+    expect(start.textContent).toContain("skor terendah");
+    expect(start.textContent).not.toMatch(/menit/);
+  });
+
+  it("melipat rewrite pengalaman panjang dan menyimpan centang per id", () => {
+    localStorage.clear();
+    const first = render(
+      <LanguageProvider>
+        <LinkedInResultView result={result} branding="" resultId="lo1" />
+      </LanguageProvider>,
+    );
+    expect(screen.queryByText(/Empat/)).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: /Tampilkan 2 baris lagi/ }));
+    expect(screen.getByText(/Empat/)).toBeInTheDocument();
+
+    fireEvent.click(screen.getAllByRole("checkbox", { name: "Sudah diterapkan" })[0]);
+    expect(JSON.parse(localStorage.getItem("lo_done:lo1") ?? "[]")).toEqual(["headline"]);
+    first.unmount();
+    render(
+      <LanguageProvider>
+        <LinkedInResultView result={result} branding="" resultId="lo1" />
+      </LanguageProvider>,
+    );
+    expect(screen.getAllByRole("checkbox", { name: "Sudah diterapkan" })[0]).toBeChecked();
   });
 });

@@ -50,7 +50,7 @@ export default function LinkedInOptimizerResultPage() {
     <div className="flex min-h-screen flex-col bg-desk text-ink">
       <SiteHeader variant="pill" />
 
-      <main className="mx-auto w-full max-w-[820px] flex-1 px-5 pb-20 pt-24 md:px-6 md:pt-28">
+      <main className="mx-auto w-full max-w-[820px] flex-1 lg:max-w-[1040px] px-5 pb-20 pt-24 md:px-6 md:pt-28">
         <Link
           href="/linkedin-optimizer"
           className="inline-flex items-center gap-1.5 text-xs font-bold text-ink-soft transition-colors hover:text-ink"
@@ -98,7 +98,7 @@ export default function LinkedInOptimizerResultPage() {
             ) : null}
 
             <div className="mt-10">
-              <LinkedInResultView result={result} branding={branding} />
+              <LinkedInResultView result={result} branding={branding} resultId={id} />
             </div>
           </div>
         ) : null}
