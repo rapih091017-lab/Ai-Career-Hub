@@ -35,6 +35,10 @@ interface QuickSummaryCardProps {
   analysis: StoredAnalysisResult;
   /** Hasil mapper `toQuickSummary` — sudah bersih dari fix invalid dan dibatasi. */
   summary: QuickSummary;
+  /** Indeks top_fixes yang sudah tampil di kartu "Mulai dari sini". Bila
+   *  diisi, perbaikan itu tidak diulang; sisanya dilipat sebagai
+   *  "Perbaikan lain (N)". Tanpa prop ini daftar tampil penuh seperti dulu. */
+  hideFixIndexes?: number[];
 }
 
 /**
@@ -42,10 +46,12 @@ interface QuickSummaryCardProps {
  * prioritas lintas section di paling atas halaman hasil. Tanpa angka poin per
  * fix — hanya level dampak dan estimasi menit, sesuai data dari mapper.
  */
-export function QuickSummaryCard({ analysis, summary }: QuickSummaryCardProps) {
+export function QuickSummaryCard({ analysis, summary, hideFixIndexes }: QuickSummaryCardProps) {
   const gc = gradeColor(analysis.grade);
   const changePack = buildChangePack(analysis);
   const { t } = useTranslation();
+  const hidden = new Set(hideFixIndexes ?? []);
+  const fixes = summary.top_fixes.map((fix, i) => ({ fix, i })).filter(({ i }) => !hidden.has(i));
 
   return (
     <motion.section
@@ -94,9 +100,9 @@ export function QuickSummaryCard({ analysis, summary }: QuickSummaryCardProps) {
       )}
 
       {/* ── Daftar perbaikan prioritas ── */}
-      {summary.top_fixes.length > 0 && (
+      {fixes.length > 0 && !hideFixIndexes && (
         <ul aria-label="Perbaikan prioritas" className="space-y-2">
-          {summary.top_fixes.map((fix, i) => (
+          {fixes.map(({ fix, i }) => (
             <li
               key={fix.id || i}
               className="flex flex-col items-stretch gap-2 rounded-xl border-[1.5px] border-ink/15 bg-surface-container-low px-3 py-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3"
@@ -131,6 +137,53 @@ export function QuickSummaryCard({ analysis, summary }: QuickSummaryCardProps) {
             </li>
           ))}
         </ul>
+      )}
+      {/* Perbaikan yang tidak masuk "Mulai dari sini": tetap bisa dibuka. */}
+      {fixes.length > 0 && hideFixIndexes && (
+        <details className="group rounded-xl border-[1.5px] border-ink/15">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 text-sm font-bold text-ink [&::-webkit-details-marker]:hidden">
+            {t("checker.quick.other-fixes").replace("{n}", String(fixes.length))}
+            <span className="material-symbols-outlined select-none text-base transition-transform group-open:rotate-180" aria-hidden="true">expand_more</span>
+          </summary>
+          <div className="px-3 pb-3">
+            <ul aria-label="Perbaikan prioritas" className="space-y-2">
+              {fixes.map(({ fix, i }) => (
+                <li
+                  key={fix.id || i}
+                  className="flex flex-col items-stretch gap-2 rounded-xl border-[1.5px] border-ink/15 bg-surface-container-low px-3 py-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3"
+                >
+                  {/* Di mobile judul dapat baris penuh; tanpa ini (flex-1 di baris
+                      yang sama dengan badge + dua tombol) judulnya pecah satu kata
+                      per baris di lebar 390px. */}
+                  <span className="text-sm font-semibold leading-snug text-ink sm:min-w-0 sm:flex-1">
+                    {fix.title}
+                  </span>
+                  <span
+                    className={`shrink-0 rounded-full border-[1.5px] px-2 py-0.5 text-xs font-extrabold uppercase tracking-[0.05em] ${IMPACT_CHIP[fix.impact]}`}
+                  >
+                    {fix.impact}
+                  </span>
+                  {typeof fix.est_minutes === "number" && (
+                    <span className="shrink-0 text-xs font-semibold text-ink-soft">
+                      ±{fix.est_minutes} menit
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => scrollToSection(SECTION_ANCHORS[fix.target_section])}
+                    className="inline-flex shrink-0 items-center gap-1 rounded-full border-[1.5px] border-ink px-3 py-1 text-xs font-bold text-ink transition-all hover:bg-surface-container active:scale-95"
+                  >
+                    Lihat
+                    <span className="material-symbols-outlined select-none text-[13px]" aria-hidden="true">
+                      arrow_forward
+                    </span>
+                  </button>
+                  {fix.copy_text && <CopyButton text={fix.copy_text} label="Salin teks" />}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </details>
       )}
 
       {/* ── Salin semua perubahan; nonaktif kalau tidak ada yang bisa disalin ── */}

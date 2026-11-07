@@ -102,3 +102,24 @@ describe("Collapsible", () => {
     expect(screen.getByText("2 temuan")).toBeInTheDocument();
   });
 });
+
+describe("Mulai dari sini + Ringkasan 10 detik tanpa duplikasi", () => {
+  it("quick fix yang sudah di StartHere tidak diulang; sisanya terlipat di Perbaikan lain", async () => {
+    const { QuickSummaryCard } = await import("@/components/checker/QuickSummaryCard");
+    const steps = pickStartSteps(QS, null);
+    const hide = steps.map((s) => s.fixIndex!);
+    expect(hide.sort()).toEqual([0, 1, 2]);
+    const analysis = { id: "r", scores: { overall: 60, keywordGap: 0, contextRelevance: 0, atsRules: 0 }, aiFeedback: { keywordGap: "", contextRelevance: "", atsRules: "", summary: "" }, summary: "" };
+    const { container } = render(
+      <LanguageProvider>
+        <QuickSummaryCard analysis={analysis as never} summary={QS} hideFixIndexes={hide} />
+      </LanguageProvider>,
+    );
+    expect(screen.queryByText("Tinggi 5")).toBeNull();
+    const details = container.querySelector("details") as HTMLDetailsElement;
+    expect(details.open).toBe(false);
+    expect(screen.getByText("Perbaikan lain (1)")).toBeInTheDocument();
+    // Data tidak hilang: fix sisa tetap ada di DOM, hanya terlipat.
+    expect(details.textContent).toContain("Rendah 1");
+  });
+});

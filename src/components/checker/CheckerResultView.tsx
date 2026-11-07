@@ -266,7 +266,11 @@ export function CheckerResultView({ result, variant, donutRef, resultsRef, wrapp
           jadi mapper menghasilkan null dan kartu tidak muncul. */}
       {quickSummary && (
         <div id="section-ringkasan" className="scroll-mt-32 lg:scroll-mt-28">
-          <QuickSummaryCard analysis={result} summary={quickSummary} />
+          <QuickSummaryCard
+            analysis={result}
+            summary={quickSummary}
+            hideFixIndexes={startSteps.flatMap((s) => (typeof s.fixIndex === "number" ? [s.fixIndex] : []))}
+          />
         </div>
       )}
 

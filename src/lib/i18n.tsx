@@ -617,7 +617,6 @@ const DICT: Record<string, { id: string; en: string }> = {
   "checker.cta-subtitle": { id: "Gunakan CV Builder kami untuk memperbaiki kekurangan secara otomatis.", en: "Use our CV Builder to automatically fix shortcomings." },
   "checker.cta-btn": { id: "Perbaiki Sekarang", en: "Fix Now" },
   "checker.error-upload": { id: "Silakan unggah file CV terlebih dahulu.", en: "Please upload your CV file first." },
-  "checker.error-jd": { id: "Silakan isi deskripsi pekerjaan.", en: "Please fill in the job description." },
   "checker.error-failed": { id: "Analisis gagal", en: "Analysis failed" },
   "checker.error-generic": { id: "Terjadi kesalahan", en: "An error occurred" },
 
@@ -2230,6 +2229,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   "checker.progress.state-done": { id: "selesai", en: "done" },
   "checker.progress.state-active": { id: "sedang berjalan", en: "in progress" },
   "checker.progress.state-todo": { id: "belum", en: "pending" },
+  "checker.quick.other-fixes": { id: "Perbaikan lain ({n})", en: "Other fixes ({n})" },
   "checker.start.kicker": { id: "Prioritas", en: "Priority" },
   "checker.start.title": { id: "Mulai dari sini", en: "Start here" },
   "checker.start.progress": { id: "{done} dari {total} sudah diperbaiki", en: "{done} of {total} fixed" },

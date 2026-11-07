@@ -25,6 +25,13 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+/*
+ * Snapshot awal dibuat dari halaman lama sebelum refaktor (HTML setara).
+ * Snapshot sengaja diperbarui saat tata letak berubah: urutan baru + bagian
+ * terlipat, lalu quick fix di "Ringkasan 10 detik" tidak lagi mengulang tiga
+ * prioritas yang sudah tampil di "Mulai dari sini" (sisanya dilipat sebagai
+ * "Perbaikan lain"). Isi tiap section tetap; yang berubah hanya letaknya.
+ */
 describe("render hasil cek CV dari fixture", () => {
   it("/checker (hasil segar) tetap sama", async () => {
     const view = await renderFreshResults(CheckerPage);

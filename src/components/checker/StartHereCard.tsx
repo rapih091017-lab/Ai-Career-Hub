@@ -16,6 +16,8 @@ export interface StartStep {
   impact?: QuickFixImpact;
   est_minutes?: number;
   copy_text?: string;
+  /** Indeks di quickSummary.top_fixes; dipakai agar kartu ringkasan tidak mengulangnya. */
+  fixIndex?: number;
   /** Anchor tujuan tombol "Lompat ke bagian". */
   anchor: string;
 }
@@ -40,11 +42,13 @@ export function pickStartSteps(quickSummary?: QuickSummary | null, actionPlan?: 
   const fixes = quickSummary?.top_fixes ?? [];
   if (fixes.length > 0) {
     const minutes = (f: QuickFix) => (typeof f.est_minutes === "number" ? f.est_minutes : Number.POSITIVE_INFINITY);
-    return [...fixes]
-      .sort((a, b) => IMPACT_RANK[a.impact] - IMPACT_RANK[b.impact] || minutes(a) - minutes(b))
+    return fixes
+      .map((f, index) => ({ f, index }))
+      .sort((a, b) => IMPACT_RANK[a.f.impact] - IMPACT_RANK[b.f.impact] || minutes(a.f) - minutes(b.f))
       .slice(0, 3)
-      .map((f, i) => ({
-        id: `fix-${f.id || i}`,
+      .map(({ f, index }) => ({
+        id: `fix-${f.id || index}`,
+        fixIndex: index,
         title: f.title,
         impact: f.impact,
         est_minutes: f.est_minutes,
