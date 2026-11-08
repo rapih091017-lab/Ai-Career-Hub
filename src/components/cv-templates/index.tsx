@@ -732,8 +732,8 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, divid
                     }}
                   >
                     {D(`organisations.${org.id}.startDate`, org.startDate, formatDate(org.startDate))}
-                    {org.startDate && org.endDate ? " – " : ""}
-                    {D(`organisations.${org.id}.endDate`, org.endDate, formatDate(org.endDate))}
+                    {org.startDate && (org.endDate || org.isPresent) ? " – " : ""}
+                    {org.isPresent ? L("present") : D(`organisations.${org.id}.endDate`, org.endDate, formatDate(org.endDate))}
                   </span>
                 </div>
                 {/* Position, italic, smaller, below org name */}
@@ -863,7 +863,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, divid
           </p>
         )}
         {/* Custom fields in header */}
-        {data.customFields && data.customFields.length > 0 && (
+        {data.customFields?.some((f) => f.label.trim() && f.value.trim()) && (
           <p
             {...P("customFields")}
             style={{
@@ -872,7 +872,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, divid
               margin: "4pt 0 0 0",
             }}
           >
-            {data.customFields.map((f) => `${f.label}: ${f.value}`).filter(Boolean).join("  •  ")}
+            {data.customFields.filter((f) => f.label.trim() && f.value.trim()).map((f) => `${f.label}: ${f.value}`).join("  •  ")}
           </p>
         )}
       </header>
@@ -891,7 +891,7 @@ export function AtsBaseRenderer({ data, style, sectionOrder, showDividers, divid
           // Custom section, look up by ID
           const customSection = data.customSections?.find(cs => cs.id === key);
           if (customSection) {
-            const lines = customSection.content.split('\n').filter(Boolean);
+            const lines = customSection.content.split('\n').filter((l) => l.trim());
             content = lines.length === 0 ? null : (
               <>
                 <SectionHeader title={T(`customSections.${customSection.id}.title`, customSection.title)} style={style} />
