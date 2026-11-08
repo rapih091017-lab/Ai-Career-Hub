@@ -123,3 +123,19 @@ describe("Mulai dari sini + Ringkasan 10 detik tanpa duplikasi", () => {
     expect(details.textContent).toContain("Rendah 1");
   });
 });
+
+describe("pickStartSteps: pembanding tahan data rusak", () => {
+  it("impact tak dikenal ke belakang, menit NaN/kosong dianggap tak hingga, seri pakai urutan asli", () => {
+    const qs = {
+      verdict: "V",
+      top_strengths: [],
+      top_fixes: [
+        { id: "x", title: "Aneh", target_section: "hr", impact: "Ekstrem" },
+        { id: "a", title: "Tinggi NaN", target_section: "hr", impact: "Tinggi", est_minutes: Number.NaN },
+        { id: "b", title: "Tinggi kosong", target_section: "hr", impact: "Tinggi" },
+        { id: "c", title: "Tinggi 3", target_section: "hr", impact: "Tinggi", est_minutes: 3 },
+      ],
+    } as unknown as QuickSummary;
+    expect(pickStartSteps(qs, null).map((s) => s.title)).toEqual(["Tinggi 3", "Tinggi NaN", "Tinggi kosong"]);
+  });
+});

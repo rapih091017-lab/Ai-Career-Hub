@@ -41,10 +41,15 @@ export const START_DONE_PREFIX = "start:";
 export function pickStartSteps(quickSummary?: QuickSummary | null, actionPlan?: ActionPlan | null): StartStep[] {
   const fixes = quickSummary?.top_fixes ?? [];
   if (fixes.length > 0) {
-    const minutes = (f: QuickFix) => (typeof f.est_minutes === "number" ? f.est_minutes : Number.POSITIVE_INFINITY);
+    // Pembanding aman dari NaN: impact tak dikenal di urutan terakhir, menit
+    // tak ada/invalid = tak hingga, seri dipecah oleh urutan asli.
+    const rank = (f: QuickFix) => IMPACT_RANK[f.impact] ?? 99;
+    const minutes = (f: QuickFix) =>
+      typeof f.est_minutes === "number" && Number.isFinite(f.est_minutes) ? f.est_minutes : Number.POSITIVE_INFINITY;
+    const cmp = (x: number, y: number) => (x < y ? -1 : x > y ? 1 : 0);
     return fixes
       .map((f, index) => ({ f, index }))
-      .sort((a, b) => IMPACT_RANK[a.f.impact] - IMPACT_RANK[b.f.impact] || minutes(a.f) - minutes(b.f))
+      .sort((a, b) => cmp(rank(a.f), rank(b.f)) || cmp(minutes(a.f), minutes(b.f)) || a.index - b.index)
       .slice(0, 3)
       .map(({ f, index }) => ({
         id: `fix-${f.id || index}`,
