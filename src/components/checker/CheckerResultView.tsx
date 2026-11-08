@@ -166,6 +166,7 @@ export function CheckerResultView({ result, variant, donutRef, resultsRef, wrapp
       ? t("checker.collapse.review").replace("{n}", String(atsRecCount))
       : t("checker.collapse.review-empty");
 
+  const keywordGeneric = keywordAnalysis?.source === "role_generic";
   const keywordSummary = keywordAnalysis
     ? t("checker.collapse.keyword")
         .replace("{found}", String(keywordAnalysis.matched.length))
@@ -382,9 +383,12 @@ export function CheckerResultView({ result, variant, donutRef, resultsRef, wrapp
           >
             <div className="flex items-center justify-between gap-3">
               <div>
-                <SectionKicker>{t("checker.kicker-keyword")}</SectionKicker>
+                {/* Tanpa lowongan (source role_generic) tidak ada kecocokan
+                    lowongan yang dinilai: kicker diganti, persen disembunyikan. */}
+                <SectionKicker>{t(keywordGeneric ? "checker.kicker-keyword-generic" : "checker.kicker-keyword")}</SectionKicker>
                 <h2 className="font-display text-headline-md font-bold text-ink">{t(L.keyword)}</h2>
               </div>
+              {!keywordGeneric && (
               <div className="flex items-center gap-2">
                 <span className="font-display text-sm font-bold text-ink">{keywordAnalysis.match_rate_pct}%</span>
                 <div className="h-2 w-16 overflow-hidden rounded-full bg-ink/10">
@@ -397,7 +401,11 @@ export function CheckerResultView({ result, variant, donutRef, resultsRef, wrapp
                   />
                 </div>
               </div>
+              )}
             </div>
+            {keywordGeneric && (
+              <p className="text-xs font-semibold text-ink-soft">{t("checker.keyword-generic-note")}</p>
+            )}
 
             {/* Sumber daftar + keterangan; muncul hanya bila source ada. */}
             <KeywordSourceLine analysis={keywordAnalysis} />

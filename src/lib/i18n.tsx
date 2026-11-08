@@ -1576,6 +1576,8 @@ const DICT: Record<string, { id: string; en: string }> = {
   "checker.kicker-breakdown": { id: "Rincian skor", en: "Score detail" },
   "checker.kicker-narrative": { id: "Catatan menyeluruh", en: "Overall notes" },
   "checker.kicker-keyword": { id: "Kecocokan lowongan", en: "Job match" },
+  "checker.kicker-keyword-generic": { id: "Kata kunci umum untuk peran ini", en: "Common keywords for this role" },
+  "checker.keyword-generic-note": { id: "Isi lowongan untuk melihat kecocokan.", en: "Add a job posting to see the match." },
   "checker.kicker-checklist": { id: "Langkah perbaikan", en: "Fix steps" },
   "checker.kicker-bullet": { id: "Per poin pengalaman", en: "Per experience point" },
   "checker.kicker-impact": { id: "Skenario perbaikan", en: "Fix scenarios" },
