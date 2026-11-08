@@ -347,7 +347,7 @@ function WorkbenchEducation({ items }: { items: EducationItem[] }) {
 /* DECAL — kartu pill berisi institusi dan periode. */
 function DecalEducation({ items }: { items: EducationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((e) => e.institution);
+  const filtered = items.filter(isEducationShown);
   if (!filtered.length) return null;
 
   return (
@@ -360,8 +360,8 @@ function DecalEducation({ items }: { items: EducationItem[] }) {
           {filtered.map((e, i) => (
             <Reveal key={e.id} delay={i * 0.07} y={16}>
               <div style={{ padding: "18px 22px", background: theme.colors.surface, border: `2.5px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, minWidth: 240 }}>
-                <h3 style={{ ...wbHeading(theme, "clamp(17px, 2vw, 19px)"), margin: 0 }}>{e.institution}</h3>
-                <p style={{ margin: "6px 0 0", fontSize: 14, color: theme.colors.textSecondary }}>{[e.degree, e.field].filter(Boolean).join(" · ")}</p>
+                <h3 style={{ ...wbHeading(theme, "clamp(17px, 2vw, 19px)"), margin: 0 }}>{e.institution || e.degree}</h3>
+                <p style={{ margin: "6px 0 0", fontSize: 14, color: theme.colors.textSecondary }}>{[e.institution ? e.degree : "", e.field].filter(Boolean).join(" · ")}</p>
                 {e.startDate || e.endDate ? (
                   <span style={{ display: "inline-block", marginTop: 10, fontSize: 12, fontWeight: 800, padding: "4px 12px", background: theme.colors.primary, color: theme.colors.onPrimary, borderRadius: theme.radii.pill }}>
                     {[e.startDate, e.endDate].filter(Boolean).join(" – ")}
