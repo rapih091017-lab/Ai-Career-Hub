@@ -1,5 +1,6 @@
 "use client";
 
+import { isExperienceShown } from "@/lib/portfolio/visibility";
 import { DescriptionText } from "../render/DescriptionText";
 import { motion } from "motion/react";
 import type { ExperienceItem } from "../../portfolio-templates/types";
@@ -34,7 +35,7 @@ function GlassExperience({ items }: { items: ExperienceItem[] }) {
           <div className="absolute left-[19px] top-0 bottom-0 w-[1px]" style={{ background: `linear-gradient(to bottom, ${theme.colors.primary}40, ${theme.colors.primary}08)` }} />
 
           <div className="space-y-8">
-            {items.filter(e => e.company || e.position).map((exp, i) => (
+            {items.filter(isExperienceShown).map((exp, i) => (
               <motion.div
                 key={exp.id}
                 initial={{ opacity: 0, x: -30 }}
@@ -99,7 +100,7 @@ function GlassExperience({ items }: { items: ExperienceItem[] }) {
 /* ─── BRUTAL: Bold numbered cards with shadow overlaps ─── */
 function BrutalExperience({ items }: { items: ExperienceItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter(e => e.company || e.position);
+  const filtered = items.filter(isExperienceShown);
   if (!filtered.length) return null;
 
   return (
@@ -184,7 +185,7 @@ function BrutalExperience({ items }: { items: ExperienceItem[] }) {
 /* ─── LUXE: ledger hairline — baris tanggal serif + isi, tanpa kartu ─── */
 function LuxeExperience({ items }: { items: ExperienceItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter(e => e.company || e.position);
+  const filtered = items.filter(isExperienceShown);
   if (!filtered.length) return null;
 
   return (
@@ -253,7 +254,7 @@ function LuxeExperience({ items }: { items: ExperienceItem[] }) {
  * ═══════════════════════════════════════════════ */
 function MinimalistExperience({ items }: { items: ExperienceItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((e) => e.company || e.position);
+  const filtered = items.filter(isExperienceShown);
   if (!filtered.length) return null;
 
   return (
@@ -328,7 +329,7 @@ function MinimalistExperience({ items }: { items: ExperienceItem[] }) {
  * ═══════════════════════════════════════════════ */
 function WorkbenchExperience({ items }: { items: ExperienceItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((e) => e.company || e.position);
+  const filtered = items.filter(isExperienceShown);
   if (!filtered.length) return null;
 
   return (
@@ -396,7 +397,7 @@ function WorkbenchExperience({ items }: { items: ExperienceItem[] }) {
  * ═══════════════════════════════════════════════ */
 function DecalExperience({ items }: { items: ExperienceItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((e) => e.position || e.company);
+  const filtered = items.filter(isExperienceShown);
   if (!filtered.length) return null;
 
   return (
@@ -429,7 +430,7 @@ function DecalExperience({ items }: { items: ExperienceItem[] }) {
 /* CRAYON: kartu putih berlabel periode dengan warna aksen. */
 function CrayonExperience({ items }: { items: ExperienceItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((e) => e.company || e.position);
+  const filtered = items.filter(isExperienceShown);
   if (!filtered.length) return null;
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
@@ -461,7 +462,7 @@ function CrayonExperience({ items }: { items: ExperienceItem[] }) {
 /* SCRAPBOOK: catatan kerja di kertas tempel, periode di label selotip. */
 function ScrapbookExperience({ items }: { items: ExperienceItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((e) => e.company || e.position);
+  const filtered = items.filter(isExperienceShown);
   if (!filtered.length) return null;
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
@@ -493,7 +494,7 @@ function ScrapbookExperience({ items }: { items: ExperienceItem[] }) {
 /* ─── MAIN ─── */
 function InterstellaExperience({ items }: { items: ExperienceItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((e) => e.company || e.position);
+  const filtered = items.filter(isExperienceShown);
   if (!filtered.length) return null;
   return (
     <section style={{ padding: "clamp(56px, 9vw, 112px) 0", background: theme.colors.bg }}>
@@ -516,7 +517,7 @@ function InterstellaExperience({ items }: { items: ExperienceItem[] }) {
 
 function SherbetExperience({ items }: { items: ExperienceItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((e) => e.company || e.position);
+  const filtered = items.filter(isExperienceShown);
   if (!filtered.length) return null;
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>

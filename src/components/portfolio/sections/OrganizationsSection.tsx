@@ -1,5 +1,6 @@
 "use client";
 
+import { isOrganizationShown } from "@/lib/portfolio/visibility";
 import { motion } from "motion/react";
 import type { OrganizationItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
@@ -10,7 +11,7 @@ interface Props { items: OrganizationItem[]; }
 /* ═══ GLASS, timeline cards ═══ */
 function GlassOrganizations({ items }: { items: OrganizationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter(o => o.name);
+  const filtered = items.filter(isOrganizationShown);
   if (!filtered.length) return null;
 
   return (
@@ -84,7 +85,7 @@ function GlassOrganizations({ items }: { items: OrganizationItem[] }) {
 /* ═══ BRUTAL, bold rows with tag markers ═══ */
 function BrutalOrganizations({ items }: { items: OrganizationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter(o => o.name);
+  const filtered = items.filter(isOrganizationShown);
   if (!filtered.length) return null;
 
   return (
@@ -140,7 +141,7 @@ function BrutalOrganizations({ items }: { items: OrganizationItem[] }) {
 /* ═══ LUXE, elegant numbered list ═══ */
 function LuxeOrganizations({ items }: { items: OrganizationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter(o => o.name);
+  const filtered = items.filter(isOrganizationShown);
   if (!filtered.length) return null;
 
   return (
@@ -208,7 +209,7 @@ function LuxeOrganizations({ items }: { items: OrganizationItem[] }) {
  * ═══════════════════════════════════════════════ */
 function MinimalistOrganizations({ items }: { items: OrganizationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((o) => o.name);
+  const filtered = items.filter(isOrganizationShown);
   if (!filtered.length) return null;
 
   return (
@@ -271,7 +272,7 @@ function MinimalistOrganizations({ items }: { items: OrganizationItem[] }) {
  * ═══════════════════════════════════════════════ */
 function WorkbenchOrganizations({ items }: { items: OrganizationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((o) => o.name);
+  const filtered = items.filter(isOrganizationShown);
   if (!filtered.length) return null;
 
   return (
@@ -308,7 +309,7 @@ function WorkbenchOrganizations({ items }: { items: OrganizationItem[] }) {
 /* DECAL: organisasi sebagai kartu pill berlabel peran. */
 function DecalOrganizations({ items }: { items: OrganizationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((o) => o.name);
+  const filtered = items.filter(isOrganizationShown);
   if (!filtered.length) return null;
 
   return (
@@ -336,7 +337,7 @@ function DecalOrganizations({ items }: { items: OrganizationItem[] }) {
 /* CRAYON: organisasi sebagai kartu putih dengan label peran berwarna. */
 function CrayonOrganizations({ items }: { items: OrganizationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((o) => o.name);
+  const filtered = items.filter(isOrganizationShown);
   if (!filtered.length) return null;
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
@@ -363,7 +364,7 @@ function CrayonOrganizations({ items }: { items: OrganizationItem[] }) {
 /* SCRAPBOOK: organisasi sebagai kartu kertas dengan peran di selotip. */
 function ScrapbookOrganizations({ items }: { items: OrganizationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((o) => o.name);
+  const filtered = items.filter(isOrganizationShown);
   if (!filtered.length) return null;
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
@@ -389,7 +390,7 @@ function ScrapbookOrganizations({ items }: { items: OrganizationItem[] }) {
 
 function InterstellaOrganizations({ items }: { items: OrganizationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((o) => o.name);
+  const filtered = items.filter(isOrganizationShown);
   if (!filtered.length) return null;
   return (
     <section style={{ padding: "clamp(56px, 8vw, 96px) 0", background: theme.colors.bg }}>
@@ -406,7 +407,7 @@ function InterstellaOrganizations({ items }: { items: OrganizationItem[] }) {
 
 function SherbetOrganizations({ items }: { items: OrganizationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((o) => o.name);
+  const filtered = items.filter(isOrganizationShown);
   if (!filtered.length) return null;
   return (
     <section style={{ background: theme.colors.secondary, padding: "clamp(48px, 7vw, 80px) 0" }}>

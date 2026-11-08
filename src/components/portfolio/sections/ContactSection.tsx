@@ -1,5 +1,6 @@
 "use client";
 
+import { isExtraLinkShown } from "@/lib/portfolio/visibility";
 import { motion } from "motion/react";
 import { safeUrlUnescaped } from "@/lib/portfolio-safety";
 import type { PortfolioFormData, ExtraLink } from "../../portfolio-templates/types";
@@ -66,9 +67,9 @@ function GlassContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: Ext
                 {f.contactPhone && <ContactButton href={`tel:${f.contactPhone}`} label="Telepon" />}
               </div>
 
-              {extraLinks.filter(l => l.url).length > 0 && (
+              {extraLinks.filter(isExtraLinkShown).length > 0 && (
                 <div className="flex flex-wrap justify-center gap-2 pt-4" style={{ borderTop: `1px solid ${theme.colors.border}` }}>
-                  {extraLinks.filter(l => l.url).map(link => (
+                  {extraLinks.filter(isExtraLinkShown).map(link => (
                     <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer"
                       className="px-3 py-1.5 text-xs transition-all duration-500 hover:scale-105"
                       style={{ background: `${theme.colors.primary}08`, color: theme.colors.textMuted, border: `1px solid ${theme.colors.border}`, borderRadius: theme.radii.pill }}>
@@ -196,7 +197,7 @@ function LuxeContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: Extr
  * ═══════════════════════════════════════════════ */
 function MinimalistContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: ExtraLink[] }) {
   const theme = usePortfolioTheme();
-  const links = extraLinks.filter((l) => l.url);
+  const links = extraLinks.filter(isExtraLinkShown);
 
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(64px, 9vh, 112px) 0" }}>
@@ -291,7 +292,7 @@ function MinimalistContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks
  * ═══════════════════════════════════════════════ */
 function WorkbenchContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: ExtraLink[] }) {
   const theme = usePortfolioTheme();
-  const links = extraLinks.filter((l) => l.url);
+  const links = extraLinks.filter(isExtraLinkShown);
   const web = (value: string) => (value.startsWith("http") ? value : `https://${value.replace(/^https?:\/\//, "")}`);
 
   return (
@@ -376,7 +377,7 @@ function DecalContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: Ext
   if (f.contactPhone) links.push({ label: f.contactPhone, href: `tel:${f.contactPhone}` });
   if (f.contactLinkedin) links.push({ label: "LinkedIn", href: f.contactLinkedin });
   if (f.contactGithub) links.push({ label: "GitHub", href: f.contactGithub });
-  extraLinks.filter((l) => l.url).forEach((l) => links.push({ label: l.label || l.url, href: l.url }));
+  extraLinks.filter(isExtraLinkShown).forEach((l) => links.push({ label: l.label || l.url, href: l.url }));
 
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
@@ -407,7 +408,7 @@ function CrayonContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: Ex
   if (f.contactPhone) links.push({ label: f.contactPhone, href: `tel:${f.contactPhone}` });
   if (f.contactLinkedin) links.push({ label: "LinkedIn", href: f.contactLinkedin });
   if (f.contactGithub) links.push({ label: "GitHub", href: f.contactGithub });
-  extraLinks.filter((l) => l.url).forEach((l) => links.push({ label: l.label || l.url, href: l.url }));
+  extraLinks.filter(isExtraLinkShown).forEach((l) => links.push({ label: l.label || l.url, href: l.url }));
   if (!links.length) return null;
   const fills = [theme.colors.primary, theme.colors.secondary, theme.colors.accent];
   return (
@@ -438,7 +439,7 @@ function ScrapbookContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks:
   if (f.contactPhone) links.push({ label: f.contactPhone, href: `tel:${f.contactPhone}` });
   if (f.contactLinkedin) links.push({ label: "LinkedIn", href: f.contactLinkedin });
   if (f.contactGithub) links.push({ label: "GitHub", href: f.contactGithub });
-  extraLinks.filter((l) => l.url).forEach((l) => links.push({ label: l.label || l.url, href: l.url }));
+  extraLinks.filter(isExtraLinkShown).forEach((l) => links.push({ label: l.label || l.url, href: l.url }));
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
       <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)", textAlign: "center" }}>

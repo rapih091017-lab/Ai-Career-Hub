@@ -1,5 +1,6 @@
 "use client";
 
+import { isTestimonialShown } from "@/lib/portfolio/visibility";
 import { motion } from "motion/react";
 import type { TestimonialItem } from "../../portfolio-templates/types";
 import { useReducedMotion } from "../../../hooks/useReducedMotion";
@@ -15,7 +16,7 @@ interface Props { items: TestimonialItem[]; }
 function GlassTestimonials({ items }: { items: TestimonialItem[] }) {
   const theme = usePortfolioTheme();
   const reduced = useReducedMotion();
-  const filtered = items.filter(t => t.name || t.testimonial);
+  const filtered = items.filter(isTestimonialShown);
   if (!filtered.length) return null;
 
   return (
@@ -107,7 +108,7 @@ function GlassTestimonials({ items }: { items: TestimonialItem[] }) {
  * ═══════════════════════════════════════════════ */
 function BrutalTestimonials({ items }: { items: TestimonialItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter(t => t.name || t.testimonial);
+  const filtered = items.filter(isTestimonialShown);
   if (!filtered.length) return null;
 
   return (
@@ -176,7 +177,7 @@ function BrutalTestimonials({ items }: { items: TestimonialItem[] }) {
  * ═══════════════════════════════════════════════ */
 function LuxeTestimonials({ items }: { items: TestimonialItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter(t => t.name || t.testimonial);
+  const filtered = items.filter(isTestimonialShown);
   if (!filtered.length) return null;
 
   return (
@@ -325,7 +326,7 @@ function MinimalistTestimonials({ items }: { items: TestimonialItem[] }) {
  * ═══════════════════════════════════════════════ */
 function WorkbenchTestimonials({ items }: { items: TestimonialItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((t) => t.name || t.testimonial);
+  const filtered = items.filter(isTestimonialShown);
   if (!filtered.length) return null;
 
   return (

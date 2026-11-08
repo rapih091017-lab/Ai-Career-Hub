@@ -1,5 +1,6 @@
 "use client";
 
+import { isEducationShown } from "@/lib/portfolio/visibility";
 import { motion } from "motion/react";
 import type { EducationItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
@@ -13,7 +14,7 @@ interface Props { items: EducationItem[]; }
  * ═══════════════════════════════════════════════ */
 function GlassEducation({ items }: { items: EducationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter(e => e.institution || e.degree);
+  const filtered = items.filter(isEducationShown);
   if (!filtered.length) return null;
 
   return (
@@ -96,7 +97,7 @@ function GlassEducation({ items }: { items: EducationItem[] }) {
  * ═══════════════════════════════════════════════ */
 function BrutalEducation({ items }: { items: EducationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter(e => e.institution || e.degree);
+  const filtered = items.filter(isEducationShown);
   if (!filtered.length) return null;
 
   return (
@@ -175,7 +176,7 @@ function BrutalEducation({ items }: { items: EducationItem[] }) {
  * ═══════════════════════════════════════════════ */
 function LuxeEducation({ items }: { items: EducationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter(e => e.institution || e.degree);
+  const filtered = items.filter(isEducationShown);
   if (!filtered.length) return null;
 
   return (
@@ -240,7 +241,7 @@ function LuxeEducation({ items }: { items: EducationItem[] }) {
  * ═══════════════════════════════════════════════ */
 function MinimalistEducation({ items }: { items: EducationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((e) => e.institution || e.degree);
+  const filtered = items.filter(isEducationShown);
   if (!filtered.length) return null;
 
   return (
@@ -307,7 +308,7 @@ function MinimalistEducation({ items }: { items: EducationItem[] }) {
  * ═══════════════════════════════════════════════ */
 function WorkbenchEducation({ items }: { items: EducationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((e) => e.institution || e.degree);
+  const filtered = items.filter(isEducationShown);
   if (!filtered.length) return null;
 
   const span = (e: EducationItem) =>
@@ -378,7 +379,7 @@ function DecalEducation({ items }: { items: EducationItem[] }) {
 /* CRAYON: kartu pendidikan putih dengan label tahun berwarna. */
 function CrayonEducation({ items }: { items: EducationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((e) => e.institution || e.degree);
+  const filtered = items.filter(isEducationShown);
   if (!filtered.length) return null;
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
@@ -405,7 +406,7 @@ function CrayonEducation({ items }: { items: EducationItem[] }) {
 /* SCRAPBOOK: ijazah sebagai kartu kertas dengan tahun di selotip. */
 function ScrapbookEducation({ items }: { items: EducationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((e) => e.institution || e.degree);
+  const filtered = items.filter(isEducationShown);
   if (!filtered.length) return null;
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
@@ -431,7 +432,7 @@ function ScrapbookEducation({ items }: { items: EducationItem[] }) {
 
 function InterstellaEducation({ items }: { items: EducationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((e) => e.institution || e.degree);
+  const filtered = items.filter(isEducationShown);
   if (!filtered.length) return null;
   return (
     <section style={{ padding: "clamp(48px, 7vw, 80px) 0", background: theme.colors.bgSecondary }}>
@@ -451,7 +452,7 @@ function InterstellaEducation({ items }: { items: EducationItem[] }) {
 
 function SherbetEducation({ items }: { items: EducationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((e) => e.institution || e.degree);
+  const filtered = items.filter(isEducationShown);
   if (!filtered.length) return null;
   return (
     <section style={{ background: theme.colors.secondary, padding: "clamp(48px, 7vw, 80px) 0" }}>

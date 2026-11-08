@@ -1,5 +1,6 @@
 "use client";
 
+import { isAboutShown } from "@/lib/portfolio/visibility";
 import { motion } from "motion/react";
 import type { PortfolioFormData } from "../../portfolio-templates/types";
 import { useReducedMotion } from "../../../hooks/useReducedMotion";
@@ -419,7 +420,7 @@ function DecalAbout({ f }: { f: PortfolioFormData }) {
 /* CRAYON: bio di kartu putih dengan kotak warna di sampingnya. */
 function CrayonAbout({ f }: { f: PortfolioFormData }) {
   const theme = usePortfolioTheme();
-  if (!f.aboutText) return null;
+  if (!isAboutShown(f)) return null;
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
       <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 32, alignItems: "start" }}>
@@ -445,7 +446,7 @@ function CrayonAbout({ f }: { f: PortfolioFormData }) {
 /* SCRAPBOOK: teks bio di kertas tempel, dengan catatan kecil. */
 function ScrapbookAbout({ f }: { f: PortfolioFormData }) {
   const theme = usePortfolioTheme();
-  if (!f.aboutText) return null;
+  if (!isAboutShown(f)) return null;
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
       <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 36, alignItems: "start" }}>
@@ -493,7 +494,7 @@ function SherbetAbout({ f }: { f: PortfolioFormData }) {
 
 export default function AboutSection({ data: f }: Props) {
   const theme = usePortfolioTheme();
-  if (!f.aboutText) return null;
+  if (!isAboutShown(f)) return null;
   switch (theme.id) {
     case "glass": return <GlassAbout f={f} />;
     case "brutal": return <BrutalAbout f={f} />;

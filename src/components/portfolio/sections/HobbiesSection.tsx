@@ -1,5 +1,6 @@
 "use client";
 
+import { isHobbyShown } from "@/lib/portfolio/visibility";
 import { motion } from "motion/react";
 import type { HobbyItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
@@ -19,7 +20,7 @@ const HOBBY_ICONS = [
 /* ═══ GLASS, chip cloud ═══ */
 function GlassHobbies({ items }: { items: HobbyItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter(h => h.name);
+  const filtered = items.filter(isHobbyShown);
   if (!filtered.length) return null;
 
   return (
@@ -70,7 +71,7 @@ function GlassHobbies({ items }: { items: HobbyItem[] }) {
 /* ═══ BRUTAL, boxed tags ═══ */
 function BrutalHobbies({ items }: { items: HobbyItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter(h => h.name);
+  const filtered = items.filter(isHobbyShown);
   if (!filtered.length) return null;
 
   return (
@@ -123,7 +124,7 @@ function BrutalHobbies({ items }: { items: HobbyItem[] }) {
 /* ═══ LUXE, ledger hairline — nomor serif + nama serif, tanpa kartu ═══ */
 function LuxeHobbies({ items }: { items: HobbyItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter(h => h.name);
+  const filtered = items.filter(isHobbyShown);
   if (!filtered.length) return null;
 
   return (
@@ -182,7 +183,7 @@ function LuxeHobbies({ items }: { items: HobbyItem[] }) {
  * ═══════════════════════════════════════════════ */
 function MinimalistHobbies({ items }: { items: HobbyItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((h) => h.name);
+  const filtered = items.filter(isHobbyShown);
   if (!filtered.length) return null;
 
   return (
@@ -224,7 +225,7 @@ function MinimalistHobbies({ items }: { items: HobbyItem[] }) {
  * ═══════════════════════════════════════════════ */
 function WorkbenchHobbies({ items }: { items: HobbyItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((h) => h.name);
+  const filtered = items.filter(isHobbyShown);
   if (!filtered.length) return null;
 
   return (
@@ -252,7 +253,7 @@ function WorkbenchHobbies({ items }: { items: HobbyItem[] }) {
 /* DECAL: hobi sebagai stiker pill berwarna. */
 function DecalHobbies({ items }: { items: HobbyItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((h) => h.name);
+  const filtered = items.filter(isHobbyShown);
   if (!filtered.length) return null;
   const colors = [theme.colors.primary, theme.colors.secondary, theme.colors.accent];
 
@@ -280,7 +281,7 @@ function DecalHobbies({ items }: { items: HobbyItem[] }) {
 /* CRAYON: hobi sebagai pil warna-warni. */
 function CrayonHobbies({ items }: { items: HobbyItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((h) => h.name);
+  const filtered = items.filter(isHobbyShown);
   if (!filtered.length) return null;
   const fills = [theme.colors.primary, theme.colors.secondary, theme.colors.accent];
   return (
@@ -306,7 +307,7 @@ function CrayonHobbies({ items }: { items: HobbyItem[] }) {
 /* SCRAPBOOK: hobi sebagai label selotip kecil yang miring. */
 function ScrapbookHobbies({ items }: { items: HobbyItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((h) => h.name);
+  const filtered = items.filter(isHobbyShown);
   if (!filtered.length) return null;
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
@@ -330,7 +331,7 @@ function ScrapbookHobbies({ items }: { items: HobbyItem[] }) {
 
 function InterstellaHobbies({ items }: { items: HobbyItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((h) => h.name);
+  const filtered = items.filter(isHobbyShown);
   if (!filtered.length) return null;
   return (
     <section style={{ padding: "clamp(48px, 7vw, 80px) 0", background: theme.colors.bgSecondary }}>
@@ -346,7 +347,7 @@ function InterstellaHobbies({ items }: { items: HobbyItem[] }) {
 
 function SherbetHobbies({ items }: { items: HobbyItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((h) => h.name);
+  const filtered = items.filter(isHobbyShown);
   if (!filtered.length) return null;
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(48px, 7vw, 80px) 0" }}>

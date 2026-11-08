@@ -1,5 +1,6 @@
 "use client";
 
+import { isCertificationShown } from "@/lib/portfolio/visibility";
 import { motion } from "motion/react";
 import { safeUrlUnescaped } from "@/lib/portfolio-safety";
 import type { CertificationItem } from "../../portfolio-templates/types";
@@ -11,7 +12,7 @@ interface Props { items: CertificationItem[]; }
 /* ═══ GLASS, badge grid with glow icons ═══ */
 function GlassCertifications({ items }: { items: CertificationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter(c => c.name);
+  const filtered = items.filter(isCertificationShown);
   if (!filtered.length) return null;
 
   return (
@@ -87,7 +88,7 @@ function GlassCertifications({ items }: { items: CertificationItem[] }) {
 /* ═══ BRUTAL, bold bordered cards with stamp ═══ */
 function BrutalCertifications({ items }: { items: CertificationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter(c => c.name);
+  const filtered = items.filter(isCertificationShown);
   if (!filtered.length) return null;
 
   return (
@@ -154,7 +155,7 @@ function BrutalCertifications({ items }: { items: CertificationItem[] }) {
 /* ═══ LUXE, ledger hairline — nama serif + angka tahun, tanpa kartu ═══ */
 function LuxeCertifications({ items }: { items: CertificationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter(c => c.name);
+  const filtered = items.filter(isCertificationShown);
   if (!filtered.length) return null;
 
   return (
@@ -221,7 +222,7 @@ function LuxeCertifications({ items }: { items: CertificationItem[] }) {
  * ═══════════════════════════════════════════════ */
 function MinimalistCertifications({ items }: { items: CertificationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((c) => c.name);
+  const filtered = items.filter(isCertificationShown);
   if (!filtered.length) return null;
 
   return (
@@ -278,7 +279,7 @@ function MinimalistCertifications({ items }: { items: CertificationItem[] }) {
  * ═══════════════════════════════════════════════ */
 function WorkbenchCertifications({ items }: { items: CertificationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((c) => c.name);
+  const filtered = items.filter(isCertificationShown);
   if (!filtered.length) return null;
 
   return (
@@ -345,7 +346,7 @@ function WorkbenchCertifications({ items }: { items: CertificationItem[] }) {
 /* DECAL: sertifikat sebagai stiker pill bertanggal. */
 function DecalCertifications({ items }: { items: CertificationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((c) => c.name);
+  const filtered = items.filter(isCertificationShown);
   if (!filtered.length) return null;
 
   return (
@@ -372,7 +373,7 @@ function DecalCertifications({ items }: { items: CertificationItem[] }) {
 /* CRAYON: sertifikat sebagai kartu putih dengan label tahun. */
 function CrayonCertifications({ items }: { items: CertificationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((c) => c.name);
+  const filtered = items.filter(isCertificationShown);
   if (!filtered.length) return null;
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
@@ -398,7 +399,7 @@ function CrayonCertifications({ items }: { items: CertificationItem[] }) {
 /* SCRAPBOOK: sertifikat sebagai tiket tempel dengan tahun di selotip. */
 function ScrapbookCertifications({ items }: { items: CertificationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((c) => c.name);
+  const filtered = items.filter(isCertificationShown);
   if (!filtered.length) return null;
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
@@ -423,7 +424,7 @@ function ScrapbookCertifications({ items }: { items: CertificationItem[] }) {
 
 function InterstellaCertifications({ items }: { items: CertificationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((c) => c.name);
+  const filtered = items.filter(isCertificationShown);
   if (!filtered.length) return null;
   return (
     <section style={{ padding: "clamp(48px, 7vw, 80px) 0", background: theme.colors.bgSecondary }}>
@@ -443,7 +444,7 @@ function InterstellaCertifications({ items }: { items: CertificationItem[] }) {
 
 function SherbetCertifications({ items }: { items: CertificationItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((c) => c.name);
+  const filtered = items.filter(isCertificationShown);
   if (!filtered.length) return null;
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(48px, 7vw, 80px) 0" }}>

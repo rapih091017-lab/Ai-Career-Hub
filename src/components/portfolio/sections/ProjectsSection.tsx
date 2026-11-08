@@ -1,5 +1,6 @@
 "use client";
 
+import { isProjectShown } from "@/lib/portfolio/visibility";
 import { DescriptionText } from "../render/DescriptionText";
 import { motion } from "motion/react";
 import { safeUrlUnescaped } from "@/lib/portfolio-safety";
@@ -22,7 +23,7 @@ interface Props { items: ProjectItem[]; }
 /* ─── GLASS: Asymmetrical Bento Grid ─── */
 function GlassProjects({ items }: { items: ProjectItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter(p => p.name);
+  const filtered = items.filter(isProjectShown);
   if (!filtered.length) return null;
 
   return (
@@ -122,7 +123,7 @@ function GlassProjects({ items }: { items: ProjectItem[] }) {
 /* ─── BRUTAL: Bold cards with image showcase ─── */
 function BrutalProjects({ items }: { items: ProjectItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter(p => p.name);
+  const filtered = items.filter(isProjectShown);
   if (!filtered.length) return null;
 
   return (
@@ -203,7 +204,7 @@ function BrutalProjects({ items }: { items: ProjectItem[] }) {
 /* ─── LUXE: Editorial Split with Double-Bezel ─── */
 function LuxeProjects({ items }: { items: ProjectItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter(p => p.name);
+  const filtered = items.filter(isProjectShown);
   if (!filtered.length) return null;
 
   return (
@@ -306,7 +307,7 @@ function LuxeProjects({ items }: { items: ProjectItem[] }) {
  * ═══════════════════════════════════════════════ */
 function MinimalistProjects({ items }: { items: ProjectItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((p) => p.name);
+  const filtered = items.filter(isProjectShown);
   if (!filtered.length) return null;
 
   return (
@@ -393,7 +394,7 @@ function MinimalistProjects({ items }: { items: ProjectItem[] }) {
  * ═══════════════════════════════════════════════ */
 function WorkbenchProjects({ items }: { items: ProjectItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((p) => p.name);
+  const filtered = items.filter(isProjectShown);
   if (!filtered.length) return null;
 
   return (
@@ -470,7 +471,7 @@ function WorkbenchProjects({ items }: { items: ProjectItem[] }) {
  * ═══════════════════════════════════════════════ */
 function DecalProjects({ items }: { items: ProjectItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((p) => p.name);
+  const filtered = items.filter(isProjectShown);
   if (!filtered.length) return null;
 
   return (
@@ -519,7 +520,7 @@ function DecalProjects({ items }: { items: ProjectItem[] }) {
 /* CRAYON: proyek sebagai kartu putih dengan nomor berwarna. */
 function CrayonProjects({ items }: { items: ProjectItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((p) => p.name);
+  const filtered = items.filter(isProjectShown);
   if (!filtered.length) return null;
   const fills = [theme.colors.primary, theme.colors.secondary, theme.colors.accent];
   return (
@@ -548,7 +549,7 @@ function CrayonProjects({ items }: { items: ProjectItem[] }) {
 /* SCRAPBOOK: proyek sebagai foto tempel bertumpuk dengan judul tulisan tangan. */
 function ScrapbookProjects({ items }: { items: ProjectItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((p) => p.name);
+  const filtered = items.filter(isProjectShown);
   if (!filtered.length) return null;
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
@@ -576,7 +577,7 @@ function ScrapbookProjects({ items }: { items: ProjectItem[] }) {
 /* ─── MAIN ─── */
 function InterstellaProjects({ items }: { items: ProjectItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((p) => p.name);
+  const filtered = items.filter(isProjectShown);
   if (!filtered.length) return null;
   return (
     <section style={{ padding: "clamp(64px, 10vw, 128px) 0", background: theme.colors.bgSecondary }}>
@@ -608,7 +609,7 @@ function InterstellaProjects({ items }: { items: ProjectItem[] }) {
 
 function SherbetProjects({ items }: { items: ProjectItem[] }) {
   const theme = usePortfolioTheme();
-  const filtered = items.filter((p) => p.name);
+  const filtered = items.filter(isProjectShown);
   if (!filtered.length) return null;
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(64px, 9vw, 112px) 0" }}>
