@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { Fragment, useState, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
@@ -23,12 +23,24 @@ import { PanelSplitter, usePanelSplit } from "@/components/builder/PanelSplitter
 import { BuilderTour, tourSeen, type TourStep } from "@/components/builder/BuilderTour";
 import { FONT_SIZES, SECTION_IDS, type FontSize, type SectionId, type TextAlignment, type ThemeId } from "@/components/portfolio/types";
 import { isSectionVisible } from "@/components/portfolio/sectionVisibility";
+import {
+  aboutStatsHidden,
+  hiddenEntryNote,
+  isCertificationShown,
+  isEducationShown,
+  isExperienceShown,
+  isExtraLinkShown,
+  isHobbyShown,
+  isOrganizationShown,
+  isProjectShown,
+  isTestimonialShown,
+} from "@/lib/portfolio/visibility";
 import { StepperSteps } from "@/components/builder/StepperNav";
 import { FieldHelp } from "@/components/builder/FieldHelp";
 import { BulletEditor } from "@/components/builder/BulletEditor";
 import { aiTextForField } from "@/lib/bullet-lines";
 import { PORTFOLIO_HELP, type PortfolioHelpKey } from "@/lib/portfolio-help";
-import { PORTFOLIO_STEP_IDS, PORTFOLIO_STEP_META, isTypingTarget, portfolioStepCompletion } from "@/components/portfolio/builder/steps";
+import { PORTFOLIO_STEP_IDS, PORTFOLIO_STEP_META, isTypingTarget, portfolioStepCompletion, type PortfolioStepId } from "@/components/portfolio/builder/steps";
 
 type AccordionKey = "hero" | "about" | "projects" | "skills" | "experience" | "education" | "certifications" | "organizations" | "hobbies" | "testimonials" | "contact";
 
@@ -46,6 +58,16 @@ const SECTION_NAME_KEYS: Record<SectionId, string> = {
   hobbies: "build.hobbies",
   testimonials: "build.testimonial",
   contact: "build.contact",
+};
+
+/** Section portofolio yang diisi di tiap langkah. */
+const STEP_SECTIONS: Partial<Record<PortfolioStepId, SectionId[]>> = {
+  hero: ["hero"],
+  about: ["about", "stats", "skills", "hobbies"],
+  projects: ["projects"],
+  experience: ["experience", "education", "certifications", "organizations"],
+  testimonials: ["testimonials"],
+  contact: ["contact"],
 };
 
 const ALIGNMENT_OPTIONS: { value: TextAlignment; key: string }[] = [
@@ -911,6 +933,13 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
             {/* Isi langkah aktif. Semua nilai ada di state draft (undo stack),
                 jadi langkah yang tidak tampil tidak kehilangan isian. */}
             <div data-tour="form" className="flex flex-col gap-4">
+              {(STEP_SECTIONS[stepId] ?? [])
+                .filter((id) => !isSectionVisible(portfolio.sectionVisibility, id))
+                .map((id) => (
+                  <HiddenNote key={id} action={{ label: "Tampilkan", onClick: () => toggleSectionVisible(id) }}>
+                    Bagian {t(SECTION_NAME_KEYS[id])} disembunyikan, jadi tidak tampil di portofolio.
+                  </HiddenNote>
+                ))}
               {stepId === "hero" && (
               <StepCard>
                 <div className="px-6 space-y-4">
@@ -982,6 +1011,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                       value={formData.aboutText} onChange={update("aboutText")} />
                     <CharCounter value={formData.aboutText} max={1500} />
                   </div>
+                  {aboutStatsHidden(formData) && <HiddenNote>Bagian Tentang tampil setelah teks Tentang diisi.</HiddenNote>}
                   <div className="grid grid-cols-3 gap-4">                      <Field label={t("build.about-years")}>
                       <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="3+"
                         value={formData.aboutYearsExp} onChange={update("aboutYearsExp")} />
@@ -1044,6 +1074,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                           </button>
                         )}
                       </div>
+                        {!isHobbyShown(hobby) && <HiddenNote>{hiddenEntryNote("hobby")}</HiddenNote>}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Field label={t("live.form.hobby-name")}>
                           <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Fotografi"
@@ -1078,6 +1109,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                           <span className="material-symbols-outlined select-none" aria-hidden="true">delete</span>
                         </button>
                       </div>
+                        {!isProjectShown(p) && <HiddenNote>{hiddenEntryNote("project")}</HiddenNote>}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="md:col-span-2">
                           <span className="mb-1 flex items-center gap-1"><label className="block text-label-sm text-on-surface-variant">{t("live.form.project-name")}</label><FieldHelp topic={PORTFOLIO_HELP.projectName} /></span>
@@ -1134,6 +1166,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                           <span className="material-symbols-outlined select-none" aria-hidden="true">delete</span>
                         </button>
                       </div>
+                        {!isExperienceShown(e) && <HiddenNote>{hiddenEntryNote("experience")}</HiddenNote>}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Field label={t("live.form.company")}>
                           <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Nama perusahaan"
@@ -1192,6 +1225,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                           <span className="material-symbols-outlined select-none" aria-hidden="true">delete</span>
                         </button>
                       </div>
+                        {!isEducationShown(e) && <HiddenNote>{hiddenEntryNote("education")}</HiddenNote>}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="md:col-span-2">
                           <Field label={t("live.form.institution")}>
@@ -1239,6 +1273,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                           <span className="material-symbols-outlined select-none" aria-hidden="true">delete</span>
                         </button>
                       </div>
+                        {!isCertificationShown(cert) && <HiddenNote>{hiddenEntryNote("certification")}</HiddenNote>}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Field label={t("live.form.cert-name")}>
                           <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="AWS Certified Developer"
@@ -1278,6 +1313,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                           <span className="material-symbols-outlined select-none" aria-hidden="true">delete</span>
                         </button>
                       </div>
+                        {!isOrganizationShown(org) && <HiddenNote>{hiddenEntryNote("organization")}</HiddenNote>}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Field label={t("live.form.org-name")}>
                           <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Himpunan Mahasiswa Teknik"
@@ -1323,6 +1359,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                           </button>
                         )}
                       </div>
+                        {!isTestimonialShown(item) && <HiddenNote>{hiddenEntryNote("testimonial")}</HiddenNote>}
                       <div className="flex flex-col md:flex-row gap-6">
                         <div className="flex-shrink-0 flex flex-col items-center">
                           <label className="block text-label-sm text-on-surface-variant mb-2">Foto</label>
@@ -1394,7 +1431,8 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                     </ValidatedField>
                     {/* Extra Links */}
                     {extraLinks.map((link, i) => (
-                      <div key={link.id} className="md:col-span-2 flex items-center gap-2">
+                      <Fragment key={link.id}>
+                      <div className="md:col-span-2 flex items-center gap-2">
                         <span className="material-symbols-outlined text-outline text-xl">link</span>
                         <input className="flex-1 px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Label (Twitter, Dribbble...)"
                           value={link.label} onChange={e => setExtraLinks(prev => prev.map(x => x.id === link.id ? {...x, label: e.target.value} : x))} />
@@ -1406,6 +1444,10 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                           <span className="material-symbols-outlined select-none">close</span>
                         </button>
                       </div>
+                      {link.label && !isExtraLinkShown(link) && (
+                        <div className="md:col-span-2 -mt-2"><HiddenNote>Isi URL agar link tampil.</HiddenNote></div>
+                      )}
+                      </Fragment>
                     ))}
                     <div className="md:col-span-2">
                       <button onClick={() => setExtraLinks(prev => [...prev, { id: genId(), label: "", url: "" }])}
@@ -1959,6 +2001,21 @@ export function AccordionItem({ id, icon, title, isOpen, onToggle, children }: {
 }
 
 /** Kartu pembungkus isi satu langkah. */
+/** Catatan di editor: isian ini belum (atau tidak) tampil di portofolio. */
+export function HiddenNote({ children, action }: { children: React.ReactNode; action?: { label: string; onClick: () => void } }) {
+  return (
+    <div role="status" data-testid="hidden-note" className="mb-3 flex flex-wrap items-center gap-2 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-body-sm text-amber-900">
+      <span className="material-symbols-outlined text-lg" aria-hidden="true">visibility_off</span>
+      <span className="min-w-0 flex-1">{children}</span>
+      {action && (
+        <button type="button" onClick={action.onClick} className="min-h-11 rounded-lg px-3 font-label-bold text-amber-900 underline hover:bg-amber-100 sm:min-h-9">
+          {action.label}
+        </button>
+      )}
+    </div>
+  );
+}
+
 function StepCard({ title, children }: { title?: string; children: React.ReactNode }) {
   return (
     <div className="bg-surface-container-lowest rounded-2xl shadow-soft border border-outline-variant/50 py-6">

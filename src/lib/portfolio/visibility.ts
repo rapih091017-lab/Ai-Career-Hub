@@ -39,15 +39,15 @@ export type HiddenEntryKind =
   | "hobby"
   | "testimonial";
 
-/** Nama field (label UI) yang perlu diisi agar entri tampil. */
+/** Label field persis seperti di form editor yang perlu diisi agar entri tampil. */
 const NEEDED: Record<HiddenEntryKind, string> = {
-  project: "Nama proyek",
+  project: "Nama Project",
   experience: "Perusahaan atau Posisi",
   education: "Institusi atau Gelar",
-  certification: "Nama sertifikat",
-  organization: "Nama organisasi",
-  hobby: "Nama hobi",
-  testimonial: "Nama atau isi testimoni",
+  certification: "Nama Sertifikat",
+  organization: "Nama Organisasi",
+  hobby: "Nama Hobi",
+  testimonial: "Nama atau Testimoni",
 };
 
 /** Kalimat catatan untuk kartu entri yang belum tampil. */
