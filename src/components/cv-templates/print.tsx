@@ -122,7 +122,22 @@ export function measurePageCount(el: HTMLElement): number {
   const colW = el.clientWidth;
   const gap = parseFloat(getComputedStyle(el).columnGap) || 0;
   if (!(colW > 0)) return 1;
-  return Math.max(1, Math.round((el.scrollWidth + gap) / (colW + gap)));
+  const step = colW + gap;
+  const fromScroll = Math.round((el.scrollWidth + gap) / step);
+  // Safari/Firefox tidak selalu memasukkan kolom yang meluber ke scrollWidth,
+  // jadi hitung juga dari kolom tempat elemen terakhir benar-benar berada.
+  // Pratinjau diperkecil dengan transform: posisi layar dikembalikan ke ukuran asli.
+  const box = el.getBoundingClientRect();
+  const scale = el.offsetWidth > 0 && box.width > 0 ? box.width / el.offsetWidth : 1;
+  const left = box.left;
+  let lastCol = 0;
+  for (const node of Array.from(el.querySelectorAll<HTMLElement>("*"))) {
+    for (const r of Array.from(node.getClientRects())) {
+      if (r.width === 0 && r.height === 0) continue;
+      lastCol = Math.max(lastCol, Math.floor(((r.left - left) / scale + 1) / step));
+    }
+  }
+  return Math.max(1, fromScroll, lastCol + 1);
 }
 
 /** Dokumen HTML lengkap untuk dicetak Chromium. `body` = markup AtsBaseRenderer. */
