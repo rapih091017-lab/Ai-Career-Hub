@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { payments } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and, ne } from "drizzle-orm";
 import { getMidtransConfig, verifyNotificationSignature } from "@/lib/midtrans";
 import { recordEvent } from "@/lib/events.server";
+import { PAYMENT_SUCCESS_STATUS } from "@/lib/kasera-webhook";
 import { createConversionForPayment } from "@/lib/affiliate.server";
 
 /**
@@ -76,7 +77,8 @@ export async function POST(request: NextRequest) {
     }
 
     // ── 5. Update DB ────────────────────────────────────────────────
-    await db
+    // Hanya baris yang belum success yang diubah; baris kembali = transisi nyata ke status baru.
+    const changed = await db
       .update(payments)
       .set({
         transactionId: transaction_id ?? payment.transactionId,
@@ -86,12 +88,13 @@ export async function POST(request: NextRequest) {
         rawNotification: body,
         updatedAt: new Date(),
       })
-      .where(eq(payments.id, payment.id));
+      .where(and(eq(payments.id, payment.id), ne(payments.paymentStatus, PAYMENT_SUCCESS_STATUS)))
+      .returning({ id: payments.id });
 
     // ── 6. Atribusi affiliate (hanya saat sukses, idempotent) ───────
     if (newStatus === "success") {
-      // Event funnel "purchase" dicatat di server, sekali per pembayaran (webhook dan polling bisa sama-sama sampai di sini).
-      await recordEvent({ name: "purchase", userId: payment.userId, resourceId: payment.id, props: { package: payment.packageType }, oncePerResource: true });
+      // Event funnel "purchase": hanya bila UPDATE di atas benar-benar mengubah baris jadi success.
+      if (changed.length > 0) await recordEvent({ name: "purchase", userId: payment.userId, resourceId: payment.id, props: { package: payment.packageType } });
       try {
         await createConversionForPayment({
           id: payment.id,

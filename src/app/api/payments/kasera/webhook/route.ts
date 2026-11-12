@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { payments } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and, ne } from "drizzle-orm";
 import { verifyWebhookSignature } from "@/lib/kasera";
 import {
   mapEventToPaymentUpdate,
@@ -11,6 +11,7 @@ import {
   type KaseraWebhookPayload,
 } from "@/lib/kasera-webhook";
 import { recordEvent } from "@/lib/events.server";
+import { PAYMENT_SUCCESS_STATUS } from "@/lib/kasera-webhook";
 import { createConversionForPayment } from "@/lib/affiliate.server";
 
 export const runtime = "nodejs";
@@ -91,7 +92,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ status: "OK", mismatch: true });
   }
 
-  await db
+  // Hanya baris yang belum success yang diubah; baris kembali = transisi nyata ke status baru.
+  const changed = await db
     .update(payments)
     .set({
       paymentStatus: update.paymentStatus,
@@ -101,11 +103,12 @@ export async function POST(request: NextRequest) {
       rawNotification: payload as unknown as Record<string, unknown>,
       updatedAt: new Date(),
     })
-    .where(eq(payments.id, payment.id));
+    .where(and(eq(payments.id, payment.id), ne(payments.paymentStatus, PAYMENT_SUCCESS_STATUS)))
+    .returning({ id: payments.id });
 
   if (update.paymentStatus === "success") {
-    // Event funnel "purchase" dicatat di server, sekali per pembayaran (webhook dan polling bisa sama-sama sampai di sini).
-    await recordEvent({ name: "purchase", userId: payment.userId, resourceId: payment.id, props: { package: payment.packageType }, oncePerResource: true });
+    // Event funnel "purchase": hanya bila UPDATE di atas benar-benar mengubah baris jadi success.
+    if (changed.length > 0) await recordEvent({ name: "purchase", userId: payment.userId, resourceId: payment.id, props: { package: payment.packageType } });
     try {
       await createConversionForPayment({
         id: payment.id,

@@ -54,7 +54,8 @@ describe("event funnel tidak memengaruhi kuota", () => {
     ]) {
       const code = src(path);
       const line = code.split("\n").find((l) => l.includes('recordEvent({ name: "purchase"'));
-      expect(line, path).toContain("oncePerResource: true");
+      // Sekali per pembayaran dijamin UPDATE bersyarat (lihat purchase-event-once.test.ts).
+      expect(line, path).toContain("changed.length > 0");
     }
     for (const name of SERVER_ONLY_EVENTS) expect(CLIENT_EVENTS as readonly string[]).not.toContain(name);
   });

@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { payments } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and, ne } from "drizzle-orm";
 import { retrieveTransaction } from "@/lib/kasera";
 import { recordEvent } from "@/lib/events.server";
+import { PAYMENT_SUCCESS_STATUS } from "@/lib/kasera-webhook";
 import { createConversionForPayment } from "@/lib/affiliate.server";
 
 export const runtime = "nodejs";
@@ -64,18 +65,20 @@ export async function GET(request: NextRequest) {
           : payment.paymentStatus;
 
     if (nextStatus !== payment.paymentStatus) {
-      await db
+      // Hanya baris yang belum success yang diubah; baris kembali = transisi nyata ke status baru.
+      const changed = await db
         .update(payments)
         .set({
           paymentStatus: nextStatus,
           paidAt: nextStatus === "success" ? new Date() : payment.paidAt,
           updatedAt: new Date(),
         })
-        .where(eq(payments.id, payment.id));
+        .where(and(eq(payments.id, payment.id), ne(payments.paymentStatus, PAYMENT_SUCCESS_STATUS)))
+        .returning({ id: payments.id });
 
       if (nextStatus === "success") {
-        // Event funnel "purchase" dicatat di server, sekali per pembayaran (webhook dan polling bisa sama-sama sampai di sini).
-        await recordEvent({ name: "purchase", userId: payment.userId, resourceId: payment.id, props: { package: payment.packageType }, oncePerResource: true });
+        // Event funnel "purchase": hanya bila UPDATE di atas benar-benar mengubah baris jadi success.
+        if (changed.length > 0) await recordEvent({ name: "purchase", userId: payment.userId, resourceId: payment.id, props: { package: payment.packageType } });
         try {
           await createConversionForPayment({
             id: payment.id,
