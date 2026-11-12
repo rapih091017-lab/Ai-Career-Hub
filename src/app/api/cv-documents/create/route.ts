@@ -9,6 +9,7 @@ import { callAI, MODELS } from "@/lib/ai/adapter";
 import { GENERATOR_PROMPT_V2 } from "@/lib/ai/prompts/generator-v2";
 import { reserveQuota } from "@/lib/api-utils";
 import { normalizeSkillLevel } from "@/lib/cv-normalize";
+import { profileFromAiData, profileHasContent } from "@/lib/profile-from-ai";
 import type { SkillEntry } from "@/components/cv-templates";
 
 export async function POST(request: NextRequest) {
@@ -30,21 +31,21 @@ export async function POST(request: NextRequest) {
   }
 
   // Always fetch profile to get a valid FK id (masterProfileId is NOT NULL in schema)
-  let [masterProfile] = await db
+  const [existingProfile] = await db
     .select()
     .from(masterProfiles)
     .where(eq(masterProfiles.userId, session.user.id))
     .limit(1);
 
-  // Dari hasil cek CV, isi CV datang dari teks CV, bukan profil. User baru
-  // (baru daftar dari hasil cek) belum punya profil, jadi dibuatkan profil
-  // kosong hanya untuk memenuhi FK, supaya tidak dilempar ke halaman profil.
-  if (!masterProfile && source === "checker" && typeof rawText === "string" && rawText.trim().length > 20) {
-    [masterProfile] = await db.insert(masterProfiles).values({ userId: session.user.id }).returning();
-  }
+  // Dari hasil cek CV, user baru (baru daftar dari hasil cek) belum punya
+  // profil. Profilnya dibuat dari hasil parse AI teks CV di bawah, bukan
+  // profil kosong; bila parse gagal, tidak ada yang disimpan.
+  const profileFromChecker =
+    !existingProfile && source === "checker" && typeof rawText === "string" && rawText.trim().length > 20;
+  let masterProfile = existingProfile;
 
   // Profile is required for FK reference (masterProfileId is NOT NULL in schema)
-  if (!masterProfile) {
+  if (!existingProfile && !profileFromChecker) {
     return NextResponse.json(
       { error: "PROFILE_NOT_FOUND", message: "Silakan isi profil terlebih dahulu", redirectUrl: "/profile" },
       { status: 404 },
@@ -58,7 +59,7 @@ export async function POST(request: NextRequest) {
 
   try {
   // Only copy profile content when useProfile=true
-  const tailoredContent: any = useProfile
+  const tailoredContent: any = useProfile && masterProfile
     ? {
         personalInfo: masterProfile.personalInfo ?? null,
         workHistory: masterProfile.workHistory ?? null,
@@ -178,6 +179,24 @@ export async function POST(request: NextRequest) {
     };
   }
 
+  if (profileFromChecker) {
+    const profile = aiGeneratedData ? profileFromAiData(normalizeAiData(aiGeneratedData)) : null;
+    if (!profile || !profileHasContent(profile)) {
+      await reservation.refund();
+      return NextResponse.json(
+        {
+          error: "CV_PARSE_FAILED",
+          message: "Teks CV belum berhasil dibaca jadi draf. Coba lagi sebentar lagi; teks dari hasil cek masih tersimpan.",
+        },
+        { status: 502 },
+      );
+    }
+    [masterProfile] = await db
+      .insert(masterProfiles)
+      .values({ userId: session.user.id, ...profile } as typeof masterProfiles.$inferInsert)
+      .returning();
+  }
+
   // Merge AI-generated structured data into tailoredContent
   // AI data overrides profile data; profil dipakai sebagai fallback per-field.
   // Kolom tailoredContent di DB adalah JSON, tipe longgar (any) agar
@@ -222,7 +241,7 @@ export async function POST(request: NextRequest) {
     .insert(cvDocuments)
     .values({
       userId: session.user.id,
-      masterProfileId: masterProfile.id,
+      masterProfileId: masterProfile!.id,
       jobTitle: jobTitle?.trim() || "",
       jobDescription: jobDescription?.trim() || "",
       tailoredContent: mergedContent,
