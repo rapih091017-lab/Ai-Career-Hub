@@ -108,8 +108,8 @@ export default function PortfolioPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="font-headline-lg text-on-background mb-1">Portfolio Website</h1>
-                <p className="font-body-md text-on-surface-variant">Bangun dan kelola website portofolio pribadimu</p>
+                <h1 className="font-headline-lg text-on-background mb-1">{t("pf.title")}</h1>
+                <p className="font-body-md text-on-surface-variant">{t("pf.subtitle")}</p>
               </div>
               {/* Language toggle */}
               <button
@@ -165,11 +165,11 @@ export default function PortfolioPage() {
                 <div className="flex gap-3 flex-wrap">
                   <Link href="/portfolio/build" className="flex min-h-[44px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-5 font-label-bold text-on-light shadow-[0_3px_0_rgb(var(--c-ink))] transition-all hover:-translate-y-0.5">
                     <span className="material-symbols-outlined text-lg">edit</span>
-                    <span className="hidden sm:inline">Buat Portfolio</span>
+                    <span className="hidden sm:inline">{t("pf.create")}</span>
                   </Link>
                   <Link href={`/portfolio/preview?template=${selectedTheme}`} className="flex min-h-[44px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-paper px-5 font-label-bold text-ink transition-colors hover:bg-lime/15">
                     <span className="material-symbols-outlined text-lg">preview</span>
-                    <span className="hidden sm:inline">Preview</span>
+                    <span className="hidden sm:inline">{t("pf.preview")}</span>
                   </Link>
                 </div>
               </div>

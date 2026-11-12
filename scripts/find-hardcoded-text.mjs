@@ -34,6 +34,9 @@ const SKIP_PATH = [
   /^src\/components\/cv-templates\//,
   /^src\/components\/pdf\//,
   /Renderer\.tsx$/,
+  // Isi portofolio publik: bahasa mengikuti isi portofolio, bukan bahasa UI pengunjung.
+  /^src\/components\/portfolio\/sections\//,
+  /^src\/components\/portfolio-templates\//,
 ];
 
 // Teks yang boleh mentah: brand, singkatan, istilah yang sama di dua bahasa.

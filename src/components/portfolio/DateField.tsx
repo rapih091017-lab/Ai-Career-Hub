@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useTranslation } from "@/lib/i18n";
 
 interface DateFieldProps {
   value: string;
@@ -16,12 +17,13 @@ interface DateFieldProps {
 export default function DateField({
   value,
   onChange,
-  placeholder = "Pilih tanggal",
+  placeholder,
   label,
   showPresent = false,
   isPresent = false,
   onPresentChange,
 }: DateFieldProps) {
+  const { t, lang } = useTranslation();
   const [showPicker, setShowPicker] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(() => {
     if (value) {
@@ -46,8 +48,8 @@ export default function DateField({
   }, [showPicker]);
 
   const months = [
-    "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
-    "Jul", "Agu", "Sep", "Okt", "Nov", "Des",
+    "Jan", "Feb", "Mar", "Apr", lang === "en" ? "May" : "Mei", "Jun",
+    "Jul", lang === "en" ? "Aug" : "Agu", "Sep", lang === "en" ? "Oct" : "Okt", "Nov", lang === "en" ? "Dec" : "Des",
   ];
 
   const handleSelect = (month: number, year: number) => {
@@ -69,7 +71,7 @@ export default function DateField({
           className={inputClass + " flex items-center text-on-surface-variant"}
           style={{ cursor: "default" }}
         >
-          Sekarang
+          {t("date.present")}
         </div>
       ) : (
         <div
@@ -77,7 +79,7 @@ export default function DateField({
           onClick={() => setShowPicker(!showPicker)}
         >
           <span style={{ color: value ? "inherit" : "var(--p-text-secondary, #5c5a63)" }}>
-            {value || placeholder}
+            {value || placeholder || t("date.pick")}
           </span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-on-surface-variant">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
@@ -149,7 +151,7 @@ export default function DateField({
             className="w-3.5 h-3.5 rounded border-outline-variant text-primary focus:ring-primary/30"
           />
           <span className="text-xs text-on-surface-variant group-hover:text-on-surface transition-colors">
-            Sampai Sekarang
+            {t("date.until-now")}
           </span>
         </label>
       )}

@@ -11,6 +11,7 @@ import {
   migrateLegacyPayload,
   shouldClearLegacy,
 } from "@/lib/portfolio/legacy-migration";
+import { useTranslation } from "@/lib/i18n";
 
 /** Draft benar-benar kosong; semua field wajib schema ikut diisi. */
 function emptyFormData() {
@@ -54,6 +55,7 @@ function emptyFormData() {
  */
 export default function NewBuildPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const fired = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -83,13 +85,13 @@ export default function NewBuildPage() {
       });
       const json = await res.json().catch(() => null);
       if (!res.ok || !json?.draftId) {
-        setError("Gagal membuat draft. Periksa koneksi lalu coba lagi.");
+        setError(t("pf.draft-failed"));
         return;
       }
       if (shouldClearLegacy(legacy, migrated)) clearLegacyDraft();
       router.replace(`/portfolio/build/${json.draftId}`);
     } catch {
-      setError("Gagal membuat draft. Periksa koneksi lalu coba lagi.");
+      setError(t("pf.draft-failed"));
     } finally {
       setBusy(false);
     }
@@ -119,7 +121,7 @@ export default function NewBuildPage() {
             }}
             className="min-h-11 rounded-xl bg-primary px-5 text-sm font-bold text-on-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Coba lagi
+            {t("pf.retry")}
           </button>
         </div>
       </AuthGuard>
@@ -128,7 +130,7 @@ export default function NewBuildPage() {
 
   return (
     <AuthGuard>
-      <PortfolioSkeleton message="Menyiapkan draft baru" />
+      <PortfolioSkeleton message={t("pf.draft-preparing")} />
     </AuthGuard>
   );
 }

@@ -26,6 +26,7 @@ import { SECTION_IDS } from "./types";
 import { THEMES, DEFAULT_THEME_ID } from "./themes";
 import type { ThemeId } from "./types";
 import PortfolioDocument from "./render/PortfolioDocument";
+import { useTranslation } from "@/lib/i18n";
 
 /* ─── Context ─── */
 
@@ -51,6 +52,7 @@ function SortableSection({ id, children, isSelected }: {
   isSelected: boolean;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const { t } = useTranslation();
   const theme = usePortfolioTheme();
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -67,7 +69,7 @@ function SortableSection({ id, children, isSelected }: {
         {...listeners}
         className="absolute -left-8 top-1/2 -translate-y-1/2 z-20 opacity-0 group-hover/section:opacity-100 transition-opacity p-1 rounded cursor-grab active:cursor-grabbing"
         style={{ color: "var(--p-text-secondary, #4a4452)" }}
-        aria-label="Drag untuk urutkan"
+        aria-label={t("canvas.drag")}
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/>

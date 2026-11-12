@@ -6,6 +6,7 @@ import AuthGuard from "@/components/AuthGuard";
 import { usePortfolioDraft } from "@/lib/portfolio/usePortfolioDraft";
 import PortfolioSkeleton from "@/components/portfolio/PortfolioSkeleton";
 import BuilderEditor from "@/components/portfolio/builder/BuilderEditor";
+import { useTranslation } from "@/lib/i18n";
 
 export default function BuilderPage({
   params,
@@ -14,6 +15,7 @@ export default function BuilderPage({
 }) {
   const { draftId } = use(params);
   const router = useRouter();
+  const { t } = useTranslation();
   const draft = usePortfolioDraft(draftId);
 
   // AuthGuard membungkus semua cabang: status login dicek dulu, baru
@@ -21,7 +23,7 @@ export default function BuilderPage({
   return <AuthGuard>{body()}</AuthGuard>;
 
   function body() {
-    if (draft.loading) return <PortfolioSkeleton message="Memuat draft" />;
+    if (draft.loading) return <PortfolioSkeleton message={t("pf.draft-loading")} />;
 
     if (!draft.data) {
       return (
@@ -29,13 +31,13 @@ export default function BuilderPage({
           <span className="material-symbols-outlined text-6xl text-outline" aria-hidden="true">
             description
           </span>
-          <p className="text-sm text-on-surface-variant">Draft tidak ditemukan.</p>
+          <p className="text-sm text-on-surface-variant">{t("pf.draft-missing")}</p>
           <button
             type="button"
             onClick={() => router.replace("/portfolio/build")}
             className="min-h-11 rounded-xl bg-primary px-5 text-sm font-bold text-on-primary"
           >
-            Mulai draft baru
+            {t("pf.draft-new")}
           </button>
         </div>
       );

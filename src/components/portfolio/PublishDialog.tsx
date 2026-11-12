@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslation } from "@/lib/i18n";
+import { fill, useTranslation } from "@/lib/i18n";
 import { useToast } from "@/components/ui/toast";
 import type { PortfolioData } from "@/components/portfolio/types";
 import { isValidSlug } from "@/lib/portfolio-safety";
@@ -141,7 +141,7 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
       });
       const body = await res.json();
       if (!res.ok) {
-        setError(body.message || "Gagal publish");
+        setError(body.message || t("pub.failed"));
         if ((body.error === "QUOTA_EXCEEDED" || body.error === "PORTFOLIO_PACKAGE_REQUIRED") && body.upgradeUrl) {
           setPlan((prev) =>
             prev
@@ -173,7 +173,7 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
       setPublishedUrl(null);
       setStatus("archived");
       setUpdateMode(false);
-      addToast({ type: "info", message: "Portfolio ditutup (diarsipkan). Slug Anda tetap tersimpan." });
+      addToast({ type: "info", message: t("pub.archived-toast") });
       refresh();
     } catch {
       setError(t("publish.error-network"));
@@ -192,7 +192,7 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
       setStatus(null);
       setUpdateMode(false);
       setShowDeleteConfirm(false);
-      addToast({ type: "info", message: "Portfolio dihapus permanen dan slug dilepas." });
+      addToast({ type: "info", message: t("pub.deleted-toast") });
       refresh();
     } catch {
       setError(t("publish.error-network"));
@@ -306,7 +306,7 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
                 ) : (
                   <span className="material-symbols-outlined text-sm">archive</span>
                 )}
-                Tutup (Arsip)
+                {t("pub.archive")}
               </button>
 
               <button
@@ -314,7 +314,7 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
                 className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-error/30 text-error font-label-bold text-xs hover:bg-error-container/20 active:scale-95 transition-all"
               >
                 <span className="material-symbols-outlined text-sm">delete_forever</span>
-                Hapus Permanen
+                {t("pub.delete")}
               </button>
             </div>
           </div>
@@ -326,11 +326,11 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
             <div className="rounded-xl border border-error/30 bg-error-container/10 p-4 space-y-2">
               <div className="flex items-center gap-2 text-error font-label-bold text-sm">
                 <span className="material-symbols-outlined text-lg">warning</span>
-                Konfirmasi Hapus Permanen
+                {t("pub.delete-confirm-title")}
               </div>
               <p className="text-xs text-on-surface-variant leading-relaxed">
-                Tindakan ini akan menghapus portfolio ini secara permanen dan melepas slug{" "}
-                <span className="font-mono text-on-surface font-semibold">{slug}</span>. Slug akan tersedia untuk pengguna lain.
+                {t("pub.delete-body-a")}{" "}
+                <span className="font-mono text-on-surface font-semibold">{slug}</span>. {t("pub.delete-body-b")}
               </p>
             </div>
 
@@ -347,7 +347,7 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
                 disabled={deleting}
                 className="flex-1 py-2.5 rounded-xl border border-outline-variant text-on-surface font-label-bold hover:bg-surface-container transition-all text-sm"
               >
-                Batal
+                {t("common.cancel")}
               </button>
 
               <button
@@ -358,7 +358,7 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
                 {deleting ? (
                   <span className="material-symbols-outlined text-sm animate-spin">sync</span>
                 ) : (
-                  "Ya, Hapus Permanen"
+                  t("pub.delete-yes")
                 )}
               </button>
             </div>
@@ -372,9 +372,9 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
               <div className="flex items-start gap-2">
                 <span className="material-symbols-outlined text-amber-600 text-2xl shrink-0">lock</span>
                 <div>
-                  <p className="font-label-bold text-amber-800">Batas Portfolio Tercapai</p>
+                  <p className="font-label-bold text-amber-800">{t("pub.limit-title")}</p>
                   <p className="text-xs text-amber-700 mt-0.5 leading-relaxed">
-                    Kamu sudah punya {plan?.used} portfolio aktif dari batas {plan?.maxActive} di paket gratis. Tutup salah satu atau aktifkan paket Portfolio Web untuk menambah slot.
+                    {fill(t("pub.limit-body"), { used: plan?.used ?? 0, max: plan?.maxActive ?? 0 })}
                   </p>
                 </div>
               </div>
@@ -383,7 +383,7 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
                 className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary text-on-primary font-label-bold hover:opacity-90 active:scale-95 transition-all"
               >
                 <span className="material-symbols-outlined text-lg">workspace_premium</span>
-                Aktifkan Paket Portfolio Web
+                {t("pub.upgrade")}
               </button>
             </div>
           </div>
@@ -395,14 +395,14 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
             {isPublished && updateMode && (
               <p className="text-xs font-semibold text-primary bg-primary/5 border border-primary/20 rounded-lg px-3 py-2 flex items-center gap-1.5">
                 <span className="material-symbols-outlined text-sm">edit</span>
-                Memperbarui konten portfolio live
+                {t("pub.updating")}
               </p>
             )}
 
             {status === "archived" && (
               <p className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 flex items-center gap-1.5">
                 <span className="material-symbols-outlined text-sm">archive</span>
-                Portfolio ini saat ini diarsipkan. Terbitkan kembali untuk mengaktifkan URL.
+                {t("pub.archived-note")}
               </p>
             )}
 
@@ -414,7 +414,7 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
                   ref={slugInputRef}
                   value={slug}
                   onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
-                  placeholder="nama-kamu"
+                  placeholder={t("pub.slug-ph")}
                   className="bg-transparent border-none p-0 focus:ring-0 font-label-bold text-on-surface min-w-0 flex-1"
                   maxLength={50}
                 />
@@ -432,7 +432,7 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
             {checked && plan === null && (
               <p className="text-xs text-error flex items-center gap-1.5 bg-error-container/20 rounded-lg px-3 py-2" role="alert">
                 <span className="material-symbols-outlined text-sm">error</span>
-                Gagal memeriksa kuota. Pastikan koneksi internetmu lalu coba lagi.
+                {t("pub.quota-failed")}
               </p>
             )}
 
@@ -449,17 +449,17 @@ export default function PublishDialog({ open, onClose, data, themeId, extras }: 
               ) : !checked ? (
                 <>
                   <span className="material-symbols-outlined text-lg animate-spin">sync</span>
-                  Memeriksa ketersediaan...
+                  {t("pub.checking")}
                 </>
               ) : plan === null ? (
                 <>
                   <span className="material-symbols-outlined text-lg">refresh</span>
-                  Coba lagi memeriksa
+                  {t("pub.recheck")}
                 </>
               ) : (
                 <>
                   <span className="material-symbols-outlined text-lg">rocket_launch</span>
-                  {isPublished && updateMode ? "Perbarui Portfolio" : "Terbitkan Portfolio"}
+                  {isPublished && updateMode ? t("pub.update") : t("pub.publish")}
                 </>
               )}
             </button>
