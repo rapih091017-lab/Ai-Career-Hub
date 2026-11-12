@@ -410,7 +410,7 @@ export default function PricingSection({ defaultMode = "satuan", onSelectPlan }:
                       {formatRupiah(monthlyFrom)}
                     </b>
                     <span className="text-[13px] font-extrabold text-brand-green">
-                      /bulan, {t("pricing.door2.from")}
+                      {t("pricing.per-month")} {t("pricing.door2.from")}
                     </span>
                   </div>
                   <p className="mt-2 w-fit rounded-full border-2 border-on-light bg-brand-dark px-2.5 py-0.5 font-mono text-[11px] font-extrabold uppercase tracking-[0.08em] text-lime">

@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { CV_TEMPLATES, type CVTemplate } from "@/lib/templates";
 import dynamic from "next/dynamic";
+import { useTranslation } from "@/lib/i18n";
+import { TEMPLATE_BLURBS_EN } from "@/components/builder/TemplatePopover";
 
 const CvTemplatePreview = dynamic(
   () => import("@/components/CvTemplatePreview"),
@@ -32,6 +34,7 @@ export default function TemplatePicker({
 }: TemplatePickerProps) {
   const defaultId = CV_TEMPLATES[0]?.id || "industrial-pro";
   const [jobTitle, setJobTitle] = useState("");
+  const { t } = useTranslation();
   const [selectedId, setSelectedId] = useState(currentTemplateId || defaultId);
 
   if (!isOpen) return null;
@@ -54,18 +57,18 @@ export default function TemplatePicker({
       >
         <div className="bg-surface-container-lowest rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
           <div className="flex items-center justify-between p-6 border-b border-outline-variant/50">
-            <h2 className="font-headline-md text-on-surface">Ganti Template CV</h2>
+            <h2 className="font-headline-md text-on-surface">{t("tp.switch-title")}</h2>
             <button
               onClick={handleClose}
               className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container transition-colors"
-              aria-label="Tutup"
+              aria-label={t("common.close")}
             >
               <span className="material-symbols-outlined text-lg text-on-surface-variant">close</span>
             </button>
           </div>
 
           <div className="p-6 space-y-4">
-            <p className="text-sm text-on-surface-variant">Pilih template CV yang sesuai dengan kebutuhanmu.</p>
+            <p className="text-sm text-on-surface-variant">{t("tp.switch-desc")}</p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {CV_TEMPLATES.map((template) => (
@@ -83,7 +86,7 @@ export default function TemplatePicker({
                 onClick={handleClose}
                 className="flex-1 py-3 rounded-xl border border-outline-variant text-on-surface font-label-bold hover:bg-surface-container transition-all"
               >
-                Batal
+                {t("common.cancel")}
               </button>
               <button
                 onClick={() => {
@@ -93,7 +96,7 @@ export default function TemplatePicker({
                 disabled={isCreating}
                 className="flex-1 py-3 rounded-xl bg-primary text-on-primary font-label-bold hover:-translate-y-0.5 transition-all disabled:opacity-50"
               >
-                {isCreating ? "Menerapkan..." : "Gunakan"}
+                {isCreating ? t("tp.applying") : t("tp.use")}
               </button>
             </div>
           </div>
@@ -110,11 +113,11 @@ export default function TemplatePicker({
     >
       <div className="bg-surface-container-lowest rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b border-outline-variant/50">
-          <h2 className="font-headline-md text-on-surface">Buat CV Baru</h2>
+          <h2 className="font-headline-md text-on-surface">{t("cl.new-cv")}</h2>
           <button
             onClick={handleClose}
             className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container transition-colors"
-            aria-label="Tutup"
+            aria-label={t("common.close")}
           >
             <span className="material-symbols-outlined text-lg text-on-surface-variant">close</span>
           </button>
@@ -123,7 +126,7 @@ export default function TemplatePicker({
         <div className="p-6 space-y-5">
           {/* Template grid */}
           <div>
-            <label className="text-label-sm text-on-surface-variant uppercase tracking-wider mb-3 block">Pilih Template</label>
+            <label className="text-label-sm text-on-surface-variant uppercase tracking-wider mb-3 block">{t("cl.s1-title")}</label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {CV_TEMPLATES.map((template) => (
                 <TemplateOption
@@ -139,7 +142,7 @@ export default function TemplatePicker({
           {/* Job Title */}
           <div className="flex flex-col gap-2">
             <label className="text-sm font-semibold text-on-surface-variant">
-              Target Posisi <span className="text-outline font-normal">(opsional)</span>
+              {t("tp.target")} <span className="text-outline font-normal">{t("tp.optional")}</span>
             </label>
             <input
               className="w-full p-3 rounded-xl border border-outline-variant bg-background text-body-md focus:outline-none focus:border-primary focus:shadow-[0_0_0_2px_rgba(13,115,119,0.1)] transition-all"
@@ -149,7 +152,7 @@ export default function TemplatePicker({
             />
             <p className="text-xs text-outline flex items-center gap-1 mt-1">
               <span className="material-symbols-outlined text-[14px]">info</span>
-              Mengisi posisi membantu AI menyesuaikan konten CV-mu dengan lebih baik
+              {t("tp.target-hint")}
             </p>
           </div>
 
@@ -160,9 +163,9 @@ export default function TemplatePicker({
             className="w-full bg-primary text-on-primary font-label-bold py-3 rounded-xl hover:-translate-y-0.5 active:scale-[0.98] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
           >
             {isCreating ? (
-              <><svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg> Membuat CV...</>
+              <><svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg> {t("tp.creating")}</>
             ) : (
-              <><span className="material-symbols-outlined text-lg">auto_awesome</span> Buat CV</>
+              <><span className="material-symbols-outlined text-lg">auto_awesome</span> {t("tp.create")}</>
             )}
           </button>
         </div>
@@ -177,6 +180,7 @@ function TemplateOption({ template, selected, onSelect }: {
   selected: boolean;
   onSelect: () => void;
 }) {
+  const { lang } = useTranslation();
   return (
     <button
       onClick={onSelect}
@@ -198,7 +202,7 @@ function TemplateOption({ template, selected, onSelect }: {
             <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
           )}
         </div>
-        <p className="text-[11px] text-on-surface-variant mt-0.5 line-clamp-1">{template.description}</p>
+        <p className="text-[11px] text-on-surface-variant mt-0.5 line-clamp-1">{lang === "en" ? TEMPLATE_BLURBS_EN[template.id] ?? template.description : template.description}</p>
       </div>
     </button>
   );

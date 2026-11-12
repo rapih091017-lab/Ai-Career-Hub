@@ -45,7 +45,7 @@ const ALLOW = new Set([
   "OK", "Ok", "STAR", "HR", "GPA", "IPK", "URL", "Career Hub", "Dashboard",
   "Headline", "About", "Skills", "Portfolio", "Instagram", "GitHub", "Behance",
   "Dribbble", "Medium", "Twitter", "X", "TikTok", "YouTube", "Telegram", "Midtrans",
-  "DeepSeek", "Pro", "Premium", "Basic", "Free", "Lite", "MT", "Staff", "Bold", "Italic", "Grade",
+  "DeepSeek", "Pro", "Premium", "Basic", "Free", "Lite", "MT", "Staff", "Bold", "Italic", "Grade", "AI Career Hub", "My Resumes", "AI Rev", "Checkout", "Template", "Max", "Tips", "Skip", "Total", "Status", "Preview", "Export PDF",
 ]);
 
 const SERVER_ONLY = /^\s*import\s+["']server-only["']/m;

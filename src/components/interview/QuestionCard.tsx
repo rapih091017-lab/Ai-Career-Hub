@@ -22,7 +22,7 @@ export function QuestionCard({
   numberPrefix?: string;
 }) {
   const [open, setOpen] = useState(false);
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const [starLoading, setStarLoading] = useState(false);
   const [starResult, setStarResult] = useState<{
     situation: string;
@@ -413,7 +413,7 @@ export function QuestionCard({
                 <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
                   <p className="text-[10px] font-bold text-blue-700 uppercase tracking-wider mb-1 flex items-center gap-1">
                     <span className="material-symbols-outlined text-[12px]">forum</span>
-                    Pertanyaan Lanjutan
+                    {lang === "en" ? "Follow-up questions" : "Pertanyaan Lanjutan"}
                   </p>
                   <p className="text-[11px] text-blue-800 leading-relaxed">
                     {q.followUp}

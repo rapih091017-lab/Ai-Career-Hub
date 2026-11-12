@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { useTranslation } from "@/lib/i18n";
 
 interface ModalProps {
   open: boolean;
@@ -16,6 +17,7 @@ interface ModalProps {
  * Reusable modal with backdrop blur, motion entry/exit, and focus trap.
  */
 export default function Modal({ open, onClose, title, children, size = "max-w-md" }: ModalProps) {
+  const { t } = useTranslation();
   const panelRef = useRef<HTMLDivElement>(null);
 
   // Close on Escape
@@ -62,7 +64,7 @@ export default function Modal({ open, onClose, title, children, size = "max-w-md
               <button
                 onClick={onClose}
                 className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container transition-colors z-10"
-                aria-label="Tutup"
+                aria-label={t("common.close")}
               >
                 <span className="material-symbols-outlined text-lg text-on-surface-variant">close</span>
               </button>

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import AppHeader from "@/components/AppHeader";
 import AuthGuard from "@/components/AuthGuard";
 import AppFooter from "@/components/AppFooter";
+import { localeFor, useTranslation } from "@/lib/i18n";
 
 interface CvDetail {
   id: string;
@@ -20,6 +21,7 @@ export default function CheckoutPage() {
   const params = useParams();
   const router = useRouter();
   const cvId = params.id as string;
+  const { t, lang } = useTranslation();
 
   const [cvData, setCvData] = useState<CvDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -32,11 +34,11 @@ export default function CheckoutPage() {
     if (!cvId) return;
     fetch(`/api/cv-documents/${cvId}`)
       .then(async (res) => {
-        if (!res.ok) throw new Error("CV tidak ditemukan");
+        if (!res.ok) throw new Error(t("cvco.not-found"));
         const data = await res.json();
         setCvData({
           id: data.id,
-          jobTitle: data.jobTitle || "CV tanpa judul",
+          jobTitle: data.jobTitle || t("cl.cv-untitled"),
           templateId: data.templateId,
           createdAt: data.createdAt,
           updatedAt: data.updatedAt,
@@ -45,7 +47,7 @@ export default function CheckoutPage() {
       })
       .catch((err) => setError(err.message))
       .finally(() => setIsLoading(false));
-  }, [cvId]);
+  }, [cvId, t]);
 
   // Handle Midtrans callback redirect
   useEffect(() => {
@@ -83,7 +85,7 @@ export default function CheckoutPage() {
         const dest = checkoutDestination(activePaymentProvider(), result, window.location.origin);
         window.location.href = dest.url;
       } else {
-        throw new Error(result.message || "Gagal membuat pesanan");
+        throw new Error(result.message || t("cvco.order-failed"));
       }
     } catch (err: any) {
       setError(err.message);
@@ -92,7 +94,7 @@ export default function CheckoutPage() {
   };
 
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString("id-ID", {
+    return new Date(dateStr).toLocaleDateString(localeFor(lang), {
       day: "numeric",
       month: "long",
       year: "numeric",
@@ -109,18 +111,17 @@ export default function CheckoutPage() {
               <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto">
                 <span className="material-symbols-outlined text-green-600 text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
               </div>
-              <h1 className="font-headline-lg text-on-surface">Pembayaran Berhasil!</h1>
+              <h1 className="font-headline-lg text-on-surface">{t("cvco.success")}</h1>
               <p className="text-body-md text-on-surface-variant">
-                Single CV AI Revision untuk <strong>{cvData?.jobTitle || "CV"}</strong> sudah aktif.
-                Kamu sekarang bisa menggunakan AI Smart Revision tanpa batas untuk CV ini.
+                {t("cvco.success-a")} <strong>{cvData?.jobTitle || "CV"}</strong> {t("cvco.success-b")}
               </p>
-              <div className="animate-pulse text-sm text-outline mb-4">Mengarahkan ke halaman builder...</div>
+              <div className="animate-pulse text-sm text-outline mb-4">{t("cvco.redirecting")}</div>
               <button
                 onClick={() => router.push(`/builder/${cvId}`)}
                 className="inline-flex min-h-[44px] items-center gap-2 px-6 py-3 border-[2.5px] border-ink bg-lime text-on-light font-bold rounded-full shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-[0.98] transition-all"
               >
                 <span className="material-symbols-outlined text-lg">edit_document</span>
-                Lanjutkan ke Builder
+                {t("cvco.continue")}
               </button>
             </div>
           </main>
@@ -145,7 +146,7 @@ export default function CheckoutPage() {
                 <div>
                   <h1 className="font-headline-md text-on-surface">Checkout</h1>
                   <p className="text-body-md text-on-surface-variant mt-0.5">
-                    Pembelian <strong>Single CV AI Revision</strong>
+                    {t("cvco.purchase")} <strong>Single CV AI Revision</strong>
                   </p>
                 </div>
               </div>
@@ -161,7 +162,7 @@ export default function CheckoutPage() {
                 <span className="material-symbols-outlined text-3xl text-error mb-2">error</span>
                 <p className="font-label-bold text-error">{error}</p>
                 <button onClick={() => router.push("/dashboard")} className="mt-4 text-primary font-label-bold underline">
-                  Kembali ke Dashboard
+                  {t("bskel.back")}
                 </button>
               </div>
             ) : cvData ? (
@@ -170,23 +171,23 @@ export default function CheckoutPage() {
                 <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-hard-sm border border-outline-variant/50 space-y-4">
                   <h3 className="font-label-bold text-on-surface flex items-center gap-2">
                     <span className="material-symbols-outlined text-green-deep">description</span>
-                    Detail CV
+                    {t("cvco.details")}
                   </h3>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between py-2 border-b border-outline-variant/40">
-                      <span className="text-sm text-on-surface-variant">Judul Posisi</span>
+                      <span className="text-sm text-on-surface-variant">{t("cvco.job-title")}</span>
                       <span className="font-label-bold text-sm text-on-surface">{cvData.jobTitle || "-"}</span>
                     </div>
                     <div className="flex items-center justify-between py-2 border-b border-outline-variant/40">
                       <span className="text-sm text-on-surface-variant">Template</span>
-                      <span className="font-label-bold text-sm text-on-surface capitalize">{cvData.templateId?.replace(/-/g, " ") || "Standar"}</span>
+                      <span className="font-label-bold text-sm text-on-surface capitalize">{cvData.templateId?.replace(/-/g, " ") || t("cvco.standard")}</span>
                     </div>
                     <div className="flex items-center justify-between py-2 border-b border-outline-variant/40">
-                      <span className="text-sm text-on-surface-variant">Dibuat</span>
+                      <span className="text-sm text-on-surface-variant">{t("cvco.created")}</span>
                       <span className="font-label-bold text-sm text-on-surface">{formatDate(cvData.createdAt)}</span>
                     </div>
                     <div className="flex items-center justify-between py-2">
-                      <span className="text-sm text-on-surface-variant">Terakhir Diubah</span>
+                      <span className="text-sm text-on-surface-variant">{t("cvco.updated")}</span>
                       <span className="font-label-bold text-sm text-on-surface">{formatDate(cvData.updatedAt)}</span>
                     </div>
                   </div>
@@ -197,21 +198,21 @@ export default function CheckoutPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-label-bold text-lg text-on-surface">Single CV AI Revision</h3>
-                      <p className="text-sm text-on-surface-variant mt-0.5">Akses AI Smart Revision untuk 1 CV spesifik</p>
+                      <p className="text-sm text-on-surface-variant mt-0.5">{t("cvco.pkg-desc")}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-2xl font-bold text-green-deep">Rp25.000</p>
-                      <p className="text-xs text-on-surface-variant">1x pembayaran</p>
+                      <p className="text-xs text-on-surface-variant">{t("cvco.one-time")}</p>
                     </div>
                   </div>
 
                   <div className="border-t border-outline-variant/40 pt-4 space-y-2">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Yang kamu dapatkan:</h4>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">{t("cvco.you-get")}</h4>
                     <ul className="space-y-2">
                       {[
-                        { icon: "auto_awesome", text: "AI Smart Revision untuk CV ini · tanpa batas" },
-                        { icon: "history", text: "Riwayat revisi tersimpan" },
-                        { icon: "calendar_month", text: "Masa berlaku 1 tahun" },
+                        { icon: "auto_awesome", text: t("cvco.b1") },
+                        { icon: "history", text: t("cvco.b2") },
+                        { icon: "calendar_month", text: t("cvco.b3") },
                       ].map((benefit) => (
                         <li key={benefit.text} className="flex items-start gap-2 text-sm">
                           <span className="material-symbols-outlined text-green-600 text-[18px] shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>
@@ -229,8 +230,8 @@ export default function CheckoutPage() {
                   <div className="flex items-start gap-3 p-4 rounded-xl bg-red-50 border border-red-200">
                     <span className="material-symbols-outlined text-error shrink-0">error</span>
                     <div>
-                      <p className="font-label-bold text-sm text-error">Pembayaran Gagal</p>
-                      <p className="text-xs text-error mt-0.5">Silakan coba lagi. Jika masalah berlanjut, hubungi support.</p>
+                      <p className="font-label-bold text-sm text-error">{t("cvco.failed")}</p>
+                      <p className="text-xs text-error mt-0.5">{t("cvco.failed-desc")}</p>
                     </div>
                   </div>
                 )}
@@ -248,7 +249,7 @@ export default function CheckoutPage() {
                     onClick={() => router.push(`/builder/${cvId}`)}
                     className="flex-1 py-3 rounded-xl border border-outline-variant text-sm font-medium text-on-surface hover:bg-surface-container transition-all active:scale-[0.98]"
                   >
-                    Kembali ke Builder
+                    {t("cl.back-builder")}
                   </button>
                   <button
                     onClick={handleCheckout}
@@ -258,12 +259,12 @@ export default function CheckoutPage() {
                     {isProcessing ? (
                       <>
                         <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-                        Memproses...
+                        {t("cvco.processing")}
                       </>
                     ) : (
                       <>
                         <span className="material-symbols-outlined text-lg">lock</span>
-                        Bayar Rp25.000
+                        {t("cvco.pay")} Rp25.000
                       </>
                     )}
                   </button>
@@ -273,11 +274,11 @@ export default function CheckoutPage() {
                 <div className="flex items-start gap-3 p-4 rounded-xl bg-surface-container border border-outline-variant/50">
                   <span className="material-symbols-outlined text-outline text-lg shrink-0">info</span>
                   <div className="text-xs text-on-surface-variant leading-relaxed">
-                    <p className="font-medium text-on-surface mb-1">Metode Pembayaran</p>
+                    <p className="font-medium text-on-surface mb-1">{t("cvco.methods")}</p>
                     <p>
-                      Setelah klik <strong>Bayar</strong>, kamu akan diarahkan ke halaman Midtrans Snap.
-                      Tersedia pembayaran via <strong>Virtual Account</strong> (BCA, Mandiri, BRI, BNI),
-                      <strong> GoPay</strong>, <strong>QRIS</strong>, atau <strong>Kartu Kredit</strong>.
+                      {t("cvco.methods-a")} <strong>{t("cvco.pay")}</strong>{t("cvco.methods-b")}{" "}
+                      <strong>Virtual Account</strong> (BCA, Mandiri, BRI, BNI),
+                      <strong> GoPay</strong>, <strong>QRIS</strong>, {t("cvco.or")} <strong>{t("cvco.card")}</strong>.
                     </p>
                   </div>
                 </div>

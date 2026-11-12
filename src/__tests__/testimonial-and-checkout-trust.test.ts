@@ -9,7 +9,10 @@ const submitRouteSrc = readFileSync(
 const schemasSrc = readFileSync(join(process.cwd(), "src/lib/testimonial-schemas.ts"), "utf8");
 const billingSrc = readFileSync(join(process.cwd(), "src/app/settings/billing/page.tsx"), "utf8");
 const formSrc = readFileSync(join(process.cwd(), "src/components/billing/TestimonialRequest.tsx"), "utf8");
-const checkoutSrc = readFileSync(join(process.cwd(), "src/app/checkout/page.tsx"), "utf8");
+// Teks checkout kini lewat kamus i18n (src/lib/i18n-dict/app.ts), jadi keduanya dibaca.
+const checkoutSrc =
+  readFileSync(join(process.cwd(), "src/app/checkout/page.tsx"), "utf8") +
+  readFileSync(join(process.cwd(), "src/lib/i18n-dict/app.ts"), "utf8");
 
 describe("testimoni tidak pernah terbit tanpa ditinjau", () => {
   it("kiriman pengguna selalu disimpan sebagai belum terbit", () => {

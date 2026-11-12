@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useToast } from "@/components/ui/toast";
+import { useTranslation } from "@/lib/i18n";
 
 export function ShareButton({
   label = "Bagikan",
@@ -14,6 +15,7 @@ export function ShareButton({
 }) {
   const [copied, setCopied] = useState(false);
   const { addToast } = useToast();
+  const { t } = useTranslation();
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -22,14 +24,14 @@ export function ShareButton({
       setCopied(true);
       addToast({
         type: "success",
-        message: "Link disalin ke clipboard!",
+        message: t("share.copied"),
         duration: 2000,
       });
       setTimeout(() => setCopied(false), 2000);
     } catch {
       addToast({
         type: "error",
-        message: "Gagal menyalin link",
+        message: t("share.failed"),
       });
     }
   };

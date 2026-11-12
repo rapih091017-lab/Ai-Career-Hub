@@ -8,10 +8,10 @@ import { CheckerResultView } from "@/components/checker/CheckerResultView";
 import { type StoredAnalysisResult } from "@/components/checker/types";
 import MagneticButton from "@/components/MagneticButton";
 import Link from "next/link";
-import { useTranslation } from "@/lib/i18n";
+import { localeFor, useTranslation } from "@/lib/i18n";
 import { analysisFromFullResult } from "@/lib/checker/analysis-from-full-result";
 
-function timeAgo(date: Date, t: (key: string) => string): string {
+function timeAgo(date: Date, t: (key: string) => string, locale = "id-ID"): string {
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const mins = Math.floor(diffMs / 60000);
@@ -21,13 +21,13 @@ function timeAgo(date: Date, t: (key: string) => string): string {
   if (hours < 24) return `${hours} ${t("checker.detail.time-hour")}`;
   const days = Math.floor(hours / 24);
   if (days < 7) return `${days} ${t("checker.detail.time-day")}`;
-  return date.toLocaleDateString("id-ID");
+  return date.toLocaleDateString(locale);
 }
 
 export default function CheckerDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const id = params?.id as string;
 
   const [result, setResult] = useState<StoredAnalysisResult | null>(null);
@@ -142,7 +142,7 @@ export default function CheckerDetailPage() {
           </button>
           <div className="flex items-center gap-2">
             {createdAt && (
-              <span className="hidden text-xs uppercase tracking-[0.06em] text-ink-soft sm:inline">{timeAgo(new Date(createdAt), t)}</span>
+              <span className="hidden text-xs uppercase tracking-[0.06em] text-ink-soft sm:inline">{timeAgo(new Date(createdAt), t, localeFor(lang))}</span>
             )}
           </div>
         </div>
