@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { users, cvDocuments, usageLogs, payments, checkerResults } from "@/db/schema";
-import { count, gte, lte, sql, and, eq } from "drizzle-orm";
+import { count, gte, lte, sql, and, eq, notLike } from "drizzle-orm";
+import { EVENT_ACTION_LIKE } from "@/lib/events";
 import { withAdmin, apiHandler } from "@/lib/api-utils";
 import { PAYMENT_SUCCESS_STATUS } from "@/lib/kasera-webhook";
 
@@ -44,6 +45,8 @@ export const GET = apiHandler(async () => {
         and(
           gte(usageLogs.createdAt, startToday),
           lte(usageLogs.createdAt, endToday),
+          // Event funnel (evt_*) bukan pemakaian fitur, jangan ikut dihitung.
+          notLike(usageLogs.actionType, EVENT_ACTION_LIKE),
         ),
       );
 

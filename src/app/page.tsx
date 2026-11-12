@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import AppFooter from "@/components/AppFooter";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import PricingSection from "@/components/PricingSection";
@@ -12,6 +13,7 @@ import CheckerTeaser from "@/components/landing/CheckerTeaser";
 import ClosingCta from "@/components/landing/ClosingCta";
 import FaqSection from "@/components/landing/FaqSection";
 import HeroOrbit from "@/components/landing/HeroOrbit";
+import { track } from "@/lib/track";
 import StatsStrip from "@/components/landing/StatsStrip";
 
 /**
@@ -24,6 +26,10 @@ import StatsStrip from "@/components/landing/StatsStrip";
  * kosong), harga dan FAQ, penutup.
  */
 export default function Home() {
+  useEffect(() => {
+    track("landing_view");
+  }, []);
+
   return (
     <>
       <RevealOnScroll />

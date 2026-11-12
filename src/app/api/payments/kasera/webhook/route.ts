@@ -10,6 +10,7 @@ import {
   isAmountMismatch,
   type KaseraWebhookPayload,
 } from "@/lib/kasera-webhook";
+import { recordEvent } from "@/lib/events.server";
 import { createConversionForPayment } from "@/lib/affiliate.server";
 
 export const runtime = "nodejs";
@@ -103,6 +104,8 @@ export async function POST(request: NextRequest) {
     .where(eq(payments.id, payment.id));
 
   if (update.paymentStatus === "success") {
+    // Event funnel "purchase" dicatat di server, sekali per pembayaran (webhook dan polling bisa sama-sama sampai di sini).
+    await recordEvent({ name: "purchase", userId: payment.userId, resourceId: payment.id, props: { package: payment.packageType }, oncePerResource: true });
     try {
       await createConversionForPayment({
         id: payment.id,

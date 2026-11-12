@@ -192,7 +192,14 @@ export const coverLetters = pgTable("cover_letters", {
 export const usageLogs = pgTable("usage_logs", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
-  anonymousFingerprint: jsonb("anonymous_fingerprint").$type<{ ip: string; cookieHash: string }>(),
+  // anonId/props: hanya tipe TypeScript (kolom jsonb yang sama, tanpa migrasi).
+  // props dipakai baris event funnel (actionType "evt_*", lihat src/lib/events.ts).
+  anonymousFingerprint: jsonb("anonymous_fingerprint").$type<{
+    ip: string;
+    cookieHash: string;
+    anonId?: string;
+    props?: Record<string, string | number | boolean>;
+  }>(),
   actionType: varchar("action_type", { length: 50 }).notNull(),
   resourceId: uuid("resource_id"),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),

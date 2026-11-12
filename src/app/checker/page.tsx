@@ -13,6 +13,7 @@ import { AnalyzeProgress, StepNumber, type AnalyzePhase } from "@/components/che
 import { ROLE_CATEGORY_OPTIONS, type AnalysisResult } from "@/components/checker/types";
 import { anonIdHeaders } from "@/lib/anon-id";
 import { extractPdfTextClient, renderPdfPagesToBlobs } from "@/lib/pdf-extract-client";
+import { track } from "@/lib/track";
 import { runClientOcr, type OcrMsgs } from "@/lib/ocr-client";
 
 /* ------------------------------------------------------------------ */
@@ -108,6 +109,8 @@ export default function CheckerPage() {
   /* ---- Analyze (dengan retry support) ---- */
   const doAnalyze = useCallback(async (extractedText: string) => {
     setPhase("analyze");
+    // Event funnel: satu per permintaan analisis (coba ulang ikut terhitung).
+    track("checker_start", { mode: analyzeMode });
     const res = await fetch("/api/checker/analyze", {
       method: "POST",
       headers: {
@@ -136,6 +139,7 @@ export default function CheckerPage() {
     if (!res.ok) {
       throw new Error(data.message || data.error || t("checker.error-failed"));
     }
+    track("checker_result");
     return data as AnalysisResult;
   }, [jdText, roleCategory, file, lang, analyzeMode, t]);
 

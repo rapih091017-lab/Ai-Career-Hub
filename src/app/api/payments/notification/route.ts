@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { payments } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getMidtransConfig, verifyNotificationSignature } from "@/lib/midtrans";
+import { recordEvent } from "@/lib/events.server";
 import { createConversionForPayment } from "@/lib/affiliate.server";
 
 /**
@@ -89,6 +90,8 @@ export async function POST(request: NextRequest) {
 
     // ── 6. Atribusi affiliate (hanya saat sukses, idempotent) ───────
     if (newStatus === "success") {
+      // Event funnel "purchase" dicatat di server, sekali per pembayaran (webhook dan polling bisa sama-sama sampai di sini).
+      await recordEvent({ name: "purchase", userId: payment.userId, resourceId: payment.id, props: { package: payment.packageType }, oncePerResource: true });
       try {
         await createConversionForPayment({
           id: payment.id,

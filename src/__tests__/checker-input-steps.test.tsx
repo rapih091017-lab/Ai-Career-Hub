@@ -37,8 +37,11 @@ describe("input cek CV", () => {
     await act(async () => {
       fireEvent.click(screen.getByRole("button", { name: /Analisis CV Sekarang/ }));
     });
-    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
-    const body = JSON.parse((fetchMock.mock.calls[0] as unknown as [string, RequestInit])[1].body as string);
+    // Panggilan pertama bisa event funnel ke /api/events; ambil yang ke analyze.
+    const analyzeCall = () =>
+      (fetchMock.mock.calls as unknown as [string, RequestInit][]).find(([url]) => String(url).includes("/api/checker/analyze"));
+    await waitFor(() => expect(analyzeCall()).toBeDefined());
+    const body = JSON.parse(analyzeCall()![1].body as string);
     expect(body.jobDescription).toBe("");
     expect(body.roleCategory).toBe("fresh_graduate");
   });

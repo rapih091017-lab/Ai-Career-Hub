@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { payments } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { retrieveTransaction } from "@/lib/kasera";
+import { recordEvent } from "@/lib/events.server";
 import { createConversionForPayment } from "@/lib/affiliate.server";
 
 export const runtime = "nodejs";
@@ -73,6 +74,8 @@ export async function GET(request: NextRequest) {
         .where(eq(payments.id, payment.id));
 
       if (nextStatus === "success") {
+        // Event funnel "purchase" dicatat di server, sekali per pembayaran (webhook dan polling bisa sama-sama sampai di sini).
+        await recordEvent({ name: "purchase", userId: payment.userId, resourceId: payment.id, props: { package: payment.packageType }, oncePerResource: true });
         try {
           await createConversionForPayment({
             id: payment.id,

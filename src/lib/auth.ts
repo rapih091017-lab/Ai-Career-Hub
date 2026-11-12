@@ -4,6 +4,7 @@ import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import * as schema from "@/db/schema";
 import { db } from "@/db";
 import { eq } from "drizzle-orm";
+import { recordEvent } from "@/lib/events.server";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: DrizzleAdapter(db, {
@@ -67,6 +68,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.id as string;
       }
       return session;
+    },
+  },
+  events: {
+    // Akun baru dibuat adapter (login Google pertama): event funnel "signup".
+    async createUser({ user }) {
+      if (user.id) await recordEvent({ name: "signup", userId: user.id });
     },
   },
   pages: {

@@ -7,6 +7,8 @@ interface InsightsData {
   funnel: { totalUsers: number; usersWithCv: number; usersWithTracker: number; usersPaid: number };
   totals: { cvs: number; checkerRuns: number; coverLetters: number };
   featureUsage: { action: string; total: number }[];
+  /** Opsional: respons lama tanpa field ini tetap tampil. */
+  funnelEvents?: { name: string; last7: number; last30: number }[];
   registrations: { week: string; total: number }[];
 }
 
@@ -17,6 +19,19 @@ const ACTION_LABELS: Record<string, string> = {
   cover_letter: "Surat Lamaran",
   profile_import: "Import Profil",
   portfolio_suggest: "Saran Portfolio",
+};
+
+/** Label event jalur konversi (lihat src/lib/events.ts). */
+const EVENT_LABELS: Record<string, string> = {
+  landing_view: "Buka landing",
+  hero_cta_click: "Klik tombol hero",
+  checker_start: "Mulai cek CV",
+  checker_result: "Hasil cek CV tampil",
+  signup: "Daftar akun",
+  builder_start: "Mulai CV di builder",
+  pdf_download: "Unduh PDF CV",
+  checkout_start: "Mulai checkout",
+  purchase: "Pembayaran sukses",
 };
 
 /** Admin: insight penggunaan aplikasi (funnel, aktivitas fitur, registrasi). */
@@ -114,6 +129,38 @@ export default function AdminInsightsPage() {
                 </div>
               </div>
             </section>
+
+            {/* Event jalur konversi */}
+            {data.funnelEvents && (
+              <section className="rounded-2xl border border-outline-variant/70 bg-surface-container-lowest p-6">
+                <h2 className="text-label-bold text-on-surface">Jalur Konversi (event)</h2>
+                <p className="mt-1 text-label-sm text-on-surface-variant">
+                  Jumlah event tercatat. Satu orang bisa memicu event yang sama lebih dari sekali.
+                </p>
+                <div className="mt-4 overflow-x-auto">
+                  <table className="w-full text-left text-label-sm">
+                    <thead>
+                      <tr className="border-b border-outline-variant/50 text-on-surface-variant">
+                        <th scope="col" className="py-2 pr-4 font-semibold">Event</th>
+                        <th scope="col" className="py-2 pr-4 text-right font-semibold">7 hari</th>
+                        <th scope="col" className="py-2 text-right font-semibold">30 hari</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.funnelEvents.map((row) => (
+                        <tr key={row.name} className="border-b border-outline-variant/30 last:border-0">
+                          <th scope="row" className="py-2 pr-4 font-normal text-on-surface">
+                            {EVENT_LABELS[row.name] ?? row.name}
+                          </th>
+                          <td className="py-2 pr-4 text-right font-semibold tabular-nums text-on-surface">{row.last7.toLocaleString("id-ID")}</td>
+                          <td className="py-2 text-right font-semibold tabular-nums text-on-surface">{row.last30.toLocaleString("id-ID")}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            )}
 
             {/* Aktivitas fitur */}
             <section className="rounded-2xl border border-outline-variant/70 bg-surface-container-lowest p-6">

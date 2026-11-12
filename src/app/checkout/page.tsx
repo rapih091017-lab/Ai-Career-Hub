@@ -21,6 +21,7 @@ import { MARKETED_PACKAGE_KEYS, formatRupiah, packageGroup } from "@/lib/pricing
 import { PackageCard } from "@/components/checkout/PackageCard";
 import AppHeader from "@/components/AppHeader";
 import { useTranslation } from "@/lib/i18n";
+import { track } from "@/lib/track";
 import type { PackageDef } from "@/lib/access";
 
 interface CatalogPackage {
@@ -188,6 +189,7 @@ const toggle = (key: string) => {
     if (!selection || submitting) return;
     setSubmitting(true);
     setError(null);
+    track("checkout_start", { items: selection.keys.length });
     try {
       const isKasera = activePaymentProvider() === "kasera";
       const res = await fetch(

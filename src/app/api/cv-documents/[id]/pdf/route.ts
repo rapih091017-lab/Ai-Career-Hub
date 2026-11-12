@@ -9,6 +9,7 @@ import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limiter";
 import { normalizeCvDocument } from "@/lib/cv-normalize";
 import { cvPrintFormatFromData, cvRenderProps } from "@/lib/cv-print-format";
 import { buildCvPdfHtml } from "@/lib/pdf/cv-html";
+import { recordEvent } from "@/lib/events.server";
 import { printStandaloneHtml } from "@/lib/pdf/chromium";
 
 export const runtime = "nodejs";
@@ -96,6 +97,7 @@ export const POST = apiHandler(async (request: NextRequest, { params }: { params
     const html = await buildCvPdfHtml(props, marginMm);
     const pdf = await printStandaloneHtml(html);
     const fileName = cvPdfFileName(props.data.fullName);
+    await recordEvent({ name: "pdf_download", userId, resourceId: id });
     return new NextResponse(pdf as unknown as BodyInit, {
       status: 200,
       headers: {
