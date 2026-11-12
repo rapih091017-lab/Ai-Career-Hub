@@ -218,7 +218,6 @@ const DICT: Record<string, { id: string; en: string }> = {
   "objections.a4": { id: "Tidak. Kamu bisa mulai gratis dan memilih paket satuan jika hanya membutuhkan satu CV atau satu analisis.", en: "No. Start free and choose a one-time plan if you only need one CV or analysis." },
   "cta.stats-cv": { id: "Total CV Dibuat", en: "Total CVs Created" },
   "cta.stats-analyzed": { id: "Analisis CV Dilakukan", en: "CV Analyses Run" },
-  "cta.stats-avg-ats": { id: "Skor ATS Rata-rata", en: "Average ATS Score" },
   "cta.stats-users": { id: "Pengguna Terdaftar", en: "Registered Users" },
 
   /* Tool Cards */
