@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { AiLoadingOverlay } from "./AiLoadingOverlay";
 import { Field } from "@/components/builder/Field";
 import { AIPolishButton } from "@/components/ai/AIPolishDialog";
+import { OutputLangPicker, baseCvLang, useOutputLang } from "@/components/ai/OutputLangPicker";
 import { FieldHelp } from "@/components/builder/FieldHelp";
 import { TargetMissingNote } from "@/components/builder/TargetHint";
 import type { CustomFieldEntry } from "@/components/cv-templates";
@@ -60,6 +61,9 @@ export function SummarySection({
 }: SummarySectionProps) {
   const [aiSuggestLoading, setAiSuggestLoading] = useState(false);
   const [aiReviseLoading, setAiReviseLoading] = useState(false);
+  // Bahasa CV ditebak dari ringkasan (builder belum menyimpan cvLang).
+  const cvBase = baseCvLang(undefined, summary);
+  const [outputLang, setOutputLang] = useOutputLang(cvBase);
 
   const handleSuggest = async () => {
     setAiSuggestLoading(true);
@@ -78,6 +82,7 @@ export function SummarySection({
           workHistorySummary,
           eduSummary,
           certSummary,
+          outputLang,
         }),
       });
       const data = await res.json();
@@ -117,6 +122,7 @@ export function SummarySection({
           workHistorySummary,
           eduSummary,
           certSummary,
+          outputLang,
         }),
       });
       const data = await res.json();
@@ -239,6 +245,7 @@ export function SummarySection({
 
         {summary && (
           <div className="flex flex-col items-end mt-3 gap-1.5">
+            <OutputLangPicker value={outputLang} onChange={setOutputLang} cvLang={cvBase} disabled={aiSuggestLoading || aiReviseLoading} />
             <div className="flex items-center gap-1.5">
               <motion.button
                 type="button"

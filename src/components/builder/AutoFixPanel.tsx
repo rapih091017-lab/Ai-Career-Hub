@@ -8,6 +8,8 @@ import {
   type AutoFixSuggestion,
   applyApprovedFixesWithReport,
 } from "@/lib/auto-fix";
+import { OutputLangPicker, baseCvLang, useOutputLang } from "@/components/ai/OutputLangPicker";
+import type { OutputLang } from "@/lib/ai/output-lang";
 
 interface AutoFixPanelProps {
   cvId: string;
@@ -39,11 +41,13 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
   const [copiedId, setCopiedId] = useState("");
   const [appliedCount, setAppliedCount] = useState(0);
   const [skippedCount, setSkippedCount] = useState(0);
+  const cvBase = baseCvLang((cvData as { cvLang?: unknown }).cvLang, cvData.summary);
+  const [outputLang, setOutputLang] = useOutputLang(cvBase);
 
   const editedValue = (s: AutoFixSuggestion) =>
     edits[s.id] ?? (s.type === "replace_text" ? s.replacement : s.name);
 
-  const fetchSuggestions = async () => {
+  const fetchSuggestions = async (lang: OutputLang = outputLang) => {
     setLoading(true);
     setError("");
     setAppliedCount(0);
@@ -52,7 +56,7 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
       const res = await fetch(`/api/cv-documents/${cvId}/auto-fix`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cv: cvData, jobDescription: cvData.jobDescription ?? "" }),
+        body: JSON.stringify({ cv: cvData, jobDescription: cvData.jobDescription ?? "", outputLang: lang }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -175,6 +179,17 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
 
       {enabled && (
         <div className="space-y-3">
+          <OutputLangPicker
+            value={outputLang}
+            onChange={(v) => {
+              if (v === outputLang) return;
+              setOutputLang(v);
+              // Saran lama ditulis dalam bahasa sebelumnya: periksa ulang.
+              void fetchSuggestions(v);
+            }}
+            cvLang={cvBase}
+            disabled={loading}
+          />
           {loading && (
             <p className="text-sm text-on-surface-variant flex items-center gap-2">
               <span className="material-symbols-outlined animate-spin text-base" aria-hidden="true">sync</span>

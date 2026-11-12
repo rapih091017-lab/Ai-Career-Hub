@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Field } from "@/components/builder/Field";
 import { AIPolishButton } from "@/components/ai/AIPolishDialog";
+import { OutputLangPicker, baseCvLang, useOutputLang } from "@/components/ai/OutputLangPicker";
 import { TargetMissingNote } from "@/components/builder/TargetHint";
 import { AiLoadingOverlay } from "./AiLoadingOverlay";
 import { BulletEditor } from "./BulletEditor";
@@ -59,6 +60,8 @@ export function WorkCard({
 }: WorkCardProps) {
   const [aiSuggestLoading, setAiSuggestLoading] = useState(false);
   const [aiReviseLoading, setAiReviseLoading] = useState(false);
+  const cvBase = baseCvLang(undefined, work.description);
+  const [outputLang, setOutputLang] = useOutputLang(cvBase);
   const { addToast } = useToast();
 
   const undoGuard = useUndoGuard(work.description);
@@ -99,6 +102,7 @@ export function WorkCard({
           company: work.company,
           description: work.description || "",
           skills,
+          outputLang,
         }),
       });
       const data = await res.json();
@@ -136,6 +140,7 @@ export function WorkCard({
           sectionIndex: index,
           field: "description",
           currentText: work.description || "",
+          outputLang,
         }),
       });
       const data = await res.json();
@@ -318,7 +323,8 @@ export function WorkCard({
                       {work.description.length}/2500 | {work.description.split(/\s+/).filter(Boolean).length} kata
                     </p>
                   )}
-                  <div className="flex justify-end mt-2.5">
+                  <div className="flex flex-wrap items-center justify-between gap-2 mt-2.5">
+                    <OutputLangPicker value={outputLang} onChange={setOutputLang} cvLang={cvBase} disabled={aiSuggestLoading || aiReviseLoading} />
                     <div className="flex items-center gap-1.5">
                       <motion.button
                         type="button"

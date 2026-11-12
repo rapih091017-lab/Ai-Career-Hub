@@ -6,6 +6,7 @@ import { Popover } from "@/components/ui/popover";
 import { UNDO_BLOCKED_MESSAGE, useUndoGuard } from "@/hooks/useUndoGuard";
 import { aiErrorMessage } from "@/components/ai/ai-error-message";
 import { TargetMissingNote } from "@/components/builder/TargetHint";
+import { OutputLangPicker, baseCvLang, useOutputLang } from "@/components/ai/OutputLangPicker";
 
 export const POLISH_EXPLANATION =
   "Poles AI merapikan kalimat di kolom ini agar lebih jelas dan sesuai target pekerjaan. Fakta dan angka tidak ditambah.";
@@ -26,6 +27,8 @@ interface AIPolishButtonProps {
   /** Bentuk field deskripsi; menentukan format keluaran AI (poin per baris / satu paragraf). */
   format?: "bullets" | "paragraph";
   disabled?: boolean;
+  /** Bahasa CV; tanpa ini ditebak dari isi kolom. Default pemilih bahasa hasil. */
+  cvLang?: "id" | "en";
   /** "sm": ikon + label kecil. "icon": hanya ikon (kolom sempit), penjelasan tetap di panel. */
   size?: "sm" | "md" | "icon";
   /** Mengembalikan teks sebelum dipoles (tombol Urungkan di toast). Default: onApply. */
@@ -47,6 +50,7 @@ export function AIPolishButton({
   field,
   format,
   onRevert,
+  cvLang,
   disabled = false,
   size = "sm",
 }: AIPolishButtonProps) {
@@ -56,6 +60,9 @@ export function AIPolishButton({
   const undoGuard = useUndoGuard(content);
   // Permintaan yang masih berjalan saat panel ditutup diabaikan hasilnya.
   const requestId = useRef(0);
+
+  const cvBase = baseCvLang(cvLang, content);
+  const [outputLang, setOutputLang] = useOutputLang(cvBase);
 
   const tooShort = !content || content.trim().length < MIN_LENGTH;
 
@@ -84,6 +91,8 @@ export function AIPolishButton({
           jobDescription: jobDescription?.slice(0, 500),
           field,
           format,
+          outputLang,
+          cvLang,
         }),
       });
       if (!response.ok) throw new Error(await aiErrorMessage(response, "Gagal memoles teks"));
@@ -96,7 +105,7 @@ export function AIPolishButton({
       console.error("Polish error:", error);
       setState({ kind: "error", message: error instanceof Error ? error.message : "Gagal memoles teks" });
     }
-  }, [tooShort, content, jobTitle, skills, jobDescription, field, format]);
+  }, [tooShort, content, jobTitle, skills, jobDescription, field, format, outputLang, cvLang]);
 
   const accept = (original: string, polished: string) => {
     // Kolom diubah selama panel terbuka: hasil berdasar teks lama, jangan menimpa.
@@ -178,6 +187,7 @@ export function AIPolishButton({
             {state.kind === "error" && (
               <p role="alert" className="rounded-lg bg-error-container px-2 py-1.5 text-xs text-on-error-container">{state.message}</p>
             )}
+            {!tooShort && <OutputLangPicker value={outputLang} onChange={setOutputLang} cvLang={cvBase} disabled={loading} />}
             {tooShort ? (
               <p className="text-xs font-medium text-on-surface">Tulis minimal {MIN_LENGTH} karakter dulu, lalu poles.</p>
             ) : (
