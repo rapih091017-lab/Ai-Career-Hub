@@ -25,8 +25,17 @@ import StatsStrip from "@/components/landing/StatsStrip";
  * (plus angka platform dari API publik, keduanya sembunyi bila datanya
  * kosong), harga dan FAQ, penutup.
  */
+const LANDING_VIEW_KEY = "evt_landing_view";
+
 export default function Home() {
+  // landing_view sekali per sesi tab, supaya muat ulang tidak menggelembungkan angka.
   useEffect(() => {
+    try {
+      if (sessionStorage.getItem(LANDING_VIEW_KEY)) return;
+      sessionStorage.setItem(LANDING_VIEW_KEY, "1");
+    } catch {
+      /* sessionStorage tidak tersedia: tetap catat */
+    }
     track("landing_view");
   }, []);
 

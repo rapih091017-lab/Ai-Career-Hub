@@ -3,11 +3,12 @@ import { join } from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const inserted: Record<string, unknown>[] = [];
+let anonToday = 0;
 
 vi.mock("@/db", () => ({
   db: {
     insert: vi.fn(() => ({ values: vi.fn(async (row: Record<string, unknown>) => { inserted.push(row); }) })),
-    select: vi.fn(),
+    select: vi.fn(() => ({ from: () => ({ where: async () => [{ value: anonToday }] }) })),
   },
 }));
 vi.mock("@/lib/auth", () => ({ auth: vi.fn(async () => null) }));
@@ -81,6 +82,7 @@ describe("validasi body event", () => {
 describe("POST /api/events", () => {
   beforeEach(() => {
     inserted.length = 0;
+    anonToday = 0;
   });
 
   it("mencatat event ke usage_logs dengan actionType evt_ tanpa IP", async () => {
@@ -111,5 +113,15 @@ describe("POST /api/events", () => {
     }
     expect(statuses.filter((s) => s === 204)).toHaveLength(40);
     expect(statuses.at(-1)).toBe(429);
+    // Event sama dari anon id sama dalam semenit hanya dicatat sekali.
+    expect(inserted).toHaveLength(1);
+  });
+
+  it("tanpa sesi: melewati batas harian diabaikan diam-diam", async () => {
+    const { POST } = await import("@/app/api/events/route");
+    anonToday = 200;
+    const res = await POST(post(JSON.stringify({ name: "checker_start" }), "10.2.0.1", "anon-daily-0001") as never, undefined as never);
+    expect(res.status).toBe(204);
+    expect(inserted).toHaveLength(0);
   });
 });
