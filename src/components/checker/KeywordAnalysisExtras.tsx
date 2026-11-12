@@ -2,6 +2,7 @@
 
 import { CopyButton } from "./CopyButton";
 import type { KeywordAnalysis, KeywordPlacement, KeywordRequirement } from "./types";
+import { useTranslation } from "@/lib/i18n";
 
 /**
  * Elemen tambahan panel keyword (prompt 5), semua kondisional terhadap data:
@@ -16,11 +17,11 @@ import type { KeywordAnalysis, KeywordPlacement, KeywordRequirement } from "./ty
 const SOURCE_META = {
   job_description: {
     icon: "content_paste",
-    label: "Dihitung dari lowongan yang kamu tempel",
+    label: "kw.source-jd",
   },
   role_generic: {
     icon: "work",
-    label: "Dihitung dari kebutuhan umum role ini",
+    label: "kw.source-role",
   },
 } as const;
 
@@ -29,6 +30,7 @@ const SOURCE_META = {
  * (dihitung route); baris lama tidak punya source, jadi panelnya tak berubah.
  */
 export function KeywordSourceLine({ analysis }: { analysis: KeywordAnalysis | null | undefined }) {
+  const { t } = useTranslation();
   if (!analysis?.source) return null;
   const meta = SOURCE_META[analysis.source];
   if (!meta) return null;
@@ -38,9 +40,9 @@ export function KeywordSourceLine({ analysis }: { analysis: KeywordAnalysis | nu
         <span className="material-symbols-outlined select-none text-[14px]" aria-hidden="true">
           {meta.icon}
         </span>
-        {meta.label}
+        {t(meta.label)}
       </span>
-      <span className="text-xs text-ink-soft">Kecocokan kata kunci, bukan skor ATS resmi</span>
+      <span className="text-xs text-ink-soft">{t("kw.not-official")}</span>
     </div>
   );
 }
@@ -48,12 +50,12 @@ export function KeywordSourceLine({ analysis }: { analysis: KeywordAnalysis | nu
 const EVIDENCE_META = {
   dibuktikan: {
     icon: "verified",
-    label: "Terbukti di pengalaman",
+    label: "kw.ev-proven",
     cls: "border-green-deep/40 bg-primary-fixed text-on-primary-fixed",
   },
   hanya_daftar_skill: {
     icon: "list",
-    label: "Hanya daftar skill",
+    label: "kw.ev-list-only",
     cls: "border-tertiary/50 bg-tertiary-container text-on-tertiary-container",
   },
 } as const;
@@ -71,6 +73,7 @@ export function KeywordEvidenceBadge({
   analysis: KeywordAnalysis | null | undefined;
   keyword: string;
 }) {
+  const { t } = useTranslation();
   const entry = analysis?.evidence?.find(
     (item) => item.keyword.toLowerCase() === keyword.toLowerCase(),
   );
@@ -79,13 +82,13 @@ export function KeywordEvidenceBadge({
   if (!meta) return null;
   return (
     <span
-      title={entry.excerpt ? `Bukti: ${entry.excerpt}` : undefined}
+      title={entry.excerpt ? `${t("kw.evidence")} ${entry.excerpt}` : undefined}
       className={`inline-flex items-center gap-1 rounded-full border-[1.5px] px-2 py-0.5 text-xs font-bold uppercase tracking-wide ${meta.cls}`}
     >
       <span className="material-symbols-outlined select-none text-xs" aria-hidden="true">
         {meta.icon}
       </span>
-      {meta.label}
+      {t(meta.label)}
     </span>
   );
 }
@@ -98,6 +101,7 @@ const PLACEMENT_CHIP = {
 const PLACEMENT_LABEL = { critical: "Kritis", nice: "Pelengkap" } as const;
 
 function PlacementCard({ placement }: { placement: KeywordPlacement }) {
+  const { t } = useTranslation();
   return (
     <div className="rounded-xl border-[1.5px] border-ink/15 bg-surface-container-low p-4">
       <div className="flex flex-wrap items-center gap-2">
@@ -109,39 +113,40 @@ function PlacementCard({ placement }: { placement: KeywordPlacement }) {
         <span className="min-w-0 text-sm font-bold text-ink">{placement.keyword}</span>
       </div>
       <p className="mt-1.5 text-xs text-ink-soft">
-        <span className="font-bold text-green-deep">Ganti di: </span>
+        <span className="font-bold text-green-deep">{t("kw.replace-in")} </span>
         {placement.where}
       </p>
       {placement.replaces ? (
         <p className="mt-0.5 text-xs text-ink-soft">
-          Teks lama: <span className="italic">{placement.replaces}</span>
+          {t("kw.old-text")} <span className="italic">{placement.replaces}</span>
         </p>
       ) : null}
       <div className="mt-2 rounded-md border border-ink/10 bg-paper px-2.5 py-1.5 text-xs leading-relaxed text-ink">
         {placement.copy_text}
       </div>
       <div className="mt-2">
-        <CopyButton text={placement.copy_text} label="Salin revisi" />
+        <CopyButton text={placement.copy_text} label={t("kw.copy-revision")} />
       </div>
     </div>
   );
 }
 
 const REQUIREMENT_CHIP = {
-  terpenuhi: { label: "Terpenuhi", cls: "border-green-deep/40 bg-primary-fixed text-on-primary-fixed" },
-  sebagian: { label: "Sebagian", cls: "border-tertiary/50 bg-tertiary-container text-on-tertiary-container" },
-  tidak_ada: { label: "Tidak ada", cls: "border-error/50 bg-error-container text-on-error-container" },
+  terpenuhi: { label: "hr.ko-met", cls: "border-green-deep/40 bg-primary-fixed text-on-primary-fixed" },
+  sebagian: { label: "kw.partial", cls: "border-tertiary/50 bg-tertiary-container text-on-tertiary-container" },
+  tidak_ada: { label: "hr.ko-missing", cls: "border-error/50 bg-error-container text-on-error-container" },
 } as const;
 
 function RequirementsTable({ requirements }: { requirements: KeywordRequirement[] }) {
+  const { t } = useTranslation();
   return (
     <div className="overflow-x-auto rounded-xl border-[1.5px] border-ink/15">
       <table className="w-full min-w-[420px] border-collapse text-left align-top">
         <thead>
           <tr className="bg-surface-container-low text-xs font-extrabold uppercase tracking-[0.06em] text-ink-soft">
-            <th className="px-3 py-2">Syarat</th>
-            <th className="px-3 py-2">Status</th>
-            <th className="px-3 py-2">Bukti / catatan</th>
+            <th className="px-3 py-2">{t("kw.req")}</th>
+            <th className="px-3 py-2">{t("kw.status")}</th>
+            <th className="px-3 py-2">{t("kw.req-evidence")}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-ink/10">
@@ -154,7 +159,7 @@ function RequirementsTable({ requirements }: { requirements: KeywordRequirement[
                   <span
                     className={`inline-flex shrink-0 rounded-full border-[1.5px] px-2 py-0.5 text-xs font-bold uppercase tracking-wide ${chip.cls}`}
                   >
-                    {chip.label}
+                    {t(chip.label)}
                   </span>
                 </td>
                 <td className="px-3 py-2 text-xs text-ink-soft">
@@ -175,6 +180,7 @@ function RequirementsTable({ requirements }: { requirements: KeywordRequirement[
  * sumbernya memang lowongan (guard ganda: mapper sudah membuangnya).
  */
 export function KeywordExtrasBlock({ analysis }: { analysis: KeywordAnalysis | null | undefined }) {
+  const { t } = useTranslation();
   const placements = analysis?.placements ?? [];
   const requirements =
     analysis?.source === "job_description" ? (analysis.requirements ?? []) : [];
@@ -185,11 +191,11 @@ export function KeywordExtrasBlock({ analysis }: { analysis: KeywordAnalysis | n
       {placements.length > 0 ? (
         <div>
           <h3 className="text-xs font-extrabold uppercase tracking-[0.06em] text-green-deep">
-            Penempatan untuk keyword yang kurang
+            {t("kw.placements")}
           </h3>
           {/* Catatan statis, cukup satu kali untuk semua kartu. */}
           <p className="mt-1 text-xs italic text-ink-soft">
-            Tambahkan hanya jika benar-benar kamu kuasai
+            {t("kw.only-if-true")}
           </p>
           <div className="mt-2 space-y-2">
             {placements.map((placement, index) => (
@@ -202,7 +208,7 @@ export function KeywordExtrasBlock({ analysis }: { analysis: KeywordAnalysis | n
       {requirements.length > 0 ? (
         <div>
           <h3 className="text-xs font-extrabold uppercase tracking-[0.06em] text-green-deep">
-            Syarat dari lowongan
+            {t("kw.reqs")}
           </h3>
           <div className="mt-2">
             <RequirementsTable requirements={requirements} />

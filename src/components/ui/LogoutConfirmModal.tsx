@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { signOut } from "next-auth/react";
+import { useTranslation } from "@/lib/i18n";
 
 interface LogoutConfirmModalProps {
   open: boolean;
@@ -65,6 +66,7 @@ function LogoutIcon() {
 
 export default function LogoutConfirmModal({ open, onClose }: LogoutConfirmModalProps) {
   const cancelRef = useRef<HTMLButtonElement>(null);
+  const { t } = useTranslation();
   const confirmRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -140,7 +142,7 @@ export default function LogoutConfirmModal({ open, onClose }: LogoutConfirmModal
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.15 }}
               >
-                Yakin ingin keluar?
+                {t("logout.title")}
               </motion.h3>
 
               {/* Description */}
@@ -151,7 +153,7 @@ export default function LogoutConfirmModal({ open, onClose }: LogoutConfirmModal
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
-                Kamu akan logout dari akun ini. Jangan khawatir, data CV dan progresmu tetap aman saat kamu login kembali.
+                {t("logout.body")}
               </motion.p>
 
               {/* User session info */}
@@ -165,7 +167,7 @@ export default function LogoutConfirmModal({ open, onClose }: LogoutConfirmModal
                   <span className="material-symbols-outlined text-primary text-lg">info</span>
                 </div>
                 <p className="text-xs text-on-surface-variant leading-relaxed">
-                  Setelah logout kamu akan diarahkan ke halaman login. Pastikan semua perubahan sudah tersimpan.
+                  {t("logout.note")}
                 </p>
               </motion.div>
 
@@ -182,7 +184,7 @@ export default function LogoutConfirmModal({ open, onClose }: LogoutConfirmModal
                   onClick={onClose}
                   className="flex-1 py-3 rounded-2xl border border-outline-variant/50 text-sm font-semibold text-on-surface bg-surface-container-lowest hover:bg-surface-container-high hover:border-outline-variant transition-all duration-200 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
                 >
-                  Batal
+                  {t("common.cancel")}
                 </button>
 
                 {/* Confirm Logout */}
@@ -192,7 +194,7 @@ export default function LogoutConfirmModal({ open, onClose }: LogoutConfirmModal
                   className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-red-500 to-red-600 text-sm font-semibold text-white shadow-lg shadow-red-500/25 hover:shadow-red-500/40 hover:-translate-y-0.5 transition-all duration-200 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-red-500 focus-visible:outline-offset-2 flex items-center justify-center gap-2"
                 >
                   <span className="material-symbols-outlined text-lg">logout</span>
-                  Keluar
+                  {t("logout.confirm")}
                 </button>
               </motion.div>
             </div>

@@ -101,30 +101,29 @@ function FindingList({
 
 /* ══ Panel HR v5 (prompt 3) ═══════════════════════════════════════════
    Blok tambahan: scan 30 detik, red/green flag berbukti, pertanyaan HR,
-   risiko syarat wajib, dan format durasi kerja. Teks di sini hardcoded
-   Bahasa Indonesia — blok baru belum punya kunci i18n dan prompt 3 melarang
-   mengubah file lain. Setiap blok muncul hanya kalau datanya ada, jadi baris
+   risiko syarat wajib, dan format durasi kerja. Label UI lewat kunci i18n
+   (CHECKER_DICT, awalan hr.). Setiap blok muncul hanya kalau datanya ada, jadi baris
    lama tampil persis seperti sebelumnya tanpa kotak kosong. */
 
 const HR_SCAN_ORDER = ["last_title", "total_experience", "top_achievement", "key_skills"] as const;
 
 const HR_SCAN_LABEL: Record<(typeof HR_SCAN_ORDER)[number], string> = {
-  last_title: "Jabatan terakhir",
-  total_experience: "Total pengalaman",
-  top_achievement: "Pencapaian utama",
-  key_skills: "Kunci keahlian",
+  last_title: "hr.scan-last-title",
+  total_experience: "hr.scan-total-exp",
+  top_achievement: "hr.scan-top-achievement",
+  key_skills: "hr.scan-key-skills",
 };
 
 const SCAN_STATUS: Record<HrScanStatus, { label: string; cls: string }> = {
-  terbaca: { label: "Terbaca", cls: "border-green-deep/40 bg-primary-fixed text-on-primary-fixed" },
-  samar: { label: "Samar", cls: "border-tertiary/50 bg-tertiary-container text-on-tertiary-container" },
-  tidak_terbaca: { label: "Tidak terbaca", cls: "border-error/50 bg-error-container text-on-error-container" },
+  terbaca: { label: "hr.status-read", cls: "border-green-deep/40 bg-primary-fixed text-on-primary-fixed" },
+  samar: { label: "hr.status-vague", cls: "border-tertiary/50 bg-tertiary-container text-on-tertiary-container" },
+  tidak_terbaca: { label: "hr.status-unread", cls: "border-error/50 bg-error-container text-on-error-container" },
 };
 
 const KNOCKOUT_STATUS: Record<KnockoutStatus, { label: string; cls: string }> = {
-  terpenuhi: { label: "Terpenuhi", cls: "border-green-deep/40 bg-primary-fixed text-on-primary-fixed" },
-  belum_terlihat: { label: "Belum terlihat", cls: "border-tertiary/50 bg-tertiary-container text-on-tertiary-container" },
-  tidak_ada: { label: "Tidak ada", cls: "border-error/50 bg-error-container text-on-error-container" },
+  terpenuhi: { label: "hr.ko-met", cls: "border-green-deep/40 bg-primary-fixed text-on-primary-fixed" },
+  belum_terlihat: { label: "hr.ko-unseen", cls: "border-tertiary/50 bg-tertiary-container text-on-tertiary-container" },
+  tidak_ada: { label: "hr.ko-missing", cls: "border-error/50 bg-error-container text-on-error-container" },
 };
 
 /** Bukti CV ditampilkan sebagai kutipan, satu gaya dengan FindingList. */
@@ -139,6 +138,7 @@ function EvidenceQuote({ text }: { text: string }) {
 }
 
 function FlagItem({ flag }: { flag: HrFlag }) {
+  const { t } = useTranslation();
   return (
     <li
       className={`border-l-2 pl-3 ${flag.type === "red" ? "border-error/50" : "border-green-deep/40"}`}
@@ -149,10 +149,10 @@ function FlagItem({ flag }: { flag: HrFlag }) {
         <div className="mt-1.5">
           {flag.fix.replaces ? (
             <p className="text-label-sm text-ink-soft">
-              Mengganti: <span className="italic">{flag.fix.replaces}</span>
+              {t("hr.replaces")} <span className="italic">{flag.fix.replaces}</span>
             </p>
           ) : null}
-          <CopyButton text={flag.fix.copy_text} label="Salin perbaikan" />
+          <CopyButton text={flag.fix.copy_text} label={t("hr.copy-fix")} />
         </div>
       ) : null}
     </li>
@@ -162,6 +162,7 @@ function FlagItem({ flag }: { flag: HrFlag }) {
 /** Akordeon pertanyaan HR: satu terbuka pada satu waktu, aria-expanded benar. */
 function HrQuestionsAccordion({ questions }: { questions: NonNullable<AnalysisResult["hrQuestions"]> }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const { t } = useTranslation();
   return (
     <ul className="mt-2 divide-y divide-ink/10 rounded-xl border-[1.5px] border-ink/15 bg-surface-container-low">
       {questions.map((item, index) => {
@@ -186,13 +187,13 @@ function HrQuestionsAccordion({ questions }: { questions: NonNullable<AnalysisRe
               <div className="space-y-1 px-3 pb-3 text-body-sm text-ink-soft">
                 {item.why_asked ? (
                   <p>
-                    <span className="font-bold text-ink">Kenapa ditanyakan: </span>
+                    <span className="font-bold text-ink">{t("hr.why-asked")} </span>
                     {item.why_asked}
                   </p>
                 ) : null}
                 {item.answer_tip ? (
                   <p>
-                    <span className="font-bold text-ink">Tips menjawab: </span>
+                    <span className="font-bold text-ink">{t("hr.answer-tip")} </span>
                     {item.answer_tip}
                   </p>
                 ) : null}
@@ -207,6 +208,7 @@ function HrQuestionsAccordion({ questions }: { questions: NonNullable<AnalysisRe
 
 /** Blok tambahan panel HR; seluruhnya kondisional terhadap data. */
 function HrPanelExtra({ result }: { result: AnalysisResult }) {
+  const { t } = useTranslation();
   const hrScan = result.hrScan ?? null;
   const hrFlags = result.hrFlags ?? [];
   const hrQuestions = result.hrQuestions ?? [];
@@ -229,7 +231,7 @@ function HrPanelExtra({ result }: { result: AnalysisResult }) {
       {hrScan ? (
         <div>
           <h3 className="text-xs font-extrabold uppercase tracking-[0.06em] text-green-deep">
-            Yang HR tangkap dalam 30 detik
+            {t("hr.scan-title")}
           </h3>
           <div className="mt-2 grid gap-2 sm:grid-cols-2">
             {HR_SCAN_ORDER.map((key) => {
@@ -240,18 +242,18 @@ function HrPanelExtra({ result }: { result: AnalysisResult }) {
                 <div key={key} className="rounded-xl border-[1.5px] border-ink/15 bg-surface-container-low p-3">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-label-sm font-bold uppercase tracking-wide text-ink-soft">
-                      {HR_SCAN_LABEL[key]}
+                      {t(HR_SCAN_LABEL[key])}
                     </p>
                     <span
                       className={`shrink-0 rounded-full border-[1.5px] px-2 py-0.5 text-xs font-bold uppercase tracking-wide ${status.cls}`}
                     >
-                      {status.label}
+                      {t(status.label)}
                     </span>
                   </div>
                   {field.value ? (
                     <p className="mt-1 text-body-md text-ink">{field.value}</p>
                   ) : (
-                    <p className="mt-1 text-body-sm text-ink-soft">CV tidak menyebutkannya.</p>
+                    <p className="mt-1 text-body-sm text-ink-soft">{t("hr.not-mentioned")}</p>
                   )}
                   {field.note ? (
                     <p className="mt-1 text-label-sm text-ink-soft">{field.note}</p>
@@ -268,10 +270,10 @@ function HrPanelExtra({ result }: { result: AnalysisResult }) {
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
             <h3 className="text-xs font-extrabold uppercase tracking-[0.06em] text-error">
-              Perlu diperiksa
+              {t("hr.red")}
             </h3>
             {redFlags.length === 0 ? (
-              <p className="mt-2 text-body-md text-ink-soft">Tidak ada.</p>
+              <p className="mt-2 text-body-md text-ink-soft">{t("hr.none")}</p>
             ) : (
               <ul className="mt-2 space-y-3">
                 {redFlags.map((flag, index) => (
@@ -282,10 +284,10 @@ function HrPanelExtra({ result }: { result: AnalysisResult }) {
           </div>
           <div>
             <h3 className="text-xs font-extrabold uppercase tracking-[0.06em] text-green-deep">
-              Patut dipertahankan
+              {t("hr.green")}
             </h3>
             {greenFlags.length === 0 ? (
-              <p className="mt-2 text-body-md text-ink-soft">Tidak ada.</p>
+              <p className="mt-2 text-body-md text-ink-soft">{t("hr.none")}</p>
             ) : (
               <ul className="mt-2 space-y-3">
                 {greenFlags.map((flag, index) => (
@@ -301,7 +303,7 @@ function HrPanelExtra({ result }: { result: AnalysisResult }) {
       {hrQuestions.length > 0 ? (
         <div>
           <h3 className="text-xs font-extrabold uppercase tracking-[0.06em] text-green-deep">
-            Pertanyaan yang kemungkinan ditanyakan HR
+            {t("hr.questions")}
           </h3>
           <HrQuestionsAccordion questions={hrQuestions} />
         </div>
@@ -311,7 +313,7 @@ function HrPanelExtra({ result }: { result: AnalysisResult }) {
       {knockoutRisks.length > 0 ? (
         <div>
           <h3 className="text-xs font-extrabold uppercase tracking-[0.06em] text-error">
-            Risiko syarat wajib
+            {t("hr.knockout")}
           </h3>
           <ul className="mt-2 space-y-3">
             {knockoutRisks.map((risk, index) => {
@@ -323,7 +325,7 @@ function HrPanelExtra({ result }: { result: AnalysisResult }) {
                     <span
                       className={`shrink-0 rounded-full border-[1.5px] px-2 py-0.5 text-xs font-bold uppercase tracking-wide ${status.cls}`}
                     >
-                      {status.label}
+                      {t(status.label)}
                     </span>
                   </div>
                   {risk.evidence ? <EvidenceQuote text={risk.evidence} /> : null}
@@ -339,20 +341,20 @@ function HrPanelExtra({ result }: { result: AnalysisResult }) {
       {durationRewrite ? (
         <div className="rounded-xl border-[1.5px] border-ink/15 bg-surface-container-low p-4">
           <h3 className="text-xs font-extrabold uppercase tracking-[0.06em] text-green-deep">
-            Format durasi kerja
+            {t("hr.duration")}
           </h3>
           <p className="mt-2 text-body-md text-ink">{durationRewrite.copy_text}</p>
           {durationRewrite.replaces ? (
             <p className="mt-1 text-label-sm text-ink-soft">
-              Mengganti: <span className="italic">{durationRewrite.replaces}</span>
+              {t("hr.replaces")} <span className="italic">{durationRewrite.replaces}</span>
             </p>
           ) : null}
           <div className="mt-2">
-            <CopyButton text={durationRewrite.copy_text} label="Salin format" />
+            <CopyButton text={durationRewrite.copy_text} label={t("hr.copy-format")} />
           </div>
           {/* Catatan statis dari brief: jujur soal durasi yang dihitung. */}
           <p className="mt-2 text-label-sm text-ink-soft">
-            Tetap jujur. Pertahankan tahun jika portal lowongan memintanya.
+            {t("hr.duration-note")}
           </p>
         </div>
       ) : null}
