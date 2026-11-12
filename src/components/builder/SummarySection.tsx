@@ -61,9 +61,8 @@ export function SummarySection({
 }: SummarySectionProps) {
   const [aiSuggestLoading, setAiSuggestLoading] = useState(false);
   const [aiReviseLoading, setAiReviseLoading] = useState(false);
-  // Bahasa CV ditebak dari ringkasan (builder belum menyimpan cvLang).
-  const cvBase = baseCvLang(undefined, summary);
-  const [outputLang, setOutputLang] = useOutputLang(cvBase);
+  // Di builder state bersama dari OutputLangProvider; tebakan teks hanya cadangan.
+  const { lang: outputLang, setLang: setOutputLang, cvLang: cvBase } = useOutputLang(baseCvLang(undefined, summary));
 
   const handleSuggest = async () => {
     setAiSuggestLoading(true);

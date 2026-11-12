@@ -64,3 +64,27 @@ describe("Poles AI mengirim outputLang", () => {
     expect(window.localStorage.getItem("ai-output-lang")).toBe("en");
   });
 });
+
+describe("OutputLangProvider: satu state di builder", () => {
+  it("dua Poles AI berbagi pilihan dan default ikut cvLang provider", async () => {
+    const { OutputLangProvider, useOutputLangController } = await import("@/components/ai/OutputLangPicker");
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({ success: true, polished: "x y z" }), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    function Page() {
+      const st = useOutputLangController("en");
+      return (
+        <OutputLangProvider value={st}>
+          <span data-testid="lang">{st.lang}</span>
+          <AIPolishButton content="Mengelola tim gudang dan stok" onApply={() => {}} />
+        </OutputLangProvider>
+      );
+    }
+    render(<ToastProvider><Page /></ToastProvider>);
+    expect(screen.getByTestId("lang")).toHaveTextContent("en");
+    fireEvent.click(screen.getByRole("button", { name: /Poles AI/ }));
+    // Teks kolom berbahasa Indonesia, tapi bahasa CV dari provider = en.
+    expect(screen.getByRole("radio", { name: "English" })).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(screen.getByRole("radio", { name: "Indonesia" }));
+    expect(screen.getByTestId("lang")).toHaveTextContent("id");
+  });
+});

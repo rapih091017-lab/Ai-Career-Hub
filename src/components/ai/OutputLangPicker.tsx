@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useId, useState } from "react";
-import { OUTPUT_LANG_NAME, detectLang, type OutputLang } from "@/lib/ai/output-lang";
+import { createContext, useCallback, useContext, useEffect, useId, useMemo, useState, type ReactNode } from "react";
+import { detectLang, type OutputLang } from "@/lib/ai/output-lang";
+import { fill, useTranslation } from "@/lib/i18n";
 
 const STORAGE_KEY = "ai-output-lang";
 
@@ -20,11 +21,19 @@ export function baseCvLang(cvLang?: unknown, text?: string | null): OutputLang {
   return detectLang(text) ?? "id";
 }
 
+export interface OutputLangState {
+  /** Bahasa hasil yang dipakai saat memanggil AI. */
+  lang: OutputLang;
+  setLang: (v: OutputLang) => void;
+  /** Bahasa CV (dasar default dan catatan perbedaan). */
+  cvLang: OutputLang;
+}
+
 /**
- * Bahasa hasil AI: pilihan terakhir di perangkat ini, kalau belum pernah
- * memilih ikut bahasa CV. Pilihan disimpan di localStorage (boleh gagal).
+ * Sumber state bahasa hasil: pilihan terakhir di perangkat ini, kalau belum
+ * pernah memilih ikut bahasa CV. Disimpan di localStorage (boleh gagal).
  */
-export function useOutputLang(cvLang: OutputLang) {
+export function useOutputLangController(cvLang: OutputLang): OutputLangState {
   const [lang, setLangState] = useState<OutputLang>(cvLang);
   const [chosen, setChosen] = useState(false);
 
@@ -50,7 +59,23 @@ export function useOutputLang(cvLang: OutputLang) {
     }
   }, []);
 
-  return [lang, setLang] as const;
+  return useMemo(() => ({ lang, setLang, cvLang }), [lang, setLang, cvLang]);
+}
+
+const OutputLangContext = createContext<OutputLangState | null>(null);
+
+/** Builder memasang satu state untuk semua fitur AI di halaman. */
+export function OutputLangProvider({ value, children }: { value: OutputLangState; children: ReactNode }) {
+  return <OutputLangContext.Provider value={value}>{children}</OutputLangContext.Provider>;
+}
+
+/**
+ * State bahasa hasil. Di dalam OutputLangProvider memakai state bersama;
+ * di luar itu (mis. portofolio) memakai state lokal dari fallbackCvLang.
+ */
+export function useOutputLang(fallbackCvLang: OutputLang): OutputLangState {
+  const local = useOutputLangController(fallbackCvLang);
+  return useContext(OutputLangContext) ?? local;
 }
 
 interface OutputLangPickerProps {
@@ -61,10 +86,9 @@ interface OutputLangPickerProps {
   disabled?: boolean;
 }
 
-const CV_LANG_LABEL: Record<OutputLang, string> = { id: "Indonesia", en: "Inggris" };
-
 /** Pilihan segmented "Bahasa hasil: Indonesia | English". */
 export function OutputLangPicker({ value, onChange, cvLang, disabled = false }: OutputLangPickerProps) {
+  const { t } = useTranslation();
   const labelId = useId();
   const options: { v: OutputLang; label: string }[] = [
     { v: "id", label: "Indonesia" },
@@ -74,7 +98,7 @@ export function OutputLangPicker({ value, onChange, cvLang, disabled = false }: 
     <div className="space-y-1">
       <div className="flex items-center gap-2">
         <span id={labelId} className="text-[11px] font-semibold text-on-surface-variant">
-          Bahasa hasil:
+          {t("ai.lang-label")}
         </span>
         <div role="radiogroup" aria-labelledby={labelId} className="inline-flex rounded-lg border border-outline-variant p-0.5">
           {options.map((o) => (
@@ -96,7 +120,7 @@ export function OutputLangPicker({ value, onChange, cvLang, disabled = false }: 
       </div>
       {value !== cvLang && (
         <p className="text-[11px] text-on-surface-variant">
-          CV-mu berbahasa {CV_LANG_LABEL[cvLang]}; hasil akan dalam {OUTPUT_LANG_NAME[value]}.
+          {fill(t("ai.lang-note"), { cv: t(`ai.lang-cv-${cvLang}`), out: t(`ai.lang-out-${value}`) })}
         </p>
       )}
     </div>

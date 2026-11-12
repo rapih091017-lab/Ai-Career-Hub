@@ -59,6 +59,7 @@ import { BuilderLoadingSkeleton, BuilderErrorState } from "@/components/builder/
 import { fill, useTranslation } from "@/lib/i18n";
 import { useBuilderHelpers } from "@/hooks/useBuilderHelpers";
 import { useBuilderAI } from "@/hooks/useBuilderAI";
+import { OutputLangProvider, baseCvLang, useOutputLangController } from "@/components/ai/OutputLangPicker";
 import { useBuilderFormat } from "@/hooks/useBuilderFormat";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import { useFetchCvData } from "@/hooks/useFetchCvData";
@@ -161,7 +162,12 @@ export default function BuilderPage() {
   }, []);
 
   /* ── AI & Scoring Hook ── */
-  const ai = useBuilderAI({ cvData, setCvData, cvId, activeStep, setActiveStep, addToast });
+  // Satu state bahasa hasil AI untuk seluruh builder: default cvData.cvLang,
+  // tebakan dari isi CV hanya cadangan untuk CV lama tanpa cvLang.
+  const outputLangState = useOutputLangController(
+    baseCvLang(cvData.cvLang, [cvData.summary, ...(cvData.workHistory ?? []).map((w) => w.description)].filter(Boolean).join(" ")),
+  );
+  const ai = useBuilderAI({ cvData, setCvData, cvId, activeStep, setActiveStep, addToast, outputLang: outputLangState.lang });
 
   /* ── CRUD Helpers Hook ── */
   const helpers = useBuilderHelpers({ setCvData, setCustomSections: format.setCustomSections, setSectionOrder: format.setSectionOrder });
@@ -697,6 +703,7 @@ export default function BuilderPage() {
   return (
     <AuthGuard>
       <TargetHintProvider value={targetHint}>
+      <OutputLangProvider value={outputLangState}>
       <div className="h-[100dvh] flex flex-col bg-background">
         <AppHeader />
 
@@ -1272,6 +1279,7 @@ export default function BuilderPage() {
         {/* ── BOTTOM NAV ── */}
         <BottomNav steps={steps} activeStep={activeStep} setActiveStep={setActiveStep} sectionCompletion={sectionCompletion} sectionMeta={sectionMeta} handleSave={handleSave} isSaving={isSaving} unusedSteps={unusedSteps} />
       </div>
+      </OutputLangProvider>
       </TargetHintProvider>
     </AuthGuard>
   );

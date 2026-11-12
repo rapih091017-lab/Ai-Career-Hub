@@ -41,8 +41,7 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
   const [copiedId, setCopiedId] = useState("");
   const [appliedCount, setAppliedCount] = useState(0);
   const [skippedCount, setSkippedCount] = useState(0);
-  const cvBase = baseCvLang((cvData as { cvLang?: unknown }).cvLang, cvData.summary);
-  const [outputLang, setOutputLang] = useOutputLang(cvBase);
+  const { lang: outputLang, setLang: setOutputLang, cvLang: cvBase } = useOutputLang(baseCvLang(cvData.cvLang, cvData.summary));
 
   const editedValue = (s: AutoFixSuggestion) =>
     edits[s.id] ?? (s.type === "replace_text" ? s.replacement : s.name);

@@ -61,8 +61,7 @@ export function AIPolishButton({
   // Permintaan yang masih berjalan saat panel ditutup diabaikan hasilnya.
   const requestId = useRef(0);
 
-  const cvBase = baseCvLang(cvLang, content);
-  const [outputLang, setOutputLang] = useOutputLang(cvBase);
+  const { lang: outputLang, setLang: setOutputLang, cvLang: cvBase } = useOutputLang(baseCvLang(cvLang, content));
 
   const tooShort = !content || content.trim().length < MIN_LENGTH;
 

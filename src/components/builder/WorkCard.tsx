@@ -60,8 +60,7 @@ export function WorkCard({
 }: WorkCardProps) {
   const [aiSuggestLoading, setAiSuggestLoading] = useState(false);
   const [aiReviseLoading, setAiReviseLoading] = useState(false);
-  const cvBase = baseCvLang(undefined, work.description);
-  const [outputLang, setOutputLang] = useOutputLang(cvBase);
+  const { lang: outputLang, setLang: setOutputLang, cvLang: cvBase } = useOutputLang(baseCvLang(undefined, work.description));
   const { addToast } = useToast();
 
   const undoGuard = useUndoGuard(work.description);

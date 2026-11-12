@@ -13,6 +13,8 @@ interface UseBuilderAIProps {
   cvId: string;
   activeStep: number;
   setActiveStep: (step: number) => void;
+  /** Bahasa hasil AI pilihan user (state bersama builder). */
+  outputLang?: "id" | "en";
   addToast: (toast: { type: "success" | "info" | "error" | "warning"; message: string; duration?: number }) => void;
 }
 
@@ -23,6 +25,7 @@ export function useBuilderAI({
   activeStep,
   setActiveStep,
   addToast,
+  outputLang,
 }: UseBuilderAIProps) {
   /* ── AI JD Suggestions state ── */
   const prevActiveStep = useRef(activeStep);
@@ -67,6 +70,7 @@ export function useBuilderAI({
           jobTitle: cvData.jobTitle,
           jobDescription: cvData.jobDescription,
           skills,
+          outputLang,
         }),
       })
         .then((r) => r.json())
@@ -93,7 +97,7 @@ export function useBuilderAI({
     }
 
     prevActiveStep.current = activeStep;
-  }, [activeStep, cvData.jobTitle, cvData.jobDescription, cvData.skills, cvId, addToast, aiJdTriggered]);
+  }, [activeStep, cvData.jobTitle, cvData.jobDescription, cvData.skills, cvId, addToast, aiJdTriggered, outputLang]);
 
   /* ── ATS Score ── */
   const computeAtsScore = useMemo((): number => {
