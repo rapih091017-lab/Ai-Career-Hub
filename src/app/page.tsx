@@ -1,41 +1,31 @@
 "use client";
 
 import AppFooter from "@/components/AppFooter";
-import PortfolioSpotlight from "@/components/PortfolioSpotlight";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import PricingSection from "@/components/PricingSection";
-import ScrollProgress from "@/components/ScrollProgress";
-import ScrollSectionIndicator from "@/components/ScrollSectionIndicator";
 import StickyMobileCTA from "@/components/StickyMobileCTA";
+import TestimonialMarquee from "@/components/TestimonialMarquee";
 import SiteHeader from "@/components/nav/SiteHeader";
-import BentoFeatures from "@/components/landing/BentoFeatures";
 import BeforeAfter from "@/components/landing/BeforeAfter";
 import CaraKerja from "@/components/landing/CaraKerja";
 import CheckerTeaser from "@/components/landing/CheckerTeaser";
 import ClosingCta from "@/components/landing/ClosingCta";
 import FaqSection from "@/components/landing/FaqSection";
-import FeaturedArticle from "@/components/landing/FeaturedArticle";
 import HeroOrbit from "@/components/landing/HeroOrbit";
-import LevelStrip from "@/components/landing/LevelStrip";
-import MomentBand from "@/components/landing/MomentBand";
-import PersonaTabs from "@/components/landing/PersonaTabs";
-import SalaryBenchmark from "@/components/landing/SalaryBenchmark";
 import StatsStrip from "@/components/landing/StatsStrip";
 
 /**
- * Landing mengikuti susunan section dari tema Evergreen + Lime:
- * hero, cek CV, moment, cara kerja, fitur, persona, pintu masuk, harga,
- * portofolio, simulasi CV, angka platform, FAQ, penutup.
+ * Landing dibuat pendek dan mengarah ke satu jalur: cek CV gratis, lihat
+ * hasilnya, lalu perbaiki di builder. Bikin CV dari nol tetap ada sebagai
+ * jalur kedua di hero.
  *
- * Yang tetap memakai komponen aplikasi: navbar (bentuknya sama, warnanya
- * mengikuti tema), blok harga (PricingSection, sumber data resminya),
- * generator portofolio, dan footer.
+ * Urutan: hero, contoh hasil cek, tiga langkah, sebelum/sesudah, testimoni
+ * (plus angka platform dari API publik, keduanya sembunyi bila datanya
+ * kosong), harga dan FAQ, penutup.
  */
 export default function Home() {
   return (
     <>
-      <ScrollProgress />
-      <ScrollSectionIndicator />
       <RevealOnScroll />
 
       <SiteHeader variant="pill" />
@@ -43,17 +33,11 @@ export default function Home() {
       <main id="isi">
         <HeroOrbit />
         <CheckerTeaser />
-        <MomentBand />
         <CaraKerja />
-        <BentoFeatures />
-        <PersonaTabs />
-        <LevelStrip />
-        <PricingSection />
-        <PortfolioSpotlight />
         <BeforeAfter />
+        <TestimonialMarquee />
         <StatsStrip />
-        <SalaryBenchmark />
-        <FeaturedArticle />
+        <PricingSection />
         <FaqSection />
         <ClosingCta />
       </main>

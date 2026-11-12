@@ -3,7 +3,8 @@
 import { useTranslation } from "@/lib/i18n";
 
 /**
- * FAQ tujuh pertanyaan khusus produk. Jawaban panjang memakai Literata
+ * FAQ lima keberatan utama sebelum mendaftar: apa yang gratis, keamanan
+ * data, beda gratis dan berbayar, CV bahasa Inggris, cara bayar. Jawaban panjang memakai Literata
  * karena itu blok bacaan, bukan label antarmuka.
  */
 
@@ -13,8 +14,6 @@ const QA = [
   { q: "lp.faq.q3", a: "lp.faq.a3" },
   { q: "lp.faq.q4", a: "lp.faq.a4" },
   { q: "lp.faq.q5", a: "lp.faq.a5" },
-  { q: "lp.faq.q6", a: "lp.faq.a6" },
-  { q: "lp.faq.q7", a: "lp.faq.a7" },
 ];
 
 export default function FaqSection() {

@@ -5,7 +5,8 @@ import { useTranslation } from "@/lib/i18n";
 
 /**
  * Penutup: satu blok besar berisi ajakan bertindak, sedikit miring supaya
- * halaman tidak berakhir dengan blok yang terlalu rata-rata.
+ * halaman tidak berakhir dengan blok yang terlalu rata-rata. Ajakannya sama
+ * dengan hero (cek CV gratis), bikin dari nol jadi jalur kedua.
  */
 export default function ClosingCta() {
   const { t } = useTranslation();
@@ -30,14 +31,14 @@ export default function ClosingCta() {
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-5">
             <Link
-              href="/builder/new"
+              href="/checker"
               className="inline-flex min-h-[54px] items-center justify-center gap-3 rounded-full border-[2.5px] border-on-dark bg-lime px-6 font-display text-[15.5px] font-bold text-on-light shadow-[4px_4px_#fff] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_#fff]"
             >
               {t("lp.closing.cta-primary")}
               <span aria-hidden="true">&rarr;</span>
             </Link>
             <Link
-              href="/checkout"
+              href="/builder/new"
               className="inline-flex min-h-[48px] items-center gap-2 text-[15px] font-bold text-on-dark underline decoration-lime decoration-[3px] underline-offset-5 transition-colors hover:text-lime"
             >
               {t("lp.closing.cta-secondary")}

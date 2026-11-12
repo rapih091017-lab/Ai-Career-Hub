@@ -22,10 +22,10 @@ export default function StickyMobileCTA() {
         </div>
         <MagneticButton>
           <Link
-            href="/builder/new"
+            href="/checker"
             className="block shrink-0 whitespace-nowrap rounded-full border-[2.5px] border-ink bg-lime px-5 py-2.5 font-label-bold text-sm text-on-light shadow-[0_3px_0_rgb(var(--c-ink))] transition-all hover:-translate-y-0.5 active:translate-y-0.5"
           >
-            {t("hero.cta-start")}
+            {t("sticky.cta-btn")}
           </Link>
         </MagneticButton>
       </div>

@@ -152,14 +152,14 @@ export default function HeroOrbit() {
 
             <div className="mt-8 flex flex-wrap items-center gap-5">
               <Link
-                href="/builder/new"
+                href="/checker"
                 className="inline-flex min-h-[54px] items-center justify-center gap-3 rounded-full border-[3px] border-on-light bg-lime px-6 font-display text-[15.5px] font-bold text-on-light shadow-[4px_4px_0_rgb(var(--c-print))] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_rgb(var(--c-print))]"
               >
                 {t("lp.hero.cta-primary")}
                 <span aria-hidden="true">&rarr;</span>
               </Link>
               <Link
-                href="/checker"
+                href="/builder/new"
                 className="inline-flex min-h-[44px] items-center gap-2 text-[15px] font-bold text-on-dark underline decoration-lime decoration-[3px] underline-offset-[5px] transition-colors hover:text-lime"
               >
                 {t("lp.hero.cta-secondary")}

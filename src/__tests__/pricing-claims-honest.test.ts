@@ -42,10 +42,12 @@ describe("setiap klaim di halaman harga benar", () => {
     // Satu daftar pertanyaan saja di landing. Blok FAQ lama yang tertinggal di
     // dalam bagian harga sudah dihapus, jadi pengunjung tidak membaca dua FAQ.
     expect(pricingSrc).not.toContain("FAQ_KEYS");
-    expect(faqSectionSrc).toContain('{ q: "lp.faq.q7", a: "lp.faq.a7" }');
-    // Kuota habis dan perpanjangan adalah dua hal yang paling sering ditanya
-    // sebelum membayar.
-    expect(i18nSrc).toContain("Kuota gratis habis");
+    // Landing dipersingkat jadi lima pertanyaan: apa yang gratis, keamanan
+    // data, beda gratis dan berbayar, bahasa Inggris, cara bayar.
+    expect(faqSectionSrc).toContain('{ q: "lp.faq.q5", a: "lp.faq.a5" }');
+    expect(faqSectionSrc).not.toContain("lp.faq.q6");
+    expect(i18nSrc).toContain("Apa saja yang gratis?");
+    expect(i18nSrc).toContain("Bayar sekali lewat QRIS dari aplikasi bank");
     expect(i18nSrc).toContain("tanpa penarikan otomatis");
     expect(i18nSrc).not.toContain("paket bulanan auto-renew");
   });
