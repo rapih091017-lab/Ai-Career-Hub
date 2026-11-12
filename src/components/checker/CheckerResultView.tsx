@@ -12,6 +12,7 @@ import { ImprovementChecklist, buildChecklistItems } from "./ImprovementChecklis
 import { QuickSummaryCard } from "./QuickSummaryCard";
 import { MissingSectionsCard } from "./MissingSectionsCard";
 import { StartHereCard, pickStartSteps } from "./StartHereCard";
+import { FixInBuilderButton } from "./FixInBuilderButton";
 import { SectionNav, type SectionNavItem } from "@/components/ui/SectionNav";
 import { Collapsible } from "@/components/ui/Collapsible";
 import { useDoneState } from "@/lib/useDoneState";
@@ -50,6 +51,8 @@ interface CheckerResultViewProps {
   resultId?: string | null;
   /** CTA khusus halaman, dirender di akhir. */
   children?: ReactNode;
+  /** Teks CV hasil ekstraksi; bila ada, muncul tombol "Perbaiki di builder". */
+  cvText?: string | null;
 }
 
 /** Kunci teks yang berbeda antara dua halaman hasil. */
@@ -82,7 +85,7 @@ const LABELS = {
   },
 } as const;
 
-export function CheckerResultView({ result, variant, donutRef, resultsRef, wrapperId, resultId, children }: CheckerResultViewProps) {
+export function CheckerResultView({ result, variant, donutRef, resultsRef, wrapperId, resultId, children, cvText }: CheckerResultViewProps) {
   const { t } = useTranslation();
   const L = LABELS[variant];
   const fresh = variant === "fresh";
@@ -261,7 +264,13 @@ export function CheckerResultView({ result, variant, donutRef, resultsRef, wrapp
       </section>
 
       {/* ── Mulai dari sini: maksimal 3 langkah, tidak dirender tanpa data ── */}
-      <StartHereCard steps={startSteps} done={done} />
+      {/* Tombol utama "Perbaiki di builder" menempel di kartu ini; tanpa
+          langkah, tombolnya tetap tampil sendiri. */}
+      {startSteps.length > 0 ? (
+        <StartHereCard steps={startSteps} done={done} action={<FixInBuilderButton cvText={cvText} />} />
+      ) : (
+        <FixInBuilderButton cvText={cvText} />
+      )}
 
       {/* Ringkasan 10 detik. Baris lama tidak punya field ini di fullResult,
           jadi mapper menghasilkan null dan kartu tidak muncul. */}

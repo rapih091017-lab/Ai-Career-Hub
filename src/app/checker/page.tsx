@@ -791,7 +791,7 @@ export default function CheckerPage() {
           </div>
         </div>
 
-        <CheckerResultView result={result} variant="fresh" donutRef={donutRef} resultsRef={resultsRef}>
+        <CheckerResultView result={result} variant="fresh" donutRef={donutRef} resultsRef={resultsRef} cvText={extractedTextRef.current}>
         {/* ============================================================ */}
         {/*  7. CTA BANNER, score-based routing                          */}
         {/* ============================================================ */}

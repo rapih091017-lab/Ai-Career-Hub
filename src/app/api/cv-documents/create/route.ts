@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { jobTitle, jobDescription, templateId, useProfile = true, rawText, targetLanguage } = body;
+  const { jobTitle, jobDescription, templateId, useProfile = true, rawText, targetLanguage, source } = body;
 
   // templateId harus salah satu template yang ada (sama dengan PUT).
   if (templateId !== undefined && templateId !== null && templateId !== "" &&
@@ -30,11 +30,18 @@ export async function POST(request: NextRequest) {
   }
 
   // Always fetch profile to get a valid FK id (masterProfileId is NOT NULL in schema)
-  const [masterProfile] = await db
+  let [masterProfile] = await db
     .select()
     .from(masterProfiles)
     .where(eq(masterProfiles.userId, session.user.id))
     .limit(1);
+
+  // Dari hasil cek CV, isi CV datang dari teks CV, bukan profil. User baru
+  // (baru daftar dari hasil cek) belum punya profil, jadi dibuatkan profil
+  // kosong hanya untuk memenuhi FK, supaya tidak dilempar ke halaman profil.
+  if (!masterProfile && source === "checker" && typeof rawText === "string" && rawText.trim().length > 20) {
+    [masterProfile] = await db.insert(masterProfiles).values({ userId: session.user.id }).returning();
+  }
 
   // Profile is required for FK reference (masterProfileId is NOT NULL in schema)
   if (!masterProfile) {

@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { CopyButton } from "./CopyButton";
 import { SectionKicker } from "./ResultComponents";
 import { SECTION_ANCHORS } from "./QuickSummaryCard";
@@ -68,9 +69,11 @@ export function pickStartSteps(quickSummary?: QuickSummary | null, actionPlan?: 
 interface StartHereCardProps {
   steps: StartStep[];
   done: DoneState;
+  /** Aksi utama di bawah langkah (tombol "Perbaiki di builder"). */
+  action?: ReactNode;
 }
 
-export function StartHereCard({ steps, done }: StartHereCardProps) {
+export function StartHereCard({ steps, done, action }: StartHereCardProps) {
   const { t } = useTranslation();
   if (steps.length === 0) return null;
 
@@ -147,6 +150,7 @@ export function StartHereCard({ steps, done }: StartHereCardProps) {
           );
         })}
       </ol>
+      {action}
     </section>
   );
 }

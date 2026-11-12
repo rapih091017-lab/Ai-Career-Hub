@@ -6,6 +6,8 @@ import { useTranslation } from "@/lib/i18n";
 import AppHeader from "@/components/AppHeader";
 import AuthGuard from "@/components/AuthGuard";
 import Modal from "@/components/Modal";
+import { track } from "@/lib/track";
+import { clearCheckerCvText, readCheckerCvText } from "@/lib/checker/builder-handoff";
 import MagneticButton from "@/components/MagneticButton";
 
 function BuilderNewFormContent() {
@@ -16,6 +18,12 @@ function BuilderNewFormContent() {
   // ?next=surat-formal | surat-motivation → setelah CV dibuat, langsung lanjut
   // ke halaman surat lamaran dengan style terpilih (dipakai CTA hasil checker).
   const next = searchParams.get("next");
+  // ?from=checker: tombol "Perbaiki di builder" di hasil cek menitipkan teks
+  // CV di sessionStorage; teks itu jadi draf CV lewat generator.
+  const fromChecker = searchParams.get("from") === "checker";
+  const [checkerCvText] = useState<string | null>(() =>
+    typeof window !== "undefined" && fromChecker ? readCheckerCvText() : null,
+  );
 
   // ── Back to checker review ──
   const [checkerSource] = useState<string | null>(() => {
@@ -32,7 +40,7 @@ function BuilderNewFormContent() {
   const [errorMessage, setErrorMessage] = useState("");
   const [profileExists, setProfileExists] = useState<boolean | null>(null);
   const [showPopup, setShowPopup] = useState(false);
-  const [fillMethod, setFillMethod] = useState<"profile" | "empty" | null>(null);
+  const [fillMethod, setFillMethod] = useState<"profile" | "empty" | "checker" | null>(null);
 
   // Cek apakah user punya profil & langsung tampilkan popup
   useEffect(() => {
@@ -47,8 +55,8 @@ function BuilderNewFormContent() {
       });
   }, []);
 
-  const handleCreate = async (useProfile: boolean) => {
-    setFillMethod(useProfile ? "profile" : "empty");
+  const handleCreate = async (useProfile: boolean, rawText?: string) => {
+    setFillMethod(rawText ? "checker" : useProfile ? "profile" : "empty");
     setIsCreating(true);
     setErrorMessage("");
 
@@ -61,12 +69,15 @@ function BuilderNewFormContent() {
           jobDescription: "",
           templateId: templateId || undefined,
           useProfile,
+          ...(rawText ? { rawText, source: "checker" } : {}),
         }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
+        track("builder_start", { source: rawText ? "checker" : "new" });
+        if (rawText) clearCheckerCvText();
         if (next === "surat-formal") router.push(`/surat-lamaran/${data.id}?style=formal`);
         else if (next === "surat-motivation") router.push(`/surat-lamaran/${data.id}?style=motivation`);
         else router.push(`/builder/${data.id}`);
@@ -166,6 +177,23 @@ function BuilderNewFormContent() {
 
           {/* Options */}
           <div className="flex flex-col gap-3">
+            {checkerCvText && (
+              <MagneticButton className="w-full">
+                <button
+                  onClick={() => handleCreate(false, checkerCvText)}
+                  disabled={isCreating}
+                  className="w-full flex items-center gap-3 p-4 rounded-xl bg-lime/30 border-2 border-ink hover:bg-lime/50 transition-all active:scale-[0.98] disabled:opacity-50"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-brand-dark flex items-center justify-center shrink-0">
+                    <span className="material-symbols-outlined text-lime" style={{ fontVariationSettings: "'FILL' 1" }}>fact_check</span>
+                  </div>
+                  <div className="text-left">
+                    <p className="font-semibold text-sm text-on-surface">{t("cv.new.from-checker")}</p>
+                    <p className="text-xs text-on-surface-variant">{t("cv.new.from-checker-desc")}</p>
+                  </div>
+                </button>
+              </MagneticButton>
+            )}
             <MagneticButton className="w-full">
               <button
                 onClick={() => handleCreate(true)}
@@ -214,7 +242,11 @@ function BuilderNewFormContent() {
           <div className="flex flex-col items-center gap-3">
             <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
             <p className="text-sm text-on-surface-variant">
-              {fillMethod === "profile" ? t("cv.new.loading-profile") : t("cv.new.loading-empty")}
+              {fillMethod === "checker"
+                ? t("cv.new.loading-checker")
+                : fillMethod === "profile"
+                  ? t("cv.new.loading-profile")
+                  : t("cv.new.loading-empty")}
             </p>
           </div>
         </div>

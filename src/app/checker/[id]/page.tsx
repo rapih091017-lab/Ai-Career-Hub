@@ -35,6 +35,7 @@ export default function CheckerDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [createdAt, setCreatedAt] = useState<string | null>(null);
+  const [cvText, setCvText] = useState<string | null>(null);
 
   const resultsRef = useRef<HTMLDivElement>(null);
 
@@ -54,6 +55,7 @@ export default function CheckerDetailPage() {
         const full: Record<string, unknown> | null = data.fullResult;
         setFullResult(full);
         setCreatedAt(data.createdAt);
+        setCvText(typeof data.cvTextExtracted === "string" ? data.cvTextExtracted : null);
 
         setResult(
           analysisFromFullResult(data.id, {
@@ -145,7 +147,7 @@ export default function CheckerDetailPage() {
           </div>
         </div>
 
-        <CheckerResultView result={result} variant="stored" resultId={id} resultsRef={resultsRef} wrapperId="checker-results-detail">
+        <CheckerResultView result={result} variant="stored" resultId={id} resultsRef={resultsRef} wrapperId="checker-results-detail" cvText={cvText}>
         {/* ============================================================ */}
         {/*  6. CTA, Surat Lamaran / Motivation Letter                  */}
         {/* ============================================================ */}
