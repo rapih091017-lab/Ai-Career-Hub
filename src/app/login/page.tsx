@@ -6,6 +6,7 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { describeAuthError } from "@/lib/auth-errors";
+import { safeNextPath } from "@/lib/safe-next";
 import SkyToggle from "@/components/ui/SkyToggle";
 
 const Ripple = dynamic(
@@ -41,9 +42,8 @@ export default function LoginPage() {
     const rawNext = params.get("next");
     // Hanya path internal yang dipakai. Nilai mentah dari query bisa membuat
     // pengalihan ke situs lain tepat setelah login.
-    if (rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//")) {
-      setNextPath(rawNext);
-    }
+    const safeNext = safeNextPath(rawNext, window.location.origin);
+    if (safeNext) setNextPath(safeNext);
   }, []);
 
   const handleGoogleLogin = async () => {

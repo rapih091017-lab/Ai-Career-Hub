@@ -41,7 +41,9 @@ describe("pengguna tidak kehilangan pilihan paket saat login", () => {
   it("tujuan dari query hanya boleh path internal", () => {
     // Nilai mentah dari query dipakai apa adanya bisa menjadi open redirect
     // tepat setelah login.
-    expect(loginSrc).toContain('!rawNext.startsWith("//")');
+    // Validasi pindah ke safeNextPath (origin sama, tolak "//" dan "\\");
+    // perilakunya diuji di login-safe-next.test.ts.
+    expect(loginSrc).toContain("safeNextPath(rawNext, window.location.origin)");
   });
 
   it("checkout mengembalikan pengguna ke login sambil membawa keranjang", () => {
