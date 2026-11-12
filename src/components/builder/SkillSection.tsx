@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { FieldHelp } from "@/components/builder/FieldHelp";
 import { extraSectionPlaceholder } from "@/lib/builder-help";
-import { QUICK_CUSTOM_TITLES } from "@/lib/section-manager";
+import { quickCustomTitles } from "@/lib/section-manager";
+import { fill, useTranslation } from "@/lib/i18n";
 import { BulletEditor } from "./BulletEditor";
 import { RemoveSectionButton, UnusedSectionCard } from "./SectionControls";
 import type { SkillEntry, CertificationEntry } from "@/components/cv-templates";
@@ -46,13 +47,25 @@ export const SKILL_LEVEL_OPTIONS = [
   { value: "advanced", label: "Mahir", desc: "lancar dan bisa membimbing orang lain" },
 ] as const;
 
+const SKILL_LEVEL_EN: Record<string, { label: string; desc: string }> = {
+  beginner: { label: "Beginner", desc: "still learning and needs guidance" },
+  intermediate: { label: "Intermediate", desc: "works independently" },
+  advanced: { label: "Advanced", desc: "fluent and can coach others" },
+};
+
+/** Opsi level skill sesuai bahasa UI. */
+export function skillLevelOptions(lang: "id" | "en") {
+  return SKILL_LEVEL_OPTIONS.map((o) => (lang === "en" ? { value: o.value, ...SKILL_LEVEL_EN[o.value] } : o));
+}
+
 /** Catatan di kartu form: data ada, tapi section tidak tampil di CV. */
 export function HiddenSectionNotice({ onShow }: { onShow?: () => void }) {
+  const { t } = useTranslation();
   return (
     <div role="status" className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
       <span className="flex items-center gap-1.5">
         <span className="material-symbols-outlined text-[16px]" aria-hidden="true">visibility_off</span>
-        Bagian ini disembunyikan dari CV.
+        {t("section.hidden")}
       </span>
       {onShow && (
         <button
@@ -60,7 +73,7 @@ export function HiddenSectionNotice({ onShow }: { onShow?: () => void }) {
           onClick={onShow}
           className="rounded-md px-2 py-1 font-semibold text-amber-900 underline underline-offset-2 hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700"
         >
-          Tampilkan
+          {t("section.show")}
         </button>
       )}
     </div>
@@ -68,9 +81,9 @@ export function HiddenSectionNotice({ onShow }: { onShow?: () => void }) {
 }
 
 const CATEGORY_OPTIONS = [
-  { value: "technical", label: "Technical" },
-  { value: "soft", label: "Soft Skills" },
-  { value: "tools", label: "Tools & Platform" },
+  { value: "technical", label: "skill.cat-technical" },
+  { value: "soft", label: "skill.cat-soft" },
+  { value: "tools", label: "skill.cat-tools" },
 ] as const;
 
 export function SkillSection({
@@ -99,6 +112,9 @@ export function SkillSection({
   hasSavedContent,
   onPurgeSection,
 }: SkillSectionProps) {
+  const { t, lang } = useTranslation();
+  const levels = skillLevelOptions(lang);
+  const extraLabel = lainnyaTitle.trim() || t("skill.extra-title");
   const unusedCard = (key: string, label: string) => (
     <UnusedSectionCard
       label={label}
@@ -125,8 +141,8 @@ export function SkillSection({
             <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>psychology</span>
           </div>
           <div>
-            <h3 className="flex items-center gap-1 font-label-bold text-on-surface">Keahlian<FieldHelp topic="skills" /></h3>
-            <p className="text-xs text-on-surface-variant">Kelompokkan skill berdasarkan kategori agar CV lebih profesional</p>
+            <h3 className="flex items-center gap-1 font-label-bold text-on-surface">{t("skill.title")}<FieldHelp topic="skills" /></h3>
+            <p className="text-xs text-on-surface-variant">{t("skill.desc")}</p>
           </div>
         </div>
         {hiddenNotice("skills", skills.some((s) => s.name.trim()))}
@@ -140,7 +156,7 @@ export function SkillSection({
                   value={skill.name}
                   onChange={(e) => onSkillChange(i, "name", e.target.value)}
                   className="w-full bg-surface-container-lowest border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary text-body-md"
-                  placeholder="Nama Skill"
+                  placeholder={t("skill.name-ph")}
                 />
               </div>
               <select
@@ -149,17 +165,17 @@ export function SkillSection({
                 className="bg-surface-container-lowest border border-outline-variant/50 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary text-xs min-w-[120px]"
               >
                 {CATEGORY_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  <option key={opt.value} value={opt.value}>{t(opt.label)}</option>
                 ))}
               </select>
               <select
-                aria-label="Level keahlian"
+                aria-label={t("skill.level")}
                 value={skill.level ?? ""}
                 onChange={(e) => onSkillChange(i, "level", e.target.value as SkillEntry["level"])}
                 className="bg-surface-container-lowest border border-outline-variant/50 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-primary text-xs min-w-[100px]"
               >
-                <option value="">Pilih level</option>
-                {SKILL_LEVEL_OPTIONS.map((opt) => (
+                <option value="">{t("skill.level-pick")}</option>
+                {levels.map((opt) => (
                   <option key={opt.value} value={opt.value} title={opt.desc}>{opt.label}</option>
                 ))}
               </select>
@@ -167,7 +183,7 @@ export function SkillSection({
                 type="button"
                 onClick={() => onSkillRemove(i)}
                 className="text-error/70 hover:text-error transition-colors shrink-0"
-                aria-label="Hapus skill"
+                aria-label={t("skill.remove")}
               >
                 <span className="material-symbols-outlined text-[18px]">delete</span>
               </button>
@@ -178,25 +194,25 @@ export function SkillSection({
             onClick={onSkillAdd}
             className="w-full border-2 border-dashed border-outline/30 rounded-xl py-3 flex items-center justify-center gap-2 text-body-md text-on-surface-variant hover:border-primary/50 hover:text-primary transition-colors duration-200"
           >
-            <span className="material-symbols-outlined text-lg">add</span> Tambah Skill
+            <span className="material-symbols-outlined text-lg">add</span> {t("skill.add")}
           </button>
         </div>
 
         <p className="text-[11px] text-on-surface-variant">
-          {SKILL_LEVEL_OPTIONS.map((o) => `${o.label}: ${o.desc}.`).join(" ")} Level hanya tampil di CV bila diaktifkan di Pengaturan Tampilan.
+          {levels.map((o) => `${o.label}: ${o.desc}.`).join(" ")} {t("skill.level-note")}
         </p>
 
         {/* Color legend */}
         <div className="flex items-center gap-3 text-[10px] text-on-surface-variant pt-1">
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500" /> Technical</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500" /> Soft Skills</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-purple-500" /> Tools</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500" /> {t("skill.cat-technical")}</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500" /> {t("skill.cat-soft")}</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-purple-500" /> {t("skill.cat-tools-short")}</span>
         </div>
       </div>
 
       {/* ── Sertifikasi & Lisensi ── */}
       {unused("certifications") ? (
-        unusedCard("certifications", "Sertifikasi")
+        unusedCard("certifications", t("cert.short"))
       ) : (
       <div data-cv-field="certifications" className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
         <div className="flex items-center gap-3 pb-2">
@@ -204,10 +220,10 @@ export function SkillSection({
             <span className="material-symbols-outlined text-amber-600" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
           </div>
           <div>
-            <h3 className="flex items-center gap-1 font-label-bold text-on-surface">Sertifikasi & Lisensi<FieldHelp topic="certifications" /></h3>
-            <p className="text-xs text-on-surface-variant">Sertifikasi profesional, kursus, atau lisensi yang dimiliki</p>
+            <h3 className="flex items-center gap-1 font-label-bold text-on-surface">{t("cert.title")}<FieldHelp topic="certifications" /></h3>
+            <p className="text-xs text-on-surface-variant">{t("cert.desc")}</p>
           </div>
-          {removeBtn("certifications", "Sertifikasi")}
+          {removeBtn("certifications", t("cert.short"))}
         </div>
         {hiddenNotice("certifications", certifications.some((c) => c.name.trim()))}
 
@@ -220,7 +236,7 @@ export function SkillSection({
                   value={cert.name}
                   onChange={(e) => onCertChange(i, "name", e.target.value)}
                   className="w-full bg-surface-container-lowest border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary text-body-md"
-                  placeholder="Nama Sertifikasi"
+                  placeholder={t("cert.name-ph")}
                 />
               </div>
               <div className="w-32">
@@ -229,7 +245,7 @@ export function SkillSection({
                   value={cert.issuer}
                   onChange={(e) => onCertChange(i, "issuer", e.target.value)}
                   className="w-full bg-surface-container-lowest border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary text-body-md"
-                  placeholder="Penerbit"
+                  placeholder={t("cert.issuer-ph")}
                 />
               </div>
               <div className="w-20">
@@ -238,14 +254,14 @@ export function SkillSection({
                   value={cert.year}
                   onChange={(e) => onCertChange(i, "year", e.target.value)}
                   className="w-full bg-surface-container-lowest border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary text-body-md"
-                  placeholder="Tahun"
+                  placeholder={t("cert.year-ph")}
                 />
               </div>
               <button
                 type="button"
                 onClick={() => onCertRemove(i)}
                 className="text-error/70 hover:text-error transition-colors shrink-0"
-                aria-label="Hapus sertifikasi"
+                aria-label={t("cert.remove")}
               >
                 <span className="material-symbols-outlined text-[18px]">delete</span>
               </button>
@@ -256,7 +272,7 @@ export function SkillSection({
             onClick={onCertAdd}
             className="w-full border-2 border-dashed border-outline/30 rounded-xl py-3 flex items-center justify-center gap-2 text-body-md text-on-surface-variant hover:border-primary/50 hover:text-primary transition-colors duration-200"
           >
-            <span className="material-symbols-outlined text-lg">add</span> Tambah Sertifikasi
+            <span className="material-symbols-outlined text-lg">add</span> {t("cert.add")}
           </button>
         </div>
       </div>
@@ -264,7 +280,7 @@ export function SkillSection({
 
       {/* ── Self Evaluation / Evaluasi Diri ── */}
       {unused("selfEvaluation") ? (
-        unusedCard("selfEvaluation", "Evaluasi Diri")
+        unusedCard("selfEvaluation", t("selfeval.title"))
       ) : (
       <div data-cv-field="selfEvaluation" className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
         <div className="flex items-center gap-3 pb-2">
@@ -272,10 +288,10 @@ export function SkillSection({
             <span className="material-symbols-outlined text-green" style={{ fontVariationSettings: "'FILL' 1" }}>badge</span>
           </div>
           <div>
-            <h3 className="flex items-center gap-1 font-label-bold text-on-surface">Evaluasi Diri<FieldHelp topic="selfEvaluation" /></h3>
-            <p className="text-xs text-on-surface-variant">Tuliskan kekuatan utama, motivasi, atau tujuan kariermu (opsional)</p>
+            <h3 className="flex items-center gap-1 font-label-bold text-on-surface">{t("selfeval.title")}<FieldHelp topic="selfEvaluation" /></h3>
+            <p className="text-xs text-on-surface-variant">{t("selfeval.desc")}</p>
           </div>
-          {removeBtn("selfEvaluation", "Evaluasi Diri")}
+          {removeBtn("selfEvaluation", t("selfeval.title"))}
         </div>
         {hiddenNotice("selfEvaluation", !!selfEvaluation.trim())}
         {onSelfEvaluationChange ? (
@@ -284,7 +300,7 @@ export function SkillSection({
             onChange={(e) => onSelfEvaluationChange(e.target.value)}
             className="w-full bg-surface-container-low border-none rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary resize-none text-body-md"
             rows={3}
-            placeholder="Contoh: Teliti dalam pekerjaan angka: terbiasa mengecek ulang laporan sebelum dikirim ke atasan."
+            placeholder={t("selfeval.ph")}
           />
         ) : (
           <textarea
@@ -292,7 +308,7 @@ export function SkillSection({
             readOnly
             className="w-full bg-surface-container-low border-none rounded-xl px-3 py-2 text-body-md text-outline-variant"
             rows={3}
-            placeholder="(Fitur ini akan tersedia setelah update builder)"
+            placeholder={t("selfeval.unavailable")}
           />
         )}
       </div>
@@ -300,7 +316,7 @@ export function SkillSection({
 
       {/* ── Bagian Tambahan (id "lainnya") ── */}
       {unused("lainnya") ? (
-        unusedCard("lainnya", lainnyaTitle.trim() || "Bagian Tambahan")
+        unusedCard("lainnya", extraLabel)
       ) : (
       <div data-cv-field="customSections.lainnya" className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
         <div className="flex items-center gap-3">
@@ -308,27 +324,27 @@ export function SkillSection({
             <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>more_horiz</span>
           </div>
           <div>
-            <h3 className="flex items-center gap-1 font-label-bold text-on-surface">Bagian Tambahan<FieldHelp topic="extraSection" /></h3>
-            <p className="text-xs text-on-surface-variant">Untuk hal penting yang tidak masuk bagian lain.</p>
+            <h3 className="flex items-center gap-1 font-label-bold text-on-surface">{t("skill.extra-title")}<FieldHelp topic="extraSection" /></h3>
+            <p className="text-xs text-on-surface-variant">{t("skill.extra-desc")}</p>
           </div>
-          {removeBtn("lainnya", lainnyaTitle.trim() || "Bagian Tambahan")}
+          {removeBtn("lainnya", extraLabel)}
         </div>
         {hiddenNotice("lainnya", !!lainnyaContent.trim())}
         {onLainnyaTitleChange && (
           <div>
             <label htmlFor="extra-section-title" className="mb-1 block text-xs font-semibold text-on-surface-variant">
-              Judul di CV
+              {t("skill.extra-cv-title")}
             </label>
             <input
               id="extra-section-title"
               value={lainnyaTitle}
               maxLength={100}
               onChange={(e) => onLainnyaTitleChange(e.target.value)}
-              placeholder="Mis. Penghargaan"
+              placeholder={t("section.title-ph")}
               className="w-full rounded-lg border-none bg-surface-container-low px-3 py-2 font-label-bold text-on-surface focus:ring-2 focus:ring-primary"
             />
-            <div className="mt-2 flex flex-wrap gap-1.5" role="group" aria-label="Pilihan cepat judul">
-              {QUICK_CUSTOM_TITLES.filter((q) => !takenTitles.has(q.toLowerCase())).map((q) => {
+            <div className="mt-2 flex flex-wrap gap-1.5" role="group" aria-label={t("section.quick-titles")}>
+              {quickCustomTitles(lang).filter((q) => !takenTitles.has(q.toLowerCase())).map((q) => {
                 const active = lainnyaTitle.trim().toLowerCase() === q.toLowerCase();
                 return (
                   <button
@@ -348,12 +364,12 @@ export function SkillSection({
           </div>
         )}
         <BulletEditor
-          label={`Isi bagian ${lainnyaTitle.trim() || "Bagian Tambahan"}`}
+          label={fill(t("section.content"), { label: extraLabel })}
           value={lainnyaContent}
           onChange={onLainnyaChange}
           mode={lainnyaContentType}
           onModeChange={onLainnyaContentTypeChange}
-          placeholder={extraSectionPlaceholder(lainnyaTitle)}
+          placeholder={extraSectionPlaceholder(lainnyaTitle, lang)}
           maxLength={5000}
         />
       </div>

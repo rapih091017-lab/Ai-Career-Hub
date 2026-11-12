@@ -12,7 +12,12 @@ import { fileURLToPath } from "url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
 
-const dictSource = readFileSync(join(root, "src/lib/i18n.tsx"), "utf8");
+// Kamus utama + kamus per area di src/lib/i18n-dict yang di-spread ke DICT.
+const dictDir = join(root, "src/lib/i18n-dict");
+const dictSource = [
+  readFileSync(join(root, "src/lib/i18n.tsx"), "utf8"),
+  ...readdirSync(dictDir).filter((f) => f.endsWith(".ts")).map((f) => readFileSync(join(dictDir, f), "utf8")),
+].join("\n");
 const dictKeys = new Set(
   [...dictSource.matchAll(/^\s*"([a-zA-Z0-9._-]+)":\s*\{/gm)].map((m) => m[1]),
 );

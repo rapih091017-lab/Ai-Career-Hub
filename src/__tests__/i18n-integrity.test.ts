@@ -11,7 +11,13 @@ import { join } from "node:path";
  * tidak layak dilihat. Test ini menutup kelas bug itu.
  */
 
-const dictSource = readFileSync("src/lib/i18n.tsx", "utf8");
+// Kamus utama + kamus per area (src/lib/i18n-dict) yang di-spread ke DICT.
+const dictSource = [
+  readFileSync("src/lib/i18n.tsx", "utf8"),
+  ...readdirSync("src/lib/i18n-dict")
+    .filter((f) => f.endsWith(".ts"))
+    .map((f) => readFileSync(join("src/lib/i18n-dict", f), "utf8")),
+].join("\n");
 const dictKeys = new Set(
   [...dictSource.matchAll(/^\s*"([a-zA-Z0-9._-]+)":\s*\{/gm)].map((m) => m[1]),
 );

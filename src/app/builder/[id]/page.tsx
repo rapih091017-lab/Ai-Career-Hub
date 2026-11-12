@@ -56,7 +56,7 @@ import { BuilderTour, tourSeen } from "@/components/builder/BuilderTour";
 import { Tooltip } from "@/components/ui/popover";
 import { AtsScoreInsight } from "@/components/builder/AtsScoreInsight";
 import { BuilderLoadingSkeleton, BuilderErrorState } from "@/components/builder/BuilderSkeleton";
-import { useTranslation } from "@/lib/i18n";
+import { fill, useTranslation } from "@/lib/i18n";
 import { useBuilderHelpers } from "@/hooks/useBuilderHelpers";
 import { useBuilderAI } from "@/hooks/useBuilderAI";
 import { useBuilderFormat } from "@/hooks/useBuilderFormat";
@@ -76,7 +76,7 @@ export default function BuilderPage() {
   // (useBuilderAI), jadi langkah awal tidak boleh berawal dari Target lalu pindah sendiri.
   const [activeStep, setActiveStep] = useState<number>(STEP.PERSONAL);
   const [isSaving, setIsSaving] = useState(false);
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const steps = STEP_IDS.map((id) => t(STEP_META[id].title));
   const [collapsedWorkIds, setCollapsedWorkIds] = useState<Set<string>>(new Set());
   const [confirm, setConfirm] = useState<ConfirmAction | null>(null);
@@ -232,14 +232,14 @@ export default function BuilderPage() {
   const isSectionUnused = (key: string) => unusedSections.includes(key);
   // Langkah yang seluruh bagiannya dihapus (saat ini hanya Organisasi) tampil "Tidak dipakai".
   const unusedSteps = STEP_IDS.map((id) => id === "organizations" && isSectionUnused("organizations"));
-  const labelOf = (key: string) => sectionLabel(cvData, key);
+  const labelOf = (key: string) => sectionLabel(cvData, key, lang);
   const requestRemoveSection = (key: string) => {
     const label = labelOf(key);
     setConfirm({
-      title: `Hapus bagian ${label} dari CV?`,
-      message: "Bagian ini tidak tampil lagi di CV dan PDF. Isinya tetap tersimpan, jadi bisa dipakai lagi kapan saja lewat \"Pakai lagi\".",
-      confirmLabel: "Hapus dari CV",
-      cancelLabel: "Batal",
+      title: fill(t("bsec.remove-title"), { label }),
+      message: t("bsec.remove-msg"),
+      confirmLabel: t("section.remove"),
+      cancelLabel: t("common.cancel"),
       onConfirm: () => {
         // Posisi dihitung dari state terbaru di dalam updater, bukan dari closure render.
         const pos = { index: -1 };
@@ -251,10 +251,10 @@ export default function BuilderPage() {
         });
         addToast({
           type: "info",
-          message: `Bagian ${label} dihapus dari CV. Isinya tetap tersimpan.`,
+          message: fill(t("bsec.removed"), { label }),
           duration: 8000,
           // Urungkan hanya mengembalikan urutan; isi tidak pernah dihapus, jadi editan baru aman.
-          action: { label: "Urungkan", onClick: () => setCvData((prev) => restoreSection(prev, key, pos.index)) },
+          action: { label: t("bullet.undo"), onClick: () => setCvData((prev) => restoreSection(prev, key, pos.index)) },
         });
       },
     });
@@ -262,10 +262,10 @@ export default function BuilderPage() {
   const requestPurgeSection = (key: string) => {
     const label = labelOf(key);
     setConfirm({
-      title: `Hapus permanen isi ${label}?`,
-      message: "Semua isi bagian ini dihapus dan tidak bisa dikembalikan.",
-      confirmLabel: "Hapus permanen",
-      cancelLabel: "Batal",
+      title: fill(t("bsec.purge-title"), { label }),
+      message: t("bsec.purge-msg"),
+      confirmLabel: t("bsec.purge-confirm"),
+      cancelLabel: t("common.cancel"),
       variant: "danger",
       onConfirm: () => setCvData((prev) => purgeSectionContent(prev, key)),
     });
@@ -348,8 +348,8 @@ export default function BuilderPage() {
     h.redo = [];
   }, []);
   const onPreviewConflict = useCallback(
-    () => addToast({ type: "info", message: "Teks ini baru saja diubah di tempat lain. Isi terbaru yang dipakai; ketikan di pratinjau tidak disimpan." }),
-    [addToast],
+    () => addToast({ type: "info", message: t("bpage.preview-conflict") }),
+    [addToast, t],
   );
   // Poin di pratinjau: Enter/Backspace mengubah struktur, lalu fokus pindah ke poin tujuan.
   const pendingFocus = useRef<{ path: string; caret: "start" | "end" } | null>(null);
@@ -532,8 +532,8 @@ export default function BuilderPage() {
 
   /* ── Toolbar: konteks global atau satu bagian ── */
   const styleTargets = useMemo(
-    () => [{ key: "header", label: "Header & kontak" }, ...renderProps.sectionOrder.map((key) => ({ key, label: sectionLabel(cvData, key) }))],
-    [renderProps.sectionOrder, cvData],
+    () => [{ key: "header", label: t("bpage.header-target") }, ...renderProps.sectionOrder.map((key) => ({ key, label: sectionLabel(cvData, key, lang) }))],
+    [renderProps.sectionOrder, cvData, t, lang],
   );
   // Bagian yang sudah tidak tampil (dihapus/disembunyikan) tidak bisa tetap terpilih.
   const activeTarget = styleTarget && styleTargets.some((x) => x.key === styleTarget) ? styleTarget : null;
@@ -562,7 +562,7 @@ export default function BuilderPage() {
       // PDF dibuat server dari data di DB, jadi perubahan terakhir harus tersimpan dulu.
       const saved = await flushAutoSave();
       if (!saved) {
-        addToast({ type: "error", message: "Perubahan terakhir belum tersimpan. Periksa koneksi lalu coba unduh lagi." });
+        addToast({ type: "error", message: t("bpage.pdf-unsaved") });
         return;
       }
       const res = await fetch(`/api/cv-documents/${cvId}/pdf`, {
@@ -574,12 +574,12 @@ export default function BuilderPage() {
         const body = await res.json().catch(() => null);
         const fallback =
           res.status === 409
-            ? "CV berubah di tab lain. Muat ulang halaman ini lalu unduh lagi."
+            ? t("bpage.pdf-409")
             : res.status === 429
-            ? "Terlalu sering mengunduh PDF. Tunggu sebentar lalu coba lagi."
+            ? t("bpage.pdf-429")
             : res.status === 401
-              ? "Sesi login berakhir. Masuk lagi lalu unduh ulang."
-              : "Gagal membuat PDF. Coba lagi sebentar lagi.";
+              ? t("bpage.pdf-401")
+              : t("bpage.pdf-failed");
         // 409: pesan klien yang dipakai, karena user perlu tahu harus memuat ulang.
         const serverMsg = res.status !== 409 && body && typeof body.message === "string" ? body.message : "";
         addToast({ type: "error", message: serverMsg || fallback });
@@ -597,7 +597,7 @@ export default function BuilderPage() {
       addToast({ type: "success", message: t("builder.pdf-export-success") });
     } catch (err) {
       console.error("PDF Export Error:", err);
-      addToast({ type: "error", message: "Gagal mengunduh PDF. Periksa koneksi lalu coba lagi." });
+      addToast({ type: "error", message: t("bpage.pdf-download-failed") });
     } finally {
       setIsPdfExporting(false);
     }
@@ -721,30 +721,30 @@ export default function BuilderPage() {
         {saveStatus === "conflict" && (
           <div role="alert" className="flex flex-wrap items-center gap-3 border-b border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950 shrink-0">
             <span className="flex-1 min-w-[16rem]">
-              <strong>CV ini diubah di tab atau perangkat lain.</strong> Penyimpanan otomatis dihentikan agar tidak saling menimpa.
+              <strong>{t("bpage.conflict-title")}</strong> {t("bpage.conflict-body")}
             </span>
             <button type="button" onClick={() => window.location.reload()} className="min-h-11 rounded-lg bg-amber-900 px-3 font-semibold text-white hover:bg-amber-950 sm:min-h-9">
-              Muat versi terbaru
+              {t("bpage.conflict-reload")}
             </button>
             <button
               type="button"
               onClick={() =>
                 setConfirm({
-                  title: "Timpa dengan versi di sini?",
-                  message: "Perubahan yang dibuat di tab atau perangkat lain akan hilang dan diganti isi CV di tab ini.",
-                  confirmLabel: "Timpa",
-                  cancelLabel: "Batal",
+                  title: t("bpage.overwrite-title"),
+                  message: t("bpage.overwrite-msg"),
+                  confirmLabel: t("bpage.overwrite-confirm"),
+                  cancelLabel: t("common.cancel"),
                   variant: "danger",
                   onConfirm: () => {
                     void overwriteServer().then((ok) =>
-                      addToast(ok ? { type: "success", message: "Versi di tab ini sudah disimpan." } : { type: "error", message: "Gagal menyimpan. Coba lagi." }),
+                      addToast(ok ? { type: "success", message: t("bpage.overwrite-ok") } : { type: "error", message: t("bpage.save-retry") }),
                     );
                   },
                 })
               }
               className="min-h-11 rounded-lg border border-amber-900 px-3 font-semibold text-amber-950 hover:bg-amber-100 sm:min-h-9"
             >
-              Timpa dengan versi di sini
+              {t("bpage.overwrite-button")}
             </button>
           </div>
         )}
@@ -1069,8 +1069,8 @@ export default function BuilderPage() {
               ))}
               {activeStep === STEP.SKILLS && (
                 <div className="rounded-xl bg-surface-container-lowest p-6 shadow-soft">
-                  <h3 className="mb-1 font-label-bold text-on-surface">Tambah bagian lain</h3>
-                  <p className="mb-3 text-xs text-on-surface-variant">Butuh lebih dari satu Bagian Tambahan? Pilih judul di bawah. Bagian baru muncul di CV setelah diisi, dan urutannya bisa diatur lewat Atur urutan section.</p>
+                  <h3 className="mb-1 font-label-bold text-on-surface">{t("bpage.add-more")}</h3>
+                  <p className="mb-3 text-xs text-on-surface-variant">{t("bpage.add-more-desc")}</p>
                   <AddSectionPanel
                     unused={unusedForPanel}
                     onRestore={restoreUnused}
@@ -1127,10 +1127,10 @@ export default function BuilderPage() {
               onCloseMobilePreview={() => setMobilePreviewOpen(false)}
               onResetStyle={() =>
                 setConfirm({
-                  title: "Kembalikan ke gaya template?",
-                  message: "Font, ukuran huruf, rata teks, warna, dan gaya per bagian pilihanmu dihapus lalu mengikuti template. Urutan, spasi, margin, dan isi CV tidak berubah.",
-                  confirmLabel: "Kembalikan",
-                  cancelLabel: "Batal",
+                  title: t("bpage.reset-style-title"),
+                  message: t("bpage.reset-style-msg"),
+                  confirmLabel: t("bpage.reset-style-confirm"),
+                  cancelLabel: t("common.cancel"),
                   onConfirm: format.resetToTemplateStyle,
                 })
               }
@@ -1166,14 +1166,14 @@ export default function BuilderPage() {
                 <div ref={previewRef} data-tour="preview" className="relative" onFocus={onPreviewFocus} onBlur={onPreviewBlur} onClick={onPreviewClick} onMouseEnter={onPreviewEnter}>
                 {editHint && (
                   <div role="status" className="absolute left-1/2 top-3 z-10 flex -translate-x-1/2 items-center gap-1 rounded-full bg-inverse-surface py-1 pl-3 pr-1 text-xs font-medium text-inverse-on-surface shadow-md">
-                    Klik teks untuk mengedit
+                    {t("bpage.edit-hint")}
                     <button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
                         closeHint();
                       }}
-                      aria-label="Tutup petunjuk"
+                      aria-label={t("bpage.edit-hint-close")}
                       className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-white/15"
                     >
                       <span className="material-symbols-outlined text-[16px]" aria-hidden="true">close</span>

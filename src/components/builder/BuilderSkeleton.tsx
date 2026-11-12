@@ -5,6 +5,7 @@ import { Skeleton, CardSkeleton } from "@/components/LoadingSkeleton";
 import MagneticButton from "@/components/MagneticButton";
 import AppHeader from "@/components/AppHeader";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "@/lib/i18n";
 
 /* ─── Loading Skeleton ─── */
 export function BuilderLoadingSkeleton() {
@@ -66,20 +67,21 @@ interface BuilderErrorStateProps {
 
 export function BuilderErrorState({ message }: BuilderErrorStateProps) {
   const router = useRouter();
+  const { t } = useTranslation();
 
   return (
     <>
       <AppHeader />
       <div className="flex items-center justify-center h-[calc(100vh-64px)]">
         <div className="text-center space-y-4">
-          <p className="text-lg font-semibold text-error">Error</p>
+          <p className="text-lg font-semibold text-error">{t("bskel.error")}</p>
           <p className="text-sm text-on-surface-variant">{message}</p>
           <MagneticButton>
             <button
               onClick={() => router.push("/dashboard")}
               className="px-4 py-2 rounded-xl bg-primary text-on-primary text-sm"
             >
-              Kembali ke Dashboard
+              {t("bskel.back")}
             </button>
           </MagneticButton>
         </div>

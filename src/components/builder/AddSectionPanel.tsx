@@ -1,7 +1,8 @@
 "use client";
 
 import { useId, useState } from "react";
-import { QUICK_CUSTOM_TITLES } from "@/lib/section-manager";
+import { quickCustomTitles } from "@/lib/section-manager";
+import { fill, useTranslation } from "@/lib/i18n";
 import { MAX_CUSTOM_SECTIONS } from "@/lib/builder-format";
 
 interface AddSectionPanelProps {
@@ -20,10 +21,11 @@ interface AddSectionPanelProps {
  */
 export function AddSectionPanel({ unused, onRestore, onAddCustom, customCount, existingTitles }: AddSectionPanelProps) {
   const [title, setTitle] = useState("");
+  const { t: tr, lang } = useTranslation();
   const inputId = useId();
   const full = customCount >= MAX_CUSTOM_SECTIONS;
   const taken = new Set(existingTitles.map((t) => t.trim().toLowerCase()));
-  const quick = QUICK_CUSTOM_TITLES.filter((t) => !taken.has(t.toLowerCase()));
+  const quick = quickCustomTitles(lang).filter((t) => !taken.has(t.toLowerCase()));
   const chip =
     "inline-flex min-h-11 items-center gap-1 rounded-full border border-outline-variant/60 bg-surface-container-lowest px-3 text-sm font-medium text-on-surface hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-40 disabled:hover:border-outline-variant/60 disabled:hover:text-on-surface sm:min-h-9";
 
@@ -38,21 +40,21 @@ export function AddSectionPanel({ unused, onRestore, onAddCustom, customCount, e
     <div className="space-y-3">
       {unused.length > 0 && (
         <div>
-          <p className="mb-1.5 text-xs font-semibold text-on-surface-variant">Belum dipakai di CV</p>
+          <p className="mb-1.5 text-xs font-semibold text-on-surface-variant">{tr("section.unused-heading")}</p>
           <div className="flex flex-wrap gap-2">
             {unused.map((u) => (
               <button key={u.key} type="button" className={chip} onClick={() => onRestore(u.key)}>
                 <span className="material-symbols-outlined text-[16px]" aria-hidden="true">{u.hasContent ? "undo" : "add"}</span>
                 {u.label}
                 {/* Hanya bagian yang benar-benar punya isi yang ditandai; bagian kosong bukan data hilang. */}
-                {u.hasContent && <span className="text-xs font-normal text-on-surface-variant">· isi tersimpan</span>}
+                {u.hasContent && <span className="text-xs font-normal text-on-surface-variant">· {tr("section.content-saved")}</span>}
               </button>
             ))}
           </div>
         </div>
       )}
       <div>
-        <p className="mb-1.5 text-xs font-semibold text-on-surface-variant">Bagian baru</p>
+        <p className="mb-1.5 text-xs font-semibold text-on-surface-variant">{tr("section.new")}</p>
         {quick.length > 0 && (
           <div className="mb-2 flex flex-wrap gap-2">
             {quick.map((t) => (
@@ -65,7 +67,7 @@ export function AddSectionPanel({ unused, onRestore, onAddCustom, customCount, e
         )}
         <div className="flex gap-2">
           <label htmlFor={inputId} className="sr-only">
-            Judul bagian baru
+            {tr("section.new-title")}
           </label>
           <input
             id={inputId}
@@ -79,7 +81,7 @@ export function AddSectionPanel({ unused, onRestore, onAddCustom, customCount, e
                 submit();
               }
             }}
-            placeholder="Judul lain, mis. Seminar"
+            placeholder={tr("section.new-title-ph")}
             className="min-h-11 min-w-0 flex-1 rounded-lg border-none bg-surface-container-low px-3 text-body-md focus:ring-2 focus:ring-primary disabled:opacity-50 sm:min-h-9"
           />
           <button
@@ -88,12 +90,12 @@ export function AddSectionPanel({ unused, onRestore, onAddCustom, customCount, e
             disabled={full || !title.trim()}
             className="min-h-11 shrink-0 rounded-lg bg-primary px-4 text-sm font-semibold text-on-primary hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-40 sm:min-h-9"
           >
-            Tambah
+            {tr("common.add")}
           </button>
         </div>
         {full && (
           <p className="mt-1.5 text-xs text-on-surface-variant">
-            Sudah {MAX_CUSTOM_SECTIONS} bagian tambahan. Hapus salah satu untuk menambah yang baru.
+            {fill(tr("section.full"), { n: MAX_CUSTOM_SECTIONS })}
           </p>
         )}
       </div>

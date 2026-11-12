@@ -1,6 +1,10 @@
 "use client";
 
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
+import { BUILDER_DICT } from "@/lib/i18n-dict/builder";
+import { PORTFOLIO_DICT } from "@/lib/i18n-dict/portfolio";
+import { CHECKER_DICT } from "@/lib/i18n-dict/checker";
+import { APP_DICT } from "@/lib/i18n-dict/app";
 
 export type Lang = "id" | "en";
 
@@ -16,7 +20,8 @@ const LangContext = createContext<LangContextType>({
   lang: "id",
   setLang: () => {},
   toggleLang: () => {},
-  t: (key: string, fallback?: string) => fallback ?? key,
+  // Tanpa provider (mis. tes komponen) tetap pakai kamus Indonesia.
+  t: (key: string, fallback?: string) => DICT[key]?.id ?? fallback ?? key,
 });
 
 /* Dictionary */
@@ -2163,6 +2168,12 @@ const DICT: Record<string, { id: string; en: string }> = {
   "ui.section-nav.open": { id: "Daftar isi", en: "Contents" },
   "ui.section-nav.close": { id: "Tutup daftar isi", en: "Close contents" },
   "dashboard.linkedin-history": { id: "Riwayat LinkedIn", en: "LinkedIn history" },
+
+  /* Kamus per area hasil audit teks mentah (src/lib/i18n-dict). */
+  ...BUILDER_DICT,
+  ...PORTFOLIO_DICT,
+  ...CHECKER_DICT,
+  ...APP_DICT,
 };
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
@@ -2173,6 +2184,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     const saved = localStorage.getItem("lang") as Lang | null;
     if (saved === "id" || saved === "en") setLangState(saved);
   }, []);
+
+  // Atribut lang di <html> ikut bahasa UI (pembaca layar, tanda hubung, ejaan).
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
 
   const setLang = useCallback((l: Lang) => {
     setLangState(l);
@@ -2198,6 +2214,16 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       {children}
     </LangContext.Provider>
   );
+}
+
+/** Isi placeholder {nama} di teks kamus, mis. fill(teks, { n: 3 }). */
+export function fill(template: string, vars: Record<string, string | number>): string {
+  return template.replace(/\{(\w+)\}/g, (m, k: string) => (k in vars ? String(vars[k]) : m));
+}
+
+/** Locale Intl untuk format tanggal/angka sesuai bahasa UI. */
+export function localeFor(lang: Lang): string {
+  return lang === "en" ? "en-US" : "id-ID";
 }
 
 export function useTranslation() {

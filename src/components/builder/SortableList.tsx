@@ -13,6 +13,7 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { fill, useTranslation } from "@/lib/i18n";
 
 interface SortableListProps {
   ids: string[];
@@ -37,9 +38,10 @@ export function SortableList({ ids, onMove, itemLabel, children, className }: So
     useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 6 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
+  const { t } = useTranslation();
   const nameOf = (id: string | number) => {
     const i = ids.indexOf(String(id));
-    return i < 0 ? "Item" : itemLabel(String(id), i);
+    return i < 0 ? t("sort.item") : itemLabel(String(id), i);
   };
   const posOf = (id: string | number) => ids.indexOf(String(id)) + 1;
 
@@ -57,15 +59,15 @@ export function SortableList({ ids, onMove, itemLabel, children, className }: So
       onDragEnd={onDragEnd}
       accessibility={{
         screenReaderInstructions: {
-          draggable: "Tekan spasi atau Enter untuk mengangkat, panah atas/bawah untuk memindah, spasi lagi untuk meletakkan, Escape untuk batal.",
+          draggable: t("sort.help"),
         },
         announcements: {
-          onDragStart: ({ active }) => `${nameOf(active.id)} diangkat.`,
+          onDragStart: ({ active }) => fill(t("sort.start"), { name: nameOf(active.id) }),
           onDragOver: ({ active, over }) =>
-            over ? `${nameOf(active.id)} di posisi ${posOf(over.id)} dari ${ids.length}.` : `${nameOf(active.id)} di luar daftar.`,
+            over ? fill(t("sort.over"), { name: nameOf(active.id), n: posOf(over.id), total: ids.length }) : fill(t("sort.outside"), { name: nameOf(active.id) }),
           onDragEnd: ({ active, over }) =>
-            over ? `${nameOf(active.id)} diletakkan di posisi ${posOf(over.id)} dari ${ids.length}.` : `${nameOf(active.id)} dilepas.`,
-          onDragCancel: ({ active }) => `Pemindahan ${nameOf(active.id)} dibatalkan.`,
+            over ? fill(t("sort.end"), { name: nameOf(active.id), n: posOf(over.id), total: ids.length }) : fill(t("sort.dropped"), { name: nameOf(active.id) }),
+          onDragCancel: ({ active }) => fill(t("sort.cancel"), { name: nameOf(active.id) }),
         },
       }}
     >
@@ -83,10 +85,11 @@ export function SortableList({ ids, onMove, itemLabel, children, className }: So
 }
 
 function SortableItem({ id, label, children }: { id: string; label: string; children: (handle: ReactNode) => ReactNode }) {
+  const { t } = useTranslation();
   // roleDescription dnd-kit bawaan ("sortable") diganti deskripsi yang benar untuk tombol pegangan.
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
     id,
-    attributes: { roleDescription: "pegangan seret" },
+    attributes: { roleDescription: t("sort.handle") },
   });
   const handle = (
     <button
@@ -94,7 +97,7 @@ function SortableItem({ id, label, children }: { id: string; label: string; chil
       ref={setActivatorNodeRef}
       {...attributes}
       {...listeners}
-      aria-label={`Seret ${label}`}
+      aria-label={fill(t("sort.drag"), { name: label })}
       className="inline-flex h-11 w-11 shrink-0 cursor-grab touch-none items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary active:cursor-grabbing"
     >
       <span className="material-symbols-outlined text-[20px]" aria-hidden="true">drag_indicator</span>

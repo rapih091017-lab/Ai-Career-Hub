@@ -119,7 +119,7 @@ function BuilderNewFormContent() {
             <span className="material-symbols-outlined text-[14px] group-hover:-translate-x-0.5 transition-transform">
               arrow_back
             </span>
-            Kembali ke Hasil Review CV
+            {t("bnew.back-checker")}
           </button>
         </div>
       )}
