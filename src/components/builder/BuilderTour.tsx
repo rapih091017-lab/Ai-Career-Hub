@@ -197,7 +197,7 @@ export function BuilderTour({ open, onClose, steps: STEPS = CV_STEPS, storageKey
           <div className="ml-auto flex gap-2">
             {index > 0 && (
               <button type="button" onClick={() => setIndex(index - 1)} className="min-h-11 rounded-lg border border-outline/30 px-3 text-sm font-medium text-on-surface hover:bg-surface-container sm:min-h-9">
-                Kembali
+                {t("tour.back")}
               </button>
             )}
             <button

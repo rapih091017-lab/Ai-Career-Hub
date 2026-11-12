@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { AtsScoreRing } from "@/components/builder/AtsScoreRing";
 import MagneticButton from "@/components/MagneticButton";
 import { PdfExportButton } from "@/components/checker/PdfExportButton";
-import { useTranslation } from "@/lib/i18n";
+import { fill, useTranslation } from "@/lib/i18n";
 import { CV_FONTS, cvFontValue, resolveCvFont } from "@/lib/cv-fonts";
 import { TemplatePopover } from "@/components/builder/TemplatePopover";
 import { Tooltip } from "@/components/ui/popover";
@@ -107,13 +107,13 @@ export function FormatToolbar({
   const targetSelect = (
     <Tooltip text={t("builder.tip-target")}>
     <label className="flex items-center gap-1 text-xs text-on-surface-variant">
-      <span className="whitespace-nowrap">Atur bagian</span>
+      <span className="whitespace-nowrap">{t("fmt.target")}</span>
       <select
         value={block.target ?? ""}
         onChange={(e) => block.onTargetChange(e.target.value || null)}
         className={`${selectCls} max-w-[160px] ${sectionMode ? "border-primary text-on-surface font-semibold" : ""}`}
       >
-        <option value="">Semua bagian</option>
+        <option value="">{t("fmt.all-sections")}</option>
         {block.targets.map((x) => (
           <option key={x.key} value={x.key}>{x.label}</option>
         ))}
@@ -146,7 +146,7 @@ export function FormatToolbar({
       </Tooltip>
 
       <Tooltip text={t("builder.tip-align")}>
-      <div className="flex items-center bg-surface-container-low rounded-lg p-0.5 gap-0.5" role="group" aria-label="Rata teks">
+      <div className="flex items-center bg-surface-container-low rounded-lg p-0.5 gap-0.5" role="group" aria-label={t("fmt.align")}>
         {(["left", "center", "right", "justify"] as const).map((align) => {
           const label =
             align === "left"
@@ -176,7 +176,7 @@ export function FormatToolbar({
       {sectionMode && (
         <>
           <label className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
-            <span>Jarak baris bagian ini</span>
+            <span>{t("fmt.line-height")}</span>
             <select value={String(block.lineHeight)} onChange={(e) => block.onLineHeightChange(Number(e.target.value))} className={selectCls}>
               {!LINE_HEIGHT_OPTIONS.includes(block.lineHeight) && <option value={String(block.lineHeight)}>{block.lineHeight}</option>}
               {LINE_HEIGHT_OPTIONS.map((v) => (
@@ -185,7 +185,7 @@ export function FormatToolbar({
             </select>
           </label>
           <label className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
-            <span>Warna judul bagian ini</span>
+            <span>{t("fmt.title-color")}</span>
             <input type="color" value={block.titleColor} onChange={(e) => block.onTitleColorChange(e.target.value)}
               className="h-8 w-8 cursor-pointer rounded border border-outline-variant/50 bg-transparent p-0" />
           </label>
@@ -193,7 +193,7 @@ export function FormatToolbar({
         </>
       )}
       <MenuItem icon="horizontal_rule" onClick={() => { onDividersToggle(); close(); }} pressed={showDividers}>
-        {showDividers ? "Hapus semua garis bagian" : "Garis di antara bagian"}
+        {showDividers ? t("fmt.dividers-off") : t("fmt.dividers-on")}
       </MenuItem>
       <MenuItem icon="reorder" onClick={() => { onOpenSectionOrder(); close(); }}>{t("builder.section-order-tip")}</MenuItem>
       <MenuItem icon="palette" onClick={() => { onOpenDisplaySettings(); close(); }}>{t("builder.display-tip")}</MenuItem>
@@ -235,10 +235,10 @@ export function FormatToolbar({
     <MagneticButton>
       <button onClick={onNavigateToCheckout}
         className="relative flex min-h-[36px] items-center gap-1.5 px-3 py-1.5 rounded-full border-[2.5px] border-ink bg-lime text-xs font-bold text-on-light shadow-[0_2px_0_rgb(var(--c-ink))] overflow-hidden"
-        aria-label="Revisi CV dengan AI (berbayar)"
+        aria-label={t("fmt.revise-aria")}
       >
         <span className="material-symbols-outlined text-sm relative z-10" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">auto_awesome</span>
-        <span className="relative z-10 hidden sm:inline">Revisi dengan AI</span>
+        <span className="relative z-10 hidden sm:inline">{t("fmt.revise")}</span>
       </button>
     </MagneticButton>
     </Tooltip>
@@ -266,7 +266,7 @@ export function FormatToolbar({
         {onCloseMobilePreview && (
           <button type="button" onClick={onCloseMobilePreview} className="flex min-h-11 items-center gap-1 rounded-lg px-2 text-sm font-semibold text-on-surface hover:bg-surface-container">
             <span className="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_back</span>
-            Form
+            {t("fmt.form")}
           </button>
         )}
         <Tooltip text={t("builder.tip-format")}>
@@ -286,7 +286,7 @@ export function FormatToolbar({
 
       {/* ── Desktop ── */}
       <div className="hidden lg:contents">
-        <div className="flex items-center gap-1.5 shrink-0" title={`Kelengkapan CV: ${cvCompleteness}%`}>
+        <div className="flex items-center gap-1.5 shrink-0" title={fill(t("fmt.completeness"), { n: cvCompleteness })}>
           <div className="w-12 h-1.5 bg-outline-variant/30 rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full transition-[width,background-color] duration-500 ${
@@ -295,7 +295,7 @@ export function FormatToolbar({
               style={{ width: `${cvCompleteness}%` }}
             />
           </div>
-          <span className="text-[10px] font-bold text-on-surface-variant whitespace-nowrap">Lengkap {cvCompleteness}%</span>
+          <span className="text-[10px] font-bold text-on-surface-variant whitespace-nowrap">{fill(t("fmt.complete"), { n: cvCompleteness })}</span>
         </div>
 
         {saveBadge}
@@ -321,23 +321,23 @@ export function FormatToolbar({
 
       {sectionMode && (
         <div className="flex w-full flex-wrap items-center gap-2 border-t border-outline-variant/40 pt-2 text-xs">
-          <span className="font-semibold text-on-surface">Mengatur: {targetLabel}</span>
-          <span className="text-on-surface-variant">{block.hasStyle ? "Gaya khusus bagian ini" : "Masih ikut gaya global"}</span>
+          <span className="font-semibold text-on-surface">{fill(t("fmt.editing"), { label: targetLabel })}</span>
+          <span className="text-on-surface-variant">{block.hasStyle ? t("fmt.own-style") : t("fmt.global-style")}</span>
           <div className="ml-auto flex flex-wrap gap-2">
             <button type="button" onClick={block.onApplyAll} disabled={!block.hasStyle}
               className="min-h-9 rounded-lg bg-surface-container-low px-2.5 font-medium text-on-surface hover:bg-surface-variant disabled:opacity-50"
             >
-              Terapkan ke semua
+              {t("fmt.apply-all")}
             </button>
             <button type="button" onClick={block.onReset} disabled={!block.hasStyle}
               className="min-h-9 rounded-lg bg-surface-container-low px-2.5 font-medium text-on-surface hover:bg-surface-variant disabled:opacity-50"
             >
-              Reset bagian ini
+              {t("fmt.reset-section")}
             </button>
             <button type="button" onClick={() => block.onTargetChange(null)}
               className="min-h-9 rounded-lg px-2.5 font-medium text-on-surface-variant hover:bg-surface-variant"
             >
-              Selesai
+              {t("fmt.done")}
             </button>
           </div>
         </div>
@@ -351,7 +351,7 @@ export function FormatToolbar({
             {targetSelect}
             <div className="flex flex-wrap items-center gap-2">{fontControls}</div>
             <div className="rounded-xl border border-outline-variant/50">{moreItems(() => setSheetOpen(false))}</div>
-            <p className="text-xs text-on-surface-variant">Kelengkapan CV: {cvCompleteness}% · Kecocokan kata kunci: {computeAtsScore > 0 ? `${computeAtsScore}%` : "isi deskripsi lowongan dulu"}</p>
+            <p className="text-xs text-on-surface-variant">{fill(t("fmt.completeness"), { n: cvCompleteness })} · {t("fmt.kw-match")} {computeAtsScore > 0 ? `${computeAtsScore}%` : t("fmt.kw-need-jd")}</p>
           </div>
         </FormatSheet>
       )}
@@ -410,6 +410,7 @@ function MoreMenu({ children, tip, label }: { children: (close: () => void) => R
 
 /** Sheet bawah untuk kontrol format di layar kecil. */
 function FormatSheet({ onClose, children }: { onClose: () => void; children: ReactNode }) {
+  const { t } = useTranslation();
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -419,12 +420,12 @@ function FormatSheet({ onClose, children }: { onClose: () => void; children: Rea
   }, [onClose]);
   return (
     <div className="fixed inset-0 z-[60] flex items-end bg-black/40 lg:hidden" onClick={onClose}>
-      <div role="dialog" aria-modal="true" aria-label="Format CV" onClick={(e) => e.stopPropagation()}
+      <div role="dialog" aria-modal="true" aria-label={t("fmt.sheet")} onClick={(e) => e.stopPropagation()}
         className="max-h-[80dvh] w-full overflow-y-auto rounded-t-2xl bg-surface-container-lowest p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
       >
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-on-surface">Format CV</h2>
-          <button type="button" onClick={onClose} className="min-h-11 rounded-lg px-3 text-sm font-semibold text-primary">Selesai</button>
+          <h2 className="text-base font-semibold text-on-surface">{t("fmt.sheet")}</h2>
+          <button type="button" onClick={onClose} className="min-h-11 rounded-lg px-3 text-sm font-semibold text-primary">{t("fmt.done")}</button>
         </div>
         {children}
       </div>

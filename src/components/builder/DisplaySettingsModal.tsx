@@ -1,6 +1,7 @@
 "use client";
 
 import Modal from "@/components/Modal";
+import { fill, useTranslation } from "@/lib/i18n";
 
 interface DisplaySettingsModalProps {
   open: boolean;
@@ -20,26 +21,26 @@ interface DisplaySettingsModalProps {
 }
 
 const SECTION_LABELS: Record<string, string> = {
-  summary: "Ringkasan Profesional",
-  selfEvaluation: "Evaluasi Diri",
-  experience: "Pengalaman Kerja",
-  education: "Pendidikan",
-  skills: "Keahlian",
-  certifications: "Sertifikasi",
-  organizations: "Organisasi",
-  lainnya: "Bagian Tambahan",
+  summary: "display.sec-summary",
+  selfEvaluation: "selfeval.title",
+  experience: "display.sec-experience",
+  education: "edu.title",
+  skills: "skill.title",
+  certifications: "cert.short",
+  organizations: "display.sec-org",
+  lainnya: "skill.extra-title",
 };
 
 const SPACING_OPTIONS = [
-  { value: "compact" as const, label: "Rapat", desc: "Lebih banyak konten per halaman" },
-  { value: "normal" as const, label: "Normal", desc: "Spasi standar yang seimbang" },
-  { value: "spacious" as const, label: "Longgar", desc: "Lebih mudah dibaca, lebih sedikit konten" },
+  { value: "compact" as const, label: "display.spacing-compact", desc: "display.spacing-compact-desc" },
+  { value: "normal" as const, label: "display.normal", desc: "display.spacing-normal-desc" },
+  { value: "spacious" as const, label: "display.loose", desc: "display.spacing-loose-desc" },
 ];
 
 const MARGIN_OPTIONS = [
-  { value: "tight" as const, label: "Mepet", desc: "10mm · memaksimalkan ruang konten" },
-  { value: "normal" as const, label: "Normal", desc: "20mm · margin standar A4" },
-  { value: "wide" as const, label: "Longgar", desc: "30mm · margin luas, terlihat premium" },
+  { value: "tight" as const, label: "display.margin-tight", desc: "display.margin-tight-desc" },
+  { value: "normal" as const, label: "display.normal", desc: "display.margin-normal-desc" },
+  { value: "wide" as const, label: "display.loose", desc: "display.margin-wide-desc" },
 ];
 
 const PRESET_COLORS = [
@@ -69,12 +70,13 @@ export function DisplaySettingsModal({
   onSectionVisibilityChange,
   onShowSkillLevelChange,
 }: DisplaySettingsModalProps) {
+  const { t } = useTranslation();
   return (
-    <Modal open={open} onClose={onClose} title="Pengaturan Tampilan CV" size="max-w-lg">
+    <Modal open={open} onClose={onClose} title={t("display.title")} size="max-w-lg">
       <div className="space-y-6">
         {/* Warna Primer */}
         <div>
-          <label className="block text-label-bold text-on-surface mb-2">Warna Primer</label>
+          <label className="block text-label-bold text-on-surface mb-2">{t("display.color")}</label>
           <div className="flex flex-wrap gap-2">
             {PRESET_COLORS.map((preset) => (
               <button
@@ -87,12 +89,12 @@ export function DisplaySettingsModal({
                 }`}
                 style={{ backgroundColor: preset.value || "#e8e4ed" }}
                 title={preset.label}
-                aria-label={`Warna ${preset.label}`}
+                aria-label={fill(t("display.color-aria"), { name: preset.label })}
               />
             ))}
           </div>
           <div className="mt-2 flex items-center gap-2">
-            <label className="text-xs text-on-surface-variant">Kustom:</label>
+            <label className="text-xs text-on-surface-variant">{t("display.custom")}</label>
             <input
               type="color"
               value={customPrimaryColor || "#0d7377"}
@@ -104,7 +106,7 @@ export function DisplaySettingsModal({
                 onClick={() => onPrimaryColorChange("")}
                 className="text-[10px] text-on-surface-variant underline hover:text-on-surface"
               >
-                Reset
+                {t("display.reset")}
               </button>
             )}
           </div>
@@ -112,7 +114,7 @@ export function DisplaySettingsModal({
 
         {/* Spacing */}
         <div>
-          <label className="block text-label-bold text-on-surface mb-2">Kerapatan Spasi</label>
+          <label className="block text-label-bold text-on-surface mb-2">{t("display.spacing")}</label>
           <div className="grid grid-cols-3 gap-2">
             {SPACING_OPTIONS.map((opt) => (
               <button
@@ -124,8 +126,8 @@ export function DisplaySettingsModal({
                     : "border-outline-variant hover:border-primary/30 text-on-surface-variant"
                 }`}
               >
-                <p className="text-xs font-semibold">{opt.label}</p>
-                <p className="text-[9px] mt-0.5 opacity-70">{opt.desc}</p>
+                <p className="text-xs font-semibold">{t(opt.label)}</p>
+                <p className="text-[9px] mt-0.5 opacity-70">{t(opt.desc)}</p>
               </button>
             ))}
           </div>
@@ -133,7 +135,7 @@ export function DisplaySettingsModal({
 
         {/* Margin Kertas */}
         <div>
-          <label className="block text-label-bold text-on-surface mb-2">Margin Kertas</label>
+          <label className="block text-label-bold text-on-surface mb-2">{t("display.margin")}</label>
           <div className="grid grid-cols-3 gap-2">
             {MARGIN_OPTIONS.map((opt) => (
               <button
@@ -145,8 +147,8 @@ export function DisplaySettingsModal({
                     : "border-outline-variant hover:border-primary/30 text-on-surface-variant"
                 }`}
               >
-                <p className="text-xs font-semibold">{opt.label}</p>
-                <p className="text-[9px] mt-0.5 opacity-70">{opt.desc}</p>
+                <p className="text-xs font-semibold">{t(opt.label)}</p>
+                <p className="text-[9px] mt-0.5 opacity-70">{t(opt.desc)}</p>
               </button>
             ))}
           </div>
@@ -154,11 +156,11 @@ export function DisplaySettingsModal({
 
         {/* Header Layout */}
         <div>
-          <label className="block text-label-bold text-on-surface mb-2">Tata Letak Header</label>
+          <label className="block text-label-bold text-on-surface mb-2">{t("display.header")}</label>
           <div className="flex gap-2">
             {[
-              { value: "centered" as const, label: "Tengah", icon: "format_align_center" },
-              { value: "left" as const, label: "Kiri", icon: "format_align_left" },
+              { value: "centered" as const, label: t("display.center"), icon: "format_align_center" },
+              { value: "left" as const, label: t("display.left"), icon: "format_align_left" },
             ].map((opt) => (
               <button
                 key={opt.value}
@@ -191,15 +193,15 @@ export function DisplaySettingsModal({
               )}
             </div>
             <span>
-              <span className="block text-body-md text-on-surface">Tampilkan level keahlian</span>
-              <span className="block text-xs text-on-surface-variant">Level ditulis setelah nama skill, misalnya React (Mahir).</span>
+              <span className="block text-body-md text-on-surface">{t("display.skill-level")}</span>
+              <span className="block text-xs text-on-surface-variant">{t("display.skill-level-desc")}</span>
             </span>
           </label>
         </div>
 
         {/* Visibilitas Section */}
         <div>
-          <label className="block text-label-bold text-on-surface mb-2">Tampilkan / Sembunyikan Section</label>
+          <label className="block text-label-bold text-on-surface mb-2">{t("display.visibility")}</label>
           <div className="space-y-1.5">
             {Object.entries(SECTION_LABELS).map(([key, label]) => (
               <label
@@ -217,7 +219,7 @@ export function DisplaySettingsModal({
                     <span className="material-symbols-outlined text-sm text-white" aria-hidden="true">check</span>
                   )}
                 </div>
-                <span className="text-body-md text-on-surface">{label}</span>
+                <span className="text-body-md text-on-surface">{t(label)}</span>
               </label>
             ))}
           </div>

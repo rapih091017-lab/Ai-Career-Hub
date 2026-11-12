@@ -86,7 +86,7 @@ const LABELS = {
 } as const;
 
 export function CheckerResultView({ result, variant, donutRef, resultsRef, wrapperId, resultId, children, cvText }: CheckerResultViewProps) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const L = LABELS[variant];
   const fresh = variant === "fresh";
 
@@ -219,7 +219,7 @@ export function CheckerResultView({ result, variant, donutRef, resultsRef, wrapp
             <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold ${atsBadge.bg} ${atsBadge.text}`}>
               <span className={`w-2 h-2 rounded-full ${atsBadge.dot}`} />
               {/* Enum di data tidak diubah, hanya tampilan. */}
-              {atsReadinessLabel(atsPrediction)}
+              {atsReadinessLabel(atsPrediction, lang)}
             </div>
           )}
           {fresh && fitMeta.desc && (

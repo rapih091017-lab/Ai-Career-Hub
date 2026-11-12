@@ -50,7 +50,19 @@ const NEEDED: Record<HiddenEntryKind, string> = {
   testimonial: "Nama atau Testimoni",
 };
 
+const NEEDED_EN: Record<HiddenEntryKind, string> = {
+  project: "Project Name",
+  experience: "Company or Position",
+  education: "Institution or Degree",
+  certification: "Certificate Name",
+  organization: "Organization Name",
+  hobby: "Hobby Name",
+  testimonial: "Name or Testimonial",
+};
+
 /** Kalimat catatan untuk kartu entri yang belum tampil. */
-export const hiddenEntryNote = (kind: HiddenEntryKind) =>
-  `Belum tampil di portofolio: isi ${NEEDED[kind]}.`;
+export const hiddenEntryNote = (kind: HiddenEntryKind, lang: "id" | "en" = "id") =>
+  lang === "en"
+    ? `Not shown on your portfolio yet: fill in ${NEEDED_EN[kind]}.`
+    : `Belum tampil di portofolio: isi ${NEEDED[kind]}.`;
 

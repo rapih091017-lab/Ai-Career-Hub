@@ -375,7 +375,7 @@ function RunningScreen({
           <button
             onClick={onEnd}
             className="w-8 h-8 rounded-lg hover:bg-surface-container-low flex items-center justify-center transition-colors"
-            title="Akhiri sesi"
+            title={lang === "en" ? "End session" : "Akhiri sesi"}
           >
             <span className="material-symbols-outlined text-outline text-lg">close</span>
           </button>
@@ -512,7 +512,7 @@ function RunningScreen({
                     <div className="bg-blue-50 rounded-xl p-3 border border-blue-200">
                       <p className="text-[10px] font-bold text-blue-700 uppercase tracking-wider mb-1.5 flex items-center gap-1">
                         <span className="material-symbols-outlined text-[12px]">forum</span>
-                        Pertanyaan Lanjutan
+                        {lang === "en" ? "Follow-up questions" : "Pertanyaan Lanjutan"}
                       </p>
                       <p className="text-[11px] text-blue-800 leading-relaxed">
                         {currentQuestion.question.followUp}
@@ -782,7 +782,7 @@ function FinishedScreen({
                       {r.revealedAnswer && (
                         <>
                           <span>·</span>
-                          <span className="text-green">Lihat jawaban</span>
+                          <span className="text-green">{lang === "en" ? "View answer" : "Lihat jawaban"}</span>
                         </>
                       )}
                       {r.rating && (

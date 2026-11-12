@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { scoreColor, sectionScoreColor, severityMeta, toIssueItems, type FormatCheck, type IssueItem } from "./types";
-import { useTranslation } from "@/lib/i18n";
+import { fill, useTranslation } from "@/lib/i18n";
 import { CopyButton } from "./CopyButton";
 import { buildSectionChangePack, type PackSection } from "@/lib/checker/copy";
 import type { StoredAnalysisResult } from "./types";
@@ -14,26 +14,27 @@ import type { StoredAnalysisResult } from "./types";
  * persen — bukan menebak. Tanpa bobot (hilang/nol/NaN): TIDAK MERENDER apa pun,
  * karena "Bobot skor 0%" adalah klaim palsu.
  */
-function weightCaption(weight?: number): string | null {
+function weightCaption(template: string, weight?: number): string | null {
   if (typeof weight !== "number" || !Number.isFinite(weight) || weight <= 0) return null;
   const pct = weight <= 1 ? Math.round(weight * 100) : Math.round(weight);
-  return `Bobot skor ${pct}%`;
+  return fill(template, { n: pct });
 }
 
 /** Ikon + label teks supaya status cek tetap terbaca tanpa membedakan warna. */
 const CHECK_META: Record<FormatCheck["status"], { icon: string; label: string; cls: string }> = {
-  ok: { icon: "check_circle", label: "OK", cls: "border-green-deep/40 bg-primary-fixed text-on-primary-fixed" },
-  perlu_perbaikan: { icon: "error", label: "Perlu perbaikan", cls: "border-error/50 bg-error-container text-on-error-container" },
-  tidak_dapat_dinilai: { icon: "help", label: "Tidak dapat dinilai", cls: "border-ink/20 bg-surface-container-low text-ink-soft" },
+  ok: { icon: "check_circle", label: "ssc.ok", cls: "border-green-deep/40 bg-primary-fixed text-on-primary-fixed" },
+  perlu_perbaikan: { icon: "error", label: "ssc.needs-fix", cls: "border-error/50 bg-error-container text-on-error-container" },
+  tidak_dapat_dinilai: { icon: "help", label: "ssc.cannot-score", cls: "border-ink/20 bg-surface-container-low text-ink-soft" },
 };
 
 function CopyBlock({ label, text }: { label: string; text: string }) {
+  const { t } = useTranslation();
   return (
     <div className="rounded-md border-[1.5px] border-ink/15 bg-surface-container-low p-3">
       <p className="text-xs font-extrabold uppercase tracking-[0.06em] text-green-deep">{label}</p>
       <p className="mt-1 whitespace-pre-wrap text-xs leading-relaxed text-ink">{text}</p>
       <div className="mt-1.5">
-        <CopyButton text={text} label="Salin teks" />
+        <CopyButton text={text} label={t("checker.start.copy")} />
       </div>
     </div>
   );
@@ -41,6 +42,7 @@ function CopyBlock({ label, text }: { label: string; text: string }) {
 
 /** Blok tambahan v5 per section; seluruhnya kondisional terhadap data. */
 function SectionExtras({ sectionKey, analysis }: { sectionKey: PackSection; analysis: StoredAnalysisResult }) {
+  const { t } = useTranslation();
   const breakdown = analysis.breakdown;
 
   if (sectionKey === "summary") {
@@ -51,11 +53,11 @@ function SectionExtras({ sectionKey, analysis }: { sectionKey: PackSection; anal
         {summary.has_skills_and_achievement ? (
           <span className="inline-flex items-center gap-1 rounded-full border-[1.5px] border-green-deep/40 bg-primary-fixed px-2 py-0.5 text-xs font-bold text-on-primary-fixed">
             <span className="material-symbols-outlined select-none text-[13px]" aria-hidden="true">check</span>
-            Memuat keahlian dan pencapaian
+            {t("ssc.has-skills")}
           </span>
         ) : null}
         {summary.rewrite_copy_text ? (
-          <CopyBlock label="Siap salin: rewrite summary" text={summary.rewrite_copy_text} />
+          <CopyBlock label={t("ssc.copy-summary")} text={summary.rewrite_copy_text} />
         ) : null}
       </div>
     );
@@ -72,7 +74,7 @@ function SectionExtras({ sectionKey, analysis }: { sectionKey: PackSection; anal
     return (
       <p className="inline-flex items-center gap-1.5 rounded-full border-[1.5px] border-tertiary/50 bg-tertiary-container px-2.5 py-1 text-xs font-bold text-on-tertiary-container">
         <span className="material-symbols-outlined select-none text-[14px]" aria-hidden="true">format_list_bulleted</span>
-        {without} dari {total} poin belum menyebut hasil
+        {fill(t("ssc.bullets-no-result"), { n: without, total })}
       </p>
     );
   }
@@ -87,7 +89,7 @@ function SectionExtras({ sectionKey, analysis }: { sectionKey: PackSection; anal
         {unproven.length > 0 ? (
           <div>
             <p className="text-xs font-extrabold uppercase tracking-[0.06em] text-ink-soft">
-              Tercantum tapi belum terbukti di pengalaman
+              {t("ssc.unproven")}
             </p>
             <div className="mt-1 flex flex-wrap gap-1.5">
               {unproven.map((skill, i) => (
@@ -99,12 +101,12 @@ function SectionExtras({ sectionKey, analysis }: { sectionKey: PackSection; anal
           </div>
         ) : null}
         {skills.grouped_skills_copy_text ? (
-          <CopyBlock label="Siap salin: baris skills terkelompok" text={skills.grouped_skills_copy_text} />
+          <CopyBlock label={t("ssc.copy-skills")} text={skills.grouped_skills_copy_text} />
         ) : null}
         {missing.length > 0 ? (
           // Catatan statis: missing_skills TIDAK PERNAH ikut teks salin.
           <p className="text-xs italic text-ink-soft">
-            Missing skills ditandai untuk referensi saja; tambahkan hanya jika benar-benar kamu kuasai.
+            {t("ssc.missing-note")}
           </p>
         ) : null}
       </div>
@@ -114,7 +116,7 @@ function SectionExtras({ sectionKey, analysis }: { sectionKey: PackSection; anal
   if (sectionKey === "education") {
     const edu = breakdown?.education;
     if (!edu?.copy_text) return null;
-    return <CopyBlock label="Siap salin: format blok pendidikan" text={edu.copy_text} />;
+    return <CopyBlock label={t("ssc.copy-edu")} text={edu.copy_text} />;
   }
 
   // format_ats
@@ -124,7 +126,7 @@ function SectionExtras({ sectionKey, analysis }: { sectionKey: PackSection; anal
   return (
     <div>
       <p className="text-xs font-extrabold uppercase tracking-[0.06em] text-ink-soft">
-        Cek format ATS
+        {t("ssc.ats-check")}
       </p>
       <ul className="mt-1.5 space-y-1.5">
         {checks.map((check) => {
@@ -133,7 +135,7 @@ function SectionExtras({ sectionKey, analysis }: { sectionKey: PackSection; anal
             <li key={check.id} className="flex items-start gap-2 text-xs text-ink-soft">
               <span className={`mt-0.5 inline-flex shrink-0 items-center gap-1 rounded border px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide ${meta.cls}`}>
                 <span className="material-symbols-outlined select-none text-[12px]" aria-hidden="true">{meta.icon}</span>
-                {meta.label}
+                {t(meta.label)}
               </span>
               <span className="min-w-0 flex-1">
                 <span className="text-ink">{check.label}</span>
@@ -183,7 +185,7 @@ export function SectionScoreCard({
     sectionKey && analysis?.weightsApplied
       ? analysis.weightsApplied[`${sectionKey}_weight` as const]
       : undefined;
-  const caption = weightCaption(weight);
+  const caption = weightCaption(t("ssc.weight"), weight);
   const changePack =
     sectionKey && analysis ? buildSectionChangePack(sectionKey, analysis) : "";
 
@@ -251,7 +253,7 @@ export function SectionScoreCard({
               {/* v5: alasan skor didahulukan — pembaca bertanya "kenapa" sebelum melihat daftar. */}
               {scoreReason && (
                 <p className="text-xs leading-relaxed text-ink">
-                  <span className="font-bold">Kenapa skor ini: </span>
+                  <span className="font-bold">{t("ssc.why")} </span>
                   {scoreReason}
                 </p>
               )}
@@ -262,17 +264,17 @@ export function SectionScoreCard({
               {topFix && (
                 <div className="rounded-md border-l-2 border-tertiary/50 bg-surface-container-low px-3 py-2">
                   <p className="text-xs font-extrabold uppercase tracking-[0.06em] text-green-deep">
-                    Perbaikan terbesar
+                    {t("ssc.top-fix")}
                   </p>
                   <p className="mt-0.5 text-xs font-semibold text-ink">{topFix.title}</p>
                   {topFix.replaces ? (
                     <p className="mt-0.5 text-xs text-ink-soft">
-                      Mengganti: <span className="italic">{topFix.replaces}</span>
+                      {t("hr.replaces")} <span className="italic">{topFix.replaces}</span>
                     </p>
                   ) : null}
                   {topFix.copy_text ? (
                     <div className="mt-1.5">
-                      <CopyButton text={topFix.copy_text} label="Salin perbaikan" />
+                      <CopyButton text={topFix.copy_text} label={t("hr.copy-fix")} />
                     </div>
                   ) : null}
                 </div>
@@ -328,7 +330,7 @@ export function SectionScoreCard({
 
               {changePack && (
                 <div className="border-t-[1.5px] border-hairline pt-2">
-                  <CopyButton text={changePack} label="Salin semua perubahan section ini" />
+                  <CopyButton text={changePack} label={t("ssc.copy-all")} />
                 </div>
               )}
             </div>

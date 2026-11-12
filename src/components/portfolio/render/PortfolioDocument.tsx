@@ -31,6 +31,7 @@ import OrganizationsSection from "../sections/OrganizationsSection";
 import HobbiesSection from "../sections/HobbiesSection";
 import TestimonialsSection from "../sections/TestimonialsSection";
 import ContactSection from "../sections/ContactSection";
+import { useTranslation } from "@/lib/i18n";
 
 /**
  * Mode render. Sama dengan `SafeRenderMode` dan sengaja memakai satu kosakata:
@@ -316,10 +317,7 @@ class SectionBoundary extends Component<BoundaryProps, BoundaryState> {
     if (this.props.mode !== "editor") return null;
 
     return (
-      <p role="status" className="mx-auto max-w-2xl px-6 py-8 text-sm text-on-surface-variant">
-        Bagian ini gagal dirender karena datanya bermasalah. Perbaiki isinya, lalu muat ulang
-        builder.
-      </p>
+      <RenderErrorNote />
     );
   }
 }
@@ -414,6 +412,16 @@ export function PortfolioDocument({
         </div>
       </ThemeContext.Provider>
     </MotionConfig>
+  );
+}
+
+/** Catatan di editor saat satu bagian gagal dirender; fungsi terpisah agar bisa memakai hook bahasa. */
+function RenderErrorNote() {
+  const { t } = useTranslation();
+  return (
+    <p role="status" className="mx-auto max-w-2xl px-6 py-8 text-sm text-on-surface-variant">
+      {t("pf.render-error")}
+    </p>
   );
 }
 

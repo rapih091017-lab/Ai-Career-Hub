@@ -12,6 +12,12 @@ export const LAINNYA_ID = "lainnya";
 
 /** Judul cepat untuk section kustom baru. */
 export const QUICK_CUSTOM_TITLES = ["Penghargaan", "Proyek", "Publikasi", "Bahasa", "Kegiatan Sukarela", "Pelatihan"] as const;
+export const QUICK_CUSTOM_TITLES_EN = ["Awards", "Projects", "Publications", "Languages", "Volunteering", "Training"] as const;
+
+/** Judul cepat sesuai bahasa UI. Judul yang dipilih jadi isi CV, jadi user tetap bisa mengubahnya. */
+export function quickCustomTitles(lang: "id" | "en"): readonly string[] {
+  return lang === "en" ? QUICK_CUSTOM_TITLES_EN : QUICK_CUSTOM_TITLES;
+}
 
 export const BUILTIN_LABELS: Record<string, string> = {
   summary: "Ringkasan Profesional",
@@ -25,6 +31,18 @@ export const BUILTIN_LABELS: Record<string, string> = {
   lainnya: "Bagian Tambahan",
 };
 
+/** Label kartu form dalam bahasa Inggris (UI, bukan judul tercetak di CV). */
+export const BUILTIN_LABELS_EN: Record<string, string> = {
+  summary: "Professional Summary",
+  selfEvaluation: "Self-Assessment",
+  experience: "Work Experience",
+  education: "Education",
+  skills: "Skills",
+  certifications: "Certifications",
+  organizations: "Organizations",
+  lainnya: "Extra Section",
+};
+
 export const orderOf = (cv: CvData): string[] => cv.layout?.sectionOrder ?? [...DEFAULT_SECTION_ORDER, LAINNYA_ID];
 export const customSectionsOf = (cv: CvData): CustomSectionEntry[] => cv.customSections ?? DEFAULT_CUSTOM_SECTIONS;
 
@@ -36,12 +54,13 @@ export function isRemovableSection(cv: CvData, key: string): boolean {
   return customSectionsOf(cv).some((c) => c.id === key);
 }
 
-export function sectionLabel(cv: CvData, key: string): string {
+export function sectionLabel(cv: CvData, key: string, lang: "id" | "en" = "id"): string {
+  const labels = lang === "en" ? BUILTIN_LABELS_EN : BUILTIN_LABELS;
   const custom = customSectionsOf(cv).find((c) => c.id === key);
-  if (custom && key !== LAINNYA_ID) return custom.title.trim() || "Bagian tanpa judul";
+  if (custom && key !== LAINNYA_ID) return custom.title.trim() || (lang === "en" ? "Untitled section" : "Bagian tanpa judul");
   // Bagian Tambahan memakai judul yang tercetak (data lama: "Lainnya").
-  if (custom) return custom.title.trim() || BUILTIN_LABELS[key];
-  return BUILTIN_LABELS[key] ?? key;
+  if (custom) return custom.title.trim() || labels[key];
+  return labels[key] ?? key;
 }
 
 type LayoutPatch = { sectionOrder?: string[]; dividers?: Record<string, boolean>; sectionVisibility?: Record<string, boolean>; removedSections?: string[] };

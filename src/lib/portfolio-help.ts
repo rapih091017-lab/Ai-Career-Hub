@@ -1,11 +1,11 @@
-import type { FieldHelpContent } from "@/lib/builder-help";
+import { withEnglish, type FieldHelpText } from "@/lib/builder-help";
 
 /**
  * Isi bantuan (ikon i) per field builder portofolio. Aturan sama dengan
  * builder-help: tanpa angka, perusahaan, atau sertifikat karangan; fakta yang
  * harus diisi user ditulis sebagai placeholder [angka], [persen], [nama klien].
  */
-export const PORTFOLIO_HELP = {
+const PORTFOLIO_HELP_ID = {
   heroHeadline: {
     title: "Jabatan utama",
     what: "Peran yang kamu jalani atau incar, tampil besar di bagian atas portofolio. Cukup satu peran yang jelas.",
@@ -76,6 +76,81 @@ export const PORTFOLIO_HELP = {
     weak: "\"Orang terbaik yang pernah ada.\"",
     weakWhy: "Pujian kosong tanpa contoh terdengar dibuat-buat.",
   },
-} satisfies Record<string, FieldHelpContent>;
+} satisfies Record<string, FieldHelpText>;
 
-export type PortfolioHelpKey = keyof typeof PORTFOLIO_HELP;
+export type PortfolioHelpKey = keyof typeof PORTFOLIO_HELP_ID;
+
+const PORTFOLIO_HELP_EN: Record<PortfolioHelpKey, FieldHelpText> = {
+  heroHeadline: {
+    title: "Main role",
+    what: "The role you hold or want, shown large at the top of your portfolio. One clear role is enough.",
+    good: "UI/UX Designer",
+    weak: "Creative, hardworking, and loves a challenge",
+    weakWhy: "Those are traits, not a role. Visitors cannot tell what you do.",
+  },
+  heroSubHeadline: {
+    title: "Tagline",
+    what: "One short line near your name: the field you know well and who you work for.",
+    good: "Designing mobile apps that first-time users find easy",
+    weak: "Welcome to my portfolio",
+    weakWhy: "It tells visitors nothing about you.",
+  },
+  heroBio: {
+    title: "Short bio",
+    what: "Two or three sentences: who you are, your main skills, and the kind of work you are looking for.",
+    good: "UI designer with [number] years on booking apps. Focused on user research and fast prototyping.",
+    weak: "I am passionate and always eager to grow.",
+    weakWhy: "Very generic; no skills or field mentioned.",
+  },
+  aboutText: {
+    title: "About me",
+    what: "Your career story: how you started, what you work on now, and what you want to do next.",
+    good: "Started with a campus project building the student association site, then built [number] sites for small businesses. Now digging into web accessibility.",
+    weak: "I am a new graduate ready to work anywhere.",
+    weakWhy: "There is no story or proof the reader can hold on to.",
+  },
+  skillsMain: {
+    title: "Main skills",
+    what: "The skills you most want to highlight, separated by commas. Pick ones you actually use in projects.",
+    good: "User research, Wireframing, Interactive prototypes",
+    weak: "Microsoft Word, Internet, Teamwork",
+    weakWhy: "Too common to set you apart from other applicants.",
+  },
+  projectName: {
+    title: "Project name",
+    what: "A short name that says what the project is.",
+    good: "Clinic queue app",
+    weak: "New project",
+    weakWhy: "Visitors have to open the details to find out what it is.",
+  },
+  projectDescription: {
+    title: "Project description",
+    what: "One point per line: the problem you solved, your role, and the result. A result you have not measured yet can use a placeholder you fill in later.",
+    good: "Designed an online queue sign-up flow for clinic patients\nCut waiting time at the front desk by about [percent]",
+    weak: "Built an app with React",
+    weakWhy: "It only names a tool; no problem or result.",
+  },
+  techStack: {
+    title: "Tools / tech stack",
+    what: "Tools and technologies used in this project, separated by commas.",
+    good: "Figma, React, Firebase",
+    weak: "Computer, internet",
+    weakWhy: "Not specific.",
+  },
+  experienceDescription: {
+    title: "Experience description",
+    what: "One point per line. Start with a verb, say what you did and what changed because of it.",
+    good: "Prepared weekly sales reports for [number] branches\nBuilt a template that saves [number] hours of recap work per week",
+    weak: "Responsible for reports",
+    weakWhy: "It is unclear what you did and how big the result was.",
+  },
+  testimonial: {
+    title: "Testimonial",
+    what: "A real quote from a manager, client, or colleague. Write it exactly as they said it and ask permission before showing it.",
+    good: "\"Her designs are tidy and she always explains the reason behind each decision.\"",
+    weak: "\"The best person ever.\"",
+    weakWhy: "Empty praise with no example sounds made up.",
+  },
+};
+
+export const PORTFOLIO_HELP = withEnglish(PORTFOLIO_HELP_ID, PORTFOLIO_HELP_EN);

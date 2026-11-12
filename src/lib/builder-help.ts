@@ -11,9 +11,28 @@ export interface FieldHelpContent {
   weak: string;
   /** Kenapa contoh kurang itu kurang. */
   weakWhy: string;
+  /** Versi Inggris untuk UI berbahasa Inggris. Tanpa ini, isi Indonesia yang tampil. */
+  en?: FieldHelpText;
 }
 
-export const BUILDER_HELP = {
+export type FieldHelpText = Omit<FieldHelpContent, "en">;
+
+/** Pilih isi sesuai bahasa UI. */
+export function localizeHelp(h: FieldHelpContent, lang: "id" | "en"): FieldHelpText {
+  return lang === "en" && h.en ? h.en : h;
+}
+
+/** Tempelkan versi Inggris ke tiap entri tanpa mengubah kuncinya. */
+export function withEnglish<K extends string>(
+  id: Record<K, FieldHelpText>,
+  en: Record<K, FieldHelpText>,
+): Record<K, FieldHelpContent> {
+  const out = {} as Record<K, FieldHelpContent>;
+  for (const key of Object.keys(id) as K[]) out[key] = { ...id[key], en: en[key] };
+  return out;
+}
+
+const BUILDER_HELP_ID = {
   professionalTitle: {
     title: "Jabatan profesional",
     what: "Satu baris di bawah namamu di CV. Isi dengan peran yang kamu jalani atau incar, bukan kalimat motivasi. Ini dicetak di CV, beda dengan Judul posisi di Target Pekerjaan yang hanya dibaca AI.",
@@ -112,9 +131,112 @@ export const BUILDER_HELP = {
     weak: "Lain-lain: suka membaca",
     weakWhy: "Judul tidak jelas dan isinya tidak menambah nilai untuk lowongan.",
   },
-} satisfies Record<string, FieldHelpContent>;
+} satisfies Record<string, FieldHelpText>;
 
-export type BuilderHelpKey = keyof typeof BUILDER_HELP;
+export type BuilderHelpKey = keyof typeof BUILDER_HELP_ID;
+
+const BUILDER_HELP_EN: Record<BuilderHelpKey, FieldHelpText> = {
+  professionalTitle: {
+    title: "Professional title",
+    what: "One line under your name on the CV. Use the role you hold or want, not a motivational phrase. This is printed on the CV, unlike the Job title under Target Job, which only the AI reads.",
+    good: "Finance Admin | Bank Reconciliation & Monthly Reports",
+    weak: "Hard worker who loves to learn",
+    weakWhy: "It says nothing about your field or role.",
+  },
+  employmentStatus: {
+    title: "Employment status",
+    what: "Where you are right now, e.g. employed, job hunting, or fresh graduate. It tells the reader when you can start.",
+    good: "Fresh graduate, available to start",
+    weak: "Unemployed",
+    weakWhy: "It reads as negative. Pick a neutral term that shows you are ready.",
+  },
+  customFields: {
+    title: "Custom fields",
+    what: "Extra personal details a job posting asks for that have no field yet, e.g. driving licence, home city, or willingness to relocate.",
+    good: "Driving licence: A and C",
+    weak: "Hobby: lying around",
+    weakWhy: "Not relevant to the job, and it takes up space.",
+  },
+  summary: {
+    title: "Professional summary",
+    what: "Two to four sentences at the top of the CV: who you are, your main skills, and results you have delivered. Tailor it to the role.",
+    good: "Admin staff with [number] years of experience managing records and financial reports. Uses Excel for daily recaps and closes monthly reports on time.",
+    weak: "I am honest, disciplined, and eager to learn.",
+    weakWhy: "Generic traits with no proof; no skills or experience mentioned.",
+  },
+  jobTitle: {
+    title: "Job title you are applying for",
+    what: "The role name in the posting you want. Not printed on the CV; the AI uses it to tailor suggestions and keywords.",
+    good: "Finance Admin",
+    weak: "Anything",
+    weakWhy: "The AI has nothing to aim at, so its suggestions stay generic.",
+  },
+  jobDescription: {
+    title: "Job description",
+    what: "Paste the posting text (duties and requirements). Not printed on the CV. The AI pulls keywords from it so suggestions match the job.",
+    good: "Duties: prepare monthly financial reports, bank reconciliation. Requirements: strong Excel, detail-oriented.",
+    weak: "Admin job",
+    weakWhy: "Too short; there are no duties or requirements to match.",
+  },
+  companyDescription: {
+    title: "Company description",
+    what: "One short sentence about where you worked, useful when the reader may not know the company.",
+    good: "Office supplies distributor with [team size] employees in [city]",
+    weak: "Great, well-known company",
+    weakWhy: "It does not say what the company does or how big it is.",
+  },
+  achievement: {
+    title: "Key achievement",
+    what: "Your standout result in this role. Write what you did and what came of it. Use real numbers if you have them.",
+    good: "Cut stock recap time from [number] days to [number] days with a new Excel template",
+    weak: "Did a good job",
+    weakWhy: "There is no action or result to judge.",
+  },
+  workDescription: {
+    title: "Work description",
+    what: "Your duties and results, one point per line. Start with a verb, name the tool or method, then the result.",
+    good: "Prepared weekly sales reports in Excel for a sales team of [team size]",
+    weak: "Responsible for reports",
+    weakWhy: "Which reports, for whom, and with what result is unclear.",
+  },
+  gpa: {
+    title: "GPA",
+    what: "Fill this in if the posting asks for it or you are a fresh graduate. Include the maximum scale. You can leave it empty.",
+    good: "[number] / 4,00",
+    weak: "Cum laude",
+    weakWhy: "Without a number and scale, the reader cannot compare.",
+  },
+  skills: {
+    title: "Skill category & level",
+    what: "Categories group your skills: technical (job skills), soft skills (how you work with people), tools (software). Levels: Beginner is still learning, Intermediate works independently, Advanced is fluent and can coach others. Levels only show when turned on in Display Settings.",
+    good: "Microsoft Excel (Tools, Intermediate)",
+    weak: "Computers (Advanced)",
+    weakWhy: "Too broad; name the specific software or skill.",
+  },
+  certifications: {
+    title: "Certifications",
+    what: "Official certificates or licences you actually hold, with the issuer and year.",
+    good: "[Certificate name], [issuer], [year]",
+    weak: "Attended lots of webinars",
+    weakWhy: "That is not a certification. Name a clear certificate or skip it.",
+  },
+  selfEvaluation: {
+    title: "Self-assessment",
+    what: "How you rate your own way of working, with a short example. Optional; most postings do not ask for it.",
+    good: "Careful with numbers: I double-check reports before sending them to my manager.",
+    weak: "I am a perfectionist",
+    weakWhy: "A cliché with no real example.",
+  },
+  extraSection: {
+    title: "Extra section",
+    what: "For anything important that fits no other section, e.g. awards, projects, languages, or training. You can rename the title.",
+    good: "English: fluent, TOEFL ITP [score]",
+    weak: "Other: likes reading",
+    weakWhy: "The title is vague and the content adds nothing for the job.",
+  },
+};
+
+export const BUILDER_HELP = withEnglish(BUILDER_HELP_ID, BUILDER_HELP_EN);
 
 /** Contoh isi (placeholder) per judul bagian tambahan. Fakta diganti [placeholder]. */
 const EXTRA_SECTION_EXAMPLES: Record<string, string> = {
@@ -128,6 +250,23 @@ const EXTRA_SECTION_EXAMPLES: Record<string, string> = {
 
 const EXTRA_SECTION_FALLBACK = "Contoh: Juara [peringkat] Lomba [nama lomba], [tahun]";
 
-export function extraSectionPlaceholder(title: string): string {
-  return EXTRA_SECTION_EXAMPLES[title.trim().toLowerCase()] ?? EXTRA_SECTION_FALLBACK;
+/** Padanan Inggris; judul bagian bisa ditulis dalam bahasa CV mana pun. */
+const EXTRA_SECTION_EXAMPLES_EN: Record<string, string> = {
+  penghargaan: "Example: [rank] place, [competition name], [regional/national] level, [year]",
+  proyek: "Example: Web attendance system for [organisation name]: designed the database and admin pages",
+  publikasi: "Example: [Article title], [journal or outlet], [year]",
+  bahasa: "Example: English: fluent (TOEFL ITP [score])",
+  "kegiatan sukarela": "Example: Volunteer teacher at [community name], [year]",
+  pelatihan: "Example: [Training name], [organiser], [year]",
+};
+const EN_TITLE_ALIAS: Record<string, string> = {
+  awards: "penghargaan", projects: "proyek", publications: "publikasi", languages: "bahasa",
+  volunteering: "kegiatan sukarela", "volunteer work": "kegiatan sukarela", training: "pelatihan",
+};
+const EXTRA_SECTION_FALLBACK_EN = "Example: [rank] place, [competition name], [year]";
+
+export function extraSectionPlaceholder(title: string, lang: "id" | "en" = "id"): string {
+  const key = title.trim().toLowerCase();
+  if (lang === "en") return EXTRA_SECTION_EXAMPLES_EN[EN_TITLE_ALIAS[key] ?? key] ?? EXTRA_SECTION_FALLBACK_EN;
+  return EXTRA_SECTION_EXAMPLES[key] ?? EXTRA_SECTION_FALLBACK;
 }

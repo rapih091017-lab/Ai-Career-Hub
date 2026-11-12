@@ -4,6 +4,7 @@ import { useState } from "react";
 import Modal from "@/components/Modal";
 import { SortableList } from "./SortableList";
 import { AddSectionPanel } from "./AddSectionPanel";
+import { fill, useTranslation } from "@/lib/i18n";
 
 interface SectionOrderModalProps {
   open: boolean;
@@ -51,12 +52,13 @@ export function SectionOrderModal({
   customTitles,
 }: SectionOrderModalProps) {
   const [adding, setAdding] = useState(false);
+  const { t } = useTranslation();
   return (
-    <Modal open={open} onClose={onClose} title="Urutan Section CV" size="max-w-md">
+    <Modal open={open} onClose={onClose} title={t("order.title")} size="max-w-md">
       <div className="space-y-3">
         <p className="text-xs text-on-surface-variant">
-          Seret pegangan <span className="material-symbols-outlined align-middle text-[14px]" aria-hidden="true">drag_indicator</span> untuk
-          memindah. Ikon garis menambah atau menghapus garis di atas bagian itu.
+          {t("order.help-a")} <span className="material-symbols-outlined align-middle text-[14px]" aria-hidden="true">drag_indicator</span>{" "}
+          {t("order.help-b")}
         </p>
         <SortableList ids={sectionOrder} onMove={onMove} itemLabel={(key) => labelOf(key)} className="space-y-1.5">
           {(key, idx, handle) => {
@@ -74,20 +76,20 @@ export function SectionOrderModal({
                 {handle}
                 <span className={`min-w-0 flex-1 truncate text-sm font-medium ${visible ? "text-on-surface" : "text-on-surface-variant"}`}>
                   {label}
-                  {!visible && <span className="ml-1.5 text-[11px] font-normal">(disembunyikan)</span>}
+                  {!visible && <span className="ml-1.5 text-[11px] font-normal">{t("order.hidden")}</span>}
                 </span>
                 <button
                   type="button"
                   onClick={() => onToggleDivider(key)}
                   disabled={idx === 0}
                   aria-pressed={divider}
-                  aria-label={`Garis di atas ${label}`}
-                  title={idx === 0 ? "Bagian pertama tidak memakai garis" : divider ? "Hapus garis di atas" : "Tambah garis di atas"}
+                  aria-label={fill(t("order.divider-aria"), { label })}
+                  title={idx === 0 ? t("order.divider-first") : divider ? t("order.divider-remove") : t("order.divider-add")}
                   className={`${ICON_BTN} ${divider ? "bg-primary/10 text-primary" : ""}`}
                 >
                   <span className="material-symbols-outlined text-[18px]" aria-hidden="true">horizontal_rule</span>
                 </button>
-                <button type="button" onClick={() => onMove(idx, idx - 1)} disabled={idx === 0} className={ICON_BTN} aria-label={`Pindah ${label} ke atas`}>
+                <button type="button" onClick={() => onMove(idx, idx - 1)} disabled={idx === 0} className={ICON_BTN} aria-label={fill(t("order.up"), { label })}>
                   <span className="material-symbols-outlined text-[16px]" aria-hidden="true">arrow_upward</span>
                 </button>
                 <button
@@ -95,12 +97,12 @@ export function SectionOrderModal({
                   onClick={() => onMove(idx, idx + 1)}
                   disabled={idx === sectionOrder.length - 1}
                   className={ICON_BTN}
-                  aria-label={`Pindah ${label} ke bawah`}
+                  aria-label={fill(t("order.down"), { label })}
                 >
                   <span className="material-symbols-outlined text-[16px]" aria-hidden="true">arrow_downward</span>
                 </button>
                 {isRemovable(key) && (
-                  <button type="button" onClick={() => onRemove(key)} className={`${ICON_BTN} hover:text-error`} aria-label={`Hapus bagian ${label}`}>
+                  <button type="button" onClick={() => onRemove(key)} className={`${ICON_BTN} hover:text-error`} aria-label={fill(t("order.remove"), { label })}>
                     <span className="material-symbols-outlined text-[18px]" aria-hidden="true">delete</span>
                   </button>
                 )}
@@ -110,16 +112,16 @@ export function SectionOrderModal({
         </SortableList>
 
         <label className="flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-xl bg-surface-container-low px-3 text-sm text-on-surface">
-          Garis di atas semua bagian
+          {t("order.all-dividers")}
           <input type="checkbox" checked={allDividers} onChange={(e) => onAllDividersChange(e.target.checked)} className="h-4 w-4 accent-primary" />
         </label>
 
         {adding ? (
           <div className="rounded-xl border border-outline-variant/50 p-3">
             <div className="mb-2 flex items-center justify-between">
-              <p className="text-sm font-semibold text-on-surface">Tambah bagian</p>
+              <p className="text-sm font-semibold text-on-surface">{t("order.add")}</p>
               <button type="button" onClick={() => setAdding(false)} className="text-xs font-semibold text-on-surface-variant hover:text-on-surface">
-                Tutup
+                {t("common.close")}
               </button>
             </div>
             <AddSectionPanel unused={unused} onRestore={onRestore} onAddCustom={onAddCustom} customCount={customCount} existingTitles={customTitles} />
@@ -130,7 +132,7 @@ export function SectionOrderModal({
             onClick={() => setAdding(true)}
             className="flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-outline/30 text-sm font-medium text-on-surface-variant hover:border-primary/60 hover:text-primary"
           >
-            <span className="material-symbols-outlined text-lg" aria-hidden="true">add</span> Tambah bagian
+            <span className="material-symbols-outlined text-lg" aria-hidden="true">add</span> {t("order.add")}
           </button>
         )}
       </div>

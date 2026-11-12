@@ -30,6 +30,7 @@ import {
   valueFromLines,
 } from "@/lib/bullet-editor-ops";
 import { joinAsParagraph, splitSentences } from "@/lib/bullet-lines";
+import { fill, useTranslation } from "@/lib/i18n";
 
 export type BulletMode = "bullets" | "paragraph";
 
@@ -118,6 +119,7 @@ const BulletRow = memo(function BulletRow({ id, index, total, text, disabled, pl
   const inputRef = useCallback((el: HTMLTextAreaElement | null) => registerInput(id, el), [id, registerInput]);
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({ id, disabled });
   const n = index + 1;
+  const { t } = useTranslation();
   return (
     <li
       ref={setNodeRef}
@@ -129,8 +131,8 @@ const BulletRow = memo(function BulletRow({ id, index, total, text, disabled, pl
         ref={setActivatorNodeRef}
         {...attributes}
         {...listeners}
-        aria-label={`Seret poin ${n}`}
-        aria-roledescription="poin yang bisa diurutkan"
+        aria-label={fill(t("bullet.drag"), { n })}
+        aria-roledescription={t("bullet.sortable")}
         disabled={disabled}
         className={`${ICON_BTN} cursor-grab touch-none active:cursor-grabbing`}
       >
@@ -143,21 +145,21 @@ const BulletRow = memo(function BulletRow({ id, index, total, text, disabled, pl
         value={text}
         disabled={disabled}
         placeholder={index === 0 ? placeholder : undefined}
-        aria-label={`Poin ${n} dari ${total}`}
+        aria-label={fill(t("bullet.of"), { n, total })}
         onChange={onText}
         onKeyDown={onKeyDown}
         onPaste={onPaste}
         className="min-h-11 min-w-0 flex-1 resize-none overflow-hidden rounded-lg border-none bg-transparent px-2 py-2.5 text-body-md leading-snug focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary sm:min-h-8 sm:py-1"
       />
       <div className="hidden shrink-0 items-start group-focus-within:flex sm:flex">
-        <button type="button" className={ICON_BTN} aria-label={`Naikkan poin ${n}`} disabled={disabled || index === 0} data-index={index} data-to={index - 1} onClick={onMoveClick}>
+        <button type="button" className={ICON_BTN} aria-label={fill(t("bullet.up"), { n })} disabled={disabled || index === 0} data-index={index} data-to={index - 1} onClick={onMoveClick}>
           <span className="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_upward</span>
         </button>
-        <button type="button" className={ICON_BTN} aria-label={`Turunkan poin ${n}`} disabled={disabled || index === total - 1} data-index={index} data-to={index + 1} onClick={onMoveClick}>
+        <button type="button" className={ICON_BTN} aria-label={fill(t("bullet.down"), { n })} disabled={disabled || index === total - 1} data-index={index} data-to={index + 1} onClick={onMoveClick}>
           <span className="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_downward</span>
         </button>
       </div>
-      <button type="button" className={`${ICON_BTN} hover:text-error`} aria-label={`Hapus poin ${n}`} disabled={disabled} data-index={index} onClick={onRemoveClick}>
+      <button type="button" className={`${ICON_BTN} hover:text-error`} aria-label={fill(t("bullet.remove"), { n })} disabled={disabled} data-index={index} onClick={onRemoveClick}>
         <span className="material-symbols-outlined text-[18px]" aria-hidden="true">close</span>
       </button>
     </li>
@@ -182,6 +184,7 @@ export function BulletEditor({
   help,
 }: BulletEditorProps) {
   const labelId = useId();
+  const { t } = useTranslation();
   const [lines, setLines] = useState<string[]>(() => linesFromValue(value));
   const [ids, setIds] = useState<string[]>(() => linesFromValue(value).map(() => newId("pt")));
   const lastEmitted = useRef(value);
@@ -204,7 +207,7 @@ export function BulletEditor({
       lastJoin.current = { before: value, after: joined };
       if (joined !== value) {
         onChange(joined);
-        setNotice({ kind: "undo", message: "Poin digabung jadi satu paragraf.", value, mode: "bullets" });
+        setNotice({ kind: "undo", message: t("bullet.joined"), value, mode: "bullets" });
       } else setNotice(null);
       onModeChange("paragraph");
       return;
@@ -224,7 +227,7 @@ export function BulletEditor({
   const splitPerSentence = () => {
     const before = value;
     onChange(splitSentences(value).join("\n"));
-    setNotice({ kind: "undo", message: "Paragraf dipecah per kalimat.", value: before, mode: "bullets" });
+    setNotice({ kind: "undo", message: t("bullet.split-done"), value: before, mode: "bullets" });
   };
 
   const undoNotice = () => {
@@ -259,7 +262,7 @@ export function BulletEditor({
       const nextValue = valueFromLines(nextLines);
       // Tolak perubahan yang menambah panjang melewati batas.
       if (maxLength != null && nextValue.length > maxLength && nextValue.length > lastEmitted.current.length) {
-        setStatus(`Batas ${maxLength} karakter tercapai.`);
+        setStatus(fill(t("bullet.limit"), { n: maxLength }));
         return;
       }
       setLines(nextLines);
@@ -271,7 +274,7 @@ export function BulletEditor({
         onChange(nextValue);
       }
     },
-    [maxLength, onChange],
+    [maxLength, onChange, t],
   );
 
   const setText = (index: number, text: string) => {
@@ -283,7 +286,7 @@ export function BulletEditor({
   const move = (from: number, to: number, keepFocus = true) => {
     if (to < 0 || to >= lines.length) return;
     commit(moveLine(lines, from, to), moveLine(ids, from, to), keepFocus ? { index: to, caret: lines[from].length } : undefined);
-    setStatus(`Poin ${from + 1} dipindah ke posisi ${to + 1}.`);
+    setStatus(fill(t("bullet.moved"), { from: from + 1, to: to + 1 }));
   };
 
   const remove = (index: number) => {
@@ -292,7 +295,7 @@ export function BulletEditor({
     // Fokus pindah ke poin sebelumnya (atau poin pertama) supaya keyboard tidak tersesat.
     const focusIndex = index > 0 ? index - 1 : 0;
     commit(nextLines, nextIds, { index: focusIndex, caret: nextLines[focusIndex].length });
-    setStatus(`Poin ${index + 1} dihapus.`);
+    setStatus(fill(t("bullet.removed"), { n: index + 1 }));
   };
 
   const add = () => {
@@ -408,7 +411,7 @@ export function BulletEditor({
         </span>
         <div className="flex items-center gap-2">
           {onModeChange && (
-            <div role="group" aria-label="Bentuk penulisan" className="inline-flex rounded-lg bg-surface-container-low p-0.5 text-xs font-semibold">
+            <div role="group" aria-label={t("bullet.mode")} className="inline-flex rounded-lg bg-surface-container-low p-0.5 text-xs font-semibold">
               {(["bullets", "paragraph"] as const).map((m) => (
                 <button
                   key={m}
@@ -420,7 +423,7 @@ export function BulletEditor({
                     mode === m ? "bg-surface-container-lowest text-on-surface shadow-sm" : "text-on-surface-variant hover:text-on-surface"
                   }`}
                 >
-                  {m === "bullets" ? "Poin" : "Paragraf"}
+                  {m === "bullets" ? t("bullet.mode-bullets") : t("bullet.mode-paragraph")}
                 </button>
               ))}
             </div>
@@ -451,13 +454,13 @@ export function BulletEditor({
             onDragEnd={onDragEnd}
             accessibility={{
               screenReaderInstructions: {
-                draggable: "Tekan spasi atau Enter untuk mengangkat poin, panah atas/bawah untuk memindah, spasi lagi untuk meletakkan, Escape untuk batal.",
+                draggable: t("bullet.dnd-help"),
               },
               announcements: {
-                onDragStart: ({ active }) => `Poin ${posOf(active.id)} diangkat.`,
-                onDragOver: ({ over }) => (over ? `Di atas posisi ${posOf(over.id)}.` : "Di luar daftar."),
-                onDragEnd: ({ over }) => (over ? `Poin diletakkan di posisi ${posOf(over.id)}.` : "Poin dilepas."),
-                onDragCancel: () => "Pemindahan dibatalkan.",
+                onDragStart: ({ active }) => fill(t("bullet.dnd-start"), { n: posOf(active.id) }),
+                onDragOver: ({ over }) => (over ? fill(t("bullet.dnd-over"), { n: posOf(over.id) }) : t("bullet.dnd-outside")),
+                onDragEnd: ({ over }) => (over ? fill(t("bullet.dnd-end"), { n: posOf(over.id) }) : t("bullet.dnd-dropped")),
+                onDragCancel: () => t("bullet.dnd-cancel"),
               },
             }}
           >
@@ -490,7 +493,7 @@ export function BulletEditor({
             className="mt-1 inline-flex min-h-11 items-center gap-1 rounded-lg px-3 text-sm font-semibold text-primary hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-40 sm:min-h-8"
           >
             <span className="material-symbols-outlined text-[18px]" aria-hidden="true">add</span>
-            Tambah poin
+            {t("bullet.add")}
           </button>
         </div>
       )}
@@ -498,19 +501,19 @@ export function BulletEditor({
         <div role="status" className="mt-2 flex flex-wrap items-center gap-2 rounded-lg bg-surface-container px-3 py-2 text-xs text-on-surface">
           {notice.kind === "split" ? (
             <>
-              <span>Teks ini bisa dipecah jadi {notice.count} poin, satu per kalimat.</span>
+              <span>{fill(t("bullet.split-offer"), { n: notice.count })}</span>
               <button type="button" onClick={splitPerSentence} className="min-h-11 rounded-md px-2 font-semibold text-primary underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:min-h-8">
-                Pecah per kalimat
+                {t("bullet.split")}
               </button>
               <button type="button" onClick={() => setNotice(null)} className="min-h-11 rounded-md px-2 font-semibold text-on-surface-variant focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:min-h-8">
-                Biarkan
+                {t("bullet.keep")}
               </button>
             </>
           ) : (
             <>
               <span>{notice.message}</span>
               <button type="button" onClick={undoNotice} className="min-h-11 rounded-md px-2 font-semibold text-primary underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:min-h-8">
-                Urungkan
+                {t("bullet.undo")}
               </button>
             </>
           )}

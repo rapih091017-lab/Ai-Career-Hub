@@ -12,7 +12,7 @@ import {
   describePackageKeys,
 } from "@/lib/pricing-catalog";
 import { currentEquivalentPackage } from "@/lib/package-catalog-static";
-import { useTranslation } from "@/lib/i18n";
+import { localeFor, useTranslation } from "@/lib/i18n";
 import { useToast } from "@/components/ui/toast";
 
 /**
@@ -97,7 +97,7 @@ interface CvItem {
 }
 
 export default function SettingsBillingPage() {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const { addToast } = useToast();
   const router = useRouter();
   const [data, setData] = useState<UsageResponse | null>(null);
@@ -390,7 +390,7 @@ export default function SettingsBillingPage() {
                         <tr key={tx.id} className="border-b border-outline-variant/40">
                           <td className="py-3 px-2 text-on-surface-variant">
                             {tx.paidAt
-                              ? new Date(tx.paidAt).toLocaleDateString("id-ID", {
+                              ? new Date(tx.paidAt).toLocaleDateString(localeFor(lang), {
                                   day: "numeric",
                                   month: "short",
                                   year: "numeric",
@@ -465,7 +465,7 @@ export default function SettingsBillingPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-label-bold text-sm text-on-surface truncate">{cv.jobTitle || "CV tanpa judul"}</p>
-                      <p className="text-xs text-on-surface-variant">{new Date(cv.createdAt).toLocaleDateString("id-ID")}</p>
+                      <p className="text-xs text-on-surface-variant">{new Date(cv.createdAt).toLocaleDateString(localeFor(lang))}</p>
                     </div>
                     {selectedCvId === cv.id && (
                       <span className="material-symbols-outlined text-green-deep" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>

@@ -3,8 +3,17 @@
 import { useEffect, useRef, useState } from "react";
 import CvTemplatePreview from "@/components/CvTemplatePreview";
 import { TEMPLATE_STYLES } from "@/components/cv-templates";
+import { useTranslation } from "@/lib/i18n";
 
 /** Satu kalimat beda tiap template: apa yang terlihat dan kapan cocok. */
+export const TEMPLATE_BLURBS_EN: Record<string, string> = {
+  "industrial-pro": "Carlito type with a thin line under each title; neutral for almost any field.",
+  "clean-slate": "Inter type with boxed titles; tidy for office and tech roles.",
+  "executive-serif": "Navy serif type; suits managerial roles and formal applications.",
+  "fresh-graduate": "Open Sans type with a teal accent; friendly for new graduates.",
+  "compact-pro": "9.5pt type with boxed titles; fits more content per page.",
+};
+
 export const TEMPLATE_BLURBS: Record<string, string> = {
   "industrial-pro": "Huruf Carlito dengan garis tipis di bawah judul; netral untuk hampir semua bidang.",
   "clean-slate": "Huruf Inter dengan judul berbingkai; rapi untuk posisi kantor dan teknologi.",
@@ -52,6 +61,8 @@ export function TemplatePopover({ templateId, onSelect, hasOverrides, onResetSty
     };
   }, [open]);
 
+  const { t, lang } = useTranslation();
+  const blurbs = lang === "en" ? TEMPLATE_BLURBS_EN : TEMPLATE_BLURBS;
   const current = TEMPLATE_STYLES[templateId]?.name ?? "Template";
 
   return (
@@ -75,12 +86,12 @@ export function TemplatePopover({ templateId, onSelect, hasOverrides, onResetSty
           ref={panelRef}
           id="template-popover"
           role="dialog"
-          aria-label="Pilih template"
+          aria-label={t("tpl.pick")}
           // Layar kecil: lembar bawah fixed (toolbar ada di dekat bawah layar, panel bisa terpotong).
           className="fixed inset-x-2 bottom-2 z-[95] max-h-[75vh] overflow-y-auto lg:absolute lg:inset-x-auto lg:left-2 lg:right-2 lg:bottom-auto lg:top-full lg:mt-1 lg:max-h-[70vh] lg:max-w-[640px] rounded-2xl border border-outline-variant/50 bg-surface-container-lowest p-3 shadow-2xl"
         >
           <p className="mb-2 px-1 text-xs text-on-surface-variant">
-            Ganti template mengubah warna dan gaya judul. Font, ukuran, dan warna yang sudah kamu pilih tetap dipakai.
+            {t("tpl.note")}
           </p>
           <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {Object.values(TEMPLATE_STYLES).map((tpl) => {
@@ -104,7 +115,7 @@ export function TemplatePopover({ templateId, onSelect, hasOverrides, onResetSty
                         </span>
                       )}
                     </span>
-                    <span className="text-[11px] leading-snug text-on-surface-variant">{TEMPLATE_BLURBS[tpl.id]}</span>
+                    <span className="text-[11px] leading-snug text-on-surface-variant">{blurbs[tpl.id]}</span>
                   </button>
                 </li>
               );
@@ -112,7 +123,7 @@ export function TemplatePopover({ templateId, onSelect, hasOverrides, onResetSty
           </ul>
           <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-outline-variant/40 pt-3">
             <p className="text-[11px] text-on-surface-variant">
-              {hasOverrides ? "Font, ukuran, rata teks, atau warna masih memakai pilihanmu." : "Semua gaya mengikuti template."}
+              {hasOverrides ? t("tpl.overrides") : t("tpl.no-overrides")}
             </p>
             <button
               type="button"
@@ -123,7 +134,7 @@ export function TemplatePopover({ templateId, onSelect, hasOverrides, onResetSty
               disabled={!hasOverrides}
               className="min-h-11 rounded-lg px-3 text-xs font-semibold text-primary hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-40 sm:min-h-9"
             >
-              Kembalikan ke gaya template
+              {t("tpl.reset")}
             </button>
           </div>
         </div>

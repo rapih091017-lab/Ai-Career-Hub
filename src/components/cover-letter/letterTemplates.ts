@@ -140,5 +140,39 @@ export function getLetterTemplate(id: string): LetterTemplate {
   );
 }
 
+/** Teks kartu template dalam bahasa Inggris (UI); isi surat tetap mengikuti bahasa surat. */
+const LETTER_TEMPLATE_EN: Record<string, Pick<LetterTemplate, "label" | "badge" | "desc">> = {
+  formal: {
+    label: "Job Application Letter",
+    badge: "Formal",
+    desc: "A formal Indonesian application letter: opening hook, proof of experience, fit with the posting, closing with an interview ask. For applying by email or upload.",
+  },
+  "formal-lengkap": {
+    label: "Application Letter + Letterhead",
+    badge: "Letterhead",
+    desc: "A full formal application letter with letterhead, reference number, attachments, and subject line. For state-owned companies, corporates, and government offices.",
+  },
+  "ats-cover": {
+    label: "Cover Letter (EN)",
+    badge: "ATS · English",
+    desc: "A tight, keyword-friendly English cover letter: a measurable hook, structured proof, and keywords from the posting. For overseas companies and tech startups.",
+  },
+  motivation: {
+    label: "Motivation Letter",
+    badge: "Not for job applications",
+    desc: "NOT a job application. For scholarships, exchange programs, competitive internships, or fresh graduates. Focuses on drive, personal reasons, and long-term goals.",
+  },
+  casual: {
+    label: "Casual Application Letter",
+    badge: "Startup · Creative",
+    desc: "A job application letter with a warm but professional tone. A good fit for startups, creative companies, and relaxed teams.",
+  },
+};
+
+/** Label, badge, dan deskripsi kartu template sesuai bahasa UI. */
+export function letterTemplateText(tpl: LetterTemplate, lang: "id" | "en"): Pick<LetterTemplate, "label" | "badge" | "desc"> {
+  return lang === "en" && LETTER_TEMPLATE_EN[tpl.id] ? LETTER_TEMPLATE_EN[tpl.id] : tpl;
+}
+
 /** Semua template yang muncul di kartu pemilih */
 export const PICKER_TEMPLATES: LetterTemplate[] = [...LETTER_TEMPLATES, CASUAL_TEMPLATE];

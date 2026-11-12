@@ -193,7 +193,7 @@ function BuilderShowcase({ t, router }: { t: (key: string) => string; router: Re
             >
               <span className="material-symbols-outlined text-outline-variant text-2xl group-hover:text-primary transition-colors">add_circle</span>
               <p className="text-xs text-on-surface-variant leading-relaxed group-hover:text-on-surface transition-colors">
-                {t("features.cv-builder-title")} <br />5 template ATS
+                {t("features.cv-builder-title")} <br />{t("ft.templates")}
               </p>
             </Link>
           </TiltCard>
@@ -300,7 +300,7 @@ function LetterShowcase({ t }: { t: (key: string) => string }) {
               <span className="w-6 h-6 rounded-lg bg-green/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <span className="material-symbols-outlined text-green text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>business_center</span>
               </span>
-              <span className="text-xs font-bold text-on-surface group-hover:text-green transition-colors">Surat Lamaran</span>
+              <span className="text-xs font-bold text-on-surface group-hover:text-green transition-colors">{t("ft.letter")}</span>
             </div>
             <div className="px-4 py-3 space-y-1.5">
               <div className="h-2 w-2/3 bg-green/15 rounded" />
@@ -310,7 +310,7 @@ function LetterShowcase({ t }: { t: (key: string) => string }) {
               <div className="h-2 w-3/6 bg-outline/10 rounded" />
             </div>
             <div className="px-4 pb-3 flex justify-end">
-              <span className="text-xs font-semibold text-green bg-green/10 px-2 py-0.5 rounded-full">Resmi · BUMN/Korporasi</span>
+              <span className="text-xs font-semibold text-green bg-green/10 px-2 py-0.5 rounded-full">{t("ft.letter-badge")}</span>
             </div>
           </Link>
         </motion.div>
@@ -358,7 +358,7 @@ function LetterShowcase({ t }: { t: (key: string) => string }) {
               <div className="h-2 w-4/6 bg-outline/10 rounded" />
             </div>
             <div className="px-4 pb-3 flex justify-end">
-              <span className="text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">Beasiswa · Program · Passion</span>
+              <span className="text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">{t("ft.motivation-badge")}</span>
             </div>
           </Link>
         </motion.div>
@@ -402,7 +402,7 @@ function CheckerScoreMockup({ t }: { t: (key: string) => string }) {
             className="block bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/40 text-center hover:-translate-y-1 hover:shadow-lg hover:border-primary/30 transition-all duration-300 cursor-pointer group"
           >
             <div className="text-xs text-on-surface-variant font-medium mb-1 group-hover:text-primary transition-colors">{t("checker.score-label")}</div>
-            <p className="text-xs font-semibold text-primary/70 mb-1">Hasil analisis kamu tampil di sini</p>
+            <p className="text-xs font-semibold text-primary/70 mb-1">{t("ft.result-here")}</p>
             <div className="mt-2 h-1.5 w-full bg-primary/10 rounded-full overflow-hidden">
               <div className="h-full w-3/5 bg-primary/30 rounded-full" />
             </div>

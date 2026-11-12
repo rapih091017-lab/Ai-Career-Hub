@@ -1,12 +1,14 @@
 "use client";
 
 import { Tooltip } from "@/components/ui/popover";
+import { useTranslation } from "@/lib/i18n";
 
 /**
  * Persentase kata kunci deskripsi lowongan yang ditemukan di CV. 0 bila
  * deskripsi lowongan belum diisi, jadi angkanya diganti tanda "–".
  */
 export function AtsScoreRing({ score }: { score: number }) {
+  const { t } = useTranslation();
   const circumference = 2 * Math.PI * 16; // r=16
   const offset = circumference * (1 - score / 100);
   const empty = score <= 0;
@@ -30,7 +32,7 @@ export function AtsScoreRing({ score }: { score: number }) {
         </svg>
         <span className="absolute inset-0 flex items-center justify-center text-[8px] font-bold text-primary">{empty ? "–" : `${score}%`}</span>
       </div>
-      <span className="text-[10px] font-semibold text-on-surface-variant whitespace-nowrap">Kata kunci</span>
+      <span className="text-[10px] font-semibold text-on-surface-variant whitespace-nowrap">{t("ring.keywords")}</span>
     </div>
     </Tooltip>
   );

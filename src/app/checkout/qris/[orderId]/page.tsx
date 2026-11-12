@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import QRCode from "react-qr-code";
+import { fill, useTranslation } from "@/lib/i18n";
 
 /**
  * Halaman pembayaran QRIS.
@@ -37,6 +38,7 @@ export default function QrisCheckoutPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const router = useRouter();
+  const { t } = useTranslation();
   const [orderId, setOrderId] = useState<string>("");
   const [qr, setQr] = useState<CreateResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -106,7 +108,7 @@ export default function QrisCheckoutPage({
         <div className="text-center space-y-4">
           <p className="text-on-surface">{error}</p>
           <Link href="/settings/billing" className="font-bold text-green-deep underline decoration-lime decoration-[3px] underline-offset-4">
-            Kembali ke tagihan
+            {t("qris.back")}
           </Link>
         </div>
       </main>
@@ -116,7 +118,7 @@ export default function QrisCheckoutPage({
   if (!qr) {
     return (
       <main className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-on-surface-variant">Menyiapkan QR pembayaran…</p>
+        <p className="text-on-surface-variant">{t("qris.preparing")}</p>
       </main>
     );
   }
@@ -127,9 +129,9 @@ export default function QrisCheckoutPage({
     <main className="min-h-screen bg-background px-6 py-12">
       <div className="max-w-md mx-auto space-y-6 text-center">
         <div>
-          <h1 className="font-headline-lg text-2xl font-bold text-on-surface">Scan untuk bayar</h1>
+          <h1 className="font-headline-lg text-2xl font-bold text-on-surface">{t("qris.title")}</h1>
           <p className="text-on-surface-variant mt-1">
-            {qr.packageName ?? "Paket"} · {formatRupiah(qr.amount)}
+            {qr.packageName ?? t("qris.package")} · {formatRupiah(qr.amount)}
           </p>
         </div>
 
@@ -138,18 +140,18 @@ export default function QrisCheckoutPage({
         </div>
 
         <p className="text-sm text-on-surface-variant">
-          Scan dengan aplikasi apa pun: GoPay, OVO, DANA, ShopeePay, atau m-banking.
+          {t("qris.apps")}
         </p>
 
         {secondsLeft !== null && !expired && poll === "pending" ? (
           <p className="text-sm text-on-surface-variant">
-            QR berlaku {Math.floor(secondsLeft / 60)} menit {secondsLeft % 60} detik
+            {fill(t("qris.valid"), { m: Math.floor(secondsLeft / 60), s: secondsLeft % 60 })}
           </p>
         ) : null}
 
         {expired && poll !== "success" ? (
           <p className="text-sm text-error">
-            QR sudah kedaluwarsa. Kembali ke halaman tagihan untuk membuat QR baru.
+            {t("qris.expired")}
           </p>
         ) : null}
 
@@ -162,10 +164,10 @@ export default function QrisCheckoutPage({
         ) : null}
 
         {poll === "success" ? (
-          <p className="text-sm font-bold text-green-deep">Pembayaran diterima. Mengalihkan…</p>
+          <p className="text-sm font-bold text-green-deep">{t("qris.paid")}</p>
         ) : (
           <Link href="/settings/billing" className="font-bold text-green-deep underline decoration-lime decoration-[3px] underline-offset-4">
-            Saya sudah bayar / Kembali
+            {t("qris.done")}
           </Link>
         )}
       </div>

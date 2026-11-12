@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type RefObject } from "react";
+import { fill, useTranslation } from "@/lib/i18n";
 
 export const SPLIT_MIN = 30;
 export const SPLIT_MAX = 70;
@@ -45,6 +46,7 @@ interface PanelSplitterProps {
  * panah kiri/kanan menggeser 5%, Home/End ke batas, dobel klik = 50%.
  */
 export function PanelSplitter({ value, onChange, containerRef }: PanelSplitterProps) {
+  const { t } = useTranslation();
   const [dragging, setDragging] = useState(false);
 
   const pctAt = (clientX: number) => {
@@ -57,13 +59,13 @@ export function PanelSplitter({ value, onChange, containerRef }: PanelSplitterPr
     <div
       role="separator"
       aria-orientation="vertical"
-      aria-label="Lebar panel isian"
+      aria-label={t("split.label")}
       aria-valuenow={Math.round(value)}
       aria-valuemin={SPLIT_MIN}
       aria-valuemax={SPLIT_MAX}
-      aria-valuetext={`Panel isian ${Math.round(value)}% lebar layar`}
+      aria-valuetext={fill(t("split.value"), { n: Math.round(value) })}
       tabIndex={0}
-      title="Seret untuk mengubah lebar panel. Klik dua kali untuk 50%."
+      title={t("split.title")}
       onPointerDown={(e) => {
         if (e.button !== 0) return;
         e.preventDefault();

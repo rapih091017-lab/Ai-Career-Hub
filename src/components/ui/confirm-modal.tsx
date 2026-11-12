@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n";
 
 export interface ConfirmAction {
   title: string;
@@ -20,6 +21,7 @@ interface ConfirmModalProps {
 }
 
 export function ConfirmModal({ confirm, onClose }: ConfirmModalProps) {
+  const { t } = useTranslation();
   const confirmRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -113,7 +115,7 @@ export function ConfirmModal({ confirm, onClose }: ConfirmModalProps) {
                 }}
                 className="flex-1 py-2.5 rounded-xl border border-outline-variant text-sm font-medium text-on-surface hover:bg-surface-container transition-all"
               >
-                {confirm.cancelLabel || "Batal"}
+                {confirm.cancelLabel || t("common.cancel")}
               </button>
               <button
                 ref={confirmRef}
@@ -128,7 +130,7 @@ export function ConfirmModal({ confirm, onClose }: ConfirmModalProps) {
                     : "bg-primary hover:-translate-y-0.5 shadow-sm",
                 )}
               >
-                {confirm.confirmLabel || (isDanger ? "Hapus" : "Ya")}
+                {confirm.confirmLabel || (isDanger ? t("common.delete") : t("common.yes"))}
               </button>
             </div>
           </motion.div>

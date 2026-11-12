@@ -55,7 +55,7 @@ export function QuickSummaryCard({ analysis, summary, hideFixIndexes }: QuickSum
 
   return (
     <motion.section
-      aria-label="Ringkasan 10 detik"
+      aria-label={t("checker.nav.summary")}
       className="space-y-4 rounded-[18px] border-[2.5px] border-ink bg-paper p-6 shadow-hard"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -69,7 +69,7 @@ export function QuickSummaryCard({ analysis, summary, hideFixIndexes }: QuickSum
           <span className="material-symbols-outlined select-none text-tertiary" aria-hidden="true">
             bolt
           </span>
-          Ringkasan 10 detik
+          {t("checker.nav.summary")}
         </h2>
         {analysis.grade && (
           <span
@@ -84,7 +84,7 @@ export function QuickSummaryCard({ analysis, summary, hideFixIndexes }: QuickSum
 
       {/* ── Kekuatan utama (maksimal 3, sudah dibatasi mapper) ── */}
       {summary.top_strengths.length > 0 && (
-        <ul aria-label="Kekuatan utama" className="space-y-1">
+        <ul aria-label={t("qs.strengths")} className="space-y-1">
           {summary.top_strengths.map((s, i) => (
             <li key={i} className="flex items-start gap-2 text-sm leading-relaxed text-ink">
               <span
@@ -101,7 +101,7 @@ export function QuickSummaryCard({ analysis, summary, hideFixIndexes }: QuickSum
 
       {/* ── Daftar perbaikan prioritas ── */}
       {fixes.length > 0 && !hideFixIndexes && (
-        <ul aria-label="Perbaikan prioritas" className="space-y-2">
+        <ul aria-label={t("qs.priority")} className="space-y-2">
           {fixes.map(({ fix, i }) => (
             <li
               key={fix.id || i}
@@ -128,12 +128,12 @@ export function QuickSummaryCard({ analysis, summary, hideFixIndexes }: QuickSum
                 onClick={() => scrollToSection(SECTION_ANCHORS[fix.target_section])}
                 className="inline-flex shrink-0 items-center gap-1 rounded-full border-[1.5px] border-ink px-3 py-1 text-xs font-bold text-ink transition-all hover:bg-surface-container active:scale-95"
               >
-                Lihat
+                {t("qs.view")}
                 <span className="material-symbols-outlined select-none text-[13px]" aria-hidden="true">
                   arrow_forward
                 </span>
               </button>
-              {fix.copy_text && <CopyButton text={fix.copy_text} label="Salin teks" />}
+              {fix.copy_text && <CopyButton text={fix.copy_text} label={t("checker.start.copy")} />}
             </li>
           ))}
         </ul>
@@ -146,7 +146,7 @@ export function QuickSummaryCard({ analysis, summary, hideFixIndexes }: QuickSum
             <span className="material-symbols-outlined select-none text-base transition-transform group-open:rotate-180" aria-hidden="true">expand_more</span>
           </summary>
           <div className="px-3 pb-3">
-            <ul aria-label="Perbaikan prioritas" className="space-y-2">
+            <ul aria-label={t("qs.priority")} className="space-y-2">
               {fixes.map(({ fix, i }) => (
                 <li
                   key={fix.id || i}
@@ -173,12 +173,12 @@ export function QuickSummaryCard({ analysis, summary, hideFixIndexes }: QuickSum
                     onClick={() => scrollToSection(SECTION_ANCHORS[fix.target_section])}
                     className="inline-flex shrink-0 items-center gap-1 rounded-full border-[1.5px] border-ink px-3 py-1 text-xs font-bold text-ink transition-all hover:bg-surface-container active:scale-95"
                   >
-                    Lihat
+                    {t("qs.view")}
                     <span className="material-symbols-outlined select-none text-[13px]" aria-hidden="true">
                       arrow_forward
                     </span>
                   </button>
-                  {fix.copy_text && <CopyButton text={fix.copy_text} label="Salin teks" />}
+                  {fix.copy_text && <CopyButton text={fix.copy_text} label={t("checker.start.copy")} />}
                 </li>
               ))}
             </ul>
@@ -189,7 +189,7 @@ export function QuickSummaryCard({ analysis, summary, hideFixIndexes }: QuickSum
       {/* ── Salin semua perubahan; nonaktif kalau tidak ada yang bisa disalin ── */}
       <div className="flex flex-wrap items-center gap-3 border-t-[1.5px] border-ink/10 pt-4">
         {changePack ? (
-          <CopyButton text={changePack} label="Salin semua perubahan" />
+          <CopyButton text={changePack} label={t("qs.copy-all")} />
         ) : (
           <>
             <button
@@ -201,10 +201,10 @@ export function QuickSummaryCard({ analysis, summary, hideFixIndexes }: QuickSum
               <span className="material-symbols-outlined select-none text-sm" aria-hidden="true">
                 content_copy
               </span>
-              Salin semua perubahan
+              {t("qs.copy-all")}
             </button>
             <p className="text-xs font-semibold text-ink-soft">
-              Belum ada perubahan yang bisa disalin
+              {t("qs.nothing-to-copy")}
             </p>
           </>
         )}

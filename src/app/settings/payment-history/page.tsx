@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { useTranslation } from "@/lib/i18n";
+import { localeFor, useTranslation } from "@/lib/i18n";
 import { useCatalogPackages, describePackageKeys } from "@/lib/pricing-catalog";
 import { currentEquivalentPackage } from "@/lib/package-catalog-static";
 
@@ -22,7 +22,7 @@ interface PaymentHistoryData {
 }
 
 export default function PaymentHistoryPage() {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const { packages: catalogPackages } = useCatalogPackages();
   const nameByKey = useMemo(
     () => Object.fromEntries(catalogPackages.map((p) => [p.key, p.name])),
@@ -44,7 +44,7 @@ export default function PaymentHistoryPage() {
 
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return "-";
-    return new Date(dateStr).toLocaleDateString("id-ID", {
+    return new Date(dateStr).toLocaleDateString(localeFor(lang), {
       day: "numeric",
       month: "short",
       year: "numeric",

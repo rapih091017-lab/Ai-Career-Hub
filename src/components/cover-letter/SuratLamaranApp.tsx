@@ -10,7 +10,8 @@ import AuthGuard from "@/components/AuthGuard";
 import MagneticButton from "@/components/MagneticButton";
 import { useToast } from "@/components/ui/toast";
 import { LetterPreview } from "@/components/cover-letter/LetterPreview";
-import { PICKER_TEMPLATES, getLetterTemplate, type LetterTemplate } from "@/components/cover-letter/letterTemplates";
+import { PICKER_TEMPLATES, getLetterTemplate, letterTemplateText, type LetterTemplate } from "@/components/cover-letter/letterTemplates";
+import { fill, localeFor, useTranslation } from "@/lib/i18n";
 import { exportPdfViaServer } from "@/lib/pdf-export";
 import { useCoverLetterQuota } from "@/hooks/useCoverLetterQuota";
 import type { CvData } from "@/components/cv-templates";
@@ -45,9 +46,9 @@ interface CvOption {
 const VALID_STYLES = ["formal", "casual", "ats", "formal_lengkap", "motivation"] as const;
 type LetterStyle = (typeof VALID_STYLES)[number];
 
-function styleLabel(style: string): string {
+function styleLabel(style: string, lang: "id" | "en" = "id"): string {
   if (style === "ats") return "Cover (EN)";
-  if (style === "casual") return "Kasual";
+  if (style === "casual") return lang === "en" ? "Casual" : "Kasual";
   if (style === "formal_lengkap") return "Formal + Kop";
   if (style === "motivation") return "Motivation";
   return "Formal";
@@ -62,7 +63,7 @@ function templateIdForStyle(style: string): string {
   return "formal";
 }
 
-const STEPS = ["Template", "Data Surat", "Hasil & Edit"];
+const STEP_KEYS = ["cl.step-template", "cl.step-data", "cl.step-result"];
 
 export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
   const router = useRouter();
@@ -71,6 +72,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
   const letterFromUrl = searchParams.get("letter");
   const { addToast } = useToast();
   const quota = useCoverLetterQuota();
+  const { t, lang } = useTranslation();
 
   /* ── Stepper ── */
   // Jika datang dengan cvId (dari dashboard/dropdown) atau style (dari ReviewStep),
@@ -250,7 +252,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
     setCvLoading(true);
     fetch(`/api/cv-documents/${cvId}`)
       .then(async (res) => {
-        if (!res.ok) throw new Error(`Gagal memuat CV (${res.status})`);
+        if (!res.ok) throw new Error(fill(t("cl.cv-load-failed"), { status: res.status }));
         return res.json();
       })
       .then((data) => {
@@ -325,7 +327,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
   const loadLetterDetail = useCallback(
     (id: string) => {
       fetch(`/api/cover-letter/${id}`)
-        .then((res) => (res.ok ? res.json() : Promise.reject(new Error("Gagal memuat surat"))))
+        .then((res) => (res.ok ? res.json() : Promise.reject(new Error(t("cl.letter-load-failed")))))
         .then((full) => {
           setSubject(full.subject || "");
           setContent(full.content ?? "");
@@ -363,7 +365,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
   const handleGenerate = async () => {
     // Dari nol: minimal nama & posisi agar surat tidak kosong/boros kuota
     if (!sourceCvId && (!manual.fullName.trim() || !manual.position.trim())) {
-      addToast({ type: "error", message: "Isi minimal Nama Lengkap & Posisi yang dilamar" });
+      addToast({ type: "error", message: t("cl.need-name-position") });
       return;
     }
     setGenerating(true);
@@ -423,11 +425,11 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
 
       if (!res.ok) {
         if (data.redirectUrl) {
-          addToast({ type: "warning", message: data.message || "Silakan upgrade paket" });
+          addToast({ type: "warning", message: data.message || t("cl.upgrade") });
           setTimeout(() => router.push(data.redirectUrl!), 1500);
           return;
         }
-        throw new Error(data.message || data.error || "Gagal generate surat");
+        throw new Error(data.message || data.error || t("cl.gen-failed"));
       }
 
       const newLetter: LetterItem = {
@@ -455,9 +457,9 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
       setDirty(false);
       loadLetters();
       setActiveStep(2);
-      addToast({ type: "success", message: "Surat lamaran berhasil dibuat!" });
+      addToast({ type: "success", message: t("cl.gen-ok") });
     } catch (err: any) {
-      addToast({ type: "error", message: err.message || "Gagal generate surat" });
+      addToast({ type: "error", message: err.message || t("cl.gen-failed") });
     } finally {
       setGenerating(false);
     }
@@ -474,11 +476,11 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
         body: JSON.stringify({ content, subject, letterNumber, attachment, jobSource, companyAddress, motivationReason, futurePlan }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Gagal menyimpan");
+      if (!res.ok) throw new Error(data.message || t("cl.save-failed"));
       setDirty(false);
       setActiveLetter((prev) => (prev ? { ...prev, content, subject, letterNumber, attachment, jobSource, companyAddress, motivationReason, futurePlan, updatedAt: new Date().toISOString() } : prev));
       loadLetters();
-      addToast({ type: "success", message: "Perubahan tersimpan" });
+      addToast({ type: "success", message: t("cl.saved") });
     } catch (err: any) {
       addToast({ type: "error", message: err.message });
     } finally {
@@ -507,9 +509,9 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
         text = `${subject ? `Perihal: ${subject}\n\n` : ""}${content}`;
       }
       await navigator.clipboard.writeText(text);
-      addToast({ type: "success", message: "Teks disalin ke clipboard!" });
+      addToast({ type: "success", message: t("cl.copied") });
     } catch {
-      addToast({ type: "error", message: "Gagal menyalin teks" });
+      addToast({ type: "error", message: t("cl.copy-failed") });
     }
   };
 
@@ -526,18 +528,18 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
       // html2canvas slicing per halaman, auto-download tanpa dialog print).
       const result = await exportPdfViaServer(previewRef.current, name, 0, 297);
       if (!result.ok) {
-        addToast({ type: result.redirectUrl ? "warning" : "error", message: result.error || "Gagal export PDF" });
+        addToast({ type: result.redirectUrl ? "warning" : "error", message: result.error || t("cl.pdf-failed") });
       } else if (result.usedFallback) {
         // Versi gambar (fallback), beri tahu user jujur
         addToast({
           type: "warning",
-          message: "Server PDF teks sedang sibuk, file yang terunduh versi gambar. Coba lagi sebentar untuk versi teks.",
+          message: t("cl.pdf-image-fallback"),
         });
       } else {
         addToast({ type: "success", message: "PDF teks berhasil diunduh!" });
       }
     } catch (err) {
-      addToast({ type: "error", message: "Gagal export PDF" });
+      addToast({ type: "error", message: t("cl.pdf-failed") });
     } finally {
       setExporting(false);
     }
@@ -545,11 +547,11 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
 
   /* ── Delete ── */
   const handleDelete = async (id: string) => {
-    if (!confirm("Hapus surat lamaran ini?")) return;
+    if (!confirm(t("cl.delete-confirm"))) return;
     setDeleting(true);
     try {
       const res = await fetch(`/api/cover-letter/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Gagal menghapus");
+      if (!res.ok) throw new Error(t("cl.delete-failed"));
       setLetters((prev) => prev.filter((l) => l.id !== id));
       if (activeLetter?.id === id) {
         const remaining = letters.filter((l) => l.id !== id);
@@ -559,7 +561,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
           setContent("");
         }
       }
-      addToast({ type: "success", message: "Surat dihapus" });
+      addToast({ type: "success", message: t("cl.deleted") });
     } catch (err: any) {
       addToast({ type: "error", message: err.message });
     } finally {
@@ -580,9 +582,9 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
   const generateDisabled = !sourceCvId && !activeLetter && sourceMode === "cv";
 
   const stepMeta = [
-    { title: "Pilih Template", desc: "Pilih jenis surat & format tampilan", icon: "dashboard_customize" },
-    { title: "Data Surat", desc: cvId ? "Konfigurasi tujuan & detail surat" : "Pilih sumber data & isi detail surat", icon: "edit_note" },
-    { title: "Hasil & Edit", desc: "Generate AI, edit, preview & export", icon: "task_alt" },
+    { title: t("cl.s1-title"), desc: t("cl.s1-desc"), icon: "dashboard_customize" },
+    { title: t("cl.step-data"), desc: cvId ? t("cl.s2-desc-cv") : t("cl.s2-desc"), icon: "edit_note" },
+    { title: t("cl.step-result"), desc: t("cl.s3-desc"), icon: "task_alt" },
   ];
 
   return (
@@ -599,22 +601,22 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                   className="inline-flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary transition-colors"
                 >
                   <span className="material-symbols-outlined text-base">arrow_back</span>
-                  {cvId ? "Kembali ke Builder" : "Kembali ke Dashboard"}
+                  {cvId ? t("cl.back-builder") : t("bskel.back")}
                 </Link>
                 <h1 className="font-headline-lg text-on-surface mt-2">
-                  Surat Lamaran · Cover Letter · Motivation
+                  {t("cl.title")}
                 </h1>
                 <p className="font-body-md text-on-surface-variant">
                   {cvId && cvData?.jobTitle
-                    ? `Posisi target: ${cvData.jobTitle}`
-                    : "Buat dari template, isi data, lalu generate dengan AI · seperti builder CV."}
+                    ? fill(t("cl.target"), { title: cvData.jobTitle })
+                    : t("cl.subtitle")}
                 </p>
               </div>
               <div className="flex items-center gap-1.5">
                 {quota && !quota.isUnlimited && (
                   <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full bg-primary/10 text-primary">
                     <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>redeem</span>
-                    Sisa {quota.remaining}/{quota.limit} gratis
+                    {fill(t("review.quota"), { n: String(quota.remaining), max: String(quota.limit) })}
                   </span>
                 )}
                 {quota && quota.isUnlimited && (
@@ -628,9 +630,9 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
 
             {/* ── STEPPER ── */}
             <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/50 shadow-premium-sm px-3 py-3 md:px-5 flex items-center gap-1 overflow-x-auto custom-scrollbar">
-              {STEPS.map((label, i) => (
+              {STEP_KEYS.map((key, i) => (
                 <button
-                  key={label}
+                  key={key}
                   type="button"
                   onClick={() => setActiveStep(i)}
                   disabled={i === 2 && !activeLetter && letters.length === 0 && !content}
@@ -647,7 +649,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                   >
                     {i + 1}
                   </span>
-                  {label}
+                  {t(key)}
                 </button>
               ))}
             </div>
@@ -752,7 +754,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                         <div className="flex gap-1 mb-1">
                                           <span className="rounded-sm" style={{ width: 1.5, height: 8, background: tpl.format.accentColor }} />
                                           <span className="mb-1" style={{ fontSize: 5.5, fontWeight: 700, color: tpl.format.accentColor, lineHeight: 1.2 }}>
-                                            {tpl.label.split(" ")[0]}
+                                            {letterTemplateText(tpl, lang).label.split(" ")[0]}
                                           </span>
                                         </div>
                                         <div style={{ fontSize: 4.5, color: "#444", lineHeight: 1.4 }}>
@@ -765,16 +767,16 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 flex-wrap">
                                       <span className={`text-sm font-bold ${active ? "text-primary" : "text-on-surface"}`}>
-                                        {tpl.label}
+                                        {letterTemplateText(tpl, lang).label}
                                       </span>
                                       <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wide bg-surface-container-high text-on-surface-variant">
-                                        {tpl.badge}
+                                        {letterTemplateText(tpl, lang).badge}
                                       </span>
                                     </div>
-                                    <p className="text-[11px] text-on-surface-variant mt-1 leading-relaxed">{tpl.desc}</p>
+                                    <p className="text-[11px] text-on-surface-variant mt-1 leading-relaxed">{letterTemplateText(tpl, lang).desc}</p>
                                     <div className="flex items-center gap-2 mt-2 text-[10px] text-outline">
                                       <span className="material-symbols-outlined text-[12px]">translate</span>
-                                      {tpl.defaultLang === "id" ? "Bahasa Indonesia" : "English"}
+                                      {tpl.defaultLang === "id" ? t("cl.lang-id") : "English"}
                                       <span className="material-symbols-outlined text-[12px] ml-1">format_size</span>
                                       {tpl.format.fontFamily.includes("Times") ? "Serif" : "Sans"}
                                     </div>
@@ -797,7 +799,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                               onClick={() => setActiveStep(1)}
                               className="w-full bg-primary text-on-primary font-bold py-3.5 rounded-xl hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-premium-md"
                             >
-                              Lanjut ke Data Surat
+                              {t("cl.next-data")}
                               <span className="material-symbols-outlined text-lg">arrow_forward</span>
                             </button>
                           </MagneticButton>
@@ -817,8 +819,8 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                   <span className="material-symbols-outlined text-primary text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>travel_explore</span>
                                 </div>
                                 <div>
-                                  <h2 className="font-label-bold text-on-surface">Pilih Sumber Data Surat</h2>
-                                  <p className="text-xs text-on-surface-variant">Dari CV yang sudah ada, atau tulis dari nol</p>
+                                  <h2 className="font-label-bold text-on-surface">{t("cl.source-title")}</h2>
+                                  <p className="text-xs text-on-surface-variant">{t("cl.source-desc")}</p>
                                 </div>
                               </div>
 
@@ -829,7 +831,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                     if (cvOptions.length === 0 && !cvOptionsLoading) {
                                       // Tidak ada CV untuk dipilih, jangan kunci form manual
                                       setSourceMode("manual");
-                                      addToast({ type: "warning", message: "Kamu belum punya CV. Isi data manual di bawah, atau buat CV baru dulu." });
+                                      addToast({ type: "warning", message: t("cl.no-cv") });
                                       return;
                                     }
                                     setSourceMode("cv");
@@ -843,8 +845,8 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                     description
                                   </span>
                                   <span>
-                                    <span className={`block text-sm font-bold ${sourceMode === "cv" ? "text-primary" : "text-on-surface"}`}>Dari CV yang sudah ada</span>
-                                    <span className="block text-[11px] text-on-surface-variant mt-0.5">Data diri, pengalaman &amp; skill otomatis terisi dari CV</span>
+                                    <span className={`block text-sm font-bold ${sourceMode === "cv" ? "text-primary" : "text-on-surface"}`}>{t("cl.from-cv")}</span>
+                                    <span className="block text-[11px] text-on-surface-variant mt-0.5">{t("cl.from-cv-desc")}</span>
                                   </span>
                                 </button>
                                 <button
@@ -859,8 +861,8 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                     edit_note
                                   </span>
                                   <span>
-                                    <span className={`block text-sm font-bold ${sourceMode === "manual" ? "text-primary" : "text-on-surface"}`}>Isi Manual / Dari Nol</span>
-                                    <span className="block text-[11px] text-on-surface-variant mt-0.5">Tanpa CV · isi nama, posisi, &amp; data singkat langsung di sini</span>
+                                    <span className={`block text-sm font-bold ${sourceMode === "manual" ? "text-primary" : "text-on-surface"}`}>{t("cl.manual")}</span>
+                                    <span className="block text-[11px] text-on-surface-variant mt-0.5">{t("cl.manual-desc")}</span>
                                   </span>
                                 </button>
                               </div>
@@ -869,7 +871,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                               {sourceMode === "cv" && (
                                 <div className="mt-4 pt-4 border-t border-outline-variant/50">
                                   <p className="text-xs font-semibold text-on-surface-variant mb-2">
-                                    Pilih CV (surat dibuat dari datanya):
+                                    {t("cl.pick-cv")}
                                   </p>
                                   {cvOptionsLoading ? (
                                     <div className="space-y-2">
@@ -890,9 +892,9 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                             <span className="material-symbols-outlined text-primary text-base" style={{ fontVariationSettings: "'FILL' 1" }}>description</span>
                                           </span>
                                           <span className="flex-1 min-w-0">
-                                            <span className="block text-xs font-bold text-on-surface truncate">{cv.jobTitle || "CV tanpa judul"}</span>
+                                            <span className="block text-xs font-bold text-on-surface truncate">{cv.jobTitle || t("cl.cv-untitled")}</span>
                                             <span className="block text-[10px] text-on-surface-variant">
-                                              Diperbarui {new Date(cv.updatedAt).toLocaleDateString("id-ID")}
+                                              {t("cl.updated")} {new Date(cv.updatedAt).toLocaleDateString(localeFor(lang))}
                                             </span>
                                           </span>
                                           <span className="material-symbols-outlined text-sm text-on-surface-variant group-hover:text-primary">chevron_right</span>
@@ -902,14 +904,14 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                   ) : (
                                     <div className="rounded-xl border border-dashed border-outline-variant p-4 text-center">
                                       <p className="text-xs text-on-surface-variant mb-2">
-                                        Belum ada CV. Buat CV dulu, atau pilih &ldquo;Isi Manual&rdquo;.
+                                        {t("cl.no-cv-yet")}
                                       </p>
                                       <Link
                                         href="/builder/new"
                                         className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
                                       >
                                         <span className="material-symbols-outlined text-sm">add</span>
-                                        Buat CV Baru
+                                        {t("cl.new-cv")}
                                       </Link>
                                     </div>
                                   )}
@@ -927,14 +929,14 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                   <span className="material-symbols-outlined text-primary text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>person</span>
                                 </div>
                                 <div>
-                                  <h2 className="font-label-bold text-on-surface">Data Diri (Dari Nol)</h2>
-                                  <p className="text-xs text-on-surface-variant">Tulis langsung · tidak perlu CV</p>
+                                  <h2 className="font-label-bold text-on-surface">{t("cl.personal")}</h2>
+                                  <p className="text-xs text-on-surface-variant">{t("cl.personal-desc")}</p>
                                 </div>
                               </div>
 
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
-                                  <label className="text-sm font-semibold text-on-surface-variant block mb-1">Nama Lengkap *</label>
+                                  <label className="text-sm font-semibold text-on-surface-variant block mb-1">{t("cl.full-name")}</label>
                                   <input
                                     type="text"
                                     value={manual.fullName}
@@ -944,7 +946,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-sm font-semibold text-on-surface-variant block mb-1">Posisi yang Dilamar *</label>
+                                  <label className="text-sm font-semibold text-on-surface-variant block mb-1">{t("cl.position")}</label>
                                   <input
                                     type="text"
                                     value={manual.position}
@@ -964,7 +966,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-sm font-semibold text-on-surface-variant block mb-1">No. Telepon</label>
+                                  <label className="text-sm font-semibold text-on-surface-variant block mb-1">{t("cl.phone")}</label>
                                   <input
                                     type="tel"
                                     value={manual.phone}
@@ -974,22 +976,22 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-sm font-semibold text-on-surface-variant block mb-1">Kota / Alamat</label>
+                                  <label className="text-sm font-semibold text-on-surface-variant block mb-1">{t("cl.address")}</label>
                                   <input
                                     type="text"
                                     value={manual.address}
                                     onChange={(e) => setManual((m) => ({ ...m, address: e.target.value }))}
-                                    placeholder="Jakarta Selatan"
+                                    placeholder={t("cl.address-ph")}
                                     className="w-full rounded-lg border border-outline bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-sm font-semibold text-on-surface-variant block mb-1">Ringkasan Singkat (opsional)</label>
+                                  <label className="text-sm font-semibold text-on-surface-variant block mb-1">{t("cl.summary")}</label>
                                   <input
                                     type="text"
                                     value={manual.summary}
                                     onChange={(e) => setManual((m) => ({ ...m, summary: e.target.value }))}
-                                    placeholder="cth: 3 tahun pengalaman web dev"
+                                    placeholder={t("cl.summary-ph")}
                                     className="w-full rounded-lg border border-outline bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                                   />
                                 </div>
@@ -997,19 +999,19 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
 
                               {/* ── Deskripsi Lowongan ── */}
                               <div>
-                                <label className="text-sm font-semibold text-on-surface-variant block mb-1">Deskripsi Lowongan (opsional, sangat membantu AI)</label>
+                                <label className="text-sm font-semibold text-on-surface-variant block mb-1">{t("cl.jd")}</label>
                                 <textarea
                                   value={manual.jobDescription}
                                   onChange={(e) => setManual((m) => ({ ...m, jobDescription: e.target.value }))}
                                   rows={3}
-                                  placeholder="Tempel deskripsi lowongan di sini agar surat menyebutkan skill & requirement yang diminta perusahaan"
+                                  placeholder={t("cl.jd-ph")}
                                   className="w-full rounded-lg border border-outline bg-background px-3 py-2 text-sm leading-relaxed focus:ring-2 focus:ring-primary focus:border-primary outline-none resize-y"
                                 />
                               </div>
 
                               {/* ── Skills ── */}
                               <div>
-                                <label className="text-sm font-semibold text-on-surface-variant block mb-1">Skills (opsional)</label>
+                                <label className="text-sm font-semibold text-on-surface-variant block mb-1">{t("cl.skills")}</label>
                                 <input
                                   type="text"
                                   value={manual.skills}
@@ -1017,13 +1019,13 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                   placeholder="React, TypeScript, UI/UX, Agile"
                                   className="w-full rounded-lg border border-outline bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                                 />
-                                <p className="text-[11px] text-on-surface-variant mt-1">Pisahkan dengan koma · dipakai AI untuk menonjolkan keahlian yang relevan</p>
+                                <p className="text-[11px] text-on-surface-variant mt-1">{t("cl.skills-hint")}</p>
                               </div>
 
                               {/* ── Pengalaman Kerja ── */}
                               <div className="space-y-3">
                                 <div className="flex items-center justify-between">
-                                  <label className="text-sm font-semibold text-on-surface-variant">Pengalaman Kerja (opsional)</label>
+                                  <label className="text-sm font-semibold text-on-surface-variant">{t("cl.work")}</label>
                                   <button
                                     type="button"
                                     onClick={() => addManualEntry("workHistory")}
@@ -1031,7 +1033,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                     className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:bg-primary/10 px-2 py-1 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                                   >
                                     <span className="material-symbols-outlined text-sm">add</span>
-                                    Tambah Pengalaman
+                                    {t("cl.add-work")}
                                   </button>
                                 </div>
                                 {manual.workHistory.map((w, i) => (
@@ -1041,14 +1043,14 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                         type="text"
                                         value={w.position}
                                         onChange={(e) => updateManualEntry("workHistory", i, "position", e.target.value)}
-                                        placeholder="Posisi (cth: Frontend Developer)"
+                                        placeholder={t("cl.work-position-ph")}
                                         className="w-full rounded-lg border border-outline bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                                       />
                                       <input
                                         type="text"
                                         value={w.company}
                                         onChange={(e) => updateManualEntry("workHistory", i, "company", e.target.value)}
-                                        placeholder="Perusahaan"
+                                        placeholder={t("cl.company-ph")}
                                         className="w-full rounded-lg border border-outline bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                                       />
                                     </div>
@@ -1057,14 +1059,14 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                         type="text"
                                         value={w.startDate}
                                         onChange={(e) => updateManualEntry("workHistory", i, "startDate", e.target.value)}
-                                        placeholder="Mulai (cth: 2021)"
+                                        placeholder={t("cl.start-ph")}
                                         className="w-full rounded-lg border border-outline bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                                       />
                                       <input
                                         type="text"
                                         value={w.endDate}
                                         onChange={(e) => updateManualEntry("workHistory", i, "endDate", e.target.value)}
-                                        placeholder="Selesai (cth: 2024 / sekarang)"
+                                        placeholder={t("cl.end-ph")}
                                         className="w-full rounded-lg border border-outline bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                                       />
                                     </div>
@@ -1072,7 +1074,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                       value={w.description}
                                       onChange={(e) => updateManualEntry("workHistory", i, "description", e.target.value)}
                                       rows={2}
-                                      placeholder="Deskripsi singkat tanggung jawab & pencapaian"
+                                      placeholder={t("cl.work-desc-ph")}
                                       className="w-full rounded-lg border border-outline bg-background px-3 py-2 text-sm leading-relaxed focus:ring-2 focus:ring-primary focus:border-primary outline-none resize-y"
                                     />
                                     {manual.workHistory.length > 1 && (
@@ -1082,7 +1084,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                         className="inline-flex items-center gap-1 text-[11px] font-semibold text-error hover:bg-error-container/30 px-2 py-1 rounded-lg transition-colors"
                                       >
                                         <span className="material-symbols-outlined text-sm">close</span>
-                                        Hapus
+                                        {t("common.delete")}
                                       </button>
                                     )}
                                   </div>
@@ -1092,7 +1094,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                               {/* ── Pendidikan ── */}
                               <div className="space-y-3">
                                 <div className="flex items-center justify-between">
-                                  <label className="text-sm font-semibold text-on-surface-variant">Pendidikan (opsional)</label>
+                                  <label className="text-sm font-semibold text-on-surface-variant">{t("cl.education")}</label>
                                   <button
                                     type="button"
                                     onClick={() => addManualEntry("education")}
@@ -1100,7 +1102,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                     className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:bg-primary/10 px-2 py-1 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                                   >
                                     <span className="material-symbols-outlined text-sm">add</span>
-                                    Tambah Pendidikan
+                                    {t("cl.add-edu")}
                                   </button>
                                 </div>
                                 {manual.education.map((e, i) => (
@@ -1110,21 +1112,21 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                         type="text"
                                         value={e.degree}
                                         onChange={(ev) => updateManualEntry("education", i, "degree", ev.target.value)}
-                                        placeholder="Gelar (cth: S1)"
+                                        placeholder={t("cl.degree-ph")}
                                         className="w-full rounded-lg border border-outline bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                                       />
                                       <input
                                         type="text"
                                         value={e.field}
                                         onChange={(ev) => updateManualEntry("education", i, "field", ev.target.value)}
-                                        placeholder="Jurusan (cth: Informatika)"
+                                        placeholder={t("cl.major-ph")}
                                         className="w-full rounded-lg border border-outline bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                                       />
                                       <input
                                         type="text"
                                         value={e.institution}
                                         onChange={(ev) => updateManualEntry("education", i, "institution", ev.target.value)}
-                                        placeholder="Institusi (cth: Universitas Indonesia)"
+                                        placeholder={t("cl.institution-ph")}
                                         className="w-full rounded-lg border border-outline bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                                       />
                                     </div>
@@ -1135,7 +1137,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                         className="inline-flex items-center gap-1 text-[11px] font-semibold text-error hover:bg-error-container/30 px-2 py-1 rounded-lg transition-colors"
                                       >
                                         <span className="material-symbols-outlined text-sm">close</span>
-                                        Hapus
+                                        {t("common.delete")}
                                       </button>
                                     )}
                                   </div>
@@ -1151,25 +1153,25 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                 <span className="material-symbols-outlined text-primary text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>mail</span>
                               </div>
                               <div>
-                                <h2 className="font-label-bold text-on-surface">Konfigurasi Surat</h2>
+                                <h2 className="font-label-bold text-on-surface">{t("cl.config")}</h2>
                                 <p className="text-xs text-on-surface-variant">
                                   {cvId
-                                    ? "Data otomatis diambil dari CV ini"
+                                    ? t("cl.config-cv")
                                     : sourceMode === "manual"
-                                      ? "Berdasarkan data yang kamu isi di atas"
-                                      : "Surat dibuat dari data yang tersedia"}
+                                      ? t("cl.config-manual")
+                                      : t("cl.config-default")}
                                 </p>
                               </div>
                             </div>
 
                             {/* Bahasa */}
                             <div>
-                              <label className="text-sm font-semibold text-on-surface-variant block mb-2">Bahasa Surat</label>
+                              <label className="text-sm font-semibold text-on-surface-variant block mb-2">{t("cl.letter-lang")}</label>
                               <div className="grid grid-cols-2 gap-2">
                                 {([
-                                  { value: "id", label: "Bahasa Indonesia", icon: "translate" },
-                                  { value: "en", label: "English", icon: "language" },
-                                ] as const).map((opt) => (
+                                  { value: "id" as const, label: t("cl.lang-id"), icon: "translate" },
+                                  { value: "en" as const, label: "English", icon: "language" },
+                                ]).map((opt) => (
                                   <button
                                     key={opt.value}
                                     type="button"
@@ -1191,7 +1193,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                             {/* Detail tambahan */}
                             <div className="grid grid-cols-1 gap-3">
                               <div>
-                                <label className="text-sm font-semibold text-on-surface-variant block mb-1">Nama Perusahaan (opsional)</label>
+                                <label className="text-sm font-semibold text-on-surface-variant block mb-1">{t("cl.company")}</label>
                                 <input
                                   type="text"
                                   value={companyName}
@@ -1201,12 +1203,12 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                 />
                               </div>
                               <div>
-                                <label className="text-sm font-semibold text-on-surface-variant block mb-1">Nama HR / Recruiter (opsional)</label>
+                                <label className="text-sm font-semibold text-on-surface-variant block mb-1">{t("cl.recipient")}</label>
                                 <input
                                   type="text"
                                   value={recipientName}
                                   onChange={(e) => setRecipientName(e.target.value)}
-                                  placeholder="Bpk/Ibu Andi Pratama"
+                                  placeholder={t("cl.recipient-ph")}
                                   className="w-full rounded-lg border border-outline bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                                 />
                               </div>
@@ -1215,22 +1217,22 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                               {style === "motivation" ? (
                                 <>
                                   <div>
-                                    <label className="text-sm font-semibold text-on-surface-variant block mb-1">Alasan Utama Memilih Program Ini (opsional)</label>
+                                    <label className="text-sm font-semibold text-on-surface-variant block mb-1">{t("cl.motivation-reason")}</label>
                                     <textarea
                                       value={motivationReason}
                                       onChange={(e) => setMotivationReason(e.target.value)}
                                       rows={2}
-                                      placeholder="cth: pengalaman organisasi yang menumbuhkan minat, masalah yang ingin diselesaikan"
+                                      placeholder={t("cl.motivation-reason-ph")}
                                       className="w-full rounded-lg border border-outline bg-background px-3 py-2 text-sm leading-relaxed focus:ring-2 focus:ring-primary focus:border-primary outline-none resize-y"
                                     />
                                   </div>
                                   <div>
-                                    <label className="text-sm font-semibold text-on-surface-variant block mb-1">Rencana / Kontribusi Jika Diterima (opsional)</label>
+                                    <label className="text-sm font-semibold text-on-surface-variant block mb-1">{t("cl.future")}</label>
                                     <textarea
                                       value={futurePlan}
                                       onChange={(e) => setFuturePlan(e.target.value)}
                                       rows={2}
-                                      placeholder="cth: rencana studi, kontribusi untuk masyarakat/institusi, dampak jangka panjang"
+                                      placeholder={t("cl.future-ph")}
                                       className="w-full rounded-lg border border-outline bg-background px-3 py-2 text-sm leading-relaxed focus:ring-2 focus:ring-primary focus:border-primary outline-none resize-y"
                                     />
                                   </div>
@@ -1238,23 +1240,23 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                               ) : (
                                 <>
                                   <div>
-                                    <label className="text-sm font-semibold text-on-surface-variant block mb-1">Sumber Info Lowongan (opsional)</label>
+                                    <label className="text-sm font-semibold text-on-surface-variant block mb-1">{t("cl.job-source")}</label>
                                     <input
                                       type="text"
                                       value={jobSource}
                                       onChange={(e) => setJobSource(e.target.value)}
-                                      placeholder="cth: LinkedIn, Jobstreet, job fair, referensi teman"
+                                      placeholder={t("cl.job-source-ph")}
                                       className="w-full rounded-lg border border-outline bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                                     />
-                                    <p className="text-[11px] text-on-surface-variant mt-1">Dipakai AI di paragraf pembuka (&ldquo;berdasarkan informasi lowongan yang saya peroleh dari...&rdquo;)</p>
+                                    <p className="text-[11px] text-on-surface-variant mt-1">{t("cl.job-source-hint")}</p>
                                   </div>
                                   <div>
-                                    <label className="text-sm font-semibold text-on-surface-variant block mb-1">Alamat Perusahaan (opsional)</label>
+                                    <label className="text-sm font-semibold text-on-surface-variant block mb-1">{t("cl.company-address")}</label>
                                     <input
                                       type="text"
                                       value={companyAddress}
                                       onChange={(e) => setCompanyAddress(e.target.value)}
-                                      placeholder="cth: Jl. Sudirman No. 1, Jakarta Selatan"
+                                      placeholder={t("cl.company-address-ph")}
                                       className="w-full rounded-lg border border-outline bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                                     />
                                   </div>
@@ -1265,22 +1267,22 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                 <>
                                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     <div>
-                                      <label className="text-sm font-semibold text-on-surface-variant block mb-1">Nomor Surat</label>
+                                      <label className="text-sm font-semibold text-on-surface-variant block mb-1">{t("cl.letter-number")}</label>
                                       <input
                                         type="text"
                                         value={letterNumber}
                                         onChange={(e) => setLetterNumber(e.target.value)}
-                                        placeholder="cth: 001/CL/08/2026"
+                                        placeholder={t("cl.letter-number-ph")}
                                         className="w-full rounded-lg border border-outline bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                                       />
                                     </div>
                                     <div>
-                                      <label className="text-sm font-semibold text-on-surface-variant block mb-1">Lampiran</label>
+                                      <label className="text-sm font-semibold text-on-surface-variant block mb-1">{t("cl.attachment")}</label>
                                       <input
                                         type="text"
                                         value={attachment}
                                         onChange={(e) => setAttachment(e.target.value)}
-                                        placeholder="1 (satu) berkas"
+                                        placeholder={t("cl.attachment-ph")}
                                         className="w-full rounded-lg border border-outline bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                                       />
                                     </div>
@@ -1301,24 +1303,24 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                                     </svg>
-                                    Menulis surat dengan AI...
+                                    {t("cl.writing")}
                                   </>
                                 ) : (
                                   <>
                                     <span className="material-symbols-outlined text-lg">auto_awesome</span>
                                     {generateDisabled
-                                      ? (cvOptions.length === 0 ? "Isi data manual di atas untuk generate" : "Pilih CV di atas dulu")
-                                      : "Generate Surat dengan AI"}
+                                      ? (cvOptions.length === 0 ? t("cl.need-manual") : t("cl.need-cv"))
+                                      : t("cl.generate")}
                                   </>
                                 )}
                               </button>
                             </MagneticButton>
                             <p className="text-[11px] text-center text-on-surface-variant">
                               {quota && !quota.isUnlimited
-                                ? `Sisa ${quota.remaining}/${quota.limit} bulan ini`
+                                ? fill(t("cl.quota-month"), { n: String(quota.remaining), max: String(quota.limit) })
                                 : quota && quota.isUnlimited
-                                  ? "Tanpa batas untuk Pro dan Max"
-                                  : "Gratis 1x per bulan"}
+                                  ? t("cl.quota-unlimited")
+                                  : t("cl.quota-free")}
                             </p>
                           </motion.section>
                         </div>
@@ -1332,9 +1334,9 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                               <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                                 <span className="material-symbols-outlined text-primary text-[28px]">auto_awesome</span>
                               </div>
-                              <h3 className="font-label-bold text-on-surface mb-1">Belum ada surat</h3>
+                              <h3 className="font-label-bold text-on-surface mb-1">{t("cl.empty")}</h3>
                               <p className="text-sm text-on-surface-variant max-w-sm mx-auto mb-5">
-                                Kembali ke langkah 2 lalu klik &ldquo;Generate Surat dengan AI&rdquo;, atau pilih surat dari riwayat di kanan.
+                                {t("cl.empty-desc")}
                               </p>
                               <MagneticButton>
                                 <button
@@ -1342,26 +1344,26 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                   className="bg-primary text-on-primary font-bold px-6 py-3 rounded-xl hover:opacity-90 active:scale-[0.98] transition-all inline-flex items-center gap-2"
                                 >
                                   <span className="material-symbols-outlined text-lg">arrow_back</span>
-                                  Ke Data Surat
+                                  {t("cl.to-data")}
                                 </button>
                               </MagneticButton>
                             </div>
                           ) : (
                             <motion.section className="bg-surface-container-lowest rounded-2xl p-6 shadow-premium-md border border-outline-variant/50 space-y-4">
                               <div className="flex items-center justify-between">
-                                <h2 className="font-label-bold text-on-surface">Edit Surat</h2>
+                                <h2 className="font-label-bold text-on-surface">{t("cl.edit")}</h2>
                                 <div className="flex items-center gap-2">
                                   {dirty && (
-                                    <span className="text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-1 rounded-full">Belum disimpan</span>
+                                    <span className="text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-1 rounded-full">{t("cl.unsaved")}</span>
                                   )}
                                   <span className="text-[10px] text-on-surface-variant">
-                                    {styleLabel(activeLetter?.style || style)} ·{" "}
-                                    {(activeLetter?.language || language) === "id" ? "Indonesia" : "English"}
+                                    {styleLabel(activeLetter?.style || style, lang)} ·{" "}
+                                    {(activeLetter?.language || language) === "id" ? t("cl.lang-id-short") : "English"}
                                   </span>
                                 </div>
                               </div>
                               <div>
-                                <label className="text-sm font-semibold text-on-surface-variant block mb-1">Perihal / Subject</label>
+                                <label className="text-sm font-semibold text-on-surface-variant block mb-1">{t("cl.subject")}</label>
                                 <input
                                   type="text"
                                   value={subject}
@@ -1372,7 +1374,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                               {(activeLetter?.style === "formal_lengkap" || template.format.letterhead) && (
                                 <div className="grid grid-cols-2 gap-3">
                                   <div>
-                                    <label className="text-sm font-semibold text-on-surface-variant block mb-1">Nomor Surat</label>
+                                    <label className="text-sm font-semibold text-on-surface-variant block mb-1">{t("cl.letter-number")}</label>
                                     <input
                                       type="text"
                                       value={letterNumber}
@@ -1382,12 +1384,12 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                     />
                                   </div>
                                   <div>
-                                    <label className="text-sm font-semibold text-on-surface-variant block mb-1">Lampiran</label>
+                                    <label className="text-sm font-semibold text-on-surface-variant block mb-1">{t("cl.attachment")}</label>
                                     <input
                                       type="text"
                                       value={attachment}
                                       onChange={(e) => { setAttachment(e.target.value); setDirty(true); }}
-                                      placeholder="1 (satu) berkas"
+                                      placeholder={t("cl.attachment-ph")}
                                       className="w-full rounded-lg border border-outline bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                                     />
                                   </div>
@@ -1396,19 +1398,19 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                               {/* Isi surat, editor blok paragraf (ergonomi ala builder CV) */}
                               <div>
                                 <div className="flex items-center justify-between mb-2">
-                                  <label className="text-sm font-semibold text-on-surface-variant">Isi Surat</label>
+                                  <label className="text-sm font-semibold text-on-surface-variant">{t("cl.body")}</label>
                                   <button
                                     type="button"
                                     onClick={addBlock}
                                     className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:bg-primary/10 px-2 py-1 rounded-lg transition-colors"
                                   >
                                     <span className="material-symbols-outlined text-sm">add</span>
-                                    Tambah Paragraf
+                                    {t("cl.add-para")}
                                   </button>
                                 </div>
                                 {paraBlocks.length === 0 ? (
                                   <div className="rounded-xl border border-dashed border-outline-variant p-4 text-center text-xs text-on-surface-variant">
-                                    Belum ada isi surat. Klik &ldquo;Tambah Paragraf&rdquo; untuk mulai menulis, atau Generate AI dulu.
+                                    {t("cl.no-body")}
                                   </div>
                                 ) : (
                                   <div className="space-y-3">
@@ -1416,14 +1418,14 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                       <div key={i} className="rounded-xl border border-outline-variant/50 p-3 space-y-2 bg-surface-container-low/40">
                                         <div className="flex items-center justify-between">
                                           <span className="text-[10px] font-bold uppercase tracking-wide text-outline">
-                                            Paragraf {i + 1}
+                                            {t("bullet.mode-paragraph")} {i + 1}
                                           </span>
                                           <div className="flex items-center gap-1">
                                             <button
                                               type="button"
                                               onClick={() => moveBlock(i, -1)}
                                               disabled={i === 0}
-                                              title="Pindah ke atas"
+                                              title={t("entry.move-up")}
                                               className="w-6 h-6 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                                             >
                                               <span className="material-symbols-outlined text-sm">arrow_upward</span>
@@ -1432,7 +1434,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                               type="button"
                                               onClick={() => moveBlock(i, 1)}
                                               disabled={i === paraBlocks.length - 1}
-                                              title="Pindah ke bawah"
+                                              title={t("entry.move-down")}
                                               className="w-6 h-6 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                                             >
                                               <span className="material-symbols-outlined text-sm">arrow_downward</span>
@@ -1441,7 +1443,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                               type="button"
                                               onClick={() => removeBlock(i)}
                                               disabled={paraBlocks.length === 1}
-                                              title="Hapus paragraf"
+                                              title={t("cl.del-para")}
                                               className="w-6 h-6 flex items-center justify-center rounded-lg text-error hover:bg-error-container/30 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                                             >
                                               <span className="material-symbols-outlined text-sm">delete</span>
@@ -1452,7 +1454,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                           value={block}
                                           onChange={(e) => updateBlock(i, e.target.value)}
                                           rows={Math.max(3, Math.min(10, block.split("\n").length + 1))}
-                                          placeholder="Tulis paragraf di sini..."
+                                          placeholder={t("cl.para-ph")}
                                           className="w-full rounded-lg border border-outline bg-background p-3 text-sm leading-relaxed focus:ring-2 focus:ring-primary focus:border-primary outline-none resize-y"
                                         />
                                       </div>
@@ -1467,14 +1469,14 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                   className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary/10 text-primary text-sm font-semibold hover:bg-primary/20 disabled:opacity-50 transition-colors"
                                 >
                                   <span className="material-symbols-outlined text-base">save</span>
-                                  {saving ? "Menyimpan..." : "Simpan"}
+                                  {saving ? t("cl.saving") : t("cl.save")}
                                 </button>
                                 <button
                                   onClick={handleCopy}
                                   className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-secondary/10 text-green-deep text-sm font-semibold hover:bg-secondary/20 transition-colors"
                                 >
                                   <span className="material-symbols-outlined text-base">content_copy</span>
-                                  Salin Teks
+                                  {t("cl.copy")}
                                 </button>
                                 <button
                                   onClick={handleExportPdf}
@@ -1482,7 +1484,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                   className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-surface-container text-on-surface text-sm font-semibold hover:bg-surface-container-high disabled:opacity-50 transition-colors"
                                 >
                                   <span className="material-symbols-outlined text-base">picture_as_pdf</span>
-                                  {exporting ? "Menyiapkan PDF..." : "Export PDF"}
+                                  {exporting ? t("cl.pdf-preparing") : t("cl.pdf")}
                                 </button>
                                 {activeLetter && (
                                   <button
@@ -1509,7 +1511,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                     <section className="bg-surface-container-lowest rounded-2xl p-4 shadow-premium-sm border border-outline-variant/50">
                       <h3 className="text-sm font-bold text-on-surface mb-3 flex items-center gap-2">
                         <span className="material-symbols-outlined text-base text-primary">history</span>
-                        Riwayat Surat ({letters.length})
+                        {fill(t("cl.history"), { n: letters.length })}
                       </h3>
                       <div className="flex gap-2 overflow-x-auto pb-1 custom-scrollbar">
                         {letters.map((l) => (
@@ -1522,8 +1524,8 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                                 : "border-outline-variant/50 text-on-surface-variant hover:border-primary/40"
                             }`}
                           >
-                            {styleLabel(l.style)} ·{" "}
-                            {new Date(l.createdAt).toLocaleDateString("id-ID")}
+                            {styleLabel(l.style, lang)} ·{" "}
+                            {new Date(l.createdAt).toLocaleDateString(localeFor(lang))}
                           </button>
                         ))}
                       </div>
@@ -1537,11 +1539,11 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                     <div className="flex items-center justify-between gap-2 px-4 py-2.5 bg-surface-container-lowest/80 backdrop-blur-sm border-b border-outline-variant/40">
                       <span className="text-xs font-semibold text-on-surface-variant flex items-center gap-1.5">
                         <span className="material-symbols-outlined text-sm text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>visibility</span>
-                        Preview A4 · {template.label}
+                        {t("cl.preview")} · {letterTemplateText(template, lang).label}
                       </span>
                       {activeLetter && (
                         <span className="text-[10px] text-on-surface-variant whitespace-nowrap">
-                          {activeLetter.language === "id" ? "Indonesia" : "English"} · {styleLabel(activeLetter.style)}
+                          {activeLetter.language === "id" ? t("cl.lang-id-short") : "English"} · {styleLabel(activeLetter.style, lang)}
                         </span>
                       )}
                     </div>

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import NotFoundContent from "@/components/NotFoundContent";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -17,14 +17,7 @@ export default function NotFound() {
           </span>
         </div>
         <h1 className="text-4xl font-bold text-ink">404</h1>
-        <p className="text-base text-ink-soft">Halaman yang kamu cari tidak ditemukan. Mungkin sudah dipindah atau dihapus.</p>
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-on-primary font-semibold hover:opacity-90 transition-all active:scale-95"
-        >
-          <span className="material-symbols-outlined text-lg">home</span>
-          Kembali ke Beranda
-        </Link>
+        <NotFoundContent />
       </div>
     </div>
   );

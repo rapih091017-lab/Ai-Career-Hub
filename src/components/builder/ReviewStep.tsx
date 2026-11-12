@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { CvData } from "@/components/cv-templates";
 import { useCoverLetterQuota } from "@/hooks/useCoverLetterQuota";
 import { CONTENT_STEPS, STEP_IDS } from "@/lib/builder-steps";
+import { fill, useTranslation } from "@/lib/i18n";
 
 interface ReviewStepProps {
   cvData: CvData;
@@ -14,11 +15,12 @@ interface ReviewStepProps {
 
 export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: ReviewStepProps) {
   const quota = useCoverLetterQuota();
+  const { t } = useTranslation();
   return (
     <div className="space-y-5">
       <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="font-label-bold text-on-surface">Ringkasan CV</h3>
+          <h3 className="font-label-bold text-on-surface">{t("review.title")}</h3>
           <div className="flex items-center gap-1.5">
             <div className="flex">
               {CONTENT_STEPS.map((id) => (
@@ -44,7 +46,7 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
             >
               check_circle
             </span>
-            <span className="text-on-surface font-medium">Profil:</span>
+            <span className="text-on-surface font-medium">{t("review.profile")}</span>
             <span className="text-on-surface-variant">{cvData.fullName || "\u2014"}</span>
           </p>
           <p className="flex items-center gap-2">
@@ -55,8 +57,8 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
             >
               check_circle
             </span>
-            <span className="text-on-surface font-medium">Pengalaman Kerja:</span>
-            <span className="text-on-surface-variant">{cvData.workHistory.length} posisi</span>
+            <span className="text-on-surface font-medium">{t("review.experience")}</span>
+            <span className="text-on-surface-variant">{fill(t("review.n-positions"), { n: cvData.workHistory.length })}</span>
           </p>
           <p className="flex items-center gap-2">
             <span
@@ -66,8 +68,8 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
             >
               check_circle
             </span>
-            <span className="text-on-surface font-medium">Pendidikan:</span>
-            <span className="text-on-surface-variant">{cvData.education.length} institusi</span>
+            <span className="text-on-surface font-medium">{t("review.education")}</span>
+            <span className="text-on-surface-variant">{fill(t("review.n-institutions"), { n: cvData.education.length })}</span>
           </p>
           <p className="flex items-center gap-2">
             <span
@@ -77,8 +79,8 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
             >
               check_circle
             </span>
-            <span className="text-on-surface font-medium">Organisasi:</span>
-            <span className="text-on-surface-variant">{cvData.organisations.length} organisasi</span>
+            <span className="text-on-surface font-medium">{t("review.organizations")}</span>
+            <span className="text-on-surface-variant">{fill(t("review.n-orgs"), { n: cvData.organisations.length })}</span>
           </p>
           <p className="flex items-center gap-2">
             <span
@@ -88,8 +90,8 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
             >
               check_circle
             </span>
-            <span className="text-on-surface font-medium">Skill:</span>
-            <span className="text-on-surface-variant">{cvData.skills.length} keahlian</span>
+            <span className="text-on-surface font-medium">{t("review.skills")}</span>
+            <span className="text-on-surface-variant">{fill(t("review.n-skills"), { n: cvData.skills.length })}</span>
           </p>
         </div>
       </div>
@@ -102,7 +104,7 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
           task_alt
         </span>
         <p className="text-sm text-on-surface-variant">
-          Pastikan semua data sudah lengkap sebelum menyimpan. Kamu bisa kembali ke step sebelumnya kapan saja.
+          {t("review.check")}
         </p>
       </div>
 
@@ -111,12 +113,12 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-2 px-1">
             <p className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-              Surat Lamaran &amp; Motivation Letter
+              {t("review.letters")}
             </p>
             {quota && !quota.isUnlimited && (
               <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary whitespace-nowrap">
                 <span className="material-symbols-outlined text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>redeem</span>
-                Sisa {quota.remaining}/{quota.limit} gratis
+                {fill(t("review.quota"), { n: String(quota.remaining), max: String(quota.limit) })}
               </span>
             )}
             {quota && quota.isUnlimited && (
@@ -141,8 +143,8 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-on-surface">Surat Lamaran Formal</p>
-                <p className="text-[11px] text-on-surface-variant">Resmi · tanpa kop surat</p>
+                <p className="text-sm font-bold text-on-surface">{t("review.formal")}</p>
+                <p className="text-[11px] text-on-surface-variant">{t("review.formal-desc")}</p>
               </div>
               <span
                 className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors shrink-0"
@@ -165,8 +167,8 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-on-surface">Formal + Kop Surat</p>
-                <p className="text-[11px] text-on-surface-variant">Nomor · lampiran · BUMN/korporasi</p>
+                <p className="text-sm font-bold text-on-surface">{t("review.formal-full")}</p>
+                <p className="text-[11px] text-on-surface-variant">{t("review.formal-full-desc")}</p>
               </div>
               <span
                 className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors shrink-0"
@@ -213,8 +215,8 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-on-surface">Surat Kasual</p>
-                <p className="text-[11px] text-on-surface-variant">Hangat · startup/kreatif</p>
+                <p className="text-sm font-bold text-on-surface">{t("review.casual")}</p>
+                <p className="text-[11px] text-on-surface-variant">{t("review.casual-desc")}</p>
               </div>
               <span
                 className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors shrink-0"
@@ -238,7 +240,7 @@ export function ReviewStep({ cvData, sectionCompletion, customSections, cvId }: 
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold text-on-surface">Motivation Letter</p>
-                <p className="text-[11px] text-on-surface-variant">Beasiswa · Program · Fresh grad</p>
+                <p className="text-[11px] text-on-surface-variant">{t("review.motivation-desc")}</p>
               </div>
               <span
                 className="material-symbols-outlined text-on-surface-variant group-hover:text-amber-500 transition-colors shrink-0"

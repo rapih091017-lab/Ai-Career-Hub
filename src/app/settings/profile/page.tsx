@@ -10,7 +10,7 @@ import { useToast } from "@/components/ui/toast";
 import { ImportResumeModal } from "@/components/profile/ImportResumeModal";
 import { DeleteAccountSection } from "@/components/settings/DeleteAccountSection";
 import { newId } from "@/lib/id";
-import { SKILL_LEVEL_OPTIONS } from "@/components/builder/SkillSection";
+import { skillLevelOptions } from "@/components/builder/SkillSection";
 import { mergeImportedProfile, type ImportedProfile, type MergeMode } from "@/lib/profile-merge";
 
 interface PersonalInfo {
@@ -81,7 +81,7 @@ function HelpIcon({ hint }: { hint: string }) {
 }
 
 export default function ProfilePage() {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
   const [profileExists, setProfileExists] = useState(false);
   const [activeSection, setActiveSection] = useState("section-personal");
@@ -395,9 +395,9 @@ const handleImported = (imported: ImportedProfile, mode: MergeMode) => {
                   {skills.map((item) => (
                     <div key={item.id} className="flex items-center gap-3 border border-outline-variant rounded-xl p-3 bg-background">
                       <input className="flex-1 p-2 rounded-lg border border-outline-variant bg-surface-container-lowest text-body-md" placeholder={t("profile.placeholder-skill")} value={item.name} onChange={(e) => updateSkill(item.id, "name", e.target.value)} />
-                      <select aria-label="Level keahlian" className="p-2 rounded-lg border border-outline-variant bg-surface-container-lowest text-body-md" value={item.level} onChange={(e) => updateSkill(item.id, "level", e.target.value)}>
-                        <option value="">Pilih level</option>
-                        {SKILL_LEVEL_OPTIONS.map((o) => (
+                      <select aria-label={t("skill.level")} className="p-2 rounded-lg border border-outline-variant bg-surface-container-lowest text-body-md" value={item.level} onChange={(e) => updateSkill(item.id, "level", e.target.value)}>
+                        <option value="">{t("skill.level-pick")}</option>
+                        {skillLevelOptions(lang).map((o) => (
                           <option key={o.value} value={o.value}>{o.label}</option>
                         ))}
                       </select>

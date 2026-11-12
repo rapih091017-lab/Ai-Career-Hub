@@ -3,6 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef, type ReactNode } from "react";
+import { useTranslation } from "@/lib/i18n";
 
 interface AuthGuardProps {
   children: ReactNode;
@@ -10,6 +11,7 @@ interface AuthGuardProps {
 
 export default function AuthGuard({ children }: AuthGuardProps) {
   const { status } = useSession();
+  const { t } = useTranslation();
   const router = useRouter();
   const [ready, setReady] = useState(false);
   const startTime = useRef(Date.now());
@@ -63,7 +65,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
             />
           </svg>
-          <p className="text-sm text-ink-soft">Memuat...</p>
+          <p className="text-sm text-ink-soft">{t("common.loading")}</p>
         </div>
       </div>
     );

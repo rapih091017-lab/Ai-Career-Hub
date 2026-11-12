@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useTranslation } from "@/lib/i18n";
 
 interface PhotoUploadProps {
   value: string;
@@ -8,7 +9,8 @@ interface PhotoUploadProps {
   label?: string;
 }
 
-export default function PhotoUpload({ value, onChange, label = "Foto Profil" }: PhotoUploadProps) {
+export default function PhotoUpload({ value, onChange, label }: PhotoUploadProps) {
+  const { t } = useTranslation();
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [dragOver, setDragOver] = useState(false);
@@ -30,13 +32,13 @@ export default function PhotoUpload({ value, onChange, label = "Foto Profil" }: 
 
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.message || "Gagal upload");
+        throw new Error(err.message || t("photo.upload-failed"));
       }
 
       const data = await res.json();
       onChange(data.url);
     } catch (err: any) {
-      setError(err.message || "Gagal mengupload foto");
+      setError(err.message || t("photo.upload-failed"));
     } finally {
       setUploading(false);
     }
@@ -49,7 +51,7 @@ export default function PhotoUpload({ value, onChange, label = "Foto Profil" }: 
     if (file && file.type.startsWith("image/")) {
       handleFile(file);
     } else {
-      setError("Hanya file gambar yang diizinkan");
+      setError(t("photo.images-only"));
     }
   };
 
@@ -70,7 +72,7 @@ export default function PhotoUpload({ value, onChange, label = "Foto Profil" }: 
 
   return (
     <div className="space-y-2">
-      <label className="block text-xs font-medium text-on-surface-variant mb-1">{label}</label>
+      <label className="block text-xs font-medium text-on-surface-variant mb-1">{label ?? t("photo.label")}</label>
 
       {/* Preview + Upload Area */}
       <div
@@ -89,13 +91,13 @@ export default function PhotoUpload({ value, onChange, label = "Foto Profil" }: 
           <div className="relative">
             <img
               src={value}
-              alt="Preview"
+              alt={t("photo.preview")}
               className="w-full h-40 object-cover rounded-xl"
             />
             <button
               onClick={handleRemove}
               className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80 transition-all text-sm"
-              aria-label="Hapus foto"
+              aria-label={t("photo.remove")}
             >
               ✕
             </button>
@@ -120,10 +122,10 @@ export default function PhotoUpload({ value, onChange, label = "Foto Profil" }: 
                   <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
                 </svg>
                 <span className="text-xs text-on-surface-variant font-medium">
-                  Klik atau tarik foto ke sini
+                  {t("photo.drop")}
                 </span>
                 <span className="text-xs text-on-surface-variant">
-                  PNG, JPG, WebP. Maks 5MB
+                  {t("photo.formats")}
                 </span>
               </>
             )}
@@ -147,7 +149,7 @@ export default function PhotoUpload({ value, onChange, label = "Foto Profil" }: 
             type="text"
             value={value}
             onChange={(e) => handleUrlInput(e.target.value)}
-            placeholder="Atau masukkan URL foto..."
+            placeholder={t("photo.url-ph")}
             className="w-full px-3 py-2 rounded-lg border text-xs bg-background focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all"
           />
         </div>

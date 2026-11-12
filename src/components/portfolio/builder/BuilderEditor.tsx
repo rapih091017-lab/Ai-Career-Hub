@@ -6,7 +6,7 @@ import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
 import Modal from "@/components/Modal";
 import { AIPolishButton } from "@/components/ai/AIPolishDialog";
-import { useTranslation } from "@/lib/i18n";
+import { fill, localeFor, useTranslation } from "@/lib/i18n";
 import { useToast } from "@/components/ui/toast";
 import { ConfirmModal, type ConfirmAction } from "@/components/ui/confirm-modal";
 import PortfolioPhotoUpload from "@/components/portfolio/render/PortfolioPhotoUpload";
@@ -181,7 +181,6 @@ const PORTFOLIO_TOUR: TourStep[] = [
 
 const genId = () => Math.random().toString(36).slice(2, 9);
 
-const SAVE_FAILED_MESSAGE = "Gagal menyimpan data. Silakan coba lagi.";
 
 /* ── Validation helpers ── */
 const validateEmail = (v: string) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
@@ -252,7 +251,7 @@ function isDraftEmpty(p: PortfolioData): boolean {
 }
 
 export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResult }) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const { addToast } = useToast();
   const router = useRouter();
   // Di dalam langkah Pengalaman, sub-bagian masih berupa accordion.
@@ -337,7 +336,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
       // supaya tidak ikut terbawa ke draft baru.
       const flushed = await draft.flushNow();
       if (!flushed) {
-        addToast({ type: "error", message: SAVE_FAILED_MESSAGE });
+        addToast({ type: "error", message: t("pb.save-failed") });
         return;
       }
       const res = await fetch("/api/portfolio/draft", {
@@ -349,7 +348,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
       if (!res.ok || !json?.draftId) throw new Error("gagal membuat draft");
       router.replace(`/portfolio/build/${json.draftId}`);
     } catch {
-      addToast({ type: "error", message: "Gagal membuat draft baru. Coba lagi." });
+      addToast({ type: "error", message: t("pb.new-draft-failed") });
     } finally {
       setCreatingDraft(false);
     }
@@ -407,7 +406,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
     try {
       // 1. Ambil data CV
       const cvRes = await fetch(`/api/cv-documents/${cvId}`);
-      if (!cvRes.ok) throw new Error("Gagal mengambil data CV");
+      if (!cvRes.ok) throw new Error(t("pb.cv-fetch-failed"));
       const cvDoc = await cvRes.json();
       const cv = cvDoc.tailoredContent || cvDoc;
 
@@ -420,7 +419,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
 
       if (!suggestRes.ok) {
         const err = await suggestRes.json();
-        throw new Error(err.message || "Gagal generate portfolio dari CV");
+        throw new Error(err.message || t("pb.gen-failed"));
       }
 
       const data = await suggestRes.json();
@@ -493,9 +492,9 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
       setEducations(mappedEducations);
 
       setShowSourcePicker(false);
-      addToast({ type: "success", message: "Portfolio berhasil di-generate dari CV!" });
+      addToast({ type: "success", message: t("pb.gen-ok") });
     } catch (err: any) {
-      addToast({ type: "error", message: err.message || "Gagal generate dari CV" });
+      addToast({ type: "error", message: err.message || t("pb.gen-failed-short") });
     } finally {
       setGeneratingFromCv(null);
     }
@@ -506,7 +505,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
     setProfileLoading(true);
     fetch("/api/profile")
       .then((res) => {
-        if (!res.ok) throw new Error("Profil belum dibuat");
+        if (!res.ok) throw new Error(t("pb.no-profile"));
         return res.json();
       })
       .then((data: MasterProfile) => {
@@ -551,7 +550,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
 
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.message || "Gagal mendapatkan saran AI");
+        throw new Error(err.message || t("pb.ai-failed"));
       }
 
       const data = await res.json();
@@ -569,7 +568,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
 
   /** Apply a single AI-suggested field */
   const applyAiField = (field: string, value: string) => {
-    const label = fieldLabels[field] || field;
+    const label = fieldLabels[field] ? t(fieldLabels[field]) : field;
     const from = String((formData as unknown as Record<string, unknown>)[field] ?? "");
     setFormData((prev) => ({ ...prev, [field]: value }));
     setAiChanges((prev) => [...prev.filter((c) => c.field !== field), { field, label, from, to: value }]);
@@ -800,7 +799,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
           className="inline-flex items-center gap-1.5 text-label-sm text-error hover:underline"
         >
           <span className="material-symbols-outlined text-lg">error</span>
-          {draft.error ?? "Belum tersimpan. Ketuk untuk coba lagi."}
+          {draft.error ?? t("pb.unsaved-retry")}
         </button>
       ) : saveStatus === "saved" ? (
         <>
@@ -866,7 +865,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                 {!profileForFill && !profileLoading && (
                   <p className="text-body-sm text-on-surface-variant">
                     {t("build.profile-hint")}{" "}
-                    <a href="/settings/profile" className="text-primary underline">sini</a>
+                    <a href="/settings/profile" className="text-primary underline">{t("pb.here")}</a>
                   </p>
                 )}
 
@@ -877,7 +876,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                   className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-50 text-indigo-700 rounded-xl font-label-bold border border-indigo-200 hover:bg-indigo-100 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>description</span>
-                  Generate dari CV
+                  {t("pb.gen-from-cv")}
                 </button>
 
                 {/* Saran AI, aktif kalau profileForFill ada */}
@@ -936,8 +935,8 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
               {(STEP_SECTIONS[stepId] ?? [])
                 .filter((id) => !isSectionVisible(portfolio.sectionVisibility, id))
                 .map((id) => (
-                  <HiddenNote key={id} action={{ label: "Tampilkan", onClick: () => toggleSectionVisible(id) }}>
-                    Bagian {t(SECTION_NAME_KEYS[id])} disembunyikan, jadi tidak tampil di portofolio.
+                  <HiddenNote key={id} action={{ label: t("section.show"), onClick: () => toggleSectionVisible(id) }}>
+                    {fill(t("pb.section-hidden"), { name: t(SECTION_NAME_KEYS[id]) })}
                   </HiddenNote>
                 ))}
               {stepId === "hero" && (
@@ -981,7 +980,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                         />
                       )}
                     </div>
-                    <textarea className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={3} placeholder="Ceritakan sedikit tentang dirimu..." maxLength={500}
+                    <textarea className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={3} placeholder={t("pb.ph-bio")} maxLength={500}
                       value={formData.heroBio} onChange={update("heroBio")} />
                     <CharCounter value={formData.heroBio} max={500} />
                   </div>
@@ -1007,11 +1006,11 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                         />
                       )}
                     </div>
-                    <textarea className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={5} placeholder="Tulis cerita tentang perjalanan kariermu..." maxLength={1500}
+                    <textarea className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={5} placeholder={t("pb.ph-about")} maxLength={1500}
                       value={formData.aboutText} onChange={update("aboutText")} />
                     <CharCounter value={formData.aboutText} max={1500} />
                   </div>
-                  {aboutStatsHidden(formData) && <HiddenNote>Bagian Tentang tampil setelah teks Tentang diisi.</HiddenNote>}
+                  {aboutStatsHidden(formData) && <HiddenNote>{t("pb.about-hidden")}</HiddenNote>}
                   <div className="grid grid-cols-3 gap-4">                      <Field label={t("build.about-years")}>
                       <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="3+"
                         value={formData.aboutYearsExp} onChange={update("aboutYearsExp")} />
@@ -1055,7 +1054,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                   </div>
                   <div>
                     <label className="block text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">{t("build.skills-languages")}</label>
-                    <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Bahasa Indonesia (Native), Inggris (Professional)"
+                    <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder={t("pb.ph-languages")}
                       value={formData.skillsLanguages} onChange={update("skillsLanguages")} />
                   </div>
                 </div>
@@ -1069,15 +1068,15 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                         {hobbies.length > 1 && (
                           <button className="text-error hover:bg-error-container/30 p-1 rounded transition-colors"
                             onClick={() => setHobbies(prev => prev.filter(x => x.id !== hobby.id))}
-                            aria-label="Hapus hobi">
+                            aria-label={t("pb.del-hobby")}>
                             <span className="material-symbols-outlined select-none" aria-hidden="true">delete</span>
                           </button>
                         )}
                       </div>
-                        {!isHobbyShown(hobby) && <HiddenNote>{hiddenEntryNote("hobby")}</HiddenNote>}
+                        {!isHobbyShown(hobby) && <HiddenNote>{hiddenEntryNote("hobby", lang)}</HiddenNote>}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Field label={t("live.form.hobby-name")}>
-                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Fotografi"
+                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder={t("pb.ph-hobby")}
                             value={hobby.name} onChange={e => setHobbies(prev => prev.map(x => x.id === hobby.id ? {...x, name: e.target.value} : x))} />
                         </Field>
                         <Field label={t("live.form.hobby-desc")}>
@@ -1102,18 +1101,18 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                   {projects.map((p, idx) => (
                     <div key={p.id} className="p-4 rounded-xl border border-outline-variant bg-surface-container-low">
                       <div className="flex justify-between items-start mb-3">
-                        <h4 className="font-label-bold text-primary">Project {idx + 1}</h4>
+                        <h4 className="font-label-bold text-primary">{t("pb.project")} {idx + 1}</h4>
                         <button className="text-error hover:bg-error-container/30 p-1 rounded transition-colors"
                           onClick={() => setProjects(prev => prev.filter(x => x.id !== p.id))}
-                          aria-label="Hapus project">
+                          aria-label={t("pb.del-project")}>
                           <span className="material-symbols-outlined select-none" aria-hidden="true">delete</span>
                         </button>
                       </div>
-                        {!isProjectShown(p) && <HiddenNote>{hiddenEntryNote("project")}</HiddenNote>}
+                        {!isProjectShown(p) && <HiddenNote>{hiddenEntryNote("project", lang)}</HiddenNote>}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="md:col-span-2">
                           <span className="mb-1 flex items-center gap-1"><label className="block text-label-sm text-on-surface-variant">{t("live.form.project-name")}</label><FieldHelp topic={PORTFOLIO_HELP.projectName} /></span>
-                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Nama project"
+                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder={t("pb.ph-project")}
                             value={p.name} onChange={e => setProjects(prev => prev.map(x => x.id === p.id ? {...x, name: e.target.value} : x))} />
                         </div>
                         <div className="md:col-span-2">
@@ -1123,7 +1122,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                             help={PORTFOLIO_HELP.projectDescription}
                             value={p.description}
                             onChange={(v) => setProjects(prev => prev.map(x => x.id === p.id ? {...x, description: v} : x))}
-                            placeholder="Contoh: Merancang alur pemesanan untuk pengguna baru"
+                            placeholder={t("pb.ph-project-desc")}
                             maxLength={500}
                             headerAction={
                               p.description ? (
@@ -1162,14 +1161,14 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                         <h4 className="font-label-bold text-primary">{t("portfolio.label-experience")} {idx + 1}</h4>
                         <button className="text-error hover:bg-error-container/30 p-1 rounded transition-colors"
                           onClick={() => setExperiences(prev => prev.filter(x => x.id !== e.id))}
-                          aria-label="Hapus pengalaman">
+                          aria-label={t("pb.del-exp")}>
                           <span className="material-symbols-outlined select-none" aria-hidden="true">delete</span>
                         </button>
                       </div>
-                        {!isExperienceShown(e) && <HiddenNote>{hiddenEntryNote("experience")}</HiddenNote>}
+                        {!isExperienceShown(e) && <HiddenNote>{hiddenEntryNote("experience", lang)}</HiddenNote>}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Field label={t("live.form.company")}>
-                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Nama perusahaan"
+                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder={t("pb.ph-company")}
                             value={e.company} onChange={ev => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, company: ev.target.value} : x))} />
                         </Field>
                         <Field label={t("live.form.position")}>
@@ -1179,10 +1178,10 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                         <div className="md:col-span-2">
                           <label className="block text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">{t("portfolio.label-date-range")}</label>
                           <div className="flex items-center gap-2">
-                            <input className="flex-1 px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" type="month" placeholder="Mulai"
+                            <input className="flex-1 px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" type="month" placeholder={t("pb.start")}
                               value={e.startDate} onChange={ev => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, startDate: ev.target.value} : x))} />
-                            <span className="text-on-surface-variant">ke</span>
-                            <input className="flex-1 px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" type="month" placeholder="Selesai"
+                            <span className="text-on-surface-variant">{t("pb.to")}</span>
+                            <input className="flex-1 px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" type="month" placeholder={t("pb.end")}
                               value={e.endDate} onChange={ev => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, endDate: ev.target.value} : x))} />
                           </div>
                         </div>
@@ -1193,7 +1192,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                             help={PORTFOLIO_HELP.experienceDescription}
                             value={e.description}
                             onChange={(v) => setExperiences(prev => prev.map(x => x.id === e.id ? {...x, description: v} : x))}
-                            placeholder="Contoh: Menyusun laporan mingguan untuk [jumlah] cabang"
+                            placeholder={t("pb.ph-exp-desc")}
                             maxLength={1000}
                             headerAction={
                               e.description ? (
@@ -1218,14 +1217,14 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                   {educations.map((e, idx) => (
                     <div key={e.id} className="p-4 rounded-xl border border-outline-variant bg-surface-container-low">
                       <div className="flex justify-between items-start mb-3">
-                        <h4 className="font-label-bold text-primary">Pendidikan {idx + 1}</h4>
+                        <h4 className="font-label-bold text-primary">{t("edu.title")} {idx + 1}</h4>
                         <button className="text-error hover:bg-error-container/30 p-1 rounded transition-colors"
                           onClick={() => setEducations(prev => prev.filter(x => x.id !== e.id))}
-                          aria-label="Hapus pendidikan">
+                          aria-label={t("edu.remove")}>
                           <span className="material-symbols-outlined select-none" aria-hidden="true">delete</span>
                         </button>
                       </div>
-                        {!isEducationShown(e) && <HiddenNote>{hiddenEntryNote("education")}</HiddenNote>}
+                        {!isEducationShown(e) && <HiddenNote>{hiddenEntryNote("education", lang)}</HiddenNote>}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="md:col-span-2">
                           <Field label={t("live.form.institution")}>
@@ -1234,20 +1233,20 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                           </Field>
                         </div>
                         <Field label={t("live.form.degree")}>
-                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Sarjana (S1)"
+                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder={t("pb.ph-degree")}
                             value={e.degree} onChange={ev => setEducations(prev => prev.map(x => x.id === e.id ? {...x, degree: ev.target.value} : x))} />
                         </Field>
                         <Field label={t("live.form.field")}>
-                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Ilmu Komputer"
+                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder={t("pb.ph-field")}
                             value={e.field} onChange={ev => setEducations(prev => prev.map(x => x.id === e.id ? {...x, field: ev.target.value} : x))} />
                         </Field>
                         <div className="md:col-span-2">
                           <label className="block text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">{t("portfolio.label-year-range")}</label>
                           <div className="flex items-center gap-2">
-                            <input className="flex-1 px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" type="month" placeholder="Mulai"
+                            <input className="flex-1 px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" type="month" placeholder={t("pb.start")}
                               value={e.startDate} onChange={ev => setEducations(prev => prev.map(x => x.id === e.id ? {...x, startDate: ev.target.value} : x))} />
-                            <span className="text-on-surface-variant">ke</span>
-                            <input className="flex-1 px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" type="month" placeholder="Selesai"
+                            <span className="text-on-surface-variant">{t("pb.to")}</span>
+                            <input className="flex-1 px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" type="month" placeholder={t("pb.end")}
                               value={e.endDate} onChange={ev => setEducations(prev => prev.map(x => x.id === e.id ? {...x, endDate: ev.target.value} : x))} />
                           </div>
                         </div>
@@ -1269,11 +1268,11 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                         <h4 className="font-label-bold text-primary">{t("live.form.certification")} {idx + 1}</h4>
                         <button className="text-error hover:bg-error-container/30 p-1 rounded transition-colors"
                           onClick={() => setCertifications(prev => prev.filter(x => x.id !== cert.id))}
-                          aria-label="Hapus sertifikat">
+                          aria-label={t("cert.remove")}>
                           <span className="material-symbols-outlined select-none" aria-hidden="true">delete</span>
                         </button>
                       </div>
-                        {!isCertificationShown(cert) && <HiddenNote>{hiddenEntryNote("certification")}</HiddenNote>}
+                        {!isCertificationShown(cert) && <HiddenNote>{hiddenEntryNote("certification", lang)}</HiddenNote>}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Field label={t("live.form.cert-name")}>
                           <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="AWS Certified Developer"
@@ -1309,18 +1308,18 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                         <h4 className="font-label-bold text-primary">{t("live.form.organization")} {idx + 1}</h4>
                         <button className="text-error hover:bg-error-container/30 p-1 rounded transition-colors"
                           onClick={() => setOrganizations(prev => prev.filter(x => x.id !== org.id))}
-                          aria-label="Hapus organisasi">
+                          aria-label={t("pb.del-org")}>
                           <span className="material-symbols-outlined select-none" aria-hidden="true">delete</span>
                         </button>
                       </div>
-                        {!isOrganizationShown(org) && <HiddenNote>{hiddenEntryNote("organization")}</HiddenNote>}
+                        {!isOrganizationShown(org) && <HiddenNote>{hiddenEntryNote("organization", lang)}</HiddenNote>}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Field label={t("live.form.org-name")}>
-                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Himpunan Mahasiswa Teknik"
+                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder={t("pb.ph-org")}
                             value={org.name} onChange={e => setOrganizations(prev => prev.map(x => x.id === org.id ? {...x, name: e.target.value} : x))} />
                         </Field>
                         <Field label={t("live.form.org-role")}>
-                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Ketua Divisi Acara"
+                          <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder={t("pb.ph-org-role")}
                             value={org.role} onChange={e => setOrganizations(prev => prev.map(x => x.id === org.id ? {...x, role: e.target.value} : x))} />
                         </Field>
                         <Field label={t("live.form.org-period")}>
@@ -1329,7 +1328,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                         </Field>
                         <div className="md:col-span-2">
                           <label className="block text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">{t("live.form.org-desc")}</label>
-                          <textarea className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={2} placeholder="Jelaskan tanggung jawab & pencapaian..." maxLength={500}
+                          <textarea className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={2} placeholder={t("pb.ph-org-desc")} maxLength={500}
                             value={org.description} onChange={e => setOrganizations(prev => prev.map(x => x.id === org.id ? {...x, description: e.target.value} : x))} />
                         </div>
                       </div>
@@ -1350,19 +1349,19 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                   {testimonials.map((item, i) => (
                     <div key={item.id} className="p-4 rounded-xl border border-outline-variant bg-surface">
                       <div className="flex items-start justify-between mb-4">
-                        <h4 className="font-label-bold text-primary">Testimoni {i + 1}</h4>
+                        <h4 className="font-label-bold text-primary">{t("pb.testimonial")} {i + 1}</h4>
                         {testimonials.length > 1 && (
                           <button className="text-error hover:bg-error-container/30 p-1 rounded transition-colors"
                             onClick={() => setTestimonials(prev => prev.filter(x => x.id !== item.id))}
-                            aria-label="Hapus testimoni">
+                            aria-label={t("pb.del-testimonial")}>
                             <span className="material-symbols-outlined select-none" aria-hidden="true">delete</span>
                           </button>
                         )}
                       </div>
-                        {!isTestimonialShown(item) && <HiddenNote>{hiddenEntryNote("testimonial")}</HiddenNote>}
+                        {!isTestimonialShown(item) && <HiddenNote>{hiddenEntryNote("testimonial", lang)}</HiddenNote>}
                       <div className="flex flex-col md:flex-row gap-6">
                         <div className="flex-shrink-0 flex flex-col items-center">
-                          <label className="block text-label-sm text-on-surface-variant mb-2">Foto</label>
+                          <label className="block text-label-sm text-on-surface-variant mb-2">{t("pb.photo")}</label>
                           <div className="w-16 h-16 rounded-full bg-surface-container border-2 border-dashed border-outline-variant flex items-center justify-center overflow-hidden cursor-pointer">
                             <span className="material-symbols-outlined text-outline text-xl">person_add</span>
                           </div>
@@ -1370,7 +1369,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                         <div className="flex-grow space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                             <Field label="Nama">
-                              <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder="Nama pemberi testimoni"
+                              <input className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md" placeholder={t("pb.ph-testi-name")}
                                 value={item.name} onChange={updateTestimonial(item.id, "name")} />
                             </Field>
                             <Field label={t("live.form.position-company")}>
@@ -1380,7 +1379,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                           </div>
                           <Field label={t("live.form.testimonial")} help="testimonial">
                             <div className="relative">
-                              <textarea className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={2} placeholder="Apa yang mereka katakan tentangmu?" maxLength={500}
+                              <textarea className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-background text-body-md resize-none" rows={2} placeholder={t("pb.ph-testi")} maxLength={500}
                                 value={item.testimonial} onChange={updateTestimonial(item.id, "testimonial")} />
                             </div>
                             <CharCounter value={item.testimonial} max={500} />
@@ -1401,28 +1400,28 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
               <StepCard>
                 <div className="px-6 space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <ValidatedField label="Email" error={!validateEmail(formData.contactEmail) ? "Format email tidak valid" : undefined}>
+                    <ValidatedField label="Email" error={!validateEmail(formData.contactEmail) ? t("pb.err-email") : undefined}>
                       <div className="flex items-center gap-2 border border-outline-variant rounded-xl px-4 py-3 bg-background">
                         <span className="material-symbols-outlined text-outline text-xl">mail</span>
-                        <input className="w-full border-none p-0 focus:ring-0 text-body-md bg-transparent" placeholder="email@contoh.com" type="email"
+                        <input className="w-full border-none p-0 focus:ring-0 text-body-md bg-transparent" placeholder={t("pb.ph-email")} type="email"
                           value={formData.contactEmail} onChange={update("contactEmail")} />
                       </div>
                     </ValidatedField>
-                    <ValidatedField label="WhatsApp / No. Telp" error={!validatePhone(formData.contactPhone) ? "Format nomor tidak valid" : undefined}>
+                    <ValidatedField label={t("pb.phone")} error={!validatePhone(formData.contactPhone) ? t("pb.err-phone") : undefined}>
                       <div className="flex items-center gap-2 border border-outline-variant rounded-xl px-4 py-3 bg-background">
                         <span className="material-symbols-outlined text-outline text-xl">phone</span>
                         <input className="w-full border-none p-0 focus:ring-0 text-body-md bg-transparent" placeholder="+62 812..." type="tel"
                           value={formData.contactPhone} onChange={update("contactPhone")} />
                       </div>
                     </ValidatedField>
-                    <ValidatedField label="LinkedIn URL" error={!validateUrl(formData.contactLinkedin) ? "URL harus diawali http:// atau https://" : undefined}>
+                    <ValidatedField label="LinkedIn URL" error={!validateUrl(formData.contactLinkedin) ? t("pb.err-url") : undefined}>
                       <div className="flex items-center gap-2 border border-outline-variant rounded-xl px-4 py-3 bg-background">
                         <span className="material-symbols-outlined text-outline text-xl">link</span>
                         <input className="w-full border-none p-0 focus:ring-0 text-body-md bg-transparent" placeholder="https://linkedin.com/in/username"
                           value={formData.contactLinkedin} onChange={update("contactLinkedin")} />
                       </div>
                     </ValidatedField>
-                    <ValidatedField label="GitHub URL" error={!validateUrl(formData.contactGithub) ? "URL harus diawali http:// atau https://" : undefined}>
+                    <ValidatedField label="GitHub URL" error={!validateUrl(formData.contactGithub) ? t("pb.err-url") : undefined}>
                       <div className="flex items-center gap-2 border border-outline-variant rounded-xl px-4 py-3 bg-background">
                         <span className="material-symbols-outlined text-outline text-xl">code</span>
                         <input className="w-full border-none p-0 focus:ring-0 text-body-md bg-transparent" placeholder="https://github.com/username"
@@ -1440,12 +1439,12 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                           value={link.url} onChange={e => setExtraLinks(prev => prev.map(x => x.id === link.id ? {...x, url: e.target.value} : x))} />
                         <button className="text-error hover:bg-error-container/30 p-1 rounded"
                           onClick={() => setExtraLinks(prev => prev.filter(x => x.id !== link.id))}
-                          aria-label="Hapus link">
+                          aria-label={t("pb.del-link")}>
                           <span className="material-symbols-outlined select-none">close</span>
                         </button>
                       </div>
                       {link.label && !isExtraLinkShown(link) && (
-                        <div className="md:col-span-2 -mt-2"><HiddenNote>Isi URL agar link tampil.</HiddenNote></div>
+                        <div className="md:col-span-2 -mt-2"><HiddenNote>{t("pb.link-hidden")}</HiddenNote></div>
                       )}
                       </Fragment>
                     ))}
@@ -1591,10 +1590,10 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                 <div className="flex items-center justify-between">
                   <h3 className="font-label-bold text-xs text-primary uppercase tracking-wider flex items-center gap-1.5">
                     <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
-                    Perubahan AI ({aiChanges.length})
+                    {fill(t("pb.ai-changes"), { n: aiChanges.length })}
                   </h3>
                   <button onClick={() => setAiChanges([])} className="text-xs text-on-surface-variant hover:text-on-surface">
-                    Tutup
+                    {t("common.close")}
                   </button>
                 </div>
                 <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
@@ -1695,8 +1694,8 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                   onClick={undo}
                   disabled={!canUndo}
                   className="min-h-11 min-w-11 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                  title="Urungkan (Undo)"
-                  aria-label="Undo"
+                  title={t("pb.undo-title")}
+                  aria-label={t("pb.undo")}
                 >
                   <span className="material-symbols-outlined text-lg">undo</span>
                 </button>
@@ -1704,8 +1703,8 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                   onClick={redo}
                   disabled={!canRedo}
                   className="min-h-11 min-w-11 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                  title="Ulangi (Redo)"
-                  aria-label="Redo"
+                  title={t("pb.redo-title")}
+                  aria-label={t("pb.redo")}
                 >
                   <span className="material-symbols-outlined text-lg">redo</span>
                 </button>
@@ -1738,10 +1737,10 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
               <button className="hidden md:block text-on-surface-variant font-label-bold hover:text-primary transition-colors px-4 py-2"
                 onClick={() => {
                   setConfirmAction({
-                    title: "Batalkan Semua Perubahan",
-                    message: "Yakin ingin membatalkan semua perubahan? Data yang belum disimpan akan hilang.",
+                    title: t("pb.discard-title"),
+                    message: t("pb.discard-msg"),
                     variant: "danger",
-                    confirmLabel: "Ya, Batalkan",
+                    confirmLabel: t("pb.discard-confirm"),
                     onConfirm: () => {
                       // Reset ke draft kosong; efek sinkron otomatis mendorongnya ke server.
                       setFormData(DEFAULT_FORM);
@@ -1754,7 +1753,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                       setHobbies([{ id: genId(), name: "", description: "" }]);
                       setTestimonials([{ id: genId(), name: "", position: "", testimonial: "" }]);
                       setExtraLinks([]);
-                      addToast({ type: "info", message: "Semua perubahan dibatalkan" });
+                      addToast({ type: "info", message: t("pb.discarded") });
                     },
                   });
                 }}>
@@ -1768,12 +1767,12 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                     // preview dibuka (server adalah sumber kebenaran preview).
                     const flushed = await draft.flushNow();
                     if (!flushed) {
-                      addToast({ type: "error", message: SAVE_FAILED_MESSAGE });
+                      addToast({ type: "error", message: t("pb.save-failed") });
                       return;
                     }
                     window.open(`/portfolio/preview?draftId=${draft.draftId}`, "_blank");
                   } catch (err) {
-                    addToast({ type: "error", message: SAVE_FAILED_MESSAGE });
+                    addToast({ type: "error", message: t("pb.save-failed") });
                   } finally {
                     setSaving(false);
                   }
@@ -1801,20 +1800,20 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
       <BuilderTour open={tourOpen} onClose={() => setTourOpen(false)} steps={PORTFOLIO_TOUR} storageKey={PORTFOLIO_TOUR_KEY} />
 
       {/* ── Source Picker Popup ── */}
-      <Modal open={showSourcePicker} onClose={() => setShowSourcePicker(false)} title="Buat Portfolio Baru" size="max-w-lg">
+      <Modal open={showSourcePicker} onClose={() => setShowSourcePicker(false)} title={t("pb.new-title")} size="max-w-lg">
         <div className="space-y-4 pt-2">
           <p className="text-sm text-on-surface-variant">
-            Pilih cara memulai portfolio:
+            {t("pb.pick-start")}
           </p>
           <div className="flex flex-col gap-3">
             {/* Option 1: Generate dari CV */}
             <div className="p-4 rounded-xl border-2 border-primary/20 bg-primary/5 hover:border-primary/50 transition-all">
               <h4 className="font-label-bold text-on-surface flex items-center gap-2 mb-2">
                 <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
-                Generate dari CV
+                {t("pb.gen-from-cv")}
               </h4>
               <p className="text-sm text-on-surface-variant mb-3">
-                Pilih salah satu CV yang sudah kamu buat, AI akan generate konten portfolio secara otomatis.
+                {t("pb.gen-from-cv-desc")}
               </p>
               {userCvList.length === 0 ? (
                 <p className="text-xs text-amber-600 flex items-center gap-1">
@@ -1832,7 +1831,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                     >
                       <div className="text-left">
                         <span className="font-medium text-sm text-on-surface">{cv.jobTitle || t("portfolio.cv-untitled")}</span>
-                        <p className="text-xs text-outline">Diperbarui: {new Date(cv.updatedAt).toLocaleDateString("id-ID")}</p>
+                        <p className="text-xs text-outline">{t("pb.updated")} {new Date(cv.updatedAt).toLocaleDateString(localeFor(lang))}</p>
                       </div>
                       {generatingFromCv === cv.id ? (
                         <span className="material-symbols-outlined text-primary animate-spin">sync</span>
@@ -1858,9 +1857,9 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                 <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>person</span>
               </div>
               <div>
-                <h4 className="font-label-bold text-on-surface">Dari Profil</h4>
+                <h4 className="font-label-bold text-on-surface">{t("pb.from-profile")}</h4>
                 <p className="text-xs text-on-surface-variant">
-                  {profileForFill ? "Isi otomatis dari data profil yang sudah kamu buat" : "Isi profil dulu di halaman profil"}
+                  {profileForFill ? t("pb.from-profile-desc") : t("pb.from-profile-empty")}
                 </p>
               </div>
             </button>
@@ -1874,7 +1873,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                 <span className="material-symbols-outlined text-outline" style={{ fontVariationSettings: "'FILL' 1" }}>edit_note</span>
               </div>
               <div>
-                <h4 className="font-label-bold text-on-surface">Isi Manual</h4>
+                <h4 className="font-label-bold text-on-surface">{t("pb.manual")}</h4>
                 <p className="text-xs text-on-surface-variant">{t("portfolio.start-empty")}</p>
               </div>
             </button>
@@ -1883,12 +1882,11 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
       </Modal>
 
       {/* ── AI Suggestions Popup ── */}
-      <Modal open={showAiPopup} onClose={() => setShowAiPopup(false)} title="Saran AI untuk Portfolio" size="max-w-xl">
+      <Modal open={showAiPopup} onClose={() => setShowAiPopup(false)} title={t("pb.ai-title")} size="max-w-xl">
         <div className="space-y-4 pt-2 max-h-[60vh] overflow-y-auto custom-scrollbar">
           <p className="text-sm text-on-surface-variant">
-            AI telah menganalisis data profilmu dan memberikan saran berikut.
-            Klik <strong>Terapkan</strong> untuk menggunakan saran pada field tertentu,
-            atau <strong>Terapkan Semua</strong> untuk langsung mengisi semua.
+            {t("pb.ai-intro-a")} <strong>{t("pb.apply")}</strong> {t("pb.ai-intro-b")}{" "}
+            <strong>{t("pb.apply-all")}</strong> {t("pb.ai-intro-c")}
           </p>
 
           {aiFormList.length + aiSeoList.length > 0 && (
@@ -1907,11 +1905,11 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
                         onClick={() => applyAiField(c.field, c.to)}
                         className="shrink-0 px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/20 active:scale-95 transition-all"
                       >
-                        Terapkan
+                        {t("pb.apply")}
                       </button>
                     ) : (
                       <span className="shrink-0 px-3 py-1 rounded-lg bg-surface-container-highest text-on-surface-variant text-xs font-semibold">
-                        Via Terapkan Semua
+                        {t("pb.via-apply-all")}
                       </span>
                     )}
                   </div>
@@ -1943,13 +1941,13 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
               onClick={() => setShowAiPopup(false)}
               className="flex-1 py-3 rounded-xl border border-outline-variant text-on-surface font-label-bold hover:bg-surface-container transition-all active:scale-[0.98]"
             >
-              Tutup
+              {t("common.close")}
             </button>
             <button
               onClick={applyAllAi}
               className="flex-1 py-3 rounded-xl bg-primary text-on-primary font-label-bold hover:-translate-y-0.5 transition-all active:scale-[0.98]"
             >
-              Terapkan Semua
+              {t("pb.apply-all")}
             </button>
           </div>
         </div>
@@ -2040,14 +2038,14 @@ function Field({ label, help, children }: { label: string; help?: PortfolioHelpK
 /* ── AI field labels ── */
 
 const fieldLabels: Record<string, string> = {
-  heroHeadline: "Job Title Utama",
-  heroSubHeadline: "Sub-headline / Tagline",
-  heroBio: "Bio Singkat",
-  aboutText: "Tentang Saya",
-  aboutYearsExp: "Tahun Pengalaman",
-  aboutProjectsDone: "Project Selesai",
-  aboutClientsHappy: "Klien Puas",
-  skillsMain: "Keahlian utama",
-  skillsTools: "Tools & Software",
-  skillsLanguages: "Bahasa",
+  heroHeadline: "pb.f-headline",
+  heroSubHeadline: "pb.f-subheadline",
+  heroBio: "pb.f-bio",
+  aboutText: "pb.f-about",
+  aboutYearsExp: "pb.f-years",
+  aboutProjectsDone: "pb.f-projects",
+  aboutClientsHappy: "pb.f-clients",
+  skillsMain: "pb.f-skills",
+  skillsTools: "pb.f-tools",
+  skillsLanguages: "pb.f-languages",
 };

@@ -9,6 +9,7 @@ import {
 } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n";
 
 /* ── Types ── */
 
@@ -59,6 +60,7 @@ const COLORS: Record<Toast["type"], string> = {
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const { t: tr } = useTranslation();
 
   const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -83,7 +85,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {/* Toast Container, fixed bottom-right */}
       <div
         aria-live="polite"
-        aria-label="Notifications"
+        aria-label={tr("toast.region")}
         className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-2 pointer-events-none"
       >
         <AnimatePresence mode="popLayout">
@@ -122,7 +124,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               <button
                 onClick={() => removeToast(t.id)}
                 className="shrink-0 p-0.5 rounded opacity-60 hover:opacity-100 transition-opacity"
-                aria-label="Dismiss"
+                aria-label={tr("toast.dismiss")}
               >
                 <span className="material-symbols-outlined text-sm">close</span>
               </button>

@@ -296,7 +296,7 @@ export default function CheckerPage() {
       setResult(data);
       setPageState("results");
     } catch (err: any) {
-      setError(err.message || "Terjadi kesalahan");
+      setError(err.message || t("common.error"));
     } finally {
       setLoading(false);
     }
@@ -410,7 +410,7 @@ export default function CheckerPage() {
       setResult(data);
       setPageState("results");
     } catch (err: any) {
-      setError(err.message || "Terjadi kesalahan");
+      setError(err.message || t("common.error"));
     } finally {
       setLoading(false);
     }
@@ -429,11 +429,11 @@ export default function CheckerPage() {
       setResult(data);
       setPageState("results");
     } catch (err: any) {
-      setError(err.message || "Terjadi kesalahan");
+      setError(err.message || t("common.error"));
     } finally {
       setLoading(false);
     }
-  }, [doAnalyze]);
+  }, [doAnalyze, t]);
 
   /* ================================================================ */
   /*  RENDER: Input Screen (or skeleton while loading)                  */

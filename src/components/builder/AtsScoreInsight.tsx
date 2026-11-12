@@ -40,7 +40,7 @@ export function AtsScoreInsight({ score }: AtsScoreInsightProps) {
         </div>
         <div>
           <h5 className="text-sm font-label-bold text-on-surface mb-0.5">
-            ATS Score: {score}%
+            {t("builder.ats-score-label")} {score}%
             {" · "}
             {score >= 70
               ? t("builder.ats-ready")

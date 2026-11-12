@@ -20,7 +20,7 @@ import {
 import { MARKETED_PACKAGE_KEYS, formatRupiah, packageGroup } from "@/lib/pricing-catalog";
 import { PackageCard } from "@/components/checkout/PackageCard";
 import AppHeader from "@/components/AppHeader";
-import { useTranslation } from "@/lib/i18n";
+import { fill, useTranslation } from "@/lib/i18n";
 import { track } from "@/lib/track";
 import type { PackageDef } from "@/lib/access";
 
@@ -228,7 +228,7 @@ const toggle = (key: string) => {
       const dest = checkoutDestination(activePaymentProvider(), result as CreateOrderResponse, window.location.origin);
       window.location.href = dest.url;
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal membuat pesanan");
+      setError(err instanceof Error ? err.message : t("cvco.order-failed"));
       setSubmitting(false);
     }
   };
@@ -238,7 +238,7 @@ if (!catalog) {
       <div className="min-h-screen bg-background text-on-background">
         <AppHeader />
         <main className="pt-24 flex items-center justify-center">
-          <p className="text-on-surface-variant">Memuat katalog paket…</p>
+          <p className="text-on-surface-variant">{t("co.loading")}</p>
         </main>
       </div>
     );
@@ -252,8 +252,7 @@ return (
         <header className="mb-8">
           <h1 className="font-headline-lg text-2xl md:text-3xl font-bold text-on-surface">Checkout</h1>
           <p className="text-on-surface-variant mt-1 max-w-2xl">
-            Pilih paket di kiri, lihat di keranjang kanan. Tetap di halaman ini sampai kamu menekan
-            tombol bayar.
+            {t("co.lede")}
           </p>
         </header>
 
@@ -294,17 +293,17 @@ return (
           {/* Keranjang: ringkasan singkat yang selalu terlihat */}
           <aside className="lg:sticky lg:top-8 rounded-[14px] border-2 border-ink bg-paper shadow-hard-sm p-5 space-y-4">
             <h2 className="font-headline-lg text-base font-bold text-on-surface">
-              Keranjang
+              {t("co.cart")}
               {selected.length > 0 ? (
                 <span className="ml-2 text-xs font-normal text-on-surface-variant">
-                  {selected.length} paket
+                  {fill(t("co.n-packages"), { n: selected.length })}
                 </span>
               ) : null}
             </h2>
 
             {selected.length === 0 ? (
               <p className="text-sm text-on-surface-variant">
-                Belum ada paket di keranjang. Pilih dari daftar di samping.
+                {t("co.empty")}
               </p>
             ) : (
               <ul className="space-y-2">
@@ -319,7 +318,7 @@ return (
                       <span>
                         <span className="block text-sm font-semibold text-on-surface">{pkg.name}</span>
                         <span className="block text-xs text-on-surface-variant">
-                          {pkg.monthly ? "per bulan" : `${pkg.periodDays} hari`}
+                          {pkg.monthly ? t("co.per-month") : fill(t("co.days"), { n: pkg.periodDays })}
                         </span>
                       </span>
                       <span className="flex items-center gap-2">
@@ -329,8 +328,8 @@ return (
                         <button
                           type="button"
                           onClick={() => toggle(key)}
-                          aria-label={`Hapus ${pkg.name}`}
-                          title={`Hapus ${pkg.name}`}
+                          aria-label={fill(t("co.remove"), { name: pkg.name })}
+                          title={fill(t("co.remove"), { name: pkg.name })}
                           className="material-symbols-outlined text-lg text-on-surface-variant hover:text-error"
                         >
                           close
@@ -353,16 +352,15 @@ return (
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-on-surface-variant">
                     {selected.length > 1
-                      ? "Beli terpisah lebih mahal"
-                      : "Paket ini lebih murah daripada beli terpisah"}
+                      ? t("co.separate-dearer")
+                      : t("co.bundle-cheaper")}
                   </span>
                   <span className="font-bold text-green-700">
                     −{formatRupiah(separateTotal - selection.total)}
                   </span>
                 </div>
                 <p className="mt-1 text-xs text-on-surface-variant">
-                  {formatRupiah(selection.total)} dari {formatRupiah(separateTotal)} kalau dibeli
-                  terpisah.
+                  {fill(t("co.vs-separate"), { total: formatRupiah(selection.total), separate: formatRupiah(separateTotal) })}
                 </p>
               </div>
             ) : null}
@@ -379,18 +377,17 @@ return (
 {bundleAdvice ? (
               <div className="rounded-xl border-2 border-ink bg-lime/15 p-3">
                 <p className="text-sm text-on-surface">
-                  <span className="font-semibold">Catatan:</span> {bundleAdvice.missingCount} hak belum
-                  terakup paket pilihanmu.{" "}
+                  <span className="font-semibold">{t("co.note")}</span> {fill(t("co.missing"), { n: bundleAdvice.missingCount })}{" "}
                   {catalog[bundleAdvice.bundleKey]?.name} (
                   {formatRupiah(bundleAdvice.price)}){" "}
-                  {bundleAdvice.cheaper ? "lebih murah daripada sisanya." : "menambah hak yang belum kamu punya."}
+                  {bundleAdvice.cheaper ? t("co.cheaper-rest") : t("co.adds-rights")}
                 </p>
                 <button
                   type="button"
                   onClick={useBundle}
                   className="mt-2 text-sm font-bold text-green-deep underline decoration-lime decoration-[3px] underline-offset-4"
                 >
-                  Pakai {catalog[bundleAdvice.bundleKey]?.name} ({formatRupiah(bundleAdvice.price)})
+                  {t("co.use")} {catalog[bundleAdvice.bundleKey]?.name} ({formatRupiah(bundleAdvice.price)})
                 </button>
               </div>
             ) : null}
@@ -398,7 +395,7 @@ return (
             {error ? <p className="text-sm text-error">{error}</p> : null}
             {selection === null && selected.length > 0 ? (
               <p className="text-sm text-error">
-                {selectionError ?? "Kombinasi paket ini tidak bisa dibeli. Coba pilih satu paket saja."}
+                {selectionError ?? t("co.bad-combo")}
               </p>
             ) : null}
 
@@ -409,16 +406,16 @@ return (
               className="w-full py-3 rounded-full border-[2.5px] border-ink bg-lime text-on-light font-bold shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 disabled:opacity-50 disabled:shadow-none"
             >
               {submitting
-                ? "Menyiapkan pembayaran…"
+                ? t("co.preparing")
                 : selection
-                  ? `Bayar ${formatRupiah(selection.total)}`
-                  : "Pilih paket dulu"}
+                  ? `${t("cvco.pay")} ${formatRupiah(selection.total)}`
+                  : t("co.pick-first")}
             </button>
 
 <p className="text-xs text-on-surface-variant">
-              Pembayaran hanya dibuat setelah kamu menekan tombol bayar. Butuh bantuan?{" "}
+              {t("co.pay-note")}{" "}
               <Link href="/contact" className="font-bold text-green-deep underline decoration-lime decoration-[3px] underline-offset-4">
-                Hubungi kami
+                {t("co.contact")}
               </Link>
               .
             </p>
@@ -430,26 +427,26 @@ return (
                 <span className="material-symbols-outlined text-[14px] text-green-deep shrink-0">
                   picture_as_pdf
                 </span>
-                PDF-nya berbasis teks, bukan gambar, jadi bisa dibaca mesin ATS.
+                {t("co.faq-pdf")}
               </li>
               <li className="flex items-start gap-2 text-xs text-on-surface-variant">
                 <span className="material-symbols-outlined text-[14px] text-green-deep shrink-0">
                   event_available
                 </span>
-                Sekali bayar. Masa berlaku tertera di tiap paket, tidak ada tagihan berikutnya.
+                {t("co.faq-once")}
               </li>
               <li className="flex items-start gap-2 text-xs text-on-surface-variant">
                 <span className="material-symbols-outlined text-[14px] text-green-deep shrink-0">
                   delete
                 </span>
-                Data CV-mu bisa kamu hapus sendiri kapan saja dari halaman Pengaturan.
+                {t("co.faq-delete")}
               </li>
             </ul>
             <Link
               href="/terms"
               className="text-xs text-ink-soft underline hover:text-green-deep"
             >
-              Syarat &amp; Ketentuan
+              {t("co.terms")}
             </Link>
           </aside>
         </div>

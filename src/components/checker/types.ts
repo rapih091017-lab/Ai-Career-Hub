@@ -472,11 +472,12 @@ export function atsBadgeColor(prediction?: string | null) {
  * nilai enum di data TIDAK diubah — riwayat, API, dan skoring tetap memakai
  * "Likely Pass"/"Borderline"/"Likely Fail".
  */
-export function atsReadinessLabel(prediction?: string | null): string {
+export function atsReadinessLabel(prediction?: string | null, lang: "id" | "en" = "id"): string {
+  const en = lang === "en";
   switch (prediction) {
-    case "Likely Pass": return "Siap dibaca";
-    case "Borderline": return "Perlu dirapikan";
-    case "Likely Fail": return "Berisiko terlewat";
+    case "Likely Pass": return en ? "Ready to read" : "Siap dibaca";
+    case "Borderline": return en ? "Needs tidying" : "Perlu dirapikan";
+    case "Likely Fail": return en ? "At risk of being missed" : "Berisiko terlewat";
     default: return "";
   }
 }
