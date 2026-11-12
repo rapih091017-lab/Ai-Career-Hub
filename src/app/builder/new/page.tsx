@@ -7,7 +7,7 @@ import AppHeader from "@/components/AppHeader";
 import AuthGuard from "@/components/AuthGuard";
 import Modal from "@/components/Modal";
 import { track } from "@/lib/track";
-import { clearCheckerCvText, readCheckerCvText } from "@/lib/checker/builder-handoff";
+import { clearCheckerHandoff, readCheckerCvText } from "@/lib/checker/builder-handoff";
 import MagneticButton from "@/components/MagneticButton";
 
 function BuilderNewFormContent() {
@@ -34,6 +34,13 @@ function BuilderNewFormContent() {
     }
     return null;
   });
+
+  // Titipan dari hasil cek sudah disalin ke state di atas; hapus dari
+  // sessionStorage supaya teks CV tidak tertinggal di tab. Coba ulang di
+  // halaman ini tetap memakai salinan di state.
+  useEffect(() => {
+    if (fromChecker || checkerSource) clearCheckerHandoff();
+  }, [fromChecker, checkerSource]);
 
   const [jobTitle, setJobTitle] = useState("");
   const [isCreating, setIsCreating] = useState(false);
@@ -77,7 +84,6 @@ function BuilderNewFormContent() {
 
       if (res.ok) {
         track("builder_start", { source: rawText ? "checker" : "new" });
-        if (rawText) clearCheckerCvText();
         if (next === "surat-formal") router.push(`/surat-lamaran/${data.id}?style=formal`);
         else if (next === "surat-motivation") router.push(`/surat-lamaran/${data.id}?style=motivation`);
         else router.push(`/builder/${data.id}`);
