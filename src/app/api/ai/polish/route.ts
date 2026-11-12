@@ -4,6 +4,7 @@ import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limiter";
 import { withAuth, errorResponse } from "@/lib/api-utils";
 import { callAI, MODELS } from "@/lib/ai/adapter";
 import { SECURITY_GUARDRAIL } from "@/lib/ai/prompts/shared";
+import { OutputLangSchema, resolveOutputLang, withOutputLang } from "@/lib/ai/output-lang";
 
 // Runtime Node, bukan edge: rate limiter memakai setInterval().unref() yang
 // tidak ada di runtime edge.
@@ -72,6 +73,9 @@ const PolishBodySchema = z.object({
   jobDescription: z.string().max(5000).optional(),
   field: z.string().max(100).optional(),
   format: z.enum(["bullets", "paragraph"]).optional(),
+  // Bahasa hasil pilihan user; tanpa itu ikut bahasa CV lalu bahasa teks.
+  outputLang: OutputLangSchema.optional(),
+  cvLang: OutputLangSchema.optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -98,7 +102,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { content, jobTitle, skills, jobDescription, field, format } = parsed.data;
+    const { content, jobTitle, skills, jobDescription, field, format, outputLang, cvLang } = parsed.data;
+    const lang = resolveOutputLang({ requested: outputLang, cvLang, text: content });
 
     // Bangun CV context untuk prompt
     let contextStr = "";
@@ -121,7 +126,7 @@ ${content}
 
     // Panggil AI, text mode: output teks murni (bukan json_object)
     const polished = await callAI<string>({
-      systemPrompt: POLISH_SYSTEM_PROMPT_V2,
+      systemPrompt: withOutputLang(POLISH_SYSTEM_PROMPT_V2, lang),
       userPrompt,
       temperature: 0.4,
       maxTokens: 1024,
@@ -135,6 +140,7 @@ ${content}
       success: true,
       polished: polished.trim(),
       original: content,
+      outputLang: lang,
     });
 
   } catch (error) {

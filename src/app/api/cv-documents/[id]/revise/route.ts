@@ -10,6 +10,7 @@ import { SUGGESTION_PROMPT_V2 } from "@/lib/ai/prompts/suggestion-v2";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limiter";
 import { SUMMARY_SUGGESTION_PROMPT_V2 } from "@/lib/ai/prompts/suggestion-summary-v2";
 import { SUMMARY_REVISION_PROMPT_V2 } from "@/lib/ai/prompts/summary-revision-v2";
+import { parseOutputLangField, resolveOutputLang, withOutputLang } from "@/lib/ai/output-lang";
 
 export async function POST(
   request: NextRequest,
@@ -37,7 +38,14 @@ export async function POST(
 
     const { id } = await params;
     const body = await request.json();
-    const { section, sectionIndex, field, currentText, mode } = body;
+    const { section, currentText, mode } = body;
+    const langField = parseOutputLangField(body?.outputLang);
+    if (!langField.ok) {
+      return NextResponse.json(
+        { error: "INVALID_REQUEST", message: "Bahasa hasil harus id atau en." },
+        { status: 400 }
+      );
+    }
 
     // Ambil Data CV dulu untuk context, reuse di semua mode
     const [cvDoc] = await db
@@ -50,11 +58,18 @@ export async function POST(
     const skillsList = cvData?.skills?.map((s: any) => s.name) || [];
     const cvTitle = cvDoc?.jobTitle || "";
 
+    // Bahasa hasil: pilihan user → bahasa CV → bahasa teks input → id.
+    const lang = resolveOutputLang({
+      requested: langField.lang,
+      cvLang: cvData?.cvLang,
+      text: typeof currentText === "string" ? currentText : body.description,
+    });
+
     // Build user context untuk dikirim ke AI
     const userCtx = buildUserContext({
       jobTitle: cvTitle,
       industry: undefined,
-      cvLang: cvData?.cvLang || "id",
+      cvLang: lang,
       experienceLevel: cvData?.experienceLevel || undefined,
     });
 
@@ -78,7 +93,7 @@ export async function POST(
       });
 
       const aiResult = await callAI({
-        systemPrompt: SUMMARY_SUGGESTION_PROMPT_V2,
+        systemPrompt: withOutputLang(SUMMARY_SUGGESTION_PROMPT_V2, lang),
         userPrompt,
         temperature: 0.5,
         model: MODELS.CHAT,
@@ -115,7 +130,7 @@ export async function POST(
       });
 
       const aiResult = await callAI({
-        systemPrompt: SUGGESTION_PROMPT_V2,
+        systemPrompt: withOutputLang(SUGGESTION_PROMPT_V2, lang),
         userPrompt,
         temperature: 0.4,
         model: MODELS.CHAT,
@@ -155,7 +170,7 @@ export async function POST(
       });
 
       const aiResult = await callAI({
-        systemPrompt: SUMMARY_REVISION_PROMPT_V2,
+        systemPrompt: withOutputLang(SUMMARY_REVISION_PROMPT_V2, lang),
         userPrompt,
         temperature: 0.5,
         model: MODELS.CHAT,
@@ -214,7 +229,7 @@ export async function POST(
     });
 
     const aiResult = await callAI({
-      systemPrompt: REVISION_PROMPT_V2,
+      systemPrompt: withOutputLang(REVISION_PROMPT_V2, lang),
       userPrompt,
       temperature: 0.5,
       model: MODELS.CHAT,

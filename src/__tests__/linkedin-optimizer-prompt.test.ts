@@ -53,6 +53,6 @@ describe("prompt LinkedIn Optimizer mengikuti bahasa", () => {
   it("route analyze memakai bahasa dari request, bukan prompt tetap", () => {
     const route = readFileSync("src/app/api/linkedin-optimizer/analyze/route.ts", "utf8");
     expect(route).toContain("buildLinkedInOptimizerPrompt(outputLang)");
-    expect(route).toContain('const outputLang = lang === "en" ? "en" : "id";');
+    expect(route).toContain('const outputLang = langField.lang ?? (lang === "en" ? "en" : "id");');
   });
 });

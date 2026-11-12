@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { OutputLangSchema } from "@/lib/ai/output-lang";
 import type { CvData } from "@/components/cv-templates";
 import { aiTextForField } from "@/lib/bullet-lines";
 import { newId } from "@/lib/id";
@@ -185,6 +186,7 @@ export const AutoFixRequestSchema = z.object({
     })
     .nullish(),
   jobDescription: optText(20_000),
+  outputLang: OutputLangSchema.optional(),
 });
 export type AutoFixRequest = z.infer<typeof AutoFixRequestSchema>;
 

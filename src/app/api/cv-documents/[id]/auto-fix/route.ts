@@ -8,6 +8,7 @@ import { reserveQuota, type QuotaReservation } from "@/lib/api-utils";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limiter";
 import { AUTO_FIX_PROMPT_V1 } from "@/lib/ai/prompts/auto-fix-v1";
 import { parseAutoFixSuggestions, parseAutoFixRequest } from "@/lib/auto-fix";
+import { resolveOutputLang, withOutputLang } from "@/lib/ai/output-lang";
 
 /**
  * POST /api/cv-documents/[id]/auto-fix
@@ -17,7 +18,7 @@ import { parseAutoFixSuggestions, parseAutoFixRequest } from "@/lib/auto-fix";
  * mengusulkan — tidak ada perubahan yang disimpan. Penerapan terjadi
  * di client setelah user menyetujui tiap saran satu per satu.
  *
- * Body: { cv?: {...}, jobDescription?: string }
+ * Body: { cv?: {...}, jobDescription?: string, outputLang?: "id" | "en" }
  * Respons: { suggestions: AutoFixSuggestion[] }
  */
 const EXPERIENCE_LEVELS = ["entry", "mid", "senior", "lead"] as const;
@@ -91,7 +92,8 @@ export async function POST(
     const skills = Array.isArray(cv?.skills)
       ? cv.skills.map((s: { name?: string }) => s?.name).filter(Boolean)
       : [];
-    const cvLang = cv?.cvLang === "en" ? "en" : "id";
+    // Bahasa hasil: pilihan user → bahasa CV → bahasa ringkasan → id.
+    const cvLang = resolveOutputLang({ requested: body.outputLang, cvLang: cv?.cvLang, text: summary });
 
     if (!summary && workHistory.length === 0) {
       return NextResponse.json(
@@ -127,7 +129,7 @@ export async function POST(
     });
 
     const aiResult = await callAI({
-      systemPrompt: AUTO_FIX_PROMPT_V1,
+      systemPrompt: withOutputLang(AUTO_FIX_PROMPT_V1, cvLang),
       userPrompt,
       temperature: 0.4,
       model: MODELS.CHAT,

@@ -10,6 +10,7 @@ import type { LinkedInOptimizerResult } from "@/lib/ai/prompts/schemas";
 import { sanitizeExtractedText } from "@/lib/checker/extracted-text";
 import { buildLinkedInResult } from "@/lib/linkedin-optimizer/result";
 import { apiHandler, errorResponse } from "@/lib/api-utils";
+import { parseOutputLangField } from "@/lib/ai/output-lang";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limiter";
 
 // Satu panggilan model + validasi. Model berpikir butuh puluhan detik; tanpa
@@ -35,7 +36,12 @@ export const POST = apiHandler(async (request: NextRequest) => {
   const body = await request.json();
   const { resumeText: resumeRaw, branding: brandingRaw, lang } = body;
 
-  const outputLang = lang === "en" ? "en" : "id";
+  // outputLang = nama kontrak bersama fitur AI; `lang` lama tetap diterima.
+  const langField = parseOutputLangField(body?.outputLang);
+  if (!langField.ok) {
+    return errorResponse("INVALID_INPUT", "Bahasa hasil harus id atau en.", 400);
+  }
+  const outputLang = langField.lang ?? (lang === "en" ? "en" : "id");
   const t = (id: string, en: string) => (outputLang === "en" ? en : id);
 
   if (typeof resumeRaw !== "string" || !resumeRaw.trim()) {

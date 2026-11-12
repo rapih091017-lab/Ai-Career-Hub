@@ -13,7 +13,7 @@ import { getLetterSystemPrompt, buildCoverLetterUserPrompt, type CoverLetterInpu
  * - Free users: kuota cover_letter (3x/bln)
  * - Premium: unlimited
  *
- * Body: { cvId?, language: "id"|"en", style: "formal"|"casual"|"ats"|"formal_lengkap",
+ * Body: { cvId?, language | outputLang: "id"|"en", style: "formal"|"casual"|"ats"|"formal_lengkap",
  *         companyName?, recipientName?, letterNumber?, attachment?,
  *         position?, fullName?, phone?, email?, address?, summary?, jobDescription?,
  *         workHistory?, education?, skills?, certifications? }
@@ -27,7 +27,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
   const body = await request.json();
   const {
     cvId,
-    language = "id",
+    language: languageRaw = "id",
     style = "formal",
     companyName,
     companyAddress,
@@ -50,6 +50,8 @@ export const POST = apiHandler(async (request: NextRequest) => {
     skills,
     certifications,
   } = body;
+  // outputLang = nama kontrak bersama fitur AI; `language` tetap diterima.
+  const language = body.outputLang ?? languageRaw;
 
   if (!cvId && !String(bodyPosition ?? "").trim() && !String(fullName ?? "").trim()) {
     return errorResponse("INVALID_INPUT", "Sertakan 'cvId' atau data manual minimal (position/fullName)", 400);

@@ -5,6 +5,7 @@ import { masterProfiles, usageLogs, users } from "@/db/schema";
 import { eq, and, count, gte, asc } from "drizzle-orm";
 import { callAI, MODELS, buildUserContext } from "@/lib/ai/adapter";
 import { PORTFOLIO_PROMPT_V1 } from "@/lib/ai/prompts/portfolio-v1";
+import { parseOutputLangField, resolveOutputLang, withOutputLang } from "@/lib/ai/output-lang";
 import { getUserAccess } from "@/lib/access";
 import { PORTFOLIO_TRIAL_DAYS } from "@/lib/package-catalog-static";
 
@@ -172,6 +173,13 @@ export async function POST(request: NextRequest) {
     console.warn("Portfolio suggest: invalid JSON body, falling back to DB profile");
   }
   const { cvData } = body;
+  const langField = parseOutputLangField(body?.outputLang);
+  if (!langField.ok) {
+    return NextResponse.json(
+      { error: "INVALID_REQUEST", message: "Bahasa hasil harus id atau en." },
+      { status: 400 },
+    );
+  }
 
   // ── Build context: dari CV data atau dari DB profile ──
   let profileContext: string;
@@ -240,7 +248,14 @@ ${organisations.map((o: string) => `- ${o}`).join("\n") || "(belum ada)"}
 
   try {
     const suggestions = await callAI<SuggestResponse>({
-      systemPrompt: PORTFOLIO_PROMPT_V1,
+      systemPrompt: withOutputLang(
+        PORTFOLIO_PROMPT_V1,
+        resolveOutputLang({
+          requested: langField.lang,
+          cvLang: cvData?.cvLang,
+          text: typeof cvData?.summary === "string" ? cvData.summary : profileContext,
+        }),
+      ),
       userPrompt: `=== DATA PROFIL USER ===
 ${profileContext}`,
       temperature: 0.75,
