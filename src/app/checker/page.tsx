@@ -1,5 +1,7 @@
 "use client";
 
+import { OutputLangPicker, readStoredOutputLang, storeOutputLang } from "@/components/ai/OutputLangPicker";
+import type { OutputLang } from "@/lib/ai/output-lang";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import SiteHeader from "@/components/nav/SiteHeader";
@@ -26,6 +28,11 @@ export default function CheckerPage() {
   const [file, setFile] = useState<File | null>(null);
   const [jdText, setJdText] = useState("");
   const [roleCategory, setRoleCategory] = useState("general");
+  // Bahasa teks tempel: null = ikut bahasa CV (perilaku lama, field tidak dikirim).
+  const [copyLang, setCopyLang] = useState<OutputLang | null>(null);
+  useEffect(() => {
+    setCopyLang(readStoredOutputLang());
+  }, []);
   // "auto" mengikuti jatah paket; "fast" dan "deep"dipilih pengguna.
   // Tanpa pilihan ini, pembeli paket hanya bisa menunggu model berpikir.
   const [analyzeMode, setAnalyzeMode] = useState<"auto" | "fast" | "deep">("auto");
@@ -123,6 +130,7 @@ export default function CheckerPage() {
         jobDescription: jdText.trim(),
         roleCategory,
         lang,
+        ...(copyLang ? { outputLang: copyLang } : {}),
         mode: analyzeMode,
         originalFileName: file?.name ?? "cv.pdf",
       }),
@@ -141,7 +149,7 @@ export default function CheckerPage() {
     }
     track("checker_result");
     return data as AnalysisResult;
-  }, [jdText, roleCategory, file, lang, analyzeMode, t]);
+  }, [jdText, roleCategory, file, lang, analyzeMode, t, copyLang]);
 
   /* ---- Analyze with pasted text (skip extract) ---- */
   /* ---- OCR (PDF scan / gambar) sepenuhnya di browser, aset lokal ---- */
@@ -616,6 +624,19 @@ export default function CheckerPage() {
                     </p>
                   ) : null;
                 })()}
+              </div>
+
+              {/* Bahasa teks saran yang bisa ditempel ke CV. */}
+              <div className="flex flex-col gap-1">
+                <OutputLangPicker
+                  autoOption
+                  value={copyLang}
+                  onChange={(v) => {
+                    setCopyLang(v);
+                    storeOutputLang(v);
+                  }}
+                />
+                <p className="text-xs text-ink-soft">{t("ai.checker-lang-hint")}</p>
               </div>
 
               {/* Kecepatan analisis: pilihan nyata, bukan janji kecepatan. */}

@@ -44,5 +44,23 @@ describe("input cek CV", () => {
     const body = JSON.parse(analyzeCall()![1].body as string);
     expect(body.jobDescription).toBe("");
     expect(body.roleCategory).toBe("fresh_graduate");
+    // Tanpa pilihan bahasa hasil: field tidak dikirim (perilaku lama).
+    expect(body).not.toHaveProperty("outputLang");
+  });
+
+  it("bahasa teks tempel yang dipilih ikut dikirim sebagai outputLang", async () => {
+    const fetchMock = mockFetch();
+    render(<Providers><CheckerPage /></Providers>);
+    fireEvent.click(screen.getByRole("tab", { name: "Tempel teks" }));
+    fireEvent.change(screen.getByLabelText(/Atau tempel teks CV/), { target: { value: "Frontend Developer di PT Maju" } });
+    fireEvent.click(screen.getByRole("radio", { name: "English" }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: /Analisis CV Sekarang/ }));
+    });
+    const analyzeCall = () =>
+      (fetchMock.mock.calls as unknown as [string, RequestInit][]).find(([url]) => String(url).includes("/api/checker/analyze"));
+    await waitFor(() => expect(analyzeCall()).toBeDefined());
+    expect(JSON.parse(analyzeCall()![1].body as string).outputLang).toBe("en");
+    try { window.localStorage.removeItem("ai-output-lang"); } catch { /* abaikan */ }
   });
 });

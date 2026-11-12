@@ -24,6 +24,7 @@ import type { AnalysisResult } from "@/lib/ai/prompts/schemas";
 import { apiHandler, errorResponse } from "@/lib/api-utils";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limiter";
 import { checkProCheckAllowance } from "@/lib/fair-use";
+import { checkerCopyLangInstruction, parseOutputLangField } from "@/lib/ai/output-lang";
 
 // Model berpikir butuh ±2 menit (effort "low", terukur 22 Okt 2026). Tanpa
 // batas ini route ikut default akun, dan mode deep pernah berakhir 504
@@ -54,6 +55,14 @@ export const POST = apiHandler(async (request: NextRequest) => {
   // klien lama & backward-compat. Diteruskan ke prompt analysis-v3 {{OUTPUT_LANGUAGE}}.
   const outputLang = lang === "en" ? "en" : "id";
   const t = (id: string, en: string) => (outputLang === "en" ? en : id);
+  // Bahasa teks tempel (copy_text) pilihan user; tanpa pilihan prompt tidak berubah.
+  const copyLangField = parseOutputLangField(body?.outputLang);
+  if (!copyLangField.ok) {
+    return NextResponse.json(
+      { error: "BAD_REQUEST", message: t("Bahasa hasil harus id atau en.", "Output language must be id or en.") },
+      { status: 400 },
+    );
+  }
 
   // Kategori posisi → bobot per-section dinamis (lihat prompt analysis-v3 ROLE CATEGORY).
   const VALID_ROLE_CATEGORIES = ["tech", "creative", "sales_marketing", "fresh_graduate", "general"];
@@ -231,7 +240,8 @@ message: t(
         .replace(/\{\{ROLE_CATEGORY\}\}/g, () => roleCat)
         .replace(/\{\{OUTPUT_LANGUAGE\}\}/g, () => outputLang)
         // Kedalaman bullet review mengikuti tier akses, hemat token untuk free/flash.
-        .replace(/\{\{BULLET_MAX\}\}/g, () => (useReasoner ? "5" : "3")),
+        .replace(/\{\{BULLET_MAX\}\}/g, () => (useReasoner ? "5" : "3"))
+        + (copyLangField.lang ? checkerCopyLangInstruction(copyLangField.lang) : ""),
       userPrompt: `=== ROLE CATEGORY: ${roleCat} ===\n\n${PROMPT_MARKERS.cv}\n${extractedText}\n\n${PROMPT_MARKERS.jd}\n${jd || (outputLang === "en" ? "No job description provided." : "Tidak ada deskripsi pekerjaan.")}`,
       temperature: 0.3,
       // Model: premium → deepseek-v4-pro (thinking) untuk analisis mendalam;

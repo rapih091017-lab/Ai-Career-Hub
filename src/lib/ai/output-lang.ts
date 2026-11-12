@@ -81,3 +81,22 @@ export function parseOutputLangField(value: unknown): { ok: true; lang?: OutputL
   const r = OutputLangSchema.safeParse(value);
   return r.success ? { ok: true, lang: r.data } : { ok: false };
 }
+
+/**
+ * Checker: penjelasan mengikuti bahasa UI ({{OUTPUT_LANGUAGE}}), tapi teks
+ * yang bisa ditempel ke CV mengikuti pilihan user. Tanpa pilihan, prompt
+ * tidak diubah sama sekali (aturan lama: copy_text sebahasa dengan CV).
+ */
+export function checkerCopyLangInstruction(lang: OutputLang): string {
+  const name = OUTPUT_LANG_NAME[lang];
+  const placeholders = lang === "en" ? "[number], [percent], [team size]" : "[angka], [persen], [jumlah orang]";
+  return `
+--- BAHASA TEKS TEMPEL (PILIHAN USER, MENGALAHKAN ATURAN #3 TEKS TEMPEL) ---
+Semua teks yang bisa ditempel ke CV (copy_text, rewrite_copy_text, grouped_skills_copy_text,
+template_copy_text, fix.copy_text, suggested_rewrite) ditulis seluruhnya dalam ${name}; jangan campur bahasa.
+Terjemahkan isinya tanpa menambah fakta; nama tool, teknologi, dan perusahaan tetap.
+Placeholder memakai bahasa yang sama: ${placeholders}.
+Field lain (penjelasan, label, alasan) tetap mengikuti BAHASA output di atas.
+Kutipan bukti (evidence, source_excerpt, replaces) tetap potongan persis dari CV, tidak diterjemahkan.
+`;
+}

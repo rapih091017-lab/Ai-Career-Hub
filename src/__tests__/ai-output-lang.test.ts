@@ -65,3 +65,21 @@ describe("outputLang: instruksi prompt", () => {
     expect(p.trim().endsWith("Nama field/kunci JSON tetap seperti skema.")).toBe(true);
   });
 });
+
+describe("checker: bahasa teks tempel", async () => {
+  const { checkerCopyLangInstruction } = await import("@/lib/ai/output-lang");
+  const { readFileSync } = await import("node:fs");
+  it("instruksi en/id menyebut copy_text dan placeholder sesuai bahasa, bukti tidak diterjemahkan", () => {
+    const en = checkerCopyLangInstruction("en");
+    expect(en).toContain("ditulis seluruhnya dalam English");
+    expect(en).toContain("copy_text");
+    expect(en).toContain("[number]");
+    expect(en).toContain("tidak diterjemahkan");
+    expect(checkerCopyLangInstruction("id")).toContain("[angka]");
+  });
+  it("route menambah instruksi hanya bila outputLang dipilih (tanpa pilihan prompt tetap)", () => {
+    const route = readFileSync("src/app/api/checker/analyze/route.ts", "utf8");
+    expect(route).toContain('(copyLangField.lang ? checkerCopyLangInstruction(copyLangField.lang) : "")');
+    expect(route).toContain("parseOutputLangField(body?.outputLang)");
+  });
+});

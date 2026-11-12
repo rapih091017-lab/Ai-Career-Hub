@@ -101,3 +101,14 @@ describe("UI fitur AI dalam English", () => {
     expect(screen.getByText("Your CV is in Indonesian; the result will be in English.")).toBeInTheDocument();
   });
 });
+
+describe("OutputLangPicker dengan opsi ikut CV (checker)", () => {
+  it("null = Ikuti CV, tanpa catatan bahasa", () => {
+    const onChange = vi.fn();
+    render(<OutputLangPicker autoOption value={null} onChange={onChange} />);
+    expect(screen.getByRole("radio", { name: "Ikuti CV" })).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(screen.getByRole("radio", { name: "English" }));
+    expect(onChange).toHaveBeenCalledWith("en");
+    expect(screen.queryByText(/hasil akan dalam/)).toBeNull();
+  });
+});

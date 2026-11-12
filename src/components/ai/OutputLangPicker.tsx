@@ -6,12 +6,22 @@ import { fill, useTranslation } from "@/lib/i18n";
 
 const STORAGE_KEY = "ai-output-lang";
 
-function readStored(): OutputLang | null {
+export function readStoredOutputLang(): OutputLang | null {
   try {
     const v = window.localStorage.getItem(STORAGE_KEY);
     return v === "id" || v === "en" ? v : null;
   } catch {
     return null;
+  }
+}
+
+/** Simpan pilihan per perangkat; null menghapus (kembali ikut bahasa CV). */
+export function storeOutputLang(v: OutputLang | null) {
+  try {
+    if (v) window.localStorage.setItem(STORAGE_KEY, v);
+    else window.localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // Penyimpanan diblokir: pilihan tetap berlaku sampai halaman ditutup.
   }
 }
 
@@ -38,7 +48,7 @@ export function useOutputLangController(cvLang: OutputLang): OutputLangState {
   const [chosen, setChosen] = useState(false);
 
   useEffect(() => {
-    const stored = readStored();
+    const stored = readStoredOutputLang();
     if (stored) {
       setLangState(stored);
       setChosen(true);
@@ -52,11 +62,7 @@ export function useOutputLangController(cvLang: OutputLang): OutputLangState {
   const setLang = useCallback((v: OutputLang) => {
     setLangState(v);
     setChosen(true);
-    try {
-      window.localStorage.setItem(STORAGE_KEY, v);
-    } catch {
-      // Penyimpanan diblokir: pilihan tetap berlaku sampai halaman ditutup.
-    }
+    storeOutputLang(v);
   }, []);
 
   return useMemo(() => ({ lang, setLang, cvLang }), [lang, setLang, cvLang]);
@@ -78,19 +84,35 @@ export function useOutputLang(fallbackCvLang: OutputLang): OutputLangState {
   return useContext(OutputLangContext) ?? local;
 }
 
-interface OutputLangPickerProps {
-  value: OutputLang;
-  onChange: (v: OutputLang) => void;
-  /** Bahasa CV; bila beda dari value, tampil catatan kecil. */
-  cvLang: OutputLang;
+type PickerBase = {
   disabled?: boolean;
-}
+};
+type OutputLangPickerProps = PickerBase &
+  (
+    | {
+        value: OutputLang;
+        onChange: (v: OutputLang) => void;
+        /** Bahasa CV; bila beda dari value, tampil catatan kecil. */
+        cvLang: OutputLang;
+        autoOption?: false;
+      }
+    | {
+        /** null = ikut bahasa CV (bahasa CV belum diketahui, mis. checker sebelum upload). */
+        value: OutputLang | null;
+        onChange: (v: OutputLang | null) => void;
+        cvLang?: undefined;
+        autoOption: true;
+      }
+  );
 
 /** Pilihan segmented "Bahasa hasil: Indonesia | English". */
-export function OutputLangPicker({ value, onChange, cvLang, disabled = false }: OutputLangPickerProps) {
+export function OutputLangPicker(props: OutputLangPickerProps) {
+  const { value, cvLang, disabled = false } = props;
+  const onChange = props.onChange as (v: OutputLang | null) => void;
   const { t } = useTranslation();
   const labelId = useId();
-  const options: { v: OutputLang; label: string }[] = [
+  const options: { v: OutputLang | null; label: string }[] = [
+    ...(props.autoOption ? [{ v: null, label: t("ai.lang-auto") }] : []),
     { v: "id", label: "Indonesia" },
     { v: "en", label: "English" },
   ];
@@ -103,7 +125,7 @@ export function OutputLangPicker({ value, onChange, cvLang, disabled = false }: 
         <div role="radiogroup" aria-labelledby={labelId} className="inline-flex rounded-lg border border-outline-variant p-0.5">
           {options.map((o) => (
             <button
-              key={o.v}
+              key={o.v ?? "auto"}
               type="button"
               role="radio"
               aria-checked={value === o.v}
@@ -118,7 +140,7 @@ export function OutputLangPicker({ value, onChange, cvLang, disabled = false }: 
           ))}
         </div>
       </div>
-      {value !== cvLang && (
+      {cvLang && value && value !== cvLang && (
         <p className="text-[11px] text-on-surface-variant">
           {fill(t("ai.lang-note"), { cv: t(`ai.lang-cv-${cvLang}`), out: t(`ai.lang-out-${value}`) })}
         </p>

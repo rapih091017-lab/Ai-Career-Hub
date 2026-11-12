@@ -131,4 +131,6 @@ export const AI_DICT: Record<string, { id: string; en: string }> = {
   "ai.sec-self-eval": { id: "Evaluasi Diri", en: "Self-evaluation" },
   "ai.sec-cert": { id: "Sertifikasi", en: "Certifications" },
   "ai.sec-other": { id: "Bagian Tambahan", en: "Additional sections" },
+  "ai.lang-auto": { id: "Ikuti CV", en: "Match CV" },
+  "ai.checker-lang-hint": { id: "Berlaku untuk teks saran yang bisa disalin ke CV. Penjelasan tetap mengikuti bahasa tampilan.", en: "Applies to suggestion text you can copy into your CV. Explanations follow the display language." },
 };
