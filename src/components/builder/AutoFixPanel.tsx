@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useToast } from "@/components/ui/toast";
-import { UNDO_BLOCKED_MESSAGE, useUndoGuard } from "@/hooks/useUndoGuard";
+import { useUndoGuard } from "@/hooks/useUndoGuard";
 import type { CvData } from "@/components/cv-templates";
 import {
   type AutoFixSuggestion,
@@ -10,6 +10,7 @@ import {
 } from "@/lib/auto-fix";
 import { OutputLangPicker, baseCvLang, useOutputLang } from "@/components/ai/OutputLangPicker";
 import type { OutputLang } from "@/lib/ai/output-lang";
+import { fill, useTranslation } from "@/lib/i18n";
 
 interface AutoFixPanelProps {
   cvId: string;
@@ -17,21 +18,23 @@ interface AutoFixPanelProps {
   onApply: (next: CvData) => void;
 }
 
-const CATEGORY_LABEL: Record<string, string> = {
-  bahasa: "Bahasa",
-  bullet: "Bullet",
-  kata_kunci: "Kata kunci",
+/** Kunci kamus per kategori saran. */
+const CATEGORY_KEY: Record<string, string> = {
+  bahasa: "ai.fix-cat-language",
+  bullet: "ai.fix-cat-bullet",
+  kata_kunci: "ai.fix-cat-keyword",
 };
 
-function targetLabel(s: AutoFixSuggestion): string {
-  if (s.type === "add_skill") return "Keahlian";
-  if (s.target === "summary") return "Ringkasan";
-  return `Pengalaman ${(s.index ?? 0) + 1}`;
+function targetLabel(s: AutoFixSuggestion, t: (k: string) => string): string {
+  if (s.type === "add_skill") return t("ai.fix-target-skill");
+  if (s.target === "summary") return t("ai.fix-target-summary");
+  return fill(t("ai.fix-target-work"), { n: (s.index ?? 0) + 1 });
 }
 
 export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
   const [enabled, setEnabled] = useState(false);
   const { addToast } = useToast();
+  const { t } = useTranslation();
   const undoGuard = useUndoGuard(cvData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -59,14 +62,14 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.message || "Gagal memeriksa CV. Coba lagi beberapa saat.");
+        setError(data.message || t("ai.fix-failed"));
         return;
       }
       setSuggestions(Array.isArray(data.suggestions) ? data.suggestions : []);
       setDecisions({});
       setEdits({});
     } catch {
-      setError("Gagal menghubungi layanan AI. Periksa koneksi lalu coba lagi.");
+      setError(t("ai.network-failed"));
     } finally {
       setLoading(false);
     }
@@ -117,14 +120,14 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
       const unchanged = undoGuard.markApplied();
       addToast({
         type: "success",
-        message: `${report.applied} perbaikan diterapkan.`,
+        message: fill(t("ai.fix-applied-toast"), { n: report.applied }),
         duration: 8000,
         action: {
-          label: "Urungkan",
+          label: t("bullet.undo"),
           onClick: () => {
             // Urungkan mengembalikan seluruh CV; batalkan bila CV sudah diedit lagi.
             if (!unchanged()) {
-              addToast({ type: "info", message: "CV sudah diubah setelah perbaikan, urungkan dibatalkan." });
+              addToast({ type: "info", message: t("ai.fix-undo-blocked") });
               return;
             }
             onApply(before);
@@ -154,10 +157,10 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
           </div>
           <div>
             <h3 className="font-label-bold text-on-surface">
-              Cek & perbaiki otomatis
+              {t("ai.fix-title-short")}
             </h3>
             <p className="text-sm text-on-surface-variant">
-              AI memeriksa bahasa, bullet pengalaman, dan kata kunci — kamu setujui tiap saran sebelum diterapkan.
+              {t("ai.fix-desc")}
             </p>
           </div>
         </div>
@@ -166,7 +169,7 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
           type="button"
           role="switch"
           aria-checked={enabled}
-          aria-label="Cek dan perbaiki otomatis"
+          aria-label={t("ai.fix-title")}
           onClick={() => handleToggle(!enabled)}
           className={`relative w-11 h-6 rounded-full transition-colors shrink-0 mt-1 ${enabled ? "bg-primary" : "bg-outline-variant/60"}`}
         >
@@ -192,7 +195,7 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
           {loading && (
             <p className="text-sm text-on-surface-variant flex items-center gap-2">
               <span className="material-symbols-outlined animate-spin text-base" aria-hidden="true">sync</span>
-              AI sedang memeriksa CV-mu...
+              {t("ai.fix-loading")}
             </p>
           )}
 
@@ -206,7 +209,7 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
                   onClick={() => void fetchSuggestions()}
                   className="text-xs font-bold text-red-700 underline mt-1"
                 >
-                  Coba lagi
+                  {t("ai.retry")}
                 </button>
               </div>
             </div>
@@ -217,14 +220,14 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
               <span className="material-symbols-outlined text-green-600 text-base shrink-0" aria-hidden="true">check_circle</span>
               <div className="flex-1">
                 <p className="text-sm text-green-800">
-                  {`${appliedCount} saran diterapkan. Tinjau hasilnya di pratinjau kanan.`}
+                  {fill(t("ai.fix-applied"), { n: appliedCount })}
                 </p>
                 <button
                   type="button"
                   onClick={() => void fetchSuggestions()}
                   className="text-xs font-bold text-green-800 underline mt-1"
                 >
-                  Cek lagi
+                  {t("ai.fix-again")}
                 </button>
               </div>
             </div>
@@ -235,11 +238,11 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
               <span className="material-symbols-outlined text-amber-700 text-base shrink-0" aria-hidden="true">warning</span>
               <div className="flex-1">
                 <p className="text-sm text-amber-900">
-                  {`${skippedCount} perbaikan tidak bisa diterapkan karena teks aslinya sudah berubah.`}
+                  {fill(t("ai.fix-skipped"), { n: skippedCount })}
                 </p>
                 {appliedCount === 0 && (
                   <button type="button" onClick={() => void fetchSuggestions()} className="text-xs font-bold text-amber-900 underline mt-1">
-                    Cek lagi
+                    {t("ai.fix-again")}
                   </button>
                 )}
               </div>
@@ -248,7 +251,7 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
 
           {!loading && !error && suggestions.length === 0 && appliedCount === 0 && skippedCount === 0 && (
             <p className="text-sm text-on-surface-variant">
-              Tidak ada saran perbaikan — CV-mu sudah rapi. Kerja bagus!
+              {t("ai.fix-none")}
             </p>
           )}
 
@@ -265,10 +268,10 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
               >
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary uppercase tracking-wide">
-                    {CATEGORY_LABEL[s.type === "add_skill" ? "kata_kunci" : s.category] ?? s.category}
+                    {(() => { const k = CATEGORY_KEY[s.type === "add_skill" ? "kata_kunci" : s.category]; return k ? t(k) : s.category; })()}
                   </span>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant uppercase tracking-wide">
-                    {targetLabel(s)}
+                    {targetLabel(s, t)}
                   </span>
                 </div>
 
@@ -280,7 +283,7 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
                       value={editedValue(s)}
                       onChange={(e) => setEdits((prev) => ({ ...prev, [s.id]: e.target.value }))}
                       className="w-full bg-white border border-outline-variant/50 rounded-lg px-2.5 py-1.5 text-sm text-on-surface focus:ring-2 focus:ring-primary resize-none"
-                      aria-label="Ubah saran perbaikan"
+                      aria-label={t("ai.fix-edit")}
                     />
                   </div>
                 ) : (
@@ -290,7 +293,7 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
                       value={editedValue(s)}
                       onChange={(e) => setEdits((prev) => ({ ...prev, [s.id]: e.target.value }))}
                       className="flex-1 bg-white border border-outline-variant/50 rounded-lg px-2.5 py-1.5 text-sm text-on-surface focus:ring-2 focus:ring-primary"
-                      aria-label="Ubah nama keahlian"
+                      aria-label={t("ai.fix-edit-skill")}
                       maxLength={60}
                     />
                   </div>
@@ -307,7 +310,7 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
                     }`}
                   >
                     <span className="material-symbols-outlined text-[14px]" aria-hidden="true">check</span>
-                    Terima
+                    {t("ai.accept")}
                   </button>
                   <button
                     type="button"
@@ -317,7 +320,7 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
                     }`}
                   >
                     <span className="material-symbols-outlined text-[14px]" aria-hidden="true">close</span>
-                    Tolak
+                    {t("ai.reject")}
                   </button>
                   <button
                     type="button"
@@ -327,7 +330,7 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
                     <span className="material-symbols-outlined text-[14px]" aria-hidden="true">
                       {copiedId === s.id ? "check" : "content_copy"}
                     </span>
-                    {copiedId === s.id ? "Disalin" : "Salin"}
+                    {copiedId === s.id ? t("ai.copied") : t("ai.copy")}
                   </button>
                 </div>
               </div>
@@ -341,7 +344,7 @@ export function AutoFixPanel({ cvId, cvData, onApply }: AutoFixPanelProps) {
               className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary/90 active:scale-[0.99] transition-all"
             >
               <span className="material-symbols-outlined text-base" aria-hidden="true">auto_fix_high</span>
-              {`Terapkan ${accepted.length} saran yang disetujui`}
+              {fill(t("ai.fix-apply"), { n: accepted.length })}
             </button>
           )}
         </div>

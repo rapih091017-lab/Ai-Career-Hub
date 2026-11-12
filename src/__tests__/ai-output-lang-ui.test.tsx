@@ -88,3 +88,16 @@ describe("OutputLangProvider: satu state di builder", () => {
     expect(screen.getByTestId("lang")).toHaveTextContent("id");
   });
 });
+
+describe("UI fitur AI dalam English", () => {
+  it("panel Poles dan pemilih bahasa memakai teks English", async () => {
+    const { LanguageProvider } = await import("@/lib/i18n");
+    window.localStorage.setItem("lang", "en");
+    render(<LanguageProvider><ToastProvider><AIPolishButton content="Mengelola tim gudang dan stok" onApply={() => {}} /></ToastProvider></LanguageProvider>);
+    fireEvent.click(await screen.findByRole("button", { name: /AI Polish/ }));
+    expect(screen.getByRole("radiogroup", { name: "Output language:" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Polish this text" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("radio", { name: "English" }));
+    expect(screen.getByText("Your CV is in Indonesian; the result will be in English.")).toBeInTheDocument();
+  });
+});

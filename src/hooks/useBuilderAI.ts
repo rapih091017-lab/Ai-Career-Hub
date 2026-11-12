@@ -4,6 +4,7 @@ import { aiSkillNames } from "@/lib/cv-normalize";
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import type { CvData } from "@/components/cv-templates";
 import { CONTENT_STEPS, STEP, STEP_IDS, type StepId } from "@/lib/builder-steps";
+import { useTranslation } from "@/lib/i18n";
 
 /* ───────── AI & Scoring Logic ───────── */
 
@@ -27,6 +28,7 @@ export function useBuilderAI({
   addToast,
   outputLang,
 }: UseBuilderAIProps) {
+  const { t } = useTranslation();
   /* ── AI JD Suggestions state ── */
   const prevActiveStep = useRef(activeStep);
   const [aiJdSuggestions, setAiJdSuggestions] = useState(null as any[] | null);
@@ -79,7 +81,7 @@ export function useBuilderAI({
             setAiJdSuggestions(data.suggestions);
             addToast({
               type: "success",
-              message: "AI menganalisis deskripsi pekerjaan! Saran kata kunci tersedia di setiap section.",
+              message: t("ai.jd-analyzed"),
               duration: 5000,
             });
           }
@@ -90,14 +92,14 @@ export function useBuilderAI({
         .catch(() => {
           addToast({
             type: "info",
-            message: "Isi setiap section dengan kata kunci dari deskripsi pekerjaan agar CV lebih optimal.",
+            message: t("ai.jd-fallback"),
             duration: 4000,
           });
         });
     }
 
     prevActiveStep.current = activeStep;
-  }, [activeStep, cvData.jobTitle, cvData.jobDescription, cvData.skills, cvId, addToast, aiJdTriggered, outputLang]);
+  }, [activeStep, cvData.jobTitle, cvData.jobDescription, cvData.skills, cvId, addToast, aiJdTriggered, outputLang, t]);
 
   /* ── ATS Score ── */
   const computeAtsScore = useMemo((): number => {
@@ -185,14 +187,14 @@ export function useBuilderAI({
 
   /* ── Section label map for modals ── */
   const SECTION_LABEL_MAP: Record<string, string> = {
-    summary: "Ringkasan Profesional",
-    selfEvaluation: "Evaluasi Diri",
-    experience: "Pengalaman Kerja",
-    education: "Pendidikan",
-    skills: "Keahlian",
-    certifications: "Sertifikasi",
-    organizations: "Organisasi",
-    lainnya: "Bagian Tambahan",
+    summary: t("display.sec-summary"),
+    selfEvaluation: t("ai.sec-self-eval"),
+    experience: t("display.sec-experience"),
+    education: t("edu.title"),
+    skills: t("ai.fix-target-skill"),
+    certifications: t("ai.sec-cert"),
+    organizations: t("display.sec-org"),
+    lainnya: t("ai.sec-other"),
   };
 
   return {

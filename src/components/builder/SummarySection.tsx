@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { AiLoadingOverlay } from "./AiLoadingOverlay";
 import { Field } from "@/components/builder/Field";
 import { AIPolishButton } from "@/components/ai/AIPolishDialog";
+import { useTranslation } from "@/lib/i18n";
 import { OutputLangPicker, baseCvLang, useOutputLang } from "@/components/ai/OutputLangPicker";
 import { FieldHelp } from "@/components/builder/FieldHelp";
 import { TargetMissingNote } from "@/components/builder/TargetHint";
@@ -31,13 +32,14 @@ interface SummarySectionProps {
   onError: (message: string) => void;
 }
 
-const EMPLOYMENT_STATUS_OPTIONS = [
-  "Mencari Kerja",
-  "Bekerja",
-  "Freelance / Freelancer",
-  "Wirausaha",
-  "Mahasiswa",
-  "Tidak Aktif Bekerja",
+// Nilai disimpan apa adanya di CV (data lama tetap cocok); hanya label opsi yang diterjemahkan.
+const EMPLOYMENT_STATUS_OPTIONS: { value: string; key: string }[] = [
+  { value: "Mencari Kerja", key: "ai.status-seeking" },
+  { value: "Bekerja", key: "ai.status-employed" },
+  { value: "Freelance / Freelancer", key: "ai.status-freelance" },
+  { value: "Wirausaha", key: "ai.status-business" },
+  { value: "Mahasiswa", key: "ai.status-student" },
+  { value: "Tidak Aktif Bekerja", key: "ai.status-inactive" },
 ];
 
 export function SummarySection({
@@ -60,6 +62,7 @@ export function SummarySection({
   onError,
 }: SummarySectionProps) {
   const [aiSuggestLoading, setAiSuggestLoading] = useState(false);
+  const { t } = useTranslation();
   const [aiReviseLoading, setAiReviseLoading] = useState(false);
   // Di builder state bersama dari OutputLangProvider; tebakan teks hanya cadangan.
   const { lang: outputLang, setLang: setOutputLang, cvLang: cvBase } = useOutputLang(baseCvLang(undefined, summary));
@@ -86,7 +89,7 @@ export function SummarySection({
       });
       const data = await res.json();
       if (!res.ok) {
-        onError(data.message || "Gagal mendapatkan saran AI.");
+        onError(data.message || t("ai.suggest-failed"));
       } else if (data.suggestions?.length > 0) {
         onAISuggest(
           data.suggestions.map((s: any) => ({
@@ -126,11 +129,11 @@ export function SummarySection({
       });
       const data = await res.json();
       if (!res.ok) {
-        onError(data.message || "Gagal mengoptimalkan ringkasan.");
+        onError(data.message || t("ai.summary-optimize-failed"));
       } else if (data.versions) {
         onAIRevise(data.versions, data.explanation, data.tip);
       } else {
-        onError("AI tidak menghasilkan optimasi. Coba lagi.");
+        onError(t("ai.optimize-empty"));
       }
     } catch (error) {
       onError(error instanceof Error ? error.message : String(error));
@@ -166,7 +169,7 @@ export function SummarySection({
       {/* Employment Status */}
       <div data-cv-field="employmentStatus">
         <div className="mb-1.5 flex items-center gap-1">
-          <label htmlFor="cv-employment-status" className="block text-label-bold text-on-surface">Status Pekerjaan</label>
+          <label htmlFor="cv-employment-status" className="block text-label-bold text-on-surface">{t("ai.status-label")}</label>
           <FieldHelp topic="employmentStatus" />
         </div>
         <select
@@ -175,9 +178,9 @@ export function SummarySection({
           onChange={(e) => onEmploymentStatusChange?.(e.target.value)}
           className="w-full bg-surface-container-low border-none rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary text-body-md"
         >
-          <option value="">Pilih status...</option>
+          <option value="">{t("ai.status-pick")}</option>
           {EMPLOYMENT_STATUS_OPTIONS.map((opt) => (
-            <option key={opt} value={opt}>{opt}</option>
+            <option key={opt.value} value={opt.value}>{t(opt.key)}</option>
           ))}
         </select>
       </div>
@@ -185,7 +188,7 @@ export function SummarySection({
       {/* Summary */}
       <div className="relative" data-cv-field="summary">
         <div className="mb-1.5 flex items-center gap-1">
-          <label htmlFor="cv-summary" className="block text-label-bold text-on-surface">Ringkasan Profesional</label>
+          <label htmlFor="cv-summary" className="block text-label-bold text-on-surface">{t("display.sec-summary")}</label>
           <FieldHelp topic="summary" />
         </div>
         
@@ -200,7 +203,7 @@ export function SummarySection({
                 transition={{ duration: 0.2 }}
               >
                 <AiLoadingOverlay
-                  label={aiSuggestLoading ? "AI sedang menyusun saran" : "AI sedang mengoptimalkan"}
+                  label={aiSuggestLoading ? t("ai.suggest-loading") : t("ai.optimize-loading")}
                 />
               </motion.div>
             )}
@@ -211,7 +214,7 @@ export function SummarySection({
             value={summary}
             onChange={(e) => onChange(e.target.value)}
             className="w-full bg-surface-container-low border-none rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary resize-none text-body-md transition-all duration-300 pr-24"
-            placeholder="Tuliskan ringkasan singkat tentang dirimu..."
+            placeholder={t("ai.summary-ph")}
             maxLength={1000}
             disabled={aiSuggestLoading || aiReviseLoading}
           />
@@ -256,7 +259,7 @@ export function SummarySection({
                     ? "border-amber-300 bg-amber-100 text-amber-800 cursor-wait animate-[breathe_1.5s_ease-in-out_infinite]"
                     : "border-amber-200 bg-amber-50 text-amber-700 shadow-sm hover:bg-amber-100 hover:text-amber-800 active:bg-amber-200"
                 } disabled:opacity-40`}
-                title="Generate alternatif ringkasan profesional dari AI"
+                title={t("ai.suggest-summary-title")}
               >
                 <span className={`material-symbols-outlined text-[14px] transition-all duration-500 ${
                   aiSuggestLoading ? "animate-spin text-amber-500" : ""
@@ -264,7 +267,7 @@ export function SummarySection({
                   {aiSuggestLoading ? "sync" : "auto_awesome"}
                 </span>
                 <span>
-                  {aiSuggestLoading ? "Menyusun saran..." : "Saran AI"}
+                  {aiSuggestLoading ? t("ai.suggesting") : t("ai.suggest")}
                 </span>
               </motion.button>
 
@@ -278,7 +281,7 @@ export function SummarySection({
                     ? "bg-primary/80 text-on-primary cursor-wait animate-[pulse-ring_1.5s_ease-in-out_infinite]"
                     : "bg-primary text-on-primary shadow-sm hover:-translate-y-0.5 active:translate-y-0"
                 } disabled:opacity-40`}
-                title="Optimalkan ringkasan dengan AI"
+                title={t("ai.optimize-summary-title")}
               >
                 {aiReviseLoading && (
                   <span className="material-symbols-outlined text-[14px] animate-spin" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">
@@ -286,7 +289,7 @@ export function SummarySection({
                   </span>
                 )}
                 <span>
-                  {aiReviseLoading ? "Mengoptimalkan..." : "Optimalkan"}
+                  {aiReviseLoading ? t("ai.optimizing") : t("ai.optimize")}
                 </span>
               </motion.button>
             </div>
@@ -301,7 +304,7 @@ export function SummarySection({
           >
             <p className="text-xs text-on-surface-variant flex items-center gap-1">
               <span className="material-symbols-outlined text-sm" aria-hidden="true">info</span>
-              Tulis ringkasan dulu, lalu gunakan Saran AI atau Optimalkan untuk menyempurnakannya
+              {t("ai.summary-empty")}
             </p>
           </motion.div>
         )}
@@ -315,8 +318,8 @@ export function SummarySection({
               <span className="material-symbols-outlined text-indigo-600" style={{ fontVariationSettings: "'FILL' 1" }}>tune</span>
             </div>
             <div>
-              <h3 className="flex items-center gap-1 font-label-bold text-on-surface">Field Kustom<FieldHelp topic="customFields" /></h3>
-              <p className="text-xs text-on-surface-variant">Tambahkan info tambahan (GitHub, Website, dll)</p>
+              <h3 className="flex items-center gap-1 font-label-bold text-on-surface">{t("ai.custom-title")}<FieldHelp topic="customFields" /></h3>
+              <p className="text-xs text-on-surface-variant">{t("ai.custom-desc")}</p>
             </div>
           </div>
         </div>
@@ -329,7 +332,7 @@ export function SummarySection({
                 value={field.label}
                 onChange={(e) => updateCustomField(i, "label", e.target.value)}
                 className="w-full bg-surface-container-lowest border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary text-body-md"
-                placeholder="Label (misal: GitHub)"
+                placeholder={t("ai.custom-label-ph")}
               />
             </div>
             <div className="flex-1">
@@ -338,14 +341,14 @@ export function SummarySection({
                 value={field.value}
                 onChange={(e) => updateCustomField(i, "value", e.target.value)}
                 className="w-full bg-surface-container-lowest border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary text-body-md"
-                placeholder="Nilai (misal: https://github.com/username)"
+                placeholder={t("ai.custom-value-ph")}
               />
             </div>
             <button
               type="button"
               onClick={() => removeCustomField(i)}
               className="text-error/70 hover:text-error transition-colors shrink-0"
-              aria-label="Hapus field kustom"
+              aria-label={t("ai.custom-remove")}
             >
               <span className="material-symbols-outlined text-[18px]">delete</span>
             </button>
@@ -356,7 +359,7 @@ export function SummarySection({
           onClick={addCustomField}
           className="w-full border-2 border-dashed border-outline/30 rounded-xl py-3 flex items-center justify-center gap-2 text-body-md text-on-surface-variant hover:border-primary/50 hover:text-primary transition-colors duration-200"
         >
-          <span className="material-symbols-outlined text-lg">add</span> Tambah Field Kustom
+          <span className="material-symbols-outlined text-lg">add</span> {t("ai.custom-add")}
         </button>
       </div>
     </div>

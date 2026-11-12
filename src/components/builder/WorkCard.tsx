@@ -9,7 +9,8 @@ import { TargetMissingNote } from "@/components/builder/TargetHint";
 import { AiLoadingOverlay } from "./AiLoadingOverlay";
 import { BulletEditor } from "./BulletEditor";
 import { useToast } from "@/components/ui/toast";
-import { UNDO_BLOCKED_MESSAGE, useUndoGuard } from "@/hooks/useUndoGuard";
+import { useUndoGuard } from "@/hooks/useUndoGuard";
+import { fill, useTranslation } from "@/lib/i18n";
 import { aiTextForField, applyAiBullets } from "@/lib/bullet-lines";
 import type { WorkEntry } from "@/components/cv-templates";
 
@@ -62,6 +63,7 @@ export function WorkCard({
   const [aiReviseLoading, setAiReviseLoading] = useState(false);
   const { lang: outputLang, setLang: setOutputLang, cvLang: cvBase } = useOutputLang(baseCvLang(undefined, work.description));
   const { addToast } = useToast();
+  const { t } = useTranslation();
 
   const undoGuard = useUndoGuard(work.description);
   // Indeks bisa bergeser bila entri diurutkan ulang sebelum Urungkan diklik.
@@ -77,10 +79,10 @@ export function WorkCard({
       message,
       duration: 8000,
       action: {
-        label: "Urungkan",
+        label: t("bullet.undo"),
         onClick: () => {
           if (!unchanged()) {
-            addToast({ type: "info", message: UNDO_BLOCKED_MESSAGE });
+            addToast({ type: "info", message: t("ai.undo-blocked") });
             return;
           }
           onUpdate(indexRef.current, "description", before);
@@ -106,17 +108,17 @@ export function WorkCard({
       });
       const data = await res.json();
       if (!res.ok) {
-        onError(data.message || "Gagal mendapatkan saran AI.");
+        onError(data.message || t("ai.suggest-failed"));
       } else {
         const bullets = data.suggestions?.map((s: any) => s.bullet) || [];
         if (bullets.length > 0) {
           onAISuggest(
-            `Saran AI · ${work.position || "Posisi " + (index + 1)}`,
+            `${t("ai.suggest")} · ${work.position || fill(t("ai.position-n"), { n: index + 1 })}`,
             data.suggestions,
             (text: string, mode: "append" | "replace" = "replace") => {
               const before = work.description;
               onUpdate(index, "description", applyAiBullets(before, text, mode));
-              offerUndo(mode === "append" ? "Poin saran ditambahkan." : "Deskripsi diganti dengan saran AI.", before);
+              offerUndo(mode === "append" ? t("ai.suggest-appended") : t("ai.suggest-replaced"), before);
             }
           );
         }
@@ -144,10 +146,10 @@ export function WorkCard({
       });
       const data = await res.json();
       if (!res.ok) {
-        onError(data.message || "Terjadi kesalahan saat menghubungi AI.");
+        onError(data.message || t("ai.contact-failed"));
       } else {
         onAIRevise(
-          `Optimalkan · ${work.position || "Posisi " + (index + 1)}`,
+          `${t("ai.optimize")} · ${work.position || fill(t("ai.position-n"), { n: index + 1 })}`,
           work.description,
           data.versions,
           data.explanation,
@@ -155,7 +157,7 @@ export function WorkCard({
           (text: string) => {
             const before = work.description;
             onUpdateDescription(index, aiTextForField(text, work.descriptionType));
-            offerUndo("Deskripsi diganti dengan versi yang dioptimalkan.", before);
+            offerUndo(t("ai.optimize-replaced"), before);
           }
         );
       }
@@ -177,7 +179,7 @@ export function WorkCard({
             type="button"
             onClick={() => onToggleCollapse(work.id)}
             className="shrink-0 p-1 hover:bg-surface-container rounded transition-colors"
-            aria-label={isCollapsed ? "Perluas detail" : "Ciutkan detail"}
+            aria-label={isCollapsed ? t("ai.expand") : t("ai.collapse")}
           >
             <span
               className="material-symbols-outlined text-[18px] text-on-surface-variant transition-transform duration-200"
@@ -197,8 +199,8 @@ export function WorkCard({
             type="button"
             onClick={() => onToggleVisibility(index)}
             className={`transition-colors p-1.5 rounded ${isHidden ? "text-on-surface-variant" : "text-primary hover:text-primary/80"}`}
-            title={isHidden ? "Tampilkan di CV" : "Sembunyikan dari CV"}
-            aria-label={isHidden ? "Tampilkan" : "Sembunyikan"}
+            title={isHidden ? t("entry.show-in-cv") : t("entry.hide-from-cv")}
+            aria-label={isHidden ? t("section.show") : t("entry.hide")}
           >
             <span className="material-symbols-outlined text-[18px]">
               {isHidden ? "visibility_off" : "visibility"}
@@ -207,7 +209,7 @@ export function WorkCard({
           {index > 0 && (
             <button type="button" onClick={() => onMoveUp(index)}
               className="text-on-surface-variant hover:text-primary transition-colors p-1.5"
-              aria-label="Pindah ke atas"
+              aria-label={t("entry.move-up")}
             >
               <span className="material-symbols-outlined text-[16px]">arrow_upward</span>
             </button>
@@ -215,7 +217,7 @@ export function WorkCard({
           {index < totalItems - 1 && (
             <button type="button" onClick={() => onMoveDown(index)}
               className="text-on-surface-variant hover:text-primary transition-colors p-1.5"
-              aria-label="Pindah ke bawah"
+              aria-label={t("entry.move-down")}
             >
               <span className="material-symbols-outlined text-[16px]">arrow_downward</span>
             </button>
@@ -224,7 +226,7 @@ export function WorkCard({
             type="button"
             onClick={() => onRemove(index)}
             className="text-error/70 hover:text-error transition-colors p-1.5"
-            aria-label="Hapus pengalaman"
+            aria-label={t("ai.work-remove")}
           >
             <span className="material-symbols-outlined text-[18px]">delete</span>
           </button>
@@ -241,21 +243,21 @@ export function WorkCard({
             className="overflow-hidden"
           >
             <div className="space-y-4">
-              <Field cvField="position" label="Posisi Jabatan" value={work.position} onChange={(v) => onUpdate(index, "position", v)} enableAiPolish fieldName="position" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
-              <Field cvField="company" label="Perusahaan" value={work.company} onChange={(v) => onUpdate(index, "company", v)} enableAiPolish fieldName="company" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
-              <Field cvField="companyDescription" label="Deskripsi Perusahaan (opsional)" help="companyDescription" value={work.companyDescription || ""} onChange={(v) => onUpdate(index, "companyDescription", v)} />
-              <Field cvField="location" label="Lokasi" value={work.location} onChange={(v) => onUpdate(index, "location", v)} />
-              <Field cvField="projectUrl" label="Link Proyek / Portofolio (opsional)" value={work.projectUrl || ""} onChange={(v) => onUpdate(index, "projectUrl", v)} placeholder="https://github.com/..." />
+              <Field cvField="position" label={t("ai.work-position")} value={work.position} onChange={(v) => onUpdate(index, "position", v)} enableAiPolish fieldName="position" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
+              <Field cvField="company" label={t("ai.work-company")} value={work.company} onChange={(v) => onUpdate(index, "company", v)} enableAiPolish fieldName="company" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
+              <Field cvField="companyDescription" label={t("ai.work-company-desc")} help="companyDescription" value={work.companyDescription || ""} onChange={(v) => onUpdate(index, "companyDescription", v)} />
+              <Field cvField="location" label={t("ai.work-location")} value={work.location} onChange={(v) => onUpdate(index, "location", v)} />
+              <Field cvField="projectUrl" label={t("ai.work-project")} value={work.projectUrl || ""} onChange={(v) => onUpdate(index, "projectUrl", v)} placeholder="https://github.com/..." />
               <div className="bg-primary/5 border border-primary/10 rounded-xl p-3">
-                <Field cvField="achievement" label="Pencapaian Utama (opsional)" help="achievement" value={work.achievement || ""} onChange={(v) => onUpdate(index, "achievement", v)} placeholder="Contoh: Mempercepat rekap stok dari [angka] menjadi [angka] hari" enableAiPolish fieldName="achievement" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
+                <Field cvField="achievement" label={t("ai.work-achievement")} help="achievement" value={work.achievement || ""} onChange={(v) => onUpdate(index, "achievement", v)} placeholder={t("ai.work-achievement-ph")} enableAiPolish fieldName="achievement" jobTitle={jobTitle} skills={skills} jobDescription={jobDescription} />
                 <p className="text-[10px] text-on-surface-variant mt-1 flex items-center gap-1">
                   <span className="material-symbols-outlined text-xs" aria-hidden="true">info</span>
-                  Soroti pencapaian dengan angka/metrik · ini yang paling dilihat HR!
+                  {t("ai.work-achievement-tip")}
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <Field cvField="startDate" label="Mulai" type="month" value={work.startDate} onChange={(v) => onUpdate(index, "startDate", v)} />
-                <Field label="Selesai" type="month" value={work.endDate} onChange={(v) => onUpdate(index, "endDate", v)} disabled={work.isCurrent} />
+                <Field cvField="startDate" label={t("ai.start")} type="month" value={work.startDate} onChange={(v) => onUpdate(index, "startDate", v)} />
+                <Field label={t("ai.end")} type="month" value={work.endDate} onChange={(v) => onUpdate(index, "endDate", v)} disabled={work.isCurrent} />
               </div>
               <label className="relative flex items-center gap-2.5 cursor-pointer select-none mt-2 group">
                 <input
@@ -272,7 +274,7 @@ export function WorkCard({
                     <span className="material-symbols-outlined text-sm text-white" aria-hidden="true">check</span>
                   )}
                 </div>
-                <span className="text-body-md text-on-surface-variant group-hover:text-on-surface transition-colors">Saya masih bekerja di sini</span>
+                <span className="text-body-md text-on-surface-variant group-hover:text-on-surface transition-colors">{t("ai.work-current")}</span>
               </label>
               <div>
                 <div className="relative">
@@ -285,20 +287,20 @@ export function WorkCard({
                         transition={{ duration: 0.2 }}
                       >
                         <AiLoadingOverlay
-                          label={aiSuggestLoading ? "AI sedang menyusun saran" : "AI sedang mengoptimalkan"}
+                          label={aiSuggestLoading ? t("ai.suggest-loading") : t("ai.optimize-loading")}
                         />
                       </motion.div>
                     )}
                   </AnimatePresence>
                   <BulletEditor
                     cvField="description"
-                    label="Deskripsi"
+                    label={t("ai.description")}
                     help="workDescription"
                     value={work.description}
                     onChange={(v) => onUpdate(index, "description", v)}
                     mode={work.descriptionType ?? "bullets"}
                     onModeChange={(m) => onUpdate(index, "descriptionType", m)}
-                    placeholder="Contoh: Menyusun laporan stok mingguan untuk 3 gudang"
+                    placeholder={t("ai.work-desc-ph")}
                     maxLength={2500}
                     disabled={aiSuggestLoading || aiReviseLoading}
                     headerAction={
@@ -335,7 +337,7 @@ export function WorkCard({
                             ? "border-amber-300 bg-amber-100 text-amber-800 cursor-wait animate-[breathe_1.5s_ease-in-out_infinite]"
                             : "border-amber-200 bg-amber-50 text-amber-700 shadow-sm hover:bg-amber-100 hover:text-amber-800 active:bg-amber-200"
                         } disabled:opacity-40`}
-                        title="Generate bullet points achievement-based dari AI"
+                        title={t("ai.suggest-work-title")}
                       >
                         <span className={`material-symbols-outlined text-[14px] transition-all duration-500 ${
                           aiSuggestLoading ? "animate-spin text-amber-500" : ""
@@ -343,7 +345,7 @@ export function WorkCard({
                           {aiSuggestLoading ? "sync" : "auto_awesome"}
                         </span>
                         <span>
-                          {aiSuggestLoading ? "Menyusun saran..." : "Saran AI"}
+                          {aiSuggestLoading ? t("ai.suggesting") : t("ai.suggest")}
                         </span>
                       </motion.button>
 
@@ -357,7 +359,7 @@ export function WorkCard({
                             ? "bg-primary/80 text-on-primary cursor-wait animate-[pulse-ring_1.5s_ease-in-out_infinite]"
                             : "bg-primary text-on-primary shadow-sm hover:-translate-y-0.5 active:translate-y-0"
                         } disabled:opacity-40`}
-                        title="Optimalkan teks dengan AI"
+                        title={t("ai.optimize-work-title")}
                       >
                         {aiReviseLoading && (
                           <span className="material-symbols-outlined text-[14px] animate-spin" style={{ fontVariationSettings: "'FILL' 1" }} aria-hidden="true">
@@ -365,7 +367,7 @@ export function WorkCard({
                           </span>
                         )}
                         <span>
-                          {aiReviseLoading ? "Mengoptimalkan..." : "Optimalkan"}
+                          {aiReviseLoading ? t("ai.optimizing") : t("ai.optimize")}
                         </span>
                       </motion.button>
                     </div>

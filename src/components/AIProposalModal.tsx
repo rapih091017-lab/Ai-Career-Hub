@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Modal from "./Modal";
 import { bulletList, splitAiBullets } from "@/lib/bullet-lines";
+import { fill, useTranslation } from "@/lib/i18n";
 
 /* ───────── Types ───────── */
 
@@ -50,6 +51,7 @@ export default function AIProposalModal({
   asBullets = false,
   onAccept,
 }: AIProposalModalProps) {
+  const { t } = useTranslation();
   const [selectedVersion, setSelectedVersion] = useState<"conservative" | "improved" | "bold" | null>(null);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState<number | null>(null);
   // Saran poin (multi pilih): default semua dicentang.
@@ -99,16 +101,16 @@ export default function AIProposalModal({
   }
   var isMultiSuggest = mode === "suggest" && !isSingleSelectSuggest;
 
-  var buttonLabel = "Pakai versi ini";
+  var buttonLabel = t("ai.use-version");
   if (isMultiSuggest) {
-    buttonLabel = checked.size > 0 ? "Tambahkan " + checked.size + " poin" : "Tambahkan";
+    buttonLabel = checked.size > 0 ? fill(t("ai.add-n"), { n: checked.size }) : t("ai.add");
   }
 
   /* ── Mode context labels ── */
-  var modeLabel = mode === "suggest" ? "Saran baru" : "Perbaikan";
+  var modeLabel = mode === "suggest" ? t("ai.mode-suggest") : t("ai.mode-revise");
   var modeHint = mode === "suggest"
-    ? "Ditulis dari posisi dan skill kamu. Periksa dulu; isi sendiri bagian dalam [kurung]."
-    : "Tiga versi dari teks kamu, dari perubahan paling kecil sampai paling tegas.";
+    ? t("ai.hint-suggest")
+    : t("ai.hint-revise");
   var modeColors = mode === "suggest"
     ? "bg-amber-100 text-amber-700"
     : "bg-primary/10 text-primary";
@@ -134,8 +136,8 @@ export default function AIProposalModal({
           <div className="space-y-3">
             <p className="text-sm text-on-surface-variant">
               {isSingleSelectSuggest
-                ? "Pilih satu versi ringkasan:"
-                : checked.size + " dari " + suggestions.length + " poin dipilih. Tambahkan menaruhnya di bawah deskripsi; Ganti semua menimpa deskripsi."}
+                ? t("ai.pick-summary")
+                : fill(t("ai.n-of-total"), { n: checked.size, total: suggestions.length })}
             </p>
             {!isSingleSelectSuggest && (
               <button
@@ -145,7 +147,7 @@ export default function AIProposalModal({
                 }}
                 className="min-h-11 rounded-md px-1 text-xs font-semibold text-primary underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:min-h-8"
               >
-                {checked.size === suggestions.length ? "Kosongkan pilihan" : "Pilih semua"}
+                {checked.size === suggestions.length ? t("ai.clear-selection") : t("ai.select-all")}
               </button>
             )}
             <div className="space-y-2">
@@ -221,7 +223,7 @@ export default function AIProposalModal({
               <details className="group">
                 <summary className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider cursor-pointer flex items-center gap-1.5 hover:text-primary transition-colors">
                   <span className="material-symbols-outlined text-sm group-open:rotate-90 transition-transform">chevron_right</span>
-                  Teks Asli
+                  {t("ai.original")}
                 </summary>
                 <div className="mt-2 p-3 rounded-xl bg-surface-container-low border border-outline-variant/50">
                   {asBullets ? (
@@ -239,9 +241,9 @@ export default function AIProposalModal({
 
             <div className="grid gap-3">
               {([
-                { key: "conservative" as const, label: "Ringan", desc: "Perubahan kecil, isi tetap sama", color: "border-blue-300 bg-blue-50/30", labelColor: "bg-blue-100 text-blue-700", iconColor: "text-blue-600" },
-                { key: "improved" as const, label: "Lebih tegas", desc: "Hasil kerja lebih menonjol", color: "border-amber-300 bg-amber-50/30", labelColor: "bg-amber-100 text-amber-700", iconColor: "text-amber-600" },
-                { key: "bold" as const, label: "Paling tegas", desc: "Cocok untuk peran senior", color: "border-green-300 bg-green-50/30", labelColor: "bg-green-100 text-green-700", iconColor: "text-green-600" },
+                { key: "conservative" as const, label: t("ai.v-light"), desc: t("ai.v-light-desc"), color: "border-blue-300 bg-blue-50/30", labelColor: "bg-blue-100 text-blue-700", iconColor: "text-blue-600" },
+                { key: "improved" as const, label: t("ai.v-strong"), desc: t("ai.v-strong-desc"), color: "border-amber-300 bg-amber-50/30", labelColor: "bg-amber-100 text-amber-700", iconColor: "text-amber-600" },
+                { key: "bold" as const, label: t("ai.v-bold"), desc: t("ai.v-bold-desc"), color: "border-green-300 bg-green-50/30", labelColor: "bg-green-100 text-green-700", iconColor: "text-green-600" },
               ]).map(function (item) {
                 var text = versions[item.key];
                 var isSelected = selectedVersion === item.key;
@@ -291,9 +293,9 @@ export default function AIProposalModal({
                     <line x1="12" y1="16" x2="12" y2="12" />
                     <line x1="12" y1="8" x2="12.01" y2="8" />
                   </svg>
-                  <span className="text-[10px] font-bold text-primary uppercase tracking-wider">Apa yang berubah</span>
+                  <span className="text-[10px] font-bold text-primary uppercase tracking-wider">{t("ai.what-changed")}</span>
                 </div>
-                <p className="text-sm text-on-surface-variant leading-relaxed">{versionLabelsInText(explanation)}</p>
+                <p className="text-sm text-on-surface-variant leading-relaxed">{versionLabelsInText(explanation, { conservative: t("ai.v-light"), improved: t("ai.v-strong"), bold: t("ai.v-bold") })}</p>
               </div>
             )}
           </div>
@@ -318,7 +320,7 @@ export default function AIProposalModal({
             onClick={handleClose}
             className="flex-1 py-2.5 rounded-xl border border-outline-variant text-sm font-medium text-on-surface hover:bg-surface-container transition-all active:scale-[0.98]"
           >
-            Batal
+            {t("ai.cancel")}
           </button>
           {isMultiSuggest && (
             <button
@@ -328,7 +330,7 @@ export default function AIProposalModal({
               className="flex-1 py-2.5 rounded-xl border border-amber-400 bg-amber-50 text-sm font-semibold text-amber-900 hover:bg-amber-100 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-1.5"
             >
               <span className="material-symbols-outlined text-base" aria-hidden="true">warning</span>
-              Ganti semua
+              {t("ai.replace-all")}
             </button>
           )}
           <button
@@ -353,7 +355,9 @@ export default function AIProposalModal({
  * (respons lama atau model tidak patuh). Petakan ke label kartu versi.
  * Hanya bentuk berlabel (diikuti titik dua) yang diganti, isi teks lain tidak.
  */
-export function versionLabelsInText(text: string): string {
-  const map: Record<string, string> = { conservative: "Ringan", improved: "Lebih tegas", bold: "Paling tegas" };
+export function versionLabelsInText(
+  text: string,
+  map: Record<string, string> = { conservative: "Ringan", improved: "Lebih tegas", bold: "Paling tegas" },
+): string {
   return text.replace(/\b(Conservative|Improved|Bold)(\s*):/gi, (_m, w: string, sp: string) => `${map[w.toLowerCase()]}${sp}:`);
 }
