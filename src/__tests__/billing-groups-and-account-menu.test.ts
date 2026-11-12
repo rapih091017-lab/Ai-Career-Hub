@@ -5,7 +5,8 @@ import { packageGroup, singleProductOf, SINGLE_PRODUCT_ORDER } from "@/lib/prici
 
 const billingSrc = readFileSync(join(process.cwd(), "src/app/settings/billing/page.tsx"), "utf8");
 const checkoutSrc = readFileSync(join(process.cwd(), "src/app/checkout/page.tsx"), "utf8");
-const landingSrc = readFileSync(join(process.cwd(), "src/app/page.tsx"), "utf8");
+// Isi landing pindah ke komponen klien; src/app/page.tsx hanya metadata.
+const landingSrc = readFileSync(join(process.cwd(), "src/components/landing/LandingPage.tsx"), "utf8");
 const i18nSrc = readFileSync(join(process.cwd(), "src/lib/i18n.tsx"), "utf8");
 const navItemsSrc = readFileSync(join(process.cwd(), "src/lib/nav-items.ts"), "utf8");
 

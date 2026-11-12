@@ -1,66 +1,38 @@
-"use client";
+import type { Metadata } from "next";
+import LandingPage from "@/components/landing/LandingPage";
+import { SITE_URL } from "@/lib/site-url";
 
-import { useEffect } from "react";
-import AppFooter from "@/components/AppFooter";
-import RevealOnScroll from "@/components/RevealOnScroll";
-import PricingSection from "@/components/PricingSection";
-import StickyMobileCTA from "@/components/StickyMobileCTA";
-import TestimonialMarquee from "@/components/TestimonialMarquee";
-import SiteHeader from "@/components/nav/SiteHeader";
-import BeforeAfter from "@/components/landing/BeforeAfter";
-import CaraKerja from "@/components/landing/CaraKerja";
-import CheckerTeaser from "@/components/landing/CheckerTeaser";
-import ClosingCta from "@/components/landing/ClosingCta";
-import FaqSection from "@/components/landing/FaqSection";
-import HeroOrbit from "@/components/landing/HeroOrbit";
-import { track } from "@/lib/track";
-import StatsStrip from "@/components/landing/StatsStrip";
+const TITLE = "AI Career Hub - Tahu kenapa CV-mu belum dipanggil, lalu perbaiki";
+const DESCRIPTION =
+  "Cek CV gratis: skor per bagian, kata kunci lowongan yang belum muncul, dan contoh kalimat pengganti. Lalu perbaiki di builder dari teks CV yang sama dan unduh PDF-nya.";
 
 /**
- * Landing dibuat pendek dan mengarah ke satu jalur: cek CV gratis, lihat
- * hasilnya, lalu perbaiki di builder. Bikin CV dari nol tetap ada sebagai
- * jalur kedua di hero.
- *
- * Urutan: hero, contoh hasil cek, tiga langkah, sebelum/sesudah, testimoni
- * (plus angka platform dari API publik, keduanya sembunyi bila datanya
- * kosong), harga dan FAQ, penutup.
+ * Metadata khusus halaman depan, mengikuti janji hero. Field lain (robots,
+ * keywords, metadataBase) tetap dari layout. openGraph dan twitter ditulis
+ * lengkap karena Next mengganti seluruh objeknya, bukan menggabungkan.
  */
-const LANDING_VIEW_KEY = "evt_landing_view";
+export const metadata: Metadata = {
+  title: { absolute: TITLE },
+  description: DESCRIPTION,
+  alternates: { canonical: SITE_URL },
+  openGraph: {
+    type: "website",
+    locale: "id_ID",
+    alternateLocale: "en_US",
+    siteName: "AI Career Hub",
+    title: TITLE,
+    description: DESCRIPTION,
+    url: SITE_URL,
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: ["/og-image.png"],
+  },
+};
 
 export default function Home() {
-  // landing_view sekali per sesi tab, supaya muat ulang tidak menggelembungkan angka.
-  useEffect(() => {
-    try {
-      if (sessionStorage.getItem(LANDING_VIEW_KEY)) return;
-      sessionStorage.setItem(LANDING_VIEW_KEY, "1");
-    } catch {
-      /* sessionStorage tidak tersedia: tetap catat */
-    }
-    track("landing_view");
-  }, []);
-
-  return (
-    <>
-      <RevealOnScroll />
-
-      <SiteHeader variant="pill" />
-
-      <main id="isi">
-        <HeroOrbit />
-        <CheckerTeaser />
-        <CaraKerja />
-        <BeforeAfter />
-        <TestimonialMarquee />
-        <StatsStrip />
-        <PricingSection />
-        <FaqSection />
-        <ClosingCta />
-      </main>
-
-      <AppFooter variant="full" />
-      <StickyMobileCTA />
-      {/* Spacer kompensasi sticky mobile CTA agar tidak menimpa footer */}
-      <div className="h-20 md:hidden" aria-hidden="true" />
-    </>
-  );
+  return <LandingPage />;
 }

@@ -6,6 +6,7 @@ const FILES = [
   "src/components/PricingSection.tsx",
   "src/lib/i18n.tsx",
   "src/app/page.tsx",
+  "src/components/landing/LandingPage.tsx",
   "src/app/portfolio/page.tsx",
 ];
 
