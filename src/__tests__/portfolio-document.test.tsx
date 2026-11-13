@@ -121,7 +121,9 @@ describe.each(["interstella", "sherbet"] as const)("tema %s", (themeId) => {
   it("merender isi seluruh section, gambar, dan tautan yang bisa diaktifkan", () => {
     const { container } = render(<PortfolioDocument data={rich} themeId={themeId} mode="static" />);
     for (const id of DEFAULT_SECTION_ORDER) expect(anchor(container, id).querySelector("section"), id).toBeTruthy();
-    expect(container.querySelector("h1")).toHaveTextContent("Kampanye dari gagasan sampai layar");
+    // Nama jadi h1; sub-headline tetap tampil sebagai paragraf pembuka.
+    expect(container.querySelector("h1")).toHaveTextContent("Teguh Surya");
+    expect(anchor(container, "hero")).toHaveTextContent("Kampanye dari gagasan sampai layar");
     expect(anchor(container, "projects").querySelector("img")).toHaveAttribute("src", "https://example.com/proyek.jpg");
     expect(anchor(container, "projects")).toHaveTextContent("Direktur kreatif");
     expect(anchor(container, "certifications")).toHaveTextContent("Penerbit contoh");
@@ -153,7 +155,7 @@ describe.each(["interstella", "sherbet"] as const)("tema %s", (themeId) => {
     const host = document.createElement("div");
     host.innerHTML = html;
     expect(host.querySelector('a[href^="javascript:"], a[href^="data:"]')).toBeNull();
-    expect(host.querySelector("h1")).toHaveTextContent("Kampanye dari gagasan sampai layar");
+    expect(host.querySelector("h1")).toHaveTextContent("Teguh Surya");
     expect(host.querySelector("h1")?.closest('[style*="opacity:0"]')).toBeNull();
     expect(html).not.toContain("NaN");
   });

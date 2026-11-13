@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import type { EducationItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
 import { inkOn } from "../ink";
-import { Paper, Reveal, SectionHead, wbHeading, wbMono, wbSection, wbWrap } from "../workbench/kit";
+import { Paper, Reveal, SectionHead, wbHeading, wbMono, wbSection, wbWrap, isHeading } from "../workbench/kit";
 
 interface Props { items: EducationItem[]; }
 
@@ -438,7 +438,7 @@ function InterstellaEducation({ items }: { items: EducationItem[] }) {
   return (
     <section style={{ padding: "clamp(48px, 7vw, 80px) 0", background: theme.colors.bgSecondary }}>
       <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
-        <h2 style={{ margin: "0 0 32px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 700, color: theme.colors.text }}>Pendidikan</h2>
+        <h2 style={{ ...isHeading(theme), margin: "0 0 32px" }}>Pendidikan</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))", gap: 32 }}>
           {filtered.map((e) => <article key={e.id} style={{ paddingTop: 24, borderTop: `1px solid ${theme.colors.border}` }}>
             <h3 style={{ margin: 0, fontFamily: theme.typography.display, fontSize: 22, color: theme.colors.text }}>{e.institution}</h3>

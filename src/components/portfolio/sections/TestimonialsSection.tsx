@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import type { TestimonialItem } from "../../portfolio-templates/types";
 import { useReducedMotion } from "../../../hooks/useReducedMotion";
 import { usePortfolioTheme } from "../PortfolioCanvas";
-import { Paper, Reveal, SectionHead, wbHeading, wbMono, wbSection, wbWrap } from "../workbench/kit";
+import { Paper, Reveal, SectionHead, wbHeading, wbMono, wbSection, wbWrap, isHeading } from "../workbench/kit";
 
 interface Props { items: TestimonialItem[]; }
 
@@ -453,7 +453,7 @@ function InterstellaTestimonials({ items }: { items: TestimonialItem[] }) {
   return (
     <section style={{ padding: "clamp(64px, 10vw, 120px) 0", background: theme.colors.bg }}>
       <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
-        <h2 style={{ margin: "0 0 48px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 4vw, 3rem)", color: theme.colors.text }}>Kata rekan kerja</h2>
+        <h2 style={{ ...isHeading(theme), margin: "0 0 48px" }}>Testimoni</h2>
         {filtered.map((t) => <figure key={t.id} style={{ margin: "0 0 40px", padding: "32px 0", borderTop: `1px solid ${theme.colors.border}` }}>
           <blockquote style={{ margin: 0, fontFamily: theme.typography.display, fontSize: "clamp(1.5rem, 3.5vw, 2.5rem)", fontWeight: 500, lineHeight: 1.5, color: theme.colors.text }}>{t.testimonial}</blockquote>
           {(t.name || t.position) && <figcaption style={{ marginTop: 24, fontSize: 15, color: theme.colors.textMuted }}>{[t.name, t.position].filter(Boolean).join(" · ")}</figcaption>}
@@ -470,7 +470,7 @@ function SherbetTestimonials({ items }: { items: TestimonialItem[] }) {
   return (
     <section style={{ background: theme.colors.bgSecondary, padding: "clamp(64px, 9vw, 112px) 0" }}>
       <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
-        <h2 style={{ margin: "0 0 40px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 800, color: theme.colors.text }}>Cerita setelah kolaborasi</h2>
+        <h2 style={{ margin: "0 0 40px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 800, color: theme.colors.text }}>Testimoni</h2>
         <div style={{ display: "grid", gap: 36 }}>{filtered.map((t) => <figure key={t.id} style={{ margin: 0 }}>
           <blockquote style={{ margin: 0, maxWidth: "40ch", fontFamily: theme.typography.display, fontSize: "clamp(1.5rem, 3vw, 2.5rem)", lineHeight: 1.5, fontWeight: 600, color: theme.colors.text }}><p style={{ margin: 0 }}>{t.testimonial}</p></blockquote>
           {(t.name || t.position) && <figcaption style={{ marginTop: 20, color: theme.colors.textSecondary }}><strong style={{ display: "block" }}>{t.name}</strong>{t.position && <span style={{ display: "block", marginTop: 4 }}>{t.position}</span>}</figcaption>}

@@ -16,8 +16,7 @@ import {
   wbHeading,
   wbMono,
   wbSection,
-  wbWrap,
-} from "../workbench/kit";
+  wbWrap, isHeading } from "../workbench/kit";
 
 interface Props { items: ProjectItem[]; }
 
@@ -76,7 +75,7 @@ function GlassProjects({ items }: { items: ProjectItem[] }) {
                     ) : null}
                     <div className="p-6 flex flex-col flex-1">
                       <span className="text-xs font-medium mb-2" style={{ color: theme.colors.primary, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-                        Project {String(i + 1).padStart(2, "0")}
+                        Proyek {String(i + 1).padStart(2, "0")}
                       </span>
                       <h3 className="font-bold mb-2" style={{ fontSize: isWide ? "1.3rem" : "1.1rem", color: theme.colors.text }}>
                         {p.name}
@@ -179,7 +178,7 @@ function BrutalProjects({ items }: { items: ProjectItem[] }) {
                       <a href={p.link} target="_blank" rel="noopener noreferrer"
                         className="mt-4 inline-flex items-center gap-1 text-xs font-bold transition-all"
                         style={{ color: theme.colors.primary }}>
-                        VIEW PROJECT ↗
+                        LIHAT PROYEK ↗
                       </a>
                     )}
                   </div>
@@ -576,7 +575,7 @@ function InterstellaProjects({ items }: { items: ProjectItem[] }) {
   return (
     <section style={{ padding: "clamp(64px, 10vw, 128px) 0", background: theme.colors.bgSecondary }}>
       <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
-        <h2 style={{ fontFamily: theme.typography.display, fontSize: "clamp(2.5rem, 6vw, 4.5rem)", lineHeight: 1.1, letterSpacing: "-0.03em", fontWeight: 800, margin: "0 0 48px", color: theme.colors.text }}>Karya pilihan.</h2>
+        <h2 style={{ ...isHeading(theme), margin: "0 0 48px" }}>Karya pilihan</h2>
         <div style={{ display: "grid", gap: 56 }}>
           {filtered.map((p) => {
             const links = [{ label: "Lihat proyek", url: p.liveUrl || p.link }, { label: "Repositori", url: p.repoUrl }].map((l) => ({ ...l, href: safeUrlUnescaped(l.url || "") })).filter((l) => l.href);
@@ -608,7 +607,7 @@ function SherbetProjects({ items }: { items: ProjectItem[] }) {
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(64px, 9vw, 112px) 0" }}>
       <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
-        <h2 style={{ margin: "0 0 40px", fontFamily: theme.typography.display, fontWeight: 800, fontSize: "clamp(2.4rem, 5vw, 4rem)", lineHeight: 1.1, color: theme.colors.text }}>Cerita dalam karya.</h2>
+        <h2 style={{ margin: "0 0 40px", fontFamily: theme.typography.display, fontWeight: 800, fontSize: "clamp(2.4rem, 5vw, 4rem)", lineHeight: 1.1, color: theme.colors.text }}>Karya pilihan</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))", gap: "40px 28px" }}>{filtered.map((p) => {
           const links = [{ label: "Lihat karya", url: p.liveUrl || p.link }, { label: "Repositori", url: p.repoUrl }].map((l) => ({ ...l, href: safeUrlUnescaped(l.url || "") })).filter((l) => l.href);
           return <article key={p.id} style={{ minWidth: 0 }}>

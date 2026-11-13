@@ -202,7 +202,7 @@ function GlassHero({ data: f, name, initials }: { data: PortfolioFormData; name:
           animate="visible"
         >
           <motion.div variants={STAGGER_CHILD}>
-            <Eyebrow text={f.heroSubHeadline || "Welcome to my portfolio"} />
+            {f.heroSubHeadline ? <Eyebrow text={f.heroSubHeadline} /> : null}
           </motion.div>
 
           <motion.h1
@@ -326,7 +326,7 @@ function BrutalHero({ data: f, name, initials }: { data: PortfolioFormData; name
             animate="visible"
           >
             <motion.div variants={STAGGER_CHILD}>
-              <Eyebrow text={f.heroSubHeadline || "HELLO THERE"} />
+              {f.heroSubHeadline ? <Eyebrow text={f.heroSubHeadline} /> : null}
             </motion.div>
 
             <motion.h1
@@ -1037,12 +1037,13 @@ function InterstellaHero({ data: f, name }: { data: PortfolioFormData; name: str
     <section style={{ padding: "clamp(64px, 12vw, 144px) 0 clamp(56px, 9vw, 108px)", background: `linear-gradient(135deg, ${theme.colors.bg} 35%, ${theme.colors.secondary} 75%, ${theme.colors.primaryGlow})` }}>
       <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
         <motion.div initial={reduced ? false : { y: 20 }} animate={{ y: 0 }} transition={{ duration: 0.8, ease: WB_EASE }}>
-          <h1 style={{ margin: 0, maxWidth: "17ch", fontFamily: theme.typography.display, fontSize: "clamp(2.8rem, 8vw, 6rem)", fontWeight: 800, lineHeight: 1.06, letterSpacing: "-0.04em", color: theme.colors.text }}>{f.heroSubHeadline || f.heroHeadline || name}</h1>
+          {/* Nama sebagai h1; sub-headline jadi paragraf pembuka. */}
+          <h1 style={{ margin: 0, maxWidth: "17ch", fontFamily: theme.typography.display, fontSize: "clamp(2.8rem, 8vw, 6rem)", fontWeight: 800, lineHeight: 1.06, letterSpacing: "-0.04em", color: theme.colors.text }}>{name}</h1>
+          {f.heroSubHeadline && <p style={{ margin: "24px 0 0", maxWidth: "36ch", fontSize: "clamp(20px, 2.6vw, 28px)", lineHeight: 1.4, fontWeight: 600, color: theme.colors.text }}>{f.heroSubHeadline}</p>}
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "start", gap: "24px 64px", marginTop: 40 }}>
-            <div style={{ flex: "1 1 220px" }}>
-              <p style={{ margin: 0, fontWeight: 700, fontSize: 18, color: theme.colors.text }}>{name}</p>
-              {f.heroHeadline && <p style={{ margin: "8px 0 0", color: theme.colors.textSecondary }}>{f.heroHeadline}</p>}
-            </div>
+            {f.heroHeadline && <div style={{ flex: "1 1 220px" }}>
+              <p style={{ margin: 0, fontWeight: 700, fontSize: 18, color: theme.colors.primary }}>{f.heroHeadline}</p>
+            </div>}
             {f.heroBio && <p style={{ flex: "2 1 280px", maxWidth: "60ch", margin: 0, fontSize: 18, lineHeight: 1.75, color: theme.colors.textSecondary }}>{f.heroBio}</p>}
           </div>
           {f.contactEmail && <a href={`mailto:${f.contactEmail}`} className="inline-flex items-center hover:underline" style={{ marginTop: 36, minHeight: 48, padding: "12px 24px", borderRadius: theme.radii.button, background: theme.colors.primary, color: theme.colors.onPrimary, fontWeight: 700, textUnderlineOffset: 5 }}>Hubungi saya</a>}
@@ -1060,9 +1061,10 @@ function SherbetHero({ data: f, name }: { data: PortfolioFormData; name: string 
     <section style={{ background: theme.colors.bgSecondary, padding: "clamp(48px, 8vw, 96px) 0" }}>
       <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", display: "flex", flexWrap: "wrap", alignItems: "center", gap: 40, overflowWrap: "anywhere" }}>
         <motion.div initial={reduced ? false : { y: 16 }} animate={{ y: 0 }} transition={{ duration: 0.7, ease: WB_EASE }} style={{ flex: "2 1 280px", minWidth: 0 }}>
-          <h1 style={{ margin: 0, maxWidth: "16ch", fontFamily: theme.typography.display, fontSize: "clamp(2.6rem, 7vw, 5.5rem)", lineHeight: 1.06, letterSpacing: "-0.03em", fontWeight: 800, color: theme.colors.text }}>{f.heroSubHeadline || f.heroHeadline || name}</h1>
-          <p style={{ margin: "28px 0 0", fontSize: 18, fontWeight: 700, color: theme.colors.text }}>{name}</p>
-          {f.heroHeadline && <p style={{ margin: "6px 0 0", color: theme.colors.textSecondary }}>{f.heroHeadline}</p>}
+          {/* Nama sebagai h1; sub-headline jadi paragraf pembuka. */}
+          {f.heroHeadline && <p style={{ margin: "0 0 12px", fontSize: 16, fontWeight: 700, color: theme.colors.textSecondary }}>{f.heroHeadline}</p>}
+          <h1 style={{ margin: 0, maxWidth: "16ch", fontFamily: theme.typography.display, fontSize: "clamp(2.6rem, 7vw, 5.5rem)", lineHeight: 1.06, letterSpacing: "-0.03em", fontWeight: 800, color: theme.colors.text }}>{name}</h1>
+          {f.heroSubHeadline && <p style={{ margin: "24px 0 0", maxWidth: "32ch", fontSize: "clamp(20px, 2.4vw, 26px)", lineHeight: 1.4, fontWeight: 600, color: theme.colors.text }}>{f.heroSubHeadline}</p>}
           {f.heroBio && <p style={{ margin: "20px 0 0", maxWidth: "60ch", fontSize: 18, lineHeight: 1.7, color: theme.colors.textSecondary }}>{f.heroBio}</p>}
           {f.contactEmail && <a href={`mailto:${f.contactEmail}`} className="inline-flex items-center hover:underline" style={{ minHeight: 48, marginTop: 28, padding: "12px 24px", borderRadius: theme.radii.button, background: theme.colors.primary, color: theme.colors.onPrimary, fontWeight: 700, textUnderlineOffset: 5 }}>Diskusikan kolaborasi</a>}
         </motion.div>

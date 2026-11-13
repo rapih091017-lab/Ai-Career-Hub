@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 import type { PortfolioFormData } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
 import { inkOn } from "../ink";
-import { Chip, Reveal, SectionHead, wbHeading, wbMono, wbPaper, wbSection, wbWrap } from "../workbench/kit";
+import { Chip, Reveal, SectionHead, wbHeading, wbMono, wbPaper, wbSection, wbWrap, isHeading } from "../workbench/kit";
 
 interface Props { data: PortfolioFormData; }
 
@@ -431,7 +431,7 @@ function InterstellaSkills({ f }: { f: PortfolioFormData }) {
   return (
     <section style={{ padding: "clamp(64px, 10vw, 120px) 0", background: theme.colors.bg }}>
       <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
-        <h2 style={{ margin: "0 0 40px", fontFamily: theme.typography.display, fontSize: "clamp(2.5rem, 6vw, 4rem)", fontWeight: 800, lineHeight: 1.1, color: theme.colors.text }}>Keahlian.</h2>
+        <h2 style={{ ...isHeading(theme), margin: "0 0 40px" }}>Keahlian</h2>
         {groups.map((g) => <div key={g.label} style={{ display: "flex", flexWrap: "wrap", gap: "16px 48px", padding: "28px 0", borderTop: `1px solid ${theme.colors.border}` }}>
           <h3 style={{ flex: "1 1 220px", margin: 0, fontSize: 18, fontWeight: 600, color: theme.colors.textMuted }}>{g.label}</h3>
           <p style={{ flex: "2 1 280px", margin: 0, fontFamily: theme.typography.display, fontSize: "clamp(1.4rem, 3vw, 2rem)", lineHeight: 1.6, fontWeight: 600, color: theme.colors.text }}>{g.value}</p>
@@ -448,7 +448,7 @@ function SherbetSkills({ f }: { f: PortfolioFormData }) {
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
       <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
-        <h2 style={{ margin: "0 0 32px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 800, color: theme.colors.text }}>Bekal berkarya</h2>
+        <h2 style={{ margin: "0 0 32px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 800, color: theme.colors.text }}>Keahlian</h2>
         <dl style={{ margin: 0, display: "flex", flexWrap: "wrap", gap: "32px 48px" }}>{groups.map((g) => <div key={g.label} style={{ flex: "1 1 240px", minWidth: 0 }}>
           <dt style={{ fontSize: 20, fontWeight: 700, color: theme.colors.text }}>{g.label}</dt>
           <dd style={{ margin: "16px 0 0", display: "flex", flexWrap: "wrap", gap: 10 }}>{g.value.split(",").map((v) => v.trim()).filter(Boolean).map((v, i) => <span key={`${v}-${i}`} style={{ padding: "8px 16px", background: theme.colors.secondary, borderRadius: theme.radii.pill, color: theme.colors.textSecondary }}>{v}</span>)}</dd>

@@ -6,7 +6,7 @@ import { safeUrlUnescaped } from "@/lib/portfolio-safety";
 import type { PortfolioFormData, ExtraLink } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
 import { inkOn } from "../ink";
-import { PillLink, Reveal, SheetLabel, wbHeading, wbMono, wbPaper, wbSection, wbWrap } from "../workbench/kit";
+import { PillLink, Reveal, SheetLabel, wbHeading, wbMono, wbPaper, wbSection, wbWrap, isHeading } from "../workbench/kit";
 
 interface Props { data: PortfolioFormData; extraLinks: ExtraLink[]; }
 
@@ -445,7 +445,7 @@ function ScrapbookContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks:
     <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
       <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)", textAlign: "center" }}>
         <Reveal>
-          <h2 style={{ ...wbHeading(theme, "clamp(2.2rem, 6vw, 3.6rem)"), fontWeight: 700, color: theme.colors.primary }}>Mari bertemu di kertas berikutnya</h2>
+          <h2 style={{ ...wbHeading(theme, "clamp(2.2rem, 6vw, 3.6rem)"), fontWeight: 700, color: theme.colors.primary }}>Kontak</h2>
         </Reveal>
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 14, marginTop: 30 }}>
           {links.map((l, i) => (
@@ -475,7 +475,7 @@ function InterstellaContact({ f, extraLinks }: { f: PortfolioFormData; extraLink
   return (
     <section style={{ padding: "clamp(64px, 10vw, 128px) 0", background: theme.colors.bgSecondary }}>
       <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
-        <h2 style={{ margin: "0 0 40px", maxWidth: "14ch", fontFamily: theme.typography.display, fontSize: "clamp(2.8rem, 7vw, 5rem)", fontWeight: 800, lineHeight: 1.1, letterSpacing: "-0.03em", color: theme.colors.text }}>Mari bekerja sama.</h2>
+        <h2 style={{ ...isHeading(theme), margin: "0 0 40px" }}>Kontak</h2>
         <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>{links.map((l, i) => <li key={`${l.href}-${i}`} style={{ borderTop: `1px solid ${theme.colors.border}` }}>
           <a href={l.href} className="hover:underline" {...(/^https?:/i.test(l.href) ? { target: "_blank", rel: "noopener noreferrer" } : {})} style={{ display: "flex", alignItems: "center", minHeight: 56, padding: "16px 0", fontSize: "clamp(1rem, 2.5vw, 1.5rem)", color: theme.colors.primary, textUnderlineOffset: 6 }}>{l.label}</a>
         </li>)}</ul>
@@ -497,7 +497,7 @@ function SherbetContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: E
   return (
     <section style={{ background: theme.colors.secondary, padding: "clamp(64px, 9vw, 112px) 0" }}>
       <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", textAlign: "center", overflowWrap: "anywhere" }}>
-        <h2 style={{ maxWidth: "18ch", margin: "0 auto 32px", fontFamily: theme.typography.display, fontSize: "clamp(2.5rem, 6vw, 4.5rem)", lineHeight: 1.1, fontWeight: 800, color: theme.colors.text }}>Mulai cerita berikutnya.</h2>
+        <h2 style={{ maxWidth: "18ch", margin: "0 auto 32px", fontFamily: theme.typography.display, fontSize: "clamp(2.5rem, 6vw, 4.5rem)", lineHeight: 1.1, fontWeight: 800, color: theme.colors.text }}>Kontak</h2>
         <address style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 16, fontStyle: "normal" }}>{links.map((l, i) => <a key={`${l.href}-${i}`} href={l.href} className="hover:underline" {...(/^https?:/i.test(l.href) ? { target: "_blank", rel: "noopener noreferrer" } : {})} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minHeight: 48, maxWidth: "100%", padding: "12px 24px", borderRadius: theme.radii.button, background: i === 0 ? theme.colors.primary : theme.colors.surface, color: i === 0 ? theme.colors.onPrimary : theme.colors.text, fontWeight: 700, textUnderlineOffset: 5 }}>{l.label}</a>)}</address>
       </div>
     </section>

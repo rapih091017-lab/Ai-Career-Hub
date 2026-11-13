@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import type { OrganizationItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
 import { inkOn } from "../ink";
-import { Paper, Reveal, SectionHead, wbHeading, wbMono, wbSection, wbWrap } from "../workbench/kit";
+import { Paper, Reveal, SectionHead, wbHeading, wbMono, wbSection, wbWrap, isHeading } from "../workbench/kit";
 
 interface Props { items: OrganizationItem[]; }
 
@@ -396,7 +396,7 @@ function InterstellaOrganizations({ items }: { items: OrganizationItem[] }) {
   return (
     <section style={{ padding: "clamp(56px, 8vw, 96px) 0", background: theme.colors.bg }}>
       <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
-        <h2 style={{ margin: "0 0 40px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 4vw, 3rem)", color: theme.colors.text }}>Organisasi</h2>
+        <h2 style={{ ...isHeading(theme), margin: "0 0 40px" }}>Organisasi</h2>
         {filtered.map((o) => <article key={o.id} style={{ display: "flex", flexWrap: "wrap", gap: "20px 64px", padding: "28px 0", borderTop: `1px solid ${theme.colors.border}` }}>
           <div style={{ flex: "1 1 220px" }}><h3 style={{ margin: 0, fontSize: 24, color: theme.colors.text }}>{o.name}</h3>{o.period && <p style={{ margin: "10px 0 0", fontSize: 14, color: theme.colors.textMuted }}>{o.period}</p>}</div>
           <div style={{ flex: "2 1 280px" }}>{o.role && <p style={{ margin: 0, fontSize: 18, fontWeight: 600, color: theme.colors.text }}>{o.role}</p>}{o.description && <p style={{ margin: "12px 0 0", maxWidth: "65ch", lineHeight: 1.75, whiteSpace: "pre-line", color: theme.colors.textSecondary }}>{o.description}</p>}</div>
@@ -413,7 +413,7 @@ function SherbetOrganizations({ items }: { items: OrganizationItem[] }) {
   return (
     <section style={{ background: theme.colors.secondary, padding: "clamp(48px, 7vw, 80px) 0" }}>
       <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
-        <h2 style={{ margin: "0 0 32px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 800, color: theme.colors.text }}>Tumbuh bersama</h2>
+        <h2 style={{ margin: "0 0 32px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 800, color: theme.colors.text }}>Organisasi</h2>
         <dl style={{ margin: 0 }}>{filtered.map((o) => <div key={o.id} style={{ padding: "24px 0", borderTop: `1px solid ${theme.colors.border}` }}>
           <dt style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}><strong style={{ fontSize: 24, color: theme.colors.text }}>{o.name}</strong><span style={{ fontSize: 14, color: theme.colors.textMuted }}>{o.period}</span></dt>
           <dd style={{ margin: "12px 0 0" }}>{o.role && <p style={{ margin: 0, fontWeight: 700, color: theme.colors.text }}>{o.role}</p>}{o.description && <p style={{ margin: "10px 0 0", maxWidth: "65ch", lineHeight: 1.75, whiteSpace: "pre-line", color: theme.colors.textSecondary }}>{o.description}</p>}</dd>

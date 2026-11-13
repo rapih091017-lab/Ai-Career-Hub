@@ -4,7 +4,7 @@ import { isHobbyShown } from "@/lib/portfolio/visibility";
 import { motion } from "motion/react";
 import type { HobbyItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
-import { Paper, Reveal, SectionHead, wbHeading, wbSection, wbWrap } from "../workbench/kit";
+import { Paper, Reveal, SectionHead, wbHeading, wbSection, wbWrap, isHeading } from "../workbench/kit";
 
 interface Props { items: HobbyItem[]; }
 
@@ -336,7 +336,7 @@ function InterstellaHobbies({ items }: { items: HobbyItem[] }) {
   return (
     <section style={{ padding: "clamp(48px, 7vw, 80px) 0", background: theme.colors.bgSecondary }}>
       <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
-        <h2 style={{ margin: "0 0 32px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 4vw, 3rem)", color: theme.colors.text }}>Di luar pekerjaan</h2>
+        <h2 style={{ ...isHeading(theme), margin: "0 0 32px" }}>Hobi</h2>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "24px 48px" }}>{filtered.map((h) => <article key={h.id} style={{ flex: "1 1 240px", minWidth: 0 }}>
           <h3 style={{ margin: 0, fontSize: 22, fontWeight: 600, color: theme.colors.text }}>{h.name}</h3>{h.description && <p style={{ margin: "12px 0 0", lineHeight: 1.75, color: theme.colors.textSecondary }}>{h.description}</p>}
         </article>)}</div>
@@ -352,7 +352,7 @@ function SherbetHobbies({ items }: { items: HobbyItem[] }) {
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(48px, 7vw, 80px) 0" }}>
       <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", display: "flex", flexWrap: "wrap", gap: "24px 56px", overflowWrap: "anywhere" }}>
-        <h2 style={{ flex: "1 1 220px", margin: 0, fontFamily: theme.typography.display, fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 800, color: theme.colors.text }}>Sumber inspirasi</h2>
+        <h2 style={{ flex: "1 1 220px", margin: 0, fontFamily: theme.typography.display, fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 800, color: theme.colors.text }}>Hobi</h2>
         <ul style={{ flex: "2 1 260px", listStyle: "none", margin: 0, padding: 0 }}>{filtered.map((h) => <li key={h.id} style={{ padding: "0 0 24px" }}>
           <h3 style={{ margin: 0, fontSize: 24, color: theme.colors.text }}>{h.name}</h3>{h.description && <p style={{ margin: "10px 0 0", lineHeight: 1.75, color: theme.colors.textSecondary }}>{h.description}</p>}
         </li>)}</ul>

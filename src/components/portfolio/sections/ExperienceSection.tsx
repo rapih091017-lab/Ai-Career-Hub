@@ -6,7 +6,7 @@ import { motion } from "motion/react";
 import type { ExperienceItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
 import { inkOn } from "../ink";
-import { Reveal, SectionHead, wbHeading, wbMono, wbSection, wbWrap } from "../workbench/kit";
+import { Reveal, SectionHead, wbHeading, wbMono, wbSection, wbWrap, isHeading } from "../workbench/kit";
 
 interface Props { items: ExperienceItem[]; }
 
@@ -500,7 +500,7 @@ function InterstellaExperience({ items }: { items: ExperienceItem[] }) {
   return (
     <section style={{ padding: "clamp(56px, 9vw, 112px) 0", background: theme.colors.bg }}>
       <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
-        <h2 style={{ margin: "0 0 40px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 700, color: theme.colors.text }}>Pengalaman</h2>
+        <h2 style={{ ...isHeading(theme), margin: "0 0 40px" }}>Pengalaman</h2>
         {filtered.map((e) => <article key={e.id} style={{ display: "flex", flexWrap: "wrap", gap: "16px 48px", padding: "28px 0", borderTop: `1px solid ${theme.colors.border}` }}>
           <div style={{ flex: "1 1 220px" }}>
             <p style={{ margin: 0, color: theme.colors.textMuted, fontSize: 14 }}>{[e.startDate, e.isPresent ? "Sekarang" : e.endDate].filter(Boolean).join(" – ")}</p>
@@ -523,7 +523,7 @@ function SherbetExperience({ items }: { items: ExperienceItem[] }) {
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
       <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
-        <h2 style={{ margin: "0 0 32px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 800, color: theme.colors.text }}>Perjalanan kerja</h2>
+        <h2 style={{ margin: "0 0 32px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 800, color: theme.colors.text }}>Pengalaman</h2>
         <ol style={{ padding: 0, margin: 0, listStyle: "none", display: "grid", gap: 20 }}>{filtered.map((e) => <li key={e.id} style={{ background: theme.colors.surface, padding: "clamp(20px, 4vw, 32px)", borderRadius: theme.radii.card }}>
           <article style={{ display: "flex", flexWrap: "wrap", gap: "16px 40px" }}>
             <header style={{ flex: "1 1 220px", minWidth: 0 }}><h3 style={{ margin: 0, fontSize: 24, color: theme.colors.text }}>{e.position || e.company}</h3>{e.position && <p style={{ margin: "8px 0 0", fontWeight: 600, color: theme.colors.textSecondary }}>{e.company}</p>}<p style={{ margin: "12px 0 0", fontSize: 14, color: theme.colors.textMuted }}>{[e.startDate, e.isPresent ? "Sekarang" : e.endDate].filter(Boolean).join(" – ")}</p></header>

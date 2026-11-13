@@ -6,7 +6,7 @@ import { safeUrlUnescaped } from "@/lib/portfolio-safety";
 import type { CertificationItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
 import { inkOn } from "../ink";
-import { ArrowUpRight, Reveal, SectionHead, wbHeading, wbMono, wbPaper, wbSection, wbWrap } from "../workbench/kit";
+import { ArrowUpRight, Reveal, SectionHead, wbHeading, wbMono, wbPaper, wbSection, wbWrap, isHeading } from "../workbench/kit";
 
 interface Props { items: CertificationItem[]; }
 
@@ -430,7 +430,7 @@ function InterstellaCertifications({ items }: { items: CertificationItem[] }) {
   return (
     <section style={{ padding: "clamp(48px, 7vw, 80px) 0", background: theme.colors.bgSecondary }}>
       <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
-        <h2 style={{ margin: "0 0 32px", fontFamily: theme.typography.display, fontSize: "clamp(2rem, 4vw, 3rem)", color: theme.colors.text }}>Sertifikasi</h2>
+        <h2 style={{ ...isHeading(theme), margin: "0 0 32px" }}>Sertifikasi</h2>
         {filtered.map((c) => {
           const href = safeUrlUnescaped(c.url || "");
           return <article key={c.id} style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 16, padding: "24px 0", borderTop: `1px solid ${theme.colors.border}` }}>

@@ -282,3 +282,15 @@ export function ArrowUpRight({ size = 14 }: { size?: number }) {
     </svg>
   );
 }
+
+/** Gaya judul section Interstella: satu ukuran dan bobot untuk semua section. */
+export function isHeading(theme: ThemeDefinition): CSSProperties {
+  return {
+    fontFamily: theme.typography.display,
+    fontSize: "clamp(2rem, 4vw, 3rem)",
+    fontWeight: 700,
+    lineHeight: 1.15,
+    letterSpacing: "-0.02em",
+    color: theme.colors.text,
+  };
+}

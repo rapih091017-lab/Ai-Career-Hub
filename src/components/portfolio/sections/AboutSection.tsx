@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import type { PortfolioFormData } from "../../portfolio-templates/types";
 import { useReducedMotion } from "../../../hooks/useReducedMotion";
 import { usePortfolioTheme } from "../PortfolioCanvas";
-import { Paper, Reveal, SheetLabel, wbHeading, wbMono, wbSection, wbWrap } from "../workbench/kit";
+import { Paper, Reveal, SheetLabel, wbHeading, wbMono, wbSection, wbWrap, isHeading } from "../workbench/kit";
 
 interface Props {
   data: PortfolioFormData;
@@ -79,7 +79,7 @@ function GlassAbout({ f }: { f: PortfolioFormData }) {
                 <div className="space-y-3">
                   {[
                     { value: f.aboutYearsExp, label: "Tahun Pengalaman", icon: "M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" },
-                    { value: f.aboutProjectsDone, label: "Project Selesai", icon: "M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" },
+                    { value: f.aboutProjectsDone, label: "Proyek Selesai", icon: "M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" },
                   ].filter(s => s.value).map((s, i) => (
                     <div key={s.label} className="flex items-center gap-3 p-3" style={{
                       background: `${theme.colors.primary}08`,
@@ -108,13 +108,11 @@ function GlassAbout({ f }: { f: PortfolioFormData }) {
 }
 
 /* ═══════════════════════════════════════════════
- * BRUTAL, Pull-quote with massive drop cap,
+ * BRUTAL, Pull-quote dengan garis aksen,
  *          bold border frame, asymmetrical layout
  * ═══════════════════════════════════════════════ */
 function BrutalAbout({ f }: { f: PortfolioFormData }) {
   const theme = usePortfolioTheme();
-  const firstWord = f.aboutText?.split(" ")[0] || "T";
-  const restText = f.aboutText?.split(" ").slice(1).join(" ") || "";
 
   return (
     <section className="relative overflow-hidden" style={{ padding: "96px 0" }}>
@@ -140,27 +138,15 @@ function BrutalAbout({ f }: { f: PortfolioFormData }) {
               </div>
 
               <div className="flex items-start gap-6">
-                {/* Drop cap, massive first letter */}
-                <div className="hidden md:block flex-shrink-0 text-center" style={{ minWidth: 100 }}>
-                  <span className="font-black leading-none" style={{
-                    fontSize: "clamp(5rem, 10vw, 7rem)",
-                    color: theme.colors.primary,
-                    display: "block",
-                    lineHeight: 0.85,
-                  }}>
-                    {firstWord[0]}
-                  </span>
-                  <div className="w-12 h-1 mx-auto mt-2" style={{ background: theme.colors.accent }} />
-                </div>
-
+                {/* Garis aksen menggantikan drop-cap: kata pertama tidak dipisah. */}
+                <div aria-hidden="true" className="hidden md:block flex-shrink-0 w-2 self-stretch" style={{ background: theme.colors.accent }} />
                 <div className="flex-1">
                   <h2 className="font-black mb-4" style={{ fontSize: "clamp(1.2rem, 2.5vw, 1.6rem)", color: theme.colors.text, letterSpacing: "-0.03em" }}>
                     TENTANG SAYA
                   </h2>
                   {f.aboutText && (
                     <p className="leading-relaxed" style={{ color: theme.colors.textSecondary, fontSize: 15, lineHeight: 1.8 }}>
-                      <span className="md:hidden font-black text-3xl float-left mr-2" style={{ color: theme.colors.primary }}>{firstWord[0]}</span>
-                      {restText}
+                      {f.aboutText}
                     </p>
                   )}
                 </div>
@@ -179,9 +165,6 @@ function BrutalAbout({ f }: { f: PortfolioFormData }) {
  * ═══════════════════════════════════════════════ */
 function LuxeAbout({ f }: { f: PortfolioFormData }) {
   const theme = usePortfolioTheme();
-  const words = f.aboutText?.split(" ") || [];
-  const firstWord = words[0] || "A";
-  const restWords = words.slice(1).join(" ");
 
   return (
     <section className="relative overflow-hidden" style={{ padding: "96px 0" }}>
@@ -215,18 +198,9 @@ function LuxeAbout({ f }: { f: PortfolioFormData }) {
             <div className="relative pl-6" style={{ borderLeft: `1px solid ${theme.colors.border}` }}>
               {f.aboutText && (
                 <div className="leading-relaxed" style={{ color: theme.colors.textMuted, fontSize: 15, lineHeight: 1.8 }}>
-                  <span className="float-left mr-3 font-bold leading-none" style={{
-                    fontSize: "clamp(3.5rem, 6vw, 5rem)",
-                    color: theme.colors.primary,
-                    fontFamily: theme.typography.display,
-                    lineHeight: 0.8,
-                  }}>
-                    {firstWord[0]}
-                  </span>
-                  <span className="text-xs font-medium uppercase tracking-wider" style={{ color: theme.colors.textMuted }}>
-                    {firstWord.substring(1)}{" "}
-                  </span>
-                  {restWords}
+                  {/* Drop-cap lewat ::first-letter agar kata pertama tetap utuh. */}
+                  <style>{`.pf-luxe-dropcap::first-letter{float:left;margin:4px 12px 0 0;font-family:${theme.typography.display};font-weight:700;font-size:4.2em;line-height:0.8;color:${theme.colors.primary}}`}</style>
+                  <p className="pf-luxe-dropcap" style={{ margin: 0 }}>{f.aboutText}</p>
                 </div>
               )}
 
@@ -464,7 +438,7 @@ function InterstellaAbout({ f }: { f: PortfolioFormData }) {
   return (
     <section style={{ padding: "clamp(56px, 9vw, 112px) 0", background: theme.colors.bg }}>
       <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", display: "flex", flexWrap: "wrap", gap: "24px 80px", overflowWrap: "anywhere" }}>
-        <h2 style={{ flex: "1 1 220px", margin: 0, fontFamily: theme.typography.display, fontSize: "clamp(2rem, 4vw, 3rem)", lineHeight: 1.15, fontWeight: 700, color: theme.colors.text }}>Tentang saya</h2>
+        <h2 style={{ ...isHeading(theme), flex: "1 1 220px", margin: 0 }}>Tentang saya</h2>
         <p style={{ flex: "2 1 280px", maxWidth: "65ch", margin: 0, fontSize: "clamp(18px, 2.2vw, 24px)", lineHeight: 1.7, whiteSpace: "pre-line", color: theme.colors.textSecondary }}>{f.aboutText}</p>
       </div>
     </section>
@@ -477,7 +451,7 @@ function SherbetAbout({ f }: { f: PortfolioFormData }) {
     <section style={{ background: theme.colors.bg, padding: "clamp(56px, 8vw, 96px) 0" }}>
       <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)", overflowWrap: "anywhere" }}>
         <div style={{ background: theme.colors.secondary, borderRadius: theme.radii.card, padding: "clamp(24px, 5vw, 56px)" }}>
-          <h2 style={{ margin: "0 0 24px", maxWidth: "18ch", fontFamily: theme.typography.display, fontWeight: 800, fontSize: "clamp(2rem, 5vw, 3.5rem)", lineHeight: 1.1, color: theme.colors.text }}>Kenali saya lebih dekat.</h2>
+          <h2 style={{ margin: "0 0 24px", maxWidth: "18ch", fontFamily: theme.typography.display, fontWeight: 800, fontSize: "clamp(2rem, 5vw, 3.5rem)", lineHeight: 1.1, color: theme.colors.text }}>Tentang saya</h2>
           <p style={{ margin: 0, maxWidth: "65ch", fontSize: 18, lineHeight: 1.8, whiteSpace: "pre-line", color: theme.colors.textSecondary }}>{f.aboutText}</p>
         </div>
       </div>
