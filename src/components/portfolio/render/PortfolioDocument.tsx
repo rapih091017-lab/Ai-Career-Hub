@@ -83,9 +83,11 @@ export type PortfolioDocumentProps = {
  * (experience, education, projects, certifications, organizations, hobbies,
  * testimonials), dan contact memakai dua-duanya.
  */
-const RENDERERS: Record<SectionId, (d: PortfolioData) => ReactElement | null> = {
+type RenderContext = { statsShown: boolean };
+
+const RENDERERS: Record<SectionId, (d: PortfolioData, ctx: RenderContext) => ReactElement | null> = {
   hero: (d) => <HeroSection data={d.formData} />,
-  about: (d) => <AboutSection data={d.formData} />,
+  about: (d, ctx) => <AboutSection data={d.formData} hideStats={ctx.statsShown} />,
   stats: (d) => <StatsSection data={d.formData} />,
   experience: (d) => <ExperienceSection items={d.experiences} />,
   education: (d) => <EducationSection items={d.educations} />,
@@ -351,6 +353,15 @@ export function PortfolioDocument({
   const resolvedFontSize = resolveFontSize(fontSize);
   const fontVars = FONT_SIZE_VARS[resolvedFontSize];
   const interactive = mode === "editor" && onSectionClick ? onSectionClick : null;
+  // Angka statistik cukup tampil sekali: bila section Statistik terlihat dan
+  // punya isi, About tidak mengulang angkanya.
+  const f = safeData.formData;
+  const ctx: RenderContext = {
+    statsShown:
+      order.includes("stats") &&
+      isSectionVisible(sectionVisibility, "stats") &&
+      Boolean(f.aboutYearsExp || f.aboutProjectsDone || f.aboutClientsHappy),
+  };
 
   return (
     <MotionConfig reducedMotion={mode === "static" ? "always" : "user"}>
@@ -398,7 +409,7 @@ export function PortfolioDocument({
               >
                 <ThemeContext.Provider value={themeForSection(theme, id, sectionColors)}>
                   <SectionBoundary sectionId={id} mode={mode} resetKey={data}>
-                    {renderSection(safeData)}
+                    {renderSection(safeData, ctx)}
                   </SectionBoundary>
                 </ThemeContext.Provider>
               </div>

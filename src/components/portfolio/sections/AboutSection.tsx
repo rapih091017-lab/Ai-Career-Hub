@@ -7,7 +7,16 @@ import { useReducedMotion } from "../../../hooks/useReducedMotion";
 import { usePortfolioTheme } from "../PortfolioCanvas";
 import { Paper, Reveal, SheetLabel, wbHeading, wbMono, wbSection, wbWrap } from "../workbench/kit";
 
-interface Props { data: PortfolioFormData; }
+interface Props {
+  data: PortfolioFormData;
+  /** true bila section Statistik sudah menampilkan angka yang sama. */
+  hideStats?: boolean;
+}
+
+/** Kosongkan angka statistik agar tidak tampil dobel dengan section Statistik. */
+function withoutStats(f: PortfolioFormData): PortfolioFormData {
+  return { ...f, aboutYearsExp: "", aboutProjectsDone: "", aboutClientsHappy: "" };
+}
 
 /* ═══════════════════════════════════════════════
  * GLASS, Floating bento card with mesh gradient,
@@ -53,7 +62,7 @@ function GlassAbout({ f }: { f: PortfolioFormData }) {
             <div className="h-1 w-full" style={{ background: `linear-gradient(90deg, ${theme.colors.primary}, ${theme.colors.accent})` }} />
 
             <div className="p-8 md:p-12">
-              <div className="grid md:grid-cols-[1fr_0.7fr] gap-8 items-start">
+              <div className={`grid gap-8 items-start ${f.aboutYearsExp || f.aboutProjectsDone ? "md:grid-cols-[1fr_0.7fr]" : ""}`}>
                 {/* Left: Main text */}
                 <div>
                   <h2 className="font-bold mb-4" style={{ fontSize: "clamp(1.5rem, 3vw, 2rem)", color: theme.colors.text }}>
@@ -476,9 +485,10 @@ function SherbetAbout({ f }: { f: PortfolioFormData }) {
   );
 }
 
-export default function AboutSection({ data: f }: Props) {
+export default function AboutSection({ data, hideStats }: Props) {
   const theme = usePortfolioTheme();
-  if (!isAboutShown(f)) return null;
+  if (!isAboutShown(data)) return null;
+  const f = hideStats ? withoutStats(data) : data;
   switch (theme.id) {
     case "glass": return <GlassAbout f={f} />;
     case "brutal": return <BrutalAbout f={f} />;
