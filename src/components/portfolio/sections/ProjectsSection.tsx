@@ -6,6 +6,7 @@ import { motion } from "motion/react";
 import { safeUrlUnescaped } from "@/lib/portfolio-safety";
 import type { ProjectItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { numberedLabel, useSectionNumber } from "../sectionNumber";
 import { inkOn } from "../ink";
 import {
   ArrowUpRight,
@@ -97,8 +98,8 @@ function GlassProjects({ items }: { items: ProjectItem[] }) {
                       )}
                       {p.link && (
                         <a href={p.link} target="_blank" rel="noopener noreferrer"
-                          className="mt-4 inline-flex items-center gap-2 text-xs font-semibold transition-all duration-500"
-                          style={{ color: theme.colors.primary }}>
+                          className="mt-4 inline-flex items-center gap-2 text-sm font-semibold transition-all duration-500"
+                          style={{ color: theme.colors.primary, minHeight: 24 }}>
                           Detail
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                             <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -176,8 +177,8 @@ function BrutalProjects({ items }: { items: ProjectItem[] }) {
                     )}
                     {p.link && (
                       <a href={p.link} target="_blank" rel="noopener noreferrer"
-                        className="mt-4 inline-flex items-center gap-1 text-xs font-bold transition-all"
-                        style={{ color: theme.colors.primary }}>
+                        className="mt-4 inline-flex items-center gap-1 text-sm font-bold transition-all"
+                        style={{ color: theme.colors.primary, minHeight: 24 }}>
                         LIHAT PROYEK ↗
                       </a>
                     )}
@@ -272,8 +273,8 @@ function LuxeProjects({ items }: { items: ProjectItem[] }) {
                         )}
                         {p.link && (
                           <a href={p.link} target="_blank" rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 text-xs font-semibold transition-all"
-                            style={{ color: theme.colors.primary }}>
+                            className="inline-flex items-center gap-2 text-sm font-semibold transition-all"
+                            style={{ color: theme.colors.primary, minHeight: 24 }}>
                             Lihat Proyek
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                               <path d="M7 17L17 7M7 7h10v10"/>
@@ -300,14 +301,15 @@ function LuxeProjects({ items }: { items: ProjectItem[] }) {
  * ═══════════════════════════════════════════════ */
 function MinimalistProjects({ items }: { items: ProjectItem[] }) {
   const theme = usePortfolioTheme();
+  const sectionNumber = useSectionNumber();
   const filtered = items.filter(isProjectShown);
   if (!filtered.length) return null;
 
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(64px, 9vh, 112px) 0" }}>
       <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)" }}>
-        <span style={{ fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: theme.colors.textSecondary }}>
-          04 / Karya
+        <span style={{ fontSize: 12, letterSpacing: "0.18em", textTransform: "uppercase", color: theme.colors.textSecondary }}>
+          {numberedLabel(sectionNumber, "Karya")}
         </span>
         <h2 style={{
           fontFamily: theme.typography.display,
@@ -357,9 +359,11 @@ function MinimalistProjects({ items }: { items: ProjectItem[] }) {
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
-                        display: "inline-block",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        minHeight: 24,
                         marginTop: 14,
-                        fontSize: 13,
+                        fontSize: 14,
                         color: theme.colors.text,
                         textDecoration: "underline",
                         textUnderlineOffset: 4,
@@ -393,7 +397,7 @@ function WorkbenchProjects({ items }: { items: ProjectItem[] }) {
   return (
     <section style={wbSection(theme)}>
       <div style={wbWrap()}>
-        <SectionHead label="karya" title="Karya pilihan" aside={<span style={{ ...wbMono(theme), fontSize: 11.5, color: theme.colors.textSecondary }}>{filtered.length} proyek</span>} />
+        <SectionHead label="karya" title="Karya pilihan" aside={<span style={{ ...wbMono(theme), fontSize: 12, color: theme.colors.textSecondary }}>{filtered.length} proyek</span>} />
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
           {filtered.map((p, i) => (
@@ -408,7 +412,7 @@ function WorkbenchProjects({ items }: { items: ProjectItem[] }) {
                   />
                 ) : null}
 
-                <div style={{ padding: "clamp(16px, 2.2vw, 22px)", display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
+                <div style={{ padding: "clamp(20px, 2.6vw, 26px)", display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
                     <span
                       style={{

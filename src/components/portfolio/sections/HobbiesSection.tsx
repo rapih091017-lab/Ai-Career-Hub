@@ -4,6 +4,7 @@ import { isHobbyShown } from "@/lib/portfolio/visibility";
 import { motion } from "motion/react";
 import type { HobbyItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { numberedLabel, useSectionNumber } from "../sectionNumber";
 import { Paper, Reveal, SectionHead, wbHeading, wbSection, wbWrap, isHeading } from "../workbench/kit";
 
 interface Props { items: HobbyItem[]; }
@@ -57,7 +58,7 @@ function GlassHobbies({ items }: { items: HobbyItem[] }) {
                 </svg>
                 <span className="text-sm font-medium" style={{ color: theme.colors.text }}>{hobby.name}</span>
                 {hobby.description && (
-                  <span className="text-xs hidden sm:inline" style={{ color: theme.colors.textMuted }}>, {hobby.description}</span>
+                  <span className="text-sm hidden sm:inline" style={{ color: theme.colors.textMuted }}>, {hobby.description}</span>
                 )}
               </div>
             </motion.div>
@@ -110,7 +111,7 @@ function BrutalHobbies({ items }: { items: HobbyItem[] }) {
                 </div>
                 <div className="font-bold text-sm" style={{ color: theme.colors.text }}>{hobby.name}</div>
                 {hobby.description && (
-                  <div className="text-xs mt-1 leading-snug" style={{ color: theme.colors.textMuted }}>{hobby.description}</div>
+                  <div className="text-sm mt-1 leading-snug" style={{ color: theme.colors.textMuted }}>{hobby.description}</div>
                 )}
               </div>
             </motion.div>
@@ -183,14 +184,15 @@ function LuxeHobbies({ items }: { items: HobbyItem[] }) {
  * ═══════════════════════════════════════════════ */
 function MinimalistHobbies({ items }: { items: HobbyItem[] }) {
   const theme = usePortfolioTheme();
+  const sectionNumber = useSectionNumber();
   const filtered = items.filter(isHobbyShown);
   if (!filtered.length) return null;
 
   return (
     <section style={{ background: theme.colors.bgSecondary, padding: "clamp(64px, 9vh, 112px) 0" }}>
       <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)" }}>
-        <span style={{ fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: theme.colors.textSecondary }}>
-          07 / Minat
+        <span style={{ fontSize: 12, letterSpacing: "0.18em", textTransform: "uppercase", color: theme.colors.textSecondary }}>
+          {numberedLabel(sectionNumber, "Minat")}
         </span>
         <h2 style={{
           fontFamily: theme.typography.display,

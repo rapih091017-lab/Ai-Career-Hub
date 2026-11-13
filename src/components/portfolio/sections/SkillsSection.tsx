@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import type { PortfolioFormData } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { numberedLabel, useSectionNumber } from "../sectionNumber";
 import { inkOn } from "../ink";
 import { Chip, Reveal, SectionHead, wbHeading, wbMono, wbPaper, wbSection, wbWrap, isHeading } from "../workbench/kit";
 
@@ -217,6 +218,7 @@ function LuxeSkills({ f }: { f: PortfolioFormData }) {
  * ═══════════════════════════════════════════════ */
 function MinimalistSkills({ f }: { f: PortfolioFormData }) {
   const theme = usePortfolioTheme();
+  const sectionNumber = useSectionNumber();
   const groups = [
     { label: "Utama", value: f.skillsMain },
     { label: "Alat", value: f.skillsTools },
@@ -228,8 +230,8 @@ function MinimalistSkills({ f }: { f: PortfolioFormData }) {
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(64px, 9vh, 112px) 0" }}>
       <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)" }}>
-        <span style={{ fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: theme.colors.textSecondary }}>
-          08 / Keahlian
+        <span style={{ fontSize: 12, letterSpacing: "0.18em", textTransform: "uppercase", color: theme.colors.textSecondary }}>
+          {numberedLabel(sectionNumber, "Keahlian")}
         </span>
         <h2 style={{
           fontFamily: theme.typography.display,

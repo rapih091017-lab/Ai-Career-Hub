@@ -6,6 +6,8 @@ import { useReducedMotion } from "../../../hooks/useReducedMotion";
 import type { PortfolioFormData } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
 import { inkOn } from "../ink";
+import { useShownSections } from "../sectionNumber";
+import type { SectionId } from "../types";
 import {
   ArrowRight,
   PillLink,
@@ -60,7 +62,7 @@ function Eyebrow({ text }: { text: string }) {
   const theme = usePortfolioTheme();
   return (
     <span
-      className="inline-block px-3 py-1 text-xs uppercase tracking-[0.2em] font-medium mb-6"
+      className="inline-block px-3 py-1 text-sm uppercase tracking-[0.16em] font-medium mb-6"
       style={{
         background: `${theme.colors.primary}08`,
         color: theme.colors.primary,
@@ -487,7 +489,7 @@ function LuxeHero({ data: f, name, initials }: { data: PortfolioFormData; name: 
               className="inline-block font-medium mb-4"
               style={{
                 color: theme.colors.primary,
-                fontSize: 13,
+                fontSize: 14,
                 letterSpacing: "0.15em",
                 textTransform: "uppercase",
                 fontFamily: theme.typography.eyebrow,
@@ -523,9 +525,9 @@ function LuxeHero({ data: f, name, initials }: { data: PortfolioFormData; name: 
                 animate={{ width: [40, 60, 40] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
               />
-              <span style={{ fontSize: 11, color: theme.colors.textMuted, letterSpacing: "0.2em", textTransform: "uppercase", fontFamily: theme.typography.eyebrow }}>
-                {f.heroHeadline || "PORTFOLIO"}
-              </span>
+              {f.heroHeadline ? <span style={{ fontSize: 12, color: theme.colors.textMuted, letterSpacing: "0.2em", textTransform: "uppercase", fontFamily: theme.typography.eyebrow }}>
+                {f.heroHeadline}
+              </span> : null}
               <div className="flex-1" style={{ height: 1, background: theme.colors.border }} />
             </motion.div>
 
@@ -594,7 +596,7 @@ function MinimalistHero({ data: f, name, initials }: { data: PortfolioFormData; 
     <section
       data-hero-variant="minimalist"
       className="relative w-full"
-      style={{ background: theme.colors.bg, color: theme.colors.text, padding: "clamp(56px, 10vh, 120px) 0" }}
+      style={{ background: theme.colors.bg, color: theme.colors.text, padding: "clamp(56px, 10vh, 120px) 0 clamp(8px, 2vh, 24px)" }}
     >
       <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: 40 }}>
@@ -702,6 +704,7 @@ function MinimalistHero({ data: f, name, initials }: { data: PortfolioFormData; 
  * ═══════════════════════════════════════════════ */
 function WorkbenchHero({ data: f, name, initials }: { data: PortfolioFormData; name: string; initials: string }) {
   const theme = usePortfolioTheme();
+  const shown = useShownSections();
   const reduced = useReducedMotion();
 
   const firstName = (f.heroFirstName || "").trim();
@@ -711,7 +714,7 @@ function WorkbenchHero({ data: f, name, initials }: { data: PortfolioFormData; n
     { href: "#projects", label: "Karya" },
     { href: "#experience", label: "Pengalaman" },
     { href: "#contact", label: "Kontak" },
-  ];
+  ].filter((c) => !shown || shown.has(c.href.slice(1) as SectionId)); // hanya section yang ada
 
   return (
     <section
@@ -739,7 +742,7 @@ function WorkbenchHero({ data: f, name, initials }: { data: PortfolioFormData; n
       <div style={wbWrap({ position: "relative" })}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "clamp(32px, 5vw, 56px)", alignItems: "center" }}>
           <Reveal>
-            <SheetLabel>{f.heroSubHeadline || "Portofolio · kertas kerja"}</SheetLabel>
+            <SheetLabel>portofolio</SheetLabel>
 
             <h1
               style={{
@@ -782,8 +785,15 @@ function WorkbenchHero({ data: f, name, initials }: { data: PortfolioFormData; n
             </h1>
 
             {f.heroHeadline ? (
-              <p style={{ margin: "18px 0 0", ...wbMono(theme), fontSize: 13, color: theme.colors.textSecondary }}>
+              <p style={{ margin: "18px 0 0", ...wbMono(theme), fontSize: 14, color: theme.colors.textSecondary }}>
                 {f.heroHeadline}
+              </p>
+            ) : null}
+
+            {/* Sub-headline sebagai paragraf pembuka, bukan label mono kecil. */}
+            {f.heroSubHeadline ? (
+              <p style={{ margin: "14px 0 0", maxWidth: 520, fontSize: 18, fontWeight: 600, lineHeight: 1.5, color: theme.colors.text }}>
+                {f.heroSubHeadline}
               </p>
             ) : null}
 
@@ -794,11 +804,13 @@ function WorkbenchHero({ data: f, name, initials }: { data: PortfolioFormData; n
             ) : null}
 
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 26 }}>
-              <PillLink href="#projects" primary>
-                Lihat karya
-                <ArrowRight />
-              </PillLink>
-              <PillLink href="#contact">Hubungi saya</PillLink>
+              {!shown || shown.has("projects") ? (
+                <PillLink href="#projects" primary>
+                  Lihat karya
+                  <ArrowRight />
+                </PillLink>
+              ) : null}
+              {!shown || shown.has("contact") ? <PillLink href="#contact">Hubungi saya</PillLink> : null}
             </div>
           </Reveal>
 
@@ -859,7 +871,7 @@ function WorkbenchHero({ data: f, name, initials }: { data: PortfolioFormData; n
         </div>
 
         {/* Daftar isi: fungsi navigasi sekaligus penanda bahwa ini lembar kerja. */}
-        <Reveal delay={0.2} style={{ marginTop: "clamp(36px, 5vw, 52px)" }}>
+        {contents.length ? <Reveal delay={0.2} style={{ marginTop: "clamp(36px, 5vw, 52px)" }}>
           <div style={{ borderTop: `2.5px solid ${theme.colors.border}` }}>
             {contents.map((item) => (
               <motion.a
@@ -888,7 +900,7 @@ function WorkbenchHero({ data: f, name, initials }: { data: PortfolioFormData; n
               </motion.a>
             ))}
           </div>
-        </Reveal>
+        </Reveal> : null}
       </div>
     </section>
   );
@@ -901,7 +913,7 @@ function CrayonHero({ data: f, name, initials }: { data: PortfolioFormData; name
     <section data-hero-variant="crayon" style={{ background: theme.colors.bg, padding: "clamp(64px, 9vw, 112px) 0" }}>
       <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 40, alignItems: "center" }}>
         <div>
-          {f.heroSubHeadline ? <span style={{ display: "inline-block", padding: "6px 14px", background: theme.colors.secondary, color: inkOn(theme.colors.secondary, theme.colors), borderRadius: theme.radii.pill, fontWeight: 800, fontSize: 13 }}>{f.heroSubHeadline}</span> : null}
+          {f.heroSubHeadline ? <span style={{ display: "inline-block", padding: "6px 14px", background: theme.colors.secondary, color: inkOn(theme.colors.secondary, theme.colors), borderRadius: theme.radii.pill, fontWeight: 800, fontSize: 14 }}>{f.heroSubHeadline}</span> : null}
           <h1 style={{ margin: "16px 0 0", fontFamily: theme.typography.display, fontSize: "clamp(3.2rem, 8vw, 5.4rem)", fontWeight: 800, lineHeight: 1, color: theme.colors.primary }}>{name}</h1>
           <p style={{ margin: "18px 0 0", fontSize: 17, lineHeight: 1.7, color: theme.colors.textSecondary, maxWidth: 520 }}>{f.heroBio}</p>
           {f.heroHeadline ? <span style={{ display: "inline-block", marginTop: 22, padding: "8px 16px", background: theme.colors.accent, color: inkOn(theme.colors.accent, theme.colors), borderRadius: theme.radii.pill, fontWeight: 800, fontSize: 14 }}>{f.heroHeadline}</span> : null}
@@ -926,7 +938,7 @@ function ScrapbookHero({ data: f, name, initials }: { data: PortfolioFormData; n
     <section data-hero-variant="scrapbook" style={{ background: theme.colors.bg, padding: "clamp(64px, 9vw, 112px) 0" }}>
       <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 40, alignItems: "center" }}>
         <div>
-          {f.heroSubHeadline ? <p style={{ margin: 0, fontFamily: theme.typography.body, fontWeight: 800, fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", color: theme.colors.secondary }}>{f.heroSubHeadline}</p> : null}
+          {f.heroSubHeadline ? <p style={{ margin: 0, fontFamily: theme.typography.body, fontWeight: 800, fontSize: 14, letterSpacing: "0.06em", textTransform: "uppercase", color: theme.colors.secondary }}>{f.heroSubHeadline}</p> : null}
           <h1 style={{ margin: "12px 0 0", fontFamily: theme.typography.display, fontSize: "clamp(3.2rem, 8vw, 5.6rem)", fontWeight: 700, lineHeight: 0.95, color: theme.colors.primary }}>{name}</h1>
           <p style={{ margin: "18px 0 0", fontSize: 17, lineHeight: 1.7, color: theme.colors.textSecondary, maxWidth: 520 }}>{f.heroBio}</p>
           {f.heroHeadline ? <span style={{ display: "inline-block", marginTop: 22, padding: "6px 14px", background: theme.colors.accent, color: inkOn(theme.colors.accent, theme.colors), border: `2px solid ${theme.colors.border}`, fontFamily: theme.typography.body, fontWeight: 800, fontSize: 14, transform: "rotate(-2deg)" }}>{f.heroHeadline}</span> : null}
@@ -967,7 +979,7 @@ function DecalHero({ data: f, name, initials }: { data: PortfolioFormData; name:
               style={{
                 ...wbMono(theme),
                 fontFamily: theme.typography.display,
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: 700,
                 padding: "6px 14px",
                 background: i % 2 ? theme.colors.secondary : theme.colors.primary,

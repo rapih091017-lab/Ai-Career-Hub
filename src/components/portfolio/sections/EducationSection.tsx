@@ -4,6 +4,7 @@ import { isEducationShown } from "@/lib/portfolio/visibility";
 import { motion } from "motion/react";
 import type { EducationItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { numberedLabel, useSectionNumber } from "../sectionNumber";
 import { inkOn } from "../ink";
 import { Paper, Reveal, SectionHead, wbHeading, wbMono, wbSection, wbWrap, isHeading } from "../workbench/kit";
 
@@ -242,6 +243,7 @@ function LuxeEducation({ items }: { items: EducationItem[] }) {
  * ═══════════════════════════════════════════════ */
 function MinimalistEducation({ items }: { items: EducationItem[] }) {
   const theme = usePortfolioTheme();
+  const sectionNumber = useSectionNumber();
   const filtered = items.filter(isEducationShown);
   if (!filtered.length) return null;
 
@@ -250,8 +252,8 @@ function MinimalistEducation({ items }: { items: EducationItem[] }) {
       <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "clamp(24px, 5vw, 64px)" }}>
           <div>
-            <span style={{ fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: theme.colors.textSecondary }}>
-              03 / Pendidikan
+            <span style={{ fontSize: 12, letterSpacing: "0.18em", textTransform: "uppercase", color: theme.colors.textSecondary }}>
+              {numberedLabel(sectionNumber, "Pendidikan")}
             </span>
             <div style={{ height: 1, background: theme.colors.border, marginTop: 16 }} />
           </div>
@@ -323,9 +325,9 @@ function WorkbenchEducation({ items }: { items: EducationItem[] }) {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 18 }}>
           {filtered.map((edu, i) => (
             <Reveal key={edu.id} delay={i * 0.07} y={18} style={{ display: "flex" }}>
-              <Paper style={{ padding: "clamp(18px, 2.4vw, 24px)", flex: 1, transform: `rotate(${i % 2 === 0 ? -0.4 : 0.4}deg)` }}>
+              <Paper style={{ padding: "clamp(20px, 2.6vw, 26px)", flex: 1, transform: `rotate(${i % 2 === 0 ? -0.4 : 0.4}deg)` }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
-                  <span style={{ ...wbMono(theme), fontSize: 11.5, color: theme.colors.textSecondary }}>{span(edu)}</span>
+                  <span style={{ ...wbMono(theme), fontSize: 12, color: theme.colors.textSecondary }}>{span(edu)}</span>
                   <span aria-hidden="true" style={{ width: 20, height: 6, background: theme.colors.accent, border: `1.5px solid ${theme.colors.border}` }} />
                 </div>
                 <h3 style={{ ...wbHeading(theme, "clamp(18px, 2.2vw, 21px)"), margin: "14px 0 0" }}>{edu.degree || "Gelar"}</h3>

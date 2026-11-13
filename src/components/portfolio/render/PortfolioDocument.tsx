@@ -32,6 +32,7 @@ import HobbiesSection from "../sections/HobbiesSection";
 import TestimonialsSection from "../sections/TestimonialsSection";
 import ContactSection from "../sections/ContactSection";
 import { useTranslation } from "@/lib/i18n";
+import { SectionNumberContext, ShownSectionsContext, sectionHasContent } from "../sectionNumber";
 
 /**
  * Mode render. Sama dengan `SafeRenderMode` dan sengaja memakai satu kosakata:
@@ -362,10 +363,16 @@ export function PortfolioDocument({
       isSectionVisible(sectionVisibility, "stats") &&
       Boolean(f.aboutYearsExp || f.aboutProjectsDone || f.aboutClientsHappy),
   };
+  // Penomoran "01 / ..." dihitung dari section yang benar-benar tampil.
+  const numbers = new Map<SectionId, number>();
+  for (const id of order) {
+    if (isSectionVisible(sectionVisibility, id) && sectionHasContent(id, safeData)) numbers.set(id, numbers.size + 1);
+  }
 
   return (
     <MotionConfig reducedMotion={mode === "static" ? "always" : "user"}>
       <ThemeContext.Provider value={theme}>
+       <ShownSectionsContext.Provider value={new Set(numbers.keys())}>
         <div
           data-theme={theme.id}
           data-mode={mode}
@@ -408,9 +415,11 @@ export function PortfolioDocument({
                 onClick={interactive ? () => interactive(id) : undefined}
               >
                 <ThemeContext.Provider value={themeForSection(theme, id, sectionColors)}>
-                  <SectionBoundary sectionId={id} mode={mode} resetKey={data}>
-                    {renderSection(safeData, ctx)}
-                  </SectionBoundary>
+                  <SectionNumberContext.Provider value={numbers.get(id) ?? null}>
+                    <SectionBoundary sectionId={id} mode={mode} resetKey={data}>
+                      {renderSection(safeData, ctx)}
+                    </SectionBoundary>
+                  </SectionNumberContext.Provider>
                 </ThemeContext.Provider>
               </div>
             );
@@ -422,6 +431,7 @@ export function PortfolioDocument({
             );
           })}
         </div>
+       </ShownSectionsContext.Provider>
       </ThemeContext.Provider>
     </MotionConfig>
   );

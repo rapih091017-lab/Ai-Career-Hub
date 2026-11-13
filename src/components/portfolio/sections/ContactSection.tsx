@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { safeUrlUnescaped } from "@/lib/portfolio-safety";
 import type { PortfolioFormData, ExtraLink } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { numberedLabel, useSectionNumber } from "../sectionNumber";
 import { inkOn } from "../ink";
 import { PillLink, Reveal, SheetLabel, wbHeading, wbMono, wbPaper, wbSection, wbWrap, isHeading } from "../workbench/kit";
 
@@ -72,9 +73,9 @@ function GlassContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: Ext
                 <div className="flex flex-wrap justify-center gap-2 pt-4" style={{ borderTop: `1px solid ${theme.colors.border}` }}>
                   {extraLinks.filter(isExtraLinkShown).map(link => (
                     <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer"
-                      className="px-3 py-1.5 text-xs transition-all duration-500 hover:scale-105"
-                      style={{ background: `${theme.colors.primary}08`, color: theme.colors.textMuted, border: `1px solid ${theme.colors.border}`, borderRadius: theme.radii.pill }}>
-                      {link.label || "Link"}
+                      className="inline-flex items-center px-4 py-2 text-sm transition-all duration-500 hover:scale-105"
+                      style={{ background: `${theme.colors.primary}08`, color: theme.colors.textMuted, border: `1px solid ${theme.colors.border}`, borderRadius: theme.radii.pill, minHeight: 44 }}>
+                      {link.label || "Tautan"}
                     </a>
                   ))}
                 </div>
@@ -198,13 +199,14 @@ function LuxeContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: Extr
  * ═══════════════════════════════════════════════ */
 function MinimalistContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: ExtraLink[] }) {
   const theme = usePortfolioTheme();
+  const sectionNumber = useSectionNumber();
   const links = extraLinks.filter(isExtraLinkShown);
 
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(64px, 9vh, 112px) 0" }}>
       <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)" }}>
-        <span style={{ fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: theme.colors.textSecondary }}>
-          10 / Kontak
+        <span style={{ fontSize: 12, letterSpacing: "0.18em", textTransform: "uppercase", color: theme.colors.textSecondary }}>
+          {numberedLabel(sectionNumber, "Kontak")}
         </span>
         <h2 style={{
           fontFamily: theme.typography.display,
@@ -229,6 +231,9 @@ function MinimalistContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks
                   textDecoration: "underline",
                   textUnderlineOffset: 6,
                   wordBreak: "break-word",
+                  display: "inline-block",
+                  minHeight: 44,
+                  paddingBlock: 4,
                 }}
               >
                 {f.contactEmail}
@@ -243,7 +248,7 @@ function MinimalistContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks
 
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {f.contactPhone ? (
-                <a href={`tel:${f.contactPhone}`} style={{ fontSize: 14, color: theme.colors.textSecondary, width: "fit-content" }}>
+                <a href={`tel:${f.contactPhone}`} style={{ fontSize: 14, color: theme.colors.textSecondary, width: "fit-content", display: "inline-flex", alignItems: "center", minHeight: 44 }}>
                   {f.contactPhone}
                 </a>
               ) : null}
@@ -252,7 +257,7 @@ function MinimalistContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks
                   href={f.contactLinkedin.startsWith("http") ? f.contactLinkedin : `https://${f.contactLinkedin}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ fontSize: 14, color: theme.colors.textSecondary, width: "fit-content" }}
+                  style={{ fontSize: 14, color: theme.colors.textSecondary, width: "fit-content", display: "inline-flex", alignItems: "center", minHeight: 44 }}
                 >
                   LinkedIn
                 </a>
@@ -262,7 +267,7 @@ function MinimalistContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks
                   href={f.contactGithub.startsWith("http") ? f.contactGithub : `https://${f.contactGithub}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ fontSize: 14, color: theme.colors.textSecondary, width: "fit-content" }}
+                  style={{ fontSize: 14, color: theme.colors.textSecondary, width: "fit-content", display: "inline-flex", alignItems: "center", minHeight: 44 }}
                 >
                   GitHub
                 </a>
@@ -273,7 +278,7 @@ function MinimalistContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks
                   href={l.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ fontSize: 14, color: theme.colors.textSecondary, width: "fit-content" }}
+                  style={{ fontSize: 14, color: theme.colors.textSecondary, width: "fit-content", display: "inline-flex", alignItems: "center", minHeight: 44 }}
                 >
                   {l.label}
                 </a>
@@ -335,8 +340,8 @@ function WorkbenchContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks:
                 </div>
 
                 {f.contactEmail ? (
-                  <p style={{ margin: "14px 0 0", ...wbMono(theme), fontSize: 12.5 }}>
-                    <a href={`mailto:${f.contactEmail}`} style={{ color: theme.colors.primary, textDecoration: "underline", textUnderlineOffset: 4, wordBreak: "break-word" }}>
+                  <p style={{ margin: "14px 0 0", ...wbMono(theme), fontSize: 14 }}>
+                    <a href={`mailto:${f.contactEmail}`} style={{ color: theme.colors.primary, textDecoration: "underline", textUnderlineOffset: 4, wordBreak: "break-word", display: "inline-flex", alignItems: "center", minHeight: 44 }}>
                       {f.contactEmail}
                     </a>
                   </p>
@@ -352,7 +357,7 @@ function WorkbenchContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks:
                             href={link.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            style={{ ...wbMono(theme), fontSize: 12.5, color: theme.colors.textSecondary, textDecoration: "underline", textUnderlineOffset: 4 }}
+                            style={{ ...wbMono(theme), fontSize: 14, color: theme.colors.textSecondary, textDecoration: "underline", textUnderlineOffset: 4, display: "inline-flex", alignItems: "center", minHeight: 44 }}
                           >
                             {link.label || "Tautan"}
                           </a>

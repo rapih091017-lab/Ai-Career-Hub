@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import type { TestimonialItem } from "../../portfolio-templates/types";
 import { useReducedMotion } from "../../../hooks/useReducedMotion";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { numberedLabel, useSectionNumber } from "../sectionNumber";
 import { Paper, Reveal, SectionHead, wbHeading, wbMono, wbSection, wbWrap, isHeading } from "../workbench/kit";
 
 interface Props { items: TestimonialItem[]; }
@@ -75,7 +76,7 @@ function GlassTestimonials({ items }: { items: TestimonialItem[] }) {
                         {tm.position && (
                           <>
                             <span className="w-1 h-1" style={{ background: theme.colors.textMuted, borderRadius: theme.radii.pill }} />
-                            <span className="text-xs" style={{ color: theme.colors.textMuted }}>{tm.position}</span>
+                            <span className="text-sm" style={{ color: theme.colors.textMuted }}>{tm.position}</span>
                           </>
                         )}
                       </div>
@@ -158,7 +159,7 @@ function BrutalTestimonials({ items }: { items: TestimonialItem[] }) {
                     </div>
                     <div>
                       <div className="text-sm font-bold" style={{ color: theme.colors.text }}>{tm.name}</div>
-                      {tm.position && <div className="text-xs font-medium" style={{ color: theme.colors.textMuted }}>{tm.position}</div>}
+                      {tm.position && <div className="text-sm font-medium" style={{ color: theme.colors.textMuted }}>{tm.position}</div>}
                     </div>
                   </div>
                 </div>
@@ -246,7 +247,7 @@ function LuxeTestimonials({ items }: { items: TestimonialItem[] }) {
                     {tm.name}
                   </div>
                   {tm.position && (
-                    <div className="text-xs mt-0.5" style={{ color: theme.colors.textMuted }}>
+                    <div className="text-sm mt-0.5" style={{ color: theme.colors.textMuted }}>
                       {tm.position}
                     </div>
                   )}
@@ -266,14 +267,15 @@ function LuxeTestimonials({ items }: { items: TestimonialItem[] }) {
  * ═══════════════════════════════════════════════ */
 function MinimalistTestimonials({ items }: { items: TestimonialItem[] }) {
   const theme = usePortfolioTheme();
+  const sectionNumber = useSectionNumber();
   const filtered = items.filter((t) => t.testimonial);
   if (!filtered.length) return null;
 
   return (
     <section style={{ background: theme.colors.bgSecondary, padding: "clamp(64px, 9vh, 112px) 0" }}>
       <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)" }}>
-        <span style={{ fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: theme.colors.textSecondary }}>
-          09 / Testimoni
+        <span style={{ fontSize: 12, letterSpacing: "0.18em", textTransform: "uppercase", color: theme.colors.textSecondary }}>
+          {numberedLabel(sectionNumber, "Testimoni")}
         </span>
         <h2 style={{
           fontFamily: theme.typography.display,
@@ -307,7 +309,7 @@ function MinimalistTestimonials({ items }: { items: TestimonialItem[] }) {
               }}>
                 {t.testimonial}
               </blockquote>
-              <figcaption style={{ fontSize: 13, color: theme.colors.textSecondary }}>
+              <figcaption style={{ fontSize: 14, color: theme.colors.textSecondary }}>
                 {t.name}
                 {t.position ? ` — ${t.position}` : ""}
               </figcaption>
@@ -343,7 +345,7 @@ function WorkbenchTestimonials({ items }: { items: TestimonialItem[] }) {
                   <blockquote style={{ margin: 0, flex: 1, fontSize: 15, lineHeight: 1.7, color: theme.colors.text }}>
                     {t.testimonial}
                   </blockquote>
-                  <figcaption style={{ borderTop: `1.5px solid ${theme.colors.border}`, paddingTop: 10, ...wbMono(theme), fontSize: 12, color: theme.colors.textSecondary }}>
+                  <figcaption style={{ borderTop: `1.5px solid ${theme.colors.border}`, paddingTop: 10, ...wbMono(theme), fontSize: 14, color: theme.colors.textSecondary }}>
                     <span style={{ color: theme.colors.text }}>{t.name}</span>
                     {t.position ? ` · ${t.position}` : ""}
                   </figcaption>

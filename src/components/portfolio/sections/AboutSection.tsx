@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import type { PortfolioFormData } from "../../portfolio-templates/types";
 import { useReducedMotion } from "../../../hooks/useReducedMotion";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { numberedLabel, useSectionNumber } from "../sectionNumber";
 import { Paper, Reveal, SheetLabel, wbHeading, wbMono, wbSection, wbWrap, isHeading } from "../workbench/kit";
 
 interface Props {
@@ -228,6 +229,7 @@ function LuxeAbout({ f }: { f: PortfolioFormData }) {
  * ═══════════════════════════════════════════════ */
 function MinimalistAbout({ f }: { f: PortfolioFormData }) {
   const theme = usePortfolioTheme();
+  const sectionNumber = useSectionNumber();
   const stats = [
     { value: f.aboutYearsExp, label: "Tahun" },
     { value: f.aboutProjectsDone, label: "Proyek" },
@@ -240,10 +242,10 @@ function MinimalistAbout({ f }: { f: PortfolioFormData }) {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "clamp(24px, 5vw, 64px)" }}>
           <div>
             <span style={{
-              fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase",
+              fontSize: 12, letterSpacing: "0.18em", textTransform: "uppercase",
               color: theme.colors.textSecondary,
             }}>
-              01 / Tentang
+              {numberedLabel(sectionNumber, "Tentang")}
             </span>
             <div style={{ height: 1, background: theme.colors.border, marginTop: 16 }} />
           </div>
@@ -334,7 +336,7 @@ function WorkbenchAbout({ f }: { f: PortfolioFormData }) {
                     <span style={{ ...wbHeading(theme, "clamp(28px, 3.4vw, 36px)"), color: theme.colors.primary }}>
                       {note.value}
                     </span>
-                    <span style={{ ...wbMono(theme), fontSize: 11.5, color: theme.colors.textSecondary }}>{note.label}</span>
+                    <span style={{ ...wbMono(theme), fontSize: 12, color: theme.colors.textSecondary }}>{note.label}</span>
                   </Paper>
                 </Reveal>
               ))}

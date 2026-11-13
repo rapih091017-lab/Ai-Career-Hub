@@ -31,3 +31,13 @@ describe("statistik tidak dobel", () => {
     expect(aboutHtml(html)).toContain("987");
   });
 });
+
+describe("penomoran Minimalist dari section yang terlihat", () => {
+  it("section kosong dilewati sehingga nomor tetap berurutan", () => {
+    const d = { ...data, projects: [{ id: "p", name: "Proyek A", description: "", techStack: "", link: "" }] } as unknown as PortfolioData;
+    const html = renderToStaticMarkup(<PortfolioDocument themeId="minimalist" data={d} mode="static" />);
+    expect(html).toContain("01 / Tentang");
+    expect(html).toContain("02 / Karya");
+    expect(html).not.toContain("04 / Karya");
+  });
+});

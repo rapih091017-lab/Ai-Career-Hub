@@ -4,6 +4,7 @@ import { isOrganizationShown } from "@/lib/portfolio/visibility";
 import { motion } from "motion/react";
 import type { OrganizationItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { numberedLabel, useSectionNumber } from "../sectionNumber";
 import { inkOn } from "../ink";
 import { Paper, Reveal, SectionHead, wbHeading, wbMono, wbSection, wbWrap, isHeading } from "../workbench/kit";
 
@@ -69,7 +70,7 @@ function GlassOrganizations({ items }: { items: OrganizationItem[] }) {
                         <p className="text-sm font-medium mt-0.5" style={{ color: theme.colors.primary }}>{org.role}</p>
                       )}
                       {org.description && (
-                        <p className="text-xs mt-2 leading-relaxed" style={{ color: theme.colors.textMuted }}>{org.description}</p>
+                        <p className="text-sm mt-2 leading-relaxed" style={{ color: theme.colors.textMuted }}>{org.description}</p>
                       )}
                     </div>
                   </div>
@@ -128,7 +129,7 @@ function BrutalOrganizations({ items }: { items: OrganizationItem[] }) {
                   <p className="text-sm font-semibold mb-1" style={{ color: theme.colors.primary }}>{org.role}</p>
                 )}
                 {org.description && (
-                  <p className="text-xs leading-relaxed" style={{ color: theme.colors.textMuted }}>{org.description}</p>
+                  <p className="text-sm leading-relaxed" style={{ color: theme.colors.textMuted }}>{org.description}</p>
                 )}
               </div>
             </motion.div>
@@ -193,7 +194,7 @@ function LuxeOrganizations({ items }: { items: OrganizationItem[] }) {
                   <p className="text-sm font-medium mt-0.5" style={{ color: theme.colors.textSecondary }}>{org.role}</p>
                 )}
                 {org.description && (
-                  <p className="text-xs mt-1 leading-relaxed" style={{ color: theme.colors.textMuted }}>{org.description}</p>
+                  <p className="text-sm mt-1 leading-relaxed" style={{ color: theme.colors.textMuted }}>{org.description}</p>
                 )}
               </div>
             </motion.div>
@@ -210,14 +211,15 @@ function LuxeOrganizations({ items }: { items: OrganizationItem[] }) {
  * ═══════════════════════════════════════════════ */
 function MinimalistOrganizations({ items }: { items: OrganizationItem[] }) {
   const theme = usePortfolioTheme();
+  const sectionNumber = useSectionNumber();
   const filtered = items.filter(isOrganizationShown);
   if (!filtered.length) return null;
 
   return (
     <section style={{ background: theme.colors.bg, padding: "clamp(64px, 9vh, 112px) 0" }}>
       <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 48px)" }}>
-        <span style={{ fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: theme.colors.textSecondary }}>
-          06 / Komunitas
+        <span style={{ fontSize: 12, letterSpacing: "0.18em", textTransform: "uppercase", color: theme.colors.textSecondary }}>
+          {numberedLabel(sectionNumber, "Komunitas")}
         </span>
         <h2 style={{
           fontFamily: theme.typography.display,
@@ -252,7 +254,7 @@ function MinimalistOrganizations({ items }: { items: OrganizationItem[] }) {
                   </p>
                 ) : null}
               </div>
-              <span style={{ fontSize: 13, color: theme.colors.textSecondary, textAlign: "right" }}>
+              <span style={{ fontSize: 14, color: theme.colors.textSecondary, textAlign: "right" }}>
                 {o.role}
                 {o.period ? ` · ${o.period}` : ""}
               </span>
@@ -284,13 +286,13 @@ function WorkbenchOrganizations({ items }: { items: OrganizationItem[] }) {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 18 }}>
           {filtered.map((o, i) => (
             <Reveal key={o.id} delay={i * 0.06} y={18} style={{ display: "flex" }}>
-              <Paper style={{ padding: "clamp(16px, 2.2vw, 22px)", flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
+              <Paper style={{ padding: "clamp(20px, 2.6vw, 26px)", flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
                   {o.role ? (
-                    <span style={{ ...wbMono(theme), fontSize: 11.5, color: theme.colors.primary }}>{o.role}</span>
+                    <span style={{ ...wbMono(theme), fontSize: 12, color: theme.colors.primary }}>{o.role}</span>
                   ) : <span />}
                   {o.period ? (
-                    <span style={{ ...wbMono(theme), fontSize: 11.5, color: theme.colors.textSecondary }}>{o.period}</span>
+                    <span style={{ ...wbMono(theme), fontSize: 12, color: theme.colors.textSecondary }}>{o.period}</span>
                   ) : null}
                 </div>
                 <h3 style={{ ...wbHeading(theme, "clamp(17px, 2.1vw, 20px)"), margin: 0 }}>{o.name}</h3>

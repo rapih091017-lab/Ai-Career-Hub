@@ -231,7 +231,7 @@ function WorkbenchStats({ stats }: { stats: { value: string; label: string; icon
                 >
                   <span aria-hidden="true" style={{ width: 22, height: 6, background: theme.colors.accent, border: `1.5px solid ${theme.colors.border}` }} />
                   <span style={{ ...wbHeading(theme, "clamp(30px, 4.2vw, 42px)"), color: theme.colors.primary }}>{s.value}</span>
-                  <span style={{ ...wbMono(theme), fontSize: 11.5, color: theme.colors.textSecondary }}>{s.label}</span>
+                  <span style={{ ...wbMono(theme), fontSize: 12, color: theme.colors.textSecondary }}>{s.label}</span>
                 </div>
               ))}
             </div>
