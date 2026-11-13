@@ -1,6 +1,7 @@
-import "@testing-library/jest-dom/vitest";
 import { describe, it, expect, vi, beforeAll } from "vitest";
-import { render } from "@testing-library/react";
+// renderToStaticMarkup, bukan render() jsdom: jsdom membuang nilai inline
+// seperti clamp() sehingga HTML harness tidak sama dengan halaman nyata.
+import { renderToStaticMarkup } from "react-dom/server";
 import { writeFileSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -78,12 +79,12 @@ const RICH: PortfolioData = {
 } as unknown as PortfolioData;
 
 function card(id: ThemeId, data: PortfolioData, width = 360): string {
-  const { container } = render(<PortfolioDocument themeId={id} data={data} mode="static" />);
+  const html = renderToStaticMarkup(<PortfolioDocument themeId={id} data={data} mode="static" />);
   return `<figure style="margin:0;width:${width}px">
   <div data-thumb-viewport style="position:relative;width:100%;overflow:hidden;background:${THEMES[id].colors.bg};height:220px">
     <style>[data-thumb-viewport] [data-section-id="hero"]{display:none !important}</style>
     <div aria-hidden="true" style="position:absolute;top:0;left:0;transform:scale(0.8);transform-origin:top left;width:calc(100% / 0.8)">
-      ${container.innerHTML}
+      ${html}
     </div>
   </div>
   <figcaption style="font:14px system-ui;color:#111">${THEMES[id].name}</figcaption>
@@ -105,16 +106,16 @@ h1,h2,h3,p,span,li,div{max-width:100%}</style>
 }
 
 describe.skipIf(process.env.QA_HARNESS !== "1")("harness visual tema", () => {
-  it("tulis 3 halaman tema penuh + 1 halaman kartu ke direktori temp", () => {
+  it("tulis halaman tema penuh + 1 halaman kartu ke direktori temp", () => {
     // Ditulis ke temp, bukan public/: file QA tidak boleh ikut ter-deploy.
     const dir = join(tmpdir(), "portfolio-qa");
     mkdirSync(dir, { recursive: true });
 
     for (const id of THEME_IDS) {
-      const { container } = render(
+      const html = renderToStaticMarkup(
         <PortfolioDocument themeId={id} data={RICH} mode="static" />,
       );
-      const full = shell(`${id} penuh`, `<div style="width:1100px">${container.innerHTML}</div>`);
+      const full = shell(`${id} penuh`, `<div style="width:1100px">${html}</div>`);
       writeFileSync(join(dir, `qa-theme-${id}.html`), full, "utf8");
     }
 
@@ -127,14 +128,6 @@ describe.skipIf(process.env.QA_HARNESS !== "1")("harness visual tema", () => {
       "utf8",
     );
 
-    for (const id of THEME_IDS) {
-      const { container } = render(<PortfolioDocument themeId={id} data={RICH} mode="static" />);
-      writeFileSync(
-        join(dir, `qa-theme-${id}.html`),
-        shell(`${id} penuh`, `<div style="width:1100px">${container.innerHTML}</div>`),
-        "utf8",
-      );
-    }
   });
 });
 
