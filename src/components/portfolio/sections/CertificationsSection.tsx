@@ -387,7 +387,7 @@ function CrayonCertifications({ items }: { items: CertificationItem[] }) {
             <Reveal key={c.id} delay={i * 0.06} y={12}>
               <div style={{ padding: "14px 20px", background: theme.colors.surface, border: `3px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
                 <strong style={{ display: "block", fontSize: 16, color: theme.colors.text }}>{c.name}</strong>
-                {c.year ? <span style={{ display: "inline-block", marginTop: 6, fontSize: 12, fontWeight: 800, padding: "2px 12px", background: theme.colors.accent, borderRadius: theme.radii.pill }}>{c.year}</span> : null}
+                {c.year ? <span style={{ display: "inline-block", marginTop: 6, fontSize: 12, fontWeight: 800, padding: "2px 12px", background: theme.colors.accent, color: inkOn(theme.colors.accent, theme.colors), borderRadius: theme.radii.pill }}>{c.year}</span> : null}
               </div>
             </Reveal>
           ))}

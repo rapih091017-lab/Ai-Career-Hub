@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import type { PortfolioFormData } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { inkOn } from "../ink";
 import { Chip, Reveal, SectionHead, wbHeading, wbMono, wbPaper, wbSection, wbWrap } from "../workbench/kit";
 
 interface Props { data: PortfolioFormData; }
@@ -367,9 +368,9 @@ function DecalSkills({ f }: { f: PortfolioFormData }) {
 function CrayonSkills({ f }: { f: PortfolioFormData }) {
   const theme = usePortfolioTheme();
   const groups = [
-    { label: "utama", value: f.skillsMain, fill: theme.colors.primary, text: theme.colors.onPrimary },
-    { label: "alat", value: f.skillsTools, fill: theme.colors.accent, text: theme.colors.text },
-    { label: "bahasa", value: f.skillsLanguages, fill: theme.colors.secondary, text: theme.colors.text },
+    { label: "utama", value: f.skillsMain, fill: theme.colors.primary, text: inkOn(theme.colors.primary, theme.colors) },
+    { label: "alat", value: f.skillsTools, fill: theme.colors.accent, text: inkOn(theme.colors.accent, theme.colors) },
+    { label: "bahasa", value: f.skillsLanguages, fill: theme.colors.secondary, text: inkOn(theme.colors.secondary, theme.colors) },
   ].filter((g) => g.value);
   if (!groups.length) return null;
   return (

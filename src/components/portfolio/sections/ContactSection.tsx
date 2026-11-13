@@ -421,7 +421,7 @@ function CrayonContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks: Ex
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 14, marginTop: 30 }}>
           {links.map((l, i) => (
             <Reveal key={`${l.href}-${i}`} delay={i * 0.06} y={10}>
-              <a href={l.href} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", padding: "12px 22px", background: fills[i % fills.length], color: i % 3 === 2 ? theme.colors.text : theme.colors.onPrimary, borderRadius: theme.radii.pill, border: `3px solid ${theme.colors.border}`, fontWeight: 800, textDecoration: "none" }}>
+              <a href={l.href} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", padding: "12px 22px", background: fills[i % fills.length], color: inkOn(fills[i % fills.length], theme.colors), borderRadius: theme.radii.pill, border: `3px solid ${theme.colors.border}`, fontWeight: 800, textDecoration: "none" }}>
                 {l.label}
               </a>
             </Reveal>

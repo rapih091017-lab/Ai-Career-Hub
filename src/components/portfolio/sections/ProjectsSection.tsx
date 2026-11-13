@@ -6,6 +6,7 @@ import { motion } from "motion/react";
 import { safeUrlUnescaped } from "@/lib/portfolio-safety";
 import type { ProjectItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { inkOn } from "../ink";
 import {
   ArrowUpRight,
   Chip,
@@ -271,7 +272,7 @@ function LuxeProjects({ items }: { items: ProjectItem[] }) {
                           <div className="flex flex-wrap gap-1.5 mb-4">
                             {p.techStack.split(",").map((tech, idx) => (
                               <span key={idx} className="text-xs px-2.5 py-1 font-medium"
-                                style={{ background: `${theme.colors.primary}08`, color: theme.colors.secondary, border: `1px solid ${theme.colors.border}`, borderRadius: theme.radii.pill }}>
+                                style={{ background: `${theme.colors.primary}08`, color: theme.colors.primary, border: `1px solid ${theme.colors.border}`, borderRadius: theme.radii.pill }}>
                                 {tech.trim()}
                             </span>
                             ))}
@@ -533,7 +534,7 @@ function CrayonProjects({ items }: { items: ProjectItem[] }) {
           {filtered.map((p, i) => (
             <Reveal key={p.id} delay={i * 0.07} y={16}>
               <div style={{ padding: 22, background: theme.colors.surface, border: `3px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
-                <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 44, height: 44, borderRadius: 999, background: fills[i % fills.length], color: i % 3 === 2 ? theme.colors.text : theme.colors.onPrimary, fontFamily: theme.typography.display, fontWeight: 800, fontSize: 18 }}>{String(i + 1).padStart(2, "0")}</span>
+                <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 44, height: 44, borderRadius: 999, background: fills[i % fills.length], color: inkOn(fills[i % fills.length], theme.colors), fontFamily: theme.typography.display, fontWeight: 800, fontSize: 18 }}>{String(i + 1).padStart(2, "0")}</span>
                 <h3 style={{ fontFamily: theme.typography.display, fontSize: "clamp(20px, 2.4vw, 24px)", fontWeight: 800, margin: "12px 0 0", color: theme.colors.primary }}>{p.name}</h3>
                 {p.description ? <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: theme.colors.textSecondary }}><DescriptionText text={p.description} /></p> : null}
                 {p.techStack ? <p style={{ margin: "10px 0 0", fontSize: 12, fontWeight: 800, color: theme.colors.textMuted }}>{p.techStack}</p> : null}

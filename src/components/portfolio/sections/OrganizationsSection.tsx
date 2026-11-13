@@ -121,7 +121,7 @@ function BrutalOrganizations({ items }: { items: OrganizationItem[] }) {
                 <div className="flex items-center justify-between gap-3 flex-wrap mb-2">
                   <h3 className="font-bold" style={{ color: theme.colors.text }}>{org.name}</h3>
                   {org.period && (
-                    <span className="text-xs font-bold px-2 py-0.5" style={{ background: theme.colors.accent, color: theme.colors.text }}>{org.period}</span>
+                    <span className="text-xs font-bold px-2 py-0.5" style={{ background: theme.colors.accent, color: inkOn(theme.colors.accent, theme.colors) }}>{org.period}</span>
                   )}
                 </div>
                 {org.role && (
@@ -350,7 +350,7 @@ function CrayonOrganizations({ items }: { items: OrganizationItem[] }) {
           {filtered.map((o, i) => (
             <Reveal key={o.id} delay={i * 0.07} y={14}>
               <div style={{ padding: "18px 22px", background: theme.colors.surface, border: `3px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
-                {o.role ? <span style={{ display: "inline-block", fontSize: 12, fontWeight: 800, padding: "2px 12px", background: i % 2 ? theme.colors.secondary : theme.colors.accent, color: theme.colors.text, borderRadius: theme.radii.pill }}>{o.role}</span> : null}
+                {o.role ? <span style={{ display: "inline-block", fontSize: 12, fontWeight: 800, padding: "2px 12px", background: i % 2 ? theme.colors.secondary : theme.colors.accent, color: inkOn(i % 2 ? theme.colors.secondary : theme.colors.accent, theme.colors), borderRadius: theme.radii.pill }}>{o.role}</span> : null}
                 <h3 style={{ fontFamily: theme.typography.display, fontSize: "clamp(18px, 2.2vw, 22px)", fontWeight: 800, margin: "10px 0 0", color: theme.colors.primary }}>{o.name}</h3>
                 {o.description ? <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: theme.colors.textSecondary }}>{o.description}</p> : null}
               </div>

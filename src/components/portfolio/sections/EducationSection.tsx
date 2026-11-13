@@ -4,6 +4,7 @@ import { isEducationShown } from "@/lib/portfolio/visibility";
 import { motion } from "motion/react";
 import type { EducationItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { inkOn } from "../ink";
 import { Paper, Reveal, SectionHead, wbHeading, wbMono, wbSection, wbWrap } from "../workbench/kit";
 
 interface Props { items: EducationItem[]; }
@@ -147,7 +148,7 @@ function BrutalEducation({ items }: { items: EducationItem[] }) {
                       <h3 className="font-bold" style={{ color: theme.colors.text }}>
                         {edu.degree || "Gelar"}
                       </h3>
-                      <span className="text-xs font-bold px-2 py-0.5" style={{ background: theme.colors.accent, color: theme.colors.text }}>
+                      <span className="text-xs font-bold px-2 py-0.5" style={{ background: theme.colors.accent, color: inkOn(theme.colors.accent, theme.colors) }}>
                         {edu.startDate}{edu.startDate ? ", " : ""}{edu.isPresent ? "Sekarang" : edu.endDate || ""}
                       </span>
                     </div>

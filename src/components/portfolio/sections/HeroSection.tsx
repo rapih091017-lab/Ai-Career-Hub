@@ -62,7 +62,7 @@ function Eyebrow({ text }: { text: string }) {
     <span
       className="inline-block px-3 py-1 text-xs uppercase tracking-[0.2em] font-medium mb-6"
       style={{
-        background: `${theme.colors.primary}12`,
+        background: `${theme.colors.primary}08`,
         color: theme.colors.primary,
         border: `1px solid ${theme.colors.primary}20`,
         borderRadius: theme.radii.pill,
@@ -929,7 +929,7 @@ function ScrapbookHero({ data: f, name, initials }: { data: PortfolioFormData; n
           {f.heroSubHeadline ? <p style={{ margin: 0, fontFamily: theme.typography.body, fontWeight: 800, fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", color: theme.colors.secondary }}>{f.heroSubHeadline}</p> : null}
           <h1 style={{ margin: "12px 0 0", fontFamily: theme.typography.display, fontSize: "clamp(3.2rem, 8vw, 5.6rem)", fontWeight: 700, lineHeight: 0.95, color: theme.colors.primary }}>{name}</h1>
           <p style={{ margin: "18px 0 0", fontSize: 17, lineHeight: 1.7, color: theme.colors.textSecondary, maxWidth: 520 }}>{f.heroBio}</p>
-          {f.heroHeadline ? <span style={{ display: "inline-block", marginTop: 22, padding: "6px 14px", background: theme.colors.accent, color: theme.colors.text, border: `2px solid ${theme.colors.border}`, fontFamily: theme.typography.body, fontWeight: 800, fontSize: 14, transform: "rotate(-2deg)" }}>{f.heroHeadline}</span> : null}
+          {f.heroHeadline ? <span style={{ display: "inline-block", marginTop: 22, padding: "6px 14px", background: theme.colors.accent, color: inkOn(theme.colors.accent, theme.colors), border: `2px solid ${theme.colors.border}`, fontFamily: theme.typography.body, fontWeight: 800, fontSize: 14, transform: "rotate(-2deg)" }}>{f.heroHeadline}</span> : null}
         </div>
         {/* Foto ditempel seperti polaroid; inisial hanya cadangan. */}
         <div style={{ position: "relative", padding: f.heroPhotoUrl ? "12px 12px 28px" : 28, background: theme.colors.surface, border: `2px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, transform: "rotate(1.5deg)", maxWidth: 420, width: "100%", justifySelf: "center" }}>

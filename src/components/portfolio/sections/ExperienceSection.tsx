@@ -443,7 +443,7 @@ function CrayonExperience({ items }: { items: ExperienceItem[] }) {
           {filtered.map((e, i) => (
             <Reveal key={e.id} delay={i * 0.07} y={16}>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, alignItems: "start" }}>
-                <span style={{ justifySelf: "start", fontWeight: 800, fontSize: 13, padding: "6px 14px", background: i % 2 ? theme.colors.secondary : theme.colors.accent, color: theme.colors.text, borderRadius: theme.radii.pill }}>
+                <span style={{ justifySelf: "start", fontWeight: 800, fontSize: 13, padding: "6px 14px", background: i % 2 ? theme.colors.secondary : theme.colors.accent, color: inkOn(i % 2 ? theme.colors.secondary : theme.colors.accent, theme.colors), borderRadius: theme.radii.pill }}>
                   {e.startDate} – {e.isPresent ? "kini" : e.endDate}
                 </span>
                 <div style={{ padding: "18px 22px", background: theme.colors.surface, border: `3px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>

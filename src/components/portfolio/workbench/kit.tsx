@@ -1,4 +1,5 @@
 "use client";
+import { inkOn } from "../ink";
 
 import type { CSSProperties, ReactNode } from "react";
 import { motion } from "motion/react";
@@ -254,7 +255,7 @@ export function PillLink({
         fontSize: 14,
         fontWeight: 700,
         textDecoration: "none",
-        color: theme.colors.text,
+        color: primary ? inkOn(theme.colors.accent, theme.colors) : theme.colors.text,
         background: primary ? theme.colors.accent : "transparent",
         border: `2.5px solid ${theme.colors.border}`,
         borderRadius: theme.radii.button,

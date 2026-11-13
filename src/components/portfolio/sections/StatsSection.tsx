@@ -158,7 +158,7 @@ function LuxeStats({ stats }: { stats: { value: string; label: string; icon: str
                   {s.label}
                 </span>
                 {i < stats.length - 1 && (
-                  <span className="mx-3" style={{ color: theme.colors.border, fontSize: 18 }}>·</span>
+                  <span aria-hidden="true" className="mx-3" style={{ color: theme.colors.border, fontSize: 18 }}>·</span>
                 )}
               </motion.span>
             ))}
@@ -271,7 +271,7 @@ function CrayonStats({ stats }: { stats: { value: string; label: string; icon: s
       <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 18 }}>
         {stats.map((s, i) => (
           <Reveal key={s.label} delay={i * 0.08} y={12}>
-            <div style={{ padding: "20px 22px", background: fills[i % fills.length], color: i === 2 ? theme.colors.text : theme.colors.onPrimary, borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
+            <div style={{ padding: "20px 22px", background: fills[i % fills.length], color: inkOn(fills[i % fills.length], theme.colors), borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
               <p style={{ margin: 0, fontFamily: theme.typography.display, fontSize: 48, fontWeight: 800, lineHeight: 1 }}>{s.value}</p>
               <p style={{ margin: "6px 0 0", fontSize: 14, fontWeight: 700 }}>{s.label}</p>
             </div>
