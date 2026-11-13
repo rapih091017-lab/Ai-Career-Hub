@@ -5,6 +5,7 @@ import { DescriptionText } from "../render/DescriptionText";
 import { motion } from "motion/react";
 import type { ExperienceItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { inkOn } from "../ink";
 import { Reveal, SectionHead, wbHeading, wbMono, wbSection, wbWrap } from "../workbench/kit";
 
 interface Props { items: ExperienceItem[]; }
@@ -474,7 +475,7 @@ function ScrapbookExperience({ items }: { items: ExperienceItem[] }) {
           {filtered.map((e, i) => (
             <Reveal key={e.id} delay={i * 0.07} y={16}>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 18, alignItems: "start" }}>
-                <span style={{ justifySelf: "start", fontFamily: theme.typography.body, fontWeight: 800, fontSize: 13, padding: "4px 12px", background: theme.colors.accent, color: theme.colors.text, border: `2px solid ${theme.colors.border}`, transform: `rotate(${i % 2 ? 1.5 : -1.5}deg)` }}>
+                <span style={{ justifySelf: "start", fontFamily: theme.typography.body, fontWeight: 800, fontSize: 13, padding: "4px 12px", background: theme.colors.accent, color: inkOn(theme.colors.accent, theme.colors), border: `2px solid ${theme.colors.border}`, transform: `rotate(${i % 2 ? 1.5 : -1.5}deg)` }}>
                   {e.startDate} – {e.isPresent ? "kini" : e.endDate}
                 </span>
                 <div style={{ padding: "16px 20px", background: theme.colors.surface, border: `2px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>

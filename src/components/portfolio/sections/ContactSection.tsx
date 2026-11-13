@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { safeUrlUnescaped } from "@/lib/portfolio-safety";
 import type { PortfolioFormData, ExtraLink } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { inkOn } from "../ink";
 import { PillLink, Reveal, SheetLabel, wbHeading, wbMono, wbPaper, wbSection, wbWrap } from "../workbench/kit";
 
 interface Props { data: PortfolioFormData; extraLinks: ExtraLink[]; }
@@ -449,7 +450,7 @@ function ScrapbookContact({ f, extraLinks }: { f: PortfolioFormData; extraLinks:
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 14, marginTop: 30 }}>
           {links.map((l, i) => (
             <Reveal key={`${l.href}-${i}`} delay={i * 0.06} y={10}>
-              <a href={l.href} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", padding: "10px 18px", background: i % 2 ? theme.colors.accent : theme.colors.surface, color: theme.colors.text, border: `2px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, fontWeight: 700, textDecoration: "none", transform: `rotate(${i % 2 ? 1 : -1}deg)` }}>
+              <a href={l.href} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", padding: "10px 18px", background: i % 2 ? theme.colors.accent : theme.colors.surface, color: i % 2 ? inkOn(theme.colors.accent, theme.colors) : theme.colors.text, border: `2px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, fontWeight: 700, textDecoration: "none", transform: `rotate(${i % 2 ? 1 : -1}deg)` }}>
                 {l.label}
               </a>
             </Reveal>

@@ -417,7 +417,7 @@ function DecalAbout({ f }: { f: PortfolioFormData }) {
   );
 }
 
-/* CRAYON: bio di kartu putih dengan kotak warna di sampingnya. */
+/* CRAYON: judul ungu dan bio satu kolom. */
 function CrayonAbout({ f }: { f: PortfolioFormData }) {
   const theme = usePortfolioTheme();
   if (!isAboutShown(f)) return null;
@@ -428,22 +428,12 @@ function CrayonAbout({ f }: { f: PortfolioFormData }) {
           <h2 style={{ fontFamily: theme.typography.display, fontSize: "clamp(2.2rem, 5vw, 3.2rem)", fontWeight: 800, margin: 0, color: theme.colors.primary }}>Tentang saya</h2>
           <p style={{ margin: "16px 0 0", fontSize: 17, lineHeight: 1.75, color: theme.colors.textSecondary }}>{f.aboutText}</p>
         </Reveal>
-        <Reveal delay={0.1}>
-          <div style={{ padding: 24, background: theme.colors.surface, border: `3px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card }}>
-            <div style={{ display: "flex", gap: 8 }}>
-              <span style={{ width: 28, height: 28, borderRadius: 999, background: theme.colors.primary }} />
-              <span style={{ width: 28, height: 28, borderRadius: 999, background: theme.colors.secondary }} />
-              <span style={{ width: 28, height: 28, borderRadius: 999, background: theme.colors.accent }} />
-            </div>
-            <p style={{ margin: "14px 0 0", fontSize: 14, lineHeight: 1.6, color: theme.colors.textMuted }}>Angka di bawah ini adalah ringkasan kerja yang bisa Anda ubah di editor.</p>
-          </div>
-        </Reveal>
       </div>
     </section>
   );
 }
 
-/* SCRAPBOOK: teks bio di kertas tempel, dengan catatan kecil. */
+/* SCRAPBOOK: judul tulisan tangan dan bio satu kolom. */
 function ScrapbookAbout({ f }: { f: PortfolioFormData }) {
   const theme = usePortfolioTheme();
   if (!isAboutShown(f)) return null;
@@ -453,12 +443,6 @@ function ScrapbookAbout({ f }: { f: PortfolioFormData }) {
         <Reveal>
           <h2 style={{ ...wbHeading(theme, "clamp(2rem, 5vw, 3rem)"), fontWeight: 700, color: theme.colors.primary }}>Tentang saya</h2>
           <p style={{ margin: "16px 0 0", fontSize: 17, lineHeight: 1.75, color: theme.colors.textSecondary }}>{f.aboutText}</p>
-        </Reveal>
-        <Reveal delay={0.1}>
-          <div style={{ padding: 24, background: theme.colors.surface, border: `2px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, transform: "rotate(-1deg)" }}>
-            <p style={{ margin: 0, fontFamily: theme.typography.display, fontSize: 26, color: theme.colors.secondary }}>catatan kecil</p>
-            <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: theme.colors.textMuted }}>Angka di bawah ini adalah ringkasan kerja yang bisa Anda ubah di editor.</p>
-          </div>
         </Reveal>
       </div>
     </section>

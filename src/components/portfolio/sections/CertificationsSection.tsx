@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { safeUrlUnescaped } from "@/lib/portfolio-safety";
 import type { CertificationItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { inkOn } from "../ink";
 import { ArrowUpRight, Reveal, SectionHead, wbHeading, wbMono, wbPaper, wbSection, wbWrap } from "../workbench/kit";
 
 interface Props { items: CertificationItem[]; }
@@ -412,7 +413,7 @@ function ScrapbookCertifications({ items }: { items: CertificationItem[] }) {
             <Reveal key={c.id} delay={i * 0.06} y={12}>
               <div style={{ padding: "14px 18px", background: theme.colors.surface, border: `2px dashed ${theme.colors.primary}`, borderRadius: theme.radii.card, transform: `rotate(${i % 2 ? 1 : -1}deg)` }}>
                 <strong style={{ display: "block", fontSize: 16, color: theme.colors.text }}>{c.name}</strong>
-                {c.year ? <span style={{ display: "inline-block", marginTop: 6, fontSize: 12, fontWeight: 800, padding: "2px 10px", background: theme.colors.accent, border: `1.5px solid ${theme.colors.border}` }}>{c.year}</span> : null}
+                {c.year ? <span style={{ display: "inline-block", marginTop: 6, fontSize: 12, fontWeight: 800, padding: "2px 10px", background: theme.colors.accent, color: inkOn(theme.colors.accent, theme.colors), border: `1.5px solid ${theme.colors.border}` }}>{c.year}</span> : null}
               </div>
             </Reveal>
           ))}

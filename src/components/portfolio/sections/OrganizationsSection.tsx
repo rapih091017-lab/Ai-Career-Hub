@@ -4,6 +4,7 @@ import { isOrganizationShown } from "@/lib/portfolio/visibility";
 import { motion } from "motion/react";
 import type { OrganizationItem } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { inkOn } from "../ink";
 import { Paper, Reveal, SectionHead, wbHeading, wbMono, wbSection, wbWrap } from "../workbench/kit";
 
 interface Props { items: OrganizationItem[]; }
@@ -376,7 +377,7 @@ function ScrapbookOrganizations({ items }: { items: OrganizationItem[] }) {
           {filtered.map((o, i) => (
             <Reveal key={o.id} delay={i * 0.07} y={14}>
               <div style={{ padding: "18px 20px", background: theme.colors.surface, border: `2px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, transform: `rotate(${i % 2 ? 1 : -1}deg)` }}>
-                {o.role ? <span style={{ display: "inline-block", fontSize: 12, fontWeight: 800, padding: "2px 10px", background: theme.colors.accent, border: `1.5px solid ${theme.colors.border}` }}>{o.role}</span> : null}
+                {o.role ? <span style={{ display: "inline-block", fontSize: 12, fontWeight: 800, padding: "2px 10px", background: theme.colors.accent, color: inkOn(theme.colors.accent, theme.colors), border: `1.5px solid ${theme.colors.border}` }}>{o.role}</span> : null}
                 <h3 style={{ ...wbHeading(theme, "clamp(18px, 2.2vw, 22px)"), margin: "10px 0 0", color: theme.colors.primary }}>{o.name}</h3>
                 {o.description ? <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: theme.colors.textSecondary }}>{o.description}</p> : null}
               </div>

@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { useReducedMotion } from "../../../hooks/useReducedMotion";
 import type { PortfolioFormData } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { inkOn } from "../ink";
 import {
   ArrowRight,
   PillLink,
@@ -900,13 +901,18 @@ function CrayonHero({ data: f, name, initials }: { data: PortfolioFormData; name
     <section data-hero-variant="crayon" style={{ background: theme.colors.bg, padding: "clamp(64px, 9vw, 112px) 0" }}>
       <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 40, alignItems: "center" }}>
         <div>
-          <span style={{ display: "inline-block", padding: "6px 14px", background: theme.colors.secondary, color: theme.colors.text, borderRadius: theme.radii.pill, fontWeight: 800, fontSize: 13 }}>{f.heroSubHeadline}</span>
+          {f.heroSubHeadline ? <span style={{ display: "inline-block", padding: "6px 14px", background: theme.colors.secondary, color: inkOn(theme.colors.secondary, theme.colors), borderRadius: theme.radii.pill, fontWeight: 800, fontSize: 13 }}>{f.heroSubHeadline}</span> : null}
           <h1 style={{ margin: "16px 0 0", fontFamily: theme.typography.display, fontSize: "clamp(3.2rem, 8vw, 5.4rem)", fontWeight: 800, lineHeight: 1, color: theme.colors.primary }}>{name}</h1>
           <p style={{ margin: "18px 0 0", fontSize: 17, lineHeight: 1.7, color: theme.colors.textSecondary, maxWidth: 520 }}>{f.heroBio}</p>
-          {f.heroHeadline ? <span style={{ display: "inline-block", marginTop: 22, padding: "8px 16px", background: theme.colors.accent, color: theme.colors.text, borderRadius: theme.radii.pill, fontWeight: 800, fontSize: 14 }}>{f.heroHeadline}</span> : null}
+          {f.heroHeadline ? <span style={{ display: "inline-block", marginTop: 22, padding: "8px 16px", background: theme.colors.accent, color: inkOn(theme.colors.accent, theme.colors), borderRadius: theme.radii.pill, fontWeight: 800, fontSize: 14 }}>{f.heroHeadline}</span> : null}
         </div>
-        <div style={{ padding: 32, background: theme.colors.surface, border: `3px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, transform: "rotate(-2deg)" }}>
-          <span style={{ fontFamily: theme.typography.display, fontSize: 60, fontWeight: 800, color: theme.colors.primary }}>{initials}</span>
+        {/* Foto bila ada; inisial hanya cadangan. */}
+        <div style={{ padding: f.heroPhotoUrl ? 12 : 32, background: theme.colors.surface, border: `3px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, transform: "rotate(-2deg)", maxWidth: 420, width: "100%", justifySelf: "center" }}>
+          {f.heroPhotoUrl ? (
+            <img src={f.heroPhotoUrl} alt={name} style={{ display: "block", width: "100%", aspectRatio: "4 / 5", objectFit: "cover", borderRadius: theme.radii.image }} />
+          ) : (
+            <span aria-hidden="true" style={{ fontFamily: theme.typography.display, fontSize: 60, fontWeight: 800, color: theme.colors.primary }}>{initials}</span>
+          )}
         </div>
       </div>
     </section>
@@ -920,13 +926,18 @@ function ScrapbookHero({ data: f, name, initials }: { data: PortfolioFormData; n
     <section data-hero-variant="scrapbook" style={{ background: theme.colors.bg, padding: "clamp(64px, 9vw, 112px) 0" }}>
       <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(20px, 5vw, 40px)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 40, alignItems: "center" }}>
         <div>
-          <p style={{ margin: 0, fontFamily: theme.typography.body, fontWeight: 800, fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", color: theme.colors.secondary }}>{f.heroSubHeadline}</p>
+          {f.heroSubHeadline ? <p style={{ margin: 0, fontFamily: theme.typography.body, fontWeight: 800, fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", color: theme.colors.secondary }}>{f.heroSubHeadline}</p> : null}
           <h1 style={{ margin: "12px 0 0", fontFamily: theme.typography.display, fontSize: "clamp(3.2rem, 8vw, 5.6rem)", fontWeight: 700, lineHeight: 0.95, color: theme.colors.primary }}>{name}</h1>
           <p style={{ margin: "18px 0 0", fontSize: 17, lineHeight: 1.7, color: theme.colors.textSecondary, maxWidth: 520 }}>{f.heroBio}</p>
           {f.heroHeadline ? <span style={{ display: "inline-block", marginTop: 22, padding: "6px 14px", background: theme.colors.accent, color: theme.colors.text, border: `2px solid ${theme.colors.border}`, fontFamily: theme.typography.body, fontWeight: 800, fontSize: 14, transform: "rotate(-2deg)" }}>{f.heroHeadline}</span> : null}
         </div>
-        <div style={{ position: "relative", padding: 28, background: theme.colors.surface, border: `2px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, transform: "rotate(1.5deg)" }}>
-          <span style={{ fontFamily: theme.typography.display, fontSize: 56, color: theme.colors.secondary }}>{initials}</span>
+        {/* Foto ditempel seperti polaroid; inisial hanya cadangan. */}
+        <div style={{ position: "relative", padding: f.heroPhotoUrl ? "12px 12px 28px" : 28, background: theme.colors.surface, border: `2px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, transform: "rotate(1.5deg)", maxWidth: 420, width: "100%", justifySelf: "center" }}>
+          {f.heroPhotoUrl ? (
+            <img src={f.heroPhotoUrl} alt={name} style={{ display: "block", width: "100%", aspectRatio: "4 / 5", objectFit: "cover", borderRadius: theme.radii.image }} />
+          ) : (
+            <span aria-hidden="true" style={{ fontFamily: theme.typography.display, fontSize: 56, color: theme.colors.secondary }}>{initials}</span>
+          )}
         </div>
       </div>
     </section>

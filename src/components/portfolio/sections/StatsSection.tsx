@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import type { PortfolioFormData } from "../../portfolio-templates/types";
 import { usePortfolioTheme } from "../PortfolioCanvas";
+import { inkOn } from "../ink";
 import { Paper, Reveal, wbHeading, wbMono, wbSection, wbWrap } from "../workbench/kit";
 
 interface Props { data: PortfolioFormData; }
@@ -290,8 +291,8 @@ function ScrapbookStats({ stats }: { stats: { value: string; label: string; icon
         {stats.map((s, i) => (
           <Reveal key={s.label} delay={i * 0.08} y={12}>
             <div style={{ padding: "18px 20px", background: i === 1 ? theme.colors.accent : theme.colors.surface, border: `2px solid ${theme.colors.border}`, borderRadius: theme.radii.card, boxShadow: theme.shadow.card, transform: `rotate(${i % 2 ? 1.2 : -1.2}deg)` }}>
-              <p style={{ margin: 0, fontFamily: theme.typography.display, fontSize: 44, lineHeight: 1, color: theme.colors.primary }}>{s.value}</p>
-              <p style={{ margin: "6px 0 0", fontSize: 14, fontWeight: 700, color: theme.colors.textSecondary }}>{s.label}</p>
+              <p style={{ margin: 0, fontFamily: theme.typography.display, fontSize: 44, lineHeight: 1, color: i === 1 ? inkOn(theme.colors.accent, theme.colors) : theme.colors.primary }}>{s.value}</p>
+              <p style={{ margin: "6px 0 0", fontSize: 14, fontWeight: 700, color: i === 1 ? inkOn(theme.colors.accent, theme.colors) : theme.colors.textSecondary }}>{s.label}</p>
             </div>
           </Reveal>
         ))}

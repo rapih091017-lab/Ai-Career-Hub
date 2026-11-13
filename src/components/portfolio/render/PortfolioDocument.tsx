@@ -364,9 +364,10 @@ export function PortfolioDocument({
             {
               backgroundColor: theme.colors.bg,
               color: theme.colors.text,
-              fontFamily: theme.font.includes(" ")
-                ? `'${theme.font}', sans-serif`
-                : `${theme.font}, sans-serif`,
+              // Huruf badan dari typography.body: font tampilan (mis. Caveat
+              // di Scrapbook) hanya untuk judul, bukan untuk paragraf.
+              fontFamily: theme.typography?.body
+                || (theme.font.includes(" ") ? `'${theme.font}', sans-serif` : `${theme.font}, sans-serif`),
               "--p-font-size-base": fontVars.base,
               "--p-font-size-sm": fontVars.small,
               "--p-font-size-h2": fontVars.h2,
