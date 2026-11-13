@@ -49,7 +49,8 @@ function GlassProjects({ items }: { items: ProjectItem[] }) {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
           {filtered.map((p, i) => {
             const isWide = i % 3 === 0;
-            const isTall = i % 4 === 0;
+            // Kartu tanpa gambar cukup teks: tidak diberi baris ganda agar tidak jadi kotak kosong.
+            const isTall = i % 4 === 0 && Boolean(p.imageUrl);
             return (
               <motion.div
                 key={p.id}
@@ -72,11 +73,7 @@ function GlassProjects({ items }: { items: ProjectItem[] }) {
                       <div className="w-full overflow-hidden" style={{ height: isWide ? 240 : 180 }}>
                         <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105" loading="lazy" />
                       </div>
-                    ) : (
-                      <div className="w-full flex items-center justify-center" style={{ height: isWide ? 240 : 180, background: `linear-gradient(135deg, ${theme.colors.primary}15, ${theme.colors.accent}10)` }}>
-                        <span className="text-4xl font-bold" style={{ color: theme.colors.primary, opacity: 0.15 }}>{p.name?.[0]?.toUpperCase() || "P"}</span>
-                      </div>
-                    )}
+                    ) : null}
                     <div className="p-6 flex flex-col flex-1">
                       <span className="text-xs font-medium mb-2" style={{ color: theme.colors.primary, letterSpacing: "0.1em", textTransform: "uppercase" }}>
                         Project {String(i + 1).padStart(2, "0")}
@@ -157,11 +154,7 @@ function BrutalProjects({ items }: { items: ProjectItem[] }) {
                     <div className="w-full h-56 overflow-hidden" style={{ borderBottom: `3px solid ${theme.colors.border}` }}>
                       <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105" loading="lazy" />
                     </div>
-                  ) : (
-                    <div className="w-full h-32 flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${theme.colors.primary}15, ${theme.colors.accent}10)` }}>
-                      <span className="text-4xl font-black" style={{ color: theme.colors.primary, opacity: 0.15 }}>{p.name?.[0]?.toUpperCase() || "P"}</span>
-                    </div>
-                  )}
+                  ) : null}
                   <div className="p-6">
                     <div className="flex items-start justify-between gap-4 flex-wrap">
                       <div className="flex-1">
