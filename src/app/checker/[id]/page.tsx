@@ -1,5 +1,6 @@
 "use client";
 
+import { GuideLink } from "@/components/guide/FeatureGuide";
 import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import SiteHeader from "@/components/nav/SiteHeader";
@@ -144,6 +145,7 @@ export default function CheckerDetailPage() {
             {createdAt && (
               <span className="hidden text-xs uppercase tracking-[0.06em] text-ink-soft sm:inline">{timeAgo(new Date(createdAt), t, localeFor(lang))}</span>
             )}
+            <GuideLink id="checker" />
           </div>
         </div>
 

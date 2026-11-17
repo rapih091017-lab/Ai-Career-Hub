@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FeatureTour } from "@/components/guide/FeatureTour";
 import { guideFeature, guideHref, tourSeen, type GuideFeatureId } from "@/lib/guide-features";
@@ -45,5 +46,20 @@ export function GuideButton({ onClick, label, aria, className = "" }: { onClick:
       <span className="material-symbols-outlined text-[18px]" aria-hidden="true">help</span>
       {label}
     </button>
+  );
+}
+
+/** Versi tautan tombol Panduan untuk halaman tanpa tur: langsung ke bagian fitur di /panduan. */
+export function GuideLink({ id, className = "" }: { id: GuideFeatureId; className?: string }) {
+  const { t } = useTranslation();
+  return (
+    <Link
+      href={guideHref(id)}
+      data-guide-button
+      className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border-2 border-ink/30 bg-paper px-3.5 text-sm font-semibold text-ink transition-colors hover:border-ink hover:bg-lime/20 ${className}`}
+    >
+      <span className="material-symbols-outlined text-[18px]" aria-hidden="true">help</span>
+      {t("guide.button")}
+    </Link>
   );
 }

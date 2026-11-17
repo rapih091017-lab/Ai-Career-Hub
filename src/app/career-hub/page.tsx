@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import SiteHeader from "@/components/nav/SiteHeader";
 import AppFooter from "@/components/AppFooter";
+import { GuideLink } from "@/components/guide/FeatureGuide";
 import CareerHubPostList from "@/components/career-hub/CareerHubPostList";
 import { db } from "@/db";
 import { careerHubPosts } from "@/db/schema";
@@ -21,5 +22,5 @@ export default async function CareerHubPage() {
       .from(careerHubPosts).where(eq(careerHubPosts.status, "published")).orderBy(desc(careerHubPosts.publishedAt), desc(careerHubPosts.createdAt)).limit(12),
     db.select({ total: sql<number>`count(*)::int` }).from(careerHubPosts).where(eq(careerHubPosts.status, "published")),
   ]);
-  return <div className="flex min-h-screen flex-col bg-background text-on-background"><SiteHeader variant="pill" /><main className="flex-1 px-margin-mobile pb-16 pt-24 md:px-gutter"><div className="mx-auto max-w-[1100px]"><header className="mb-10 max-w-2xl"><p className="kicker">Career Hub</p><h1 className="font-display text-4xl text-ink">Panduan untuk langkah karier berikutnya</h1><p className="mt-3 text-body-lg text-ink-soft">Baca materi praktis tentang CV, interview, skill, dan cara mencari kerja dengan lebih terarah.</p></header><CareerHubPostList initialPosts={posts} initialTotal={total} /></div></main><AppFooter bordered /></div>;
+  return <div className="flex min-h-screen flex-col bg-background text-on-background"><SiteHeader variant="pill" /><main className="flex-1 px-margin-mobile pb-16 pt-24 md:px-gutter"><div className="mx-auto max-w-[1100px]"><div className="mb-2 flex justify-end"><GuideLink id="careerhub" /></div><header className="mb-10 max-w-2xl"><p className="kicker">Career Hub</p><h1 className="font-display text-4xl text-ink">Panduan untuk langkah karier berikutnya</h1><p className="mt-3 text-body-lg text-ink-soft">Baca materi praktis tentang CV, interview, skill, dan cara mencari kerja dengan lebih terarah.</p></header><CareerHubPostList initialPosts={posts} initialTotal={total} /></div></main><AppFooter bordered /></div>;
 }
