@@ -16,6 +16,8 @@ import { ROLE_CATEGORY_OPTIONS, type AnalysisResult } from "@/components/checker
 import { anonIdHeaders } from "@/lib/anon-id";
 import { extractPdfTextClient, renderPdfPagesToBlobs } from "@/lib/pdf-extract-client";
 import { track } from "@/lib/track";
+import { FeatureGuide } from "@/components/guide/FeatureGuide";
+import { HowToUse } from "@/components/guide/HowToUse";
 import { runClientOcr, type OcrMsgs } from "@/lib/ocr-client";
 
 /* ------------------------------------------------------------------ */
@@ -488,19 +490,23 @@ export default function CheckerPage() {
               `.workbench-grid` (globals.css), bukan dekorasi bebas. */}
           <div aria-hidden="true" className="workbench-grid pointer-events-none absolute inset-x-0 top-0 -z-10 h-[540px]" />
           <div className="relative mx-auto flex w-full max-w-[600px] flex-col gap-6">
-            <div>
-              <SectionKicker>{t("checker.hero-kicker")}</SectionKicker>
-              <h1 className="max-w-[20ch] font-display text-headline-lg font-bold text-ink">
-                {t("checker.title")}
-              </h1>
-              <p className="mt-3 max-w-[48ch] text-body-md leading-relaxed text-ink-soft">
-                {t("checker.subtitle")}
-              </p>
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <SectionKicker>{t("checker.hero-kicker")}</SectionKicker>
+                <h1 className="max-w-[20ch] font-display text-headline-lg font-bold text-ink">
+                  {t("checker.title")}
+                </h1>
+                <p className="mt-3 max-w-[48ch] text-body-md leading-relaxed text-ink-soft">
+                  {t("checker.subtitle")}
+                </p>
+              </div>
+              <FeatureGuide id="checker" />
             </div>
+            <HowToUse id="checker" />
 
             <div className="flex flex-col gap-7 rounded-[18px] border-[2.5px] border-ink bg-paper p-6 shadow-hard md:p-8">
               {/* ── Langkah 1: CV (unggah atau tempel teks, dua-duanya selalu terlihat) ── */}
-              <fieldset className="flex min-w-0 flex-col gap-3">
+              <fieldset data-tour="checker-cv" className="flex min-w-0 flex-col gap-3">
                 <legend className="mb-3 flex items-center gap-2 font-display text-base font-bold text-ink">
                   <StepNumber n={1} />
                   {t("checker.step-cv")}
@@ -566,7 +572,7 @@ export default function CheckerPage() {
               </fieldset>
 
               {/* ── Langkah 2: lowongan, opsional ── */}
-              <fieldset className="flex min-w-0 flex-col gap-2">
+              <fieldset data-tour="checker-jd" className="flex min-w-0 flex-col gap-2">
                 <legend className="mb-3 flex items-center gap-2 font-display text-base font-bold text-ink">
                   <StepNumber n={2} />
                   {t("checker.step-jd")}
@@ -721,6 +727,7 @@ export default function CheckerPage() {
               <div className="flex flex-col items-center gap-4">
                 <MagneticButton className="w-full">
                   <button
+                    data-tour="checker-submit"
                     className="flex w-full items-center justify-center gap-2 rounded-full border-[2.5px] border-ink bg-lime py-4 text-[15px] font-bold text-on-light shadow-[0_4px_0_rgb(var(--c-ink))] transition-transform hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-60 disabled:hover:translate-y-0"
                     onClick={handleAnalyze}
                     disabled={loading}
