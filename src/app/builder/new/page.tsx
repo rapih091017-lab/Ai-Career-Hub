@@ -1,5 +1,6 @@
 "use client";
 
+import { HowToUse } from "@/components/guide/HowToUse";
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslation } from "@/lib/i18n";
@@ -131,6 +132,7 @@ function BuilderNewFormContent() {
           {t("cv.new.subtitle")}
         </p>
       </div>
+      <HowToUse id="builder" className="mx-auto max-w-[480px] text-left" />
 
       {/* Ambil pilihan lewat popup, konten halaman sebagai fallback */}
       <div className="flex justify-center pt-8">

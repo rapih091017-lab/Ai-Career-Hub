@@ -1242,7 +1242,7 @@ export default function BuilderPage() {
 
         <ConfirmModal confirm={confirm} onClose={() => setConfirm(null)} />
 
-        <BuilderTour open={tourOpen} onClose={closeTour} />
+        <BuilderTour open={tourOpen} onClose={closeTour} guideHref="/panduan#builder" />
 
         {/* ── DISPLAY SETTINGS MODAL ── */}
         <DisplaySettingsModal
