@@ -6,6 +6,7 @@ import { PORTFOLIO_DICT } from "@/lib/i18n-dict/portfolio";
 import { CHECKER_DICT } from "@/lib/i18n-dict/checker";
 import { APP_DICT } from "@/lib/i18n-dict/app";
 import { AI_DICT } from "@/lib/i18n-dict/ai";
+import { GUIDE_DICT } from "@/lib/i18n-dict/guide";
 
 export type Lang = "id" | "en";
 
@@ -2176,6 +2177,7 @@ const DICT: Record<string, { id: string; en: string }> = {
   ...CHECKER_DICT,
   ...APP_DICT,
   ...AI_DICT,
+  ...GUIDE_DICT,
 };
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
