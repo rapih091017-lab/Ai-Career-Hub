@@ -33,8 +33,6 @@ export const GUIDE_DICT: Record<string, { id: string; en: string }> = {
   "guide.page.meta-title": { id: "Panduan | AI Career Hub", en: "Guide | AI Career Hub" },
   "guide.page.meta-desc": { id: "Cara memakai Cek CV, builder CV, surat lamaran, portofolio, LinkedIn optimizer, latihan interview, dan tracker lamaran.", en: "How to use the CV checker, CV builder, cover letters, portfolio, LinkedIn optimizer, interview practice, and the application tracker." },
   "guide.nav.label": { id: "Panduan", en: "Guide" },
-  "guide.nav.group": { id: "Bantuan", en: "Help" },
-  "guide.nav.contact": { id: "Kontak", en: "Contact" },
 
   /* Landing */
   "guide.landing.new": { id: "Baru di sini? Mulai dari Cek CV: unggah CV, lihat bagian yang paling lemah, lalu perbaiki.", en: "New here? Start with Check CV: upload your CV, see the weakest part, then fix it." },
