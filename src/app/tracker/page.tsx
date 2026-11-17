@@ -18,6 +18,9 @@ import AuthGuard from "@/components/AuthGuard";
 import { ConfirmModal, type ConfirmAction } from "@/components/ui/confirm-modal";
 import { useToast } from "@/components/ui/toast";
 import { useTranslation } from "@/lib/i18n";
+import { FeatureGuide } from "@/components/guide/FeatureGuide";
+import { HowToUse } from "@/components/guide/HowToUse";
+import { GuidedEmptyState } from "@/components/guide/GuidedEmptyState";
 import { POSITION_GAP } from "@/lib/tracker";
 import { JobCardContent } from "@/components/tracker/JobCard";
 import { JobModal } from "@/components/tracker/JobModal";
@@ -271,9 +274,12 @@ export default function TrackerPage() {
 
         <main className="mx-auto max-w-[1400px] px-margin-mobile pb-24 pt-24 md:px-gutter">
           <section className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <h1 className="text-headline-lg font-headline-lg text-on-background">{t("tracker.title")}</h1>
-              <p className="mt-1 max-w-[560px] text-body-md text-on-surface-variant">{t("tracker.subtitle")}</p>
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h1 className="text-headline-lg font-headline-lg text-on-background">{t("tracker.title")}</h1>
+                <p className="mt-1 max-w-[560px] text-body-md text-on-surface-variant">{t("tracker.subtitle")}</p>
+              </div>
+              <FeatureGuide id="tracker" ready={!isLoading} />
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
@@ -293,6 +299,7 @@ export default function TrackerPage() {
               </div>
               <button
                 type="button"
+                data-tour="tr-stages"
                 onClick={() => setStageModalOpen(true)}
                 className="h-11 rounded-xl border border-outline-variant px-4 text-label-bold text-on-surface transition-colors hover:bg-surface-container"
               >
@@ -300,6 +307,7 @@ export default function TrackerPage() {
               </button>
               <button
                 type="button"
+                data-tour="tr-add"
                 onClick={() => openAddJob()}
                 className="h-11 rounded-full border-[2.5px] border-ink bg-lime px-4 text-label-bold text-on-light shadow-[0_3px_0_rgb(var(--c-ink))] transition-all hover:-translate-y-0.5 active:scale-[0.98]"
               >
@@ -329,6 +337,16 @@ export default function TrackerPage() {
             </div>
           ) : (
             <>
+              <HowToUse id="tracker" className="mb-4" />
+              {jobs.length === 0 && (
+                <GuidedEmptyState
+                  className="mb-6"
+                  icon="view_kanban"
+                  title={t("guide.empty.tracker.title")}
+                  desc={t("guide.empty.tracker.desc")}
+                  action={{ label: t("guide.empty.tracker.cta"), onClick: () => openAddJob() }}
+                />
+              )}
               {/* Board desktop: kolom bisa digeser horizontal, ukuran tetap per kolom. */}
               <DndContext
                 sensors={sensors}
@@ -342,6 +360,7 @@ export default function TrackerPage() {
                 }}
               >
                 <div
+                  data-tour="tr-board"
                   className={`hidden gap-4 overflow-x-auto pb-4 md:flex ${
                     activeJobId ? "cursor-grabbing select-none" : ""
                   }`}
@@ -365,7 +384,7 @@ export default function TrackerPage() {
               </DndContext>
 
               {/* Mobile: daftar per tahap, tanpa drag, aksi lewat menu kartu. */}
-              <div className="space-y-6 md:hidden">
+              <div data-tour="tr-board" className="space-y-6 md:hidden">
                 {stages.map((stage) => {
                   const list = jobsByStage.get(stage.id) ?? [];
                   return (
