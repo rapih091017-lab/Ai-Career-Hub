@@ -30,7 +30,7 @@ const STEPS = [
     sub: "lp.steps.n3.sub",
     desc: "lp.steps.n3.desc",
     cta: "lp.steps.n3.cta",
-    href: "/surat-lamaran",
+    href: "/my-resumes",
   },
 ];
 

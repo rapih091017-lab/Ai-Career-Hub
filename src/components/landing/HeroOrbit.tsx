@@ -174,6 +174,13 @@ export default function HeroOrbit() {
               {t("lp.hero.proof")} <span className="font-bold text-lime">{t("lp.hero.proof-strong")}</span>
             </p>
 
+            <p className="mt-2 text-[13px] leading-relaxed text-on-dark/70">
+              {t("guide.landing.new")}{" "}
+              <Link href="/panduan" className="inline-flex min-h-11 items-center font-bold text-on-dark underline decoration-lime decoration-2 underline-offset-4 hover:text-lime sm:min-h-0">
+                {t("guide.landing.link")}
+              </Link>
+            </p>
+
             <ul className="mt-5 flex flex-wrap gap-2">
               {["lp.hero.chip-1", "lp.hero.chip-2", "lp.hero.chip-3", "lp.hero.chip-4"].map((key) => (
                 <li
