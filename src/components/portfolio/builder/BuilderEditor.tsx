@@ -1797,7 +1797,7 @@ export default function BuilderEditor({ draft }: { draft: UsePortfolioDraftResul
 
       <ConfirmModal confirm={confirmAction} onClose={() => setConfirmAction(null)} />
 
-      <BuilderTour open={tourOpen} onClose={() => setTourOpen(false)} steps={PORTFOLIO_TOUR} storageKey={PORTFOLIO_TOUR_KEY} />
+      <BuilderTour open={tourOpen} onClose={() => setTourOpen(false)} steps={PORTFOLIO_TOUR} storageKey={PORTFOLIO_TOUR_KEY} guideHref="/panduan#portfolio" />
 
       {/* ── Source Picker Popup ── */}
       <Modal open={showSourcePicker} onClose={() => setShowSourcePicker(false)} title={t("pb.new-title")} size="max-w-lg">

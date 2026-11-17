@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
+import { FeatureGuide } from "@/components/guide/FeatureGuide";
+import { HowToUse } from "@/components/guide/HowToUse";
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/components/ui/toast";
 import AuthGuard from "@/components/AuthGuard";
@@ -106,11 +108,13 @@ export default function PortfolioPage() {
         <main className="pt-24 pb-20 px-margin-mobile md:px-gutter">
           <div className="max-w-[900px] mx-auto space-y-8">
             {/* Header */}
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
                 <h1 className="font-headline-lg text-on-background mb-1">{t("pf.title")}</h1>
                 <p className="font-body-md text-on-surface-variant">{t("pf.subtitle")}</p>
               </div>
+              <div className="flex shrink-0 items-center gap-2">
+              <FeatureGuide id="portfolio" ready={publishInfo !== null} />
               {/* Language toggle */}
               <button
                 onClick={toggleLang}
@@ -119,10 +123,13 @@ export default function PortfolioPage() {
               >
                 {lang === "id" ? "EN" : "ID"}
               </button>
+              </div>
             </div>
 
+            <HowToUse id="portfolio" />
+
             {/* Live URL + Quick Actions */}
-            <div className="rounded-[18px] border-[2.5px] border-ink bg-paper p-6 shadow-hard">
+            <div data-tour="pf-status" className="rounded-[18px] border-[2.5px] border-ink bg-paper p-6 shadow-hard">
               <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
                 <div className="flex-1 min-w-0">
                   <label className="text-label-bold text-on-surface-variant block mb-1.5">{t("portfolio.url-label")}</label>
@@ -143,7 +150,7 @@ export default function PortfolioPage() {
                             href={publishInfo.plan.upgradeUrl || "/settings/billing?plan=portfolio-web"}
                             className="mt-0.5 block text-xs font-semibold text-brand-green underline-offset-2 hover:underline"
                           >
-                            Trial 1x terpakai · perbarui konten butuh Portfolio Web &rarr;
+                            {t("guide.pf.trial-used")} &rarr;
                           </a>
                         )}
                       </div>
@@ -153,9 +160,10 @@ export default function PortfolioPage() {
                       <span className="material-symbols-outlined text-outline text-lg shrink-0" aria-hidden="true">public</span>
                       <div>
                         <p className="text-sm text-on-surface-variant">{t("portfolio.publish-not-live")}</p>
+                        <p className="mt-0.5 text-xs text-on-surface-variant">{t("guide.empty.portfolio.desc")}</p>
                         {publishInfo?.plan?.trialAvailable && (
                           <p className="text-xs text-primary mt-0.5 font-medium">
-                            Publish pertama GRATIS &middot; update berikutnya butuh paket Portfolio Web
+                            {t("guide.pf.trial-free")}
                           </p>
                         )}
                       </div>
@@ -163,13 +171,13 @@ export default function PortfolioPage() {
                   )}
                 </div>
                 <div className="flex gap-3 flex-wrap">
-                  <Link href="/portfolio/build" className="flex min-h-[44px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-5 font-label-bold text-on-light shadow-[0_3px_0_rgb(var(--c-ink))] transition-all hover:-translate-y-0.5">
+                  <Link href="/portfolio/build" data-tour="pf-build" className="flex min-h-[44px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-lime px-5 font-label-bold text-on-light shadow-[0_3px_0_rgb(var(--c-ink))] transition-all hover:-translate-y-0.5">
                     <span className="material-symbols-outlined text-lg">edit</span>
-                    <span className="hidden sm:inline">{t("pf.create")}</span>
+                    <span>{t("pf.create")}</span>
                   </Link>
-                  <Link href={`/portfolio/preview?template=${selectedTheme}`} className="flex min-h-[44px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-paper px-5 font-label-bold text-ink transition-colors hover:bg-lime/15">
+                  <Link href={`/portfolio/preview?template=${selectedTheme}`} data-tour="pf-preview" className="flex min-h-[44px] items-center gap-2 rounded-full border-[2.5px] border-ink bg-paper px-5 font-label-bold text-ink transition-colors hover:bg-lime/15">
                     <span className="material-symbols-outlined text-lg">preview</span>
-                    <span className="hidden sm:inline">{t("pf.preview")}</span>
+                    <span>{t("pf.preview")}</span>
                   </Link>
                 </div>
               </div>
