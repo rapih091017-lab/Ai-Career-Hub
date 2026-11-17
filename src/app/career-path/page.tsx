@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import SiteHeader from "@/components/nav/SiteHeader";
 import AppFooter from "@/components/AppFooter";
+import { FeatureGuide } from "@/components/guide/FeatureGuide";
 import { SITE_URL } from "@/lib/site-url";
 import { db } from "@/db";
 import { careerPaths } from "@/db/schema";
@@ -36,6 +37,9 @@ export default async function CareerPathPage() {
 
       <main className="flex-1 px-margin-mobile pb-16 pt-24 md:px-gutter">
         <div className="mx-auto max-w-[1000px]">
+          <div className="mb-2 flex justify-end">
+            <FeatureGuide id="careerpath" />
+          </div>
           <section className="mb-10 text-center">
             <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary/5 px-4 py-1.5 text-xs font-bold tracking-wider text-primary">
               <span className="material-symbols-outlined text-sm">route</span>
@@ -61,7 +65,7 @@ export default async function CareerPathPage() {
               Belum ada jalur karier yang dipublikasikan. Cek lagi nanti.
             </p>
           ) : (
-            <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <section data-tour="cp-list" className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {paths.map((path) => (
                 <Link
                   key={path.id}
@@ -96,7 +100,7 @@ export default async function CareerPathPage() {
             </section>
           )}
 
-          <section className="mt-12 rounded-[14px] border-[2.5px] border-ink bg-lime/15 shadow-hard p-8 text-center">
+          <section data-tour="cp-cta" className="mt-12 rounded-[14px] border-[2.5px] border-ink bg-lime/15 shadow-hard p-8 text-center">
             <h2 className="font-display text-headline-md text-ink">Siap mulai dari posisi ini?</h2>
             <p className="mx-auto mt-2 max-w-[520px] text-body-md text-ink-soft">
               Bangun CV dengan kata kunci yang tepat, lalu cek skornya sebelum melamar.
