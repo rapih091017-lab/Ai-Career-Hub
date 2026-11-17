@@ -19,6 +19,7 @@ import {
   type JobSort,
 } from "@/lib/job-classification";
 import { useTranslation } from "@/lib/i18n";
+import { FeatureGuide } from "@/components/guide/FeatureGuide";
 
 const EXTERNAL_PORTALS = [
   {
@@ -151,10 +152,13 @@ export default function KarirPage() {
       {/* ── Hero ── */}
       <div className="bg-evergreen text-on-dark">
         <div className="max-w-3xl mx-auto px-6 py-20 md:py-24">
-          <Link href="/" className="inline-flex min-h-[44px] items-center gap-2 text-on-dark/75 hover:text-lime transition-colors mb-6 text-sm">
-            <span className="material-symbols-outlined text-lg">arrow_back</span>
-            {t("karir.back-home")}
-          </Link>
+          <div className="mb-6 flex items-center justify-between gap-3">
+            <Link href="/" className="inline-flex min-h-[44px] items-center gap-2 text-on-dark/75 hover:text-lime transition-colors text-sm">
+              <span className="material-symbols-outlined text-lg">arrow_back</span>
+              {t("karir.back-home")}
+            </Link>
+            <FeatureGuide id="karir" ready={totalJobs !== null} />
+          </div>
           <div className="inline-flex min-h-[44px] items-center gap-2 px-4 py-1.5 border border-lime/40 bg-evergreen rounded-full text-xs font-bold tracking-wider mb-6 text-lime">
             <span className={`w-2 h-2 rounded-full ${totalJobs ? "bg-lime" : "bg-lime animate-pulse"}`} />
             {totalJobs === null
@@ -165,7 +169,7 @@ export default function KarirPage() {
           </div>
           <h1 className="font-display text-3xl md:text-4xl font-bold mb-3">{t("karir.title")}</h1>
           <p className="text-on-dark/75 text-lg max-w-xl">
-            {t("karir.subtitle")}
+            {totalJobs ? t("guide.karir.subtitle-open") : t("karir.subtitle")}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
@@ -189,7 +193,7 @@ export default function KarirPage() {
       <div className="max-w-3xl mx-auto px-6 py-12 md:py-16">
         {/* ── Loker pilihan (dikelola admin) ── */}
         {hasJobs ? (
-          <section className="mb-16">
+          <section data-tour="karir-jobs" className="mb-16">
             <div className="text-center mb-8">
               <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary/5 text-primary text-xs font-bold tracking-wider rounded-full mb-4">
                 <span className="material-symbols-outlined text-sm">work</span>
@@ -454,7 +458,7 @@ export default function KarirPage() {
         )}
 
         {/* ── External Job Portals ── */}
-        <section className="mb-16">
+        <section data-tour="karir-portals" className="mb-16">
           <div className="text-center mb-8">
             <span className="inline-flex min-h-[44px] items-center gap-2 px-4 py-1.5 border border-ink/25 bg-lime/25 text-ink text-xs font-bold tracking-wider rounded-full mb-4">
               <span className="material-symbols-outlined text-sm">link</span>
@@ -490,7 +494,7 @@ export default function KarirPage() {
         </section>
 
         {/* ── CTA ── */}
-        <section className="card-hard bg-paper p-8 md:p-10 text-center">
+        <section data-tour="karir-cta" className="card-hard bg-paper p-8 md:p-10 text-center">
           <div className="max-w-lg mx-auto">
             <div className="w-14 h-14 rounded-[14px] border-2 border-ink bg-lime flex items-center justify-center mx-auto mb-4">
               <span className="material-symbols-outlined text-on-light text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>description</span>

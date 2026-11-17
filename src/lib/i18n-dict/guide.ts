@@ -228,6 +228,8 @@ export const GUIDE_DICT: Record<string, { id: string; en: string }> = {
   "guide.f.careerhub.q": { id: "Artikelnya dalam bahasa apa?", en: "What language are the articles in?" },
   "guide.f.careerhub.a": { id: "Sebagian besar dalam Bahasa Indonesia.", en: "Most are in Indonesian." },
 
+  "guide.karir.subtitle-open": { id: "Lowongan pilihan ada di bawah. Kalau belum ada yang cocok, coba situs lowongan tepercaya di bagian akhir.", en: "Selected jobs are below. If none fits, try the trusted job sites further down." },
+
   /* Tur dashboard */
   "guide.tour.dashboard.1.title": { id: "Pintasan alat", en: "Tool shortcuts" },
   "guide.tour.dashboard.1.body": { id: "Buka alat yang kamu perlukan dari kartu-kartu ini.", en: "Open the tool you need from these cards." },

@@ -146,7 +146,7 @@ export const GUIDE_FEATURES: GuideFeature[] = [
     href: "/career-path",
     icon: "route",
     tourKey: tourKeyFor("careerpath"),
-    tour: steps("careerpath", [["cp-list"], ["cp-list"], []]),
+    tour: steps("careerpath", [["cp-list"], ["cp-list"], ["cp-cta"]]),
     terms: ["keyword"],
   },
   {
@@ -154,7 +154,7 @@ export const GUIDE_FEATURES: GuideFeature[] = [
     href: "/karir",
     icon: "work",
     tourKey: tourKeyFor("karir"),
-    tour: steps("karir", [["karir-jobs"], ["karir-portals"], []]),
+    tour: steps("karir", [["karir-jobs", "karir-portals"], ["karir-portals"], ["karir-cta"]]),
   },
   { id: "careerhub", href: "/career-hub", icon: "menu_book" },
   {
