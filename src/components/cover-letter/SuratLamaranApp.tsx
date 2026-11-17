@@ -12,6 +12,9 @@ import { useToast } from "@/components/ui/toast";
 import { LetterPreview } from "@/components/cover-letter/LetterPreview";
 import { PICKER_TEMPLATES, getLetterTemplate, letterTemplateText, type LetterTemplate } from "@/components/cover-letter/letterTemplates";
 import { fill, localeFor, useTranslation } from "@/lib/i18n";
+import { FeatureGuide } from "@/components/guide/FeatureGuide";
+import { HowToUse } from "@/components/guide/HowToUse";
+import { GuidedEmptyState } from "@/components/guide/GuidedEmptyState";
 import { exportPdfViaServer } from "@/lib/pdf-export";
 import { useCoverLetterQuota } from "@/hooks/useCoverLetterQuota";
 import type { CvData } from "@/components/cv-templates";
@@ -162,6 +165,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
 
   // Result state
   const [letters, setLetters] = useState<LetterItem[]>([]);
+  const [lettersLoaded, setLettersLoaded] = useState(false);
   const [activeLetter, setActiveLetter] = useState<LetterItem | null>(null);
   const [subject, setSubject] = useState("");
   const [content, setContent] = useState("");
@@ -313,7 +317,8 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
           }
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setLettersLoaded(true));
   }, [cvId, styleFromUrl, letterFromUrl]);
 
   useEffect(() => {
@@ -613,6 +618,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                 </p>
               </div>
               <div className="flex items-center gap-1.5">
+                <FeatureGuide id="letter" ready={lettersLoaded} />
                 {quota && !quota.isUnlimited && (
                   <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full bg-primary/10 text-primary">
                     <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>redeem</span>
@@ -628,8 +634,10 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
               </div>
             </div>
 
+            <HowToUse id="letter" />
+
             {/* ── STEPPER ── */}
-            <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/50 shadow-premium-sm px-3 py-3 md:px-5 flex items-center gap-1 overflow-x-auto custom-scrollbar">
+            <div data-tour="cl-steps" className="bg-surface-container-lowest rounded-2xl border border-outline-variant/50 shadow-premium-sm px-3 py-3 md:px-5 flex items-center gap-1 overflow-x-auto custom-scrollbar">
               {STEP_KEYS.map((key, i) => (
                 <button
                   key={key}
@@ -662,7 +670,7 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                 {/* ════ LEFT: STEP CONTENT ════ */}
-                <div className="space-y-5">
+                <div data-tour="cl-panel" className="space-y-5">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={activeStep}
@@ -1507,8 +1515,18 @@ export default function SuratLamaranApp({ cvId }: { cvId: string | null }) {
                 {/* ════ RIGHT: PREVIEW A4 + RIWAYAT ════ */}
                 <div className="space-y-5 lg:sticky lg:top-24">
                   {/* Riwayat */}
+                  {lettersLoaded && letters.length === 0 && (
+                    <div data-tour="cl-history">
+                      <GuidedEmptyState
+                        icon="history"
+                        title={t("guide.empty.letters.title")}
+                        desc={t("guide.empty.letters.desc")}
+                        action={{ label: t("guide.empty.letters.cta"), onClick: () => setActiveStep(1) }}
+                      />
+                    </div>
+                  )}
                   {letters.length > 0 && (
-                    <section className="bg-surface-container-lowest rounded-2xl p-4 shadow-premium-sm border border-outline-variant/50">
+                    <section data-tour="cl-history" className="bg-surface-container-lowest rounded-2xl p-4 shadow-premium-sm border border-outline-variant/50">
                       <h3 className="text-sm font-bold text-on-surface mb-3 flex items-center gap-2">
                         <span className="material-symbols-outlined text-base text-primary">history</span>
                         {fill(t("cl.history"), { n: letters.length })}
