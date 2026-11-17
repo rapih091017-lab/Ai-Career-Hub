@@ -16,6 +16,8 @@ import MagneticButton from "@/components/MagneticButton";
 import { useToast } from "@/components/ui/toast";
 import { ConfirmModal, type ConfirmAction } from "@/components/ui/confirm-modal";
 import { DashboardStats } from "@/components/dashboard/DashboardStats";
+import { FeatureGuide } from "@/components/guide/FeatureGuide";
+import { GuidedEmptyState } from "@/components/guide/GuidedEmptyState";
 
 /* ── Relative time helper (ikuti bahasa aktif) ── */
 function timeAgo(date: Date, t: (k: string) => string, lang: string): string {
@@ -100,6 +102,8 @@ export default function DashboardPage() {
   const router = useRouter();
   const [cvList, setCvList] = useState<CVItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  // Tur dashboard menunggu popup onboarding; pengguna baru melihat tur di kunjungan berikutnya.
+  const [onboarding, setOnboarding] = useState<"pending" | "shown" | "none">("pending");
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [confirmAction, setConfirmAction] = useState<ConfirmAction | null>(null);
@@ -265,8 +269,11 @@ export default function DashboardPage() {
             {/* Welcome + Profile */}
             <section className="mb-10">
               <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h1 className="font-headline-lg text-on-background mb-1">{t("dashboard.title")}</h1>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <h1 className="font-headline-lg text-on-background mb-1">{t("dashboard.title")}</h1>
+                    <FeatureGuide id="dashboard" ready={!isLoading && onboarding === "none"} />
+                  </div>
                   <p className="font-body-md text-on-surface-variant">{t("dashboard.subtitle")}</p>
                 </div>
                 {profileData === null ? (
@@ -331,7 +338,7 @@ export default function DashboardPage() {
             </section>
 
             {/* Quick Actions, staggered entry */}
-            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
+            <section data-tour="dash-tools" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
               {[
                 { icon: "edit_document", label: t("dashboard.new-cv"), desc: t("dashboard.new-cv-desc"), color: "bg-lime/40", iconColor: "text-ink", onClick: () => setShowTemplatePicker(true), href: undefined },
                 { icon: "search", label: t("dashboard.check-cv"), desc: t("dashboard.check-cv-desc"), color: "bg-secondary-container/50", iconColor: "text-green-deep", onClick: undefined, href: "/checker" },
@@ -367,7 +374,7 @@ export default function DashboardPage() {
             </section>
 
             {/* Next Best Action */}
-            <section className="mb-6">
+            <section data-tour="dash-next" className="mb-6">
               <Link
                 href={nextAction.href}
                 className="flex items-center gap-4 rounded-[14px] border-2 border-ink/60 bg-lime/15 p-4 transition-colors hover:border-ink"
@@ -444,7 +451,17 @@ export default function DashboardPage() {
                   ))}
                 </div>
               </section>
-            ) : checkerHistory.length > 0 && (
+            ) : checkerHistory.length === 0 ? (
+              <section className="mb-8">
+                <h2 className="font-headline-md text-on-surface mb-3">{t("dashboard.checker-history")}</h2>
+                <GuidedEmptyState
+                  icon="fact_check"
+                  title={t("guide.empty.checks.title")}
+                  desc={t("guide.empty.checks.desc")}
+                  action={{ label: t("guide.empty.checks.cta"), href: "/checker" }}
+                />
+              </section>
+            ) : (
               <section className="mb-8">
                 <h2 className="font-headline-md text-on-surface mb-3">{t("dashboard.checker-history")}</h2>
                 <div className="space-y-2">
@@ -528,7 +545,7 @@ export default function DashboardPage() {
             )}
 
             {/* ── Riwayat Surat ── */}
-            <section className="mb-8">
+            <section data-tour="dash-letters" className="mb-8">
               <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
                 <h2 className="font-headline-md text-on-surface">{t("dashboard.letters-history")}</h2>
                 <div className="flex items-center gap-2">
@@ -619,7 +636,7 @@ export default function DashboardPage() {
             </section>
 
             {/* Recent CVs, manager lengkap ada di /my-resumes */}
-            <section>
+            <section data-tour="dash-cvs">
               <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
                 <h2 className="font-headline-md text-on-surface">{t("dashboard.recent-cvs")}</h2>
                 <Link
@@ -774,7 +791,7 @@ export default function DashboardPage() {
 <TemplatePicker isOpen={showTemplatePicker} onClose={() => { if (!isCreating) setShowTemplatePicker(false); }} onSelect={handleCreateCV} isCreating={isCreating} />
         <ConfirmModal confirm={confirmAction} onClose={() => setConfirmAction(null)} />
         {/* Langkah pertama untuk pengguna baru: isi profil dari LinkedIn atau berkas. */}
-        <ProfileOnboardingPopup onStartImport={() => router.push("/settings/profile?import=1")} />
+        <ProfileOnboardingPopup onStartImport={() => router.push("/settings/profile?import=1")} onSettled={(shown) => setOnboarding(shown ? "shown" : "none")} />
       </div>
     </AuthGuard>
   );

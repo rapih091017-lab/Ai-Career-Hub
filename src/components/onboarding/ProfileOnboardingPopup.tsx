@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslation } from "@/lib/i18n";
 import Modal from "@/components/Modal";
@@ -23,32 +23,41 @@ type OnboardingAction = "linkedin" | "upload" | "skip";
 export function ProfileOnboardingPopup({
   onStartImport,
   onFinishImport,
+  onSettled,
 }: {
   /** Membuka modal impor profil yang sudah ada (tempel teks / unggah berkas). */
   onStartImport: () => void;
   /** Dipanggil setelah profil berhasil diisi lewat modal impor. */
   onFinishImport?: () => void;
+  /** Dipanggil sekali setelah status dicek; `shown` = popup tampil (dashboard menunda tur). */
+  onSettled?: (shown: boolean) => void;
 }) {
   const { data: session } = useSession();
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState<OnboardingAction | null>(null);
   const [checked, setChecked] = useState(false);
+  const onSettledRef = useRef(onSettled);
+  onSettledRef.current = onSettled;
 
   // Cek status satu kali setelah sesi siap. Default tersembunyi supaya
   // pengguna lama tidak pernah melihatnya bahkan sesaat.
   useEffect(() => {
     if (!session?.user?.id) return;
     let alive = true;
+    let shown = false;
     fetch("/api/onboarding/profile", { cache: "no-store" })
       .then((res) => (res.ok ? res.json() : null))
       .then((data: { isNewUser?: boolean } | null) => {
         if (!alive || !data) return;
+        shown = data.isNewUser === true;
         if (data.isNewUser) setOpen(true);
       })
       .catch(() => {})
       .finally(() => {
-        if (alive) setChecked(true);
+        if (!alive) return;
+        setChecked(true);
+        onSettledRef.current?.(shown);
       });
     return () => {
       alive = false;
