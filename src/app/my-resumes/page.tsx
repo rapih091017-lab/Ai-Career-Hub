@@ -14,6 +14,8 @@ import MagneticButton from "@/components/MagneticButton";
 import { useToast } from "@/components/ui/toast";
 import { ConfirmModal, type ConfirmAction } from "@/components/ui/confirm-modal";
 import { useTranslation } from "@/lib/i18n";
+import { FeatureGuide } from "@/components/guide/FeatureGuide";
+import { GuidedEmptyState } from "@/components/guide/GuidedEmptyState";
 
 function timeAgo(date: Date, t: (k: string) => string, lang: string): string {
   const now = new Date();
@@ -149,14 +151,17 @@ export default function MyResumesPage() {
         <main className="pt-24 pb-20 px-margin-mobile md:px-gutter">
           <div className="max-w-[900px] mx-auto">
             <section className="mb-8 flex items-start justify-between gap-4 flex-wrap">
-              <div>
-                <h1 className="font-headline-lg text-on-background mb-1">My Resumes</h1>
+              <div className="min-w-0">
+                <h1 className="font-headline-lg text-on-background mb-1">{t("nav.item.my-resumes")}</h1>
                 <p className="font-body-md text-on-surface-variant">
                   {t("myresumes.subtitle")}
                 </p>
               </div>
+              <div className="flex items-center gap-2">
+              <FeatureGuide id="resumes" ready={!isLoading} />
               <MagneticButton>
                 <button
+                  data-tour="resumes-new"
                   onClick={() => setShowTemplatePicker(true)}
                   className="inline-flex min-h-[44px] items-center gap-2 px-5 py-2.5 border-[2.5px] border-ink bg-lime text-on-light font-bold rounded-full shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 active:scale-[0.98] transition-all"
                 >
@@ -164,10 +169,11 @@ export default function MyResumesPage() {
                   {t("dashboard.create-new")}
                 </button>
               </MagneticButton>
+              </div>
             </section>
 
             {/* Toolbar: search + filter + sort */}
-            <section className="mb-6 flex items-center justify-between flex-wrap gap-2">
+            <section data-tour="resumes-filter" className="mb-6 flex items-center justify-between flex-wrap gap-2">
               <div className="flex items-center gap-2">
                 <div className="relative">
                   <span className="material-symbols-outlined text-sm text-outline absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none select-none">search</span>
@@ -232,29 +238,17 @@ export default function MyResumesPage() {
                 ))}
               </div>
             ) : cvList.length === 0 ? (
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.1 }}
-                className="bg-paper rounded-[14px] p-12 border-2 border-dashed border-ink/25 text-center shadow-hard-sm"
-              >
-                <div className="w-16 h-16 rounded-[14px] border-2 border-ink bg-lime flex items-center justify-center mx-auto mb-4">
-                  <span className="material-symbols-outlined text-ink text-3xl select-none">description</span>
-                </div>
-                <h3 className="font-display text-ink mb-2">{t("dashboard.no-cv-title")}</h3>
-                <p className="text-body-md text-ink-soft mb-6">{t("dashboard.no-cv-desc")}</p>
-                <MagneticButton>
-                  <button
-                    onClick={() => setShowTemplatePicker(true)}
-                    className="inline-flex min-h-[44px] items-center gap-2 px-6 py-3 border-[2.5px] border-ink bg-lime text-on-light font-bold rounded-full shadow-[0_3px_0_rgb(var(--c-ink))] hover:-translate-y-0.5 transition-all"
-                  >
-                    <span className="material-symbols-outlined text-lg select-none">add</span>
-                    {t("dashboard.first-cv")}
-                  </button>
-                </MagneticButton>
-              </motion.div>
+              <div data-tour="resumes-list">
+                <GuidedEmptyState
+                  icon="description"
+                  title={t("guide.empty.resumes.title")}
+                  desc={t("guide.empty.resumes.desc")}
+                  action={{ label: t("guide.empty.resumes.cta"), onClick: () => setShowTemplatePicker(true) }}
+                  secondary={{ label: t("guide.empty.resumes.alt"), href: "/checker" }}
+                />
+              </div>
             ) : (
-              <div className="space-y-3">
+              <div data-tour="resumes-list" className="space-y-3">
                 {filteredCvList.map((cv) => (
                   <div
                     key={cv.id}
