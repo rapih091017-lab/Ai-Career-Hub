@@ -10,6 +10,8 @@ import { AnimatedButton } from "@/components/ui/AnimatedButton";
 import { useBookmarks } from "@/hooks/useBookmarks";
 import { PositionModal } from "@/components/interview/PositionModal";
 import { useTranslation } from "@/lib/i18n";
+import { FeatureGuide } from "@/components/guide/FeatureGuide";
+import { HowToUse } from "@/components/guide/HowToUse";
 import {
   getInterviewPositions,
   getInterviewCategories,
@@ -52,6 +54,9 @@ export default function InterviewPage() {
 
         <main className="flex-1 pt-24 pb-20 px-margin-mobile md:px-gutter">
           <div className="max-w-[1000px] mx-auto">
+            <div className="mb-2 flex justify-end">
+              <FeatureGuide id="interview" />
+            </div>
             {/* ── Hero ── */}
             <section className="mb-10 text-center">
               <div className="inline-flex min-h-[44px] items-center gap-2 px-3 py-1.5 rounded-full border border-ink/25 bg-lime/25 text-ink text-xs font-bold mb-4">
@@ -68,6 +73,7 @@ export default function InterviewPage() {
               </p>
 
               {/* Practice Mode CTA */}
+              <span data-tour="iv-practice" className="inline-block">
               <AnimatedButton
                 onClick={() => router.push("/interview/practice")}
                 variant="emerald"
@@ -82,9 +88,10 @@ export default function InterviewPage() {
               >
                 {lang === "en" ? "Practice Mode · Timer & Random Questions" : "Mode Latihan · Timer & Pertanyaan Acak"}
               </AnimatedButton>
+              </span>
 
               {/* Search */}
-              <div className="relative max-w-[420px] mx-auto">
+              <div data-tour="iv-search" className="relative max-w-[420px] mx-auto">
                 <span className="material-symbols-outlined text-outline absolute left-3.5 top-1/2 -translate-y-1/2 text-lg pointer-events-none">
                   search
                 </span>
@@ -177,7 +184,10 @@ export default function InterviewPage() {
               </div>
             </section>
 
+            <HowToUse id="interview" className="mb-8" />
+
             {/* ── Position Grid ── */}
+            <div data-tour="iv-positions">
             {positions.length === 0 ? (
               <div className="bg-paper rounded-[14px] p-12 border-2 border-dashed border-ink/30 text-center shadow-hard-sm">
                 <div className="w-14 h-14 rounded-[14px] border-2 border-ink bg-lime flex items-center justify-center mx-auto mb-4">
@@ -257,6 +267,7 @@ export default function InterviewPage() {
                 })}
               </div>
             )}
+            </div>
 
             {/* ── Bottom info ── */}
             <section className="mt-10 bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/50 shadow-hard-sm">

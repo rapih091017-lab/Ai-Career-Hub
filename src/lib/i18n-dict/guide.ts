@@ -156,7 +156,7 @@ export const GUIDE_DICT: Record<string, { id: string; en: string }> = {
   "guide.f.interview.s1": { id: "Cari posisi yang mirip dengan lowonganmu.", en: "Find a role close to your job posting." },
   "guide.f.interview.s2": { id: "Baca pertanyaan dan tips menjawabnya.", en: "Read the questions and their answering tips." },
   "guide.f.interview.s3": { id: "Tulis jawabanmu dan minta penilaian STAR.", en: "Write your answer and ask for a STAR review." },
-  "guide.f.interview.free": { id: "Daftar pertanyaan gratis. Penilaian jawaban dengan AI perlu masuk akun.", en: "The question list is free. AI answer reviews need you to sign in." },
+  "guide.f.interview.free": { id: "Gratis, perlu akun. Termasuk penilaian jawaban STAR dengan AI.", en: "Free, needs an account. Includes AI reviews of your STAR answers." },
   "guide.f.interview.q": { id: "Apakah pertanyaannya pasti keluar di interview?", en: "Will these questions come up in my interview?" },
   "guide.f.interview.a": { id: "Tidak ada jaminan. Ini pertanyaan umum untuk latihan menyusun jawaban.", en: "There is no guarantee. These are common questions for practicing your answers." },
   "guide.tour.interview.1.title": { id: "Cari posisi", en: "Find a role" },
