@@ -84,6 +84,19 @@ export function FeatureTour({ open, onClose, steps: STEPS = CV_TOUR_STEPS, stora
     };
   }, [open]);
 
+  // Elemen yang disorot di luar layar (umum di HP): gulir ke tengah dulu, lalu ukur.
+  useEffect(() => {
+    if (!open) return;
+    const el = visibleAnchor(STEPS[index].anchors);
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    // Atas elemen ditaruh di bawah navbar, di separuh atas layar agar tidak tertutup dialog.
+    if (r.top < 64 || r.top > window.innerHeight * 0.45) {
+      const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+      window.scrollBy?.({ top: r.top - 96, behavior: reduce ? "auto" : "smooth" });
+    }
+  }, [open, index, STEPS]);
+
   const measure = useCallback(() => {
     setWide(window.matchMedia?.("(min-width: 1024px)").matches ?? true);
     const el = visibleAnchor(STEPS[index].anchors);

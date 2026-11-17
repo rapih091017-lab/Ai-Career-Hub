@@ -176,7 +176,7 @@ export default function HeroOrbit() {
 
             <p className="mt-2 text-[13px] leading-relaxed text-on-dark/70">
               {t("guide.landing.new")}{" "}
-              <Link href="/panduan" className="inline-flex min-h-11 items-center font-bold text-on-dark underline decoration-lime decoration-2 underline-offset-4 hover:text-lime sm:min-h-0">
+              <Link href="/panduan" className="-my-3 inline-block py-3 font-bold text-on-dark underline decoration-lime decoration-2 underline-offset-4 hover:text-lime">
                 {t("guide.landing.link")}
               </Link>
             </p>
