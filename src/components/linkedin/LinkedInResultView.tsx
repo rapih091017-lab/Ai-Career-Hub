@@ -6,6 +6,7 @@ import { useTranslation } from "@/lib/i18n";
 import { useDoneState } from "@/lib/useDoneState";
 import { SectionNav, scrollToSection, type SectionNavItem } from "@/components/ui/SectionNav";
 import type { LinkedInResult, LinkedInSectionKey, LinkedInSectionScore } from "@/lib/linkedin-optimizer/result";
+import Link from "next/link";
 import { RewriteCard } from "./RewriteCard";
 import { ScoreBreakdown } from "./ScoreBreakdown";
 
@@ -218,6 +219,18 @@ export function LinkedInResultView({
             done={doneProp("skills")}
           />
         </div>
+      </section>
+
+      {/* Langkah berikutnya: hasil tidak berhenti di layar ini. */}
+      <section data-next-steps className="rounded-[14px] border-2 border-ink bg-lime/25 p-5">
+        <h2 className="font-display text-lg font-bold text-ink">{t("guide.next.title")}</h2>
+        <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm leading-relaxed text-ink">
+          <li>{t("guide.next.linkedin-1")}</li>
+          <li>{t("guide.next.linkedin-2")}</li>
+        </ol>
+        <Link href="/checker" className="mt-3 inline-flex min-h-11 items-center rounded-full border-[2.5px] border-ink bg-lime px-5 text-sm font-bold text-on-light shadow-[0_3px_0_rgb(var(--c-ink))]">
+          {t("guide.next.linkedin-cta")}
+        </Link>
       </section>
     </div>
     </SectionNav>

@@ -9,6 +9,8 @@ import { useTranslation } from "@/lib/i18n";
 import { extractPdfTextClient } from "@/lib/pdf-extract-client";
 import { anonIdHeaders } from "@/lib/anon-id";
 import { StepNumber } from "@/components/checker/InputSteps";
+import { FeatureGuide } from "@/components/guide/FeatureGuide";
+import { HowToUse } from "@/components/guide/HowToUse";
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
 
@@ -150,20 +152,26 @@ export default function LinkedInOptimizerPage() {
       <SiteHeader variant="pill" />
 
       <main className="mx-auto w-full max-w-[760px] flex-1 px-5 pb-20 pt-24 md:px-6 md:pt-28">
-        <p className="kicker">{t("lo.kicker")}</p>
-        <h1 className="max-w-[22ch] font-display text-headline-lg font-bold text-ink">
-          {t("lo.title")}
-        </h1>
-        <p className="mt-3 max-w-[58ch] text-[15px] leading-relaxed text-ink-soft">
-          {t("lo.subtitle")}
-        </p>
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="kicker">{t("lo.kicker")}</p>
+            <h1 className="max-w-[22ch] font-display text-headline-lg font-bold text-ink">
+              {t("lo.title")}
+            </h1>
+            <p className="mt-3 max-w-[58ch] text-[15px] leading-relaxed text-ink-soft">
+              {t("lo.subtitle")}
+            </p>
+          </div>
+          <FeatureGuide id="linkedin" />
+        </div>
+        <HowToUse id="linkedin" className="mt-6" />
 
         <form
           onSubmit={handleSubmit}
           className="mt-8 space-y-6 rounded-[20px] border-[2.5px] border-ink bg-paper p-5 shadow-hard md:p-7"
         >
           {/* Arah branding */}
-          <div>
+          <div data-tour="lo-direction">
             <label htmlFor="lo-branding" className="flex items-center gap-2 text-sm font-extrabold text-ink">
               <StepNumber n={1} />
               {t("lo.form.branding-label")}
@@ -182,7 +190,7 @@ export default function LinkedInOptimizerPage() {
           </div>
 
           {/* Resume: tab Unggah PDF | Tempel teks */}
-          <fieldset className="min-w-0">
+          <fieldset data-tour="lo-resume" className="min-w-0">
             <legend className="flex items-center gap-2 text-sm font-extrabold text-ink">
               <StepNumber n={2} />
               {t("lo.form.resume-step")}
@@ -297,6 +305,7 @@ export default function LinkedInOptimizerPage() {
           <div className="flex flex-wrap items-center gap-3">
             <button
               type="submit"
+              data-tour="lo-submit"
               disabled={busy}
               className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border-[2.5px] border-on-light bg-lime px-6 text-sm font-extrabold text-on-light shadow-[0_3px_0_rgb(var(--c-print))] transition-transform active:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
             >
