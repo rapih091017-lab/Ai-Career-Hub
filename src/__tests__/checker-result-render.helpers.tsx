@@ -37,6 +37,10 @@ export function mockFetch() {
 /** Menjalankan alur unggah DOCX → analisis sampai layar hasil /checker tampil. */
 export async function renderFreshResults(Page: () => ReactNode) {
   mockFetch();
+  // Animasi masuk donat dijalankan lewat requestAnimationFrame; tanpa stub,
+  // snapshot bergantung pada apakah frame sempat berjalan sebelum diambil.
+  vi.stubGlobal("requestAnimationFrame", () => 0);
+  vi.stubGlobal("cancelAnimationFrame", () => {});
   const view = render(
     <Providers>
       <Page />
