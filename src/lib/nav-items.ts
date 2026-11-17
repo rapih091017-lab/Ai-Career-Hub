@@ -110,7 +110,16 @@ export const NAV_GROUPS: NavGroup[] = [
       { labelKey: "nav.item.career-hub", label: "Career Hub", href: "/career-hub", icon: "menu_book", activePrefixes: ["/career-hub/"] },
       { labelKey: "nav.item.contoh-cv", label: "Contoh CV", href: "/contoh-cv", icon: "description", activePrefixes: ["/contoh-cv/", "/cv-examples"] },
       { labelKey: "nav.item.sinonim", label: "Sinonim Kata", href: "/sinonim", icon: "swap_horiz" },
-      { labelKey: "nav.item.faq", label: "FAQ", href: "/faq", icon: "help" },
+    ],
+  },
+  {
+    labelKey: "guide.nav.group",
+    label: "Bantuan",
+    icon: "help",
+    items: [
+      { labelKey: "guide.nav.label", label: "Panduan", href: "/panduan", icon: "menu_book" },
+      { labelKey: "nav.item.faq", label: "FAQ", href: "/faq", icon: "quiz" },
+      { labelKey: "guide.nav.contact", label: "Kontak", href: "/contact", icon: "mail" },
     ],
   },
 ];

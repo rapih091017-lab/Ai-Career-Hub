@@ -110,6 +110,7 @@ export default function AppFooter({ variant = "simple", bordered = false }: AppF
             <div>
               <h4 className="font-mono text-[11px] font-bold uppercase tracking-[0.06em] text-mint mb-5">{t("footer.bantuan")}</h4>
               <ul className="space-y-3">
+                <li><Link className="text-on-dark hover:text-lime transition-colors" href="/panduan">{t("guide.nav.label")}</Link></li>
                 <li><Link className="text-on-dark hover:text-lime transition-colors" href="/faq">{t("footer.faq")}</Link></li>
                 <li><Link className="text-on-dark hover:text-lime transition-colors" href="/contact">{t("footer.pusat-bantuan")}</Link></li>
                 <li><Link className="text-on-dark hover:text-lime transition-colors" href="/privacy">{t("footer.privasi")}</Link></li>
@@ -147,6 +148,7 @@ export default function AppFooter({ variant = "simple", bordered = false }: AppF
     >
       <div className="text-green-deep font-bold font-display text-lg">AI Career Hub</div>
       <div className="flex flex-wrap justify-center gap-6 text-on-surface-variant">
+        <Link className="hover:text-green-deep transition-colors" href="/panduan">{t("guide.nav.label")}</Link>
         <Link className="hover:text-green-deep transition-colors" href="/about">{t("footer.tentang-simple")}</Link>
         <Link className="hover:text-green-deep transition-colors" href="/privacy">{t("footer.privasi-simple")}</Link>
         <Link className="hover:text-green-deep transition-colors" href="/terms">{t("footer.syarat-simple")}</Link>

@@ -9,7 +9,6 @@ export const GUIDE_DICT: Record<string, { id: string; en: string }> = {
   "guide.howto.hide": { id: "Sembunyikan cara pakai", en: "Hide how to use" },
   "guide.howto.terms": { id: "Istilah:", en: "Terms:" },
   "guide.term.aria": { id: "Arti istilah {term}", en: "Meaning of {term}" },
-  "guide.empty.what": { id: "Apa ini?", en: "What is this?" },
 
   /* Halaman /panduan */
   "guide.page.kicker": { id: "Pusat panduan", en: "Help center" },
@@ -35,7 +34,6 @@ export const GUIDE_DICT: Record<string, { id: string; en: string }> = {
   "guide.page.meta-desc": { id: "Cara memakai Cek CV, builder CV, surat lamaran, portofolio, LinkedIn optimizer, latihan interview, dan tracker lamaran.", en: "How to use the CV checker, CV builder, cover letters, portfolio, LinkedIn optimizer, interview practice, and the application tracker." },
   "guide.nav.label": { id: "Panduan", en: "Guide" },
   "guide.nav.group": { id: "Bantuan", en: "Help" },
-  "guide.nav.faq": { id: "FAQ", en: "FAQ" },
   "guide.nav.contact": { id: "Kontak", en: "Contact" },
 
   /* Landing */

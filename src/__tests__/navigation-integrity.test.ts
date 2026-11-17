@@ -97,6 +97,7 @@ describe("isi navigasi", () => {
       "/contoh-cv",
       "/sinonim",
       "/faq",
+      "/panduan",
       "/checkout",
       "/settings/billing",
       "/settings/payment-history",

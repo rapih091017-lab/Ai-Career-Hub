@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { LanguageProvider } from "@/lib/i18n";
@@ -8,6 +8,10 @@ import { FeatureGuide } from "@/components/guide/FeatureGuide";
 import { HowToUse } from "@/components/guide/HowToUse";
 import { Term } from "@/components/guide/Term";
 import { GuidedEmptyState } from "@/components/guide/GuidedEmptyState";
+import GuideCenter from "@/components/guide/GuideCenter";
+
+const push = vi.fn();
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
 
 // Huruf/kata khas Indonesia yang tidak boleh muncul di mode en.
 const INDONESIAN = /\b(yang|dan|untuk|dengan|belum|lewati|berikutnya|selesai|kamu|panduan|cara pakai|istilah|lowongan)\b/i;
@@ -130,5 +134,26 @@ describe("GuidedEmptyState", () => {
     expect(clicked).toBe(1);
     expect(screen.getByRole("link", { name: "Lain" })).toHaveAttribute("href", "/checker");
     expect(screen.getByText("Penjelasan")).toBeInTheDocument();
+  });
+});
+
+describe("/panduan", () => {
+  it("render bahasa Indonesia: semua fitur, tombol buka & tur", () => {
+    wrap("id", <GuideCenter />);
+    expect(screen.getByRole("heading", { level: 1, name: "Panduan memakai AI Career Hub" })).toBeInTheDocument();
+    for (const f of GUIDE_FEATURES) expect(document.getElementById(f.id)).not.toBeNull();
+    expect(screen.getAllByRole("link", { name: "Buka fitur" })).toHaveLength(GUIDE_FEATURES.length);
+    localStorage.setItem(tourKeyFor("tracker"), "1");
+    const card = document.getElementById("tracker")!;
+    fireEvent.click(card.querySelector("button:last-of-type") as HTMLElement);
+    expect(localStorage.getItem(tourKeyFor("tracker"))).toBeNull();
+    expect(push).toHaveBeenCalledWith("/tracker");
+  });
+
+  it("render bahasa Inggris tanpa teks Indonesia", () => {
+    const { container } = wrap("en", <GuideCenter />);
+    expect(screen.getByRole("heading", { level: 1, name: "How to use AI Career Hub" })).toBeInTheDocument();
+    // Nama fitur & merek (mis. "Career Hub") boleh; kalimat Indonesia tidak.
+    expect(container.textContent).not.toMatch(INDONESIAN);
   });
 });
