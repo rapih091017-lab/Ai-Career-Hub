@@ -114,7 +114,7 @@ export default function SiteHeader({ variant = "bar" }: Props) {
             </span>
           </Link>
 
-          <nav aria-label={t("nav.menu-label")} className="hidden lg:flex items-center gap-1">
+          <nav aria-label={t("nav.menu-label")} className="hidden xl:flex items-center gap-1">
             {NAV_GROUPS.map((group) => (
               <NavGroupMenu key={group.labelKey} group={group} isLoggedIn={isLoggedIn} variant="desktop" />
             ))}
@@ -122,15 +122,18 @@ export default function SiteHeader({ variant = "bar" }: Props) {
               <Link
                 key={item.href}
                 href={item.href}
-                className="hidden whitespace-nowrap rounded-lg px-3 py-2 font-label-bold text-on-surface-variant underline decoration-transparent xl:inline decoration-[3px] underline-offset-[5px] transition-colors hover:text-green-deep hover:decoration-lime"
+                className="whitespace-nowrap rounded-lg px-3 py-2 font-label-bold text-on-surface-variant underline decoration-transparent xl:inline decoration-[3px] underline-offset-[5px] transition-colors hover:text-green-deep hover:decoration-lime"
               >
                 {t(item.labelKey, item.label)}
               </Link>
             ))}
           </nav>
 
-          <div className="flex items-center gap-3">
-            <SkyToggle />
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Di HP sakelar tema pindah ke menu agar CTA tetap muat di header. */}
+            <span className="hidden sm:inline-flex">
+              <SkyToggle />
+            </span>
             <button
               onClick={toggleLang}
               title={t("header.lang-toggle")}
@@ -227,7 +230,7 @@ export default function SiteHeader({ variant = "bar" }: Props) {
             ) : (
               <Link
                 href="/#pricing"
-                className="hidden items-center whitespace-nowrap rounded-full border-2 border-brand-dark bg-brand-dark px-4 py-2 font-label-bold text-on-dark transition-colors hover:bg-brand-green active:scale-95 dark:border-lime/60 dark:bg-lime/15 dark:text-lime dark:hover:bg-lime/25 sm:inline-flex lg:hidden xl:inline-flex"
+                className="inline-flex items-center whitespace-nowrap rounded-full border-2 border-brand-dark bg-brand-dark px-4 py-2 font-label-bold max-sm:px-3 max-sm:text-[13px] text-on-dark transition-colors hover:bg-brand-green active:scale-95 dark:border-lime/60 dark:bg-lime/15 dark:text-lime dark:hover:bg-lime/25"
               >
                 {t("nav.try-free")}
               </Link>
@@ -237,7 +240,7 @@ export default function SiteHeader({ variant = "bar" }: Props) {
               onClick={() => setMobileOpen((v) => !v)}
               aria-expanded={mobileOpen}
               aria-label={t("nav.menu-label")}
-              className="text-on-surface-variant transition-colors hover:text-primary lg:hidden"
+              className="text-on-surface-variant transition-colors hover:text-primary xl:hidden"
             >
               <span className="material-symbols-outlined" aria-hidden="true">
                 {mobileOpen ? "close" : "menu"}
@@ -253,12 +256,15 @@ export default function SiteHeader({ variant = "bar" }: Props) {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.2, ease: "easeInOut" }}
-              className="overflow-hidden border-t border-hairline bg-paper lg:hidden"
+              className="overflow-hidden border-t border-hairline bg-paper xl:hidden"
             >
               <div className="max-h-[70vh] space-y-1 overflow-y-auto px-margin-mobile py-3">
                 {NAV_GROUPS.map((group) => (
                   <NavGroupMenu key={group.labelKey} group={group} isLoggedIn={isLoggedIn} variant="mobile" />
                 ))}
+                <div className="px-3 pt-2 sm:hidden">
+                  <SkyToggle />
+                </div>
                 <div className="space-y-1 pt-2">
                   {LANDING_LINKS.map((item) => (
                     <Link
