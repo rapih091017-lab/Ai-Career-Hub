@@ -122,7 +122,7 @@ export default function SiteHeader({ variant = "bar" }: Props) {
               <Link
                 key={item.href}
                 href={item.href}
-                className="rounded-lg px-3 py-2 font-label-bold text-on-surface-variant underline decoration-transparent decoration-[3px] underline-offset-[5px] transition-colors hover:text-green-deep hover:decoration-lime"
+                className="hidden whitespace-nowrap rounded-lg px-3 py-2 font-label-bold text-on-surface-variant underline decoration-transparent xl:inline decoration-[3px] underline-offset-[5px] transition-colors hover:text-green-deep hover:decoration-lime"
               >
                 {t(item.labelKey, item.label)}
               </Link>
@@ -227,7 +227,7 @@ export default function SiteHeader({ variant = "bar" }: Props) {
             ) : (
               <Link
                 href="/#pricing"
-                className="hidden items-center rounded-full border-2 border-brand-dark bg-brand-dark px-4 py-2 font-label-bold text-on-dark transition-colors hover:bg-brand-green active:scale-95 dark:border-lime/60 dark:bg-lime/15 dark:text-lime dark:hover:bg-lime/25 sm:inline-flex"
+                className="hidden items-center whitespace-nowrap rounded-full border-2 border-brand-dark bg-brand-dark px-4 py-2 font-label-bold text-on-dark transition-colors hover:bg-brand-green active:scale-95 dark:border-lime/60 dark:bg-lime/15 dark:text-lime dark:hover:bg-lime/25 sm:inline-flex lg:hidden xl:inline-flex"
               >
                 {t("nav.try-free")}
               </Link>
